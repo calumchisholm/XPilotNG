@@ -285,13 +285,13 @@ bool Option_add_desc(option_desc *desc)
     hash_node	*node1, *node2;
 
     if (!val) {
-	return FALSE;
+	return false;
     }
 
     node1 = Option_allocate_node(desc->name, val);
     if (!node1) {
 	Option_free_value(val);
-	return FALSE;
+	return false;
     }
 
     node2 = NULL;
@@ -299,7 +299,7 @@ bool Option_add_desc(option_desc *desc)
 	node2 = Option_allocate_node(desc->commandLineOption, val);
 	if (!node2) {
 	    Option_free_node(node1);
-	    return FALSE;
+	    return false;
 	}
     }
 
@@ -308,7 +308,7 @@ bool Option_add_desc(option_desc *desc)
 	Option_add_node(node2);
     }
 
-    return TRUE;
+    return true;
 }
 
 
@@ -341,11 +341,11 @@ static void Option_change_node(
 	int		override,
 	optOrigin	opt_origin)
 {
-    bool	set_ok = FALSE;
+    bool	set_ok = false;
 
     if (node->value == NULL) {
 	/* permit if option has no default value. */
-	set_ok = TRUE;
+	set_ok = true;
     }
     else {
 
@@ -362,7 +362,7 @@ static void Option_change_node(
 	switch (opt_origin) {
 	    case OPT_COMMAND:
 		/* command line always overrides */
-		set_ok = TRUE;
+		set_ok = true;
 		break;
 
 	    case OPT_DEFAULTS:
@@ -374,14 +374,14 @@ static void Option_change_node(
 		    case OPT_DEFAULTS:
 			/* can't change if previous value has override. */
 			if (!node->value->override) {
-			    set_ok = TRUE;
+			    set_ok = true;
 			}
 			break;
 
 		    case OPT_MAP:
 			/* defaults file override wins over map. */
 			if (override) {
-			    set_ok = TRUE;
+			    set_ok = true;
 			}
 			break;
 
@@ -390,7 +390,7 @@ static void Option_change_node(
 			break;
 
 		    case OPT_INIT:
-			set_ok = TRUE;
+			set_ok = true;
 			break;
 
 		    default:
@@ -407,14 +407,14 @@ static void Option_change_node(
 		    case OPT_DEFAULTS:
 			/* can't change if defaults value has override. */
 			if (!node->value->override) {
-			    set_ok = TRUE;
+			    set_ok = true;
 			}
 			break;
 
 		    case OPT_MAP:
 			/* can't change if previous value has override. */
 			if (!node->value->override) {
-			    set_ok = TRUE;
+			    set_ok = true;
 			}
 			break;
 
@@ -423,7 +423,7 @@ static void Option_change_node(
 			break;
 
 		    case OPT_INIT:
-			set_ok = TRUE;
+			set_ok = true;
 			break;
 
 		    default:
@@ -439,23 +439,23 @@ static void Option_change_node(
 
 		    case OPT_DEFAULTS:
 			/* password file always wins over defaults. */
-			set_ok = TRUE;
+			set_ok = true;
 			break;
 
 		    case OPT_MAP:
 			/* password file always wins over map. */
-			set_ok = TRUE;
+			set_ok = true;
 			break;
 
 		    case OPT_PASSWORD:
 			/* can't change if previous value has override. */
 			if (!node->value->override) {
-			    set_ok = TRUE;
+			    set_ok = true;
 			}
 			break;
 
 		    case OPT_INIT:
-			set_ok = TRUE;
+			set_ok = true;
 			break;
 
 		    default:
@@ -468,7 +468,7 @@ static void Option_change_node(
 	}
     }
 
-    if (set_ok == TRUE) {
+    if (set_ok == true) {
 	if (node->value == NULL) {
 	    node->value = Option_allocate_value(value, NULL, opt_origin);
 	    if (node->value == NULL) {
@@ -651,9 +651,9 @@ bool Convert_string_to_int(const char *value_str, int *int_ptr)
 
     /* if at least one digit was found we're satisfied. */
     if (end_ptr > value_str) {
-	result = TRUE;
+	result = true;
     } else {
-	result = FALSE;
+	result = false;
     }
 
     return result;
@@ -673,9 +673,9 @@ bool Convert_string_to_float(const char *value_str, DFLOAT *float_ptr)
 
     /* if at least one digit was found we're satisfied. */
     if (end_ptr > value_str) {
-	result = TRUE;
+	result = true;
     } else {
-	result = FALSE;
+	result = false;
     }
 
     return result;
@@ -689,17 +689,17 @@ bool Convert_string_to_bool(const char *value_str, bool *bool_ptr)
     if (!strcasecmp(value_str, "yes")
 	|| !strcasecmp(value_str, "on")
 	|| !strcasecmp(value_str, "true")) {
-	*bool_ptr = TRUE;
-	result = TRUE;
+	*bool_ptr = true;
+	result = true;
     }
     else if (!strcasecmp(value_str, "no")
 	     || !strcasecmp(value_str, "off")
 	     || !strcasecmp(value_str, "false")) {
-	*bool_ptr = FALSE;
-	result = TRUE;
+	*bool_ptr = false;
+	result = true;
     }
     else {
-	result = FALSE;
+	result = false;
     }
 
     return result;
@@ -811,7 +811,7 @@ static void Option_parse_node(hash_node *np)
 	{
 	    int		*ptr = (int *)desc->variable;
 
-	    if (Convert_string_to_int(value, ptr) != TRUE) {
+	    if (Convert_string_to_int(value, ptr) != true) {
 		warn("%s value '%s' not an integral number.",
 			np->name, value);
 		Convert_string_to_int(desc->defaultValue, ptr);
@@ -823,7 +823,7 @@ static void Option_parse_node(hash_node *np)
 	{
 	    DFLOAT	*ptr = (DFLOAT *)desc->variable;
 
-	    if (Convert_string_to_float(value, ptr) != TRUE) {
+	    if (Convert_string_to_float(value, ptr) != true) {
 		warn("%s value '%s' not a number.",
 			np->name, value);
 		Convert_string_to_float(desc->defaultValue, ptr);
@@ -835,7 +835,7 @@ static void Option_parse_node(hash_node *np)
 	{
 	    bool	*ptr = (bool *)desc->variable;
 
-	    if (Convert_string_to_bool(value, ptr) != TRUE) {
+	    if (Convert_string_to_bool(value, ptr) != true) {
 		warn("%s value '%s' not a boolean.",
 			np->name, value);
 		Convert_string_to_bool(desc->defaultValue, ptr);
@@ -854,8 +854,8 @@ static void Option_parse_node(hash_node *np)
 		      desc->name, value);
 		break;
 	    }
-	    if (Convert_string_to_int(value, &(ptr->x)) != TRUE ||
-		Convert_string_to_int(s + 1, &(ptr->y)) != TRUE) {
+	    if (Convert_string_to_int(value, &(ptr->x)) != true ||
+		Convert_string_to_int(s + 1, &(ptr->y)) != true) {
 		warn("%s value '%s' not a valid position.",
 			np->name, value);
 		value = desc->defaultValue;
@@ -879,7 +879,7 @@ static void Option_parse_node(hash_node *np)
 	    int		*ptr = (int *)desc->variable;
 	    DFLOAT	seconds;
 
-	    if (Convert_string_to_float(value, &seconds) != TRUE) {
+	    if (Convert_string_to_float(value, &seconds) != true) {
 		warn("%s value '%s' not a number.",
 			np->name, value);
 		Convert_string_to_float(desc->defaultValue, &seconds);
@@ -893,7 +893,7 @@ static void Option_parse_node(hash_node *np)
 	    DFLOAT	*ptr = (DFLOAT *)desc->variable;
 	    DFLOAT	seconds;
 
-	    if (Convert_string_to_float(value, &seconds) != TRUE) {
+	    if (Convert_string_to_float(value, &seconds) != true) {
 		warn("%s value '%s' not a number.",
 			np->name, value);
 		Convert_string_to_float(desc->defaultValue, &seconds);
@@ -953,7 +953,7 @@ static void Options_parse_FPS(void)
     if (fpsstr != NULL) {
 	int		frames;
 
-	if (Convert_string_to_int(fpsstr, &frames) != TRUE) {
+	if (Convert_string_to_int(fpsstr, &frames) != true) {
 	    warn("Invalid framesPerSecond specification '%s' in %s.",
 		fpsstr, Origin_name(value_origin));
 	}

@@ -147,7 +147,7 @@ int main(int argc, char **argv)
     /*seedMT((unsigned)time((time_t *)0) * Get_process_id());*/
     /* Removed seeding random number generator because of server recordings. */
 
-    if (Parser(argc, argv) == FALSE) {
+    if (Parser(argc, argv) == false) {
 	exit(1);
     }
 
@@ -206,7 +206,7 @@ int main(int argc, char **argv)
     Log_game("START");
 
     if (!Contact_init())
-		return(FALSE);
+		return(false);
 
     Meta_init();
 
@@ -402,7 +402,7 @@ int End_game(void)
 #ifndef _WINDOWS
     exit (0);
 #endif
-    return(FALSE); /* return FALSE so windows bubbles out of the main loop */
+    return(false); /* return false so windows bubbles out of the main loop */
 }
 
 /*

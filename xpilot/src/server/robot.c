@@ -1037,8 +1037,8 @@ static void Robot_play(int ind)
 
 /*
  * Check if robot is still considered good enough to continue playing.
- * Return FALSE if robot continues playing,
- * return TRUE if robot leaves the game.
+ * Return false if robot continues playing,
+ * return true if robot leaves the game.
  */
 static int Robot_check_leave(int ind)
 {
@@ -1062,11 +1062,11 @@ static int Robot_check_leave(int ind)
 	    Robot_talks(ROBOT_TALK_LEAVE, pl->name, "");
 	    Set_message(msg);
 	    Robot_delete(ind, false);
-	    return TRUE;
+	    return true;
 	}
     }
 
-    return FALSE;
+    return false;
 }
 
 

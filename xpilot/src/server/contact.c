@@ -128,7 +128,7 @@ int Contact_init(void)
    }
 
     install_input(Contact, contactSocket.fd, (void *) &contactSocket);
-    return(TRUE);
+    return(true);
 }
 
 /*

@@ -1076,7 +1076,7 @@ void Xpmap_blocks_to_polygons(void)
     Xpmap_walls_to_polygons();
 
     if (polygonMode)
-	is_polygon_map = TRUE;
+	is_polygon_map = true;
 
     for (i = 0; i < World.NumTreasures; i++)
 	Xpmap_treasure_to_polygon(i);

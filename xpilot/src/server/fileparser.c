@@ -363,11 +363,11 @@ static bool parseOpenFile(FILE *ifile, optOrigin opt_origin)
 
     fd = fileno(ifile);
 
-    is_polygon_map = FALSE; /* In case first map fails and this is another */
+    is_polygon_map = false; /* In case first map fails and this is another */
 
     /* kps - first try the new map format */
     if (isXp2MapFile(fd)) {
-	is_polygon_map = TRUE;
+	is_polygon_map = true;
 	return parseXp2MapFile(fd, opt_origin);
     }
 

@@ -71,7 +71,7 @@ int max_asteroidconcs = 0, max_bases = 0, max_cannons = 0, max_checks = 0,
  * Globals.
  */
 World_map World;
-bool is_polygon_map = FALSE;
+bool is_polygon_map = false;
 
 static void Generate_random_map(void);
 
@@ -476,7 +476,7 @@ static bool Grok_map_old(void);
  */
 static bool Grok_map_size(void)
 {
-    bool bad = FALSE;
+    bool bad = false;
 
     if (!is_polygon_map) {
 	mapWidth *= BLOCK_SZ;
@@ -486,26 +486,26 @@ static bool Grok_map_size(void)
     if (mapWidth < BLOCK_SZ) {
 	warn("mapWidth too small, minimum is 1 block (%d pixels).\n",
 	     BLOCK_SZ);
-	bad = TRUE;
+	bad = true;
     }
     if (mapWidth > MAX_MAP_SIZE * BLOCK_SZ) {
 	warn("mapWidth too big, maximum is %d blocks (%d pixels).\n",
 	    MAX_MAP_SIZE, MAX_MAP_SIZE * BLOCK_SZ);
-	bad = TRUE;
+	bad = true;
     }
     if (mapHeight < BLOCK_SZ) {
 	warn("mapHeight too small, minimum is 1 block (%d pixels).\n",
 	     BLOCK_SZ);
-	bad = TRUE;
+	bad = true;
     }
     if (mapHeight > MAX_MAP_SIZE * BLOCK_SZ) {
 	warn("mapWidth too big, maximum is %d blocks (%d pixels).\n",
 	     MAX_MAP_SIZE, MAX_MAP_SIZE * BLOCK_SZ);
-	bad = TRUE;
+	bad = true;
     }
 
     if (bad)
-	return FALSE;
+	return false;
 
     /* pixel sizes */
     World.width = mapWidth;
@@ -525,13 +525,13 @@ static bool Grok_map_size(void)
     World.y = (World.height - 1) / BLOCK_SZ + 1;
     World.diagonal = (int) LENGTH(World.x, World.y);
 
-    return TRUE;
+    return true;
 }
 
 bool Grok_map(void)
 {
     if (!Grok_map_old())
-	return FALSE;
+	return false;
 
     if (maxRobots == -1) {
 	maxRobots = World.NumBases;
@@ -547,7 +547,7 @@ bool Grok_map(void)
 
     if (World.NumBases <= 0) {
 	warn("WARNING: map has no bases!");
-	return FALSE;
+	return false;
     }
 
 #ifndef	SILENT
@@ -556,7 +556,7 @@ bool Grok_map(void)
 	     World.height, BIT(World.rules->mode, TEAM_PLAY) ? "on" : "off");
 #endif
 
-    return TRUE;
+    return true;
 }
 
 bool Grok_map_options(void)
@@ -576,7 +576,7 @@ bool Grok_map_options(void)
 	CLR_BIT(World.rules->mode, TEAM_PLAY);
     }
 
-    return TRUE;
+    return true;
 }
 
 bool Grok_map_new(void)
@@ -584,7 +584,7 @@ bool Grok_map_new(void)
     Reset_map_object_counters();
 
     if (!Grok_map_size())
-	return FALSE;
+	return false;
 
     return Grok_map_options();
 }
@@ -683,7 +683,7 @@ static void Reset_itemid_array(void)
 static bool Grok_map_old(void)
 {
     if (is_polygon_map)
-	return TRUE;
+	return true;
 
     Reset_map_object_counters();
 
@@ -699,7 +699,7 @@ static bool Grok_map_old(void)
 	error("Generating random map");
 	Generate_random_map();
 	if (!mapData) {
-	    return FALSE;
+	    return false;
 	}
     }
 
@@ -728,7 +728,7 @@ static bool Grok_map_old(void)
 
     Xpmap_find_map_object_teams();
 
-    return TRUE;
+    return true;
 }
 
 
@@ -739,7 +739,7 @@ static bool Grok_map_old(void)
 
 static void Generate_random_map(void)
 {
-    edgeWrap = TRUE;
+    edgeWrap = true;
     mapWidth = 150;
     mapHeight = 150;
 

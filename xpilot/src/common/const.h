@@ -184,13 +184,6 @@ extern DFLOAT		tbl_cos[];
 
 #define DEBRIS_TYPES		(8 * 4 * 4)
 
-#ifndef FALSE
-#define FALSE   0
-#endif
-#ifndef TRUE
-#define TRUE    1
-#endif
-
 #ifdef __GNUC__
 #define INLINE	inline
 #else

@@ -105,7 +105,7 @@ static int Picture_find_path(const char *filename, char *path, size_t path_size)
     int			len;
 
     if (!filename || !*filename) {
-	return FALSE;
+	return false;
     }
 
     /*
@@ -114,7 +114,7 @@ static int Picture_find_path(const char *filename, char *path, size_t path_size)
      */
     if (access(filename, 4) == 0) {
 	strlcpy(path, filename, path_size);
-	return TRUE;
+	return true;
     }
 
     /*
@@ -137,14 +137,14 @@ static int Picture_find_path(const char *filename, char *path, size_t path_size)
 		}
 		strlcpy(&path[len], filename, path_size - len);
 		if (access(path, 4) == 0) {
-		    return TRUE;
+		    return true;
 		}
 	    }
 	}
     }
 
     error("Can't find PPM file \"%s\"", filename);
-    return(FALSE);
+    return(false);
 }
 
 /*

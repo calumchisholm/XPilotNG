@@ -50,14 +50,14 @@ int Mapdata_setup (const char *urlstr) {
     URL url;
     char *name, *dir, *ptr;
     char path[1024], buf[1024];
-    int rv = FALSE;
+    int rv = false;
 
     memset(path, 0, sizeof(path));
     memset(buf, 0, sizeof(buf));
 
     if (!Url_parse(urlstr, &url)) {
         error("malformed URL: %s", urlstr);
-        return FALSE;
+        return false;
     }
 	
 	for (name = url.path + strlen(url.path) - 1; name > url.path; name--) {
@@ -134,7 +134,7 @@ int Mapdata_setup (const char *urlstr) {
 
     if (access(path, F_OK) == 0) {
         printf("Required bitmaps have already been downloaded.\n");
-        rv = TRUE;
+        rv = true;
         goto end;
     }
     /* reset path so that it points to the package file name */
@@ -152,7 +152,7 @@ int Mapdata_setup (const char *urlstr) {
         goto end;
     }
 
-    rv = TRUE;
+    rv = true;
 
  end:
     Url_free_parsed(&url);
@@ -276,24 +276,24 @@ static int Mapdata_download (const URL *url, const char *filePath)
 
     if (strncmp("http", url->protocol, 4) != 0) {
         error("unsupported protocol %s", url->protocol);
-        return FALSE;
+        return false;
     }
 
     if ((f = fopen(filePath, "wb")) == NULL) {
         error("failed to open %s", filePath);
-        return FALSE;
+        return false;
     }
 
     if (sock_open_tcp(&s) == SOCK_IS_ERROR) {
 	error("failed to create a socket");
 	fclose(f);
-	return FALSE;
+	return false;
     }
     if (sock_connect(&s, url->host, url->port) == SOCK_IS_ERROR) {
         error("couldn't connect to download address");
 	sock_close(&s);
         fclose(f);
-        return FALSE;
+        return false;
     }
 
     if (url->query) {
@@ -303,7 +303,7 @@ static int Mapdata_download (const URL *url, const char *filePath)
             error("too long URL");
             fclose(f);
             sock_close(&s);
-            return FALSE;
+            return false;
         }
 
     } else {
@@ -314,7 +314,7 @@ static int Mapdata_download (const URL *url, const char *filePath)
             error("too long URL");
             fclose(f);
 	    sock_close(&s);
-            return FALSE;
+            return false;
         }
     }
 
@@ -322,7 +322,7 @@ static int Mapdata_download (const URL *url, const char *filePath)
         error("socket write failed");
         fclose(f);
         sock_close(&s);
-        return FALSE;
+        return false;
     }
 
     header = 1;
@@ -331,12 +331,12 @@ static int Mapdata_download (const URL *url, const char *filePath)
     for(;;) {
         if ((len = sock_read(&s, buf, 1024)) == -1) {
             error("socket read failed");
-            rv = FALSE;
+            rv = false;
             break;
         }
 
         if (len == 0) {
-            rv = TRUE;
+            rv = true;
             break;
         }
 
@@ -363,7 +363,7 @@ static int Mapdata_download (const URL *url, const char *filePath)
         if (!header) {
             if (fwrite(buf, 1, len, f) == -1) {
                 error("file write failed");
-                rv =  FALSE;
+                rv =  false;
                 break;
             }
         }
@@ -388,7 +388,7 @@ static int Url_parse (const char *urlstr, URL *url)
     buf = strdup(urlstr);
     if (buf == NULL) {
         error("no memory for URL");
-        return FALSE;
+        return false;
     }
 
     for (i = 0; i < len; i++) {
@@ -402,7 +402,7 @@ static int Url_parse (const char *urlstr, URL *url)
     beg = i + 3;
     if (beg >= len || buf[i + 1] != '/' || buf[i + 2] != '/') {
         free(buf);
-        return FALSE;
+        return false;
     }
 
     doPort = 0;
@@ -416,7 +416,7 @@ static int Url_parse (const char *urlstr, URL *url)
 
     url->host = buf + beg;
     beg = i + 1;
-    if (beg >= len) return TRUE;
+    if (beg >= len) return true;
 
     if (doPort) {
         for (i = beg; i < len; i++) {
@@ -429,7 +429,7 @@ static int Url_parse (const char *urlstr, URL *url)
         /* error detection should be added */
 
         beg = i + 1;
-        if (beg >= len) return TRUE;
+        if (beg >= len) return true;
     }
 
     /* make space for / in the beginning of path */
@@ -446,10 +446,10 @@ static int Url_parse (const char *urlstr, URL *url)
     url->path = buf + beg - 1;
 
     beg = i + 1;
-    if (beg >= len) return TRUE;
+    if (beg >= len) return true;
 
     url->query = buf + beg;
-    return TRUE;
+    return true;
 }
 
 

@@ -3590,12 +3590,12 @@ static option_desc options[] = {
 };
 
 
-static bool options_inited = FALSE;
+static bool options_inited = false;
 
 
 option_desc* Get_option_descs(int *count_ptr)
 {
-    if (options_inited != TRUE) {
+    if (options_inited != true) {
 	dumpcore("options not initialized");
     }
 
@@ -3640,21 +3640,21 @@ bool Init_options(void)
     int			i;
     int			option_count = NELEM(options);
 
-    if (options_inited != FALSE) {
+    if (options_inited != false) {
 	dumpcore("Can't init options twice.");
     }
 
     Init_default_options();
 
     for (i = 0; i < option_count; i++) {
-	if (Option_add_desc(&options[i]) == FALSE) {
-	    return FALSE;
+	if (Option_add_desc(&options[i]) == false) {
+	    return false;
 	}
     }
 
-    options_inited = TRUE;
+    options_inited = true;
 
-    return TRUE;
+    return true;
 }
 
 
@@ -3663,8 +3663,8 @@ void Free_options(void)
     int			i;
     int			option_count = NELEM(options);
 
-    if (options_inited == TRUE) {
-	options_inited = FALSE;
+    if (options_inited == true) {
+	options_inited = false;
 	for (i = 0; i < option_count; i++) {
 	    if (options[i].type == valString) {
 		char **str_ptr = (char **)options[i].variable;

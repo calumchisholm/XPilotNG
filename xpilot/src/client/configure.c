@@ -1838,8 +1838,8 @@ static void Config_save_bool(FILE *fp, const char *resource, int value)
 
 /*
  * Find a key in keyDefs[].
- * On success set output pointer to index into keyDefs[] and return TRUE.
- * On failure return FALSE.
+ * On success set output pointer to index into keyDefs[] and return true.
+ * On failure return false.
  */
 static int Config_find_key(keys_t key, int start, int end, int *key_index)
 {
@@ -1848,11 +1848,11 @@ static int Config_find_key(keys_t key, int start, int end, int *key_index)
     for (i = start; i < end; i++) {
 	if (keyDefs[i].key == key) {
 	    *key_index = i;
-	    return TRUE;
+	    return true;
 	}
     }
 
-    return FALSE;
+    return false;
 }
 
 static void Config_save_keys(FILE *fp)
@@ -1870,7 +1870,7 @@ static void Config_save_keys(FILE *fp)
 	key = keyDefs[i].key;
 
 	/* try and see if we have already saved this key. */
-	if (Config_find_key(key, 0, i, &j) == TRUE) {
+	if (Config_find_key(key, 0, i, &j) == true) {
 	    /* yes, saved this one before.  skip it now. */
 	    continue;
 	}
@@ -1883,7 +1883,7 @@ static void Config_save_keys(FILE *fp)
 	    strlcpy(buf, str, sizeof(buf));
 	    /* find all other keysyms which map to the same key. */
 	    j = i;
-	    while (Config_find_key(key, j + 1, maxKeyDefs, &j) == TRUE) {
+	    while (Config_find_key(key, j + 1, maxKeyDefs, &j) == true) {
 		ks = keyDefs[j].keysym;
 		if ((str = XKeysymToString(ks)) != NULL) {
 		    strcat(buf, " ");

@@ -338,30 +338,30 @@ static bool Parse_check_info_request(char **argv, int i)
     if (strcmp(arg, "-help") == 0
 	|| strcmp(arg, "-h") == 0) {
 	Parse_help(*argv);
-	return TRUE;
+	return true;
     }
     if (strcmp(arg, "-dump") == 0) {
 	Parser_dump_all(*argv);
-	return TRUE;
+	return true;
     }
     if (strcmp(arg, "-dumpMan") == 0) {
 	Parser_dump_options(*argv);
-	return TRUE;
+	return true;
     }
     if (strcmp(arg, "-dumpWindows") == 0) {
 	Parser_dump_options(*argv);
-	return TRUE;
+	return true;
     }
     if (strcmp(arg, "-dumpFlags") == 0) {
 	Parser_dump_flags(*argv);
-	return TRUE;
+	return true;
     }
     if (strcmp(arg, "-version") == 0 || strcmp(arg, "-v") == 0) {
 	puts(TITLE);
-	return TRUE;
+	return true;
     }
 
-    return FALSE;
+    return false;
 }
 
 
@@ -382,13 +382,13 @@ bool Parser(int argc, char **argv)
     mapWidth = 0;
     mapHeight = 0;
 
-    if (Init_options() == FALSE) {
-	return FALSE;
+    if (Init_options() == false) {
+	return false;
     }
 
     for (i = 1; i < argc; i++) {
-	if (Parse_check_info_request(argv, i) == TRUE) {
-	    return FALSE;
+	if (Parse_check_info_request(argv, i) == true) {
+	    return false;
 	}
 
 	if (argv[i][0] == '-' || argv[i][0] == '+') {
@@ -481,8 +481,8 @@ bool Parser(int argc, char **argv)
      * Construct the World structure from the options.
      */
     status = Grok_map();
-    if (status == FALSE)
-	return FALSE;
+    if (status == false)
+	return false;
 
     if (!is_polygon_map) {
 	xpprintf("Converting blocks to polygons...\n");
@@ -490,7 +490,7 @@ bool Parser(int argc, char **argv)
 	xpprintf("Done creating polygons.\n");
     }
 
-    return TRUE;
+    return true;
 }
 
 
@@ -519,7 +519,7 @@ int Tune_option(char *name, char *val)
 
     switch (opt->type) {
     case valInt:
-	if (Convert_string_to_int(val, &ival) != TRUE) {
+	if (Convert_string_to_int(val, &ival) != true) {
 	    return 0;
 	}
 	*(int *)opt->variable = ival;
@@ -538,21 +538,21 @@ int Tune_option(char *name, char *val)
 	(*opt->tuner)();
 	return 1;
     case valReal:
-	if (Convert_string_to_float(val, &fval) != TRUE) {
+	if (Convert_string_to_float(val, &fval) != true) {
 	    return 0;
 	}
 	*(DFLOAT *)opt->variable = fval;
 	(*opt->tuner)();
 	return 1;
     case valSec:
-	if (Convert_string_to_int(val, &ival) != TRUE) {
+	if (Convert_string_to_int(val, &ival) != true) {
 	    return 0;
 	}
 	*(int *)opt->variable = ival * FPS;
 	(*opt->tuner)();
 	return 1;
     case valPerSec:
-	if (Convert_string_to_float(val, &fval) != TRUE) {
+	if (Convert_string_to_float(val, &fval) != true) {
 	    return 0;
 	}
 	*(DFLOAT *)opt->variable = fval / FPS;

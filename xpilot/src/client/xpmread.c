@@ -619,7 +619,7 @@ int xpm_picture_from_file(xp_picture_t *pic, char *filename)
     char	   *color_name;
 
     memset(&xpm, 0, sizeof(xpm));
-    if (xpm_read_xpm_from_file(filename, &xpm)) return FALSE;
+    if (xpm_read_xpm_from_file(filename, &xpm)) return false;
 
     if (mono) {
         key = XPM_m;
@@ -669,7 +669,7 @@ int xpm_picture_from_file(xp_picture_t *pic, char *filename)
 		colors[i] = 0;
 	    }
 	    else {
-		return FALSE;
+		return false;
 	    }
 	}
 	else {
@@ -702,7 +702,7 @@ int xpm_picture_from_file(xp_picture_t *pic, char *filename)
 	}
     }
 
-    return TRUE;
+    return true;
 }
 
 XImage *xpm_image_from_pixmap(Pixmap pixmap)
