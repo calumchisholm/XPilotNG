@@ -111,7 +111,7 @@ int	spark_size;		/* size of debris and spark */
 int	shot_size;		/* size of shot */
 int	teamshot_size;		/* size of team shot */
 bool	showNastyShots = false;		/* show original flavor shots or the new "nasty shots" */
-long	control_count;		/* Display control for how long? */
+DFLOAT	controlTime;		/* Display control for how long? */
 u_byte	spark_rand;		/* Sparkling effect */
 u_byte	old_spark_rand;		/* previous value of spark_rand */
 
@@ -1722,7 +1722,7 @@ int Client_setup(void)
 	SWAP(turnspeed, turnspeed_s);
 	SWAP(turnresistance, turnresistance_s);
 #undef SWAP
-	control_count = CONTROL_DELAY;
+	controlTime = CONTROL_TIME;
 	Add_message("Old server can't handle turnResistance=0.0; "
 		    "swapping to alternate settings [*Client message*]");
     }

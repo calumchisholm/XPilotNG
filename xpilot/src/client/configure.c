@@ -1550,14 +1550,14 @@ static int Config_update_dots(int widget_desc, void *data, int *val)
 static int Config_update_power(int widget_desc, void *data, DFLOAT *val)
 {
     Send_power(*val);
-    control_count = CONTROL_DELAY;
+    controlTime = CONTROL_TIME;
     return 0;
 }
 
 static int Config_update_turnSpeed(int widget_desc, void *data, DFLOAT *val)
 {
     Send_turnspeed(*val);
-    control_count = CONTROL_DELAY;
+    controlTime = CONTROL_TIME;
     return 0;
 }
 

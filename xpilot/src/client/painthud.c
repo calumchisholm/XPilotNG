@@ -241,13 +241,18 @@ void Paint_meters(void)
 
     if (BIT(instruments, SHOW_FUEL_METER))
 	Paint_meter(-10, y += 20, "Fuel", (int)fuelSum, (int)fuelMax);
-    if (BIT(instruments, SHOW_POWER_METER) || control_count)
+    if (BIT(instruments, SHOW_POWER_METER) || controlTime > 0.0)
 	Paint_meter(-10, y += 20, "Power", (int)displayedPower, (int)MAX_PLAYER_POWER);
-    if (BIT(instruments, SHOW_TURNSPEED_METER) || control_count)
+    if (BIT(instruments, SHOW_TURNSPEED_METER) || controlTime > 0.0)
 	Paint_meter(-10, y += 20, "Turnspeed",
 		    (int)displayedTurnspeed, (int)MAX_PLAYER_TURNSPEED);
-    if (control_count > 0)
-	control_count--;
+
+    if (controlTime > 0.0) {
+	controlTime -= timePerFrame;
+	if (controlTime <= 0.0)
+	    controlTime = 0.0;
+    }
+
     if (BIT(instruments, SHOW_PACKET_SIZE_METER))
 	Paint_meter(-10, y += 20, "Packet",
 		   (packet_size >= 4096) ? 4096 : packet_size, 4096);

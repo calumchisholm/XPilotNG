@@ -369,7 +369,7 @@ bool Key_press_swap_settings(keys_t key)
     SWAP(power, power_s);
     SWAP(turnspeed, turnspeed_s);
     SWAP(turnresistance, turnresistance_s);
-    control_count = CONTROL_DELAY;
+    controlTime = CONTROL_TIME;
     Config_redraw();
 
     return true;
@@ -397,7 +397,7 @@ bool Key_press_increase_power(keys_t key)
     Send_power(power);
 
     Config_redraw();
-    control_count = CONTROL_DELAY;
+    controlTime = CONTROL_TIME;
     return false;	/* server doesn't see these keypresses anymore */
 
 }
@@ -409,7 +409,7 @@ bool Key_press_decrease_power(keys_t key)
     Send_power(power);
 
     Config_redraw();
-    control_count = CONTROL_DELAY;
+    controlTime = CONTROL_TIME;
     return false;	/* server doesn't see these keypresses anymore */
 }
 
@@ -420,7 +420,7 @@ bool Key_press_increase_turnspeed(keys_t key)
     Send_turnspeed(turnspeed);
 
     Config_redraw();
-    control_count = CONTROL_DELAY;
+    controlTime = CONTROL_TIME;
     return false;	/* server doesn't see these keypresses anymore */
 }
 
@@ -431,7 +431,7 @@ bool Key_press_decrease_turnspeed(keys_t key)
     Send_turnspeed(turnspeed);
 
     Config_redraw();
-    control_count = CONTROL_DELAY;
+    controlTime = CONTROL_TIME;
     return false;	/* server doesn't see these keypresses anymore */
 }
 
