@@ -59,11 +59,12 @@ void Arraylist_add(arraylist_t *alp, void *element)
 arraylist_t *Arraylist_create(size_t element_size)
 {
     arraylist_t *alp = XCALLOC(arraylist_t, 1);
-    size_t padded_size;
+    size_t padded_size = element_size;
 
-    if ((element_size % ARRAYLIST_ELEMENT_ALIGNMENT) != 0) {
-	padded_size = element_size;
-
+    if (((element_size % ARRAYLIST_ELEMENT_ALIGNMENT) != 0)
+	&& element_size != 1
+	&& element_size != 2
+	&& element_size != 4) {
 	padded_size /= ARRAYLIST_ELEMENT_ALIGNMENT;
 	padded_size *= ARRAYLIST_ELEMENT_ALIGNMENT;
 	padded_size += ARRAYLIST_ELEMENT_ALIGNMENT;
