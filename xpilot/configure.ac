@@ -202,6 +202,12 @@ AC_CHECK_FUNCS([ \
 
 AC_CONFIG_FILES([ \
 	Makefile \
+	doc/Makefile \
+	doc/man/Makefile \
+	doc/man/xpilot.man \
+	doc/man/xp-replay.man \
+	doc/man/xp-mapedit.man \
+	doc/man/xpilots.man \
 	lib/Makefile \
 	lib/maps/Makefile \
 	lib/textures/Makefile \
