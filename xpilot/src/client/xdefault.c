@@ -46,16 +46,19 @@ static bool testxcolors = false;
 /*
  * Default fonts
  */
-#define GAME_FONT	"-*-fixed-medium-r-*--15-*-*-*-c-*-iso8859-1"
+#define GAME_FONT	"-*-fixed-bold-*-*--13-*-*-*-c-*-iso8859-1"
 /*"-*-times-*-*-*--18-*-*-*-*-*-iso8859-1"*/
 #define MESSAGE_FONT	"-*-fixed-medium-r-*--13-*-*-*-c-*-iso8859-1"
 /*"-*-times-*-*-*--14-*-*-*-*-*-iso8859-1"*/
 #define SCORE_LIST_FONT	"-*-fixed-bold-*-*--13-*-*-*-c-*-iso8859-1"
-#define BUTTON_FONT	"-*-*-bold-o-*--14-*-*-*-*-*-iso8859-1"
-#define TEXT_FONT	"-*-*-bold-i-*--14-*-*-*-p-*-iso8859-1"
+#define BUTTON_FONT	"-*-fixed-bold-*-*--13-*-*-*-c-*-iso8859-1"
+/*"-*-*-bold-o-*--14-*-*-*-*-*-iso8859-1"*/
+#define TEXT_FONT	"-*-fixed-bold-*-*--13-*-*-*-c-*-iso8859-1"
+/*"-*-*-bold-i-*--14-*-*-*-p-*-iso8859-1"*/
 #define TALK_FONT	"-*-fixed-bold-*-*--15-*-*-*-c-*-iso8859-1"
 #define KEY_LIST_FONT	"-*-fixed-medium-r-*--10-*-*-*-c-*-iso8859-1"
-#define MOTD_FONT	"-*-courier-bold-r-*--14-*-*-*-*-*-iso8859-1"
+#define MOTD_FONT	"-*-fixed-bold-*-*--13-*-*-*-c-*-iso8859-1"
+/*"-*-courier-bold-r-*--14-*-*-*-*-*-iso8859-1"*/
 
 static char displayName[MAX_DISP_LEN];
 static char keyboardName[MAX_DISP_LEN];
