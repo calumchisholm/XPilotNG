@@ -186,25 +186,35 @@ static void Radar_paint_objects()
 {
     int	i, x, y, s;
     float fx, fy, sx, sy;
+    SDL_Rect rb = radar_bounds;
 
-    sx = FOOpos.x * radar_bounds.w / Setup->width;
-    sy = FOOpos.y * radar_bounds.h / Setup->height;
+    if (BIT(instruments, SHOW_SLIDING_RADAR)) {
+	sx = FOOpos.x * rb.w / Setup->width;
+	sy = FOOpos.y * rb.h / Setup->height;
+    }
     
     for (i = 0; i < num_radar; i++) {
-        
-        fx = radar_ptr[i].x * radar_bounds.w / RadarWidth;
-        fy = radar_ptr[i].y * radar_bounds.h / RadarHeight;
+        fx = radar_ptr[i].x * rb.w / RadarWidth;
+        fy = radar_ptr[i].y * rb.h / RadarHeight;
         s = radar_ptr[i].size;
 
 	if (BIT(instruments, SHOW_SLIDING_RADAR)) {
-            fx -= sx;
-            fy -= sy;
-            if (fx < -1) fx += radar_bounds.w;
-            if (fy < -1) fy += radar_bounds.h;
+            fx = fx - sx;
+            fy = fy - sy;
+	    if (fx < -rb.w/2)
+		fx += rb.w;
+	    else if (fx > rb.w/2)
+		fx -= rb.w;
+	    if (fy < -rb.h/2)
+		fy += rb.h;
+	    else if (fy > rb.h/2)
+		fy -= rb.h;
+	    fx += rb.w/2;
+	    fy += rb.w/2;
         }
 
-	x = radar_bounds.x + (fx + 0.5) - s/2 + radar_bounds.w/2;
-	y = radar_bounds.y + radar_bounds.h/2 - (fy + 0.5) - s/2;
+	x = rb.x + (fx + 0.5) - s/2;
+	y = rb.y + rb.h - (fy + 0.5) - s/2;
 
 	if (radar_ptr[i].type == friend) glColor3ub(0, 0xff, 0);
 	else glColor3ub(0xff, 0xff, 0xff);
