@@ -256,12 +256,13 @@ extern long	loops;
 extern unsigned long	loopsSlow;
 extern int	clientFPS;
 extern time_t	currentTime;
+extern bool	newSecond;
 extern DFLOAT	timePerFrame;
 extern int	maxMessages;
 extern int	messagesToStdout;
 extern bool	selectionAndHistory;
 
-extern DFLOAT	scaleFactor;		/* scale the draw (main playfield) window */
+extern DFLOAT	scaleFactor;	/* scale the draw (main playfield) window */
 extern DFLOAT	scaleFactor_s;
 extern short	scaleArray[];
 extern void	Init_scale_array(void);

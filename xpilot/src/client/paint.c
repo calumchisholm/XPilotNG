@@ -122,7 +122,8 @@ unsigned long	loopsSlow = 0;	/* Proceeds slower than loops */
 int		clientFPS = 1;	/* How many fps we actually paint */
 static time_t	old_time = 0;	/* Previous value of time */
 time_t		currentTime;	/* Current value of time() */
-static int	frame_count = 0;/* Used to estimate paint fps */
+bool		newSecond = false; /* True if time() incremented this frame */
+static int	frame_count = 0;/* Used to estimate client fps */
 DFLOAT		timePerFrame = 0.0;/* How much real time proceeds per frame */
 static DFLOAT	time_counter = 0.0;
 
@@ -149,14 +150,13 @@ void Game_over_action(u_byte stat)
     static u_byte old_stat = 0;
 
     if (BIT(old_stat, GAME_OVER) && !BIT(stat, GAME_OVER)
-	&& !BIT(stat,PAUSE)) {
+	&& !BIT(stat,PAUSE))
 	XMapRaised(dpy, top);
-    }
+
     /* GAME_OVER -> PLAYING */
     if (BIT(old_stat, PLAYING|PAUSE|GAME_OVER) != PLAYING) {
-	if (BIT(stat, PLAYING|PAUSE|GAME_OVER) == PLAYING) {
+	if (BIT(stat, PLAYING|PAUSE|GAME_OVER) == PLAYING)
 	    Reset_shields();
-	}
     }
 
     old_stat = stat;
@@ -169,23 +169,29 @@ void Paint_frame(void)
     static int		prev_damaged = 0;
     static int		prev_prev_damaged = 0;
 
-#ifdef _WINDOWS	/* give any outgoing data a head start to the server */
-    Net_flush();	/* send anything to the server before returning to Windows */
+#ifdef _WINDOWS
+    /* give any outgoing data a head start to the server */
+    /* send anything to the server before returning to Windows */
+    Net_flush();
 #endif
 
     if (start_loops != end_loops)
 	warn("Start neq. End (%ld,%ld,%ld)", start_loops, end_loops, loops);
     loops = end_loops;
 
-    /*
-     * Instead of using loops to determining if things are drawn this frame,
-     * loopsSlow should be used.
-     */
     frame_count++;
+
     currentTime = time(NULL);
     if (currentTime != old_time) {
-	/* assume one second has passed */
 	old_time = currentTime;
+	newSecond = true;
+    } else
+	newSecond = false;
+
+    /*
+     * If time() changed from previous value, assume one second has passed.
+     */
+    if (newSecond) {
 	clientFPS = frame_count;
 	frame_count = 0;
 	/*
@@ -203,7 +209,9 @@ void Paint_frame(void)
     }
 
     /*
-     * We don't want things to happen too fast at high fps.
+     * Instead of using loops to determining if things are drawn this frame,
+     * loopsSlow should be used. We don't want things to be drawn too fast
+     * at high fps.
      */
     time_counter += timePerFrame;
     if (time_counter >= 1.0 / 12) {
@@ -638,14 +646,14 @@ void Paint_score_entry(int entry_num,
 
 static void Paint_clock(bool redraw)
 {
-    int			minute,
+    int			second,
+			minute,
 			hour,
 			height = scoreListFont->ascent + scoreListFont->descent
 				+ 3,
 			border = 3;
     struct tm		*m;
     char		buf[16];
-    static long		prev_loops;
     static int		width;
 
     if (!clockColor) {
@@ -659,34 +667,26 @@ static void Paint_clock(bool redraw)
 	}
 	return;
     }
-    /* kps - fix */
-    if (!redraw
-	&& loops > prev_loops
-	&& loops - prev_loops < (FPS << 5)) {
-	return;
-    }
-    prev_loops = loops;
-    m = localtime(&currentTime);
 
-    /* round seconds up to next minute. */
+    if (!redraw && !newSecond)
+	return;
+
+    m = localtime(&currentTime);
+    second = m->tm_sec;
     minute = m->tm_min;
     hour = m->tm_hour;
-    if (minute++ == 59) {
-	minute = 0;
-	if (hour++ == 23) {
-	    hour = 0;
-	}
-    }
-    if (!BIT(instruments, SHOW_CLOCK_AMPM_FORMAT)) {
-	sprintf(buf, "%02d:%02d", hour, minute);
-    } else {
+    /*warn("drawing clock at %02d:%02d:%02d", hour, minute, second);*/
+
+    if (!BIT(instruments, SHOW_CLOCK_AMPM_FORMAT))
+	sprintf(buf, "%02d:%02d" /*":%02d"*/, hour, minute /*, second*/);
+    else {
 	char tmpchar = 'A';
 	/* strftime(buf, sizeof(buf), "%l:%M%p", m); */
-	if (m->tm_hour > 12){
+	if (hour > 12){
 	    tmpchar = 'P';
-	    m->tm_hour %= 12;
+	    hour %= 12;
 	}
-	sprintf(buf, "%2d:%02d%cM", m->tm_hour, m->tm_min, tmpchar);
+	sprintf(buf, "%2d:%02d%cM", hour, minute, tmpchar);
     }
     width = XTextWidth(scoreListFont, buf, strlen(buf));
     XSetForeground(dpy, scoreListGC, colors[windowColor].pixel);
