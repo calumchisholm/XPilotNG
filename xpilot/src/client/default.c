@@ -622,7 +622,7 @@ xp_option_t default_options[] = {
 
     XP_DOUBLE_OPTION(
 	"turnSpeed",
-	10.0,
+	16.0,
 	MIN_PLAYER_TURNSPEED,
 	MAX_PLAYER_TURNSPEED,
 	&turnspeed,
@@ -647,7 +647,7 @@ xp_option_t default_options[] = {
 
     XP_DOUBLE_OPTION(
 	"altPower",
-	35.0,
+	55.0,
 	MIN_PLAYER_POWER,
 	MAX_PLAYER_POWER,
 	&power_s,
@@ -658,7 +658,7 @@ xp_option_t default_options[] = {
 
     XP_DOUBLE_OPTION(
 	"altTurnSpeed",
-	25.0,
+	16.0,
 	MIN_PLAYER_TURNSPEED,
 	MAX_PLAYER_TURNSPEED,
 	&turnspeed_s,
