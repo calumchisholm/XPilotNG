@@ -1508,8 +1508,8 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	Set_player_message(pl, msg);
     }
 
-    if (getenv("XPILOTGREETING") != NULL) {
-	sprintf(msg, "%s", getenv("XPILOTGREETING"));
+    if (greeting) {
+	snprintf(msg, sizeof(msg), "%s %s", greeting, sender);
 	Set_player_message(pl, msg);
     }
 

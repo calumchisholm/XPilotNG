@@ -74,7 +74,7 @@ char		*mapAuthor;		/* Name of the creator */
 char		*dataURL;		/* URL to client for extra data */
 int		contactPort;		/* Contact port number */
 char		*serverHost;		/* Host name (for multihomed hosts) */
-
+char		*greeting;		/* Player greeting upon login */
 bool		crashWithPlayer;	/* Can players overrun other players? */
 bool		bounceWithPlayer;	/* Can players bounce other players? */
 bool		playerKillings;		/* Can players kill each other? */
@@ -844,6 +844,16 @@ static option_desc options[] = {
 	tuner_none,
 	"The server's fully qualified domain name (for multihomed hosts).\n",
 	OPT_COMMAND | OPT_DEFAULTS | OPT_VISIBLE
+    },
+    {
+	"greeting",
+	"xpilotGreeting",
+	NULL,
+	&greeting,
+	valString,
+	tuner_dummy,
+	"Short greeting string for players when they login to server.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"mapData",
