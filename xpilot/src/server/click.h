@@ -28,6 +28,10 @@
 # include "draw.h"
 #endif
 
+#ifndef MAP_H
+# include "map.h"
+#endif
+
 /*
  * The wall collision detection routines depend on repeatability
  * (getting the same result even after some "neutral" calculations)
@@ -42,26 +46,22 @@
 #define BLOCK_CENTER(B)		((int)((B) * BLOCK_CLICKS) + BLOCK_CLICKS / 2)
 
 /*
- * Two macros for edge wrap of x and y coordinates measured in clicks.
- * Note that the correction needed should never be bigger than the size of the map.
+ * Two inline function for edge wrap of x and y coordinates measured
+ * in clicks.
+ *
+ * Note that even when wrap play is off, ships will wrap around the map
+ * if there is not walls that hinder it.
  */
-#define WRAP_XCLICK(x_)	\
-	(BIT(World.rules->mode, WRAP_PLAY) \
-	    ? ((x_) < 0 \
-		? (x_) + World.cwidth \
-		: ((x_) >= World.cwidth \
-		    ? (x_) - World.cwidth \
-		    : (x_))) \
-	    : (x_))
+static inline int WRAP_XCLICK(int cx)
+{
+    return World_wrap_xclick(&World, cx);
+}
 
-#define WRAP_YCLICK(y_)	\
-	(BIT(World.rules->mode, WRAP_PLAY) \
-	    ? ((y_) < 0 \
-		? (y_) + World.cheight \
-		: ((y_) >= World.cheight \
-		    ? (y_) - World.cheight \
-		    : (y_))) \
-	    : (y_))
+static inline int WRAP_YCLICK(int cy)
+{
+    return World_wrap_yclick(&World, cy);
+}
+
 
 /*
  * Two macros for edge wrap of differences in position.

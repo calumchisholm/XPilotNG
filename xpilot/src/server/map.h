@@ -279,6 +279,8 @@ typedef struct {
     frictionarea_t		*frictionAreas;
 } world_t;
 
+extern world_t		World;
+
 static inline void World_set_block(world_t *world, blpos blk, int type)
 {
     assert (! (blk.bx < 0 || blk.bx >= world->x
@@ -314,9 +316,6 @@ static inline clpos World_get_random_clpos(world_t *world)
 
 static inline int World_wrap_xclick(world_t *world, int cx)
 {
-    if (!BIT(world->rules->mode, WRAP_PLAY))
-	return cx;
-
     while (cx < 0)
 	cx += world->cwidth;
     while (cx >= world->cwidth)
@@ -327,9 +326,6 @@ static inline int World_wrap_xclick(world_t *world, int cx)
 
 static inline int World_wrap_yclick(world_t *world, int cy)
 {
-    if (!BIT(world->rules->mode, WRAP_PLAY))
-	return cy;
-
     while (cy < 0)
 	cy += world->cheight;
     while (cy >= world->cheight)
@@ -351,51 +347,60 @@ static inline base_t *Bases(world_t *world, int ind)
 {
     return &world->bases[ind];
 }
+
 static inline fuel_t *Fuels(world_t *world, int ind)
 {
     return &world->fuels[ind];
 }
+
 static inline cannon_t *Cannons(world_t *world, int ind)
 {
     return &world->cannons[ind];
 }
+
 static inline check_t *Checks(world_t *world, int ind)
 {
     return &world->checks[ind];
 }
+
 static inline grav_t *Gravs(world_t *world, int ind)
 {
     return &world->gravs[ind];
 }
+
 static inline target_t *Targets(world_t *world, int ind)
 {
     return &world->targets[ind];
 }
+
 static inline treasure_t *Treasures(world_t *world, int ind)
 {
     return &world->treasures[ind];
 }
+
 static inline wormhole_t *Wormholes(world_t *world, int ind)
 {
     return &world->wormholes[ind];
 }
+
 static inline asteroid_concentrator_t *AsteroidConcs(world_t *world, int ind)
 {
     return &world->asteroidConcs[ind];
 }
+
 static inline item_concentrator_t *ItemConcs(world_t *world, int ind)
 {
     return &world->itemConcs[ind];
 }
+
 static inline frictionarea_t *FrictionAreas(world_t *world, int ind)
 {
     return &world->frictionAreas[ind];
 }
+
 static inline team_t *Teams(world_t *world, int team)
 {
     return &world->teams[team];
 }
-
-
 
 #endif

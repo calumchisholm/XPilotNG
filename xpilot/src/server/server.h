@@ -86,7 +86,6 @@ extern int		login_in_progress;
 extern char		ShutdownReason[];
 extern sock_t		contactSocket;
 extern time_t		serverTime;
-extern world_t		World;
 extern server		Server;
 extern char		*serverAddr;
 extern double		laserRepeatRate;
