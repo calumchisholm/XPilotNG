@@ -2087,7 +2087,7 @@ void Paint_messages(void)
     /* Check if any alert message has timed out, if so remove it */
     while ((*tol)) {
 	if ((*tol)->timeout != 0.0) {
-	    (*tol)->timeout -= (loops - lastloops)/clientFPS;
+	    (*tol)->timeout -= (loops - lastloops)/(double)FPS;
 	    if ((*tol)->timeout <= 0.0) {
 	    	garbage = (*tol);
 		*tol = (*tol)->next;

@@ -2975,6 +2975,7 @@ GLWidget *Init_ScrollPaneWidget( GLWidget *content )
 /* Begin: MainWidget  */
 /**********************/
 static void SetBounds_MainWidget( GLWidget *widget, SDL_Rect *b );
+static void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );
 
 void MainWidget_ShowMenu( GLWidget *widget, bool show )
 {
@@ -3058,7 +3059,7 @@ static void SetBounds_MainWidget( GLWidget *widget, SDL_Rect *b )
     bs.w = wid_info->alert_msgs->bounds.w;
     bs.x = (b->w - bs.w)/2;
     bs.h = wid_info->alert_msgs->bounds.h;
-    bs.y = (b->h - bs.h)/2;
+    bs.y = (b->h - bs.h)/2-50;
     
     SetBounds_GLWidget(wid_info->alert_msgs,&bs);
     
@@ -3068,6 +3069,24 @@ static void SetBounds_MainWidget( GLWidget *widget, SDL_Rect *b )
     widget->bounds.y = b->y;
     widget->bounds.h = b->h;
     
+}
+
+static void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
+{
+    WrapperWidget *tmp;
+    
+    if (!data) return;
+    tmp = (WrapperWidget *)(((GLWidget *)data)->wid_info);
+
+    if (state == SDL_PRESSED) {
+	if (button == 1) {
+	    Key_press(KEY_POINTER_CONTROL);
+	}
+	if (button == 2) {
+    	    if (Console_isVisible()) {
+	    }
+	}
+    }
 }
 
 GLWidget *Init_MainWidget( font_data *font )
@@ -3096,6 +3115,8 @@ GLWidget *Init_MainWidget( font_data *font )
     tmp->bounds.w   	= draw_width;
     tmp->bounds.h   	= draw_height;
     tmp->SetBounds 	= SetBounds_MainWidget;
+    tmp->button     	= button_MainWidget;
+    tmp->buttondata 	= tmp;
     
     if ( !AppendGLWidgetList(&(tmp->children),(wid_info->radar = Init_RadarWidget())) ) {
 	error("radar initialization failed");
@@ -3135,8 +3156,8 @@ GLWidget *Init_MainWidget( font_data *font )
 	return NULL;
     }
     if ( !AppendGLWidgetList(&(tmp->children),
-    	    (wid_info->alert_msgs = Init_ListWidget(tmp->bounds.w/2,tmp->bounds.h/2,
-	    &nullRGBA,&nullRGBA,&greenRGBA,LW_HCENTER,LW_VCENTER,false)))
+    	    (wid_info->alert_msgs = Init_ListWidget(tmp->bounds.w/2,tmp->bounds.h/2-50,
+	    &nullRGBA,&nullRGBA,&greenRGBA,LW_UP,LW_HCENTER,false)))
 	) {
 	error("Failed to initialize alert msg list");
 	Close_Widget(&tmp);
