@@ -24,23 +24,6 @@
 #ifndef SCORE_H
 #define SCORE_H
 
-#define ED_SHOT			(-0.2)
-#define ED_SMART_SHOT		(-30.0)
-#define ED_MINE			(-60.0)
-#define ED_ECM			(-60.0)
-#define ED_TRANSPORTER		(-60.0)
-#define ED_HYPERJUMP		(-60.0)
-#define ED_SHIELD		(-0.20)
-#define ED_PHASING_DEVICE	(-0.40)
-#define ED_CLOAKING_DEVICE	(-0.07)
-#define ED_DEFLECTOR		(-0.15)
-#define ED_SHOT_HIT		(-25.0)
-#define ED_SMART_SHOT_HIT	(-120.0)
-#define ED_PL_CRASH		(-100.0)
-#define ED_BALL_HIT		(-50.0)
-#define ED_LASER		(-10.0)
-#define ED_LASER_HIT		(-100.0)
-
 #define CANNON_SCORE	    	-1436.0
 #define WALL_SCORE	    	2000.0
 
