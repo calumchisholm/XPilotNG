@@ -1540,6 +1540,9 @@ void Update_missile(world_t *world, missileobject_t *shot)
 
 	    /* Get player and set min to distance */
 	    pl = Player_by_id(shot->info);
+	    /* kps - bandaid since Player_by_id can return NULL. */
+	    if (!pl)
+		return;
 	    engine = Ship_get_engine_clpos(pl->ship, pl->dir);
 	    range = Wrap_length(pl->pos.cx + engine.cx - shot->pos.cx,
 				pl->pos.cy + engine.cy - shot->pos.cy)
@@ -1657,6 +1660,10 @@ void Update_missile(world_t *world, missileobject_t *shot)
     }
     else
 	/*NOTREACHED*/
+	return;
+
+    /* kps - Player_by_id might return NULL. */
+    if (!pl)
 	return;
 
     /*
