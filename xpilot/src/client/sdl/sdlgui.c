@@ -30,6 +30,8 @@
 
 int wallColor = 0xff;
 extern unsigned long	loopsSlow;	        /* Proceeds slower than loops */
+extern ipos world;
+extern int active_view_height;
 
 static void set_color(int color)
 {
@@ -44,16 +46,16 @@ void Gui_paint_cannon(int x, int y, int type)
 {
     switch (type) {
     case SETUP_CANNON_UP:
-        Image_paint(IMG_CANNON_DOWN, x, y + BLOCK_SZ, 0);
+        Image_paint(IMG_CANNON_DOWN, x, y, 0);
         break;
     case SETUP_CANNON_DOWN:
-        Image_paint(IMG_CANNON_UP, x, y + BLOCK_SZ - 1, 0);
+        Image_paint(IMG_CANNON_UP, x, y + 1, 0);
         break;
     case SETUP_CANNON_LEFT:
-        Image_paint(IMG_CANNON_RIGHT, x, y + BLOCK_SZ, 0);
+        Image_paint(IMG_CANNON_RIGHT, x, y, 0);
         break;
     case SETUP_CANNON_RIGHT:
-        Image_paint(IMG_CANNON_LEFT, x - 1, y + BLOCK_SZ, 0);
+        Image_paint(IMG_CANNON_LEFT, x - 1, y, 0);
         break;
     default:
         errno = 0;
@@ -100,6 +102,24 @@ void Gui_paint_fuel(int x, int y, double fuel)
 
 void Gui_paint_base(int x, int y, int id, int team, int type)
 {
+    switch (type) {
+    case SETUP_BASE_UP:
+        Image_paint(IMG_BASE_DOWN, x, y, 0);
+        break;
+    case SETUP_BASE_DOWN:
+        Image_paint(IMG_BASE_UP, x, y + 1, 0);
+        break;
+    case SETUP_BASE_LEFT:
+        Image_paint(IMG_BASE_RIGHT, x, y, 0);
+        break;
+    case SETUP_BASE_RIGHT:
+        Image_paint(IMG_BASE_LEFT, x - 1, y, 0);
+        break;
+    default:
+        errno = 0;
+        error("Bad base dir.");
+        return;
+    }    
 }
 
 void Gui_paint_decor(int x, int y, int xi, int yi, int type,
@@ -177,6 +197,7 @@ void Gui_paint_setup_target(int x, int y, int team, double damage, bool own)
 
 void Gui_paint_setup_treasure(int x, int y, int team, bool own)
 {
+    Image_paint(own ? IMG_HOLDER_FRIEND : IMG_HOLDER_ENEMY, x, y, 0);
 }
 
 void Gui_paint_walls(int x, int y, int type)
@@ -259,10 +280,16 @@ void Gui_paint_item_object(int type, int x, int y)
 
 void Gui_paint_ball(int x, int y)
 {
+    Image_paint(IMG_BALL, x - BALL_RADIUS, y - BALL_RADIUS, 0);
 }
 
 void Gui_paint_ball_connector(int x_1, int y_1, int x_2, int y_2)
 {
+    set_color(0xffffff);
+    glBegin(GL_LINES);
+    glVertex2i(x_1, y_1);
+    glVertex2i(x_2, y_2);
+    glEnd();
 }
 
 void Gui_paint_mine(int x, int y, int teammine, char *name)
@@ -281,12 +308,25 @@ void Gui_paint_asteroid(int x, int y, int type, int rot, int size)
 {
 }
 
+
+/*
+ * It seems that currently the screen coordinates are calculated already
+ * in paintobjects.c. This should be changed.
+ */
 void Gui_paint_fastshot(int color, int x, int y)
 {
+    Image_paint(IMG_BULLET, 
+		x + world.x, 
+		active_view_height + world.y - y - 5, 
+		3);
 }
 
 void Gui_paint_teamshot(int x, int y)
 {
+    Image_paint(IMG_BULLET_OWN, 
+		x + world.x, 
+		active_view_height + world.y - y, 
+		3);
 }
 
 void Gui_paint_missiles_begin(void)
@@ -315,6 +355,10 @@ void Gui_paint_laser(int color, int x_1, int y_1, int len, int dir)
 
 void Gui_paint_paused(int x, int y, int count)
 {
+    Image_paint(IMG_PAUSED, 
+		x - BLOCK_SZ / 2,
+		y - BLOCK_SZ / 2,
+		(count <= 0 || loopsSlow % 10 >= 5) ? 1 : 0);
 }
 
 void Gui_paint_appearing(int x, int y, int id, int count)
