@@ -139,7 +139,10 @@ static void Paint_checkpoint_radar(float xf, float yf)
             y = (RadarHeight - (int)(y * BLOCK_SZ * yf + 0.5) + DSIZE - 1) - 
                 slidingradar_y;
         } else {
-            /* add code to handle new server */
+            irec b = checks[nextCheckPoint].bounds;
+            x = (int)(b.x * xf + 0.5) - slidingradar_x;
+            y = (RadarHeight - (int)(b.y * yf + 0.5) + DSIZE - 1) - 
+                slidingradar_y;
         }
         if (x <= 0) {
             x += 256;
