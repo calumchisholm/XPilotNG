@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -115,6 +114,7 @@ static int Config_create_showShipShapes(int widget_desc, int *height);
 static int Config_create_showMyShipShape(int widget_desc, int *height);
 static int Config_create_ballMsgScan(int widget_desc, int *height);
 static int Config_create_showLivesByShip(int widget_desc, int *height);
+static int Config_create_showExtraBaseInfo(int widget_desc, int *height);
 static int Config_create_treatZeroSpecial(int widget_desc, int *height);
 static int Config_create_speedFactHUD(int widget_desc, int *height);
 static int Config_create_speedFactPTR(int widget_desc, int *height);
@@ -292,6 +292,7 @@ static int	(*config_creator_default[])(int widget_desc, int *height) = {
     Config_create_showMyShipShape,
     Config_create_ballMsgScan,
     Config_create_showLivesByShip,
+    Config_create_showExtraBaseInfo,
     Config_create_treatZeroSpecial,
     Config_create_speedFactHUD,
     Config_create_speedFactPTR,
@@ -876,6 +877,15 @@ static int Config_create_showLivesByShip(int widget_desc, int *height)
 			      ? true : false,
 			      Config_update_hackedInstruments,
 			      (void *) SHOW_LIVES_BY_SHIP);
+}
+
+static int Config_create_showExtraBaseInfo(int widget_desc, int *height)
+{
+    return Config_create_bool(widget_desc, height, "showExtraBaseInfo",
+			      BIT(hackedInstruments, SHOW_EXTRA_BASE_INFO)
+			      ? true : false,
+			      Config_update_hackedInstruments,
+			      (void *) SHOW_EXTRA_BASE_INFO);
 }
 
 static int Config_create_treatZeroSpecial(int widget_desc, int *height)
@@ -1937,6 +1947,7 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_bool(fp, "mapRadar", BIT(hackedInstruments, MAP_RADAR));
     Config_save_bool(fp, "clientRanker", BIT(hackedInstruments, CLIENT_RANKER));
     Config_save_bool(fp, "showLivesByShip", BIT(hackedInstruments, SHOW_LIVES_BY_SHIP));
+    Config_save_bool(fp, "showExtraBaseInfo", BIT(hackedInstruments, SHOW_EXTRA_BASE_INFO));
     Config_save_bool(fp, "treatZeroSpecial", BIT(hackedInstruments, TREAT_ZERO_SPECIAL));
     Config_save_bool(fp, "showShipShapes", BIT(hackedInstruments, SHOW_SHIP_SHAPES));
     Config_save_bool(fp, "showMyShipShape", BIT(hackedInstruments, SHOW_MY_SHIP_SHAPE));

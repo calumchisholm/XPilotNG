@@ -331,9 +331,10 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
     int color;
     int i;
     const int BORDER = 4;		/* in pixels */
-    int size;
+    int size = 0, size2 = 0;
     other_t *other;
     char s[3];
+    char info[6];
     homebase_t *base = NULL;
 
     if (baseNameColor)
@@ -446,8 +447,7 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 	} else
 	    s[1] = '\0';
 	size = XTextWidth(gameFont, s, other ? 2 : 1);
-    } else
-	size = 0;
+    }
 
     switch (type) {
     case SETUP_BASE_UP:
@@ -469,6 +469,19 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 	y += -WINSCALE(BLOCK_SZ / 2) + gameFont->ascent / 2;
 	break;
     }
+
+    if (other && BIT(hackedInstruments, SHOW_EXTRA_BASE_INFO)) {
+	if (other->mychar == ' ' || other->mychar == 'R') {
+	    if (BIT(Setup->mode, LIMITED_LIVES))
+		sprintf(info, " %d", other->life);
+	    else
+		sprintf(info, " ");
+	} else
+	    sprintf(info, " %c", other->mychar);
+
+	size2 = XTextWidth(gameFont, info, strlen(info));
+    }
+
     if (size) {
 	rd.drawString(dpy, p_draw, gc, x, y, s, other ? 2 : 1);
 	Erase_rectangle(x - 1, y - gameFont->ascent - 1,
@@ -482,6 +495,13 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 	Erase_rectangle(x - 1,
 			y - gameFont->ascent - 1,
 			other->name_width + 2,
+			gameFont->ascent + gameFont->descent + 2);
+	x += other->name_width;
+    }
+    if (size2) {
+	rd.drawString(dpy, p_draw, gc, x, y, info, strlen(info));
+	Erase_rectangle(x - 1, y - gameFont->ascent - 1,
+			size2 + 2,
 			gameFont->ascent + gameFont->descent + 2);
     }
 }

@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -382,12 +381,21 @@ option options[] = {
 	"Scan messages for BALL, SAFE, COVER and POP and paint \n"
 	"warning circles inside ship.\n"
     },
+    /* these 2 should really be color options */
     {
 	"showLivesByShip",
 	NULL,
 	"No",
 	KEY_DUMMY,
-	"Paint remaining lives next to ships \n"
+	"Paint remaining lives next to ships.\n"
+    },
+    {
+	"showExtraBaseInfo",
+	NULL,
+	"Yes",
+	KEY_DUMMY,
+	"Paint remaining lives or D (dead), P (paused) or \n"
+	"W (waiting for next round) at base.\n"
     },
     {
 	"treatZeroSpecial",
@@ -3176,6 +3184,8 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_bit_resource(rDB, "ballMsgScan", &hackedInstruments, BALL_MSG_SCAN);
     Get_bit_resource(rDB, "showLivesByShip", &hackedInstruments,
 		     SHOW_LIVES_BY_SHIP);
+    Get_bit_resource(rDB, "showExtraBaseInfo", &hackedInstruments,
+		     SHOW_EXTRA_BASE_INFO);
     Get_bit_resource(rDB, "treatZeroSpecial", &hackedInstruments,
 		     TREAT_ZERO_SPECIAL);
     Get_bit_resource(rDB, "slidingRadar", &instruments, SHOW_SLIDING_RADAR);

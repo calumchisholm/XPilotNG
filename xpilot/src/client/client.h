@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -70,6 +69,7 @@
 #define MAP_RADAR		(1L << 12)
 #define SHOW_LIVES_BY_SHIP	(1L << 13)
 #define TREAT_ZERO_SPECIAL	(1L << 14)
+#define SHOW_EXTRA_BASE_INFO	(1L << 15)
 
 
 #define PACKET_LOSS		0
