@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
     printf("  " COPYRIGHT ".\n"
 	   "  " TITLE " comes with ABSOLUTELY NO WARRANTY; "
 	      "for details see the\n"
-	   "  provided LICENSE file.\n\n");
+	   "  provided COPYING file.\n\n");
     if (strcmp(Conf_localguru(), "xpilot@xpilot.org")
 	&& strcmp(Conf_localguru(), "xpilot@cs.uit.no")) {
 	printf("  %s is responsible for the local installation.\n\n",
