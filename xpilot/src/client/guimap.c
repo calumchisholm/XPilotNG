@@ -440,7 +440,7 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 	break;
     }
 
-    if (other && BIT(hackedInstruments, SHOW_EXTRA_BASE_INFO)) {
+    if (other && BIT(instruments, SHOW_EXTRA_BASE_INFO)) {
 	if (other->mychar == ' ' || other->mychar == 'R') {
 	    if (BIT(Setup->mode, LIMITED_LIVES))
 		sprintf(info, " %d", other->life);

@@ -106,7 +106,6 @@ int     charsPerSecond;         /* Message output speed (configurable) */
 DFLOAT	hud_move_fact;		/* scale the hud-movement (speed) */
 DFLOAT	ptr_move_fact;		/* scale the speed pointer length */
 long	instruments;		/* Instruments on screen (bitmask) */
-long	hackedInstruments;	/* Hacked instruments on screen (bitmask) */
 char	mods[MAX_CHARS];	/* Current modifiers in effect */
 int	packet_size;		/* Current frame update packet size */
 int	packet_loss;		/* lost packets per second */

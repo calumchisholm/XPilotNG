@@ -167,13 +167,13 @@ int main(int argc, char *argv[])
     }
 
     if (result == 1) {
-      retval =
+	retval =
 	  Join(conpar->server_addr, conpar->server_name,
 	       conpar->login_port, conpar->real_name, conpar->nick_name,
 	       conpar->team, conpar->disp_name, conpar->server_version);
     }
     
-    if (BIT(hackedInstruments, CLIENT_RANKER))
+    if (BIT(instruments, CLIENT_RANKER))
 	Print_saved_scores();
 
     return retval;

@@ -568,7 +568,7 @@ static void Gui_paint_ship_name(int x, int y, other_t *other)
     } else
 	SET_FG(colors[BLUE].pixel);
 
-    if (BIT(hackedInstruments, SHOW_LIVES_BY_SHIP)
+    if (BIT(instruments, SHOW_LIVES_BY_SHIP)
 	&& BIT(Setup->mode, LIMITED_LIVES)) {
 	char keff[4] = "";
 
@@ -906,11 +906,11 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
     ship_color = WHITE;
 
     /* mara attempts similar behaviour to the kth ss hack */
-    if ((!BIT(hackedInstruments, SHOW_SHIP_SHAPES))
+    if ((!BIT(instruments, SHOW_SHIP_SHAPES))
 	&& (self != NULL)
 	&& (self->id != id))
 	cnt = set_shipshape(x, y, dir, Default_ship(), points);
-    else if ((!BIT(hackedInstruments, SHOW_MY_SHIP_SHAPE))
+    else if ((!BIT(instruments, SHOW_MY_SHIP_SHAPE))
 	       && (self != NULL)
 	       && (self->id == id))
 	cnt = set_shipshape(x, y, dir, Default_ship(), points);

@@ -473,7 +473,7 @@ static void Msg_scan_game_msg(char *message)
     if (i_am_victim || i_am_victim2)
 	killratio_deaths++;
 
-    if (BIT(hackedInstruments, CLIENT_RANKER)) {
+    if (BIT(instruments, CLIENT_RANKER)) {
 	/*static char tauntstr[MAX_CHARS];
 	  int kills, deaths; */
 
@@ -688,7 +688,7 @@ void Add_message(char *message)
     else if (Msg_is_in_angle_brackets(message))
 	Msg_scan_angle_bracketed_msg(message, want_scan);
 
-    else if (BIT(hackedInstruments, BALL_MSG_SCAN)
+    else if (BIT(instruments, BALL_MSG_SCAN)
 	     && !is_game_msg
 	     && BIT(Setup->mode, TEAM_PLAY)
 	     && want_scan

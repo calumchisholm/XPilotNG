@@ -45,31 +45,26 @@
 #endif
 
 
-#define SHOW_SLIDING_RADAR	(1L << 8)
-#define SHOW_ITEMS		(1L << 14)
-#define SHOW_MESSAGES		(1L << 15)
-
-#define SHOW_OUTLINE_WORLD	(1L << 17)
-#define SHOW_FILLED_WORLD	(1L << 18)
-#define SHOW_TEXTURED_WALLS	(1L << 19)
-#define SHOW_DECOR		(1L << 20)
-#define SHOW_OUTLINE_DECOR	(1L << 21)
-#define SHOW_FILLED_DECOR	(1L << 22)
-#define SHOW_TEXTURED_DECOR	(1L << 23)
-#define SHOW_CLOCK_AMPM_FORMAT	(1L << 24)
-
-#define SHOW_REVERSE_SCROLL	(1L << 26)
-
-#define SHOW_SHIP_ID            (1L << 29)
-
-/* hacked instruments */
-#define SHOW_SHIP_SHAPES	(1L << 2)
-#define SHOW_MY_SHIP_SHAPE	(1L << 3)
-#define BALL_MSG_SCAN		(1L << 6)
-#define CLIENT_RANKER		(1L << 7)
-#define MAP_RADAR		(1L << 12)
-#define SHOW_LIVES_BY_SHIP	(1L << 13)
-#define SHOW_EXTRA_BASE_INFO	(1L << 15)
+#define SHOW_SLIDING_RADAR	(1L << 0)
+#define SHOW_ITEMS		(1L << 1)
+#define SHOW_MESSAGES		(1L << 2)
+#define SHOW_OUTLINE_WORLD	(1L << 3)
+#define SHOW_FILLED_WORLD	(1L << 4)
+#define SHOW_TEXTURED_WALLS	(1L << 5)
+#define SHOW_DECOR		(1L << 6)
+#define SHOW_OUTLINE_DECOR	(1L << 7)
+#define SHOW_FILLED_DECOR	(1L << 8)
+#define SHOW_TEXTURED_DECOR	(1L << 9)
+#define SHOW_CLOCK_AMPM_FORMAT	(1L << 10)
+#define SHOW_REVERSE_SCROLL	(1L << 11)
+#define SHOW_SHIP_ID		(1L << 12)
+#define SHOW_SHIP_SHAPES	(1L << 13)
+#define SHOW_MY_SHIP_SHAPE	(1L << 14)
+#define BALL_MSG_SCAN		(1L << 15)
+#define CLIENT_RANKER		(1L << 16)
+#define MAP_RADAR		(1L << 17)
+#define SHOW_LIVES_BY_SHIP	(1L << 18)
+#define SHOW_EXTRA_BASE_INFO	(1L << 19)
 
 
 #define PACKET_LOSS		0

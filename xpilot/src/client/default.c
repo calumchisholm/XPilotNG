@@ -3170,20 +3170,18 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_resource(rDB, "sparkColors", sparkColors, MSG_LEN);
 
     instruments = 0;
-    hackedInstruments = 0;
 
     Get_bit_resource(rDB, "showMessages", &instruments, SHOW_MESSAGES);
 
-    Get_bit_resource(rDB, "mapRadar", &hackedInstruments, MAP_RADAR);
-    Get_bit_resource(rDB, "clientRanker", &hackedInstruments, CLIENT_RANKER);
-    Get_bit_resource(rDB, "showShipShapes", &hackedInstruments,
-		     SHOW_SHIP_SHAPES);
-    Get_bit_resource(rDB, "showMyShipShape", &hackedInstruments,
+    Get_bit_resource(rDB, "mapRadar", &instruments, MAP_RADAR);
+    Get_bit_resource(rDB, "clientRanker", &instruments, CLIENT_RANKER);
+    Get_bit_resource(rDB, "showShipShapes", &instruments, SHOW_SHIP_SHAPES);
+    Get_bit_resource(rDB, "showMyShipShape", &instruments,
 		     SHOW_MY_SHIP_SHAPE);
-    Get_bit_resource(rDB, "ballMsgScan", &hackedInstruments, BALL_MSG_SCAN);
-    Get_bit_resource(rDB, "showLivesByShip", &hackedInstruments,
+    Get_bit_resource(rDB, "ballMsgScan", &instruments, BALL_MSG_SCAN);
+    Get_bit_resource(rDB, "showLivesByShip", &instruments,
 		     SHOW_LIVES_BY_SHIP);
-    Get_bit_resource(rDB, "showExtraBaseInfo", &hackedInstruments,
+    Get_bit_resource(rDB, "showExtraBaseInfo", &instruments,
 		     SHOW_EXTRA_BASE_INFO);
     Get_bit_resource(rDB, "slidingRadar", &instruments, SHOW_SLIDING_RADAR);
     Get_bit_resource(rDB, "showItems", &instruments, SHOW_ITEMS);

@@ -525,9 +525,8 @@ void Paint_HUD_items(int hud_pos_x, int hud_pos_y)
 
 	    if (i == lose_item) {
 		if (lose_item_active != 0) {
-		    if (lose_item_active < 0) {
+		    if (lose_item_active < 0)
 			lose_item_active++;
-		    }
 		    rd.drawRectangle(dpy, p_draw, gc,
 				horiz_pos-ITEM_SIZE-2,
 				vert_pos-2, ITEM_SIZE+2, ITEM_SIZE+2);
@@ -583,15 +582,14 @@ void Paint_HUD(void)
      */
     if (ptr_move_fact != 0.0
 	&& selfVisible
-	&& (vel.x != 0 || vel.y != 0)) {
+	&& (vel.x != 0 || vel.y != 0))
 	Segment_add(hudColor,
 		    ext_view_width / 2,
 		    ext_view_height / 2,
 		    (int)(ext_view_width / 2 - ptr_move_fact*vel.x),
 		    (int)(ext_view_height / 2 + ptr_move_fact*vel.y));
-    }
 
-    if (selfVisible && dirPtrColor) {
+    if (selfVisible && dirPtrColor)
 	Segment_add(dirPtrColor,
 		    (int) (ext_view_width / 2 +
 			   (100 - 15) * tcos(heading)),
@@ -599,7 +597,6 @@ void Paint_HUD(void)
 			   (100 - 15) * tsin(heading)),
 		    (int) (ext_view_width / 2 + 100 * tcos(heading)),
 		    (int) (ext_view_height / 2 - 100 * tsin(heading)));
-    }
 
     if (hudRadarEnemyColor || hudRadarOtherColor) {
 	hudRadarMapScale = (DFLOAT) Setup->width / (DFLOAT) 256;
@@ -611,7 +608,7 @@ void Paint_HUD(void)
 		  * hudRadarScale / hudRadarMapScale),
 	    hudRadarDotSize);
 
-	if (BIT(hackedInstruments, MAP_RADAR))
+	if (BIT(instruments, MAP_RADAR))
 	    Paint_hudradar(hudRadarMapScale,
 			   active_view_width / 2,
 			   active_view_height / 2,
@@ -619,7 +616,7 @@ void Paint_HUD(void)
     }
 
     /* message scan hack by mara*/
-    if (BIT(hackedInstruments, BALL_MSG_SCAN)) {
+    if (BIT(instruments, BALL_MSG_SCAN)) {
 	if (ball_shout && msgScanBallColor)
 	    Arc_add(msgScanBallColor, ext_view_width / 2 - 5,
 		    ext_view_height / 2 - 5, 10, 10, 0, 64 * 360);
@@ -869,9 +866,8 @@ void Paint_messages(void)
     /* get number of player messages */
     if (selectionAndHistory) {
 	while (last_msg_index < maxMessages
-		&& TalkMsg[last_msg_index]->len != 0) {
+		&& TalkMsg[last_msg_index]->len != 0)
 	    last_msg_index++;
-	}
 	last_msg_index--; /* make it an index */
     }
 
