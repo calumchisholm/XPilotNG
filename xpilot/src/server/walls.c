@@ -476,8 +476,7 @@ void Object_hits_target(int ind, object *obj, long player_cost)
 	return;
     }
 
-    sound_play_sensors(PIXEL_TO_CLICK(x), PIXEL_TO_CLICK(y),
-		       DESTROY_TARGET_SOUND);
+    sound_play_sensors(targ->pos.cx, targ->pos.cy, DESTROY_TARGET_SOUND);
 
     if (targets_remaining > 0) {
 	sc = Rate(Players[killer]->score, CANNON_SCORE)/4;
