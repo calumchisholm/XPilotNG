@@ -1478,7 +1478,7 @@ void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *d
     widget = (GLWidget *)data;
     wid_info = ((WrapperWidget *)widget->wid_info);
     if (state == SDL_PRESSED) {
-    	if (button == 2) {
+    	if (button != 1) {
 	    if (!wid_info->confmenu) {
     	    	wid_info->confmenu = Init_ConfMenuWidget( wid_info->font, x, y );
 		if (!(wid_info->confmenu)) {
