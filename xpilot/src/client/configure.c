@@ -904,21 +904,21 @@ static int Config_create_speedFactPTR(int widget_desc, int *height)
 static int Config_create_fuelNotify(int widget_desc, int *height)
 {
     return Config_create_float(widget_desc, height,
-			       "fuelNotify", &fuelLevel3, 0.0, 1000.0,
+			       "fuelNotify", &fuelNotify, 0.0, 1000.0,
 			       NULL, NULL);
 }
 
 static int Config_create_fuelWarning(int widget_desc, int *height)
 {
     return Config_create_float(widget_desc, height,
-			       "fuelWarning", &fuelLevel2, 0.0, 1000.0,
+			       "fuelWarning", &fuelWarning, 0.0, 1000.0,
 			       NULL, NULL);
 }
 
 static int Config_create_fuelCritical(int widget_desc, int *height)
 {
     return Config_create_float(widget_desc, height,
-			       "fuelCritical", &fuelLevel1, 0.0, 1000.0,
+			       "fuelCritical", &fuelCritical, 0.0, 1000.0,
 			       NULL, NULL);
 }
 
@@ -1983,9 +1983,9 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_float(fp, "altTurnResistance", turnresistance_s);
     Config_save_float(fp, "speedFactHUD", hud_move_fact);
     Config_save_float(fp, "speedFactPTR", ptr_move_fact);
-    Config_save_float(fp, "fuelNotify", fuelLevel3);
-    Config_save_float(fp, "fuelWarning", fuelLevel2);
-    Config_save_float(fp, "fuelCritical", fuelLevel1);
+    Config_save_float(fp, "fuelNotify", fuelNotify);
+    Config_save_float(fp, "fuelWarning", fuelWarning);
+    Config_save_float(fp, "fuelCritical", fuelCritical);
     Config_save_bool(fp, "showMessages", instruments.showMessages);
     Config_save_int(fp, "maxMessages", maxMessages);
     Config_save_int(fp, "messagesToStdout", messagesToStdout);

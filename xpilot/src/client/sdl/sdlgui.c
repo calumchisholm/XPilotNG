@@ -1386,7 +1386,7 @@ bool newcode = true;
 	Paint_HUD_items(hud_pos_x, hud_pos_y);
 
     /* Fuel notify, HUD meter on */
-    if (hudColorRGBA && (fuelTime > 0.0 || fuelSum < fuelLevel3)) {
+    if (hudColorRGBA && (fuelTime > 0.0 || fuelSum < fuelNotify)) {
 	did_fuel = 1;
 	/* TODO fix this */
 	if (newcode) {
@@ -1555,12 +1555,12 @@ bool newcode = true;
     /* draw fuel gauge */
     if (fuelGaugeColorRGBA &&
 	((fuelTime > 0.0)
-	 || (fuelSum < fuelLevel3
-	     && ((fuelSum < fuelLevel1 && (loopsSlow % 4) < 2)
-		 || (fuelSum < fuelLevel2
-		     && fuelSum > fuelLevel1
+	 || (fuelSum < fuelNotify
+	     && ((fuelSum < fuelCritical && (loopsSlow % 4) < 2)
+		 || (fuelSum < fuelWarning
+		     && fuelSum > fuelCritical
 		     && (loopsSlow % 8) < 4)
-		 || (fuelSum > fuelLevel2))))) {
+		 || (fuelSum > fuelWarning))))) {
 
 	set_alphacolor(fuelGaugeColorRGBA);
 	tempx = hud_pos_x + hudSize - HUD_OFFSET + FUEL_GAUGE_OFFSET - 1;

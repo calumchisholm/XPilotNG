@@ -596,7 +596,7 @@ void Paint_HUD(void)
 	Paint_HUD_items(hud_pos_x, hud_pos_y);
 
     /* Fuel notify, HUD meter on */
-    if (hudColor && (fuelTime > 0.0 || fuelSum < fuelLevel3)) {
+    if (hudColor && (fuelTime > 0.0 || fuelSum < fuelNotify)) {
 	SET_FG(colors[hudColor].pixel);
 	did_fuel = 1;
 	sprintf(str, "%04d", (int)fuelSum);
@@ -689,12 +689,12 @@ void Paint_HUD(void)
     /* draw fuel gauge */
     if (fuelGaugeColor &&
 	((fuelTime > 0.0)
-	 || (fuelSum < fuelLevel3
-	     && ((fuelSum < fuelLevel1 && (loopsSlow % 4) < 2)
-		 || (fuelSum < fuelLevel2
-		     && fuelSum > fuelLevel1
+	 || (fuelSum < fuelNotify
+	     && ((fuelSum < fuelCritical && (loopsSlow % 4) < 2)
+		 || (fuelSum < fuelWarning
+		     && fuelSum > fuelCritical
 		     && (loopsSlow % 8) < 4)
-		 || (fuelSum > fuelLevel2))))) {
+		 || (fuelSum > fuelWarning))))) {
 
 	SET_FG(colors[fuelGaugeColor].pixel);
 	rd.drawRectangle(dpy, drawPixmap, gameGC,

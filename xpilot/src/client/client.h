@@ -518,9 +518,9 @@ extern double	fuelMax;		/* How much fuel can you take? */
 extern short	fuelCurrent;		/* Number of currently used tank */
 extern short	numTanks;		/* Number of tanks */
 extern double	fuelTime;		/* Display fuel for how long? */
-extern double	fuelLevel1;		/* Fuel critical level */
-extern double	fuelLevel2;		/* Fuel warning level */
-extern double	fuelLevel3;		/* Fuel notify level */
+extern double	fuelCritical;		/* Fuel critical level */
+extern double	fuelWarning;		/* Fuel warning level */
+extern double	fuelNotify;		/* Fuel notify level */
 
 extern char	*shipShape;		/* Shape of player's ship */
 extern double	power;			/* Force of thrust */

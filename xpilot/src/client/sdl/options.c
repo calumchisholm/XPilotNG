@@ -3269,9 +3269,9 @@ void Parse_options(int *argcp, char **argvp)
 
     Get_float_resource(rDB, "speedFactHUD", &hud_move_fact);
     Get_float_resource(rDB, "speedFactPTR", &ptr_move_fact);
-    Get_float_resource(rDB, "fuelNotify", &fuelLevel3);
-    Get_float_resource(rDB, "fuelWarning", &fuelLevel2);
-    Get_float_resource(rDB, "fuelCritical", &fuelLevel1);
+    Get_float_resource(rDB, "fuelNotify", &fuelNotify);
+    Get_float_resource(rDB, "fuelWarning", &fuelWarning);
+    Get_float_resource(rDB, "fuelCritical", &fuelCritical);
 
     Get_int_resource(rDB, "maxMessages", &maxMessages);
     Get_int_resource(rDB, "messagesToStdout", &messagesToStdout);

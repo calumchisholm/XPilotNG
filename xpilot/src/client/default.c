@@ -836,7 +836,7 @@ xp_option_t default_options[] = {
 	500.0,
 	0.0,
 	1000.0,
-	&fuelLevel3,
+	&fuelNotify,
 	NULL,
 	"The limit when the HUD fuel bar will become visible.\n"),
 
@@ -845,7 +845,7 @@ xp_option_t default_options[] = {
 	200.0,
 	0.0,
 	1000.0,
-	&fuelLevel2,
+	&fuelWarning,
 	NULL,
 	"The limit when the HUD fuel bar will start flashing.\n"),
 
@@ -854,7 +854,7 @@ xp_option_t default_options[] = {
 	100.0,
 	0.0,
 	1000.0,
-	&fuelLevel1,
+	&fuelCritical,
 	NULL,
 	"The limit when the HUD fuel bar will flash faster.\n"),
 
@@ -4435,9 +4435,9 @@ void Parse_options(int *argcp, char **argvp)
 
     Get_float_resource(rDB, "speedFactHUD", &hud_move_fact);
     Get_float_resource(rDB, "speedFactPTR", &ptr_move_fact);
-    Get_float_resource(rDB, "fuelNotify", &fuelLevel3);
-    Get_float_resource(rDB, "fuelWarning", &fuelLevel2);
-    Get_float_resource(rDB, "fuelCritical", &fuelLevel1);
+    Get_float_resource(rDB, "fuelNotify", &fuelNotify);
+    Get_float_resource(rDB, "fuelWarning", &fuelWarning);
+    Get_float_resource(rDB, "fuelCritical", &fuelCritical);
 
     Get_resource(rDB, "gameFont", gameFontName, sizeof gameFontName);
     Get_resource(rDB, "messageFont", messageFontName, sizeof messageFontName);

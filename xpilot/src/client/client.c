@@ -96,9 +96,9 @@ double	fuelMax;		/* How much fuel can you take? */
 short	fuelCurrent;		/* Number of currently used tank */
 short	numTanks;		/* Number of tanks */
 double	fuelTime;		/* Display fuel for how long? */
-double	fuelLevel1;		/* Fuel critical level */
-double	fuelLevel2;		/* Fuel warning level */
-double	fuelLevel3;		/* Fuel notify level */
+double	fuelCritical;		/* Fuel critical level */
+double	fuelWarning;		/* Fuel warning level */
+double	fuelNotify;		/* Fuel notify level */
 
 char	*shipShape = NULL;	/* Shape of player's ship */
 double	power;			/* Force of thrust */
