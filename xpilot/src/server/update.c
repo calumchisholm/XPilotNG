@@ -1007,88 +1007,16 @@ static void Do_warping(player *pl)
 }
 
 
-/********** **********
- * Updating objects and the like.
+/* * * * * *
+ *
+ * Player loop. Computes miscellaneous updates.
+ *
  */
-void Update_objects(void)
+static void Update_players(void)
 {
-    int i, j;
+    int i;
     player *pl;
 
-    /*
-     * Since the amount per frame of some things could get too small to
-     * be represented accurately as an integer, FPSMultiplier makes these
-     * things happen less often (in terms of frames) rather than smaller
-     * amount each time.
-     *
-     * Can also be used to do some updates less frequently.
-     */
-    do_update_this_frame = false;
-    if ((time_to_update -= timeStep) <= 0) {
-	do_update_this_frame = true;
-	time_to_update += 1;
-    }
-
-    Robot_update();
-
-    /*
-     * Fast aim:
-     * When calculating a frame, turn the ship before firing.
-     * This means you can change aim one frame faster.
-     */
-    Players_turn();
-
-    for (i = 0; i < NumPlayers; i++) {
-	pl = Players(i);
-
-	if (pl->stunned > 0) {
-	    pl->stunned -= timeStep;
-	    if (pl->stunned <= 0)
-		pl->stunned = 0;
-	    CLR_BIT(pl->used, HAS_SHIELD|HAS_LASER|HAS_SHOT);
-	    pl->did_shoot = false;
-	    CLR_BIT(pl->status, THRUSTING);
-	}
-	if (pl->warped > 0) {
-	    pl->warped -= timeStep;
-	    if (pl->warped <= 0)
-		pl->warped = 0;
-	}
-	if (BIT(pl->used, HAS_SHOT) || pl->did_shoot)
-	    Fire_normal_shots(pl);
-	if (BIT(pl->used, HAS_LASER)) {
-	    if (pl->item[ITEM_LASER] <= 0 || BIT(pl->used, HAS_PHASING_DEVICE))
-		CLR_BIT(pl->used, HAS_LASER);
-	    else
-		Fire_laser(pl);
-	}
-	pl->did_shoot = false;
-    }
-
-    /*
-     * Special items.
-     */
-    if (do_update_this_frame) {
-	for (i = 0; i < NUM_ITEMS; i++)
-	    if (World.items[i].num < World.items[i].max
-		&& World.items[i].chance > 0
-		&& (rfrac() * World.items[i].chance) < 1.0f)
-		Place_item(NULL, i);
-    }
-
-    Fuel_update();
-    Misc_object_update();
-    Asteroid_update();
-    Ecm_update();
-    Transporter_update();
-    Cannon_update();
-    Target_update();
-
-    /* * * * * *
-     *
-     * Player loop. Computes miscellaneous updates.
-     *
-     */
     for (i = 0; i < NumPlayers; i++) {
 	pl = Players(i);
 
@@ -1249,6 +1177,85 @@ void Update_objects(void)
 
 	pl->used &= pl->have;
     }
+}
+
+/********** **********
+ * Updating objects and the like.
+ */
+void Update_objects(void)
+{
+    int i, j;
+    player *pl;
+
+    /*
+     * Since the amount per frame of some things could get too small to
+     * be represented accurately as an integer, FPSMultiplier makes these
+     * things happen less often (in terms of frames) rather than smaller
+     * amount each time.
+     *
+     * Can also be used to do some updates less frequently.
+     */
+    do_update_this_frame = false;
+    if ((time_to_update -= timeStep) <= 0) {
+	do_update_this_frame = true;
+	time_to_update += 1;
+    }
+
+    Robot_update();
+
+    /*
+     * Fast aim:
+     * When calculating a frame, turn the ship before firing.
+     * This means you can change aim one frame faster.
+     */
+    Players_turn();
+
+    for (i = 0; i < NumPlayers; i++) {
+	pl = Players(i);
+
+	if (pl->stunned > 0) {
+	    pl->stunned -= timeStep;
+	    if (pl->stunned <= 0)
+		pl->stunned = 0;
+	    CLR_BIT(pl->used, HAS_SHIELD|HAS_LASER|HAS_SHOT);
+	    pl->did_shoot = false;
+	    CLR_BIT(pl->status, THRUSTING);
+	}
+	if (pl->warped > 0) {
+	    pl->warped -= timeStep;
+	    if (pl->warped <= 0)
+		pl->warped = 0;
+	}
+	if (BIT(pl->used, HAS_SHOT) || pl->did_shoot)
+	    Fire_normal_shots(pl);
+	if (BIT(pl->used, HAS_LASER)) {
+	    if (pl->item[ITEM_LASER] <= 0 || BIT(pl->used, HAS_PHASING_DEVICE))
+		CLR_BIT(pl->used, HAS_LASER);
+	    else
+		Fire_laser(pl);
+	}
+	pl->did_shoot = false;
+    }
+
+    /*
+     * Special items.
+     */
+    if (do_update_this_frame) {
+	for (i = 0; i < NUM_ITEMS; i++)
+	    if (World.items[i].num < World.items[i].max
+		&& World.items[i].chance > 0
+		&& (rfrac() * World.items[i].chance) < 1.0f)
+		Place_item(NULL, i);
+    }
+
+    Fuel_update();
+    Misc_object_update();
+    Asteroid_update();
+    Ecm_update();
+    Transporter_update();
+    Cannon_update();
+    Target_update();
+    Update_players();
 
     for (i = World.NumWormholes - 1; i >= 0; i--) {
 	wormhole_t *wh = Wormholes(i);
@@ -1290,7 +1297,6 @@ void Update_objects(void)
      * Checking for collision, updating score etc. (see collision.c)
      */
     Check_collision();
-
 
     /*
      * Update tanks, Kill players that ought to be killed.
