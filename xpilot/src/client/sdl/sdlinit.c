@@ -93,7 +93,7 @@ int Init_playing_windows(void)
 int Init_window(void)
 {
     int value;
-    char defaultfontname[] = CONF_FONTDIR "Test.ttf";
+    char defaultfontname[] = CONF_FONTDIR "FreeSansBoldOblique.ttf";
     bool gf_exists = true,df_exists = true,gf_init = false, mf_init = false;
     
     if (TTF_Init()) {
@@ -302,7 +302,7 @@ static xp_option_t sdlinit_options[] = {
 
     XP_STRING_OPTION(
 	"TTFont",
-	CONF_FONTDIR "Test.ttf",
+	CONF_FONTDIR "FreeSansBoldOblique.ttf",
 	NULL, 0,
 	Set_fontName, NULL, Get_fontName,
 	XP_OPTFLAG_DEFAULT,
