@@ -48,6 +48,7 @@
 #include "pack.h"
 #include "error.h"
 #include "objpos.h"
+#include "commonproto.h"
 #include "click.h"  /* CLICK_TO_FLOAT for laser hack */
 
 char collision_version[] = VERSION;

@@ -139,11 +139,11 @@ void Place_general_mine(int ind, u_short team, long status, int x, int y,
     y = WRAP_YCLICK(y);
 
     if (pl && BIT(pl->status, KILLED)) {
-	life = (int)(rfrac() * FPS);
+	life = (int)(rfrac() * 12 * TIME_FACT);
     } else if (BIT(status, FROMCANNON)) {
 	life = CANNON_SHOT_LIFE;
     } else {
-	life = (mineLife ? mineLife : MINE_LIFETIME);
+	life = (mineLife ? mineLife * TIME_FACT : MINE_LIFETIME);
     }
 
     if (!BIT(mods.warhead, CLUSTER))
@@ -623,9 +623,9 @@ void Fire_general_shot(int ind, u_short team, bool cannon, int x, int y,
 	}
 
 	if (pl && BIT(pl->status, KILLED)) {
-	    life = (int)(rfrac() * FPS);
+	    life = (int)(rfrac() * 12 * TIME_FACT);
 	} else if (!cannon) {
-	    life = (missileLife ? missileLife : MISSILE_LIFETIME);
+	    life = (missileLife ? missileLife * TIME_FACT : MISSILE_LIFETIME);
 	}
 
 	switch (type) {
@@ -1034,10 +1034,10 @@ void Fire_normal_shots(int ind)
     player		*pl = Players[ind];
     int			i, shot_angle;
 
-    if (frame_loops < pl->shot_time + fireRepeatRate) {
+    if (frame_time < pl->shot_time + fireRepeatRate) {
 	return;
     }
-    pl->shot_time = frame_loops;
+    pl->shot_time = frame_time;
 
     shot_angle = MODS_SPREAD_MAX - pl->mods.spread;
 
@@ -1151,7 +1151,8 @@ void Delete_shot(int ind)
 	    Make_debris(
 		shot->prevpos.x, shot->prevpos.y, shot->vel.x, shot->vel.y,
 		shot->id, shot->team, OBJ_DEBRIS, DEBRIS_MASS, GRAVITY,
-		RED, 8, 10, 20, 0, RES-1, 10, 50, 10, 2*(FPS+15));
+		RED, 8, 10, 20, 0, RES-1, 10, 50, 10 * TIME_FACT,
+		54 * TIME_FACT);
 	}
 	break;
 	/* Shots related to a player. */
@@ -1262,8 +1263,8 @@ void Delete_shot(int ind)
 	    /* min,max speed  */ 20 * speed_modv,
 				 (intensity >> 2) * speed_modv,
 #endif
-	    /* min,max life   */ (int)(8 * life_modv),
-				 (int)((intensity >> 1) * life_modv)
+	    /* min,max life   */ (int)(8 * TIME_FACT * life_modv),
+				 (int)((intensity >> 1) * TIME_FACT *life_modv)
 	    );
 	break;
 
@@ -1286,23 +1287,23 @@ void Delete_shot(int ind)
 	switch (shot->info) {
 
 	case ITEM_MISSILE:
-	    if (shot->life == 0 && shot->color != WHITE) {
+	    if (shot->life <= 0 && shot->color != WHITE) {
 		shot->color = WHITE;
 		shot->life  = FPS * WARN_TIME;
 		return;
 	    }
-	    if (shot->life == 0 && rfrac() < rogueHeatProb) {
+	    if (shot->life <= 0 && rfrac() < rogueHeatProb) {
 		addHeat = 1;
 	    }
 	    break;
 
 	case ITEM_MINE:
-	    if (!shot->life && shot->color != WHITE) {
+	    if (shot->life <= 0 && shot->color != WHITE) {
 		shot->color = WHITE;
 		shot->life  = FPS * WARN_TIME;
 		return;
 	    }
-	    if (shot->life == 0 && rfrac() < rogueMineProb) {
+	    if (shot->life <= 0 && rfrac() < rogueMineProb) {
 		addMine = 1;
 	    }
 	    break;
@@ -1489,13 +1490,13 @@ void Connector_force(int ind)
 
     /* compute acceleration for player, assume t = 1 */
     accell = (force + damping) / pl->mass;
-    pl->vel.x += D.x * accell / FPSMultiplier;
-    pl->vel.y += D.y * accell / FPSMultiplier;
+    pl->vel.x += D.x * accell * framespeed2;
+    pl->vel.y += D.y * accell * framespeed2;
 
     /* compute acceleration for ball, assume t = 1 */
     accell = (force + damping) / ball->mass;
-    ball->vel.x += -D.x * accell / FPSMultiplier;
-    ball->vel.y += -D.y * accell / FPSMultiplier;
+    ball->vel.x += -D.x * accell * framespeed2;
+    ball->vel.y += -D.y * accell * framespeed2;
 }
 
 

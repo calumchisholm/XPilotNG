@@ -350,9 +350,6 @@ int Init_player(int ind, wireobj *ship)
     pl->acc.x	= pl->acc.y	= 0.0;
     pl->float_dir = pl->dir	= DIR_UP;
     pl->turnvel		= 0.0;
-#ifdef	TURN_FUEL
-    pl->oldturnvel	= 0.0;
-#endif
     pl->turnacc		= 0.0;
     pl->mass		= ShipMass;
     pl->emptymass	= ShipMass;
@@ -1883,10 +1880,6 @@ static void Player_death_reset(int ind)
     }
 
     pl->forceVisible	= 0;
-/*    pl->shot_speed	= ShotsSpeed;
-    pl->shot_max	= ShotsMax;
-    pl->shot_life	= ShotsLife;
-    pl->shot_mass	= ShotsMass;*/
     pl->count		= RECOVERY_DELAY;
     pl->ecmcount	= 0;
     pl->emergency_thrust_left = 0;

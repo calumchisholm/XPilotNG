@@ -76,7 +76,8 @@ typedef struct {
 } radar_t;
 
 
-long			frame_loops = 1;
+long		frame_loops = 1;
+unsigned long			frame_time = TIME_FACT;
 static long		last_frame_shuffle;
 static unsigned short	object_shuffle[MAX_TOTAL_SHOTS];
 static unsigned short	player_shuffle[64 + MAX_PSEUDO_PLAYERS];
@@ -417,7 +418,7 @@ static int Frame_status(int conn, int ind)
 			pl->emergency_shield_left,
 			pl->emergency_shield_max);
     if (BIT(pl->status, SELF_DESTRUCT) && pl->count > 0) {
-	Send_destruct(conn, pl->count);
+	Send_destruct(conn, pl->count >> TIME_BITS);
     }
     if (BIT(pl->used, OBJ_PHASING_DEVICE))
 	Send_phasingtime(conn,
@@ -548,21 +549,18 @@ static void Frame_shots(int conn, int ind)
 	     */
 	    if (debris_colors >= 3) {
 		if (debris_colors > 4) {
-		    if (color == BLUE) {
-			color = (shot->life >> 1);
-		    } else {
-			color = (shot->life >> 2);
-		    }
+		    if (color == BLUE)
+			color = shot->life >> TIME_BITS + 1;
+		    else
+			color = shot->life >> TIME_BITS + 2;
 		} else {
-		    if (color == BLUE) {
-			color = (shot->life >> 2);
-		    } else {
-			color = (shot->life >> 3);
-		    }
+		    if (color == BLUE)
+			color = shot->life >> TIME_BITS + 2;
+		    else
+			color = shot->life >> TIME_BITS + 3;
 		}
-		if (color >= debris_colors) {
+		if (color >= debris_colors)
 		    color = debris_colors - 1;
-		}
 	    }
 
 	    debris_store((int)(shot->pos.px - pv.world.x),
@@ -733,7 +731,7 @@ static void Frame_ships(int conn, int ind)
 	    Send_paused(conn,
 			pl_i->pos.px,
 			pl_i->pos.py,
-			pl_i->count);
+			pl_i->count >> TIME_BITS);
 	    continue;
 	}
 
@@ -928,8 +926,12 @@ void Frame_update(void)
     static time_t	oldTimeLeft;
     static bool		game_over_called = false;
 
-    if (++frame_loops >= LONG_MAX)	/* Used for misc. timing purposes */
-	frame_loops = 0;
+    frame_loops++;
+    frame_time += framespeed;
+    if (frame_time > ULONG_MAX - TIME_FACT) {
+	frame_loops = 0; /* This is likely to cause visible problems, but */
+	frame_time = 0;  /* maybe nothing fatal. Might happen after a ~month.*/
+    }
 
     Frame_shuffle();
 

@@ -58,7 +58,8 @@ void Thrust(int ind)
     const int		min_dir = (int)(pl->dir + RES/2 - RES*0.2 - 1);
     const int		max_dir = (int)(pl->dir + RES/2 + RES*0.2 + 1);
     const DFLOAT	max_speed = 1 + (pl->power * 0.14);
-    const int		max_life = 3 + (int)(pl->power * 0.35);
+    const int		max_life = 3 * TIME_FACT + (int)(pl->power * 0.35 *
+							TIME_FACT);
     static int		keep_rand;
     int			this_rand = (((keep_rand >>= 2)
 					? (keep_rand)
@@ -90,7 +91,7 @@ void Thrust(int ind)
 	/* min,max debris */ tot_sparks-alt_sparks, tot_sparks-alt_sparks,
 	/* min,max dir    */ min_dir, max_dir,
 	/* min,max speed  */ 1.0, max_speed,
-	/* min,max life   */ 3, max_life
+	/* min,max life   */ 3 * TIME_FACT, max_life
 	);
 
     Make_debris(
@@ -106,36 +107,9 @@ void Thrust(int ind)
 	/* min,max debris */ alt_sparks, alt_sparks,
 	/* min,max dir    */ min_dir, max_dir,
 	/* min,max speed  */ 1.0, max_speed,
-	/* min,max life   */ 3, max_life
+	/* min,max life   */ 3 * TIME_FACT, max_life
 	);
 }
-
-
-#ifdef TURN_FUEL
-void Turn_thrust(int ind,int num_sparks)
-{
-    player	*pl = Players[ind];
-    int		x = pl->pos.cx + pl->ship->pts[0][pl->dir].x;
-    int		y = pl->pos.cy + pl->ship->pts[0][pl->dir].y;
-    int		dir = pl->dir + ((pl->turnacc > 0.0) ? (RES/4) : (3*(RES/4)));
-
-    Make_debris(
-	/* pos.x, pos.y   */ x, y,
-	/* vel.x, vel.y   */ pl->vel.x, pl->vel.y,
-	/* owner id       */ pl->id,
-	/* owner team	  */ pl->team,
-	/* kind           */ OBJ_SPARK,
-	/* mass           */ THRUST_MASS,
-	/* status         */ GRAVITY | OWNERIMMUNE,
-	/* color          */ RED,
-	/* radius         */ 1,
-	/* min,max debris */ num_sparks, num_sparks,
-	/* min,max dir    */ dir - (RES*0.1) -1, dir + (RES*0.1) + 1,
-	/* min,max speed  */ 1, 3,
-	/* min,max life   */ 1, 2*FPS
-	);
-}
-#endif
 
 
 /* Calculates the recoil if a ship fires a shot */
@@ -289,14 +263,14 @@ void Update_tanks(pl_fuel_t *ft)
 	    if (!fuel) {
 		if (t
 		    && t != ft->current
-		    && *f >= low_level + REFUEL_RATE
-		    && *(f-1) <= TANK_CAP(t-1) - REFUEL_RATE) {
+		    && *f >= low_level + REFUEL_RATE * framespeed
+		    && *(f-1) <= TANK_CAP(t-1) - REFUEL_RATE * framespeed) {
 
-		    *f -= REFUEL_RATE;
-		    fuel = REFUEL_RATE;
+		    *f -= REFUEL_RATE * framespeed;
+		    fuel = REFUEL_RATE * framespeed;
 		} else if (t && *f < low_level) {
-		    *f += REFUEL_RATE;
-		    fuel = -REFUEL_RATE;
+		    *f += REFUEL_RATE * framespeed;
+		    fuel = -REFUEL_RATE * framespeed;
 		}
 	    }
 	    if (fuel && t == 0) {
@@ -388,9 +362,6 @@ void Tank_handle_detach(player *pl)
     dummy->float_dir	= pl->float_dir;
     dummy->turnresistance = pl->turnresistance;
     dummy->turnvel	= pl->turnvel;
-#ifdef TURN_FUEL
-    dummy->oldturnvel	= pl->oldturnvel;
-#endif
     dummy->turnacc	= pl->turnacc;
     dummy->power	= pl->power;
 
@@ -509,12 +480,6 @@ void Make_wreckage(
 
     if (max_life < min_life)
 	max_life = min_life;
-    if (ShotsLife >= FPS) {
-	if (min_life > ShotsLife) {
-	    min_life = ShotsLife;
-	    max_life = ShotsLife;
-	}
-    }
 
     if (min_speed * max_life > World.hypotenuse)
 	min_speed = World.hypotenuse / max_life;
@@ -619,7 +584,8 @@ void Explode_fighter(int ind)
 	/* min,max debris */ min_debris, max_debris,
 	/* min,max dir    */ 0, RES-1,
 	/* min,max speed  */ 20.0, 20 + (((int)(pl->mass))>>1),
-	/* min,max life   */ 5, (int)(5 + (pl->mass * 1.5))
+	/* min,max life   */ 5 * TIME_FACT, (int)(5 +
+						  (pl->mass * 1.5)) * TIME_FACT
 	);
 
     if ( !BIT(pl->status, KILLED) )
@@ -636,7 +602,8 @@ void Explode_fighter(int ind)
 	/* max wreckage     */ 10,
 	/* min,max dir      */ 0, RES-1,
 	/* min,max speed    */ 10.0, 10 + (((int)(pl->mass))>>1),
-	/* min,max life     */ 5, (int)(5 + (pl->mass * 1.5))
+	/* min,max life     */ 5 * TIME_FACT, (int)(
+					    5 +(pl->mass * 1.5)) * TIME_FACT
 	);
 
 }

@@ -173,7 +173,7 @@ void Ball_hits_goal(object *ball, int group)
      * The team should be punished.
      */
     sprintf(msg," < The ball was loose for %ld frames >",
-	    LONG_MAX - ball->life);
+	    (LONG_MAX - ball->life) / framespeed);
     Set_message(msg);
     if (Punish_team(GetInd[ball->owner], ball->treasure,
 		    ball->pos.cx, ball->pos.cy))
@@ -211,14 +211,6 @@ void Make_debris(
 
     if (max_life < min_life)
 	max_life = min_life;
-    if (ShotsLife >= FPS) {
-	if (min_life > ShotsLife) {
-	    min_life = ShotsLife;
-	    max_life = ShotsLife;
-	} else if (max_life > ShotsLife) {
-	    max_life = ShotsLife;
-	}
-    }
     if (min_speed * max_life > World.hypotenuse)
 	min_speed = World.hypotenuse / max_life;
     if (max_speed * min_life > World.hypotenuse)

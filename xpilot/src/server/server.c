@@ -134,9 +134,7 @@ int main(int argc, char **argv)
     cmw_priv_init();
 #endif /* SUNCMW */
     init_error(argv[0]);
-    srand(1); /* !@# srand(time((time_t *)0) * Get_process_id());
-	         Removed because of server recordings.
-	         Changed to seedMT() in current version with new RNG */
+    /* Removed seeding random number generator because of server recordings. */
     Check_server_versions();
     if (!Parser(argc, argv))
 #ifndef _WINDOWS
@@ -200,6 +198,8 @@ int main(int argc, char **argv)
     Contact_init();
 
     Meta_init();
+
+    Timing_setup();
 
     if (Setup_net_server() == -1) {
 	End_game();

@@ -316,7 +316,7 @@ void Place_item(int item, int ind)
     obj->acc.x =
     obj->acc.y = 0.0;
     obj->mass = 10.0;
-    obj->life = 1500 + (int)(rfrac() * 512);
+    obj->life = 1500 * TIME_FACT + (int)(rfrac() * 512 * TIME_FACT);
     obj->count = num_per_pack;
     obj->pl_range = ITEM_SIZE/2;
     obj->pl_radius = ITEM_SIZE/2;

@@ -232,7 +232,7 @@ void Pause_player(int ind, int onoff)
     if (onoff != 0 && !BIT(pl->status, PAUSE)) { /* Turn pause mode on */
 	if (pl->team != TEAM_NOT_SET)
 	    World.teams[pl->team].SwapperId = -1;
-	pl->count = 10*FPS;
+	pl->count = 10 * TIME_FACT * FPS / FPSMultiplier;
 	pl->updateVisibility = 1;
 	CLR_BIT(pl->status, SELF_DESTRUCT|PLAYING);
 	SET_BIT(pl->status, PAUSE);
@@ -784,7 +784,7 @@ int Handle_keyboard(int ind)
 	    case KEY_SELF_DESTRUCT:
 		TOGGLE_BIT(pl->status, SELF_DESTRUCT);
 		if (BIT(pl->status, SELF_DESTRUCT))
-		    pl->count = 150;
+		    pl->count = 150 * TIME_FACT;
 		break;
 
 	    case KEY_PAUSE:
@@ -842,7 +842,7 @@ int Handle_keyboard(int ind)
 			/*
 			 * Turn hover pause on, together with shields.
 			 */
-			pl->count = 5*FPS;
+			pl->count = 5 * FPS * TIME_FACT;
 			CLR_BIT(pl->status, SELF_DESTRUCT);
 			SET_BIT(pl->status, HOVERPAUSE);
 
@@ -1057,7 +1057,7 @@ int Handle_keyboard(int ind)
 		     * shields and firing in order to prevent macros
 		     * and hacked clients.
 		     */
-		    pl->shot_time = frame_loops;
+		    pl->shot_time = frame_time;
 		}
 		break;
 

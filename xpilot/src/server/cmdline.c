@@ -50,9 +50,11 @@ DFLOAT		ShotsMass;		/* Default mass of shots */
 DFLOAT		ShotsSpeed;		/* Default speed of shots */
 int		ShotsLife;		/* Default number of ticks */
 					/* each shot will live */
+DFLOAT		ShotsLifeSetting;	/* Above is set through this */
 int		ShotsMax;		/* Max shots pr. player */
 bool		ShotsGravity;		/* Shots affected by gravity */
-int		fireRepeatRate;		/* Frames per autorepeat fire (0=off) */
+int		fireRepeatRate;		/* Frames per autorepeat fire (0=off)*/
+DFLOAT		fireRepeatRateSetting;	/* Above is set through this */
 
 bool		RawMode;		/* Calculate frames even if there */
 					/* are no players logged in */
@@ -217,6 +219,8 @@ int		clientPortStart;	/* First UDP port for clients */
 int             clientPortEnd;          /* Last one (these are for firewalls)*/
 char		*recordFileName;
 int		FPSMultiplier;		/* Slow everything by this factor */
+int		framespeed;
+DFLOAT		framespeed2;
 
 
 extern char	conf_default_map_string[];	/* from common/config.c */
@@ -310,9 +314,9 @@ static optionDesc options[] = {
 	"shotLife",
 	"shotLife",
 	"60",
-	&ShotsLife,
-	valInt,
-	tuner_dummy,
+	&ShotsLifeSetting,
+	valReal,
+	Timing_setup,
 	"Life of bullets in ticks.\n",
 	OPT_ANY
     },
@@ -320,9 +324,9 @@ static optionDesc options[] = {
 	"fireRepeatRate",
 	"fireRepeat",
 	"2",
-	&fireRepeatRate,
-	valInt,
-	tuner_dummy,
+	&fireRepeatRateSetting,
+	valReal,
+	Timing_setup,
 	"Number of frames per automatic fire (0=off).\n",
 	OPT_ANY
     },
@@ -2446,12 +2450,21 @@ static optionDesc options[] = {
 	"1",
 	&FPSMultiplier,
 	valInt,
-	tuner_dummy,
+	Timing_setup,
 	"Everything is slowed by this (integer) factor. Allows using higher\n"
 	"FPS without making the game too fast.\n",
 	OPT_ANY
     }
 };
+
+
+void Timing_setup(void)
+{ 
+    framespeed = TIME_FACT / FPSMultiplier;
+    framespeed2 = 1. / FPSMultiplier;
+    ShotsLife = ShotsLifeSetting * TIME_FACT;
+    fireRepeatRate = fireRepeatRateSetting * TIME_FACT;
+}
 
 
 static void Parse_help(char *progname)

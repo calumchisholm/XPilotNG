@@ -51,12 +51,12 @@ char update_version[] = VERSION;
 #define update_object_speed(o_)						\
     if (BIT((o_)->status, GRAVITY)) {					\
 	(o_)->vel.x += ((o_)->acc.x					\
-    + World.gravity[(o_)->pos.bx][(o_)->pos.by].x) / FPSMultiplier;	\
+    + World.gravity[(o_)->pos.bx][(o_)->pos.by].x) * framespeed2;	\
 	(o_)->vel.y += ((o_)->acc.y					\
-    + World.gravity[(o_)->pos.bx][(o_)->pos.by].y) / FPSMultiplier;	\
+    + World.gravity[(o_)->pos.bx][(o_)->pos.by].y) * framespeed2;	\
     } else {								\
-	(o_)->vel.x += (o_)->acc.x / FPSMultiplier;			\
-	(o_)->vel.y += (o_)->acc.y / FPSMultiplier;			\
+	(o_)->vel.x += (o_)->acc.x * framespeed2;			\
+	(o_)->vel.y += (o_)->acc.y * framespeed2;			\
     }
 
 int	rdelay = 0;		/* delay until start of next round */
@@ -102,6 +102,7 @@ static void Transport_to_home(int ind)
 	t = T - t;
 	m = (4 * t) / (T * T - 2 * t * t);
     }
+    m *= framespeed;
     pl->vel.x = dx * m / CLICK;
     pl->vel.y = dy * m / CLICK;
 }
@@ -461,7 +462,7 @@ void Update_objects(void)
      * Let the fuel stations regenerate some fuel.
      */
     if (NumPlayers > 0) {
-	int fuel = (int)(NumPlayers * STATION_REGENERATION);
+	int fuel = (int)(NumPlayers * framespeed * STATION_REGENERATION);
 	int frames_per_update = MAX_STATION_FUEL / (fuel * BLOCK_SZ);
 	for (i=0; i<World.NumFuels; i++) {
 	    if (World.fuel[i].fuel == MAX_STATION_FUEL) {
@@ -622,7 +623,7 @@ void Update_objects(void)
 	else if (World.targets[i].damage == TARGET_DAMAGE) {
 	    continue;
 	}
-	World.targets[i].damage += TARGET_REPAIR_PER_FRAME;
+	World.targets[i].damage += TARGET_REPAIR_PER_FRAME * framespeed;
 	if (World.targets[i].damage >= TARGET_DAMAGE) {
 	    World.targets[i].damage = TARGET_DAMAGE;
 	}
@@ -644,10 +645,6 @@ void Update_objects(void)
      *
      */
     for (i=0; i<NumPlayers; i++) {
-#ifdef TURN_FUEL
-	long tf = 0;
-#endif
-
 	pl = Players[i];
 
 	/* Limits. */
@@ -659,32 +656,31 @@ void Update_objects(void)
 	if (pl->damaged > 0)
 	    pl->damaged--;
 
-	if (pl->count > 0) {
-	    pl->count--;
-	    if (!BIT(pl->status, PLAYING)) {
-		Transport_to_home(i);
-		Move_player(i);
-		continue;
+	if (pl->count >= 0) {
+	    pl->count -= framespeed;
+	    if (pl->count > 0) {
+		if (!BIT(pl->status, PLAYING)) {
+		    Transport_to_home(i);
+		    Move_player(i);
+		    continue;
+		}
+	    }
+	    else {
+		pl->count = -1;
+		if (!BIT(pl->status, PLAYING)) {
+		    SET_BIT(pl->status, PLAYING);
+		    Go_home(i);
+		}
+		if (BIT(pl->status, SELF_DESTRUCT)) {
+		    SET_BIT(pl->status, KILLED);
+		    sprintf(msg, "%s has comitted suicide.", pl->name);
+		    Set_message(msg);
+		    Throw_items(i);
+		    Kill_player(i);
+		    updateScores = true;
+		}
 	    }
 	}
-
-	if (pl->count == 0) {
-	    pl->count = -1;
-
-	    if (!BIT(pl->status, PLAYING)) {
-		SET_BIT(pl->status, PLAYING);
-		Go_home(i);
-	    }
-	    if (BIT(pl->status, SELF_DESTRUCT)) {
-		SET_BIT(pl->status, KILLED);
-		sprintf(msg, "%s has comitted suicide.", pl->name);
-		Set_message(msg);
-		Throw_items(i);
-		Kill_player(i);
-		updateScores = true;
-	    }
-	}
-
 
 	if (BIT(pl->status, PLAYING|GAME_OVER|PAUSE) != PLAYING)
 	    continue;
@@ -787,20 +783,6 @@ void Update_objects(void)
 	    pl->turnvel *= pl->turnresistance;
 	}
 
-#ifdef TURN_FUEL
-	tf = pl->oldturnvel - pl->turnvel;
-	tf = TURN_FUEL(tf);
-	if (pl->fuel.sum <= tf) {
-	    tf = 0;
-	    pl->turnacc = 0.0;
-	    pl->turnvel = pl->oldturnvel;
-	} else {
-	    Add_fuel(&(pl->fuel),-tf);
-	    pl->oldturnvel = pl->turnvel;
-	}
-#endif
-
-
 	pl->float_dir	+= pl->turnvel;
 
 	while (pl->float_dir < 0)
@@ -862,11 +844,11 @@ void Update_objects(void)
 		int ct = pl->fuel.current;
 
 		do {
-		    if (World.fuel[pl->fs].fuel > REFUEL_RATE) {
-			World.fuel[pl->fs].fuel -= REFUEL_RATE;
+		    if (World.fuel[pl->fs].fuel > REFUEL_RATE * framespeed) {
+			World.fuel[pl->fs].fuel -= REFUEL_RATE * framespeed;
 			World.fuel[pl->fs].conn_mask = 0;
 			World.fuel[pl->fs].last_change = frame_loops;
-			Add_fuel(&(pl->fuel), REFUEL_RATE);
+			Add_fuel(&(pl->fuel), REFUEL_RATE * framespeed);
 		    } else {
 			Add_fuel(&(pl->fuel), World.fuel[pl->fs].fuel);
 			World.fuel[pl->fs].fuel = 0;
@@ -899,11 +881,12 @@ void Update_objects(void)
 		int ct = pl->fuel.current;
 
 		do {
-		    if (pl->fuel.tank[pl->fuel.current] > REFUEL_RATE) {
+		    if (pl->fuel.tank[pl->fuel.current] >
+				REFUEL_RATE * framespeed) {
 			targ->damage += TARGET_FUEL_REPAIR_PER_FRAME;
 			targ->conn_mask = 0;
 			targ->last_change = frame_loops;
-			Add_fuel(&(pl->fuel), -REFUEL_RATE);
+			Add_fuel(&(pl->fuel), -REFUEL_RATE * framespeed);
 			if (targ->damage > TARGET_DAMAGE) {
 			    targ->damage = TARGET_DAMAGE;
 			    break;
@@ -924,7 +907,7 @@ void Update_objects(void)
 	    CLR_BIT(pl->used, OBJ_SHIELD|OBJ_CLOAKING_DEVICE|OBJ_DEFLECTOR);
 	    CLR_BIT(pl->status, THRUSTING);
 	}
-	if (pl->fuel.sum > (pl->fuel.max-REFUEL_RATE))
+	if (pl->fuel.sum > (pl->fuel.max - REFUEL_RATE * framespeed))
 	    CLR_BIT(pl->used, OBJ_REFUEL);
 
 	/*
@@ -1122,10 +1105,6 @@ void Update_objects(void)
   		Thrust(i);
 	    }
 	}
-#ifdef TURN_FUEL
-	if (tf)
-	    Turn_thrust(i, TURN_SPARKS(tf));
-#endif
 
 	Compute_sensor_range(pl);
 
@@ -1201,8 +1180,8 @@ void Update_objects(void)
     /*
      * Kill shots that ought to be dead.
      */
-    for (i=NumObjs-1; i>=0; i--)
-	if (--(Obj[i]->life) <= 0)
+    for (i = NumObjs - 1; i >= 0; i--)
+	if ((Obj[i]->life -= framespeed) <= 0)
 	    Delete_shot(i);
 
     /*

@@ -330,9 +330,6 @@ struct player {
     DFLOAT	float_dir;		/* Direction, in float var */
     DFLOAT	turnresistance;		/* How much is lost in % */
     DFLOAT	turnvel;		/* Current velocity of turn (right) */
-#ifdef TURN_FUEL
-    DFLOAT	oldturnvel;		/* Last velocity of turn (right) */
-#endif
     DFLOAT	turnacc;		/* Current acceleration of turn */
     long	mode;			/* Player mode, currently */
     long	score;			/* Current score of player */

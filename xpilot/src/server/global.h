@@ -57,6 +57,7 @@ extern pulse_t		*Pulses[];
 extern ecm_t		*Ecms[];
 extern trans_t		*Transporters[];
 extern long		frame_loops;
+extern unsigned long	frame_time;
 extern int              observerStart;
 extern int		NumPlayers;
 extern int              NumObservers;
@@ -243,7 +244,10 @@ extern char             *dataURL;
 extern int	       	clientPortStart;
 extern int		clientPortEnd;
 extern char		*recordFileName;
-int			FPSMultiplier;
+extern int		FPSMultiplier;
+extern int		framespeed;
+extern DFLOAT		framespeed2;
+
 
 #endif
 

@@ -504,7 +504,7 @@ void Cannon_fire(int ind, int weapon, int target, int dir)
 		/* dir */	dir - 4 * (4 - cannonSmartness),
 				dir + 4 * (4 - cannonSmartness),
 		/* speed */	0.1, speed * 4,
-		/* life */	3, 20);
+		/* life */	3 * TIME_FACT, 20 * TIME_FACT);
 	    c->item[ITEM_EMERGENCY_THRUST]--;
 	} else {
 	    Make_debris(
@@ -521,7 +521,7 @@ void Cannon_fire(int ind, int weapon, int target, int dir)
 		/* dir */	dir - 3 * (4 - cannonSmartness),
 				dir + 3 * (4 - cannonSmartness),
 		/* speed */	0.1, speed * 2,
-		/* life */	3, 20);
+		/* life */	3 * TIME_FACT, 20 * TIME_FACT);
 	}
 	c->item[ITEM_FUEL]--;
 	IFSOUND(sound = THRUST_SOUND;)

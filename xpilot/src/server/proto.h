@@ -93,14 +93,12 @@ void Make_table(void);
 int Parse_list(int *index, char *buf);
 int Parser(int argc, char **argv);
 int Tune_option(char *opt, char *val);
+void Timing_setup(void);
 
 /*
  * Prototypes for play.c
  */
 void Thrust(int ind);
-#ifdef TURN_FUEL
-void Turn_thrust(int ind,int num_sparks);
-#endif
 void Recoil(object *ship, object *shot);
 void Record_shove(player *pl, player *pusher, long time);
 void Delta_mv(object *ship, object *obj);

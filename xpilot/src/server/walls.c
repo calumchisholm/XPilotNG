@@ -3102,7 +3102,7 @@ static void Cannon_dies(move_state_t *ms)
 	/* min,max debris */ 20, 40,
 	/* min,max dir    */ (int)(cannon->dir - (RES * 0.2)), (int)(cannon->dir + (RES * 0.2)),
 	/* min,max speed  */ 20, 50,
-	/* min,max life   */ 8, 68
+	/* min,max life   */ 8 * TIME_FACT, 68 * TIME_FACT
 	);
     Make_wreckage(
 	/* pos.x, pos.y   */ x, y,
@@ -3245,7 +3245,7 @@ static void Object_hits_target(move_state_t *ms, long player_cost)
 	/* min,max debris */ 75, 150,
 	/* min,max dir    */ 0, RES-1,
 	/* min,max speed  */ 20, 70,
-	/* min,max life   */ 10, 100
+	/* min,max life   */ 10 * TIME_FACT, 100 * TIME_FACT
 	);
 
     if (BIT(World.rules->mode, TEAM_PLAY)) {
@@ -3373,27 +3373,6 @@ static void Object_crash(move_state_t *ms)
 
     case CrashWall:
 	obj->life = 0;
-#if 0
-/* GK: - Added sparks to wallcrashes for objects != OBJ_SPARK|OBJ_DEBRIS.
-**       I'm not sure of the amount of sparks or the direction.
-*/
-	if (!BIT(obj->type, OBJ_SPARK | OBJ_DEBRIS)) {
-	    Make_debris(ms->pos.x,
-			ms->pos.y,
-			0, 0,
-			obj->owner,
-			obj->team,
-			OBJ_SPARK,
-			(obj->mass * VECTOR_LENGTH(obj->vel)) / 3,
-			GRAVITY,
-			RED,
-			1,
-			5, 10,
-			MOD2(ms->dir - RES/4, RES), MOD2(ms->dir + RES/4, RES),
-			15, 25,
-			5, 15);
-	}
-#endif
 	break;
 
     case CrashUniverse:
@@ -3427,8 +3406,8 @@ static void Move_ball(int ind)
     struct move move;
     struct collans ans;
 
-    move.delta.x = FLOAT_TO_CLICK(obj->vel.x) / FPSMultiplier;
-    move.delta.y = FLOAT_TO_CLICK(obj->vel.y) / FPSMultiplier;
+    move.delta.x = FLOAT_TO_CLICK(obj->vel.x) * framespeed2;
+    move.delta.y = FLOAT_TO_CLICK(obj->vel.y) * framespeed2;
     obj->extpos.x = obj->pos.cx + move.delta.x;
     while (obj->extpos.x >= World.cwidth)
 	obj->extpos.x -= World.cwidth;
@@ -3525,8 +3504,8 @@ void Move_object(int ind)
 
     move.start.x = obj->pos.cx;
     move.start.y = obj->pos.cy;
-    move.delta.x = FLOAT_TO_CLICK(obj->vel.x) / FPSMultiplier;
-    move.delta.y = FLOAT_TO_CLICK(obj->vel.y) / FPSMultiplier;
+    move.delta.x = FLOAT_TO_CLICK(obj->vel.x) * framespeed2;
+    move.delta.y = FLOAT_TO_CLICK(obj->vel.y) * framespeed2;
     obj->extpos.x = WRAP_XCLICK(obj->pos.cx + move.delta.x);
     obj->extpos.y = WRAP_YCLICK(obj->pos.cy + move.delta.y);
     while (move.delta.x || move.delta.y) {
@@ -3590,8 +3569,8 @@ void Move_player(int ind)
 
     pl->collmode = 1;
 
-    move.delta.x = FLOAT_TO_CLICK(pl->vel.x) / FPSMultiplier;
-    move.delta.y = FLOAT_TO_CLICK(pl->vel.y) / FPSMultiplier;
+    move.delta.x = FLOAT_TO_CLICK(pl->vel.x) * framespeed2;
+    move.delta.y = FLOAT_TO_CLICK(pl->vel.y) * framespeed2;
     pl->extpos.x = pl->pos.cx + move.delta.x;
     while (pl->extpos.x >= World.cwidth)
 	pl->extpos.x -= World.cwidth;
