@@ -505,8 +505,7 @@ void Do_deflector(player *pl)
     }
     Player_add_fuel(pl, ED_DEFLECTOR);
 
-    Cell_get_objects(OBJ_X_IN_BLOCKS(pl), OBJ_Y_IN_BLOCKS(pl),
-		     (int)(range / BLOCK_CLICKS + 1), 200,
+    Cell_get_objects(pl->pos, (int)(range / BLOCK_CLICKS + 1), 200,
 		     &obj_list, &obj_count);
 
     for (i = 0; i < obj_count; i++) {

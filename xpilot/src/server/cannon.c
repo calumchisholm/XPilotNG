@@ -277,12 +277,11 @@ static int Cannon_in_danger(cannon_t *c)
     int		npx, npy, tdx, tdy;
     int		cpx = CLICK_TO_PIXEL(c->pos.cx);
     int		cpy = CLICK_TO_PIXEL(c->pos.cy);
-    blpos	bpos = Clpos_to_blpos(c->pos);
 
     if (options.cannonSmartness == 0)
 	return false;
 
-    Cell_get_objects(bpos.bx, bpos.by, range, max_objs,
+    Cell_get_objects(c->pos, range, max_objs,
 		     &obj_list, &obj_count);
 
     for (i = 0; (i < obj_count) && !danger; i++) {

@@ -421,7 +421,7 @@ void Alloc_cells(void);
 void Cell_init_object(object *obj);
 void Cell_add_object(object *obj);
 void Cell_remove_object(object *obj);
-void Cell_get_objects(int x, int y, int r, int max, object ***list, int *count);
+void Cell_get_objects(clpos pos, int r, int max, object ***list, int *count);
 
 /*
  * Prototypes for collision.c

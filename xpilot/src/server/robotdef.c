@@ -792,9 +792,8 @@ static bool Check_robot_target(player *pl, clpos item_pos, int new_mode)
     item_dist = LENGTH(dy, dx);
 
     if (dx == 0 && dy == 0) {
-	vector	*grav = &world->gravity
-	    [OBJ_X_IN_BLOCKS(pl)][OBJ_Y_IN_BLOCKS(pl)];
-	item_dir = findDir(grav->x, grav->y);
+	vector grav = World_gravity(world, pl->pos);
+	item_dir = findDir(grav.x, grav.y);
 	item_dir = MOD2(item_dir + RES/2, RES);
     } else
 	item_dir = findDir((double)dx, (double)dy);
@@ -1348,6 +1347,7 @@ static bool Ball_handler(player *pl)
     }
     if (BIT(pl->have, HAS_BALL) || pl->ball) {
 	ballobject *ball = NULL;
+	blpos bbpos;
 	int dist_np = INT_MAX;
 	int xdist, ydist;
 	int dx, dy;
@@ -1376,16 +1376,15 @@ static bool Ball_handler(player *pl)
 	bdir = findDir(ball->vel.x, ball->vel.y);
 	tdir = Wrap_cfindDir(closest_treasure->pos.cx - ball->pos.cx,
 			     closest_treasure->pos.cy - ball->pos.cy);
-	xdist = (closest_treasure->pos.cx / BLOCK_CLICKS)
-	    - OBJ_X_IN_BLOCKS(ball);
-	ydist = (closest_treasure->pos.cy / BLOCK_CLICKS)
-	    - OBJ_Y_IN_BLOCKS(ball);
+	bbpos = Clpos_to_blpos(ball->pos);
+	xdist = (closest_treasure->pos.cx / BLOCK_CLICKS) - bbpos.bx;
+	ydist = (closest_treasure->pos.cy / BLOCK_CLICKS) - bbpos.by;
 	for (dist = 0;
 	     clear_path && dist < (closest_tr_dist - BLOCK_SZ);
 	     dist += BLOCK_SZ / 2) {
 	    double fraction = (double)dist / closest_tr_dist;
-	    dx = (int)((fraction * xdist) + OBJ_X_IN_BLOCKS(ball));
-	    dy = (int)((fraction * ydist) + OBJ_Y_IN_BLOCKS(ball));
+	    dx = (int)((fraction * xdist) + bbpos.bx);
+	    dy = (int)((fraction * ydist) + bbpos.by);
 
 	    dx = WRAP_XBLOCK(dx);
 	    dy = WRAP_YBLOCK(dy);
@@ -1613,8 +1612,7 @@ static void Robot_default_play_check_objects(player *pl,
     if (options.asteroidCollisionMayKill)
 	killing_shots |= OBJ_ASTEROID;
 
-    Cell_get_objects(OBJ_X_IN_BLOCKS(pl), OBJ_Y_IN_BLOCKS(pl),
-		     (int)(Visibility_distance / BLOCK_SZ), max_objs,
+    Cell_get_objects(pl->pos, (int)(Visibility_distance / BLOCK_SZ), max_objs,
 		     &obj_list, &obj_count);
 
     for (j = 0; j < obj_count; j++) {
@@ -1815,9 +1813,7 @@ static void Robot_default_play(player *pl)
 				speed, x_speed, y_speed;
     int				item_dist, mine_dist;
     int				item_i, mine_i;
-    int				j, ship_i, item_imp,
-				enemy_i;
-    int				x, y;
+    int				j, ship_i, item_imp, enemy_i;
     bool			harvest_checked;
     bool			evade_checked;
     bool			navigate_checked;
@@ -2120,7 +2116,8 @@ static void Robot_default_play(player *pl)
 	    || (item_imp == ROBOT_IGNORE_ITEM)
 	    || (delta_dir < 3 * RES / 4 && delta_dir > RES / 4)) {
 	    navigate_checked = true;
-	    if (Check_robot_target(pl, Checks(world, pl->check)->pos, RM_NAVIGATE))
+	    if (Check_robot_target(pl, Checks(world, pl->check)->pos,
+				   RM_NAVIGATE))
 		return;
 	}
     }
@@ -2214,10 +2211,8 @@ static void Robot_default_play(player *pl)
 	    CLR_BIT(pl->used, HAS_CLOAKING_DEVICE);
     }
 
-    x = OBJ_X_IN_BLOCKS(pl);
-    y = OBJ_Y_IN_BLOCKS(pl);
-    x_speed = pl->vel.x - 2 * world->gravity[x][y].x;
-    y_speed = pl->vel.y - 2 * world->gravity[x][y].y;
+    x_speed = pl->vel.x - 2 * World_gravity(world, pl->pos).x;
+    y_speed = pl->vel.y - 2 * World_gravity(world, pl->pos).y;
 
     if (y_speed < (-my_data->robot_normal_speed)
 	|| (my_data->robot_count % 64) < 32) {

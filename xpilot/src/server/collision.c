@@ -533,8 +533,7 @@ static void PlayerObjectCollision(player *pl)
     if (!Player_is_playing(pl))
 	return;
 
-    Cell_get_objects(OBJ_X_IN_BLOCKS(pl), OBJ_Y_IN_BLOCKS(pl),
-		     4, 500, &obj_list, &obj_count);
+    Cell_get_objects(pl->pos, 4, 500, &obj_list, &obj_count);
 
     for (j = 0; j < obj_count; j++) {
 	bool hit;
@@ -1333,8 +1332,7 @@ static void AsteroidCollision(void)
 
 	assert(World_contains_clpos(world, ast->pos));
 
-	Cell_get_objects(OBJ_X_IN_BLOCKS(ast), OBJ_Y_IN_BLOCKS(ast),
-			 ast->pl_radius / BLOCK_SZ + 1, 300,
+	Cell_get_objects(ast->pos, ast->pl_radius / BLOCK_SZ + 1, 300,
 			 &obj_list, &obj_count);
 
 	for (j = 0; j < obj_count; j++) {
@@ -1501,8 +1499,7 @@ static void BallCollision(void)
 	if (!options.ballCollisions)
 	    continue;
 
-	Cell_get_objects(OBJ_X_IN_BLOCKS(ball), OBJ_Y_IN_BLOCKS(ball),
-			 4, 300, &obj_list, &obj_count);
+	Cell_get_objects(ball->pos, 4, 300, &obj_list, &obj_count);
 
 	for (j = 0; j < obj_count; j++) {
 	    int radius;
@@ -1598,8 +1595,7 @@ static void MineCollision(void)
 	    mine->life <= 0.0)		/* dying mine */
 	    continue;
 
-	Cell_get_objects(OBJ_X_IN_BLOCKS(mine), OBJ_Y_IN_BLOCKS(mine),
-			 4, 300, &obj_list, &obj_count);
+	Cell_get_objects(mine->pos, 4, 300, &obj_list, &obj_count);
 
 	for (j = 0; j < obj_count; j++) {
 	    double radius;

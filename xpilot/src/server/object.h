@@ -160,9 +160,6 @@ typedef struct {
 #define NOTEAM_BIT		(1U << 10)
 #define HITMASK(team) ((team) == TEAM_NOT_SET ? NOTEAM_BIT : 1U << (team))
 
-#define OBJ_X_IN_BLOCKS(obj)	CLICK_TO_BLOCK((obj)->pos.cx)
-#define OBJ_Y_IN_BLOCKS(obj)	CLICK_TO_BLOCK((obj)->pos.cy)
-
 
 /*
  * Node within a Cell list.
