@@ -298,16 +298,6 @@ The default value is: 2.
 How many seconds score objects remain visible on the map.
 The default value is: 4.000.
 .HP
-\fB\-pointerControl\fR <value>
-.TP
-Enable mouse control.
-This allows ship direction control by
-.IP
-moving the mouse to the left for an anti-clockwise turn and
-moving the mouse to the right for a clockwise turn.
-Also see the pointerButton options for use of the mouse buttons.
-The default value is: no.
-.HP
 \fB\-charsPerSecond\fR <value>
 .IP
 Rate at which messages appear on screen in characters per second.
