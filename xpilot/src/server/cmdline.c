@@ -1518,7 +1518,7 @@ static option_desc opts[] = {
     {
 	"ballConnectorSpringConstant",
 	"ballConnectorSpringConstant",
-	"1500.0",
+	"1650.0", /* legacy value was 1500 */
 	&options.ballConnectorSpringConstant,
 	valReal,
 	tuner_dummy,
@@ -2804,7 +2804,7 @@ static option_desc opts[] = {
     {
 	"initialFuel",
 	"initialFuel",
-	"1000",
+	"300", /* was 1000 */
 	&World.items[ITEM_FUEL].initial,
 	valInt,
 	Set_initial_resources,
@@ -3657,7 +3657,7 @@ static option_desc opts[] = {
     {
 	"constantSpeed",
 	"oldThrust",
-	"1.0",
+	"0.88",
 	&options.constantSpeed,
 	valReal,
 	tuner_dummy,
