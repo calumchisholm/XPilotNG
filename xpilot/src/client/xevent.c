@@ -380,8 +380,6 @@ static ipos_t	delta;
 ipos_t	mousePosition;	/* position of mouse pointer. */
 int	mouseMovement;	/* horizontal mouse movement. */
 struct timeval next_time = {0,0};
-int maxMouseTurnsPF;
-long movement_interval;
 
 void xevent_pointer(void)
 {

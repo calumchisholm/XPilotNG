@@ -51,7 +51,7 @@ extern display_t server_display; /* the servers idea about our display */
 
 extern int mouseMovement;
 extern struct timeval next_time;
-extern int maxMouseTurnsPF;
+extern int maxMouseTurnsPS;
 extern long movement_interval;
 
 int Net_setup(void);

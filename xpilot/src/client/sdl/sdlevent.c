@@ -37,8 +37,6 @@ bool            pointerControl = false;
 /* horizontal mouse movement. */
 int	mouseMovement;
 struct timeval next_time = {0,0};
-int maxMouseTurnsPF;
-long movement_interval;
 
 GLWidget *target[NUM_MOUSE_BUTTONS];
 GLWidget *hovertarget = NULL;

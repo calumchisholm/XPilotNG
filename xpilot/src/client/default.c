@@ -30,6 +30,8 @@
 char default_version[] = VERSION;
 
 static double	hudScale;	/* Scale for HUD drawing */
+int maxMouseTurnsPS = 0;
+long movement_interval = 0;
 
 static bool Set_nickName(xp_option_t *opt, const char *value)
 {
@@ -377,18 +379,20 @@ static bool Set_maxFPS(xp_option_t *opt, int val)
 {
     UNUSED_PARAM(opt);
     maxFPS = val;
-    if (maxMouseTurnsPF) movement_interval = 1000000 / (maxMouseTurnsPF*MIN(maxFPS,FPS));
-    else movement_interval = 0;
+    if (maxMouseTurnsPS) {
+    	movement_interval = 1000000 / maxMouseTurnsPS;
+    } else movement_interval = 0;
     Check_client_fps();
     return true;
 }
 
-static bool Set_maxMouseTurnsPF(xp_option_t *opt, int val)
+static bool Set_maxMouseTurnsPS(xp_option_t *opt, int val)
 {
     UNUSED_PARAM(opt);
-    maxMouseTurnsPF = val;
-    if (maxMouseTurnsPF) movement_interval = 1000000 / (maxMouseTurnsPF*MIN(maxFPS,FPS));
-    else movement_interval = 0;
+    maxMouseTurnsPS = val;
+    if (maxMouseTurnsPS) {
+    	movement_interval = 1000000 / maxMouseTurnsPS;
+    } else movement_interval = 0;
     return true;
 }
 
@@ -688,15 +692,14 @@ xp_option_t default_options[] = {
 	"send at most this many frames per second to the client.\n"),
 
     XP_INT_OPTION(
-	"maxMouseTurnsPF",
+	"maxMouseTurnsPS",
 	0,
 	0,
-	15,
-	&maxMouseTurnsPF,
-	Set_maxMouseTurnsPF,
+	MAX_SUPPORTED_FPS*2,
+	&maxMouseTurnsPS,
+	Set_maxMouseTurnsPS,
 	XP_OPTFLAG_CONFIG_DEFAULT,
-	"Set maximum number of mouse turns sent during a frame interval\n"
-	"(so per second max is MIN(maxFPS,FPS)/maxMouseTurnsPF)\n"
+	"Set maximum number of mouse turns sent per second\n"
 	"Set to 0 to disable this feature (its mostly useful on modem)\n"),
 
     XP_DOUBLE_OPTION(
