@@ -231,14 +231,14 @@ int in_range_partial(int p1x, int p1y, int p2x, int p2y,
     top = (fac1 * x2d + fac2 * y2d);
     bot = (fac1 * fac1 + fac2 * fac2);
 
-    if (top < 0)
+    if (top >= bot)
 	return 0;
-    if (bot < 5 * CLICK * CLICK || top > bot)
-	tmin = wall_time;
+    if (bot < 5 * CLICK * CLICK || top < 0)
+	tmin = 1 - wall_time;
     else
 	tmin = top / bot;
-    if (tmin > wall_time)
-	tmin = wall_time;
+    if (tmin < 1 - wall_time)
+	tmin = 1 - wall_time;
     fminx = x2d - fac1 * tmin;
     fminy = y2d - fac2 * tmin;
     if (fminx * fminx + fminy * fminy < r * r)
