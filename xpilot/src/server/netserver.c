@@ -379,8 +379,8 @@ static int Init_setup_old(void)
 		break;
 	    case CHECK:
 		for (i = 0; i < World.NumChecks; i++) {
-		    if (x != World.check[i].cx / BLOCK_CLICKS
-			|| y != World.check[i].cy / BLOCK_CLICKS) {
+		    if (x != CLICK_TO_BLOCK(World.check[i].cx)
+			|| y != CLICK_TO_BLOCK(World.check[i].cy)) {
 			continue;
 		    }
 		    *mapptr = SETUP_CHECK + i;
@@ -2191,8 +2191,8 @@ int Send_score_object(int ind, DFLOAT score, int cx, int cy,
 	return 0;
     }
 
-    bx = cx / BLOCK_CLICKS;
-    by = cy / BLOCK_CLICKS;
+    bx = CLICK_TO_BLOCK(cx);
+    by = CLICK_TO_BLOCK(cy);
 
     if (connp->version < 0x4500
 	|| (connp->version >= 0x4F09 && connp->version < 0x4F11)) {
