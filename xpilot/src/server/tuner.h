@@ -26,22 +26,26 @@
 #ifndef	TUNER_H
 #define	TUNER_H
 
-void tuner_plock(void);
-void tuner_shipmass(void);
-void tuner_ballmass(void);
-void tuner_maxrobots(void);
-void tuner_minrobots(void);
-void tuner_playershielding(void);
-void tuner_playerstartsshielded(void);
-void tuner_worldlives(void);
-void tuner_cannonsmartness(void);
-void tuner_teamcannons(void);
-void tuner_cannonsuseitems(void);
-void tuner_wormhole_stable_ticks(void);
-void tuner_modifiers(void);
-void tuner_gameduration(void);
-void tuner_racelaps(void);
-void tuner_allowalliances(void);
-void tuner_announcealliances(void);
+#ifndef MAP_H
+# include "map.h"
+#endif
+
+void tuner_plock(world_t *world);
+void tuner_shipmass(world_t *world);
+void tuner_ballmass(world_t *world);
+void tuner_maxrobots(world_t *world);
+void tuner_minrobots(world_t *world);
+void tuner_playershielding(world_t *world);
+void tuner_playerstartsshielded(world_t *world);
+void tuner_worldlives(world_t *world);
+void tuner_cannonsmartness(world_t *world);
+void tuner_teamcannons(world_t *world);
+void tuner_cannonsuseitems(world_t *world);
+void tuner_wormhole_stable_ticks(world_t *world);
+void tuner_modifiers(world_t *world);
+void tuner_gameduration(world_t *world);
+void tuner_racelaps(world_t *world);
+void tuner_allowalliances(world_t *world);
+void tuner_announcealliances(world_t *world);
 
 #endif

@@ -554,7 +554,7 @@ bool Grok_map(world_t *world)
     if (!is_polygon_map)
 	Xpmap_blocks_to_polygons(world);
 
-    Compute_gravity();
+    Compute_gravity(world);
     Find_base_direction(world);
 
     return true;
@@ -573,9 +573,9 @@ bool Grok_map_options(world_t *world)
 
     World_alloc(world);
 
-    Set_world_rules();
-    Set_world_items();
-    Set_world_asteroids();
+    Set_world_rules(world);
+    Set_world_items(world);
+    Set_world_asteroids(world);
 
     if (BIT(world->rules->mode, TEAM_PLAY|TIMING) == (TEAM_PLAY|TIMING)) {
 	warn("Cannot teamplay while in race mode -- ignoring teamplay");
@@ -850,10 +850,8 @@ static void Compute_local_gravity(world_t *world)
 }
 
 
-void Compute_gravity(void)
+void Compute_gravity(world_t *world)
 {
-    world_t *world = &World;
-
     Compute_global_gravity(world);
     Compute_local_gravity(world);
 }

@@ -139,10 +139,8 @@ static inline bool can_hit(group_t *gp, move_t *move)
     return gp->hitfunc(gp, move);
 }
 
-void Move_init(void)
+void Move_init(world_t *world)
 {
-    world_t *world = &World;
-
     LIMIT(options.maxObjectWallBounceSpeed, 0, world->hypotenuse);
     LIMIT(options.maxShieldedWallBounceSpeed, 0, world->hypotenuse);
     LIMIT(options.maxUnshieldedWallBounceSpeed, 0, world->hypotenuse);
@@ -2464,7 +2462,7 @@ static void Corner_init(void)
 }
 
 
-void Ball_line_init(void)
+void Ball_line_init(world_t *world)
 {
     int i;
     static shapepos_t coords[MAX_SHIP_PTS];
@@ -2533,9 +2531,8 @@ static void Poly_to_lines(void)
     return;
 }
 
-void Walls_init(void)
+void Walls_init(world_t *world)
 {
-    world_t *world = &World;
     double x, y, l2;
     int i;
 
@@ -2554,7 +2551,7 @@ void Walls_init(void)
      * sides of a moving polygon shape. */
     Corner_init();
 
-    Ball_line_init();
+    Ball_line_init(world);
 
     /* Initialize the data structures used when determining whether a given
      * arbitrary point on the map is inside something. */

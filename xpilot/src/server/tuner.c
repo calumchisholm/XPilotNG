@@ -27,13 +27,13 @@
 
 char tuner_version[] = VERSION;
 
-void tuner_plock(void)
+void tuner_plock(world_t *world)
 {
     options.pLockServer
 	= (plock_server(options.pLockServer) == 1) ? true : false;
 }
 
-void tuner_shipmass(void)
+void tuner_shipmass(world_t *world)
 {
     int i;
 
@@ -41,7 +41,7 @@ void tuner_shipmass(void)
 	Players(i)->emptymass = options.shipMass;
 }
 
-void tuner_ballmass(void)
+void tuner_ballmass(world_t *world)
 {
     int i;
 
@@ -51,10 +51,8 @@ void tuner_ballmass(void)
     }
 }
 
-void tuner_maxrobots(void)
+void tuner_maxrobots(world_t *world)
 {
-    world_t *world = &World;
-
     if (options.maxRobots < 0)
 	options.maxRobots = world->NumBases;
 
@@ -65,7 +63,7 @@ void tuner_maxrobots(void)
 	Robot_delete(NULL, true);
 }
 
-void tuner_minrobots(void)
+void tuner_minrobots(world_t *world)
 {
     if (options.minRobots < 0)
 	options.minRobots = options.maxRobots;
@@ -74,11 +72,11 @@ void tuner_minrobots(void)
 	options.maxRobots = options.minRobots;
 }
 
-void tuner_playershielding(void)
+void tuner_playershielding(world_t *world)
 {
     int i;
 
-    Set_world_rules();
+    Set_world_rules(world);
 
     if (options.playerShielding) {
 	SET_BIT(DEF_HAVE, HAS_SHIELD);
@@ -104,21 +102,19 @@ void tuner_playershielding(void)
     }
 }
 
-void tuner_playerstartsshielded(void)
+void tuner_playerstartsshielded(world_t *world)
 {
     if (options.playerShielding)
 	/* Doesn't make sense to turn off when shields are on. */
 	options.playerStartsShielded = true;
 }
 
-void tuner_worldlives(void)
+void tuner_worldlives(world_t *world)
 {
-    world_t *world = &World;
-
     if (options.worldLives < 0)
 	options.worldLives = 0;
 
-    Set_world_rules();
+    Set_world_rules(world);
 
     if (BIT(world->rules->mode, LIMITED_LIVES)) {
 	Reset_all_players();
@@ -127,16 +123,15 @@ void tuner_worldlives(void)
     }
 }
 
-void tuner_cannonsmartness(void)
+void tuner_cannonsmartness(world_t *world)
 {
     LIMIT(options.cannonSmartness, 0, 3);
 }
 
-void tuner_teamcannons(void)
+void tuner_teamcannons(world_t *world)
 {
     int i;
     int team;
-    world_t *world = &World;
 
     if (options.teamCannons) {
 	for (i = 0; i < world->NumCannons; i++) {
@@ -154,13 +149,12 @@ void tuner_teamcannons(void)
     }
 }
 
-void tuner_cannonsuseitems(void)
+void tuner_cannonsuseitems(world_t *world)
 {
     int i, j;
     cannon_t *c;
-    world_t *world = &World;
 
-    Move_init();
+    Move_init(world);
 
     for (i = 0; i < world->NumCannons; i++) {
 	c = Cannons(world, i);
@@ -169,15 +163,15 @@ void tuner_cannonsuseitems(void)
 
 	    if (options.cannonsUseItems)
 		Cannon_add_item(c, j,
-				(int)(rfrac() * (world->items[j].initial + 1)));
+				(int)(rfrac()
+				      * (world->items[j].initial + 1)));
 	}
     }
 }
 
-void tuner_wormhole_stable_ticks(void)
+void tuner_wormhole_stable_ticks(world_t *world)
 {
     int i;
-    world_t *world = &World;
 
     if (options.wormholeStableTicks < 0.0)
 	options.wormholeStableTicks = 0.0;
@@ -186,17 +180,17 @@ void tuner_wormhole_stable_ticks(void)
 	Wormholes(world, i)->countdown = options.wormholeStableTicks;
 }
 
-void tuner_modifiers(void)
+void tuner_modifiers(world_t *world)
 {
     int i;
 
-    Set_world_rules();
+    Set_world_rules(world);
 
     for (i = 0; i < NumPlayers; i++)
 	filter_mods(&Players(i)->mods);
 }
 
-void tuner_gameduration(void)
+void tuner_gameduration(world_t *world)
 {
     if (options.gameDuration <= 0.0)
 	gameOverTime = time(NULL);
@@ -204,10 +198,8 @@ void tuner_gameduration(void)
 	gameOverTime = (time_t) (options.gameDuration * 60) + time(NULL);
 }
 
-void tuner_racelaps(void)
+void tuner_racelaps(world_t *world)
 {
-    world_t *world = &World;
-
     if (BIT(world->rules->mode, TIMING)) {
 	Reset_all_players();
 	if (options.gameDuration == -1)
@@ -215,10 +207,8 @@ void tuner_racelaps(void)
     }
 }
 
-void tuner_allowalliances(void)
+void tuner_allowalliances(world_t *world)
 {
-    world_t *world = &World;
-
     if (BIT(world->rules->mode, TEAM_PLAY))
 	CLR_BIT(world->rules->mode, ALLIANCES);
 
@@ -226,7 +216,7 @@ void tuner_allowalliances(void)
 	Dissolve_all_alliances();
 }
 
-void tuner_announcealliances(void)
+void tuner_announcealliances(world_t *world)
 {
     updateScores = true;
 }

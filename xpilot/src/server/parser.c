@@ -442,9 +442,10 @@ bool Parser(int argc, char **argv)
  */
 int Tune_option(char *name, char *val)
 {
-    int			ival;
-    double		fval;
-    option_desc		*opt;
+    int ival;
+    double fval;
+    option_desc *opt;
+    world_t *world = &World;
 
     if (!(opt = Find_option_by_name(name)))
 	return -2;	/* Variable not found */
@@ -457,7 +458,7 @@ int Tune_option(char *name, char *val)
 	if (Convert_string_to_int(val, &ival) != true)
 	    return 0;
 	*(int *)opt->variable = ival;
-	(*opt->tuner)();
+	(*opt->tuner)(world);
 	return 1;
     case valBool:
 	if (ON(val))
@@ -466,13 +467,13 @@ int Tune_option(char *name, char *val)
 	    *(bool *)opt->variable = false;
 	else
 	    return 0;
-	(*opt->tuner)();
+	(*opt->tuner)(world);
 	return 1;
     case valReal:
 	if (Convert_string_to_float(val, &fval) != true)
 	    return 0;
 	*(double *)opt->variable = fval;
-	(*opt->tuner)();
+	(*opt->tuner)(world);
 	return 1;
     case valString:
 	{
@@ -482,7 +483,7 @@ int Tune_option(char *name, char *val)
 	    if (*(char **)(opt->variable) != opt->defaultValue)
 		free(*(char **)opt->variable);
 	    *(char **)opt->variable = s;
-	    (*opt->tuner)();
+	    (*opt->tuner)(world);
 	    return 1;
 	}
     default:

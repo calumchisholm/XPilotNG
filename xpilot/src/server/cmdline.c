@@ -57,34 +57,34 @@ struct options options;
  * The tuner_dummy can be specified if it is OK to modify the option
  * during runtime and no follow up action is needed.
  */
-void tuner_none(void)  {}
-void tuner_dummy(void) {}
+void tuner_none(world_t *world)  {}
+void tuner_dummy(world_t *world) {}
 
 
-static void Tune_robot_user_name(void)
+static void Tune_robot_user_name(world_t *world)
 {
     Fix_user_name(options.robotUserName);
 }
-static void Tune_robot_host_name(void)
+static void Tune_robot_host_name(world_t *world)
 {
     Fix_host_name(options.robotHostName);
 }
-static void Tune_tank_user_name(void)
+static void Tune_tank_user_name(world_t *world)
 {
     Fix_user_name(options.tankUserName);
 }
-static void Tune_tank_host_name(void)
+static void Tune_tank_host_name(world_t *world)
 {
     Fix_host_name(options.tankHostName);
 }
-static void Tune_tagGame(void)
+static void Tune_tagGame(world_t *world)
 {
     if (!options.tagGame)
 	tagItPlayerId = NO_ID;
 }
 
 
-static void Check_baseless(void);
+static void Check_baseless(world_t *world);
 
 static option_desc opts[] = {
     {
@@ -3647,10 +3647,8 @@ option_desc* Find_option_by_name(const char* name)
 }
 
 
-void Check_playerlimit(void)
+void Check_playerlimit(world_t *world)
 {
-    world_t *world = &World;
-
     if (options.playerLimit == 0)
 	options.playerLimit = world->NumBases + 10;
 
@@ -3662,18 +3660,14 @@ void Check_playerlimit(void)
 	options.playerLimit = options.playerLimit_orig;
 }
 
-static void Check_baseless(void)
+static void Check_baseless(world_t *world)
 {
-    world_t *world = &World;
-
     if (!BIT(world->rules->mode, TEAM_PLAY))
 	options.baselessPausing = false;
 }
 
-void Timing_setup(void)
+void Timing_setup(world_t *world)
 {
-    world_t *world = &World;
-
     if (FPS > 100)
 	FPS = 100;
     if (FPS < 1)

@@ -67,12 +67,12 @@ long	USED_KILL =
  * Convert between probability for something to happen a given second on a
  * given block, to chance for such an event to happen on any block this tick.
  */
-static void Set_item_chance(int item)
+static void Set_item_chance(world_t *world, int item)
 {
-    world_t *world = &World;
-    double	max = options.itemProbMult * options.maxItemDensity * world->x * world->y;
-    double	sum = 0;
-    int		i, num = 0;
+    double max
+	= options.itemProbMult * options.maxItemDensity * world->x * world->y;
+    double sum = 0;
+    int i, num = 0;
 
     if (options.itemProbMult * world->items[item].prob > 0) {
 	world->items[item].chance = (int)(1.0
@@ -114,15 +114,15 @@ static void Set_item_chance(int item)
  * An item probability has been changed during game play.
  * Update the world->items structure and test if there are more items
  * in the world than wanted for the new item probabilities.
- * This function is also called when options.itemProbMult or options.maxItemDensity changes.
+ * This function is also called when option itemProbMult or
+ * option maxItemDensity changes.
  */
-void Tune_item_probs(void)
+void Tune_item_probs(world_t *world)
 {
     int i, j, excess;
-    world_t *world = &World;
 
     for (i = 0; i < NUM_ITEMS; i++) {
-	Set_item_chance(i);
+	Set_item_chance(world, i);
 	excess = world->items[i].num - world->items[i].max;
 	if (excess > 0) {
 	    for (j = 0; j < NumObjs; j++) {
@@ -141,9 +141,8 @@ void Tune_item_probs(void)
     }
 }
 
-void Tune_asteroid_prob(void)
+void Tune_asteroid_prob(world_t *world)
 {
-    world_t *world = &World;
     double max = options.maxAsteroidDensity * world->x * world->y;
 
     if (world->asteroids.prob > 0) {
@@ -171,10 +170,8 @@ void Tune_asteroid_prob(void)
 /*
  * Postprocess a change command for the number of items per pack.
  */
-void Tune_item_packs(void)
+void Tune_item_packs(world_t *world)
 {
-    world_t *world = &World;
-
     world->items[ITEM_MINE].max_per_pack = options.maxMinesPerPack;
     world->items[ITEM_MISSILE].max_per_pack = options.maxMissilesPerPack;
 }
@@ -186,16 +183,14 @@ void Tune_item_packs(void)
  * second and third parameters are minimum and maximum number
  * of elements one item gives when picked up by a ship.
  */
-static void Init_item(int item, int minpp, int maxpp)
+static void Init_item(world_t *world, int item, int minpp, int maxpp)
 {
-    world_t *world = &World;
-
     world->items[item].num = 0;
 
     world->items[item].min_per_pack = minpp;
     world->items[item].max_per_pack = maxpp;
 
-    Set_item_chance(item);
+    Set_item_chance(world, item);
 }
 
 
@@ -204,10 +199,9 @@ static void Init_item(int item, int minpp, int maxpp)
  * the availability of initial items.
  * Limit the initial resources between minimum and maximum possible values.
  */
-void Set_initial_resources(void)
+void Set_initial_resources(world_t *world)
 {
     int i;
-    world_t *world = &World;
 
     LIMIT(world->items[ITEM_FUEL].limit, 0, MAX_FUEL);
     LIMIT(world->items[ITEM_WIDEANGLE].limit, 0, MAX_WIDEANGLE);
@@ -266,10 +260,8 @@ void Set_initial_resources(void)
 }
 
 
-void Set_misc_item_limits(void)
+void Set_misc_item_limits(world_t *world)
 {
-    world_t *world = &World;
-
     LIMIT(options.dropItemOnKillProb, 0.0, 1.0);
     LIMIT(options.detonateItemOnKillProb, 0.0, 1.0);
     LIMIT(options.movingItemProb, 0.0, 1.0);
@@ -289,39 +281,38 @@ void Set_misc_item_limits(void)
 /*
  * First time initialization of all global item stuff.
  */
-void Set_world_items(void)
+void Set_world_items(world_t *world)
 {
-    Init_item(ITEM_FUEL, 0, 0);
-    Init_item(ITEM_TANK, 1, 1);
-    Init_item(ITEM_ECM, 1, 1);
-    Init_item(ITEM_ARMOR, 1, 1);
-    Init_item(ITEM_MINE, 1, options.maxMinesPerPack);
-    Init_item(ITEM_MISSILE, 1, options.maxMissilesPerPack);
-    Init_item(ITEM_CLOAK, 1, 1);
-    Init_item(ITEM_SENSOR, 1, 1);
-    Init_item(ITEM_WIDEANGLE, 1, 1);
-    Init_item(ITEM_REARSHOT, 1, 1);
-    Init_item(ITEM_AFTERBURNER, 1, 1);
-    Init_item(ITEM_TRANSPORTER, 1, 1);
-    Init_item(ITEM_MIRROR, 1, 1);
-    Init_item(ITEM_DEFLECTOR, 1, 1);
-    Init_item(ITEM_HYPERJUMP, 1, 1);
-    Init_item(ITEM_PHASING, 1, 1);
-    Init_item(ITEM_LASER, 1, 1);
-    Init_item(ITEM_EMERGENCY_THRUST, 1, 1);
-    Init_item(ITEM_EMERGENCY_SHIELD, 1, 1);
-    Init_item(ITEM_TRACTOR_BEAM, 1, 1);
-    Init_item(ITEM_AUTOPILOT, 1, 1);
+    Init_item(world, ITEM_FUEL, 0, 0);
+    Init_item(world, ITEM_TANK, 1, 1);
+    Init_item(world, ITEM_ECM, 1, 1);
+    Init_item(world, ITEM_ARMOR, 1, 1);
+    Init_item(world, ITEM_MINE, 1, options.maxMinesPerPack);
+    Init_item(world, ITEM_MISSILE, 1, options.maxMissilesPerPack);
+    Init_item(world, ITEM_CLOAK, 1, 1);
+    Init_item(world, ITEM_SENSOR, 1, 1);
+    Init_item(world, ITEM_WIDEANGLE, 1, 1);
+    Init_item(world, ITEM_REARSHOT, 1, 1);
+    Init_item(world, ITEM_AFTERBURNER, 1, 1);
+    Init_item(world, ITEM_TRANSPORTER, 1, 1);
+    Init_item(world, ITEM_MIRROR, 1, 1);
+    Init_item(world, ITEM_DEFLECTOR, 1, 1);
+    Init_item(world, ITEM_HYPERJUMP, 1, 1);
+    Init_item(world, ITEM_PHASING, 1, 1);
+    Init_item(world, ITEM_LASER, 1, 1);
+    Init_item(world, ITEM_EMERGENCY_THRUST, 1, 1);
+    Init_item(world, ITEM_EMERGENCY_SHIELD, 1, 1);
+    Init_item(world, ITEM_TRACTOR_BEAM, 1, 1);
+    Init_item(world, ITEM_AUTOPILOT, 1, 1);
 
-    Set_misc_item_limits();
+    Set_misc_item_limits(world);
 
-    Set_initial_resources();
+    Set_initial_resources(world);
 }
 
 
-void Set_world_rules(void)
+void Set_world_rules(world_t *world)
 {
-    world_t *world = &World;
     static rules_t rules;
 
     rules.mode =
@@ -356,10 +347,8 @@ void Set_world_rules(void)
     DEF_USED &= DEF_HAVE;
 }
 
-void Set_world_asteroids(void)
+void Set_world_asteroids(world_t *world)
 {
-    world_t *world = &World;
-
     world->asteroids.num = 0;
-    Tune_asteroid_prob();
+    Tune_asteroid_prob(world);
 }

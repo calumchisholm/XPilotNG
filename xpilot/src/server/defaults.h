@@ -26,6 +26,10 @@
 #ifndef DEFAULTS_H
 #define DEFAULTS_H
 
+#ifndef MAP_H
+# include "map.h"
+#endif
+
 enum valType {
     valVoid,		/* variable is not a variable */
     valInt,		/* variable is type int */
@@ -66,7 +70,7 @@ typedef struct _option_desc {
     const char		*defaultValue;
     void		*variable;
     enum valType	type;
-    void		(*tuner)(void);
+    void		(*tuner)(world_t *world);
     const char		*helpLine;
     int			flags;		/* allowable option origins. */
 } option_desc;

@@ -1063,7 +1063,7 @@ static int Check_address(char *str)
     return 0;
 }
 
-void Set_deny_hosts(void)
+void Set_deny_hosts(world_t *world)
 {
     char		*list;
     char		*tok, *slash;

@@ -100,11 +100,11 @@ int main(int argc, char **argv)
     if (Parser(argc, argv) == false)
 	exit(1);
 
-    Init_recording();
+    Init_recording(world);
     /* Lock the server into memory */
     plock_server(options.pLockServer);
 
-    Walls_init();
+    Walls_init(world);
 
     /* Allocate memory for players, shots and messages */
     Alloc_players(world->NumBases + MAX_PSEUDO_PLAYERS + MAX_SPECTATORS);
@@ -112,10 +112,10 @@ int main(int argc, char **argv)
     Alloc_shots(MAX_TOTAL_SHOTS);
     Alloc_cells();
 
-    Move_init();
+    Move_init(world);
     Robot_init();
     Treasure_init();
-    Hitmasks_init();
+    Hitmasks_init(world);
 
     Rank_init_saved_scores();
 
@@ -149,8 +149,8 @@ int main(int argc, char **argv)
 
     Meta_init();
 
-    Timing_setup();
-    Check_playerlimit();
+    Timing_setup(world);
+    Check_playerlimit(world);
 
     if (Setup_net_server() == -1)
 	End_game();
@@ -287,8 +287,8 @@ void Main_loop(void)
  */
 int End_game(void)
 {
-    player_t		*pl;
-    char		msg[MSG_LEN];
+    player_t *pl;
+    char msg[MSG_LEN];
     world_t *world = &World;
 
     record = rrecord;
@@ -319,7 +319,7 @@ int End_game(void)
 
     if (options.recordMode != 0) {
 	options.recordMode = 0;
-	Init_recording();
+	Init_recording(world);
     }
 
     /* Tell meta server that we are gone. */

@@ -216,7 +216,7 @@ void Get_recording_data(void)
     }
 }
 
-void Init_recording(void)
+void Init_recording(world_t *world)
 {
     static int oldMode = 0;
     int i;

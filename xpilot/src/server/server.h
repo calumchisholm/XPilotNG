@@ -449,9 +449,9 @@ void release_ID(int id);
  * Prototypes for walls.c
  */
 void Groups_init(void);
-void Walls_init(void);
+void Walls_init(world_t *world);
 void Treasure_init(void);
-void Move_init(void);
+void Move_init(world_t *world);
 void Move_object(object_t *obj);
 void Move_player(player_t *pl);
 void Turn_player(player_t *pl);
@@ -459,7 +459,7 @@ int is_inside(int x, int y, hitmask_t hitmask, const object_t *obj);
 int shape_is_inside(int cx, int cy, hitmask_t hitmask, const object_t *obj,
 		    const shape_t *s, int dir);
 int Polys_to_client(unsigned char **);
-void Ball_line_init(void);
+void Ball_line_init(world_t *world);
 void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt);
 void Object_crash(object_t *obj, int crashtype, int mapobj_ind);
 
@@ -495,7 +495,7 @@ int World_place_friction_area(world_t *world, clpos_t pos, double fric);
 void World_add_temporary_wormholes(world_t *world, clpos_t pos1, clpos_t pos2);
 void Wormhole_line_init(void);
 
-void Compute_gravity(void);
+void Compute_gravity(world_t *world);
 double Wrap_findDir(double dx, double dy);
 double Wrap_cfindDir(int dx, int dy);
 double Wrap_length(int dx, int dy);
@@ -525,12 +525,12 @@ bool parseXp2MapFile(int fd, optOrigin opt_origin);
 /*
  * Prototypes for cmdline.c
  */
-void tuner_none(void);
-void tuner_dummy(void);
+void tuner_none(world_t *world);
+void tuner_dummy(world_t *world);
+void Check_playerlimit(world_t *world);
+void Timing_setup(world_t *world);
 bool Init_options(void);
 void Free_options(void);
-void Check_playerlimit(void);
-void Timing_setup(void);
 
 /*
  * Prototypes for play.c
@@ -582,7 +582,7 @@ void World_restore_cannon(world_t *world, cannon_t *cannon);
 void World_remove_cannon(world_t *world, cannon_t *cannon);
 
 hitmask_t Target_hitmask(target_t *targ);
-void Target_init(void);
+void Target_init(world_t *world);
 void World_restore_target(world_t *world, target_t *targ);
 void World_remove_target(world_t *world, target_t *targ);
 
@@ -592,8 +592,8 @@ void World_remove_wormhole(world_t *world, wormhole_t *wormhole);
 
 bool Friction_area_hitfunc(group_t *groupptr, move_t *move);
 
-void Team_immunity_init(void);
-void Hitmasks_init(void);
+void Team_immunity_init(world_t *world);
+void Hitmasks_init(world_t *world);
 void Transfer_tag(player_t *oldtag_pl, player_t *newtag_pl);
 /*double Handle_tag(double score, player_t *victim_pl, player_t* killer_pl);*/
 void Check_tag(void);
@@ -838,14 +838,14 @@ void Robot_message(player_t *robot, const char *message);
 /*
  * Prototypes for rules.c
  */
-void Tune_item_probs(void);
-void Tune_item_packs(void);
-void Set_initial_resources(void);
-void Set_world_items(void);
-void Set_world_rules(void);
-void Set_world_asteroids(void);
-void Set_misc_item_limits(void);
-void Tune_asteroid_prob(void);
+void Tune_item_probs(world_t *world);
+void Tune_item_packs(world_t *world);
+void Set_initial_resources(world_t *world);
+void Set_world_items(world_t *world);
+void Set_world_rules(world_t *world);
+void Set_world_asteroids(world_t *world);
+void Set_misc_item_limits(world_t *world);
+void Tune_asteroid_prob(world_t *world);
 
 /*
  * Prototypes for server.c
@@ -870,7 +870,7 @@ void Queue_kick(const char *nick);
 void Queue_loop(void);
 int Queue_advance_player(char *name, char *msg);
 int Queue_show_list(char *msg);
-void Set_deny_hosts(void);
+void Set_deny_hosts(world_t *world);
 
 /*
  * Prototypes for metaserver.c
@@ -995,7 +995,7 @@ char *showtime(void);
 /*
  * Prototypes for srecord.c
  */
-void Init_recording(void);
+void Init_recording(world_t *world);
 void Handle_recording_buffers(void);
 void Get_recording_data(void);
 

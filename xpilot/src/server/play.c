@@ -556,10 +556,9 @@ static void Target_set_hitmask(int group, target_t *targ)
     P_set_hitmask(targ->group, Target_hitmask(targ));
 }
 
-void Target_init(void)
+void Target_init(world_t *world)
 {
     int group;
-    world_t *world = &World;
 
     for (group = 0; group < num_groups; group++) {
 	group_t *gp = groupptr_by_id(group);
@@ -697,10 +696,9 @@ bool Friction_area_hitfunc(group_t *groupptr, move_t *move)
 /*
  * Handling of group properties
  */
-void Team_immunity_init(void)
+void Team_immunity_init(world_t *world)
 {
     int group;
-    world_t *world = &World;
 
     for (group = 0; group < num_groups; group++) {
 	group_t *gp = groupptr_by_id(group);
@@ -719,8 +717,8 @@ void Team_immunity_init(void)
 }
 
 /* kps - called at server startup to initialize hit masks */
-void Hitmasks_init(void)
+void Hitmasks_init(world_t *world)
 {
-    Target_init();
-    Team_immunity_init();
+    Target_init(world);
+    Team_immunity_init(world);
 }

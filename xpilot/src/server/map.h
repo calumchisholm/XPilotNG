@@ -32,16 +32,13 @@
 #define	MAP_H
 
 #ifndef TYPES_H
-/* need position */
-#include "types.h"
+# include "types.h"
 #endif
 #ifndef RULES_H
-/* need rules_t */
-#include "rules.h"
+# include "rules.h"
 #endif
 #ifndef ITEM_H
-/* need NUM_ITEMS */
-#include "item.h"
+# include "item.h"
 #endif
 
 #define SPACE			0

@@ -524,8 +524,8 @@ static void Xpmap_place_treasure(world_t *world, blkpos_t blk, bool empty,
 {
     World_set_block(world, blk, TREASURE);
     if (create)
-	World_place_treasure(world, Block_get_center_clpos(blk), TEAM_NOT_SET, empty,
-			     0xff);
+	World_place_treasure(world, Block_get_center_clpos(blk),
+			     TEAM_NOT_SET, empty, 0xff);
 }
 
 static void Xpmap_place_wormhole(world_t *world, blkpos_t blk, wormType type,
@@ -814,6 +814,7 @@ void Xpmap_find_map_object_teams(world_t *world)
 void Xpmap_find_base_direction(world_t *world)
 {
     int	i;
+    blkpos_t blk;
 
     for (i = 0; i < world->NumBases; i++) {
 	base_t *base = Bases(world, i);
@@ -884,13 +885,9 @@ void Xpmap_find_base_direction(world_t *world)
 	    dir = att;
 	base->dir = dir;
     }
-    for (i = 0; i < world->x; i++) {
-	int j;
-	for (j = 0; j < world->y; j++) {
-	    blkpos_t blk;
-	    blk.bx = i;
-	    blk.by = j;
-	    if (world->block[i][j] == BASE_ATTRACTOR)
+    for (blk.bx = 0; blk.bx < world->x; blk.bx++) {
+	for (blk.by = 0; blk.by < world->y; blk.by++) {
+	    if (World_get_block(world, blk) == BASE_ATTRACTOR)
 		World_set_block(world, blk, SPACE);
 	}
     }
