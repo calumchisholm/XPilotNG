@@ -622,7 +622,8 @@ int Net_flush(void)
 	wbuf.ptr = wbuf.buf;
 	return 0;
     }
-    if (last_keyboard_ack != last_keyboard_change)
+    if (last_keyboard_ack != last_keyboard_change &&
+	last_keyboard_update != last_loops)
 	/*
 	 * Since 3.2.10: just call Key_update to add our keyboard vector.
 	 * Key_update will call Send_keyboard to flush our buffer.
