@@ -237,16 +237,12 @@ void Place_item(int item, int ind)
 	    else
 		cy += (BLOCK_CLICKS + (int)(rfrac() * 8 * CLICK));
 	}
-	if (cx < 0)
-	    cx += World.cwidth;
-	else if (cx >= World.cwidth)
-	    cx -= World.cwidth;
-	if (cy < 0)
-	    cy += World.cheight;
-	else if (cy >= World.cheight)
-	    cy -= World.cheight;
-	bx = cx / BLOCK_CLICKS;
-	by = cy / BLOCK_CLICKS;
+	cx = WRAP_XCLICK(cx);
+	cy = WRAP_YCLICK(cy);
+	if (!INSIDE_MAP(cx, cy))
+	    return;
+	bx = CLICK_TO_BLOCK(cx);
+	by = CLICK_TO_BLOCK(cy);
 
 	if (is_polygon_map || !useOldCode) {
 	    if (is_inside(cx, cy, NOTEAM_BIT | NONBALL_BIT, NULL) != -1)
@@ -285,28 +281,20 @@ void Place_item(int item, int ind)
 	    if (con) {
 		/* change to use clicks */
 		dir = (int)(rfrac() * RES);
-		dist = (int)(rfrac() * ((itemConcentratorRadius * BLOCK_SZ) + 1));
-		cx = con->pos.cx + PIXEL_TO_CLICK(dist * tcos(dir));
-		cy = con->pos.cy + PIXEL_TO_CLICK(dist * tsin(dir));
-		if (BIT(World.rules->mode, WRAP_PLAY)) {
-		    if (cx < 0) cx += World.cwidth;
-		    if (cx >= World.cwidth) cx -= World.cwidth;
-		    if (cy < 0) cy += World.cheight;
-		    if (cy >= World.cheight) cy -= World.cheight;
-		}
-		if (cx < 0 || cx >= World.cwidth
-		    || cy < 0 || cy >= World.cheight) {
+		dist = (int)(rfrac() * ((itemConcentratorRadius * BLOCK_CLICKS) + 1));
+		cx = con->pos.cx + dist * tcos(dir);
+		cy = con->pos.cy + dist * tsin(dir);
+		cx = WRAP_XCLICK(cx);
+		cy = WRAP_YCLICK(cy);
+		if (!INSIDE_MAP(cx, cy))
 		    continue;
-		}
-		bx = cx / BLOCK_CLICKS;
-		by = cy / BLOCK_CLICKS;
 	    }
 	    else {
 		cx = (int)(rfrac() * World.cwidth);
 		cy = (int)(rfrac() * World.cheight);
-		bx = cx / BLOCK_CLICKS;
-		by = cy / BLOCK_CLICKS;
 	    }
+	    bx = CLICK_TO_BLOCK(cx);
+	    by = CLICK_TO_BLOCK(cy);
 
 	    if (is_polygon_map || !useOldCode) {
 		if (is_inside(cx, cy, NOTEAM_BIT | NONBALL_BIT, NULL) == -1)

@@ -382,11 +382,8 @@ static void Place_asteroid(void)
 	    cy = con->pos.cy + dist * tsin(dir);
 	    cx = WRAP_XCLICK(cx);
 	    cy = WRAP_YCLICK(cy);
-
-	    if (cx < 0 || cx > World.cwidth
-		|| cy < 0 || cy > World.cheight) {
+	    if (!INSIDE_MAP(cx, cy))
 		continue;
-	    }
 	} else {
 	    cx = (int)(rfrac() * World.cwidth);
 	    cy = (int)(rfrac() * World.cheight);
