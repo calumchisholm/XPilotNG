@@ -3364,7 +3364,8 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     /*
      * Pointer button bindings
      */
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < NUM_MOUSE_BUTTONS; i++) {
+    	buttonMap[i] = NULL;
 	sprintf(resValue, "pointerButton%d", i+1);
 	Get_resource(rDB, resValue, resValue, sizeof resValue);
 	ptr = resValue;
@@ -3377,7 +3378,11 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 		for (j = 0; j < NELEM(options); j++) {
 		    if (options[j].key != KEY_DUMMY) {
 			if (!strcasecmp(ptr, options[j].name + 3)) {
-			    buttonMap[i] = options[j].key;
+    	    	    	    keylist *temp = buttonMap[i];
+    	    	    	    buttonMap[i] = (keylist *)malloc(sizeof(keylist));
+    	    	    	    buttonMap[i]->next = temp;
+	    	
+    	    	    	    buttonMap[i]->key = options[j].key;
 			    break;
 			}
 		    }

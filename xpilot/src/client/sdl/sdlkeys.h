@@ -4,6 +4,7 @@
 #include "SDL.h"
 #include "keys.h"
 
+#define NUM_MOUSE_BUTTONS 5
 
 SDLKey Get_key_by_name(const char* name);
 char *Get_name_by_key(SDLKey key);
@@ -14,6 +15,6 @@ typedef struct {
 } keylist;
 
 keylist     	*keyMap[SDLK_LAST];   /* maps SDLKeys to keys_t */
-keys_t          buttonMap[5];        /* maps mouse buttons to keys_t */
+keylist         *buttonMap[NUM_MOUSE_BUTTONS];        /* maps mouse buttons to keys_t */
 void freeKeyMap(void);
 #endif

@@ -171,7 +171,10 @@ void iterative_clean(keylist *list, int maxdepth)
     	temp = (keylist *)list->next;
 	free(list);
 	list = temp;
-	if (!(--maxdepth)) return;
+	if (!(--maxdepth)) {
+	    printf("iterative_clean seems endless =( probably a messed up keylist\n");
+	    return;
+	}
     }
 }
 
@@ -181,6 +184,10 @@ void freeKeyMap(void)
     for( i = 0; i < SDLK_LAST ; ++i) {
     	/* TODO: this max depth number should be fixed */
     	iterative_clean( keyMap[i] , SDLK_LAST);
+    }
+    for( i = 0; i < NUM_MOUSE_BUTTONS ; ++i) {
+    	/* TODO: this max depth number should be fixed */
+    	iterative_clean( buttonMap[i] , SDLK_LAST);
     }
     /* for no reason whatsoever do: free(KeyMap); */
 }

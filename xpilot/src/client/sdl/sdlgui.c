@@ -537,17 +537,17 @@ void Gui_paint_fastshot(int color, int x, int y)
     /* not sure why i need that 7 to make it right */
     /* that 2 seems to be the size/2 of the bullet */
     Image_paint(IMG_BULLET, 
-		x + world.x - 2, 
-		world.y - 7 + ext_view_height - y, 
-		3,255);
+		x + world.x - 3, 
+		world.y - 6 + ext_view_height - y, 
+		5,255);
 }
 
 void Gui_paint_teamshot(int x, int y)
 {
     Image_paint(IMG_BULLET_OWN, 
-		x + world.x - 2, 
-		world.y - 7 + ext_view_height - y, 
-		3,255);
+		x + world.x - 3, 
+		world.y - 6 + ext_view_height - y, 
+		5,255);
 }
 
 void Gui_paint_missiles_begin(void)
@@ -917,7 +917,9 @@ void Paint_client_fps(void)
     sprintf(buf, "FPS: %d", clientFPS);
     len = strlen(buf);
     x = draw_width - 20;
-    y = draw_height - 200;
+    /* Better make sure it's below the meters */
+    y = draw_height - 9*((20>gamefont.h)?20:gamefont.h);
+;
     HUDprint(&gamefont,hudColor,RIGHT,DOWN,x,y,buf);
 }
 
@@ -982,12 +984,13 @@ static void Paint_meter(int xoff, int y, const char *title, int val, int max,
 
 void Paint_meters(void)
 {
-    int y = 20, color;
+    int spacing = (20>gamefont.h)?20:gamefont.h;
+    int y = spacing, color;
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     if (fuelMeterColor)
-	Paint_meter(-10, y += 20, "Fuel",
+	Paint_meter(-10, y += spacing, "Fuel",
 		    (int)fuelSum, (int)fuelMax, fuelMeterColor);
 
     if (powerMeterColor)
@@ -998,7 +1001,7 @@ void Paint_meters(void)
 	color = 0;
 
     if (color)
-	Paint_meter(-10, y += 20, "Power",
+	Paint_meter(-10, y += spacing, "Power",
 		    (int)displayedPower, (int)MAX_PLAYER_POWER, color);
 
     if (turnSpeedMeterColor)
@@ -1009,7 +1012,7 @@ void Paint_meters(void)
 	color = 0;
 
     if (color)
-	Paint_meter(-10, y += 20, "Turnspeed",
+	Paint_meter(-10, y += spacing, "Turnspeed",
 		    (int)displayedTurnspeed, (int)MAX_PLAYER_TURNSPEED, color);
 
     if (controlTime > 0.0) {
@@ -1019,17 +1022,17 @@ void Paint_meters(void)
     }
 
     if (packetSizeMeterColor)
-	Paint_meter(-10, y += 20, "Packet",
+	Paint_meter(-10, y += spacing, "Packet",
 		   (packet_size >= 4096) ? 4096 : packet_size, 4096,
 		    packetSizeMeterColor);
     if (packetLossMeterColor)
-	Paint_meter(-10, y += 20, "Loss", packet_loss, FPS,
+	Paint_meter(-10, y += spacing, "Loss", packet_loss, FPS,
 		    packetLossMeterColor);
     if (packetDropMeterColor)
-	Paint_meter(-10, y += 20, "Drop", packet_drop, FPS,
+	Paint_meter(-10, y += spacing, "Drop", packet_drop, FPS,
 		    packetDropMeterColor);
     if (packetLagMeterColor)
-	Paint_meter(-10, y += 20, "Lag", MIN(packet_lag, 1 * FPS), 1 * FPS,
+	Paint_meter(-10, y += spacing, "Lag", MIN(packet_lag, 1 * FPS), 1 * FPS,
 		    packetLagMeterColor);
 
     if (temporaryMeterColor) {
@@ -1041,26 +1044,26 @@ void Paint_meters(void)
 			thrusttimemax, temporaryMeterColor);
 
 	if (shieldtime >= 0 && shieldtimemax > 0)
-	    Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 20,
+	    Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + spacing,
 			"Shields Left",
 			(shieldtime >= shieldtimemax
 			 ? shieldtimemax : shieldtime),
 			shieldtimemax, temporaryMeterColor);
 
 	if (phasingtime >= 0 && phasingtimemax > 0)
-	    Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 40,
+	    Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 2*spacing,
 			"Phasing left",
 			(phasingtime >= phasingtimemax
 			 ? phasingtimemax : phasingtime),
 			phasingtimemax, temporaryMeterColor);
 
 	if (destruct > 0)
-	    Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 60,
+	    Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 3*spacing,
 			"Self destructing", destruct, 150,
 			temporaryMeterColor);
 
 	if (shutdown_count >= 0)
-	    Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 80,
+	    Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 4*spacing,
 			"SHUTDOWN", shutdown_count, shutdown_delay,
 			temporaryMeterColor);
     }

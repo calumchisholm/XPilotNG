@@ -86,6 +86,7 @@ int Process_event(SDL_Event *evt)
 {
     int key_change = 0;
     movement = 0;
+    keylist *temp;
 
     if (Console_process(evt)) return 1;
     
@@ -96,7 +97,7 @@ int Process_event(SDL_Event *evt)
 	
     case SDL_KEYDOWN:
 	if (Console_isVisible()) break;
-    	keylist *temp = keyMap[evt->key.keysym.sym];
+    	temp = keyMap[evt->key.keysym.sym];
     	while (temp) {
     	    key_change |= Key_press(temp->key);
 	    temp = (keylist *)temp->next;
@@ -105,10 +106,10 @@ int Process_event(SDL_Event *evt)
 	
     case SDL_KEYUP:
 	if (Console_isVisible()) break;
-    	keylist *temp2 = keyMap[evt->key.keysym.sym];
-    	while (temp2) {
-    	    key_change |= Key_release(temp2->key);
-	    temp2 = (keylist *)temp2->next;
+    	temp = keyMap[evt->key.keysym.sym];
+    	while (temp) {
+    	    key_change |= Key_release(temp->key);
+	    temp = (keylist *)temp->next;
     	}
 	break;
 	
@@ -116,7 +117,11 @@ int Process_event(SDL_Event *evt)
 	if (!pointerControl) {
 	    break;
 	} else {
-	    key_change |= Key_press(buttonMap[evt->button.button - 1]);
+    	    temp = buttonMap[evt->button.button - 1];
+    	    while (temp) {
+    	    	key_change |= Key_press(temp->key);
+	    	temp = (keylist *)temp->next;
+    	    }
 	    break;
 	}
 	
@@ -127,7 +132,11 @@ int Process_event(SDL_Event *evt)
 	
     case SDL_MOUSEBUTTONUP:
 	if (!pointerControl) break;
-	key_change |= Key_release(buttonMap[evt->button.button - 1]);
+    	temp = buttonMap[evt->button.button - 1];
+    	while (temp) {
+    	    key_change |= Key_release(temp->key);
+    	    temp = (keylist *)temp->next;
+    	}
 	break;
 
     case SDL_VIDEORESIZE:     
