@@ -1,5 +1,6 @@
-/*
- * Wildmap, a random map generator for XPilot.  Copyright (C) 1993 by
+/* 
+ *
+ * Wildmap, a random map generator for XPilot.  Copyright (C) 1993-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -20,12 +21,18 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <errno.h>
 #include <limits.h>
 #include <time.h>
 #include <string.h>
+
+#ifndef _WINDOWS
+# include <unistd.h>
+#endif
+
+
 
 #define NELEM(a)	(sizeof(a) / sizeof(a[0]))
 
@@ -117,17 +124,17 @@ static unsigned fuzz_bound(unsigned max)
 
 static void Default_map(void)
 {
-    map.width = 150;
-    map.height = 150;
+    map.width = 100;
+    map.height = 100;
     map.seed = (unsigned)getpid() ^ (unsigned)time(NULL) * (unsigned)getppid();
-    map.seed_ratio = 0.19;
-    map.fill_ratio = 0.18;
-    map.num_bases = 16;
+    map.seed_ratio = 0.16;
+    map.fill_ratio = 0.20;
+    map.num_bases = 26;
     map.num_teams = 3;
     map.cannon_ratio = 0.0020;
     map.fuel_ratio   = 0.0006;
     map.grav_ratio   = 0.0006;
-    map.worm_ratio   = 0.0002;
+    map.worm_ratio   = 0.0004;
 }
 
 static void Option_map(int argc, char **argv)
@@ -1146,12 +1153,8 @@ static void Decorate_map(void)
     free(home);
 }
 
-static void Print_map(void)
+static void Border_map(void)
 {
-    /*
-     * Output the map in XPilot 2.0 map format.
-     */
-
     int			i;
     char		*left, *middle, *right;
 
@@ -1189,15 +1192,126 @@ static void Print_map(void)
 	right += map.linewidth;
     }
     map.data[map.datasize] = '\0';
+}
+
+static void Dump_map(void)
+{
 
     printf("mapWidth:	%d\n", map.width);
     printf("mapHeight:	%d\n", map.height);
     printf("mapName:	Wild Map %u\n", map.seed);
-    printf("mapAuthor:	The Wild Map Generator\n");
+    printf("mapAuthor:	The Wild Map Generator 1.2\n");
     printf("edgeWrap:	True\n");
     printf("mapData:	\\multiline: EndOfMapData\n");
     printf("%sEndOfMapData\n", map.data);
+}
 
+static void Picture_map(void)
+{
+#ifdef DEVELOPMENT
+    char		name[1024];
+    FILE		*fp;
+    int			x, y;
+    unsigned char	*line;
+
+    if (!getenv("WILDMAPDUMP")) {
+	return;
+    }
+
+    sprintf(name, "wildmap.ppm");
+    fp = fopen(name, "w");
+    if (!fp) {
+	perror(name);
+	return;
+    }
+    line = (unsigned char *)malloc(3 * map.width);
+    if (!line) {
+	perror("No memory for wildmap dump");
+	fclose(fp);
+	return;
+    }
+    fprintf(fp, "P6\n");
+    fprintf(fp, "%d %d\n", map.width, map.height);
+    fprintf(fp, "%d\n", 255);
+    for (y = 0; y < map.height; y++) {
+	for (x = 0; x < map.width; x++) {
+	    switch (map.data[x + map.linewidth * y]) {
+	    case BLOCK_SPACE:
+		line[x * 3 + 0] = 0;
+		line[x * 3 + 1] = 0;
+		line[x * 3 + 2] = 0;
+		break;
+	    case BLOCK_SOLID:
+		line[x * 3 + 0] = 0;
+		line[x * 3 + 1] = 0;
+		line[x * 3 + 2] = 255;
+		break;
+	    case BLOCK_UP_RIGHT:
+	    case BLOCK_UP_LEFT:
+	    case BLOCK_DOWN_LEFT:
+	    case BLOCK_DOWN_RIGHT:
+		line[x * 3 + 0] = 0;
+		line[x * 3 + 1] = 0;
+		line[x * 3 + 2] = 192;
+		break;
+	    case BLOCK_CANNON_RIGHT:
+	    case BLOCK_CANNON_DOWN:
+	    case BLOCK_CANNON_LEFT:
+	    case BLOCK_CANNON_UP:
+		line[x * 3 + 0] = 255;
+		line[x * 3 + 1] = 255;
+		line[x * 3 + 2] = 255;
+		break;
+	    case BLOCK_FUEL:
+		line[x * 3 + 0] = 255;
+		line[x * 3 + 1] = 0;
+		line[x * 3 + 2] = 0;
+		break;
+	    case BLOCK_GRAV_POS:
+	    case BLOCK_GRAV_NEG:
+	    case BLOCK_GRAV_CLOCK:
+	    case BLOCK_GRAV_ANTI_CLOCK:
+		line[x * 3 + 0] = 192;
+		line[x * 3 + 1] = 192;
+		line[x * 3 + 2] = 0;
+		break;
+	    case BLOCK_WORM_BOTH:
+	    case BLOCK_WORM_IN:
+	    case BLOCK_WORM_OUT:
+		line[x * 3 + 0] = 0;
+		line[x * 3 + 1] = 255;
+		line[x * 3 + 2] = 0;
+		break;
+	    case '_':
+	    case '0':
+	    case '1':
+	    case '2':
+	    case '3':
+	    case '4':
+	    case '5':
+	    case '6':
+	    case '7':
+	    case '8':
+	    case '9':
+		line[x * 3 + 0] = 0;
+		line[x * 3 + 1] = 192;
+		line[x * 3 + 2] = 192;
+		break;
+	    default:
+		break;
+	    }
+	}
+	fwrite(line, map.width, 3, fp);
+    }
+    free(line);
+    fclose(fp);
+
+    fprintf(stderr, "Wildmap dumped to %s\n", name);
+#endif
+}
+
+void Dealloc_map(void)
+{
     free(map.data);
 }
 
@@ -1211,7 +1325,10 @@ int main(int argc, char **argv)
     Partition_map();
     Smooth_map();
     Decorate_map();
-    Print_map();
+    Border_map();
+    Picture_map();
+    Dump_map();
+    Dealloc_map();
  
     return 0;
 }

@@ -1,4 +1,4 @@
-/* $Id$ */
+/*  */
 
 /* need config to compile msub.c. */
 #include "Local.config"
@@ -22,7 +22,8 @@ InstallMultipleDest(install.msub,msub,$(BINDIR))
 DependTarget ()
 
 test:: msub
-	msub -f test.makefile testfile
+	./msub -f test.makefile testfile
 
 regression:: msub
-	msub -f test.makefile testfile | diff test.out -
+	./msub -f test.makefile testfile | diff test.out -
+

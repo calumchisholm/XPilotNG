@@ -10,8 +10,8 @@ source code, and the LICENSE file.
 
 Installation instructions are in the INSTALL.txt file.
 
-NT and Win95 users should examine the contrib/NT subdirectory and read
-the README.txt which is in there.
+NT and Win95 users should examine the src/common/NT/bindist subdirectory
+and read the README.txt which is in there.
 
 The documentation for XPilot is far from complete.  The map format is
 only explained in doc/README.MAPS and doc/README.MAPS2, not in the server
@@ -66,4 +66,4 @@ discuss your potential contributions to the source code, please see the
 URL http://nslug.ns.ca/mailman/listinfo/xpilot-hacks for further
 information.
 
-$Id$
+

@@ -19,7 +19,7 @@
 
 #ifndef	lint
 static char sourceid[] =
-    "@(#)$Id$";
+    "@(#)";
 static char versionid[] =
     "@(#)Version 1.2";
 #endif
