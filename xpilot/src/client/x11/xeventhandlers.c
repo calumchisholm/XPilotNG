@@ -276,30 +276,16 @@ void ButtonPress_event(XEvent *event)
 	return;
     }
 
-    if (xbutton->window == drawWindow
-	|| xbutton->window == talkWindow) {
+    if (xbutton->window == drawWindow) {
 	switch (xbutton->button) {
 	case Button1:
-	    if (!talk_mapped)
-		/* start cutting from the talk messages */
-		Talk_cut_from_messages(xbutton);
-	    else {
-		/* start cutting from ... */
-		if (xbutton->window == drawWindow)
-		    /* ...the talk messages */
-		    Talk_cut_from_messages(xbutton);
-		else
-		    /* ...the talk window */
-		    Talk_window_cut(xbutton);
-	    }
+	    /* start cutting from the talk messages */
+	    Talk_cut_from_messages(xbutton);
 	    break;
 
 	case Button2:
-	    if (talk_mapped) {
-		if (xbutton->window == talkWindow)
-		    Talk_place_cursor(xbutton, false);
+	    if (talk_mapped)
 		Selection_request();
-	    }
 	    break;
 
 	default:
@@ -307,6 +293,26 @@ void ButtonPress_event(XEvent *event)
 	} /* switch */
 	return;
     }
+
+    if (xbutton->window == talkWindow) {
+	assert(talk_mapped);
+	switch (xbutton->button) {
+	case Button1:
+	    /* start cutting from the talk window */
+	    Talk_window_cut(xbutton);
+	    break;
+
+	case Button2:
+	    Talk_place_cursor(xbutton, false);
+	    Selection_request();
+	    break;
+
+	default:
+	    break;
+	} /* switch */
+	return;
+    }
+
     if (Widget_event(event) != 0)
 	return;
     Expose_button_window(BLACK, xbutton->window);
