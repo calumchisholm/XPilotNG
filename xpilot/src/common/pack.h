@@ -111,9 +111,9 @@
  * 4.F.1.4: balls use polygon styles
  */
 #ifdef SERVER
-#define	MAGIC		(is_polygon_map ? 0x4F14F4ED : 0x4501F4ED)
+#define	MAGIC	(is_polygon_map ? 0x4F14F4ED : 0x4501F4ED)
 #else
-#define	MAGIC		0x4F14F4ED
+#define	MAGIC	(instruments.useBlockProtocol ? 0x4501F4ED : 0x4F14F4ED)
 #endif
 
 #define MAGIC2VERSION(M)	(((M) >> 16) & 0xFFFF)

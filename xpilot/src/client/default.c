@@ -622,8 +622,6 @@ xp_option_t default_options[] = {
 	XP_OPTFLAG_NO_SAVE,
 	"Use UDP ports clientPortStart - clientPortEnd (for firewalls).\n"),
 
-
-    /* steering */
     XP_DOUBLE_OPTION(
 	"power",
 	55.0,
@@ -702,6 +700,24 @@ xp_option_t default_options[] = {
 	"Set maximum number of mouse turns sent per second\n"
 	"Set to 0 to disable this feature (its mostly useful on modem)\n"),
 
+    XP_BOOL_OPTION(
+	"blockProtocol",
+	false,
+	&instruments.useBlockProtocol,
+	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
+	"Prefer (old) block protocol when joining servers.\n"),
+
+    XP_INT_OPTION(
+	"sparkSize",
+	2,
+	MIN_SPARK_SIZE,
+	MAX_SPARK_SIZE,
+	&spark_size,
+	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
+	"Size of sparks in pixels.\n"),
+
     XP_DOUBLE_OPTION(
 	"sparkProb",
 	0.4,
@@ -714,8 +730,6 @@ xp_option_t default_options[] = {
 	"This gives a sparkling effect.\n"
 	"Valid values are in the range [0.0-1.0]\n"),
 
-
-    /* hud stuff */
     XP_INT_OPTION(
 	"hudRadarDotSize",
 	8,
@@ -771,9 +785,6 @@ xp_option_t default_options[] = {
 	"A value of 1 draws a time meter on a base when a ship is appearing.\n"
 	"A value of 2 makes the base name flash when a ship is appearing.\n"
 	"A value of 3 combines the effects of values 1 and 2.\n"),
-
-
-    /* instruments */
 
     XP_BOOL_OPTION(
 	"slidingRadar",
@@ -920,8 +931,6 @@ xp_option_t default_options[] = {
 	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Use AMPM format for clock display instead of 24 hour format.\n"),
 
-
-    /* painted stuff */
     XP_INT_OPTION(
 	"shotSize",
 	5,
@@ -942,16 +951,6 @@ xp_option_t default_options[] = {
 	XP_OPTFLAG_CONFIG_DEFAULT,
 	"The size of team shots in pixels.\n"
 	"Note that team shots are drawn in teamShotColor.\n"),
-
-    XP_INT_OPTION(
-	"sparkSize",
-	2,
-	MIN_SPARK_SIZE,
-	MAX_SPARK_SIZE,
-	&spark_size,
-	NULL,
-	XP_OPTFLAG_CONFIG_DEFAULT,
-	"Size of sparks in pixels.\n"),
 
     XP_INT_OPTION(
 	"backgroundPointDist",
@@ -985,7 +984,6 @@ xp_option_t default_options[] = {
 	XP_OPTFLAG_CONFIG_DEFAULT,
 	"How many seconds score objects remain visible on the map.\n"),
 
-    /* message stuff */
     XP_INT_OPTION(
 	"charsPerSecond",
 	100,
@@ -1039,8 +1037,6 @@ xp_option_t default_options[] = {
 	"Number of your messages saved in the `history' of the talk window.\n"
 	"`history' is accessible with `keyTalkCursorUp/Down'.\n"),
 
-
-    /* misc stuff */
     XP_BOOL_OPTION(
 	"toggleShield",
 	false,
@@ -1163,7 +1159,6 @@ xp_option_t default_options[] = {
 	"Too complicated.  Keep it on 3.\n"),
 #endif
 
-    /* eye candy stuff */
     XP_BOOL_OPTION(
 	"markingLights",
 	false,
@@ -1172,8 +1167,6 @@ xp_option_t default_options[] = {
 	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Should the fighters have marking lights, just like airplanes?\n"),
 
-
-    /* modbanks */
     XP_STRING_OPTION(
 	"modifierBank1",
 	"",

@@ -71,6 +71,7 @@ typedef struct {
     bool showSlidingRadar;
     bool useClientRanker;
     bool useAMPMFormatClock;
+    bool useBlockProtocol;
 } instruments_t;
 
 typedef struct {
