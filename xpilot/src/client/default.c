@@ -751,34 +751,6 @@ option options[] = {
 	"The number of colors to use.  Valid values are 4, 8 and 16.\n"
     },
     {
-	"black",
-	NULL,
-	"",
-	KEY_DUMMY,
-	"The color value for black (better use color0 instead).\n"
-    },
-    {
-	"white",
-	NULL,
-	"",
-	KEY_DUMMY,
-	"The color value for white (better use color1 instead).\n"
-    },
-    {
-	"blue",
-	NULL,
-	"",
-	KEY_DUMMY,
-	"The color value for blue (better use color2 instead).\n"
-    },
-    {
-	"red",
-	NULL,
-	"",
-	KEY_DUMMY,
-	"The color value for red (better use color3 instead).\n"
-    },
-    {
 	"color0",
 	NULL,
 	"",
@@ -2487,9 +2459,8 @@ unsigned String_hash(const char *s)
 {
     unsigned		hash = 0;
 
-    for (; *s; s++) {
+    for (; *s; s++)
 	hash = (((hash >> 29) & 7) | (hash << 3)) ^ *s;
-    }
     return hash;
 }
 
@@ -2503,9 +2474,8 @@ char* Get_keyHelpString(keys_t key)
     for (i = 0; i < NELEM(options); i++) {
 	if (options[i].key == key) {
 	    strlcpy(buf, options[i].help, sizeof buf);
-	    if ((nl = strchr(buf, '\n')) != NULL) {
+	    if ((nl = strchr(buf, '\n')) != NULL)
 		*nl = '\0';
-	    }
 	    return buf;
 	}
     }
@@ -2519,9 +2489,8 @@ const char* Get_keyResourceString(keys_t key)
     int			i;
 
     for (i = 0; i < NELEM(options); i++) {
-	if (options[i].key == key) {
+	if (options[i].key == key)
 	    return options[i].name;
-	}
     }
 
     return NULL;
@@ -2545,13 +2514,11 @@ static void Usage(void)
 	    printf("        ");
 	    for (str = options[i].help; *str; str++) {
 		putchar(*str);
-		if (*str == '\n' && str[1]) {
+		if (*str == '\n' && str[1])
 		    printf("        ");
-		}
 	    }
-	    if (str[-1] != '\n') {
+	    if (str[-1] != '\n')
 		putchar('\n');
-	    }
 	}
 	if (options[i].fallback && options[i].fallback[0]) {
 	    printf("        The default %s: %s.\n",
@@ -2596,8 +2563,7 @@ static int Find_resource(XrmDatabase db, const char *resource,
 	    break;
 	}
 	if (++i >= NELEM(options)) {
-	    errno = 0;
-	    error("BUG: Can't find option \"%s\"", resource);
+	    warn("BUG: Can't find option \"%s\"", resource);
 	    exit(1);
 	}
     }
@@ -2605,9 +2571,9 @@ static int Find_resource(XrmDatabase db, const char *resource,
     sprintf(str_class, "%s.%c%s", myClass, toupper(*resource), resource + 1);
 
     if (XrmGetResource(db, str_name, str_class, str_type, &rmValue) == True) {
-	if (rmValue.addr == NULL) {
+	if (rmValue.addr == NULL)
 	    len = 0;
-	} else {
+	else {
 	    len = MIN(rmValue.size, size - 1);
 	    memcpy(result, rmValue.addr, len);
 	}
@@ -2643,12 +2609,12 @@ static int Get_string_resource(XrmDatabase db,
 
     val = Find_resource(db, resource, result, size, &index);
     src = dst = result;
-    while ((*src & 0x7f) == *src && isgraph(*src) == 0 && *src != '\0') {
+    while ((*src & 0x7f) == *src && isgraph(*src) == 0 && *src != '\0')
 	src++;
-    }
-    while ((*src & 0x7f) != *src || isgraph(*src) != 0) {
+
+    while ((*src & 0x7f) != *src || isgraph(*src) != 0)
 	*dst++ = *src++;
-    }
+
     *dst = '\0';
 
     return val;
@@ -2663,9 +2629,8 @@ static void Get_int_resource(XrmDatabase db,
 
     Find_resource(db, resource, resValue, sizeof resValue, &index);
     if (sscanf(resValue, "%d", result) <= 0) {
-	errno = 0;
-	error("Bad value \"%s\" for option \"%s\", using default...",
-	      resValue, resource);
+	warn("Bad value \"%s\" for option \"%s\", using default...",
+	     resValue, resource);
 	sscanf(options[index].fallback, "%d", result);
     }
 }
@@ -2681,9 +2646,8 @@ static void Get_float_resource(XrmDatabase db,
     temp_result = 0.0;
     Find_resource(db, resource, resValue, sizeof resValue, &index);
     if (sscanf(resValue, "%lf", &temp_result) <= 0) {
-	errno = 0;
-	error("Bad value \"%s\" for option \"%s\", using default...",
-	      resValue, resource);
+	warn("Bad value \"%s\" for option \"%s\", using default...",
+	     resValue, resource);
 	sscanf(options[index].fallback, "%lf", &temp_result);
     }
     *result = (DFLOAT) temp_result;
@@ -2708,9 +2672,8 @@ static void Get_bit_resource(XrmDatabase db, const char *resource,
     char		resValue[MAX_CHARS];
 
     Find_resource(db, resource, resValue, sizeof resValue, &index);
-    if (ON(resValue)) {
+    if (ON(resValue))
 	SET_BIT(*mask, bit);
-    }
 }
 
 static void Get_shipshape_resource(XrmDatabase db, char **ship_shape)
@@ -2724,9 +2687,9 @@ static void Get_shipshape_resource(XrmDatabase db, char **ship_shape)
 	Get_resource(db, "shipShapeFile", resValue, sizeof resValue);
 	if (resValue[0] != '\0') {
 	    FILE *fp = fopen(resValue, "r");
-	    if (!fp) {
+	    if (!fp)
 		perror(resValue);
-	    } else {
+	    else {
 		char *ptr;
 		char *str;
 		char line[1024];
@@ -2735,15 +2698,13 @@ static void Get_shipshape_resource(XrmDatabase db, char **ship_shape)
 			|| (str = strstr(line, "(NM:" )) != NULL) {
 			str = strchr(str, ':');
 			while (*++str == ' ');
-			if ((ptr = strchr(str, ')' )) != NULL) {
+			if ((ptr = strchr(str, ')' )) != NULL)
 			    *ptr = '\0';
-			}
 			if (!strcmp(str, *ship_shape)) {
 			    /* Gotcha */
 			    free(*ship_shape);
-			    if (ptr != NULL) {
+			    if (ptr != NULL)
 				*ptr = ')';
-			    }
 			    *ship_shape = xp_strdup(line);
 			    break;
 			}
@@ -2763,17 +2724,14 @@ void Get_xpilotrc_file(char *path, unsigned size)
     const char		*defaultFile = ".xpilotrc";
     const char		*optionalFile = getenv("XPILOTRC");
 
-    if (optionalFile != NULL) {
+    if (optionalFile != NULL)
 	strlcpy(path, optionalFile, size);
-    }
     else if (home != NULL) {
 	strlcpy(path, home, size);
 	strlcat(path, "/", size);
 	strlcat(path, defaultFile, size);
-    }
-    else {
+    } else
 	strlcpy(path, "", size);
-    }
 }
 #endif
 
@@ -2793,12 +2751,10 @@ static void Get_file_defaults(XrmDatabase *rDBptr)
 
     if (lang != NULL) {
 	sprintf(path, "/usr/lib/X11/%s/app-defaults/%s", lang, myClass);
-	if (access(path, 0) == -1) {
+	if (access(path, 0) == -1)
 	    sprintf(path, "/usr/lib/X11/app-defaults/%s", myClass);
-	}
-    } else {
+    } else
 	sprintf(path, "/usr/lib/X11/app-defaults/%s", myClass);
-    }
     tmpDB = XrmGetFileDatabase(path);
     XrmMergeDatabases(tmpDB, rDBptr);
 
@@ -2810,24 +2766,20 @@ static void Get_file_defaults(XrmDatabase *rDBptr)
     else if ((ptr = getenv("XAPPLRESDIR")) != NULL) {
 	if (lang != NULL) {
 	    sprintf(path, "%s/%s/%s", ptr, lang, myClass);
-	    if (access(path, 0) == -1) {
+	    if (access(path, 0) == -1)
 		sprintf(path, "%s/%s", ptr, myClass);
-	    }
-	} else {
+	} else
 	    sprintf(path, "%s/%s", ptr, myClass);
-	}
 	tmpDB = XrmGetFileDatabase(path);
 	XrmMergeDatabases(tmpDB, rDBptr);
     }
     else if (home != NULL) {
 	if (lang != NULL) {
 	    sprintf(path, "%s/app-defaults/%s/%s", home, lang, myClass);
-	    if (access(path, 0) == -1) {
+	    if (access(path, 0) == -1)
 		sprintf(path, "%s/app-defaults/%s", home, myClass);
-	    }
-	} else {
+	} else
 	    sprintf(path, "%s/app-defaults/%s", home, myClass);
-	}
 	tmpDB = XrmGetFileDatabase(path);
 	XrmMergeDatabases(tmpDB, rDBptr);
     }
@@ -2978,9 +2930,9 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 	if ((ptr = getenv(KEYBOARD_ENV)) != NULL)
 	    strlcpy(resValue, ptr, MAX_DISP_LEN);
     }
-    if (resValue[0] == '\0') {
+    if (resValue[0] == '\0')
 	kdpy = NULL;
-    } else if ((kdpy = XOpenDisplay(resValue)) == NULL) {
+    else if ((kdpy = XOpenDisplay(resValue)) == NULL) {
 	error("Can't open keyboard '%s'", resValue);
 	exit(1);
     }
@@ -2999,26 +2951,27 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     geometry = xp_strdup(resValue);
 #endif
 
-    if ((talk_fast_temp_buf_big = (char *)malloc(TALK_FAST_MSG_SIZE)) != NULL) {
+    if ((talk_fast_temp_buf_big
+	 = (char *)malloc(TALK_FAST_MSG_SIZE)) != NULL) {
         for (i = 0; i < TALK_FAST_NR_OF_MSGS; ++i) {
             sprintf (talk_fast_temp_buf, "msg%d", i + 1);
-            Get_resource(rDB, talk_fast_temp_buf, talk_fast_temp_buf_big, TALK_FAST_MSG_SIZE);
+            Get_resource(rDB, talk_fast_temp_buf, talk_fast_temp_buf_big,
+			 TALK_FAST_MSG_SIZE);
             talk_fast_msgs[i] = xp_strdup (talk_fast_temp_buf_big);
         }
         free (talk_fast_temp_buf_big);
     }
     else {
-	for (i = 0; i < TALK_FAST_NR_OF_MSGS; ++i) {
+	for (i = 0; i < TALK_FAST_NR_OF_MSGS; ++i)
 	    talk_fast_msgs[i] = NULL;
-	}
     }
 
     Get_bool_resource(rDB, "ignoreWindowManager", &ignoreWindowManager);
 
     Get_resource(rDB, "user", resValue, MAX_NAME_LEN);
-    if (resValue[0]) {
+    if (resValue[0])
 	strlcpy(realName, resValue, MAX_NAME_LEN);
-    }
+
     if (Check_real_name(realName) == NAME_ERROR) {
 	xpprintf("Fixing realname from \"%s\" ", realName);
 	Fix_real_name(realName);
@@ -3026,9 +2979,9 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     }
 
     Get_resource(rDB, "host", resValue, MAX_HOST_LEN);
-    if (resValue[0]) {
+    if (resValue[0])
 	strlcpy(hostName, resValue, MAX_HOST_LEN);
-    }
+
     if (Check_host_name(hostName) == NAME_ERROR) {
 	xpprintf("Fixing host from \"%s\" ", hostName);
 	Fix_host_name(hostName);
@@ -3037,14 +2990,12 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 
 
     Get_resource(rDB, "name", nickName, MAX_NAME_LEN);
-    if (!nickName[0]) {
+    if (!nickName[0])
 	strlcpy(nickName, realName, MAX_NAME_LEN);
-    }
     CAP_LETTER(nickName[0]);
     if (nickName[0] < 'A' || nickName[0] > 'Z') {
-	errno = 0;
-	error("Your player name \"%s\" should start with an uppercase letter",
-	    nickName);
+	warn("Your player name \"%s\" should start with an uppercase letter",
+	     nickName);
 	exit(1);
     }
     if (Check_nick_name(nickName) == NAME_ERROR) {
@@ -3061,9 +3012,8 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     IFWINDOWS( Config_get_name(name) );
     IFWINDOWS( Config_get_team(my_team) );
 
-    if (*my_team < 0 || *my_team > 9) {
+    if (*my_team < 0 || *my_team > 9)
 	*my_team = TEAM_NOT_SET;
-    }
     team = *my_team;
 
     Get_int_resource(rDB, "port", port);
@@ -3134,17 +3084,12 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     /* Windows already derived maxColors in InitWinX */
     IFNWINDOWS( Get_int_resource(rDB, "maxColors", &maxColors) );
 
-    Get_string_resource(rDB, "black", color_names[0], sizeof(color_names[0]));
-    Get_string_resource(rDB, "white", color_names[1], sizeof(color_names[1]));
-    Get_string_resource(rDB, "blue", color_names[2], sizeof(color_names[2]));
-    Get_string_resource(rDB, "red", color_names[3], sizeof(color_names[3]));
     for (i = 0; i < MAX_COLORS; i++) {
 	char buf[16];
 	sprintf(buf, "color%d", i);
 	if (!Get_string_resource(rDB, buf, resValue, MAX_COLOR_LEN)) {
-	    if (i < NUM_COLORS) {
+	    if (i < NUM_COLORS)
 		strlcpy(resValue, color_names[i], MAX_COLOR_LEN);
-	    }
 	}
 	strlcpy(color_names[i], resValue, MAX_COLOR_LEN);
     }
@@ -3231,8 +3176,10 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 
     Get_bit_resource(rDB, "mapRadar", &hackedInstruments, MAP_RADAR);
     Get_bit_resource(rDB, "clientRanker", &hackedInstruments, CLIENT_RANKER);
-    Get_bit_resource(rDB, "showShipShapes", &hackedInstruments, SHOW_SHIP_SHAPES);
-    Get_bit_resource(rDB, "showMyShipShape", &hackedInstruments, SHOW_MY_SHIP_SHAPE);
+    Get_bit_resource(rDB, "showShipShapes", &hackedInstruments,
+		     SHOW_SHIP_SHAPES);
+    Get_bit_resource(rDB, "showMyShipShape", &hackedInstruments,
+		     SHOW_MY_SHIP_SHAPE);
     Get_bit_resource(rDB, "ballMsgScan", &hackedInstruments, BALL_MSG_SCAN);
     Get_bit_resource(rDB, "showLivesByShip", &hackedInstruments,
 		     SHOW_LIVES_BY_SHIP);
@@ -3273,7 +3220,8 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 
     Get_resource(rDB, "gameFont", gameFontName, sizeof gameFontName);
     Get_resource(rDB, "messageFont", messageFontName, sizeof messageFontName);
-    Get_resource(rDB, "scoreListFont", scoreListFontName, sizeof scoreListFontName);
+    Get_resource(rDB, "scoreListFont", scoreListFontName,
+		 sizeof scoreListFontName);
     Get_resource(rDB, "buttonFont", buttonFontName, sizeof buttonFontName);
     Get_resource(rDB, "textFont", textFontName, sizeof textFontName);
     Get_resource(rDB, "talkFont", talkFontName, sizeof talkFontName);
@@ -3288,7 +3236,8 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 #endif
 
     Get_int_resource(rDB, "receiveWindowSize", &receive_window_size);
-    LIMIT(receive_window_size, MIN_RECEIVE_WINDOW_SIZE, MAX_RECEIVE_WINDOW_SIZE);
+    LIMIT(receive_window_size,
+	  MIN_RECEIVE_WINDOW_SIZE, MAX_RECEIVE_WINDOW_SIZE);
 
     Get_resource(rDB, "recordFile", resValue, sizeof resValue);
     Record_init(resValue);
@@ -3312,14 +3261,12 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     IFWINDOWS( Get_bool_resource(rDB, "threadedDraw", &ThreadedDraw) );
 
     Get_float_resource(rDB, "scaleFactor", &scaleFactor);
-    if (scaleFactor == 0.0) {
+    if (scaleFactor == 0.0)
 	scaleFactor = 1.0;
-    }
     LIMIT(scaleFactor, MIN_SCALEFACTOR, MAX_SCALEFACTOR);
     Get_float_resource(rDB, "altScaleFactor", &scaleFactor_s);
-    if (scaleFactor_s == 0.0) {
+    if (scaleFactor_s == 0.0)
         scaleFactor_s = 2.0;
-    }
     LIMIT(scaleFactor_s, MIN_SCALEFACTOR, MAX_SCALEFACTOR);
 
 #ifdef SOUND
@@ -3340,9 +3287,8 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     }
     num = 0;
     for (i = 0; i < NELEM(options); i++) {
-	if ((key = options[i].key) == KEY_DUMMY) {
+	if ((key = options[i].key) == KEY_DUMMY)
 	    continue;
-	}
 	Get_resource(rDB, options[i].name, resValue, sizeof resValue);
 	firstKeyDef = num;
 	for (str = strtok(resValue, " \t\r\n");
@@ -3357,13 +3303,11 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 
 	    for (j = firstKeyDef; j < num; j++) {
 		if (keyDefs[j].keysym == ks
-		    && keyDefs[j].key == key) {
+		    && keyDefs[j].key == key)
 		    break;
-		}
 	    }
-	    if (j < num) {
+	    if (j < num)
 		continue;
-	    }
 	    if (num >= maxKeyDefs) {
 		maxKeyDefs += NUM_KEYS;
 		if (!(keyDefs = (keydefs_t *)
@@ -3375,9 +3319,8 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 
 	    /* insertion sort. */
 	    for (j = num; j > 0; j--) {
-		if (ks >= keyDefs[j - 1].keysym) {
+		if (ks >= keyDefs[j - 1].keysym)
 		    break;
-		}
 		keyDefs[j] = keyDefs[j - 1];
 	    }
 	    keyDefs[j].keysym = ks;
@@ -3415,10 +3358,9 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 		    if (options[j].key != KEY_DUMMY) {
 			if (!strcasecmp(ptr, options[j].name + 3)) {
 			    if (NUM_BUTTON_DEFS(i) == MAX_BUTTON_DEFS) {
-				errno = 0;
-				error("Can only have %d keys bound to"
-				      " pointer button %d",
-				      MAX_BUTTON_DEFS, i);
+				warn("Can only have %d keys bound to"
+				     " pointer button %d",
+				     MAX_BUTTON_DEFS, i);
 				break;
 			    }
 			    buttonDefs[i][NUM_BUTTON_DEFS(i)++]
@@ -3427,10 +3369,8 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 			}
 		    }
 		}
-		if (j == NELEM(options)) {
-		    errno = 0;
-		    error("Unknown key \"%s\" for pointer button %d", ptr, i);
-		}
+		if (j == NELEM(options))
+		    warn("Unknown key \"%s\" for pointer button %d", ptr, i);
 	    }
 	}
     }
@@ -3509,9 +3449,8 @@ static void X_after(Display *display)
 {
     static int		n;
 
-    if (n < 1000) {
+    if (n < 1000)
 	printf("_X_ %4d\n", n++);
-    }
 }
 
 static void Get_test_resources(XrmDatabase rDB)
@@ -3526,9 +3465,8 @@ static void Get_test_resources(XrmDatabase rDB)
 	    XSynchronize(dpy, True);
 	    XSetErrorHandler(X_error_handler);
 	}
-	else if (!strncasecmp(s, "xdebug", 4)) {
+	else if (!strncasecmp(s, "xdebug", 4))
 	    XSetErrorHandler(X_error_handler);
-	}
 	else if (!strncasecmp(s, "after", 5)) {
 	    XSetAfterFunction(dpy, (int (*)(
 #if NeedNestedPrototypes
@@ -3536,9 +3474,8 @@ static void Get_test_resources(XrmDatabase rDB)
 #endif
 					    )) X_after);
 	}
-	else if (!strncasecmp(s, "color", 3)) {
+	else if (!strncasecmp(s, "color", 3))
 	    Colors_debug();
-	}
 	else {
 	    printf("typo %s\n", s);
 	    exit(1);
