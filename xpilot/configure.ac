@@ -5,7 +5,7 @@ AC_INIT(XPilot, 4.5.4X2, ksoderbl@cc.hut.fi, xpilot)
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR(src/client/xpilot.c)
 AM_INIT_AUTOMAKE
-
+AM_MAINTAINER_MODE
 AM_CONFIG_HEADER(config.h)
 dnl AC_CANONICAL_HOST
 
