@@ -662,78 +662,6 @@ void Paint_score_entry(int entry_num, other_t* other, bool is_team)
 }
 
 
-static void Print_roundend_messages(other_t **order)
-{
-    static char		hackbuf[MSG_LEN];
-    static char		hackbuf2[MSG_LEN];
-    static char		kdratio[16];
-    static char		killsperround[16];
-    char		*s;
-    int			i;
-    other_t		*other;
-
-    roundend = false;
-
-    if (killratio_totalkills == 0)
-	sprintf(kdratio, "0");
-    else if (killratio_totaldeaths == 0)
-	sprintf(kdratio, "infinite");
-    else
-	sprintf(kdratio, "%.2f",
-		(double)killratio_totalkills / killratio_totaldeaths);
-
-    if (rounds_played == 0)
-	sprintf(killsperround, "0");
-    else
-	sprintf(killsperround, "%.2f",
-		(double)killratio_totalkills / rounds_played);
-
-    sprintf(hackbuf, "Kill ratio - Round: %d/%d Total: %d/%d (%s) "
-	    "Rounds played: %d  Avg.kills/round: %s",
-	    killratio_kills, killratio_deaths,
-	    killratio_totalkills, killratio_totaldeaths, kdratio,
-	    rounds_played, killsperround);
-
-    killratio_kills = 0;
-    killratio_deaths = 0;
-    Add_message(hackbuf);
-
-    sprintf(hackbuf, "Ballstats - Cash/Repl/Team/Lost: %d/%d/%d/%d",
-	    ballstats_cashes, ballstats_replaces,
-	    ballstats_teamcashes, ballstats_lostballs);
-    Add_message(hackbuf);
-
-    s = hackbuf;
-    s += sprintf(s, "Points - ");
-    /*
-     * Scores are nice to see e.g. in cup recordings.
-     */
-    for (i = 0; i < num_others; i++) {
-	other = order[i];
-	if (other->mychar == 'P')
-	    continue;
-
-	if (Using_score_decimals()) {
-	    sprintf(hackbuf2, "%s: %.*f ", other->name,
-		    showScoreDecimals, other->score);
-	    if ((s - hackbuf) + strlen(hackbuf2) > MSG_LEN) {
-		Add_message(hackbuf);
-		s = hackbuf;
-	    }
-	    s += sprintf(s, "%s", hackbuf2);
-	} else {
-	    sprintf(hackbuf2, "%s: %d ", other->name,
-		    (int) rint(other->score));
-	    if ((s - hackbuf) + strlen(hackbuf2) > MSG_LEN) {
-		Add_message(hackbuf);
-		s = hackbuf;
-	    }
-	    s += sprintf(s,"%s",hackbuf2);
-	}
-    }
-    Add_message(hackbuf);
-}
-
 struct team_score {
     double	score;
     int		life;
@@ -944,7 +872,7 @@ void Paint_score_table(void)
     }
 
     if (roundend)
-	Print_roundend_messages(order);
+	Add_roundend_messages(order);
 
     free(order);
 

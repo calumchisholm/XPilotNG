@@ -626,22 +626,13 @@ extern long		start_loops, end_loops;
 extern long		time_left;
 
 extern bool roundend;
-extern int killratio_kills;
-extern int killratio_deaths;
-extern int killratio_totalkills;
-extern int killratio_totaldeaths;
-extern int ballstats_cashes;
-extern int ballstats_replaces;
-extern int ballstats_teamcashes;
-extern int ballstats_lostballs;
 extern bool played_this_round;
-extern int rounds_played;
-
 
 int Alloc_msgs(void);
 void Free_msgs(void);
 void Add_message(const char *message);
 void Add_pending_messages(void);
+void Add_roundend_messages(other_t **order);
 double Fuel_by_pos(int x, int y);
 int Target_alive(int x, int y, double *damage);
 int Target_by_index(int ind, int *xp, int *yp, int *dead_time, double *damage);

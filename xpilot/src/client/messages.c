@@ -38,16 +38,16 @@ bool ball_shout = false;
 bool need_cover = false;
 
 bool roundend = false;
-int killratio_kills = 0;
-int killratio_deaths = 0;
-int killratio_totalkills = 0;
-int killratio_totaldeaths = 0;
-int ballstats_cashes = 0;
-int ballstats_replaces = 0;
-int ballstats_teamcashes = 0;
-int ballstats_lostballs = 0;
+static int killratio_kills = 0;
+static int killratio_deaths = 0;
+static int killratio_totalkills = 0;
+static int killratio_totaldeaths = 0;
+static int ballstats_cashes = 0;
+static int ballstats_replaces = 0;
+static int ballstats_teamcashes = 0;
+static int ballstats_lostballs = 0;
 bool played_this_round = false;
-int rounds_played = 0;
+static int rounds_played = 0;
 
 static message_t	*MsgBlock = NULL;
 static message_t	*MsgBlock_pending = NULL;
@@ -876,4 +876,90 @@ void Add_pending_messages(void)
 	    Add_message(GameMsg_pending[i]->txt);
     }
     Delete_pending_messages();
+}
+
+
+static void Roundend(void)
+{
+    int i;
+
+    roundend = false;
+    ball_shout = false;
+    need_cover = false;
+
+    for (i = 0; i < maxMessages; i++)
+	TalkMsg[i]->bmsinfo = BmsNone;
+}
+
+
+void Add_roundend_messages(other_t **order)
+{
+    static char		hackbuf[MSG_LEN];
+    static char		hackbuf2[MSG_LEN];
+    static char		kdratio[16];
+    static char		killsperround[16];
+    char		*s;
+    int			i;
+    other_t		*other;
+
+    Roundend();
+
+    if (killratio_totalkills == 0)
+	sprintf(kdratio, "0");
+    else if (killratio_totaldeaths == 0)
+	sprintf(kdratio, "infinite");
+    else
+	sprintf(kdratio, "%.2f",
+		(double)killratio_totalkills / killratio_totaldeaths);
+
+    if (rounds_played == 0)
+	sprintf(killsperround, "0");
+    else
+	sprintf(killsperround, "%.2f",
+		(double)killratio_totalkills / rounds_played);
+
+    sprintf(hackbuf, "Kill ratio - Round: %d/%d Total: %d/%d (%s) "
+	    "Rounds played: %d  Avg.kills/round: %s",
+	    killratio_kills, killratio_deaths,
+	    killratio_totalkills, killratio_totaldeaths, kdratio,
+	    rounds_played, killsperround);
+
+    killratio_kills = 0;
+    killratio_deaths = 0;
+    Add_message(hackbuf);
+
+    sprintf(hackbuf, "Ballstats - Cash/Repl/Team/Lost: %d/%d/%d/%d",
+	    ballstats_cashes, ballstats_replaces,
+	    ballstats_teamcashes, ballstats_lostballs);
+    Add_message(hackbuf);
+
+    s = hackbuf;
+    s += sprintf(s, "Points - ");
+    /*
+     * Scores are nice to see e.g. in cup recordings.
+     */
+    for (i = 0; i < num_others; i++) {
+	other = order[i];
+	if (other->mychar == 'P')
+	    continue;
+
+	if (Using_score_decimals()) {
+	    sprintf(hackbuf2, "%s: %.*f ", other->name,
+		    showScoreDecimals, other->score);
+	    if ((s - hackbuf) + strlen(hackbuf2) > MSG_LEN) {
+		Add_message(hackbuf);
+		s = hackbuf;
+	    }
+	    s += sprintf(s, "%s", hackbuf2);
+	} else {
+	    sprintf(hackbuf2, "%s: %d ", other->name,
+		    (int) rint(other->score));
+	    if ((s - hackbuf) + strlen(hackbuf2) > MSG_LEN) {
+		Add_message(hackbuf);
+		s = hackbuf;
+	    }
+	    s += sprintf(s,"%s",hackbuf2);
+	}
+    }
+    Add_message(hackbuf);
 }

@@ -65,12 +65,6 @@ int	packetLagMeterColor;	/* Color index for packet lag meter */
 int	temporaryMeterColor;	/* Color index for temporary meter drawing */
 int	meterBorderColor;	/* Color index for meter border drawing */
 
-message_t	*TalkMsg[MAX_MSGS], *GameMsg[MAX_MSGS];
-/* store incoming messages while a cut is pending */
-message_t	*TalkMsg_pending[MAX_MSGS], *GameMsg_pending[MAX_MSGS];
-/* history of the talk window */
-char		*HistoryMsg[MAX_HIST_MSGS];
-
 /*
  * Draw a meter of some kind on screen.
  * When the x-offset is specified as a negative value then
