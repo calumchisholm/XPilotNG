@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -33,13 +32,6 @@
 #define TALK_FAST_MIDDLE_DELIMITER	'|'
 #define TALK_FAST_SPECIAL_TALK_CHAR	'#'
 
-/*
-#define TEAM_PLAY               (1<<8)
-#define LIMITED_LIVES           (1<<3)
-#define MSG_PARSED_FIELD_LEN      20
-*/
-
-/* Talk Macros */
 int Talk_macro(char *str);
 
 #endif
