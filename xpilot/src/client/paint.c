@@ -523,22 +523,20 @@ void Paint_score_start(void)
     }
     Paint_score_background(thisLine);
 
-    if (1/*!BIT(Setup->mode, TEAM_PLAY) || showRealName*/) {
-	ShadowDrawString(dpy, players, scoreListGC,
-			 SCORE_BORDER, thisLine,
-			 headingStr,
-			 colors[scoreColor].pixel,
-			 colors[BLACK].pixel);
+    ShadowDrawString(dpy, players, scoreListGC,
+		     SCORE_BORDER, thisLine,
+		     headingStr,
+		     colors[scoreColor].pixel,
+		     colors[BLACK].pixel);
+    
+    gcv.line_style = LineSolid;
+    XChangeGC(dpy, scoreListGC, GCLineStyle, &gcv);
+    XDrawLine(dpy, players, scoreListGC,
+	      SCORE_BORDER, thisLine,
+	      players_width - SCORE_BORDER, thisLine);
 
-	gcv.line_style = LineSolid;
-	XChangeGC(dpy, scoreListGC, GCLineStyle, &gcv);
-	XDrawLine(dpy, players, scoreListGC,
-		  SCORE_BORDER, thisLine,
-		  players_width - SCORE_BORDER, thisLine);
-
-	gcv.line_style = LineOnOffDash;
-	XChangeGC(dpy, scoreListGC, GCLineStyle, &gcv);
-    }
+    gcv.line_style = LineOnOffDash;
+    XChangeGC(dpy, scoreListGC, GCLineStyle, &gcv);
 
     Paint_clock(1);
 }
