@@ -198,7 +198,6 @@ static int Cmd_set(char *arg, player_t *pl, bool oper, char *msg, size_t size);
 static int Cmd_shutdown(char *arg, player_t *pl, bool oper, char *msg, size_t size);
 static int Cmd_stats(char *arg, player_t *pl, bool oper, char *msg, size_t size);
 static int Cmd_team(char *arg, player_t *pl, bool oper, char *msg, size_t size);
-static int Cmd_turnqueue(char *arg, player_t *pl, bool oper, char *msg, size_t size);
 static int Cmd_version(char *arg, player_t *pl, bool oper, char *msg, size_t size);
 
 
@@ -360,13 +359,6 @@ static Command_info commands[] = {
 	"Can be used with full teams too.",
 	false,
 	Cmd_team
-    },
-    {
-	"turnqueue",
-	"turnq",
-	"/turnqueue . Toggles turnqueue for player",
-	false,
-	Cmd_turnqueue
     },
     {
 	"version",
@@ -1234,32 +1226,6 @@ static int Cmd_team(char *arg, player_t *pl, bool oper, char *msg, size_t size)
     }
     snprintf(msg, size, "You are queued for swap to team %d.", team);
     world->teams[team].SwapperId = pl->id;
-    return CMD_RESULT_SUCCESS;
-}
-
-static int Cmd_turnqueue(char *arg, player_t *pl, bool oper, char *msg, size_t size)
-{
-    UNUSED_PARAM(pl); UNUSED_PARAM(oper);
-
-    if (!arg || !*arg) {
-	snprintf(msg, size, "Turnqueue is %s.",
-		 pl->use_turnqueue ? "on" : "off");
-	return CMD_RESULT_SUCCESS;
-    }
-
-    if (!strcmp(arg, "1"))
-	pl->use_turnqueue = true;
-    else if (!strcmp(arg, "0"))
-	pl->use_turnqueue = false;
-    else {
-	snprintf(msg, size, "Invalid argument '%s'.  Specify either 0 or 1.",
-		 arg);
-	return CMD_RESULT_ERROR;
-    }
-
-    snprintf(msg, size, "Turnqueue is turned %s.",
-		  pl->use_turnqueue ? "on" : "off");
-
     return CMD_RESULT_SUCCESS;
 }
 

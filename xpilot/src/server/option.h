@@ -76,11 +76,6 @@ extern struct options {
     bool	shotsWallBounce;
     bool	ballsWallBounce;
     bool	ballCollisions;
-    double      turnPush;
-    double      pushMin;
-    double      pushMax;
-    int         pushType;
-
     bool	ballSparkCollisions;
     bool	minesWallBounce;
     bool	itemsWallBounce;

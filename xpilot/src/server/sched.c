@@ -178,7 +178,7 @@ static void setup_timer(void)
     frametime = 1.0 / (double)timer_freq;
 
     gettimeofday(&tv, NULL);
-    t = timeval_to_seconds(tv);
+    t = timeval_to_seconds(&tv);
     t_nextframe = t + frametime;
 }
 
@@ -225,14 +225,14 @@ void sched(void)
 
     sched_running = true;
     gettimeofday(&tv, NULL);
-    t_now = timeval_to_seconds(tv);
+    t_now = timeval_to_seconds(&tv);
     t_nextframe = t_now + frametime;
 
     while (sched_running) {
 	fd_set readmask = input_mask;
 
 	gettimeofday(&tv, NULL);
-	t_now = timeval_to_seconds(tv);
+	t_now = timeval_to_seconds(&tv);
 	t_wait = t_nextframe - t_now;
 
 	/* heuristics for different cases */

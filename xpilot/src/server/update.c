@@ -620,10 +620,7 @@ static void Players_turn(void)
 	if (pl->turnresistance)
 	    pl->turnvel *= pl->turnresistance;
 
-	if (pl->use_turnqueue)
-	    new_float_dir = pl->wanted_float_dir;/*TURNQUEUE*/
-	else
-	    new_float_dir = pl->float_dir;
+    	new_float_dir = pl->float_dir;
 	    
 	new_float_dir += pl->turnvel;
 
@@ -634,13 +631,12 @@ static void Players_turn(void)
 
 	Player_set_float_dir(pl, new_float_dir);
 
-    	if (pl->use_turnqueue)
-	    pl->wanted_float_dir = pl->float_dir;/*TURNQUEUE*/
+    	pl->wanted_float_dir = pl->float_dir;
 	
 	if (!pl->turnresistance)
 	    pl->turnvel = 0;
 
-	Turn_player(pl);
+	Turn_player(pl,true);
     }
 }
 
@@ -1211,6 +1207,13 @@ void Update_objects(world_t *world)
     if (!options.fastAim)
 	Players_turn();
     Update_players(world);
+    for (i = 0; i < NumPlayers; i++) {
+	pl = Player_by_index(i);
+	if (pl->wanted_float_dir != pl->float_dir) {
+	    Player_set_float_dir(pl,pl->wanted_float_dir);
+	    Turn_player(pl,false);
+	}
+    }
 
     for (i = world->NumWormholes - 1; i >= 0; i--) {
 	wormhole_t *wh = Wormhole_by_index(world, i);

@@ -604,7 +604,7 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
     world_t *world = pl->world;
     bool constant_speed_subtracted
 	= (pl->last_wall_touch == frame_loops ? true : false);
-
+	
     x = linet[line].delta.cx;
     y = linet[line].delta.cy;
     l2 = (x*x + y*y);
@@ -1268,18 +1268,15 @@ static int Shape_morph(const shape_t *shape1, int dir1,
     while ( (p = *points++) != 65535) {
 	clpos_t pto1, ptn1;
 
-	if (linet[p].group
-	    && (!can_hit(&groups[linet[p].group], &mv)))
+	if (linet[p].group && (!can_hit(&groups[linet[p].group], &mv)))
 	    continue;
 	xp = CENTER_XCLICK(linet[p].start.cx - x);
 	yp = CENTER_YCLICK(linet[p].start.cy - y);
 
 	/*pto1 = pts1[num_points - 1];
 	  ptn1 = pts2[num_points - 1];*/
-	pto1 = Ship_get_point_clpos(
-	    (shipshape_t *)shape1, num_points - 1, dir1);
-	ptn1 = Ship_get_point_clpos(
-	    (shipshape_t *)shape2, num_points - 1, dir2);
+	pto1 = Ship_get_point_clpos((shipshape_t *)shape1, num_points - 1, dir1);
+	ptn1 = Ship_get_point_clpos((shipshape_t *)shape2, num_points - 1, dir2);
 
 	xo1 = pto1.cx - xp;
 	yo1 = pto1.cy - yp;
@@ -1300,43 +1297,43 @@ static int Shape_morph(const shape_t *shape1, int dir1,
 	    xn2 = ptn2.cx - xp;
 	    yn2 = ptn2.cy - yp;
 
-#define TEMPFUNC(X1, Y1, X2, Y2)                                           \
-			   myanswer->line = -1;  			   \
-			   myanswer->point = i;  			   \
-			   myanswer->moved.cx = (X2) - (X1);		   \
-			   myanswer->moved.cy = (Y2) - (Y1);		   \
-	    if ((X1) < 0) {                                                \
-		if ((X2) >= 0) {                                           \
-		    if ((Y1) > 0 && (Y2) >= 0)                             \
-			t++;                                               \
-		    else if (((Y1) >= 0 || (Y2) >= 0) &&                   \
-			     (s = (X1)*((Y1)-(Y2))-(Y1)*((X1)-(X2))) >= 0){\
-		       if (s == 0){					   \
-     	    	    	    return linet[p].group;                         \
-	    	    	}   	    	    	    	    	    	   \
-			else                                               \
-			    t++;                                           \
-		    }                                                      \
-		}                                                          \
-	    }                                                              \
-	    else                                                           \
-		if ((X2) <= 0) {                                           \
-		    if ((X2) == 0) {                                       \
-			if ((Y2)==0||((X1)==0 && (((Y1)<=0 && (Y2)>= 0) || \
-						 ((Y1) >= 0 && (Y2)<=0)))){\
-			    return linet[p].group;                         \
-                              		         }                         \
-		    }                                                      \
-		    else if ((Y1) > 0 && (Y2) >= 0)                        \
-			t++;                                               \
-		    else if (((Y1) >= 0 || (Y2) >= 0) &&                   \
-			     (s = (X1)*((Y1)-(Y2))-(Y1)*((X1)-(X2))) <= 0){\
-			if (s == 0)                                        \
-			    return linet[p].group;                         \
-			else                                               \
-			    t++;                                           \
-		    }                                                      \
-		}
+#define TEMPFUNC(X1, Y1, X2, Y2)    	    	    	    	    	    \
+    	    myanswer->line = -1;    	    	    	    	    	    \
+    	    myanswer->point = i;    	    	    	    	    	    \
+    	    myanswer->moved.cx = (X2) - (X1);	    	    	    	    \
+    	    myanswer->moved.cy = (Y2) - (Y1);	    	    	    	    \
+	    if ((X1) < 0) { 	    	    	    	    	    	    \
+		if ((X2) >= 0) {    	    	    	    	    	    \
+		    if ((Y1) > 0 && (Y2) >= 0)	    	    	    	    \
+			t++;	    	    	    	    	    	    \
+		    else if (((Y1) >= 0 || (Y2) >= 0) &&    	    	    \
+    	    	    	    (s = (X1)*((Y1)-(Y2))-(Y1)*((X1)-(X2))) >= 0){  \
+    	    	    	if (s == 0){	    	    	    	    	    \
+     	    	    	    return linet[p].group;  	    	    	    \
+	    	    	}   	    	    	    	    	    	    \
+			else	    	    	    	    	    	    \
+			    t++;    	    	    	    	    	    \
+		    }	    	    	    	    	    	    	    \
+		}   	    	    	    	    	    	    	    \
+	    } else {	    	    	    	    	    	    	    \
+		if ((X2) <= 0) {    	    	    	    	    	    \
+		    if ((X2) == 0) {	    	    	    	    	    \
+			if ((Y2)==0||((X1)==0 && (((Y1)<=0 && (Y2)>= 0) ||  \
+    	    	    	    	    	    	((Y1) >= 0 && (Y2)<=0)))){  \
+			    return linet[p].group;  	    	    	    \
+    	    	    	}   	    	    	    	    	    	    \
+		    }	    	    	    	    	    	    	    \
+		    else if ((Y1) > 0 && (Y2) >= 0) 	    	    	    \
+			t++;	    	    	    	    	    	    \
+		    else if (((Y1) >= 0 || (Y2) >= 0) &&    	    	    \
+			     (s = (X1)*((Y1)-(Y2))-(Y1)*((X1)-(X2))) <= 0){ \
+			if (s == 0) 	    	    	    	    	    \
+			    return linet[p].group;  	    	    	    \
+			else	    	    	    	    	    	    \
+			    t++;    	    	    	    	    	    \
+		    }	    	    	    	    	    	    	    \
+		}   	    	    	    	    	    	    	    \
+    	    }
 
 	    TEMPFUNC(xo1, yo1, xn1, yn1);
 	    TEMPFUNC(xn1, yn1, xn2, yn2);
@@ -1344,13 +1341,13 @@ static int Shape_morph(const shape_t *shape1, int dir1,
 	    TEMPFUNC(xo2, yo2, xo1, yo1);
 #undef TEMPFUNC
 
-	   if (t & 1){
-	     myanswer->line = -1;  /*p not a line, but point*/
-	     myanswer->point = i;			     
-	     myanswer->moved.cx = 0;  	     
-	     myanswer->moved.cy = 0;
-	     return linet[p].group;
-	   }
+    	    if (t & 1){
+    	    	myanswer->line = -1;  /*p not a line, but point*/
+    	    	myanswer->point = i;			     
+    	    	myanswer->moved.cx = p;  	     
+    	    	myanswer->moved.cy = 0;
+    	    	return linet[p].group;
+    	    }
 	    xo1 = xo2;
 	    yo1 = yo2;
 	    xn1 = xn2;
@@ -2855,13 +2852,14 @@ void Move_player(player_t *pl)
 }
 
 
-void Turn_player(player_t *pl)
+void Turn_player(player_t *pl, bool push)
 {
     int	new_dir = MOD2((int)(pl->float_dir + 0.5), RES);
     int next_dir, sign, group;
     hitmask_t hitmask;
     struct collans ans;
-    double length;
+    double length, relturn;
+    clpos_t p,p2;
 
     if (recOpt) {
 	if (record)
@@ -2881,10 +2879,23 @@ void Turn_player(player_t *pl)
 	return;
     }
 
-    if (new_dir > pl->dir)
-	sign = (new_dir - pl->dir <= RES + pl->dir - new_dir) ? 1 : -1;
-    else
-	sign = (pl->dir - new_dir <= RES + new_dir - pl->dir) ? -1 : 1;
+    if (new_dir > pl->dir) {
+    	if (new_dir - pl->dir <= RES + pl->dir - new_dir) {
+	    sign = 1;
+	    relturn = (new_dir - pl->dir)/(double)RES;
+	} else {
+	    sign = -1;
+	    relturn = (RES + pl->dir - new_dir)/(double)RES;
+	}
+    } else {
+    	if (pl->dir - new_dir <= RES + new_dir - pl->dir) {
+	    sign = -1;
+	    relturn = (pl->dir - new_dir)/(double)RES;
+	} else {
+	    sign = 1;
+	    relturn = (RES + new_dir - pl->dir)/(double)RES;
+	}
+    }
 
     hitmask = NONBALL_BIT | HITMASK(pl->team);
 
@@ -2893,102 +2904,104 @@ void Turn_player(player_t *pl)
 	group = Shape_morph((shape_t *)pl->ship, pl->dir, (shape_t *)pl->ship,
 			next_dir, hitmask, OBJ_PTR(pl), pl->pos.cx, pl->pos.cy, &ans);
 	if (group != NO_GROUP) {
+    	    double fact, velon, velot;
+    	    double cl, sl;  	    	/* cosine and sine of line angle    	    */
+    	    double cln, sln;	    	/* cosine and sine of line normal   	    */
+    	    double pc, ps;	    	/* cosine and sine of the points    	    */
+    	    double pdc, pds;	    	/* cosine and sine of the points direction  */
+    	    double x, y, l, v;
+	    double power = pl->power;
+	    int a = (BIT(pl->used, USES_EMERGENCY_THRUST)
+		     ? MAX_AFTERBURNER
+		     : pl->item[ITEM_AFTERBURNER]);
+	    double inert = pl->mass;
+	    double cx,cy;
+	    move_t move;
+
 	    Player_set_float_dir(pl, (double)pl->dir);
 
-	    length = 0;
+	    if (!push) break;
 
-	    if ((options.turnPush != 0) && (ans.line != -1)) {
+    	    p = Ship_get_point_clpos((shipshape_t *)pl->ship ,ans.point ,pl->dir);
+    	    p2 = Ship_get_point_clpos((shipshape_t *)pl->ship ,(ans.point+1)%(((shape_t *)pl->ship)->num_points) ,pl->dir);
+
+	    length = 0;
+	    	    
+	    if (ans.line != -1) {
 		length = Wrap_length(linet[ans.line].delta.cx,
 				     linet[ans.line].delta.cy);
-		if (length != 0) {
-    	    	    /* khs this is the previous implementation with a fixed factor     */
-    	    	    /*pl->vel.x += linet[ans.line].delta.cy/length * options.turnPush; */
-    	    	    /*pl->vel.y -= linet[ans.line].delta.cx/length * options.turnPush; */
-    	    	    /* khs the following lines implement different functions,          */
-    	    	    /* that make turnPush have a strong effect with low                */
-    	    	    /* speed of the ship perpenticular to the wall, weak effect with   */
-	    	    /* high speed the idea is that turnPush should remove wallglue but */
-	    	    /* not interfere with the game  */
-	    	    double fact, velo;
-	    
-	    	    double c, s;              /* cosine and sine of 2 times line angle */
-	    	    double cl, sl;            /* cosine and sine of line angle         */
-	    	    double x, y, l2, l;
-
-	    	    /* calculate speed of ship perpenticular to the wall - this value  */
-	    	    /*could be taken from Bounce_player later on                       */
-
-	    	    x = linet[ans.line].delta.cx;
-	    	    y = linet[ans.line].delta.cy;
-	    	    l2 = (x*x + y*y);
-	    	    c = (x*x - y*y) / l2;
-	    	    s = 2*x*y / l2;
-	    	    l = sqrt(l2);
-	    	    cl = x / l;
-	    	    sl = y / l;
-	    
-	    	    /* kps - changed from abs() to ABS(), abs() returns int */
-	    	    velo = ABS(pl->vel.x * (-sl) + pl->vel.y * cl); /*perpenticular velocity*/
-
-	    	    /* different functions used for different values of pushType */
-	    	    /* (turnPush = 0: off and all this isn't executed) */
-	    	    /* 0: off             */
-	    	    /* 1: linear relation */
-	    	    /* 2: tanh relation   */
-	    	    /* 3: sine relation   */
-	    	    /* 4: cosine relation */
-	    	    /* 5: cosine-square relation */
-	    	    /* pushMin = turnpush factor at speed higher than turnPush          */
-	    	    /* pushMax = turnpush factor at 0 speed                             */
-	    	    /* turnPush = speed at which the function becomes constant pushMin  */
-	    	    if( velo > options.turnPush ) 
-	      	    	fact = options.pushMin;
-    	    	    else
-    	    	    	switch (options.pushType) {
-    	    	    	    default:
-    	    	    	    	fact=options.pushMin;
-    	    	    	    	break;
-    	    	    	    case 0:
-    	    	    	    	fact= 0;
-    	    	    	    case 1:
-    	    	    	    	fact= options.pushMax 
-    	    	    	    	    - velo/options.turnPush 
-    	    	    	    	    * (options.pushMax - options.pushMin);
-    	    	    	    	break;
-    	    	    	    case 2: 
-    	    	    	    	fact= options.pushMax 
-    	    	    	    	    - tanh(velo*PI/options.turnPush)
-    	    	    	    	    * (options.pushMax-options.pushMin);
-    	    	    	    	break;
-    	    	    	    case 3: 
-    	    	    	    	fact= options.pushMax 
-    	    	    	    	    - tsin((int)(velo/options.turnPush*RES/4+0.5))
-    	    	    	    	    * (options.pushMax-options.pushMin);
-    	    	    	    	break;
-    	    	    	    case 4: 
-    	    	    	    	fact= (options.pushMax-options.pushMin)/2 
-    	    	    	    	    * (1+tcos((int)(velo/options.turnPush*RES/2+0.5)))
-    	    	    	    	    + options.pushMin;
-    	    	    	    	break;
-    	    	    	    case 5: 
-    	    	    	    	fact= (options.pushMax-options.pushMin) 
-    	    	    	    	    * sqr((1+tcos((int)(velo/options.turnPush*RES/2+0.5)))/2)
-    	    	    	    	    + options.pushMin;
-    	    	    	    	break;
-    	    	    	}
-#if 0
-    	    	    sprintf(msg, "velo: %.1f fact: %.2f [%s]", velo, fact, pl->name);
-    	    	    Set_message(msg);
-#endif	      
-    	    	    	/* velocity to push player away from wall */
-		    pl->vel.x += linet[ans.line].delta.cy *fact / length;
-		    pl->vel.y -= linet[ans.line].delta.cx *fact / length;
+    	    	if (length != 0) {
+    	    	    x = linet[ans.line].delta.cx;
+    	    	    y = linet[ans.line].delta.cy;
+		} else {
+		    break;
 		}
-		/*
-		 * khs
-		 * code for handling corners could go here for ans.line == -1
-		 */
+	    } else {
+    	    	x = p2.cx - p.cx;
+    	    	y = p2.cy - p.cy;
 	    }
+		
+    	    l = sqrt(x*x + y*y);
+    	    cl = x / l;
+    	    sl = y / l;
+		    
+    	    cln = sl;
+    	    sln = -cl;
+    	    	    		    
+	    if (ans.line != -1) {
+    	    	l = sqrt(p.cx*p.cx + p.cy*p.cy);
+	    	pc = p.cx/l;
+    	    	ps = p.cy/l;
+	    } else {
+	    	cx = CENTER_XCLICK(linet[ans.moved.cx].start.cx - pl->pos.cx);
+	    	cy = CENTER_YCLICK(linet[ans.moved.cx].start.cy - pl->pos.cy);
+    	    	l = sqrt(cx*cx + cy*cy);
+    	    	pc = cx/l;
+    	    	ps = cy/l;
+	    }
+		    
+    	    if (sign == 1) {
+    	    	pdc = -ps;
+    	    	pds = pc;
+    	    } else {
+    	    	pdc = ps;
+    	    	pds = -pc;
+    	    }
+    	    
+	    if (a) {
+		power = AFTER_BURN_POWER(power, a);
+	    }
+
+    	    /*v = ( power / inert ) * options.turnPush;
+
+	    v *= relturn * l / (SHIP_SZ * CLICK);
+    	    velon = ABS(v * (pdc * (-sl) + pds * cl));
+
+	    fact = tanh((power / inert) / (velon) );
+	    velon *= fact;*/
+	    
+     	    velon = 2 * ( power / inert ) * timeStep;
+    	    	    
+    	    if ((pl->vel.x*cln + pl->vel.y*sln) <= 0) {
+    	    	if (ans.line != -1) {
+    	    	    Bounce_player(pl,&move,ans.line,0);
+		} else {
+    	    	    Bounce_player(pl,&move,ans.point,0);
+		}
+	    }
+
+    	    if ((pl->vel.x*cln + pl->vel.y*sln) <= 0) {
+    	    	pl->vel.x -= velon * cln;
+    	    	pl->vel.y -= velon * sln;
+	    } else {
+    	    	pl->vel.x += velon * cln;
+    	    	pl->vel.y += velon * sln;
+	    }
+    	    
+	    /*velot = velon * options.playerWallFriction * ((-pdc) * cl + (-pds) * sl);
+    	    pl->vel.x += velot * cl;
+    	    pl->vel.y += velot * sl;*/
+	    
 	    break;
 	}
 	pl->dir = next_dir;

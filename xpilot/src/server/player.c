@@ -467,7 +467,6 @@ int Init_player(world_t *world, int ind, shipshape_t *ship, int type)
 
     pl->power = pl->power_s = MAX_PLAYER_POWER;
     pl->turnspeed = pl->turnspeed_s = MIN_PLAYER_TURNSPEED;
-    pl->use_turnqueue = false;
     pl->type = OBJ_PLAYER;
     pl->pl_type = type;
     if (type == PL_TYPE_HUMAN)

@@ -699,50 +699,6 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-	"turnPush",
-	"turnPush",
-	"10",
-	&options.turnPush,
-	valReal,
-	tuner_dummy,
-	/*was:	"How strong will turning against a wall push the ship away?\n",*/
-	"Speed at which only pushMin will be applied",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    {
-	"pushMin",
-	"pmin",
-	"0.25",
-	&options.pushMin,
-	valReal,
-	tuner_dummy,
-	"Effect of turnPush on fast bounces\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    {
-	"pushMax",
-	"pMax",
-	"2.5",
-	&options.pushMax,
-	valReal,
-	tuner_dummy,
-	"Effect of turnPush on very slow bounces\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    {
-	"pushType",
-	"pushType",
-	"1",
-	&options.pushType,
-	valInt,
-	tuner_dummy,
-	"What kind of dependency of turnpush to perpendicular bounce speed?\n"
-	"0 = no turnPush, 1 = linear relation, 2 = tanh relation,\n"
-	"3 = sinoid relation 4 = sinesqr 5 = sine to the power of 4\n"
-	"at zero-speed pushMax is applied, at speeds over turnPush pushMin\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },  
-    {
 	"minesWallBounce",
 	"minesWallBounce",
 	"no",
