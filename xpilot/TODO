@@ -124,10 +124,6 @@ Developer: kps
 Task: Code to make ship push it self away from a wall when turning, "turnpush".
 Developer: throat
 
-Task: Fix ball statistics counter in client so that balls that are cased when
-no enemy is around are not counted.
-Developer: kps
-
 Task: When server op does total reset to start a new match, don't clear scores
 of pausing players.
 Developer: kps

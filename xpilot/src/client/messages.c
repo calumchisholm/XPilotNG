@@ -179,6 +179,32 @@ static bool Msg_match_fmt(const char *msg, const char *fmt, msgnames_t *mn)
     return false;
 }
 
+static bool Want_scan(void)
+{
+    int i;
+    other_t *other;
+    int num_playing = 0;
+
+    /* if only player on server, let's not bother */
+    if (num_others < 2)
+	return false;
+
+    /* if not playing, don't bother */
+    if (!self || strchr("PW", self->mychar))
+	return false;
+
+    for (i = 0; i < num_others; i++) {
+	other = &Others[i];
+	/* alive and dead ships and robots are considered playing */
+	if (strchr(" DR", other->mychar))
+	    num_playing++;
+    }
+
+    if (num_playing > 1)
+	return true;
+    return false;
+}
+
 /*
  * A total reset is most often done when a new match is starting.
  * If we see a total reset message we clear the statistics.
@@ -208,7 +234,7 @@ static bool Msg_scan_for_replace_treasure(const char *message)
 {
     msgnames_t mn;
 
-    if (!self)
+    if (!self || !Want_scan())
 	return false;
 
     memset(&mn, 0, sizeof(mn));
@@ -244,7 +270,7 @@ static bool Msg_scan_for_ball_destruction(const char *message)
 {
     msgnames_t mn;
 
-    if (!self)
+    if (!self || !Want_scan())
 	return false;
 
     memset(&mn, 0, sizeof(mn));
@@ -291,36 +317,6 @@ static void Msg_scan_death(int id)
 	}
     }
 }
-
-static bool Want_msg_scan(void)
-{
-    int i;
-    other_t *other;
-    int num_playing = 0;
-
-    /* kps fix */
-    return true;
-
-    /* if only player on server, let's not bother */
-    if (num_others < 2)
-	return false;
-
-    /* if not playing, don't bother */
-    if (!self || strchr("PW", self->mychar))
-	return false;
-
-    for (i = 0; i < num_others; i++) {
-	other = &Others[i];
-	/* alive and dead ships and robots are considered playing */
-	if (strchr(" DR", other->mychar))
-	    num_playing++;
-    }
-
-    if (num_playing > 1)
-	return true;
-    return false;
-}
-
 
 static bool Msg_is_game_msg(const char *message)
 {
@@ -545,12 +541,10 @@ static bool Msg_is_in_angle_brackets(const char *message)
     return true;
 }
 
-static void Msg_scan_angle_bracketed_msg(const char *message, bool want_scan)
+static void Msg_scan_angle_bracketed_msg(const char *message)
 {
     /* let's scan for total reset even if not playing */
     if (Msg_scan_for_total_reset(message))
-	return;
-    if (!want_scan)
 	return;
     if (Msg_scan_for_ball_destruction(message))
 	return;
@@ -754,7 +748,7 @@ void Add_message(const char *message)
 {
     int			i;
     message_t		*msg, **msg_set;
-    bool		is_game_msg = false, want_scan = false;
+    bool		is_game_msg = false;
     msg_bms_t		bmsinfo = BmsNone;
     const char		*msg2;
     bool		is_drawn_talk_message	= false; /* not pending */
@@ -777,16 +771,14 @@ void Add_message(const char *message)
 	    msg_set = GameMsg;
     }
 
-    want_scan = Want_msg_scan();
-    if (is_game_msg && want_scan)
+    if (is_game_msg)
 	Msg_scan_game_msg(message);
 
     else if (Msg_is_in_angle_brackets(message))
-	Msg_scan_angle_bracketed_msg(message, want_scan);
+	Msg_scan_angle_bracketed_msg(message);
 
     else if (!is_game_msg
 	     && BIT(Setup->mode, TEAM_PLAY)
-	     && want_scan
 	     && Msg_is_from_our_team(message, &msg2))
 	bmsinfo = Msg_do_bms(msg2);
 
