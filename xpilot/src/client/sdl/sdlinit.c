@@ -13,6 +13,7 @@ int Init_playing_windows(void)
     char defaultfont[] = "defaultfont.bmp"; /* TODO make bmp fonts work */
     char testfont[] = "Test.ttf";
     int fontsize = 12;
+    int mapfontsize = 12;
     /*char testfont[] = "/doze/windows/fonts/trebuc.ttf";*/
     
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -45,8 +46,8 @@ int Init_playing_windows(void)
     gluOrtho2D(0, draw_width, 0, draw_height);
     glMatrixMode(GL_MODELVIEW);
     glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);	
-
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
     /* Set title for window */
     SDL_WM_SetCaption(TITLE, NULL);
     
@@ -58,6 +59,11 @@ int Init_playing_windows(void)
     if (fontinit(&messagefont,testfont,fontsize)) {
     	error("fontinit failed with %s, reverting to default font %s",testfont,defaultfont);
 	if (fontinit(&gamefont,defaultfont,fontsize))
+	    error("Default font failed! messagefont not available!");
+    }
+    if (fontinit(&mapfont,testfont,mapfontsize)) {
+    	error("fontinit failed with %s, reverting to default font %s",testfont,defaultfont);
+	if (fontinit(&mapfont,defaultfont,mapfontsize))
 	    error("Default font failed! messagefont not available!");
     }
         

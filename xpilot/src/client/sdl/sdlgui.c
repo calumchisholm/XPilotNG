@@ -29,12 +29,12 @@
 #include "images.h"
 #include "text.h"
 
-int null    = 0x00000000;
-int black   = 0x000000ff;
-int white   = 0xffffffff;
-int blue    = 0x0000ffff;
-int red     = 0xff0000ff;
-int green   = 0x00ff00ff;
+int nullRGBA    = 0x00000000;
+int blackRGBA   = 0x000000ff;
+int whiteRGBA   = 0xffffffff;
+int blueRGBA    = 0x0000ffff;
+int redRGBA     = 0xff0000ff;
+int greenRGBA   = 0x00ff00ff;
 
 int wallColor		    = 0x0000ffff;
 int hudColor		    = 0xff000088;
@@ -101,13 +101,14 @@ int baseWarningType = 1;
 	       color & 255);
 }*/
 /* better to use alpha everywhere, less confusion */
-static void set_alphacolor(int color)
+void set_alphacolor(int color)
 {
     glColor4ub((color >> 24) & 255,
     	       (color >> 16) & 255,
 	       (color >> 8) & 255,
 	       color & 255);
 }
+
 static GLubyte get_alpha(int color)
 {
     return (color & 255);
@@ -239,7 +240,7 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 	if (!(color = Life_color(other)))
 	    color = baseNameColor;
     } else
-	color = white;
+	color = whiteRGBA;
 
     x = x + BLOCK_SZ / 2;
     y = y + BLOCK_SZ / 2;
@@ -268,35 +269,33 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
     /* Mara's flashy basewarning */
     if (do_basewarning && (baseWarningType & 2)) {
 	if (loopsSlow & 1) {
-	    if (color != white)
-		color = white;
+	    if (color != whiteRGBA)
+		color = whiteRGBA;
 	    else
-		color = red;
+		color = redRGBA;
 	}
     }
     
     /* TODO : figure out how to make the text stop wobbling */
     
-    setupPaint_HUD();
-    set_alphacolor(color |= 0x000000ff);
+    color |= 0x000000ff;
     switch (type) {
     case SETUP_BASE_UP:
-	fontprint(&gamefont,CENTER,DOWN,GL_X(x),GL_Y(y - BLOCK_SZ / 2),other->name);
+	mapprint(&mapfont,color,CENTER,DOWN	  ,(x)  	      ,(y - BLOCK_SZ / 2),other->name);
         break;
     case SETUP_BASE_DOWN:
-	fontprint(&gamefont,CENTER,DOWN,GL_X(x),GL_Y(y + BLOCK_SZ),other->name);
+	mapprint(&mapfont,color,CENTER,UP	  ,(x)  	      ,(y + BLOCK_SZ / 1.5),other->name);
         break;
     case SETUP_BASE_LEFT:
-	fontprint(&gamefont,LEFT,UP,GL_X(x + BLOCK_SZ / 2),GL_Y(y),other->name);
+	mapprint(&mapfont,color,RIGHT,UP    ,(x + BLOCK_SZ / 2) ,(y),other->name);
         break;
     case SETUP_BASE_RIGHT:
-	fontprint(&gamefont,RIGHT,UP,GL_X(x - BLOCK_SZ / 2),GL_Y(y),other->name);
+	mapprint(&mapfont,color,LEFT,UP   ,(x - BLOCK_SZ / 2) ,(y),other->name);
         break;
     default:
         errno = 0;
         error("Bad base dir.");
     }
-    setupPaint_stationary();  
 }
 
 void Gui_paint_decor(int x, int y, int xi, int yi, int type,
@@ -328,7 +327,7 @@ void Gui_paint_visible_border(int x, int y, int xi, int yi)
 
 void Gui_paint_hudradar_limit(int x, int y, int xi, int yi)
 {
-    set_alphacolor(blue);
+    set_alphacolor(blueRGBA);
     glBegin(GL_LINE_LOOP);
     	glVertex2i(x, y);
     	glVertex2i(x, yi);
@@ -603,7 +602,7 @@ void Gui_paint_appearing(int x, int y, int id, int count)
     maxy = miny + (unsigned)(count / 180. * hsize + 1);
     
     color = Life_color(other);
-    set_alphacolor((color)?color:red);
+    set_alphacolor((color)?color:redRGBA);
     
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
@@ -747,7 +746,7 @@ static int Gui_is_my_tank(other_t *other)
 
 static int Gui_calculate_ship_color(int id, other_t *other)
 {
-    int ship_color = white;
+    int ship_color = whiteRGBA;
 
 #ifndef NO_BLUE_TEAM
     if (BIT(Setup->mode, TEAM_PLAY)
@@ -759,7 +758,7 @@ static int Gui_calculate_ship_color(int id, other_t *other)
 	    && (other->life == 0))
 	    ship_color = teamLWColor;
 	else
-	    ship_color = blue;
+	    ship_color = blueRGBA;
     }
 
     if (eyes != NULL
@@ -772,14 +771,14 @@ static int Gui_calculate_ship_color(int id, other_t *other)
 	    && (other->life == 0))
 	    ship_color = teamLWColor;
 	else
-	    ship_color = blue;
+	    ship_color = blueRGBA;
     }
 
     if (Gui_is_my_tank(other))
-	ship_color = blue;
+	ship_color = blueRGBA;
 #endif
-    if (roundDelay > 0 && ship_color == white)
-	ship_color = red;
+    if (roundDelay > 0 && ship_color == whiteRGBA)
+	ship_color = redRGBA;
 
     /* Check for team color */
     if (other && BIT(Setup->mode, TEAM_PLAY)) {
@@ -818,26 +817,21 @@ static void Gui_paint_ship_name(int x, int y, other_t *other)
     /* TODO : do all name painting together, so we don't need
      * all theese setupPaint<foo> calls
      */
-    setupPaint_HUD();
     if (shipNameColor) {
 	if (!color)
 	    color = shipNameColor;
 
-	set_alphacolor(color);
-	fontprint(&gamefont, CENTER, DOWN,GL_X(x),GL_Y(y - SHIP_SZ),"%s",other->id_string);
+	mapprint(&mapfont, color, CENTER, DOWN,x,y - SHIP_SZ,"%s",other->id_string);
     } else
-	color = blue;
+	color = blueRGBA;
 
     if (instruments.showLivesByShip
 	&& BIT(Setup->mode, LIMITED_LIVES)) {
 	if (other->life < 1)
-	    color = white;
+	    color = whiteRGBA;
 
-	set_alphacolor(color);
-	fontprint(&gamefont, LEFT, CENTER,GL_X(x + SHIP_SZ),GL_Y(y),"%d", other->life);
+	mapprint(&mapfont, color, LEFT, CENTER,x + SHIP_SZ,y,"%d", other->life);
     }
-    
-    setupPaint_moving();
 }
 
 void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
@@ -899,10 +893,7 @@ void Paint_score_objects(void)
 		x = sobj->x * BLOCK_SZ + BLOCK_SZ/2;
 		y = sobj->y * BLOCK_SZ + BLOCK_SZ/2;
   		if (wrap(&x, &y)) {
-		    x = (x - world.x)*scale;
-		    y = (y - world.y)*scale;
-    	    	    set_alphacolor(scoreObjectColor);
-		    fontprint(&gamefont,CENTER,CENTER,x,y,sobj->msg);
+		    mapprint(&mapfont,scoreObjectColor,CENTER,CENTER,x,y,sobj->msg);
 		}
 	    }
 	    sobj->life_time -= timePerFrame;
@@ -919,17 +910,15 @@ void Paint_client_fps(void)
     int			x, y;
     char		buf[32];
     int			len;
-    fontbounds dummy;
 
     if (!hudColor)
 	return;
 
-    set_alphacolor(hudColor);
     sprintf(buf, "FPS: %d", clientFPS);
     len = strlen(buf);
     x = draw_width - 20;
     y = draw_height - 200;
-    dummy = fontprint(&gamefont,RIGHT,DOWN,x,y,buf);
+    HUDprint(&gamefont,hudColor,RIGHT,DOWN,x,y,buf);
 }
 
 static void Paint_meter(int xoff, int y, const char *title, int val, int max,
@@ -942,6 +931,7 @@ static void Paint_meter(int xoff, int y, const char *title, int val, int max,
 		BORDER = 5;
     int		x, xstr;
     int x_alignment;
+    int color;
 
     if (xoff >= 0) {
 	x = xoff;
@@ -965,7 +955,7 @@ static void Paint_meter(int xoff, int y, const char *title, int val, int max,
 
     /* meterBorderColor = 0 obviously means no meter borders are drawn */
     if (meterBorderColor) {
-	int color = meterBorderColor;
+    	color = meterBorderColor;
 
 	set_alphacolor(color);
 	glBegin( GL_LINE_LOOP );
@@ -985,9 +975,9 @@ static void Paint_meter(int xoff, int y, const char *title, int val, int max,
     }
 
     if (!meterBorderColor)
-	set_alphacolor(meter_color);
+	color = meter_color;
 
-    fontprint(&gamefont,x_alignment,CENTER,xstr,draw_height - y - meterHeight/2,title);
+    HUDprint(&gamefont,color,x_alignment,UP,xstr,draw_height - y - meterHeight,title);
 }
 
 void Paint_meters(void)
@@ -1137,7 +1127,7 @@ void Paint_HUD(void)
     int tempx,tempy,tempw,temph;
     fontbounds dummy;
     hudRadarLimit = 0.050;
-    
+        
     glEnable(GL_BLEND);
     /*
      * Show speed pointer
@@ -1233,11 +1223,10 @@ void Paint_HUD(void)
 
     /* Fuel notify, HUD meter on */
     if (hudColor && (fuelTime > 0.0 || fuelSum < fuelLevel3)) {
-	set_alphacolor(hudColor);
 	did_fuel = 1;
 	sprintf(str, "%04d", (int)fuelSum);
 	/* TODO fix this */
-	fontprint(&gamefont,LEFT,DOWN,
+	HUDprint(&gamefont,hudColor,LEFT,DOWN,
 	    	hud_pos_x + hudSize-HUD_OFFSET+BORDER,
 		hud_pos_y - (hudSize-HUD_OFFSET+BORDER),
 		str);
@@ -1247,7 +1236,7 @@ void Paint_HUD(void)
 	    else
 		sprintf(str, "T%d", fuelCurrent);
 	    /* TODO fix this */
-	    fontprint(&gamefont,LEFT,DOWN,
+	    HUDprint(&gamefont,hudColor,LEFT,DOWN,
 	    	    hud_pos_x + hudSize-HUD_OFFSET + BORDER,
 		    hud_pos_y - hudSize-HUD_OFFSET + BORDER,
 		    str);
@@ -1259,20 +1248,18 @@ void Paint_HUD(void)
 
     /* Draw last score on hud if it is an message attached to it */
     if (hudColor) {
-	set_alphacolor(hudColor);
-	
-    	/* TODO: rewrite this to exploit the fact fontprint handles newlines */
+    	/* TODO: rewrite this to exploit the fact HUDprint handles newlines */
 	for (i = 0, j = 0; i < MAX_SCORE_OBJECTS; i++) {
 	    score_object_t*	sobj = &score_objects[(i+score_object)%MAX_SCORE_OBJECTS];
 	    if (sobj->hud_msg_len > 0) {
-	    	dummy = fontprintsize(&gamefont,sobj->hud_msg);
+	    	dummy = printsize(&gamefont,sobj->hud_msg);
 		if (sobj->hud_msg_width == -1)
 		    sobj->hud_msg_width = dummy.width;
 		if (j == 0 &&
 		    sobj->hud_msg_width > 2*hudSize-HUD_OFFSET*2 &&
 		    (did_fuel || hudVLineColor))
 		    ++j;
-		fontprint(&gamefont,CENTER,DOWN,
+		HUDprint(&gamefont,hudColor,CENTER,DOWN,
 		    	hud_pos_x,
 			hud_pos_y - (hudSize-HUD_OFFSET + BORDER + j * dummy.height),
 			sobj->hud_msg);
@@ -1283,7 +1270,7 @@ void Paint_HUD(void)
 	if (time_left > 0) {
 	    sprintf(str, "%3d:%02d",
 		    (int)(time_left / 60), (int)(time_left % 60));
-	    fontprint(&gamefont,RIGHT,DOWN,
+	    HUDprint(&gamefont,hudColor,RIGHT,DOWN,
 		    hud_pos_x - hudSize+HUD_OFFSET - BORDER,
 		    hud_pos_y + hudSize+HUD_OFFSET + BORDER,
 		    str);
@@ -1291,14 +1278,14 @@ void Paint_HUD(void)
 
 	/* Update the modifiers */
 	modlen = strlen(mods);
-	fontprint(&gamefont,RIGHT,UP,
+	HUDprint(&gamefont,hudColor,RIGHT,UP,
 		hud_pos_x - hudSize+HUD_OFFSET-BORDER,
 		hud_pos_y - hudSize+HUD_OFFSET-BORDER,
 		mods);
 
 	if (autopilotLight) {
-	    dummy = fontprintsize(&gamefont,autopilot);
-	    fontprint(&gamefont,CENTER,DOWN,
+	    dummy = printsize(&gamefont,autopilot);
+	    HUDprint(&gamefont,hudColor,CENTER,DOWN,
 			  hud_pos_x,
 			  hud_pos_y + hudSize+HUD_OFFSET + BORDER
 			  + dummy.height*2,
@@ -1480,7 +1467,7 @@ void Paint_messages(void)
 		    /*xoff2 = XTextWidth(messageFont, msg->txt,
 				          glBlendFunc(GL_SRC_ALPHA, GL_ONE);
  selection.draw.x1);*/
-		    xoff2 = fontprintsize(&messagefont,msg->txt).width*len;/*this is not accurate*/
+		    xoff2 = printsize(&messagefont,msg->txt).width*len;/*this is not accurate*/
 
 		    if (TALK_MSG_SCREENPOS(last_msg_index,i)
 			< selection.draw.y2) {
@@ -1502,7 +1489,7 @@ void Paint_messages(void)
 			    ptr3 = &(msg->txt[selection.draw.x2 + 1]);
 			    /*xoff3 = XTextWidth(messageFont, msg->txt,
 					       selection.draw.x2 + 1);*/
-			    xoff3 = fontprintsize(&messagefont,msg->txt).width*len;/*this is not accurate*/
+			    xoff3 = printsize(&messagefont,msg->txt).width*len;/*this is not accurate*/
 			    l3 = len - selection.draw.x2 - 1;
 			}
 		    } /* only line */
@@ -1524,33 +1511,29 @@ void Paint_messages(void)
 		    ptr3 = &(msg->txt[selection.draw.x2 + 1]);
 		    /*xoff3 = XTextWidth(messageFont, msg->txt,
 				       selection.draw.x2 + 1);*/
-		    xoff3 = fontprintsize(&messagefont,msg->txt).width*len;/*this is not accurate*/
+		    xoff3 = printsize(&messagefont,msg->txt).width*len;/*this is not accurate*/
 		    l3 = len - selection.draw.x2 - 1;
 		}
 	    } /* last line */
 
 
 	    if (ptr) {
-		set_alphacolor(msg_color);
-		fontprint(&gamefont,LEFT,CENTER,x,y,ptr);
+		HUDprint(&gamefont,msg_color,LEFT,CENTER,x,y,ptr);
 	    }
 	    if (ptr2) {
-		set_alphacolor(white);
-		fontprint(&gamefont,LEFT,CENTER,x,y,ptr2);
+		HUDprint(&gamefont,whiteRGBA,LEFT,CENTER,x,y,ptr2);
 	    }
 	    if (ptr3) {
-		set_alphacolor(msg_color);
-		fontprint(&gamefont,LEFT,CENTER,x,y,ptr2);
+		HUDprint(&gamefont,msg_color,LEFT,CENTER,x,y,ptr2);
 	    }
 
 	} else /* not emphasized */
 
 	{
-	    set_alphacolor(msg_color);
-	    fontprint(&gamefont,LEFT,CENTER,x,y,msg->txt);
+	    HUDprint(&gamefont,msg_color,LEFT,CENTER,x,y,msg->txt);
 	}
 
-	width = fontprintsize(&messagefont,"e").width*MIN(len, msg->len); /*this is not accurate*/
+	width = printsize(&messagefont,"e").width*MIN(len, msg->len); /*this is not accurate*/
     }
 }
 

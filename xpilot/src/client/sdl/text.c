@@ -50,10 +50,14 @@
 
 #define NUM_TEXTURES 1
 
+float modelview_matrix[16];
+	
 int LoadBMP(font_data *ft_font, const char * fname);
 void pushScreenCoordinateMatrix(void);
 void pop_projection_matrix(void);
 int next_p2 ( int a );
+void print(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, const char *text);
+void print2(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, const char *text);
 #ifdef HAVE_SDL_TTF
 GLuint SDL_GL_LoadTexture(SDL_Surface *surface, texcoord_t *texcoord);
 int FTinit(font_data *font, const char * fontname, int ptsize);
@@ -380,7 +384,7 @@ void pop_projection_matrix(void)
 }
 
 
-fontbounds fontprintsize(font_data *ft_font, const char *fmt, ...)
+fontbounds printsize(font_data *ft_font, const char *fmt, ...)
 {
 	
     unsigned int bufsize = 1024;
@@ -412,15 +416,15 @@ fontbounds fontprintsize(font_data *ft_font, const char *fmt, ...)
     start = 0;
     for (;;) {
 	
-	for (end=start;end<textlength-1;++end)
+	for (end=start;end<textlength;++end)
 	    if (text[end] == '\n') {
 	    	break;
 	    }
 	
-	toklen = end - start + 1;
+	toklen = end - start;
 	
 	len = 0.0;
-	for (j=start;j<=end;++j)
+	for (j=start;j<=end-1;++j)
 	    len = len + ft_font->W[(GLubyte)text[j]];
 	
     	if (len > returnval.width)
@@ -438,15 +442,8 @@ fontbounds fontprintsize(font_data *ft_font, const char *fmt, ...)
     return returnval;
 }
 
-/* The flagship function of the library - this thing will print
- * out text at window coordinates x,y, using the font ft_font.
- * The current modelview matrix will also be applied to the text.
- * Also it will return the height and width of the text written.
- */ 
-fontbounds fontprint(font_data *ft_font, int XALIGN, int YALIGN, float x, float y, const char *fmt, ...)
+void print(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, const char *text)
 {
-	
-    unsigned int bufsize = 1024;
     unsigned int i=0,j,textlength;
     fontbounds returnval,dummy;
     float xoff = 0.0,yoff = 0.0;
@@ -455,44 +452,16 @@ fontbounds fontprint(font_data *ft_font, int XALIGN, int YALIGN, float x, float 
     returnval.width = 0.0;
     returnval.height = 0.0;
     
-     if (ft_font == NULL) return returnval;
+    if (ft_font == NULL) return;
     /* We want a coordinate system where things coresponding to window pixels.*/
 
     GLuint font=ft_font->list_base;
 
-    char		text[bufsize];  /* Holds Our String */
-    va_list		ap; 	    /* Pointer To List Of Arguments */
-    
-    if (fmt == NULL)	    	    /* If There's No Text */
-    	*text=0;    	    	    /* Do Nothing */
-    else {
-    	va_start(ap, fmt);  	    /* Parses The String For Variables */
-    	vsnprintf(text, bufsize, fmt, ap);    /* And Converts Symbols To Actual Numbers */
-    	va_end(ap); 	    	    /* Results Are Stored In Text */
-    }
-    if (!(textlength = strlen(text))) {
-    	return returnval;
-	error("Someone tried to print a null string =(");
-    }
-    
-    returnval = fontprintsize(ft_font,text);
+    returnval = printsize(ft_font,text);
     
     yoff = (returnval.height/2.0f)*((float)YALIGN) - ft_font->h;
 
-    pushScreenCoordinateMatrix();					
-    
-    glPushAttrib(GL_LIST_BIT | GL_CURRENT_BIT  | GL_ENABLE_BIT | GL_TRANSFORM_BIT);	
-    glMatrixMode(GL_MODELVIEW);
-    glDisable(GL_LIGHTING);
-    glEnable(GL_TEXTURE_2D);
-    glDisable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);	
-
     glListBase(font);
-
-    float modelview_matrix[16];	
-    glGetFloatv(GL_MODELVIEW_MATRIX, modelview_matrix);
 
     /* This is where the text display actually happens.
      * For each line of text we reset the modelview matrix
@@ -503,19 +472,19 @@ fontbounds fontprint(font_data *ft_font, int XALIGN, int YALIGN, float x, float 
      * will be drawn immediatly after it. 
      */
     /* make sure not to use mytok until we are done!!! */
-    
+    textlength = strlen(text);
     start = 0;
     for (;;) {
 	
-	for (end=start;end<textlength-1;++end)
+	for (end=start;end<textlength;++end)
 	    if (text[end] == '\n') {
 	    	break;
 	    }
 	
-	toklen = end - start + 1;
+	toklen = end - start;
 	
 	dummy.width = 0.0;
-	for (j=start;j<=end;++j)
+	for (j=start;j<=end-1;++j)
 	    dummy.width = dummy.width + ft_font->W[(GLubyte)text[j]];
 	
 	xoff = - (dummy.width/2.0f)*((float)XALIGN);
@@ -523,7 +492,8 @@ fontbounds fontprint(font_data *ft_font, int XALIGN, int YALIGN, float x, float 
     	glPushMatrix();
     	glLoadIdentity();
 		
-    	glTranslatef((int)(x + xoff),(int)(y - ft_font->linespacing*i + yoff),0);
+    	if (color) set_alphacolor(color);
+	glTranslatef((int)(x + xoff),(int)(y - ft_font->linespacing*i + yoff),0);
     	glMultMatrixf(modelview_matrix);
 
     	glCallLists(toklen, GL_UNSIGNED_BYTE, (GLubyte *) &text[start]);
@@ -536,10 +506,143 @@ fontbounds fontprint(font_data *ft_font, int XALIGN, int YALIGN, float x, float 
 	
 	start = end + 1;
     }
+}
+
+void print2(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, const char *text)
+{
+    unsigned int i=0,j,textlength;
+    fontbounds returnval,dummy;
+    float xoff = 0.0,yoff = 0.0;
+    int start,end,toklen;
+    int X,Y;
+    
+    returnval.width = 0.0;
+    returnval.height = 0.0;
+    
+    if (ft_font == NULL) return;
+    /* We want a coordinate system where things coresponding to window pixels.*/
+
+    GLuint font=ft_font->list_base;
+
+    returnval = printsize(ft_font,text);
+    
+    yoff = (returnval.height/2.0f)*((float)YALIGN) - ft_font->h;
+
+    glListBase(font);
+
+    /* This is where the text display actually happens.
+     * For each line of text we reset the modelview matrix
+     * so that the line's text will start in the correct position.
+     * Notice that we need to reset the matrix, rather than just translating
+     * down by h. This is because when each character is
+     * draw it modifies the current matrix so that the next character
+     * will be drawn immediatly after it. 
+     */
+    /* make sure not to use mytok until we are done!!! */
+    textlength = strlen(text);
+    start = 0;
+    for (;;) {
+	
+	for (end=start;end<textlength;++end)
+	    if (text[end] == '\n') {
+	    	break;
+	    }
+	
+	toklen = end - start;
+	
+	dummy.width = 0.0;
+	for (j=start;j<=end-1;++j)
+	    dummy.width = dummy.width + ft_font->W[(GLubyte)text[j]];
+	
+	xoff = - (dummy.width/2.0f)*((float)XALIGN);
+    	
+	X = (int)(x + xoff);
+	Y = (int)(y - ft_font->linespacing*i + yoff);
+	
+   	if (color) set_alphacolor(color);
+   	glMultMatrixf(modelview_matrix);
+	glTranslatef(X,Y,0);
+    	glCallLists(toklen, GL_UNSIGNED_BYTE, (GLubyte *) &text[start]);
+    	glTranslatef(-X - dummy.width,-Y,0);
+		
+    	++i;
+	
+	if (end >= textlength - 1) break;
+	
+	start = end + 1;
+    }
+}
+
+void mapprint(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, const char *fmt,...)
+{
+    unsigned int bufsize = 1024;
+    unsigned int textlength;
+    
+    char		text[bufsize];  /* Holds Our String */
+    va_list		ap; 	    /* Pointer To List Of Arguments */
+    
+    if (fmt == NULL)	    	    /* If There's No Text */
+    	*text=0;    	    	    /* Do Nothing */
+    else {
+    	va_start(ap, fmt);  	    /* Parses The String For Variables */
+    	vsnprintf(text, bufsize, fmt, ap);    /* And Converts Symbols To Actual Numbers */
+    	va_end(ap); 	    	    /* Results Are Stored In Text */
+    }
+    if (!(textlength = strlen(text))) {
+    	return;
+	error("Someone tried to print a null string =(");
+    }
+
+    if (ft_font == NULL) return;
+    /* We want a coordinate system where things coresponding to window pixels.*/
+
+    glPushAttrib(GL_LIST_BIT | GL_CURRENT_BIT  | GL_ENABLE_BIT | GL_TRANSFORM_BIT);	
+    glMatrixMode(GL_MODELVIEW);
+    glDisable(GL_LIGHTING);
+    glEnable(GL_TEXTURE_2D);
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);	
+
+    print2(ft_font, color, XALIGN, YALIGN, x, y, text);
+    
+    glPopAttrib();		
+}
+
+void HUDprint(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, const char *fmt, ...)
+{
+    unsigned int textlength,bufsize = 1024;
+    char		text[bufsize];  /* Holds Our String */
+    va_list		ap; 	    /* Pointer To List Of Arguments */
+    
+    if (fmt == NULL)	    	    /* If There's No Text */
+    	*text=0;    	    	    /* Do Nothing */
+    else {
+    	va_start(ap, fmt);  	    /* Parses The String For Variables */
+    	vsnprintf(text, bufsize, fmt, ap);    /* And Converts Symbols To Actual Numbers */
+    	va_end(ap); 	    	    /* Results Are Stored In Text */
+    }
+    if (!(textlength = strlen(text))) {
+    	return;
+	error("Someone tried to print a null string =(");
+    }
+    
+    pushScreenCoordinateMatrix();					
+    
+    glPushAttrib(GL_LIST_BIT | GL_CURRENT_BIT  | GL_ENABLE_BIT | GL_TRANSFORM_BIT);	
+    glMatrixMode(GL_MODELVIEW);
+    glDisable(GL_LIGHTING);
+    glEnable(GL_TEXTURE_2D);
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);	
+
+    glGetFloatv(GL_MODELVIEW_MATRIX, modelview_matrix);
+    
+    print( ft_font, color, XALIGN, YALIGN, x, y, text );
     
     glPopAttrib();		
 
     pop_projection_matrix();
-    
-    return returnval;
+
 }
