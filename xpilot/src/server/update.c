@@ -846,6 +846,176 @@ static void Do_repair(player *pl)
     }
 }
 
+static void Do_warping(player *pl)
+{
+    clpos dest;
+    int j, wcx, wcy, nearestFront, nearestRear;
+    double proximity, proxFront, proxRear;
+
+#if 0
+    if (pl->wormHoleHit >= World.NumWormholes) {
+	/* could happen if the player hit a temporary wormhole
+	   that was removed while the player was warping */
+	CLR_BIT(pl->status, WARPING);
+	return;
+    }
+#endif
+    if (pl->wormHoleHit != -1) {
+	wormhole_t *wh_hit = Wormholes(pl->wormHoleHit);
+
+	if (wh_hit->countdown > 0)
+	    j = wh_hit->lastdest;
+	else if (rfrac() < 0.10f) {
+	    do
+		j = (int)(rfrac() * World.NumWormholes);
+	    while (World.wormholes[j].type == WORM_IN
+		   || pl->wormHoleHit == j
+		   || World.wormholes[j].temporary);
+	} else {
+	    nearestFront = nearestRear = -1;
+	    proxFront = proxRear = 1e20;
+
+	    for (j = 0; j < World.NumWormholes; j++) {
+		wormhole_t *wh = Wormholes(j);
+
+		if (j == pl->wormHoleHit
+		    || wh->type == WORM_IN
+		    || wh->temporary)
+		    continue;
+
+		wcx = WRAP_DCX(wh->pos.cx - wh_hit->pos.cx);
+		wcy = WRAP_DCY(wh->pos.cy - wh_hit->pos.cy);
+
+		proximity = (pl->vel.y * wcx + pl->vel.x * wcy);
+		proximity = ABS(proximity);
+
+		if (pl->vel.x * wcx + pl->vel.y * wcy < 0) {
+		    if (proximity < proxRear) {
+			nearestRear = j;
+			proxRear = proximity;
+		    }
+		} else if (proximity < proxFront) {
+		    nearestFront = j;
+		    proxFront = proximity;
+		}
+	    }
+
+#define RANDOM_REAR_WORM 1
+
+	    if (! RANDOM_REAR_WORM)
+		j = nearestFront < 0 ? nearestRear : nearestFront;
+	    else {
+		if (nearestFront >= 0)
+		    j = nearestFront;
+		else {
+		    do
+			j = (int)(rfrac() * World.NumWormholes);
+		    while (World.wormholes[j].type == WORM_IN
+			   || j == pl->wormHoleHit);
+		}
+	    }
+	}
+
+	sound_play_sensors(pl->pos, WORM_HOLE_SOUND);
+	dest = World.wormholes[j].pos;
+
+    } else { /* wormHoleHit == -1 */
+	int counter;
+	int hitmask = NONBALL_BIT | HITMASK(pl->team); /* kps - ok ? */
+
+	/* try to find empty space to hyperjump to */
+	for (counter = 20; counter > 0; counter--) {
+	    dest.cx = (int)(rfrac() * World.cwidth);
+	    dest.cy = (int)(rfrac() * World.cheight);
+	    if (shape_is_inside(dest.cx, dest.cy, hitmask,
+				(object *)pl, (shape_t *)pl->ship,
+				pl->dir)
+		== NO_GROUP)
+		break;
+	}
+
+	/* can't find an empty space, hyperjump failed */
+	if (!counter)
+	    dest = pl->pos;
+
+#if 0 /* kps - temporary wormholes disabled currently */
+	if (counter
+	    && wormTime
+	    && BIT(1U << World.block[OBJ_X_IN_BLOCKS(pl)]
+		   [OBJ_Y_IN_BLOCKS(pl)],
+		   SPACE_BIT)
+	    && BIT(1U << World.block[CLICK_TO_BLOCK(dest.cx)]
+		   [CLICK_TO_BLOCK(dest.cy)],
+		   SPACE_BIT))
+	    add_temp_wormholes(OBJ_X_IN_BLOCKS(pl),
+			       OBJ_Y_IN_BLOCKS(pl),
+			       CLICK_TO_BLOCK(dest.cx),
+			       CLICK_TO_BLOCK(dest.cy));
+#endif
+	j = -2;
+	sound_play_sensors(pl->pos, HYPERJUMP_SOUND);
+    }
+
+    /*
+     * Don't connect to balls while warping.
+     */
+    if (BIT(pl->used, HAS_CONNECTOR))
+	pl->ball = NULL;
+
+    if (BIT(pl->have, HAS_BALL)) {
+	/*
+	 * Take every ball associated with player through worm hole.
+	 * NB. the connector can cross a wall boundary this is
+	 * allowed, so long as the ball itself doesn't collide.
+	 */
+	int k;
+	for (k = 0; k < NumObjs; k++) {
+	    object *b = Obj[k];
+	    if (BIT(b->type, OBJ_BALL) && b->id == pl->id) {
+		clpos ballpos;
+		ballpos.cx = b->pos.cx + dest.cx - pl->pos.cx;
+		ballpos.cy = b->pos.cy + dest.cy - pl->pos.cy;
+		ballpos.cx = WRAP_XCLICK(ballpos.cx);
+		ballpos.cy = WRAP_YCLICK(ballpos.cy);
+		if (!INSIDE_MAP(ballpos.cx, ballpos.cy)) {
+		    b->life = 0;
+		    continue;
+		}
+		/*
+		 * kps - use shape is inside here to check if ball
+		 * is inside wall
+		 */
+		Object_position_set_clicks(b, ballpos.cx, ballpos.cy);
+		Object_position_remember(b);
+		b->vel.x *= WORM_BRAKE_FACTOR;
+		b->vel.y *= WORM_BRAKE_FACTOR;
+		Cell_add_object(b);
+	    }
+	}
+    }
+
+    pl->wormHoleDest = j;
+    Player_position_init_clicks(pl, dest.cx, dest.cy);
+    pl->vel.x *= WORM_BRAKE_FACTOR;
+    pl->vel.y *= WORM_BRAKE_FACTOR;
+    pl->forceVisible += 15;
+
+    if ((j != pl->wormHoleHit) && (pl->wormHoleHit != -1)) {
+	World.wormholes[pl->wormHoleHit].lastdest = j;
+	if (!World.wormholes[j].temporary)
+	    World.wormholes[pl->wormHoleHit].countdown
+		= (wormTime ? wormTime : WORMCOUNT);
+    }
+
+    CLR_BIT(pl->status, WARPING);
+    /*
+     * One second immunity to warped-to wormhole
+     */
+    pl->warped = 12 * 1.0;
+
+    sound_play_sensors(pl->pos, WORM_HOLE_SOUND);
+}
+
 
 /********** **********
  * Updating objects and the like.
@@ -869,14 +1039,6 @@ void Update_objects(void)
 	time_to_update += 1;
     }
 
-#if 0
-    xpprintf(__FILE__ ": frame loops / update : %ld / %d\n",
-	     frame_loops, do_update_this_frame);
-#endif
-
-    /*
-     * Update robots.
-     */
     Robot_update();
 
     if (fastAim)
@@ -1078,179 +1240,9 @@ void Update_objects(void)
 		   + pl->item[ITEM_ARMOR] * ARMOR_MASS;
 
 
-	/*
-	 * Wormholes and warping
-	 */
-	if (BIT(pl->status, WARPING)) {
-	    clpos dest;
-	    int wcx, wcy, nearestFront, nearestRear;
-	    double proximity, proxFront, proxRear;
-
-	    /* kps - wormHoleHit is now a pointer */
-	    if (pl->wormHoleHit >= World.NumWormholes) {
-		/* could happen if the player hit a temporary wormhole
-		   that was removed while the player was warping */
-		CLR_BIT(pl->status, WARPING);
-		break;
-	    }
-
-	    if (pl->wormHoleHit != -1) {
-		wormhole_t *wh_hit = Wormholes(pl->wormHoleHit);
-
-		if (wh_hit->countdown > 0)
-		    j = wh_hit->lastdest;
-		else if (rfrac() < 0.10f) {
-		    do
-			j = (int)(rfrac() * World.NumWormholes);
-		    while (World.wormholes[j].type == WORM_IN
-			   || pl->wormHoleHit == j
-			   || World.wormholes[j].temporary);
-		} else {
-		    nearestFront = nearestRear = -1;
-		    proxFront = proxRear = 1e20;
-
-		    for (j = 0; j < World.NumWormholes; j++) {
-			wormhole_t *wh = Wormholes(j);
-
-			if (j == pl->wormHoleHit
-			    || wh->type == WORM_IN
-			    || wh->temporary)
-			    continue;
-
-			wcx = WRAP_DCX(wh->pos.cx - wh_hit->pos.cx);
-			wcy = WRAP_DCY(wh->pos.cy - wh_hit->pos.cy);
-
-			proximity = (pl->vel.y * wcx + pl->vel.x * wcy);
-			proximity = ABS(proximity);
-
-			if (pl->vel.x * wcx + pl->vel.y * wcy < 0) {
-			    if (proximity < proxRear) {
-				nearestRear = j;
-				proxRear = proximity;
-			    }
-			} else if (proximity < proxFront) {
-			    nearestFront = j;
-			    proxFront = proximity;
-			}
-		    }
-
-#define RANDOM_REAR_WORM 1
-
-		    if (! RANDOM_REAR_WORM)
-			j = nearestFront < 0 ? nearestRear : nearestFront;
-		    else {
-			if (nearestFront >= 0)
-			    j = nearestFront;
-			else {
-			    do
-				j = (int)(rfrac() * World.NumWormholes);
-			    while (World.wormholes[j].type == WORM_IN
-				   || j == pl->wormHoleHit);
-			}
-		    }
-		}
-
-		sound_play_sensors(pl->pos, WORM_HOLE_SOUND);
-		dest = World.wormholes[j].pos;
-
-	    } else { /* wormHoleHit == -1 */
-		int counter;
-		int hitmask = NONBALL_BIT | HITMASK(pl->team); /* kps - ok ? */
-
-		/* try to find empty space to hyperjump to */
-		for (counter = 20; counter > 0; counter--) {
-		    dest.cx = (int)(rfrac() * World.cwidth);
-		    dest.cy = (int)(rfrac() * World.cheight);
-		    if (shape_is_inside(dest.cx, dest.cy, hitmask,
-					(object *)pl, (shape_t *)pl->ship,
-					pl->dir)
-			== NO_GROUP)
-			break;
-		}
-
-		/* can't find an empty space, hyperjump failed */
-		if (!counter)
-		    dest = pl->pos;
-
-#if 0 /* kps - temporary wormholes disabled currently */
-		if (counter
-		    && wormTime
-		    && BIT(1U << World.block[OBJ_X_IN_BLOCKS(pl)]
-					    [OBJ_Y_IN_BLOCKS(pl)],
-			   SPACE_BIT)
-		    && BIT(1U << World.block[CLICK_TO_BLOCK(dest.cx)]
-					    [CLICK_TO_BLOCK(dest.cy)],
-			   SPACE_BIT))
-		    add_temp_wormholes(OBJ_X_IN_BLOCKS(pl),
-				       OBJ_Y_IN_BLOCKS(pl),
-				       CLICK_TO_BLOCK(dest.cx),
-				       CLICK_TO_BLOCK(dest.cy));
-#endif
-		j = -2;
-		sound_play_sensors(pl->pos, HYPERJUMP_SOUND);
-	    }
-
-	    /*
-	     * Don't connect to balls while warping.
-	     */
-	    if (BIT(pl->used, HAS_CONNECTOR))
-		pl->ball = NULL;
-
-	    if (BIT(pl->have, HAS_BALL)) {
-		/*
-		 * Take every ball associated with player through worm hole.
-		 * NB. the connector can cross a wall boundary this is
-		 * allowed, so long as the ball itself doesn't collide.
-		 */
-		int k;
-		for (k = 0; k < NumObjs; k++) {
-		    object *b = Obj[k];
-		    if (BIT(b->type, OBJ_BALL) && b->id == pl->id) {
-			clpos ballpos;
-			ballpos.cx = b->pos.cx + dest.cx - pl->pos.cx;
-			ballpos.cy = b->pos.cy + dest.cy - pl->pos.cy;
-			ballpos.cx = WRAP_XCLICK(ballpos.cx);
-			ballpos.cy = WRAP_YCLICK(ballpos.cy);
-			if (!INSIDE_MAP(ballpos.cx, ballpos.cy)) {
-			    b->life = 0;
-			    continue;
-			}
-			/*
-			 * kps - use shape is inside here to check if ball
-			 * is inside wall
-			 */
-			Object_position_set_clicks(b, ballpos.cx, ballpos.cy);
-			Object_position_remember(b);
-			b->vel.x *= WORM_BRAKE_FACTOR;
-			b->vel.y *= WORM_BRAKE_FACTOR;
-			Cell_add_object(b);
-		    }
-		}
-	    }
-
-	    pl->wormHoleDest = j;
-	    Player_position_init_clicks(pl, dest.cx, dest.cy);
-	    pl->vel.x *= WORM_BRAKE_FACTOR;
-	    pl->vel.y *= WORM_BRAKE_FACTOR;
-	    pl->forceVisible += 15;
-
-	    if ((j != pl->wormHoleHit) && (pl->wormHoleHit != -1)) {
-		World.wormholes[pl->wormHoleHit].lastdest = j;
-		if (!World.wormholes[j].temporary) {
-		    World.wormholes[pl->wormHoleHit].countdown = (wormTime ?
-			wormTime : WORMCOUNT);
-		}
-	    }
-
-	    CLR_BIT(pl->status, WARPING);
-	    /*
-	     * One second immunity to warped-to wormhole
-	     */
-	    pl->warped = 12 * 1.0;
-
-	    sound_play_sensors(pl->pos, WORM_HOLE_SOUND);
-	}
-	/* end of somewhat-supported warping stuff */
+	/* Wormholes and warping */
+	if (BIT(pl->status, WARPING))
+	    Do_warping(pl);
 
 	update_object_speed(pl);	    /* New position */
 	Move_player(pl);
