@@ -454,15 +454,15 @@ void Tractor_beam(player *pl)
 {
     DFLOAT	maxdist, percent;
     long	cost;
+    player	*locked_pl = Player_by_id(pl->lock.pl_id);
 
-    /* kps - add lock_pl = Player_by_id(pl->lock.pl_id); */
     maxdist = TRACTOR_MAX_RANGE(pl->item[ITEM_TRACTOR_BEAM]);
     if (BIT(pl->lock.tagged, LOCK_PLAYER|LOCK_VISIBLE)
 	!= (LOCK_PLAYER|LOCK_VISIBLE)
-	|| !Player_is_playing(Player_by_id(pl->lock.pl_id))
+	|| !Player_is_playing(locked_pl)
 	|| pl->lock.distance >= maxdist
 	|| BIT(pl->used, HAS_PHASING_DEVICE)
-	|| BIT(Player_by_id(pl->lock.pl_id)->used, HAS_PHASING_DEVICE)) {
+	|| BIT(locked_pl->used, HAS_PHASING_DEVICE)) {
 	CLR_BIT(pl->used, HAS_TRACTOR_BEAM);
 	return;
     }
@@ -474,13 +474,12 @@ void Tractor_beam(player *pl)
     }
     General_tractor_beam(pl, pl->pos.cx, pl->pos.cy,
 			 pl->item[ITEM_TRACTOR_BEAM],
-			 GetInd(pl->lock.pl_id), pl->tractor_is_pressor);
+			 locked_pl, pl->tractor_is_pressor);
 }
 
 void General_tractor_beam(player *pl, int cx, int cy,
-			  int items, int target, bool pressor)
+			  int items, player *victim, bool pressor)
 {
-    player	*victim = Players(target);
     DFLOAT	maxdist = TRACTOR_MAX_RANGE(items),
 		maxforce = TRACTOR_MAX_FORCE(items),
 		percent, force, dist;

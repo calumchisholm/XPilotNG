@@ -138,7 +138,7 @@ struct cannon {
     unsigned	conn_mask;
     long	last_change;
     int		item[NUM_ITEMS];
-    int		tractor_target;
+    player	*tractor_target_pl;
     bool	tractor_is_pressor;
     unsigned short	team;
     long	used;

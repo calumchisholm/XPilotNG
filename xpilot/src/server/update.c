@@ -570,21 +570,19 @@ static void Cannon_update(void)
 	if ((c->damaged -= timeStep) <= 0)
 	    c->damaged = 0;
 	if (c->tractor_count > 0) {
-	    int ind = GetInd(c->tractor_target);
-	    player *tpl = Player_by_id(c->tractor_target);
+	    player *tpl = c->tractor_target_pl;
 
 	    if ((Wrap_length(tpl->pos.cx - c->pos.cx,
 			     tpl->pos.cy - c->pos.cy)
 		 < TRACTOR_MAX_RANGE(c->item[ITEM_TRACTOR_BEAM]) * CLICK)
 		&& Player_is_playing(tpl)) {
 		General_tractor_beam(NULL, c->pos.cx, c->pos.cy,
-				     c->item[ITEM_TRACTOR_BEAM], ind,
+				     c->item[ITEM_TRACTOR_BEAM], tpl,
 				     c->tractor_is_pressor);
 		if ((c->tractor_count -= timeStep) <= 0)
 		    c->tractor_count = 0;
-	    } else {
+	    } else
 		c->tractor_count = 0;
-	    }
 	}
 	if (c->emergency_shield_left > 0) {
 	    if ((c->emergency_shield_left -= timeStep) <= 0) {

@@ -868,7 +868,7 @@ static void Frame_ships(connection_t *conn, player *pl)
     for (i = 0; i < World.NumCannons; i++) {
 	cannon_t *cannon = World.cannon + i;
 	if (cannon->tractor_count > 0) {
-	    player *t = Player_by_id(cannon->tractor_target);
+	    player *t = cannon->tractor_target_pl;
 	    if (click_inview(&cv, t->pos.cx, t->pos.cy)) {
 		int j;
 		for (j = 0; j < 3; j++) {

@@ -34,9 +34,9 @@
 #include "list.h"
 #endif
 
-#ifndef MAP_H
+#ifndef SERVER_H
 /* need treasure_t */
-#include "map.h"
+#include "server.h"
 #endif
 
 #ifndef DEFAULTS_H
@@ -175,7 +175,7 @@ void Place_item(player *pl, int type);
 int Choose_random_item(void);
 void Tractor_beam(player *pl);
 void General_tractor_beam(player *pl, int cx, int cy,
-			  int items, int target, bool pressor);
+			  int items, player *victim, bool pressor);
 void Place_mine(player *pl);
 void Place_moving_mine(player *pl);
 void Place_general_mine(player *pl, unsigned short team, long status,

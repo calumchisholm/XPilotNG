@@ -131,7 +131,7 @@ void Cannon_init(cannon_t *c)
 			    (int)(rfrac() * (World.items[i].initial + 1)));
     }
     c->damaged = 0;
-    c->tractor_target = -1;
+    c->tractor_target_pl = NULL;
     c->tractor_count = 0;
     c->tractor_is_pressor = false;
     c->used = 0;
@@ -562,7 +562,7 @@ static void Cannon_fire(cannon_t *c, int weapon, int target, int dir)
     case CW_TRACTORBEAM:
 	/* smarter cannons use tractors more often and also push/pull longer */
 	c->tractor_is_pressor = (rfrac() * (cannonSmartness + 1) >= 1);
-	c->tractor_target = pl->id;
+	c->tractor_target_pl = pl;
 	c->tractor_count = 11 + rfrac() * (3 * cannonSmartness + 1);
 	break;
     case CW_TRANSPORTER:
