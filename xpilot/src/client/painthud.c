@@ -1348,14 +1348,15 @@ static bool Msg_scan_for_ball_destruction(char *message)
 		      " < %n's (%t) team has destroyed team %t treasure >",
 		      &mn)) {
 	int destroyer_team = atoi(mn.name[0]);
-	/*int destroyed_team = atoi(mn.name[1]);*/
+	int destroyed_team = atoi(mn.name[1]);
 	char *destroyer = mn.name[2];
 	
 	if (destroyer_team == self->team) {
 	    ballstats_teamcashes++;
 	    if (!strcmp(destroyer, self->name))
 		ballstats_cashes++;
-	} else
+	}
+	if (destroyed_team == self->team)
 	    ballstats_lostballs++;
 	return true;
     }
