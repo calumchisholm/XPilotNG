@@ -84,6 +84,7 @@ static void Close_WidgetTree ( GLWidget **widget )
 
 void Close_Widget ( GLWidget **widget )
 {
+    int i;
     GLWidget *tmp;
 
     if (!widget) {
@@ -99,7 +100,12 @@ void Close_Widget ( GLWidget **widget )
 
     if ((*widget)->Close) (*widget)->Close(*widget);
 
+    for (i=0;i<NUM_MOUSE_BUTTONS;++i)
+    	if (*widget == target[i]) target[i]=NULL;
+    if (*widget == hovertarget) hovertarget=NULL;
+
     if ((*widget)->wid_info) free((*widget)->wid_info);
+
     tmp = *widget;
     *widget = (*widget)->next;
     free(tmp);
@@ -2861,6 +2867,7 @@ static void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, 
     GLWidget *widget;
     WrapperWidget *wid_info;
     SDL_Rect b;
+    int i;
     
     widget = (GLWidget *)data;
     wid_info = ((WrapperWidget *)widget->wid_info);
@@ -2875,6 +2882,10 @@ static void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, 
 		SetBounds_GLWidget(wid_info->confmenu,&b);
 	    } else {
     	    	DelGLWidgetListItem(&(widget->children), wid_info->confmenu);
+    	    	for (i=0;i<NUM_MOUSE_BUTTONS;++i)
+    	    	    if (wid_info->confmenu == target[i]) target[i]=NULL;
+    	    	if (wid_info->confmenu == hovertarget) hovertarget=NULL;
+    
  	    }
 	}
     }
@@ -3097,6 +3108,7 @@ static void ConfMenuWidget_Save( void *data )
 
 static void ConfMenuWidget_Close( void *data )
 {
+    int i;
     GLWidget *widget;
     WrapperWidget *wid_info;
     
@@ -3114,6 +3126,11 @@ static void ConfMenuWidget_Close( void *data )
     }
     
     DelGLWidgetListItem(&(widget->children), wid_info->confmenu);
+    
+    for (i=0;i<NUM_MOUSE_BUTTONS;++i)
+    	if (wid_info->confmenu == target[i]) target[i]=NULL;
+    if (wid_info->confmenu == hovertarget) hovertarget=NULL;
+    
     wid_info->showconf = false;
     /*Close_Widget(&(wid_info->confmenu));*/
 }
