@@ -219,6 +219,11 @@ void Go_home(player_t *pl)
 	Robot_go_home(pl);
 }
 
+void Base_set_option(base_t *base, const char *name, const char *value)
+{
+    warn("setting base %p option %s to value %s", base, name, value);
+}
+
 /*
  * Compute the current sensor range for player `pl'.  This is based on the
  * amount of fuel, the number of sensor items (each one adds 25%), and the

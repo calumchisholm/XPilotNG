@@ -34,10 +34,14 @@ char xp2map_version[] = VERSION;
  */
 static world_t *current_world = NULL;
 
+static bool parsing_general_options = false;
+static cannon_t *current_cannon = NULL;
+static base_t *current_base = NULL;
+
 static void tagstart(void *data, const char *el, const char **attr)
 {
     static double scale = 1;
-    static int xptag = 0;
+    static bool xptag = false;
     world_t *world = current_world;
 
     UNUSED_PARAM(data);
@@ -58,7 +62,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    warn("Map file has newer version than this server recognizes.");
 	    warn("The map file might use unsupported features.");
 	}
-	xptag = 1;
+	xptag = true;
 	return;
     }
 
@@ -228,6 +232,7 @@ static void tagstart(void *data, const char *el, const char **attr)
     if (!strcasecmp(el, "Base")) {
 	int team = TEAM_NOT_SET, dir = DIR_UP;
 	clpos_t pos = DEFAULT_POS;
+	int ind;
 
 	while (*attr) {
 	    if (!strcasecmp(*attr, "team"))
@@ -244,7 +249,8 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    warn("Illegal team number in base tag.\n");
 	    exit(1);
 	}
-	World_place_base(world, pos, dir, team);
+	ind = World_place_base(world, pos, dir, team);
+	current_base = Base_by_index(world, ind);
 	return;
     }
 
@@ -285,6 +291,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	}
 	cannon_ind = World_place_cannon(world, pos, dir, team);
 	P_start_cannon(cannon_ind);
+	current_cannon = Cannon_by_index(world, cannon_ind);
 	return;
     }
 
@@ -429,7 +436,18 @@ static void tagstart(void *data, const char *el, const char **attr)
 		value = *(attr + 1);
 	    attr += 2;
 	}
-	Option_set_value(name, value, 0, OPT_MAP);
+	if (parsing_general_options)
+	    Option_set_value(name, value, 0, OPT_MAP);
+	else if (current_base)
+	    Base_set_option(current_base, name, value);
+	else if (current_cannon)
+	    Cannon_set_option(current_cannon, name, value);	    
+	else {
+	    warn("Options can be specified for:");
+	    warn("<GeneralOptions>, <Base> or <Cannon>.");
+	    warn("Option %s given out of context in map.", name);
+	    exit(1);
+	}
 	return;
     }
 
@@ -449,8 +467,10 @@ static void tagstart(void *data, const char *el, const char **attr)
 	return;
     }
 
-    if (!strcasecmp(el, "GeneralOptions"))
+    if (!strcasecmp(el, "GeneralOptions")) {
+	parsing_general_options = true;
 	return;
+    }
 
     warn("Unknown map tag: \"%s\"", el);
     return;
@@ -464,13 +484,16 @@ static void tagend(void *data, const char *el)
     UNUSED_PARAM(data);
     if (!strcasecmp(el, "Decor"))
 	P_end_decor();
+    else if (!strcasecmp(el, "Base"))
+	current_base = NULL;
     else if (!strcasecmp(el, "BallArea"))
 	P_end_ballarea();
     else if (!strcasecmp(el, "BallTarget"))
 	P_end_balltarget();
-    else if (!strcasecmp(el, "Cannon"))
+    else if (!strcasecmp(el, "Cannon")) {
 	P_end_cannon();
-    else if (!strcasecmp(el, "FrictionArea"))
+	current_cannon = NULL;
+    } else if (!strcasecmp(el, "FrictionArea"))
 	P_end_friction_area();
     else if (!strcasecmp(el, "Target"))
 	P_end_target();
@@ -480,6 +503,7 @@ static void tagend(void *data, const char *el)
 	P_end_polygon();
 
     if (!strcasecmp(el, "GeneralOptions")) {
+	parsing_general_options = false;
 	/* ok, got to the end of options */
 	Options_parse();
 	/* kps - this can fail - fix */
@@ -517,7 +541,8 @@ bool parseXp2MapFile(char* fname, optOrigin opt_origin, world_t *world)
 {
     gzFile in;
     char buff[8192];
-    int len, left, last_chunk;
+    int len, last_chunk;
+    unsigned left;
     XML_Parser p = XML_ParserCreate(NULL);
 
     current_world = world;

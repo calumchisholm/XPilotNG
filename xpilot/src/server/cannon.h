@@ -96,7 +96,7 @@ void Cannon_set_hitmask(int group, cannon_t *cannon);
 bool Cannon_hitfunc(group_t *groupptr, move_t *move);
 void World_restore_cannon(world_t *world, cannon_t *cannon);
 void World_remove_cannon(world_t *world, cannon_t *cannon);
-
+void Cannon_set_option(cannon_t *cannon, const char *name, const char *value);
 
 static inline int Cannon_get_smartness(cannon_t *c)
 {

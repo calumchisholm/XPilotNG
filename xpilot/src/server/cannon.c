@@ -922,3 +922,8 @@ bool Cannon_hitfunc(group_t *gp, move_t *move)
 
      return true;
 }
+
+void Cannon_set_option(cannon_t *cannon, const char *name, const char *value)
+{
+    warn("setting cannon %p option %s to value %s", cannon, name, value);
+}
