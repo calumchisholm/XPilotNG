@@ -83,9 +83,9 @@ static void Paint_meter(int xoff, int y, const char *title, int val, int max,
 
     if (xoff >= 0) {
 	x = xoff;
-        xstr = WINSCALE(x + meterWidth) + BORDER;
+        xstr = WINSCALE(x + (int)meterWidth) + BORDER;
     } else {
-	x = ext_view_width - (meterWidth - xoff);
+	x = ext_view_width - ((int)meterWidth - xoff);
         xstr = WINSCALE(x)
 	    - (BORDER + XTextWidth(gameFont, title, (int)strlen(title)));
     }
@@ -100,8 +100,8 @@ static void Paint_meter(int xoff, int y, const char *title, int val, int max,
 
 	SET_FG(colors[color].pixel);
 	rd.drawRectangle(dpy, drawPixmap, gameGC,
-		       WINSCALE(x), WINSCALE(y),
-		       WINSCALE(meterWidth), WINSCALE(meterHeight));
+			 WINSCALE(x), WINSCALE(y),
+			 UWINSCALE(meterWidth), UWINSCALE(meterHeight));
 
 	/* Paint scale levels(?) */
 	Segment_add(color, x,       y-4,	x,       y+meterHeight+4);
@@ -115,8 +115,8 @@ static void Paint_meter(int xoff, int y, const char *title, int val, int max,
 	SET_FG(colors[meter_color].pixel);
 
     rd.drawString(dpy, drawPixmap, gameGC,
-		  (xstr), WINSCALE(y)+(gameFont->ascent+meterHeight)/2,
-		  title, strlen(title));
+		  xstr, WINSCALE(y)+(gameFont->ascent+meterHeight)/2,
+		  title, (int)strlen(title));
 
     /* texturedObjects - TODO */
     /*int width = WINSCALE((int)(((meterWidth-3)*val)/(max?max:1)));*/
@@ -278,7 +278,7 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
     static int	mapdiag = 0;
 
     if (mapdiag == 0)
-	mapdiag = (int)LENGTH(Setup->width, Setup->height);
+	mapdiag = LENGTH(Setup->width, Setup->height);
 
     /*
      * Display direction arrow and miscellaneous target information.
@@ -345,8 +345,8 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
 		y = (int)(hud_pos_y - MIN_HUD_SIZE * 0.6 * tsin(lock_dir)
 			  - size * 0.5),
 		rd.fillArc(dpy, drawPixmap, gameGC,
-			 WINSCALE(x), WINSCALE(y),
-			 WINSCALE(size), WINSCALE(size), 0, 64*360);
+			   WINSCALE(x), WINSCALE(y),
+			   UWINSCALE(size), UWINSCALE(size), 0, 64*360);
 	    }
 	}
     }
@@ -555,16 +555,16 @@ void Paint_HUD(void)
 	hudRadarMapScale = (double) Setup->width / (double) 256;
 	Paint_hudradar(
 	    hudRadarScale,
-	    (int)(hudRadarLimit * (active_view_width / 2)
-		  * hudRadarScale / hudRadarMapScale),
-	    (int)(hudRadarLimit * (active_view_width / 2)
-		  * hudRadarScale / hudRadarMapScale),
+	    hudRadarLimit * (active_view_width / 2) * hudRadarScale
+	    / hudRadarMapScale,
+	    hudRadarLimit * (active_view_width / 2) * hudRadarScale
+	    / hudRadarMapScale,
 	    hudRadarDotSize);
 
 	if (instruments.showMapRadar)
 	    Paint_hudradar(hudRadarMapScale,
-			   active_view_width / 2,
-			   active_view_height / 2,
+			   (double)active_view_width / 2,
+			   (double)active_view_height / 2,
 			   SHIP_SZ);
     }
 
@@ -629,7 +629,7 @@ void Paint_HUD(void)
 		    WINSCALE(hud_pos_x + hudSize-HUD_OFFSET+BORDER),
 		    WINSCALE(hud_pos_y + hudSize-HUD_OFFSET+BORDER)
 				+ gameFont->ascent,
-		    str, strlen(str));
+		    str, (int)strlen(str));
 	if (numItems[ITEM_TANK]) {
 	    if (fuelCurrent == 0)
 		strcpy(str,"M ");
@@ -639,7 +639,7 @@ void Paint_HUD(void)
 			  WINSCALE(hud_pos_x + hudSize-HUD_OFFSET + BORDER),
 			  WINSCALE(hud_pos_y + hudSize-HUD_OFFSET + BORDER)
 			  + gameFont->descent + 2*gameFont->ascent,
-			  str, strlen(str));
+			  str, (int)strlen(str));
 	}
     }
 
@@ -682,7 +682,7 @@ void Paint_HUD(void)
 			  - size,
 			  WINSCALE(hud_pos_y - hudSize+HUD_OFFSET - BORDER)
 			  - gameFont->descent,
-			  str, strlen(str));
+			  str, (int)strlen(str));
 	}
 
 	/* Update the modifiers */
@@ -692,7 +692,7 @@ void Paint_HUD(void)
 		      - XTextWidth(gameFont, mods, modlen),
 		      WINSCALE(hud_pos_y + hudSize-HUD_OFFSET+BORDER)
 		      + gameFont->ascent,
-		      mods, strlen(mods));
+		      mods, (int)strlen(mods));
 
 	if (autopilotLight) {
 	    int text_width = XTextWidth(gameFont, autopilot,
@@ -727,8 +727,8 @@ void Paint_HUD(void)
 				  + FUEL_GAUGE_OFFSET) - 1,
 			 WINSCALE(hud_pos_y - hudSize + HUD_OFFSET
 				  + FUEL_GAUGE_OFFSET) - 1,
-			 WINSCALE(HUD_OFFSET - (2*FUEL_GAUGE_OFFSET)) + 3,
-			 WINSCALE(HUD_FUEL_GAUGE_SIZE) + 3);
+			 UWINSCALE(HUD_OFFSET - (2*FUEL_GAUGE_OFFSET)) + 3,
+			 UWINSCALE(HUD_FUEL_GAUGE_SIZE) + 3);
 
 	size = (HUD_FUEL_GAUGE_SIZE * fuelSum) / fuelMax;
 	rd.fillRectangle(dpy, drawPixmap, gameGC,
@@ -737,15 +737,16 @@ void Paint_HUD(void)
 			 WINSCALE(hud_pos_y - hudSize + HUD_OFFSET
 				  + FUEL_GAUGE_OFFSET + HUD_FUEL_GAUGE_SIZE
 				  - size) + 1,
-			 WINSCALE(HUD_OFFSET - (2*FUEL_GAUGE_OFFSET)),
-			 WINSCALE(size));
+			 UWINSCALE(HUD_OFFSET - (2*FUEL_GAUGE_OFFSET)),
+			 UWINSCALE(size));
     }
 }
 
 
 void Paint_messages(void)
 {
-    int		i, x, y, top_y, bot_y, width, len;
+    int		i, x, y, top_y, bot_y, width;
+    size_t	len;
     const int	BORDER = 10,
 		SPACING = messageFont->ascent+messageFont->descent+1;
     message_t	*msg;
@@ -829,7 +830,7 @@ void Paint_messages(void)
 	    y = bot_y;
 	    bot_y -= SPACING;
 	}
-	len = (int)(charsPerSecond * (MSG_LIFE_TIME - msg->lifeTime));
+	len = charsPerSecond * (MSG_LIFE_TIME - msg->lifeTime);
 	len = MIN(msg->len, len);
 
 #ifndef _WINDOWS
@@ -872,7 +873,7 @@ void Paint_messages(void)
 		    /*___xxx[___]*/
 		ptr = msg->txt;
 		xoff = 0;
-		if ( len < selection.draw.x1)
+		if ((int)len < selection.draw.x1)
 		    l = len;
 		else {
 			/* at least two parts */
@@ -892,7 +893,7 @@ void Paint_messages(void)
 		    } else {
 			    /* only line */
 			    /*___xxx___*/
-			if (len <= selection.draw.x2)
+			if ((int)len <= selection.draw.x2)
 				/*___xxx___*/
 				/*    ^    */
 			    l2 = len - selection.draw.x1;
@@ -912,7 +913,7 @@ void Paint_messages(void)
 		    /*xxxxxx[___]*/
 		ptr2 = msg->txt;
 		xoff2 = 0;
-		if (len <= selection.draw.x2 + 1)
+		if ((int)len <= selection.draw.x2 + 1)
 			/* all blue */
 			/*xxxxxx[___]*/
 			/*  ^        */
@@ -931,42 +932,44 @@ void Paint_messages(void)
 
 	    if (ptr) {
 		XSetForeground(dpy, messageGC, colors[msg_color].pixel);
-		rd.drawString(dpy, drawPixmap, messageGC, x + xoff, y, ptr, l);
+		rd.drawString(dpy, drawPixmap, messageGC, x + xoff, y,
+			      ptr, l);
 	    }
 	    if (ptr2) {
 		XSetForeground(dpy, messageGC, colors[DRAW_EMPHASIZED].pixel);
-		rd.drawString(dpy, drawPixmap, messageGC, x + xoff2, y, ptr2, l2);
+		rd.drawString(dpy, drawPixmap, messageGC, x + xoff2, y,
+			      ptr2, l2);
 	    }
 	    if (ptr3) {
 		XSetForeground(dpy, messageGC, colors[msg_color].pixel);
-		rd.drawString(dpy, drawPixmap, messageGC, x + xoff3, y, ptr3, l3);
+		rd.drawString(dpy, drawPixmap, messageGC, x + xoff3, y,
+			      ptr3, l3);
 	    }
 
 	} else /* not emphasized */
 #endif
 	{
 	    XSetForeground(dpy, messageGC, colors[msg_color].pixel);
-	    rd.drawString(dpy, drawPixmap, messageGC, x, y, msg->txt, len);
+	    rd.drawString(dpy, drawPixmap, messageGC, x, y,
+			  msg->txt, (int)len);
 	}
 
-	width = XTextWidth(messageFont, msg->txt, MIN(len, msg->len));
+	width = XTextWidth(messageFont, msg->txt, (int)MIN(len, msg->len));
     }
 }
 
 
 void Paint_recording(void)
 {
-    int			w = -1;
-    int			x, y;
+    int			w, x, y, len;
     char		buf[32];
-    int			len;
     double		mb;
 
     if (!recording || (loopsSlow % 16) < 8)
 	return;
 
     SET_FG(colors[RED].pixel);
-    mb = ((double)Record_size()) / 1e6;
+    mb = Record_size() / 1e6;
     sprintf(buf, "REC %.1f MB", mb);
     len = strlen(buf);
     w = XTextWidth(gameFont, buf, len);
@@ -978,10 +981,8 @@ void Paint_recording(void)
 
 void Paint_client_fps(void)
 {
-    int			w = -1;
-    int			x, y;
+    int			w, x, y, len;
     char		buf[32];
-    int			len;
 
     if (!hudColor)
 	return;
