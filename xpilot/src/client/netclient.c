@@ -1504,24 +1504,24 @@ int Net_input(void)
 int Receive_start(void)
 {
     int		n;
-    long	loops;
+    long	loops_num;
     u_byte	ch;
     long	key_ack;
 
     if ((n = Packet_scanf(&rbuf,
 			  "%c%ld%ld",
-			  &ch, &loops, &key_ack)) <= 0)
+			  &ch, &loops_num, &key_ack)) <= 0)
 	return n;
 
-    if (last_loops >= loops) {
+    if (last_loops >= loops_num) {
 	/*
 	 * Packet is duplicate or out of order.
 	 */
-	Net_measurement(loops, PACKET_DROP);
-	printf("ignoring frame (%ld)\n", last_loops - loops);
+	Net_measurement(loops_num, PACKET_DROP);
+	printf("ignoring frame (%ld)\n", last_loops - loops_num);
 	return 0;
     }
-    last_loops = loops;
+    last_loops = loops_num;
     if (key_ack > last_keyboard_ack) {
 	if (key_ack > last_keyboard_change) {
 	    printf("Premature keyboard ack by server (%ld,%ld,%ld)\n",
@@ -1536,7 +1536,7 @@ int Receive_start(void)
 	    last_keyboard_ack = key_ack;
     }
     Net_lag_measurement(key_ack);
-    if ((n = Handle_start(loops)) == -1)
+    if ((n = Handle_start(loops_num)) == -1)
 	return -1;
     return 1;
 }
@@ -1550,13 +1550,13 @@ int Receive_start(void)
 int Receive_end(void)
 {
     int		n;
-    long	loops;
+    long	loops_num;
     u_byte	ch;
 
-    if ((n = Packet_scanf(&rbuf, "%c%ld", &ch, &loops)) <= 0)
+    if ((n = Packet_scanf(&rbuf, "%c%ld", &ch, &loops_num)) <= 0)
 	return n;
-    Net_measurement(loops, PACKET_DRAW);
-    if ((n = Handle_end(loops)) == -1)
+    Net_measurement(loops_num, PACKET_DRAW);
+    if ((n = Handle_end(loops_num)) == -1)
 	return -1;
     return 1;
 }
@@ -1728,9 +1728,9 @@ int Receive_self(void)
 {
     int		n;
     short	x, y, vx, vy, lockId, lockDist,
-		fuelSum, fuelMax;
-    u_byte	ch, heading, power, turnspeed, turnresistance,
-		nextCheckPoint, lockDir, autopilotLight, currentTank, stat;
+		sFuelSum, sFuelMax;
+    u_byte	ch, sHeading, sPower, sTurnSpeed, sTurnResistance,
+		sNextCheckPoint, lockDir, sAutopilotLight, currentTank, sStat;
     u_byte	num_items[NUM_ITEMS];
 
     n = Packet_scanf(&rbuf,
@@ -1739,9 +1739,9 @@ int Receive_self(void)
 		     "%c%c%c"
 		     "%hd%hd%c%c",
 		     &ch,
-		     &x, &y, &vx, &vy, &heading,
-		     &power, &turnspeed, &turnresistance,
-		     &lockId, &lockDist, &lockDir, &nextCheckPoint);
+		     &x, &y, &vx, &vy, &sHeading,
+		     &sPower, &sTurnSpeed, &sTurnResistance,
+		     &lockId, &lockDist, &lockDir, &sNextCheckPoint);
     if (n <= 0)
 	return n;
 
@@ -1777,9 +1777,9 @@ int Receive_self(void)
 		     "%hd%hd%c"
 		     "%c%c",
 
-		     &currentTank, &fuelSum, &fuelMax,
+		     &currentTank, &sFuelSum, &sFuelMax,
 		     &ext_view_width, &ext_view_height, &debris_colors,
-		     &stat, &autopilotLight
+		     &sStat, &sAutopilotLight
 		     );
     if (n <= 0)
 	return n;
@@ -1832,18 +1832,18 @@ int Receive_self(void)
 
     Check_view_dimensions();
 
-    Game_over_action(stat);
-    Handle_self(x, y, vx, vy, heading,
-		(float) power,
-		(float) turnspeed,
-		(float) turnresistance / 255.0F,
+    Game_over_action(sStat);
+    Handle_self(x, y, vx, vy, sHeading,
+		(float) sPower,
+		(float) sTurnSpeed,
+		(float) sTurnResistance / 255.0F,
 		lockId, lockDist, lockDir,
-		nextCheckPoint, autopilotLight,
+		sNextCheckPoint, sAutopilotLight,
 		num_items,
-		currentTank, fuelSum, fuelMax, rbuf.len);
+		currentTank, sFuelSum, sFuelMax, rbuf.len);
 
 #ifdef _WINDOWS
-	received_self = TRUE;
+    received_self = TRUE;
 #endif
     return 1;
 }
@@ -1851,12 +1851,12 @@ int Receive_self(void)
 int Receive_modifiers(void)
 {
     int		n;
-    char	mods[MAX_CHARS];
+    char	sMods[MAX_CHARS];
     u_byte	ch;
 
-    if ((n = Packet_scanf(&rbuf, "%c%s", &ch, mods)) <= 0)
+    if ((n = Packet_scanf(&rbuf, "%c%s", &ch, sMods)) <= 0)
 	return n;
-    if ((n = Handle_modifiers(mods)) == -1)
+    if ((n = Handle_modifiers(sMods)) == -1)
 	return -1;
     return 1;
 }
@@ -2249,11 +2249,11 @@ int Receive_fastradar(void)
 int Receive_damaged(void)
 {
     int			n;
-    u_byte		ch, damaged;
+    u_byte		ch, dmgd;
 
-    if ((n = Packet_scanf(&rbuf, "%c%c", &ch, &damaged)) <= 0)
+    if ((n = Packet_scanf(&rbuf, "%c%c", &ch, &dmgd)) <= 0)
 	return n;
-    if ((n = Handle_damaged(damaged)) == -1)
+    if ((n = Handle_damaged(dmgd)) == -1)
 	return -1;
     return 1;
 }
