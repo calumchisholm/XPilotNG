@@ -898,7 +898,7 @@ static void Give_best_player_bonus(double average_score,
     double points;
     char msg[MSG_LEN];
 
-    if (best_ratio == 0)
+    if (num_best_players == 0 || best_ratio == 0)
 	sprintf(msg, "There is no Deadly Player.");
     else if (num_best_players == 1) {
 	player_t *bp = Players(best_players[0]);
