@@ -25,8 +25,6 @@
 
 #include "xpserver.h"
 
-static char msg[MSG_LEN];
-
 void Target_update(world_t *world)
 {
     int i, j;
@@ -209,17 +207,14 @@ void Object_hits_target(object_t *obj, target_t *targ, double player_cost)
 	 * assume there are many used as shields.  Don't litter
 	 * the game with the message below.
 	 */
-	if (options.targetTeamCollision && targets_total < 10) {
-	    sprintf(msg, "%s blew up one of team %d's targets.",
-		    kp->name, targ->team);
-	    Set_message(msg);
-	}
+	if (options.targetTeamCollision && targets_total < 10)
+	    Set_message("%s blew up one of team %d's targets.",
+			kp->name, targ->team);
 	return;
     }
 
-    sprintf(msg, "%s blew up team %d's %starget.",
-	    kp->name, targ->team, (targets_total > 1) ? "last " : "");
-    Set_message(msg);
+    Set_message("%s blew up team %d's %starget.",
+		kp->name, targ->team, (targets_total > 1) ? "last " : "");
 
     if (options.targetKillTeam)
 	Rank_add_target_kill(kp);
