@@ -233,6 +233,7 @@ extern int              timerResolution;
 extern char             *password;
 extern int              numberOfRounds;
 extern int              playerLimit;
+extern int              recordMode;
 
 #endif
 

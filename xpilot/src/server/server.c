@@ -118,47 +118,8 @@ static void Check_server_versions(void);
 extern void Main_loop(void);
 static void Handle_signal(int sig_no);
 
-void save(void)
-{
-    FILE *f;
-
-    f = fopen("/tmp/serverrec", "w");
-    fwrite(playback_ints_start, 1, 5000, f);
-    fwrite(playback_strings_start, 1, 10000, f);
-    fwrite(playback_data_start, 1, 1000000, f);
-    fwrite(playback_sched_start, 1, 500000, f);
-    fwrite(playback_ei_start, 1, 50000, f);
-    fwrite(playback_es_start, 1, 50000, f);
-    fwrite(playback_shorts_start, 1, 300000, f);
-    fwrite(playback_errnos_start, 1, 10000, f);
-    fclose(f);
-}
-
 int main(int argc, char **argv)
 {
-    FILE *f;
-
-    playback_ints = playback_ints_start = malloc(5000);
-    playback_strings = playback_strings_start = malloc(10000);
-    playback_data = playback_data_start = malloc(1000000);
-    playback_sched = playback_sched_start = malloc(500000);
-    playback_ei = playback_ei_start = malloc(50000);
-    playback_es = playback_es_start = malloc(50000);
-    playback_shorts = playback_shorts_start = malloc(300000);
-    playback_errnos = playback_errnos_start = malloc(10000);
-    if (rplayback) {
-	f = fopen("/tmp/serverrec", "r");
-	fread(playback_ints, 1, 5000, f);
-	fread(playback_strings, 1, 10000, f);
-	fread(playback_data, 1, 1000000, f);
-	fread(playback_sched, 1, 500000, f);
-	fread(playback_ei, 1, 50000, f);
-	fread(playback_es, 1, 50000, f);
-	fread(playback_shorts, 1, 300000, f);
-	fread(playback_errnos, 1, 10000, f);
-	fclose(f);
-    }
-
     /*
      * Make output always linebuffered.  By default pipes
      * and remote shells cause stdout to be fully buffered.
@@ -184,10 +145,11 @@ int main(int argc, char **argv)
     Check_server_versions();
     if (!Parser(argc, argv))
 #ifndef	_WINDOWS
-		exit(0);
+	exit(0);
 #else
-		return(0);
+        return(0);
 #endif
+    Init_recording();
     plock_server(pLockServer);           /* Lock the server into memory */
     Make_table();			/* Make trigonometric tables */
     Compute_gravity();
@@ -343,6 +305,7 @@ void Main_loop(void)
 	j = *playback_ei++;
 	Setup_connection(a, b, c, i, d, e, j);
     }
+    Handle_recording_buffers();
 }
 
 

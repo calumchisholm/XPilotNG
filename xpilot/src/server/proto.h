@@ -287,4 +287,10 @@ bool parseDefaultsFile(const char *filename);
 bool parseMapFile(const char *filename);
 void parseOptions(void);
 
+/*
+ * Prototypes for srecord.c
+ */
+void Init_recording(void);
+void Handle_recording_buffers(void);
+
 #endif

@@ -213,6 +213,7 @@ int             timerResolution;        /* OS timer resolution (ticks/s) */
 char            *password;              /* password for operator status */
 int             numberOfRounds;         /* how many rounds to play */
 int             playerLimit;            /* allow less players than bases */
+int             recordMode;             /* 0=off, 1=record, 2=playback */
 
 extern char	conf_default_map_string[];	/* from common/config.c */
 
@@ -2355,6 +2356,16 @@ optionDesc options[] = {
 	tuner_dummy,
 	"Allow only (number of bases)-playerLimit players to enter.\n"
 	"This option will probably change in future versions.\n",
+	MAP(NULL)
+    },
+    {
+	"recordMode",
+	"recordMode",
+	"0",
+	&recordMode,
+	valInt,
+	Init_recording,
+	"If some makes this work reliably, change this description.\n",
 	MAP(NULL)
     }
 };
