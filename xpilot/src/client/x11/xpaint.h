@@ -54,23 +54,15 @@ extern short	about_page;		/* Which page is the player on? */
 extern bool	players_exposed;	/* Is score window exposed? */
 extern int	radar_exposures;	/* Is radar window exposed? */
 
-					/* windows has 2 sets of item bitmaps */
 #define	ITEM_HUD	0		/* one color for the HUD */
 #define	ITEM_PLAYFIELD	1		/* and one color for the playfield */
-#ifdef _WINDOWS
-extern Pixmap	itemBitmaps[][2];
-#else
-extern Pixmap	itemBitmaps[];
-#endif
 
+extern Pixmap	itemBitmaps[];
 extern GC	gameGC, messageGC, radarGC, buttonGC;
 extern GC	scoreListGC, textGC, talkGC, motdGC;
 extern XGCValues gcv;
 extern Window	topWindow, drawWindow, keyboardWindow;
 extern Window	radarWindow, playersWindow;
-#ifdef _WINDOWS				/* see paint.c for details */
-extern Window	textWindow, msgWindow, buttonWindow;
-#endif
 extern Pixmap	drawPixmap;		/* Drawing area pixmap */
 extern Pixmap	radarPixmap;		/* Radar drawing pixmap */
 extern Pixmap	radarPixmap2;		/* Second radar drawing pixmap */
@@ -98,9 +90,6 @@ static inline void SET_FG(unsigned long fg)
 	XSetForeground(dpy, gameGC, current_foreground = fg);
 }
 
-/*
- * MS compiler might not grok this, in that case define inline to empty.
- */
 static inline void Check_name_string(other_t *other)
 {
     if (other && other->max_chars_in_names != maxCharsInNames) {

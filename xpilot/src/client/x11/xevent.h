@@ -41,8 +41,4 @@ void xevent_keyboard(int queued);
 void xevent_pointer(void);
 int x_event(int new_input);
 
-#ifdef _WINDOWS
-int win_xevent(XEvent event);
-#endif
-
 #endif

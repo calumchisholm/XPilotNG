@@ -26,10 +26,8 @@
 #ifndef XEVENTHANDLERS_H
 #define XEVENTHANDLERS_H
 
-#ifndef _WINDOWS
 /* avoid trouble with Atoms and 64 bit archs */
 typedef CARD32  Atom32;
-#endif
 
 void SelectionNotify_event(XEvent *event);
 void SelectionRequest_event(XEvent *event);

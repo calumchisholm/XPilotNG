@@ -35,12 +35,6 @@
 #define MAX_TOP_HEIGHT	1440
 #define DEF_TOP_HEIGHT	1024
 
-#ifdef _WINDOWS
-# ifndef O_BINARY
-#  define O_BINARY		0 /* compability with MSDOS */
-# endif
-#endif
-
 extern Atom		ProtocolAtom, KillAtom;
 extern int		buttonColor, windowColor, borderColor;
 extern int		ButtonHeight;
@@ -109,9 +103,6 @@ extern int Motd_callback(int, void *, const char **);
 extern void Motd_destroy(void);
 extern void Expose_about_window(void);
 extern void Scale_dashes(void);
-#ifdef _WINDOWS
-extern int Credits_callback(int, void *, const char **);
-#endif
 
 #endif
 

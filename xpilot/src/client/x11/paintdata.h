@@ -31,12 +31,6 @@
 #include "types.h"
 #endif
 
-/* Define Windows Colours */
-#ifdef _WINDOWS
-#define MAX_COLORS 16
-#define MAX_COLOR_LEN 32
-#endif
-
 extern void Rectangle_start(void);
 extern void Rectangle_end(void);
 extern int Rectangle_add(int color, int x, int y, int width, int height);
