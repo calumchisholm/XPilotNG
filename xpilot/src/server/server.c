@@ -636,9 +636,6 @@ void Game_Over(void)
     if (BIT(world->rules->mode, TEAM_PLAY)) {
 	double teamscore[MAX_TEAMS];
 
-	maxsc = -1e6;
-	minsc = 1e6;
-
 	for (i = 0; i < MAX_TEAMS; i++)
 	    teamscore[i] = FLT_MAX; /* These teams are not used... */
 
@@ -646,13 +643,20 @@ void Game_Over(void)
 	    player_t *pl = Player_by_index(i);
 	    int team;
 
-	    if (Player_is_human(pl)) {
+	    if (Player_is_paused(pl))
+		continue;
+
+	    if (Player_is_human(pl)
+		|| Player_is_robot(pl)) {
 		team = pl->team;
 		if (teamscore[team] == FLT_MAX)
 		    teamscore[team] = 0;
 		teamscore[team] += Get_Score(pl);
 	    }
 	}
+
+	maxsc = -FLT_MAX;
+	minsc = FLT_MAX;
 
 	for (i = 0; i < MAX_TEAMS; i++) {
 	    if (teamscore[i] != FLT_MAX) {
@@ -682,11 +686,14 @@ void Game_Over(void)
 	}
     }
 
-    maxsc = -1e6;
-    minsc = 1e6;
+    maxsc = -FLT_MAX;
+    minsc = FLT_MAX;
 
     for (i = 0; i < NumPlayers; i++) {
 	player_t *pl_i = Player_by_index(i);
+
+	if (Player_is_paused(pl_i))
+	    continue;
 
 	Player_set_state(pl_i, PL_STATE_DEAD);
 	if (Player_is_human(pl_i)) {
