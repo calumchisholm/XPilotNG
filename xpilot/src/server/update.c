@@ -981,20 +981,22 @@ void Update_objects(void)
 #define UPDATE_RATE 100
 
 	for (j = 0; j < NumPlayers; j++) {
-	    if (pl->forceVisible > 0)
-		Players(j)->visibility[i].canSee = 1;
+	    player *pl_j = Players(j);
 
-	    if (i == j || !BIT(Players(j)->used, HAS_CLOAKING_DEVICE))
+	    if (pl->forceVisible > 0)
+		pl_j->visibility[i].canSee = 1;
+
+	    if (i == j || !BIT(pl_j->used, HAS_CLOAKING_DEVICE))
 		pl->visibility[j].canSee = 1;
 	    else if (pl->updateVisibility
-		     || Players(j)->updateVisibility
+		     || pl_j->updateVisibility
 		     || (int)(rfrac() * UPDATE_RATE)
 		     < ABS(frame_loops - pl->visibility[j].lastChange)) {
 
 		pl->visibility[j].lastChange = frame_loops;
 		pl->visibility[j].canSee
 		    = (rfrac() * (pl->item[ITEM_SENSOR] + 1))
-		    > (rfrac() * (Players(j)->item[ITEM_CLOAK] + 1));
+		    > (rfrac() * (pl_j->item[ITEM_CLOAK] + 1));
 	    }
 	}
 
@@ -1052,7 +1054,8 @@ void Update_objects(void)
 		int ct = pl->fuel.current;
 
 		do {
-		    if (pl->fuel.tank[pl->fuel.current] > REFUEL_RATE * timeStep) {
+		    if (pl->fuel.tank[pl->fuel.current]
+			> REFUEL_RATE * timeStep) {
 			targ->damage += TARGET_FUEL_REPAIR_PER_FRAME;
 			targ->conn_mask = 0;
 			targ->last_change = frame_loops;
@@ -1365,12 +1368,12 @@ void Update_objects(void)
 		    if ((NumPlayers - NumRobots - NumPseudoPlayers) > 1) {
 			if (!game_lock && Team_zero_pausing_available()) {
 			    sprintf(msg, "%s was pause-swapped because of "
-				    "idling.", Players(i)->name);
-			    Handle_player_command(Players(i), "team 0");
+				    "idling.", pl->name);
+			    Handle_player_command(pl, "team 0");
 			} else {
 			    Pause_player(i, 1);
 			    sprintf(msg, "%s was paused for idling.",
-				    Players(i)->name);
+				    pl->name);
 	    		}
 			Set_message(msg);
 		    }
@@ -1383,12 +1386,10 @@ void Update_objects(void)
 	    && BIT(pl->status, PAUSE)
 	    && (!(teamZeroPausing && pl->team == 0))
 	    && frame_loops - pl->frame_last_busy > maxPauseTime) {
-	    sprintf(msg,
-		    "%s was auto-kicked for pausing too long [*Server notice*]",
-		    pl->name);
+	    sprintf(msg, "%s was auto-kicked for pausing too long "
+		    "[*Server notice*]", pl->name);
 	    Set_message(msg);
-	    Destroy_connection(Players(i)->conn,
-			       "auto-kicked: paused too long");
+	    Destroy_connection(pl->conn, "auto-kicked: paused too long");
 	}
     }
 
