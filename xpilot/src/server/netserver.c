@@ -1248,9 +1248,7 @@ static void LegalizeName(char *string)
 {
     while ( *string != '\0' ) {
 	char ch = *string;
-	if ( ch == ' ' )
-	    ch = (char)0xA0; /* kps - ??? */
-	else if ( ch == '\"' )
+	if ( ch == '\"' )
 	    ch = '\'';
 	else if ( !isprint(ch) || strchr("[]:", ch))
 	    ch = 'x';
