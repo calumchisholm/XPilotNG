@@ -237,8 +237,8 @@ extern int              playerLimit;
 extern int              recordMode;
 extern int              constantScoring;
 extern int              eliminationRace;
+extern char             *dataURL;
 
 #endif
 
 #endif /* GLOBAL_H */
-

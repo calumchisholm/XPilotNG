@@ -167,6 +167,8 @@ void Grok_map(void)
     World.name[sizeof(World.name) - 1] = '\0';
     strncpy(World.author, mapAuthor, sizeof(World.author) - 1);
     World.author[sizeof(World.author) - 1] = '\0';
+    strncpy(World.dataURL, dataURL, sizeof(World.dataURL) - 1);
+    World.dataURL[sizeof(World.dataURL) - 1] = 0;
 
     Alloc_map();
 

@@ -67,6 +67,7 @@ int		mapWidth;		/* Width of the universe */
 int		mapHeight;		/* Height of the universe */
 char		*mapName;		/* Name of the universe */
 char		*mapAuthor;		/* Name of the creator */
+char            *dataURL;               /* URL to client for extra data */
 int		contactPort;		/* Contact port number */
 
 bool		crashWithPlayer;	/* Can players overrun other players? */
@@ -2369,6 +2370,16 @@ static optionDesc options[] = {
 	tuner_dummy,
 	"Race mode where the last player drops out each lap.\n",
 	MAP(NULL)
+    },
+    {
+	"dataURL",
+	"dataURL",
+	"",
+	&dataURL,
+	valString,
+	tuner_dummy,
+	"URL where the client can get extra data for this map\n",
+	MAP(NULL)
     }
 };
 
@@ -2729,4 +2740,3 @@ optionDesc*	findOption(const char* name)
 	}
 	return(NULL);
 }
-

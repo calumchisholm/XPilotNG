@@ -907,7 +907,7 @@ static int Handle_setup(int ind)
 			  Setup->mode, Setup->lives,
 			  Setup->height, Setup->width,
 			  Setup->frames_per_second, Setup->map_order,
-			  Setup->name, Setup->author);
+			  Setup->name, strlen(dataURL) > 0 ? dataURL : Setup->author); /* TEMPORARY HACK !@# */
 	if (n <= 0) {
 	    Destroy_connection(ind, "setup 0 write error");
 	    return -1;
@@ -2611,7 +2611,7 @@ static void Set_swapper_state(int ind)
 	    }
     Player_lock_closest(ind, 0);
 }
-    
+
 
 static void Swap_team(int ind, char *args)
 {
@@ -3483,4 +3483,3 @@ static int Receive_audio_request(int ind)
 
     return 1;
 }
-

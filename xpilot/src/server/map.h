@@ -196,6 +196,7 @@ typedef struct {
     rules_t	*rules;
     char	name[MAX_CHARS];
     char	author[MAX_CHARS];
+    char        dataURL[MAX_CHARS];
 
     vector	**gravity;
 
