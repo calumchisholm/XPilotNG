@@ -609,7 +609,7 @@ The default keys are: space Caps_Lock.
 .IP
 Fire shot.
 Note that shields must be down to fire.
-The default keys are: Return Linefeed.
+The default key is: Return.
 .HP
 \fB\-keyFireMissile\fR <value>
 .IP
@@ -649,7 +649,7 @@ The default key is: equal.
 \fB\-keyLockClose\fR <value>
 .IP
 Lock on closest player.
-The default keys are: Select Up.
+The default key is: Up.
 .HP
 \fB\-keyLockNextClose\fR <value>
 .IP
