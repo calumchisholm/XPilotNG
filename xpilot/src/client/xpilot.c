@@ -53,11 +53,6 @@ char *Program_name(void)
     return "xpilot-ng-x11";
 }
 
-void Print_usage_line(void)
-{
-
-}
-
 /*
  * Oh glorious main(), without thee we cannot exist.
  */
