@@ -1,5 +1,6 @@
 <XPilotMap version="1.1">
 <GeneralOptions>
+<Option name="afterburnerpowermult" value="1.2"/>
 <Option name="allowclusters" value="no"/>
 <Option name="allowlasermodifiers" value="no"/>
 <Option name="allowmodifiers" value="no"/>
@@ -8,12 +9,13 @@
 <Option name="allowplayerkilling" value="yes"/>
 <Option name="allowshields" value="no"/>
 <Option name="allowshipshapes" value="yes"/>
-<Option name="ballradius" value="8"/>
+<Option name="ballconnectorspringconstant" value="1800"/>
+<Option name="ballradius" value="10"/>
 <Option name="ballstyles" value="false"/>
 <Option name="ballswallbounce" value="yes"/>
 <Option name="baselesspausing" value="yes"/>
 <Option name="constantspeed" value="0.5"/>
-<Option name="dataURL" value="http://xpilot.sourceforge.net/maps/polybloods.xpd"/>
+<Option name="dataurl" value="http://xpilot.sourceforge.net/maps/polybloods.xpd"/>
 <Option name="debriswallbounce" value="no"/>
 <Option name="edgewrap" value="yes"/>
 <Option name="gravity" value="0"/>
@@ -26,7 +28,7 @@
 <Option name="limitedvisibility" value="no"/>
 <Option name="mapauthor" value="Blood, Samaseon and Throat"/>
 <Option name="mapheight" value="3500"/>
-<Option name="mapname" value="Polygon Blood's Music v8.2"/>
+<Option name="mapname" value="Polygon Blood's Music v8.3"/>
 <Option name="mapwidth" value="3500"/>
 <Option name="maxplayershots" value="12"/>
 <Option name="maxshieldedwallbouncespeed" value="100"/>
@@ -46,7 +48,6 @@
 <Option name="treasuresonradar" value="no"/>
 <Option name="usewreckage" value="no"/>
 <Option name="waitingfps" value="0"/>
-<Option name="wallBounceFuelDrainMult" value="0.2"/>
 <Option name="worldlives" value="3"/>
 </GeneralOptions>
 <BmpStyle id="tx3.ppm" filename="tx3.ppm" flags="1"/>
