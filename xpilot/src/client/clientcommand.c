@@ -23,6 +23,8 @@
 
 #include "xpclient.h"
 
+char clientcommand_version[] = VERSION;
+
 #define NUMCOMMANDS 8
 const char c_commands[NUMCOMMANDS][16] = {
     "ignore", "i",

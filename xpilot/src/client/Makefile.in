@@ -124,13 +124,14 @@ INCLUDES = -I$(top_srcdir)/src/common
 xpilot_SOURCES = \
 	about.c \
 	bitmaps.c bitmaps.h \
-	caudio.c caudio.h client.c client.h clientrank.c clientrank.h \
+	caudio.c caudio.h client.c client.h \
+	clientcommand.c clientcommand.h clientrank.c clientrank.h \
 	colors.c configure.c configure.h connectparam.h \
 	datagram.c datagram.h dbuff.c dbuff.h \
 	debugaudio.c default.c default.h \
 	gfx2d.c gfx2d.h gfx3d.c gfx3d.h \
 	guimap.c guimap.h guiobjects.c guiobjects.h \
-	icon.h ignore.c ignore.h \
+	icon.h \
 	join.c \
 	mapdata.c messages.c \
 	netclient.c netclient.h \
@@ -158,11 +159,11 @@ bin_PROGRAMS = xpilot$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
 
 am_xpilot_OBJECTS = about.$(OBJEXT) bitmaps.$(OBJEXT) caudio.$(OBJEXT) \
-	client.$(OBJEXT) clientrank.$(OBJEXT) colors.$(OBJEXT) \
-	configure.$(OBJEXT) datagram.$(OBJEXT) dbuff.$(OBJEXT) \
-	debugaudio.$(OBJEXT) default.$(OBJEXT) gfx2d.$(OBJEXT) \
-	gfx3d.$(OBJEXT) guimap.$(OBJEXT) guiobjects.$(OBJEXT) \
-	ignore.$(OBJEXT) join.$(OBJEXT) mapdata.$(OBJEXT) \
+	client.$(OBJEXT) clientcommand.$(OBJEXT) clientrank.$(OBJEXT) \
+	colors.$(OBJEXT) configure.$(OBJEXT) datagram.$(OBJEXT) \
+	dbuff.$(OBJEXT) debugaudio.$(OBJEXT) default.$(OBJEXT) \
+	gfx2d.$(OBJEXT) gfx3d.$(OBJEXT) guimap.$(OBJEXT) \
+	guiobjects.$(OBJEXT) join.$(OBJEXT) mapdata.$(OBJEXT) \
 	messages.$(OBJEXT) netclient.$(OBJEXT) paint.$(OBJEXT) \
 	paintdata.$(OBJEXT) painthud.$(OBJEXT) paintmap.$(OBJEXT) \
 	paintobjects.$(OBJEXT) paintradar.$(OBJEXT) query.$(OBJEXT) \
@@ -179,17 +180,17 @@ depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/about.Po ./$(DEPDIR)/bitmaps.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/caudio.Po ./$(DEPDIR)/client.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/clientcommand.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/clientrank.Po ./$(DEPDIR)/colors.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/configure.Po ./$(DEPDIR)/datagram.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/dbuff.Po ./$(DEPDIR)/debugaudio.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/default.Po ./$(DEPDIR)/gfx2d.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/gfx3d.Po ./$(DEPDIR)/guimap.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/guiobjects.Po ./$(DEPDIR)/ignore.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/join.Po ./$(DEPDIR)/mapdata.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/messages.Po ./$(DEPDIR)/netclient.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/paint.Po ./$(DEPDIR)/paintdata.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/painthud.Po ./$(DEPDIR)/paintmap.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/paintobjects.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/guiobjects.Po ./$(DEPDIR)/join.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/mapdata.Po ./$(DEPDIR)/messages.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/netclient.Po ./$(DEPDIR)/paint.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/paintdata.Po ./$(DEPDIR)/painthud.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/paintmap.Po ./$(DEPDIR)/paintobjects.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/paintradar.Po ./$(DEPDIR)/query.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/record.Po ./$(DEPDIR)/talk.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/talkmacros.Po \
@@ -260,6 +261,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bitmaps.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/caudio.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/client.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clientcommand.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clientrank.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/colors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/configure.Po@am__quote@
@@ -271,7 +273,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gfx3d.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/guimap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/guiobjects.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ignore.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/join.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mapdata.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/messages.Po@am__quote@

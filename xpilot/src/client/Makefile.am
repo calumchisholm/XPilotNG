@@ -4,13 +4,14 @@ INCLUDES = -I$(top_srcdir)/src/common
 xpilot_SOURCES = \
 	about.c \
 	bitmaps.c bitmaps.h \
-	caudio.c caudio.h client.c client.h clientrank.c clientrank.h \
+	caudio.c caudio.h client.c client.h \
+	clientcommand.c clientcommand.h clientrank.c clientrank.h \
 	colors.c configure.c configure.h connectparam.h \
 	datagram.c datagram.h dbuff.c dbuff.h \
 	debugaudio.c default.c default.h \
 	gfx2d.c gfx2d.h gfx3d.c gfx3d.h \
 	guimap.c guimap.h guiobjects.c guiobjects.h \
-	icon.h ignore.c ignore.h \
+	icon.h \
 	join.c \
 	mapdata.c messages.c \
 	netclient.c netclient.h \

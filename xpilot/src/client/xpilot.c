@@ -187,6 +187,8 @@ extern char bitmaps_version[];
 extern char caudio_version[];
 extern char checknames_version[];
 extern char client_version[];
+extern char clientcommand_version[];
+extern char clientrank_version[];
 extern char colors_version[];
 extern char config_version[];
 extern char configure_version[];
@@ -239,6 +241,8 @@ static void Check_client_versions(void)
 	{ "caudio", caudio_version },
 	{ "checknames", checknames_version },
 	{ "client", client_version },
+	{ "clientcommand", clientcommand_version },
+	{ "clientrank", clientrank_version },
 	{ "colors", colors_version },
 	{ "config", config_version },
 	{ "configure", configure_version },

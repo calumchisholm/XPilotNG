@@ -52,6 +52,7 @@
 #endif
 
 #include "client.h"
+#include "clientcommand.h"
 #include "clientrank.h"
 #include "connectparam.h"
 #include "datagram.h"
@@ -59,7 +60,6 @@
 #include "gfx3d.h"
 #include "guimap.h"      /* guimap.c depends on X11 */
 #include "guiobjects.h"
-#include "ignore.h"
 #include "netclient.h"
 #include "protoclient.h" /* misc. hacks */
 #include "recordfmt.h"
