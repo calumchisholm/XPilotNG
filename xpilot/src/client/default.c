@@ -447,8 +447,6 @@ static bool Set_showDecor(xp_option_t *opt, bool val)
 }
 
 
-/* steering stuff ends */
-
 xp_option_t default_options[] = {
 
     XP_NOARG_OPTION(
@@ -481,40 +479,6 @@ xp_option_t default_options[] = {
 	&xpArgs.list_servers,
 	XP_OPTFLAG_DEFAULT,
 	"List all servers running on the local network.\n"),
-
-    XP_STRING_OPTION(
-	"shipShape",
-	"",
-	NULL, 0,
-	Set_shipShape, NULL, Get_shipShape,
-	XP_OPTFLAG_DEFAULT,
-	"Define the ship shape to use.  Because the argument to this option\n"
-	"is rather large (up to 500 bytes) the recommended way to set\n"
-	"this option is in the .xpilotrc file in your home directory.\n"
-	"The exact format is defined in the file doc/README.SHIPS in the\n"
-	"XPilot distribution. Note that there is a nifty Unix tool called\n"
-	"editss for easy ship creation. There is XPShipEditor for Windows\n"
-	"and Ship Shaper for Java.  See the XPilot FAQ for details.\n"
-	"See also the \"shipShapeFile\" option below.\n"),
-
-    XP_STRING_OPTION(
-	"shipShapeFile",
-	CONF_SHIP_FILE,
-	NULL, 0,
-	Set_shipShapeFile, NULL, Get_shipShapeFile,
-	XP_OPTFLAG_DEFAULT,
-	"An optional file where shipshapes can be stored.\n"
-	"If this resource is defined and it refers to an existing file\n"
-	"then shipshapes can be referenced to by their name.\n"
-	"For instance if you define shipShapeFile to be\n"
-	"/home/myself/.shipshapes and this file contains one or more\n"
-	"shipshapes then you can select the shipshape by starting xpilot as:\n"
-	"	xpilot -shipShape myshipshapename\n"
-	"Where \"myshipshapename\" should be the \"name:\" or \"NM:\" of\n"
-	"one of the shipshapes defined in /home/myself/.shipshapes.\n"
-	"Each shipshape definition should be defined on only one line,\n"
-	"where all characters up to the first left parenthesis don't matter.\n"
-	/* shipshopshapshepshit getting nuts from all these shpshp-s. */),
 
     XP_STRING_OPTION(
 	"shutdown",
@@ -593,11 +557,9 @@ xp_option_t default_options[] = {
 	NULL,
 	XP_OPTFLAG_DEFAULT,
 	"Use UDP ports clientPortStart - clientPortEnd (for firewalls).\n"),
-    /*
-     * kps - steering stuff, note that set functions might have to be
-     * specified here.
-     */
 
+
+    /* steering */
     XP_DOUBLE_OPTION(
 	"power",
 	55.0,
@@ -747,13 +709,13 @@ xp_option_t default_options[] = {
 
     XP_DOUBLE_OPTION(
 	"hudScale",
-	2.0, /* default is 2 times "normal" size */
+	2.0,
 	1.0,
 	6.0,
 	&hudScale,
 	Set_hudScale,
 	XP_OPTFLAG_CONFIG_DEFAULT,
-	"Which scale to use for drawing the hud.\n"),
+	"How much larger than minimum size to draw the hud.\n"),
 
     XP_INT_OPTION(
 	"baseWarningType",
@@ -769,8 +731,8 @@ xp_option_t default_options[] = {
 	"A value of 2 makes the base name flash when a ship is appearing.\n"
 	"A value of 3 combines the effects of values 1 and 2.\n"),
 
+
     /* instruments */
-    
     XP_BOOL_OPTION(
 	"mapRadar",
 	true,
@@ -933,8 +895,8 @@ xp_option_t default_options[] = {
 	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Use AMPM format for clock display instead of 24 hour format.\n"),
 
-    /* stuff drawn on map */
 
+    /* painted stuff */
     XP_INT_OPTION(
 	"shotSize",
 	5,
@@ -998,6 +960,7 @@ xp_option_t default_options[] = {
 	XP_OPTFLAG_CONFIG_DEFAULT,
 	"How many seconds score objects remain visible on the map.\n"),
 
+
     /* mouse stuff */
     XP_BOOL_OPTION(
 	"pointerControl",
@@ -1010,8 +973,8 @@ xp_option_t default_options[] = {
 	"moving the mouse to the right for a clockwise turn.\n"
 	"Also see the pointerButton options for use of the mouse buttons.\n"),
 
-    /* message stuff */
 
+    /* message stuff */
     XP_INT_OPTION(
 	"charsPerSecond",
 	100,
@@ -1073,9 +1036,8 @@ xp_option_t default_options[] = {
 	"Number of your messages saved in the `history' of the talk window.\n"
 	"`history' is accessible with `keyTalkCursorUp/Down'.\n"),
 
-    /* stuff you should not have to touch */
 
-
+    /* misc stuff */
     XP_BOOL_OPTION(
 	"toggleShield",
 	false,
@@ -1180,6 +1142,7 @@ xp_option_t default_options[] = {
 	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Should the fighters have marking lights, just like airplanes?\n"),
 
+
     /* modbanks */
     XP_STRING_OPTION(
 	"modifierBank1",
@@ -1212,6 +1175,40 @@ xp_option_t default_options[] = {
 	NULL, NULL, NULL,
 	XP_OPTFLAG_DEFAULT,
 	"The default weapon modifier values for the fourth modifier bank.\n"),
+
+    XP_STRING_OPTION(
+	"shipShape",
+	"",
+	NULL, 0,
+	Set_shipShape, NULL, Get_shipShape,
+	XP_OPTFLAG_DEFAULT,
+	"Define the ship shape to use.  Because the argument to this option\n"
+	"is rather large (up to 500 bytes) the recommended way to set\n"
+	"this option is in the .xpilotrc file in your home directory.\n"
+	"The exact format is defined in the file doc/README.SHIPS in the\n"
+	"XPilot distribution. Note that there is a nifty Unix tool called\n"
+	"editss for easy ship creation. There is XPShipEditor for Windows\n"
+	"and Ship Shaper for Java.  See the XPilot FAQ for details.\n"
+	"See also the \"shipShapeFile\" option below.\n"),
+
+    XP_STRING_OPTION(
+	"shipShapeFile",
+	CONF_SHIP_FILE,
+	NULL, 0,
+	Set_shipShapeFile, NULL, Get_shipShapeFile,
+	XP_OPTFLAG_DEFAULT,
+	"An optional file where shipshapes can be stored.\n"
+	"If this resource is defined and it refers to an existing file\n"
+	"then shipshapes can be referenced to by their name.\n"
+	"For instance if you define shipShapeFile to be\n"
+	"/home/myself/.shipshapes and this file contains one or more\n"
+	"shipshapes then you can select the shipshape by starting xpilot as:\n"
+	"	xpilot -shipShape myshipshapename\n"
+	"Where \"myshipshapename\" should be the \"name:\" or \"NM:\" of\n"
+	"one of the shipshapes defined in /home/myself/.shipshapes.\n"
+	"Each shipshape definition should be defined on only one line,\n"
+	"where all characters up to the first left parenthesis don't matter.\n"
+	/* shipshopshapshepshit getting nuts from all these shpshp-s. */),
 
     XP_STRING_OPTION(
 	"texturePath",
@@ -1307,247 +1304,3 @@ void Store_default_options(void)
 {
     STORE_OPTIONS(default_options);
 }
-
-
-
-#if 0
-
-
-unsigned String_hash(const char *s)
-{
-    unsigned		hash = 0;
-
-    for (; *s; s++)
-	hash = (((hash >> 29) & 7) | (hash << 3)) ^ *s;
-    return hash;
-}
-
-
-static int Find_resource(XrmDatabase db, const char *resource,
-			 char *result, unsigned size, int *ind)
-{
-#ifndef _WINDOWS
-    int			i;
-    size_t		len;
-    char		str_name[80],
-			str_class[80],
-			*str_type[10];
-    XrmValue		rmValue;
-    unsigned		hash = String_hash(resource);
-
-    for (i = 0;;) {
-	if (hash == options[i].hash && !strcmp(resource, options[i].name)) {
-	    *ind = i;
-	    break;
-	}
-	if (++i >= NELEM(options)) {
-	    warn("BUG: Can't find option \"%s\"", resource);
-	    exit(1);
-	}
-    }
-    sprintf(str_name, "%s.%s", myName, resource);
-    sprintf(str_class, "%s.%c%s", myClass, toupper(*resource), resource + 1);
-
-    if (XrmGetResource(db, str_name, str_class, str_type, &rmValue) == True) {
-	if (rmValue.addr == NULL)
-	    len = 0;
-	else {
-	    len = MIN(rmValue.size, size - 1);
-	    memcpy(result, rmValue.addr, len);
-	}
-	result[len] = '\0';
-	return 1;
-    }
-    strlcpy(result, options[*ind].fallback, size);
-
-    return 0;
-
-#else	/* _WINDOWS */
-    Config_get_resource(resource, result, size, ind);
-
-    return 1;
-#endif
-}
-
-
-static int Get_string_resource(XrmDatabase db,
-			       const char *resource, char *result,
-			       unsigned size)
-{
-    char		*src, *dst;
-    int			ind, val;
-
-    val = Find_resource(db, resource, result, size, &ind);
-    src = dst = result;
-    while ((*src & 0x7f) == *src && isgraph(*src) == 0 && *src != '\0')
-	src++;
-
-    while ((*src & 0x7f) != *src || isgraph(*src) != 0)
-	*dst++ = *src++;
-
-    *dst = '\0';
-
-    return val;
-}
-
-
-static void Get_int_resource(XrmDatabase db,
-			     const char *resource, int *result)
-{
-    int			ind;
-    char		resValue[MAX_CHARS];
-
-    Find_resource(db, resource, resValue, sizeof resValue, &ind);
-    if (sscanf(resValue, "%d", result) <= 0) {
-	warn("Bad value \"%s\" for option \"%s\", using default...",
-	     resValue, resource);
-	sscanf(options[ind].fallback, "%d", result);
-    }
-}
-
-
-static void Get_float_resource(XrmDatabase db,
-			       const char *resource, double *result)
-{
-    int			ind;
-    double		temp_result;
-    char		resValue[MAX_CHARS];
-
-    temp_result = 0.0;
-    Find_resource(db, resource, resValue, sizeof resValue, &ind);
-    if (sscanf(resValue, "%lf", &temp_result) <= 0) {
-	warn("Bad value \"%s\" for option \"%s\", using default...",
-	     resValue, resource);
-	sscanf(options[ind].fallback, "%lf", &temp_result);
-    }
-    *result = temp_result;
-}
-
-
-static void Get_bool_resource(XrmDatabase db, const char *resource,
-			      bool *result)
-{
-    int			ind;
-    char		resValue[MAX_CHARS];
-
-    Find_resource(db, resource, resValue, sizeof resValue, &ind);
-    *result = (ON(resValue) ? true : false);
-}
-
-static void Get_shipshape_resource(XrmDatabase db, char **ship_shape)
-{
-    char		resValue[MAX(2*MSG_LEN, PATH_MAX + 1)];
-
-    Get_resource(db, "shipShape", resValue, sizeof resValue);
-    *ship_shape = xp_strdup(resValue);
-    if (*ship_shape && **ship_shape && !strchr(*ship_shape, '(' )) {
-	/* so it must be the name of shipshape defined in the shipshapefile. */
-	Get_resource(db, "shipShapeFile", resValue, sizeof resValue);
-	if (resValue[0] != '\0') {
-	    FILE *fp = fopen(resValue, "r");
-	    if (!fp)
-		perror(resValue);
-	    else {
-		char *ptr;
-		char *str;
-		char line[1024];
-		while (fgets(line, sizeof line, fp)) {
-		    if ((str = strstr(line, "(name:" )) != NULL
-			|| (str = strstr(line, "(NM:" )) != NULL) {
-			str = strchr(str, ':');
-			while (*++str == ' ');
-			if ((ptr = strchr(str, ')' )) != NULL)
-			    *ptr = '\0';
-			if (!strcmp(str, *ship_shape)) {
-			    /* Gotcha */
-			    free(*ship_shape);
-			    if (ptr != NULL)
-				*ptr = ')';
-			    *ship_shape = xp_strdup(line);
-			    break;
-			}
-		    }
-		}
-		fclose(fp);
-	    }
-	}
-    }
-}
-
-
-
-void Parse_options(int *argcp, char **argvp)
-{
-    char		*ptr, *str;
-    int			i, j;
-    int			num;
-    int			firstKeyDef;
-    keys_t		key;
-    KeySym		ks;
-
-    char		resValue[MAX(2*MSG_LEN, PATH_MAX + 1)];
-
-#ifndef _WINDOWS
-
-    if (Get_string_resource(argDB, "display", connectParam.disp_name, MAX_DISP_LEN) == 0
-	|| connectParam.disp_name[0] == '\0') {
-	if ((ptr = getenv(DISPLAY_ENV)) != NULL)
-	    strlcpy(connectParam.disp_name, ptr, MAX_DISP_LEN);
-	else
-	    strlcpy(connectParam.disp_name, DISPLAY_DEF, MAX_DISP_LEN);
-    }
-    if ((dpy = XOpenDisplay(connectParam.disp_name)) == NULL) {
-	error("Can't open display '%s'", connectParam.disp_name);
-	if (strcmp(connectParam.disp_name, "NO_X") == 0) {
-	    /* user does not want X stuff.  experimental.  use at own risk. */
-	    if (*connectParam.user_name)
-		strlcpy(connectParam.nick_name, connectParam.user_name, MAX_NAME_LEN);
-	    else
-		strlcpy(connectParam.nick_name, "X", MAX_NAME_LEN);
-	    connectParam.team = TEAM_NOT_SET;
-	    Get_int_resource(argDB, "port", &connectParam.contact_port);
-	    Get_bool_resource(argDB, "list", &xpArgs.list_servers);
-	    xpArgs.text = true;
-	    xpArgs.auto_connect = false;
-	    XrmDestroyDatabase(argDB);
-	    free(xopt);
-	    return;
-	}
-	exit(1);
-    }
-
-    Get_string_resource(rDB, "geometry", resValue, sizeof resValue);
-    geometry = xp_strdup(resValue);
-#endif
-
-    Get_shipshape_resource(rDB, &shipShape);
-    Validate_shape_str(shipShape);
-
-    Get_bool_resource(rDB, "fullColor", &fullColor);
-    Get_bool_resource(rDB, "texturedObjects", &texturedObjects);
-    if (!fullColor) {
-	texturedObjects = false;
-	instruments.showTexturedWalls = false;
-    }
-
-    Get_resource(rDB, "recordFile", resValue, sizeof resValue);
-    Record_init(resValue);
-
-    Get_resource(rDB, "texturePath", resValue, sizeof resValue);
-    texturePath = xp_strdup(resValue);
-
-    Get_int_resource(rDB, "maxFPS", &maxFPS);
-    oldMaxFPS = maxFPS;
-
-    /* Key bindings - removed */
-    /* Pointer button bindings - removed */
-
-
-#ifdef SOUND
-    audioInit(connectParam.disp_name);
-#endif /* SOUND */
-}
-
-
-#endif
-
