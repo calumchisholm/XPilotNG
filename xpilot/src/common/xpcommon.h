@@ -263,6 +263,7 @@ typedef int socklen_t;
 
 #include "version.h"
 #include "xpconfig.h"
+#include "arraylist.h"
 #include "astershape.h"
 #include "bit.h"
 #include "checknames.h"
