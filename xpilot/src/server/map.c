@@ -564,8 +564,26 @@ bool Grok_map_options(void)
 {
     Reset_map_object_counters();
 
+#if 0
+    if (!Grok_map_size()) {
+	if (mapData != NULL) {
+	    free(mapData);
+	    mapData = NULL;
+	}
+    }
+
+    if (!mapData) {
+	errno = 0;
+	error("Generating random map");
+	Generate_random_map();
+	if (!mapData) {
+	    return false;
+	}
+    }
+#else
     if (!Grok_map_size())
 	return false;
+#endif
 
     strlcpy(World.name, mapName, sizeof(World.name));
     strlcpy(World.author, mapAuthor, sizeof(World.author));
@@ -680,26 +698,6 @@ static bool Grok_map_old(void)
 {
     if (is_polygon_map)
 	return true;
-
-#if 0
-    Reset_map_object_counters();
-
-    if (!Grok_map_size()) {
-	if (mapData != NULL) {
-	    free(mapData);
-	    mapData = NULL;
-	}
-    }
-
-    if (!mapData) {
-	errno = 0;
-	error("Generating random map");
-	Generate_random_map();
-	if (!mapData) {
-	    return false;
-	}
-    }
-#endif
 
     if (!Grok_map_options())
 	return false;
