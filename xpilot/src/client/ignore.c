@@ -122,7 +122,7 @@ static void print_help(char *arg)
     }
 }
 
-static void ignorePlayer(char *name, short level)
+static void ignorePlayer(char *name, int level)
 {
     other_t *other = Other_by_name(name, true);
     char buf[64 + MAX_NAME_LEN];
@@ -192,7 +192,7 @@ void executeCommand(char *talk_str)
 	if (argument[0] == '\0')	/* empty */
 	    print_ignorelist();
 	else
-	    ignorePlayer(argument, (short) (command_num / 2 + 1));
+	    ignorePlayer(argument, (int) (command_num / 2 + 1));
 	break;
     case 4:			/* unignore */
     case 5:			/* u */

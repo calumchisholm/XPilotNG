@@ -187,7 +187,8 @@ void Expose_about_window(void)
 		XSetForeground(dpy, textGC, colors[windowColor].pixel);
 		XFillRectangle(dpy, aboutWindow, textGC,
 			       BORDER, box_start,
-			       ABOUT_WINDOW_WIDTH, box_end - box_start);
+			       ABOUT_WINDOW_WIDTH,
+			       (unsigned)box_end - box_start);
 		XSetForeground(dpy, textGC, colors[WHITE].pixel);
 		break;
 	    }
@@ -302,7 +303,7 @@ static void About_create_window(void)
 			DefaultRootWindow(dpy),
 			0, 0,
 			windowWidth, windowHeight,
-			2, dispDepth,
+			2, (int)dispDepth,
 			InputOutput, visual,
 			mask, &sattr);
     XStoreName(dpy, aboutWindow, "XPilot - information");
@@ -497,7 +498,7 @@ void Keys_destroy(void)
 #define MAX_MOTD_SIZE	(30*1024)
 
 static char		*motd_buf = NULL;
-static int		motd_size;
+static size_t		motd_size;
        int		motd_viewer = NO_WIDGET;
 static int		motd_auto_popup;
 
@@ -532,22 +533,22 @@ int Handle_motd(long off, char *buf, int len, long filesize)
     if (!motd_buf) {
 	motd_size = MIN(filesize, MAX_MOTD_SIZE);
 	i = MAX(motd_size, (long)(sizeof no_motd_msg)) + 1;
-	if (!(motd_buf = (char *) malloc(i))) {
+	if (!(motd_buf = malloc((size_t)i))) {
 	    error("No memory for MOTD");
 	    return -1;
 	}
 	memset(motd_buf, ' ', motd_size);
-	for (i = 39; i < motd_size; i += 40)
+	for (i = 39; i < (int)motd_size; i += 40)
 	    motd_buf[i] = '\n';
     }
-    else if (filesize < motd_size) {
+    else if (filesize < (long)motd_size) {
 	motd_size = filesize;
 	motd_buf[motd_size] = '\0';
     }
-    if (off < motd_size && len > 0) {
-	if (off + len > motd_size)
+    if (off < (long)motd_size && len > 0) {
+	if (off + len > (long)motd_size)
 	    len = motd_size - off;
-	memcpy(motd_buf + off, buf, len);
+	memcpy(motd_buf + off, buf, (size_t)len);
     }
     else if (len == 0 && off > 0)
 	return 0;

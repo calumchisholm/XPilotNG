@@ -2853,7 +2853,7 @@ static int Find_resource(XrmDatabase db, const char *resource,
 {
 #ifndef _WINDOWS
     int			i;
-    int			len;
+    size_t		len;
     char		str_name[80],
 			str_class[80],
 			*str_type[10];
@@ -3138,7 +3138,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 
 #ifndef _WINDOWS
     XrmOptionDescRec	*xopt;
-    int			size;
+    size_t		size;
 
 
     XrmInitialize();
@@ -3150,7 +3150,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     for (i = 0; i < NELEM(options); i++)
 	size += 2 * (strlen(options[i].name) + 2);
 
-    if ((ptr = (char *)malloc(size)) == NULL) {
+    if ((ptr = malloc(size)) == NULL) {
 	error("No memory for options");
 	exit(1);
     }
@@ -3170,8 +3170,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 	if (options[i].noArg) {
 	    xopt[i].argKind = XrmoptionNoArg;
 	    xopt[i].value = (char *)options[i].noArg;
-	}
-	else {
+	} else {
 	    xopt[i].argKind = XrmoptionSepArg;
 	    xopt[i].value = NULL;
 	}

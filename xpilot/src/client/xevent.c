@@ -635,9 +635,8 @@ void Set_toggle_shield(bool on)
 
 void Talk_event(XEvent *event)
 {
-    if (!Talk_do_event(event)) {
+    if (!Talk_do_event(event))
 	Talk_set_state(false);
-    }
 }
 
 
@@ -819,9 +818,8 @@ int win_xevent(XEvent event)
 	    break;
 
 	case ClientMessage:
-	    if (ClientMessage_event(&event) == -1) {
+	    if (ClientMessage_event(&event) == -1)
 		return -1;
-	    }
 	    break;
 
 	    /* Back in play */

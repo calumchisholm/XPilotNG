@@ -92,9 +92,8 @@ static void Selection_request(void)
 	if (Talk_paste(selection.txt, selection.len, False) > 0)
 	    save_talk_str = true;
     }
-    else if (XGetSelectionOwner(dpy, XA_PRIMARY) == None) {
+    else if (XGetSelectionOwner(dpy, XA_PRIMARY) == None)
 	Selection_paste(DefaultRootWindow(dpy), XA_CUT_BUFFER0, False);
-    }
     else {
 	prop = XInternAtom(dpy, "VT_SELECTION", False);
 	XConvertSelection(dpy, XA_PRIMARY, XA_STRING, prop, talkWindow,

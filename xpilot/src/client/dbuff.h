@@ -90,7 +90,7 @@ extern dbuff_state_t   *dbuf_state;    /* Holds current dbuff state */
 
 dbuff_state_t *start_dbuff(Display *display, Colormap cmap,
 			   dbuff_t type,
-			   int num_planes, XColor *colors);
+			   unsigned num_planes, XColor *colors);
 void dbuff_switch(dbuff_state_t *state);
 void dbuff_init_buffer(dbuff_state_t *state);
 void end_dbuff(dbuff_state_t *state);

@@ -86,6 +86,8 @@ int			spark_color[MAX_COLORS];
 int			num_spark_colors;
 bool			ignoreWindowManager;
 
+void Raise_window(void);
+
 /*
  * NB!  Is dependent on the order of the items in item.h!
  */
@@ -826,7 +828,7 @@ int Init_playing_windows(void)
 
     button_form
 	= Widget_create_form(0, topWindow,
-			     0, RadarHeight,
+			     0, (int)RadarHeight,
 			     256, ButtonHeight + 2,
 			     0);
     Widget_create_activate(button_form,
@@ -867,7 +869,7 @@ int Init_playing_windows(void)
     players_height = top_height - (RadarHeight + ButtonHeight + 2);
     playersWindow
 	= XCreateSimpleWindow(dpy, topWindow,
-			      0, RadarHeight + ButtonHeight + 2,
+			      0, (int)RadarHeight + ButtonHeight + 2,
 			      players_width, players_height,
 			      0, 0,
 			      colors[windowColor].pixel);

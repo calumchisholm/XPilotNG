@@ -76,7 +76,7 @@ static int Picture_find_path(const char *filename, char *path,
 			     size_t path_size)
 {
     char		*dir, *colon;
-    int			len;
+    size_t		len;
 
     if (!filename || !*filename)
 	return false;

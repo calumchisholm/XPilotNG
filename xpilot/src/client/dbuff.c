@@ -69,12 +69,13 @@ static long dbuff_color(dbuff_state_t *state, long simple_color)
 
 
 dbuff_state_t *start_dbuff(Display *display, Colormap xcolormap,
-			   dbuff_t type, int num_planes, XColor *colorarray)
+			   dbuff_t type, unsigned num_planes,
+			   XColor *colorarray)
 {
     dbuff_state_t	*state;
     int			i, high_mask, low_mask;
 
-    state = (dbuff_state_t *) calloc(1, sizeof(dbuff_state_t));
+    state = calloc(1, sizeof(dbuff_state_t));
     if (state == NULL)
 	return NULL;
 
@@ -83,7 +84,7 @@ dbuff_state_t *start_dbuff(Display *display, Colormap xcolormap,
 	= (XColor *) malloc(state->colormap_size * sizeof(XColor));
     state->colormaps[1]
 	= (XColor *) malloc(state->colormap_size * sizeof(XColor));
-    state->planes = (unsigned long *) calloc(2 * num_planes, sizeof(long));
+    state->planes = calloc(2 * num_planes, sizeof(long));
     if (state->colormaps[1] == NULL ||
 	state->colormaps[0] == NULL ||
 	state->planes == NULL) {
@@ -152,7 +153,7 @@ dbuff_state_t *start_dbuff(Display *display, Colormap xcolormap,
     state->drawing_plane_masks[0] = AllPlanes;
     state->drawing_plane_masks[1] = AllPlanes;
 
-    for (i = 0; i < num_planes; i++) {
+    for (i = 0; i < (int)num_planes; i++) {
 	state->drawing_plane_masks[0] &= ~state->planes[i];
 	state->drawing_plane_masks[1] &= ~state->planes[num_planes + i];
     }

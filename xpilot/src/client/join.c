@@ -153,7 +153,7 @@ static void Input_loop(void)
 }
 #endif	/* _WINDOWS */
 
-void xpilotShutdown(void)
+static void xpilotShutdown(void)
 {
     Net_cleanup();
     Client_cleanup();
