@@ -448,6 +448,7 @@ public class MapPolygon extends MapObject {
 
             if (poly.npoints > 2) {
                 if ((me.getModifiers() & InputEvent.BUTTON1_MASK) == 0) {
+                    poly.addPoint(latest.x, latest.y);
                     MapPolygon.this.polygon = 
                         new Polygon(poly.xpoints, 
                                     poly.ypoints, 
