@@ -906,8 +906,7 @@ static void Do_warping(player *pl)
 
 		ballpos.cx = b->pos.cx + dest.cx - pl->pos.cx;
 		ballpos.cy = b->pos.cy + dest.cy - pl->pos.cy;
-		ballpos.cx = WRAP_XCLICK(ballpos.cx);
-		ballpos.cy = WRAP_YCLICK(ballpos.cy);
+		ballpos = World_wrap_clpos(world, ballpos);
 		if (!World_contains_clpos(world, ballpos)) {
 		    b->life = 0.0;
 		    continue;

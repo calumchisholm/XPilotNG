@@ -682,10 +682,9 @@ static void Frame_shots(connection_t *conn, player *pl)
 	    if (clpos_inview(&cv, pos))
 		ldir = MOD2(pulse->dir + RES/2, RES);
 	    else {
-		pos.cx = WRAP_XCLICK(pos.cx
-				     - tcos(pulse->dir) * pulse->len * CLICK);
-		pos.cy = WRAP_YCLICK(pos.cy
-				     - tsin(pulse->dir) * pulse->len * CLICK);
+		pos.cx = pos.cx - tcos(pulse->dir) * pulse->len * CLICK;
+		pos.cy = pos.cy - tsin(pulse->dir) * pulse->len * CLICK;
+		pos = World_wrap_clpos(world, pos);
 		ldir = pulse->dir;
 		if (!clpos_inview(&cv, pos))
 		    continue;

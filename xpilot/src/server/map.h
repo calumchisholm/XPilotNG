@@ -286,4 +286,38 @@ static inline bool World_contains_clpos(world_t *world, clpos pos)
 	return false;
     return true;
 }
+
+static inline int World_wrap_xclick(world_t *world, int cx)
+{
+    if (!BIT(world->rules->mode, WRAP_PLAY))
+	return cx;
+
+    while (cx < 0)
+	cx += world->cwidth;
+    while (cx >= world->cwidth)
+	cx -= world->cwidth;
+
+    return cx;
+}
+
+static inline int World_wrap_yclick(world_t *world, int cy)
+{
+    if (!BIT(world->rules->mode, WRAP_PLAY))
+	return cy;
+
+    while (cy < 0)
+	cy += world->cheight;
+    while (cy >= world->cheight)
+	cy -= world->cheight;
+
+    return cy;
+}
+
+static inline clpos World_wrap_clpos(world_t *world, clpos pos)
+{
+    pos.cx = World_wrap_xclick(world, pos.cx);
+    pos.cy = World_wrap_yclick(world, pos.cy);
+
+    return pos;
+}
 #endif

@@ -149,10 +149,12 @@ void Break_asteroid(wireobject *asteroid)
 	vely2 = tsin(dir2) * speed2;
 	split_dir = MOD2((int)dir - RES/4, RES);
 	radius = ASTEROID_RADIUS(asteroid->size - 1);
-	pos1.cx = WRAP_XCLICK(asteroid->pos.cx + tcos(split_dir) * radius);
-	pos1.cy = WRAP_YCLICK(asteroid->pos.cy + tsin(split_dir) * radius);
-	pos2.cx = WRAP_XCLICK(asteroid->pos.cx - tcos(split_dir) * radius);
-	pos2.cy = WRAP_YCLICK(asteroid->pos.cy - tsin(split_dir) * radius);
+	pos1.cx = asteroid->pos.cx + tcos(split_dir) * radius;
+	pos1.cy = asteroid->pos.cy + tsin(split_dir) * radius;
+	pos1 = World_wrap_clpos(world, pos1);
+	pos2.cx = asteroid->pos.cx - tcos(split_dir) * radius;
+	pos2.cy = asteroid->pos.cy - tsin(split_dir) * radius;
+	pos2 = World_wrap_clpos(world, pos2);
 	Make_asteroid(pos1, asteroid->size - 1, dir1, speed1);
 	Make_asteroid(pos2, asteroid->size - 1, dir2, speed2);
 	Make_wreckage(asteroid->pos,
@@ -236,8 +238,7 @@ static void Make_asteroid(clpos pos, int size, int dir, double speed)
     if (size < 1 || size > ASTEROID_MAX_SIZE)
 	return;
 
-    pos.cx = WRAP_XCLICK(pos.cx);
-    pos.cy = WRAP_YCLICK(pos.cy);
+    pos = World_wrap_clpos(world, pos);
     if (!World_contains_clpos(world, pos))
 	return;
 
@@ -326,8 +327,7 @@ static void Place_asteroid(void)
 				     * BLOCK_CLICKS) + 1));
 	    pos.cx = con->pos.cx + dist * tcos(dir);
 	    pos.cy = con->pos.cy + dist * tsin(dir);
-	    pos.cx = WRAP_XCLICK(pos.cx);
-	    pos.cy = WRAP_YCLICK(pos.cy);
+	    pos = World_wrap_clpos(world, pos);
 	    if (!World_contains_clpos(world, pos))
 		continue;
 	} else {
