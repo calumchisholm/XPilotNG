@@ -1133,13 +1133,13 @@ static void Update_players(void)
 	Player_set_mass(pl);
 
 	/*
-	 * Handle wormholes and hyperjumps.
+	 * Handle hyperjumps and wormholes.
 	 */
 	if (BIT(pl->status, WARPING)) {
-	    if (pl->wormHoleHit != -1)
-		Traverse_wormhole(pl);
-	    else
+	    if (pl->wormHoleHit == -1)
 		Hyperjump(pl);
+	    else
+		Traverse_wormhole(pl);
 	}
 
 	update_object_speed(OBJ_PTR(pl));

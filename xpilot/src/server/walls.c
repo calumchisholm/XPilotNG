@@ -258,8 +258,8 @@ static void Object_hits_target(object *obj, target_t *targ, double player_cost)
     World_remove_target(world, targ);
 
     Make_debris(
-	/* pos.cx, pos.cy   */ targ->pos,
-	/* vel.x, vel.y   */ zero_vel,
+	/* pos            */ targ->pos,
+	/* vel            */ zero_vel,
 	/* owner id       */ NO_ID,
 	/* owner team	  */ targ->team,
 	/* kind           */ OBJ_DEBRIS,
@@ -361,6 +361,15 @@ static void Object_hits_target(object *obj, target_t *targ, double player_cost)
     }
 }
 
+static void Object_hits_wormhole(object *obj, int ind)
+{
+    world_t *world = &World;
+    wormhole_t *wormhole = Wormholes(world, ind);
+
+    SET_BIT(obj->status, WARPING);
+    obj->wormHoleHit = ind;
+}
+
 
 
 void Object_crash(object *obj, int crashtype, int mapobj_ind)
@@ -369,9 +378,11 @@ void Object_crash(object *obj, int crashtype, int mapobj_ind)
 
     switch (crashtype) {
 
-    case CrashWormHole:
     default:
-	warn("%s crashed into wormhole", Object_typename(obj));
+	break;
+
+    case CrashWormHole:
+	Object_hits_wormhole(obj, mapobj_ind);
 	break;
 
     case CrashTreasure:
@@ -439,9 +450,7 @@ void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt)
 	break;
 
     case CrashWormHole:
-	warn("Player crashed into wormhole");
-	SET_BIT(pl->status, WARPING);
-	pl->wormHoleHit = mapobj_ind;
+	Object_hits_wormhole(OBJ_PTR(pl), mapobj_ind);
 	break;
 
     case CrashWall:
@@ -578,7 +587,8 @@ void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt)
 		    msg_ptr += name_len;
 		}
 		sc = cnt[i] * Rate(pusher->score, pl->score)
-				    * options.shoveKillScoreMult / total_pusher_count;
+		    * options.shoveKillScoreMult
+		    / total_pusher_count;
 
 		if (options.tagGame) {
 		    if (tagItPlayerId == pusher->id) {
@@ -740,7 +750,8 @@ static int Bounce_object(object *obj, move_t *move, int line, int point)
      * bouncing would cause acceleration of the player.
      */
     if (obj->type != OBJ_PULSE &&
-	sqr(obj->vel.x) + sqr(obj->vel.y) > sqr(options.maxObjectWallBounceSpeed)) {
+	sqr(obj->vel.x) + sqr(obj->vel.y)
+	> sqr(options.maxObjectWallBounceSpeed)) {
 	obj->life = 0;
 	return 0;
     }

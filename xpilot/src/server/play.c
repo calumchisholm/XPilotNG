@@ -618,7 +618,18 @@ bool Wormhole_hitfunc(group_t *gp, move_t *move)
     world_t *world = &World;
     wormhole_t *wormhole = Wormholes(world, gp->mapobj_ind);
 
-    return false;
+    /* this should never happen, because of the hitmask */
+    assert(wormhole->type != WORM_OUT);
+
+    if (obj == NULL) {
+	warn("Wormhole_hitfunc: wormhole %p hit by NULL.", wormhole);
+	return true;
+    }
+
+    if (BIT(obj->status, WARPED))
+	return false;
+
+    return true;
 
 #if 0
     warn("Wormhole_hitfunc: wormhole %p hit by a %s",
@@ -633,14 +644,6 @@ bool Wormhole_hitfunc(group_t *gp, move_t *move)
     return true;
 
 #if 0
-    /* this should never happen, because of the hitmask */
-    if (wormhole->type == WORM_OUT) {
-	warn("BUG: Wormhole_hitfunc: wormhole->type == WORM_OUT\n");
-	return false;
-    }
-
-    if (obj == NULL)
-	return true;
 
     if (obj->type == OBJ_PLAYER) {
 	player *pl = (player *)obj;

@@ -194,6 +194,8 @@ struct _cell_node {
     modifiers		mods;		/* Modifiers to this object */	\
     u_byte		color;		/* Color of object */		\
     short		missile_dir;	/* missile direction */		\
+    int		wormHoleHit, wormHoleDest; \
+
 /* up to here all object types are the same as all player types. */
 
 #define OBJECT_EXTEND	\
@@ -580,7 +582,6 @@ struct player {
     double	damaged;
     double	stunned;
     int		updateVisibility;
-    int		wormHoleHit, wormHoleDest;
 
     int		last_target_update;	/* index of last updated target */
     int		last_cannon_update;	/* index of last updated cannon */
