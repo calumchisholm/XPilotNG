@@ -19,6 +19,7 @@ public class MainFrame extends JFrame implements ActionListener {
     private JToggleButton btnErase;
     private JButton btnZoomIn;
     private JButton btnZoomOut;
+    private JLabel lblZoom;
 
     public MainFrame () {
 
@@ -133,6 +134,14 @@ public class MainFrame extends JFrame implements ActionListener {
             ("zoomOut", "/images/zoomouticon.gif", "Zoom out");
         toolBar.add(btnZoomOut);
 
+        toolBar.addSeparator();
+
+        lblZoom = new JLabel();
+        lblZoom.setHorizontalAlignment(SwingConstants.CENTER);
+        Font f = lblZoom.getFont();
+        lblZoom.setFont(f.deriveFont((float)(f.getSize() - 2)));
+        toolBar.add(lblZoom);
+
         getContentPane().add(toolBar, BorderLayout.WEST);
     }
 
@@ -196,6 +205,12 @@ public class MainFrame extends JFrame implements ActionListener {
              (df * (zoom + 1)) :
              (df / (-zoom + 1)));
         canvas.repaint();
+        
+        if (zoom >= 0) {
+            lblZoom.setText("x" + (zoom + 1));
+        } else {
+            lblZoom.setText("x1/" + (-zoom + 1));
+        }
     }
 
     
