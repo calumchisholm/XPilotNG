@@ -301,6 +301,30 @@ static bool Set_key_option(xp_option_t *opt, const char *value)
     return retval;
 }
 
+static bool is_legal_value(xp_option_type_t type, const char *value)
+{
+    if (type == xp_noarg_option || type == xp_bool_option) {
+	if (ON(value) || OFF(value))
+	    return true;
+	return false;
+    }
+    if (type == xp_int_option) {
+	int foo;
+
+	if (!sscanf(value, "%d", &foo))
+	    return false;
+	return true;
+    }
+    if (type == xp_double_option) {
+	double foo;
+
+	if (!sscanf(value, "%lf", &foo))
+	    return false;
+	return true;
+    }
+    return true;
+}
+
 /*
  * This could also be used from a client '\set' command, e.g.
  * "\set scalefactor 1.5"
@@ -313,6 +337,11 @@ bool Set_option(const char *name, const char *value)
     opt = Find_option(name);
     if (!opt) {
 	warn("Could not find option \"%s\"\n", name);
+	return false;
+    }
+
+    if (!is_legal_value(opt->type, value)) {
+	warn("Bad value \"%s\" for option \"%s\"", value, opt->name);
 	return false;
     }
 
