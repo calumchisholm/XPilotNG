@@ -1159,7 +1159,6 @@ int Validate_shape_str(char *str)
     return (w && w != Default_ship());
 }
 
-#if 0
 void Convert_ship_2_string(shipobj *w, char *buf, char *ext,
 			   unsigned shape_version)
 {
@@ -1174,16 +1173,19 @@ void Convert_ship_2_string(shipobj *w, char *buf, char *ext,
     ext[extlen = 0] = '\0';
 
     if (shape_version >= 0x3200) {
+	position engine, m_gun;
 	strcpy(buf, "(SH:");
 	buflen = strlen(&buf[0]);
 	for (i = 0; i < w->num_points && i < MAX_SHIP_PTS; i++) {
-	    sprintf(&buf[buflen], " %d,%d",
-		    (int)w->pts[i][0].x, (int)w->pts[i][0].y);
+	    position pt = Ship_get_point_position(w, i, 0);
+	    sprintf(&buf[buflen], " %d,%d", (int)pt.x, (int)pt.y);
 	    buflen += strlen(&buf[buflen]);
 	}
+	engine = Ship_get_engine_position(w, 0);
+	m_gun = Ship_get_m_gun_position(w, 0);
 	sprintf(&buf[buflen], ")(EN: %d,%d)(MG: %d,%d)",
-		(int)w->engine[0].x, (int)w->engine[0].y,
-		(int)w->m_gun[0].x, (int)w->m_gun[0].y);
+		(int)engine.x, (int)engine.y,
+		(int)m_gun.x, (int)m_gun.y);
 	buflen += strlen(&buf[buflen]);
 
 	/*
@@ -1201,8 +1203,9 @@ void Convert_ship_2_string(shipobj *w, char *buf, char *ext,
 	    strcpy(&tmp[0], "(LG:");
 	    tmplen = strlen(&tmp[0]);
 	    for (i = 0; i < w->num_l_gun && i < MAX_GUN_PTS; i++) {
+		position l_gun = Ship_get_l_gun_position(w, i, 0);
 		sprintf(&tmp[tmplen], " %d,%d",
-			(int)w->l_gun[i][0].x, (int)w->l_gun[i][0].y);
+			(int)l_gun.x, (int)l_gun.y);
 		tmplen += strlen(&tmp[tmplen]);
 	    }
 	    strcpy(&tmp[tmplen], ")");
@@ -1220,8 +1223,9 @@ void Convert_ship_2_string(shipobj *w, char *buf, char *ext,
 	    strcpy(&tmp[0], "(RG:");
 	    tmplen = strlen(&tmp[0]);
 	    for (i = 0; i < w->num_r_gun && i < MAX_GUN_PTS; i++) {
+		position r_gun = Ship_get_r_gun_position(w, i, 0);
 		sprintf(&tmp[tmplen], " %d,%d",
-			(int)w->r_gun[i][0].x, (int)w->r_gun[i][0].y);
+			(int)r_gun.x, (int)r_gun.y);
 		tmplen += strlen(&tmp[tmplen]);
 	    }
 	    strcpy(&tmp[tmplen], ")");
@@ -1239,8 +1243,9 @@ void Convert_ship_2_string(shipobj *w, char *buf, char *ext,
 	    strcpy(&tmp[0], "(LR:");
 	    tmplen = strlen(&tmp[0]);
 	    for (i = 0; i < w->num_l_rgun && i < MAX_GUN_PTS; i++) {
+		position l_rgun = Ship_get_l_rgun_position(w, i, 0);
 		sprintf(&tmp[tmplen], " %d,%d",
-			(int)w->l_rgun[i][0].x, (int)w->l_rgun[i][0].y);
+			(int)l_rgun.x, (int)l_rgun.y);
 		tmplen += strlen(&tmp[tmplen]);
 	    }
 	    strcpy(&tmp[tmplen], ")");
@@ -1258,8 +1263,9 @@ void Convert_ship_2_string(shipobj *w, char *buf, char *ext,
 	    strcpy(&tmp[0], "(RR:");
 	    tmplen = strlen(&tmp[0]);
 	    for (i = 0; i < w->num_r_rgun && i < MAX_GUN_PTS; i++) {
+		position r_rgun = Ship_get_r_rgun_position(w, i, 0);
 		sprintf(&tmp[tmplen], " %d,%d",
-			(int)w->r_rgun[i][0].x, (int)w->r_rgun[i][0].y);
+			(int)r_rgun.x, (int)r_rgun.y);
 		tmplen += strlen(&tmp[tmplen]);
 	    }
 	    strcpy(&tmp[tmplen], ")");
@@ -1277,8 +1283,9 @@ void Convert_ship_2_string(shipobj *w, char *buf, char *ext,
 	    strcpy(&tmp[0], "(LL:");
 	    tmplen = strlen(&tmp[0]);
 	    for (i = 0; i < w->num_l_light && i < MAX_LIGHT_PTS; i++) {
+		position l_light = Ship_get_l_light_position(w, i, 0);
 		sprintf(&tmp[tmplen], " %d,%d",
-			(int)w->l_light[i][0].x, (int)w->l_light[i][0].y);
+			(int)l_light.x, (int)l_light.y);
 		tmplen += strlen(&tmp[tmplen]);
 	    }
 	    strcpy(&tmp[tmplen], ")");
@@ -1296,8 +1303,9 @@ void Convert_ship_2_string(shipobj *w, char *buf, char *ext,
 	    strcpy(&tmp[0], "(RL:");
 	    tmplen = strlen(&tmp[0]);
 	    for (i = 0; i < w->num_r_light && i < MAX_LIGHT_PTS; i++) {
+		position r_light = Ship_get_r_light_position(w, i, 0);
 		sprintf(&tmp[tmplen], " %d,%d",
-			(int)w->r_light[i][0].x, (int)w->r_light[i][0].y);
+			(int)r_light.x, (int)r_light.y);
 		tmplen += strlen(&tmp[tmplen]);
 	    }
 	    strcpy(&tmp[tmplen], ")");
@@ -1315,8 +1323,9 @@ void Convert_ship_2_string(shipobj *w, char *buf, char *ext,
 	    strcpy(&tmp[0], "(MR:");
 	    tmplen = strlen(&tmp[0]);
 	    for (i = 0; i < w->num_m_rack && i < MAX_RACK_PTS; i++) {
+		position m_rack = Ship_get_m_rack_position(w, i, 0);
 		sprintf(&tmp[tmplen], " %d,%d",
-			(int)w->m_rack[i][0].x, (int)w->m_rack[i][0].y);
+			(int)m_rack.x, (int)m_rack.y);
 		tmplen += strlen(&tmp[tmplen]);
 	    }
 	    strcpy(&tmp[tmplen], ")");
@@ -1345,22 +1354,26 @@ void Convert_ship_2_string(shipobj *w, char *buf, char *ext,
 	}
 
 	for (i = 1, ll = rl = 0; i < num_points; i++) {
-	    if (w->pts[i][0].y > w->pts[ll][0].y
-		|| (w->pts[i][0].y == w->pts[ll][0].y
-		    && w->pts[i][0].x < w->pts[ll][0].x)) {
+	    position pti = Ship_get_point_position(w, i, 0);
+	    position ptll = Ship_get_point_position(w, i, 0);
+	    position ptrl = Ship_get_point_position(w, i, 0);
+	    if (pti.y > ptll.y
+		|| (pti.y == ptll.y
+		    && pti.x < ptll.x)) {
 		ll = i;
 	    }
-	    if (w->pts[i][0].y < w->pts[rl][0].y
-		|| (w->pts[i][0].y == w->pts[rl][0].y
-		    && w->pts[i][0].x < w->pts[rl][0].x)) {
+	    if (pti.y < ptrl.y
+		|| (pti.y == ptrl.y
+		    && pti.x < ptrl.x)) {
 		rl = i;
 	    }
 	}
 	sprintf(buf, "(%d,%d,%d)", num_points, ll, rl);
 	buflen = strlen(buf);
 	for (i = 0; i < num_points; i++) {
+	    position pti = Ship_get_point_position(w, i, 0);
 	    sprintf(&buf[buflen], "(%d,%d)",
-		    (int)w->pts[i][0].x, (int)w->pts[i][0].y);
+		    (int)pti.x, (int)pti.y);
 	    buflen += strlen(&buf[buflen]);
 	}
     }
@@ -1372,7 +1385,7 @@ void Convert_ship_2_string(shipobj *w, char *buf, char *ext,
 	xpprintf("ship 2 str: %s %s\n", buf, ext);
     }
 }
-#endif
+
 
 int Get_shape_keyword(char *keyw)
 {

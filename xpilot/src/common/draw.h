@@ -91,15 +91,7 @@
  * It will create incompatibilities and frustration.
  */
 #define MIN_SHIP_PTS	    3
-#ifdef SERVER
-#  ifdef SSHACK
-#    define MAX_SHIP_PTS	    48
-#  else
-#    define MAX_SHIP_PTS	    24
-#  endif
-#else
-#    define MAX_SHIP_PTS	    24
-#endif
+#define MAX_SHIP_PTS	    24
 #define MAX_GUN_PTS	    3
 #define MAX_LIGHT_PTS	    3
 #define MAX_RACK_PTS	    4

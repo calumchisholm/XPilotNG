@@ -271,11 +271,7 @@ static int shape2wire(char *ship_shape_str, shipobj *w)
 		    }
 		    break;
 		}
-#ifdef SSHACK
-		if (w->num_points >= MAX_SHIP_PTS / 2) {
-#else
 		if (w->num_points >= MAX_SHIP_PTS) {
-#endif
 		    if (verboseShapeParsing) {
 			xpprintf("Too many ship shape coordinates\n");
 		    }
@@ -561,11 +557,7 @@ static int shape2wire(char *ship_shape_str, shipobj *w)
 
 	if (sscanf(str, "(%d,%d,%d)", &ofNum, &ofLeft, &ofRight) != 3
 	    || ofNum < MIN_SHIP_PTS
-#ifdef SSHACK
-	    || ofNum > MAX_SHIP_PTS / 2
-#else
 	    || ofNum > MAX_SHIP_PTS
-#endif
 	    || ofLeft < 0
 	    || ofLeft >= ofNum
 	    || ofRight < 0
@@ -613,27 +605,6 @@ static int shape2wire(char *ship_shape_str, shipobj *w)
 	engine.y = (pt[ofLeft].y + pt[ofRight].y) / 2;
 	engineSet = true;
     }
-
-/*MARA evil hack*/
-#ifdef SSHACK
-    /*xpprintf("MARA evil shipshape hack (numpoints = %i)\n", w->num_points);*/
-    
-    pt[w->num_points].x = pt[0].x;
-    pt[w->num_points].y = pt[0].y;
-    /*xpprintf("first point added\n");*/
-    for (i = 1; i < w->num_points; i++) {
-	/*xpprintf("%i th point added\n",i+1);*/
-	pt[i+w->num_points].x = pt[w->num_points-i].x;
-	pt[i+w->num_points].y = pt[w->num_points-i].y;
-    }
-    /*xpprintf("SS: ");*/
-    /*for (i = 0; i < w->num_points * 2; i++)
-      xpprintf("(%i,%i)", pt[i].x, pt[i].y);
-      xpprintf("\n");*/
-    
-    w->num_points = w->num_points * 2;
-#endif
-/*MARA evil hack*/
 
     /* Check for some things being set, and give them defaults if not */
 
@@ -1153,239 +1124,6 @@ void Free_ship_shape(shipobj *w)
 	free(w);
     }
 }
-
-void Convert_ship_2_string(shipobj *w, char *buf, char *ext,
-			   unsigned shape_version)
-{
-    char		tmp[MSG_LEN];
-    int			i,
-			buflen,
-			extlen,
-			tmplen,
-			ll,
-			rl;
-
-    ext[extlen = 0] = '\0';
-
-    if (shape_version >= 0x3200) {
-	position engine, m_gun;
-	strcpy(buf, "(SH:");
-	buflen = strlen(&buf[0]);
-#ifdef SSHACK
-	for (i = 0; i < w->num_points / 2 && i < MAX_SHIP_PTS / 2; i++)
-#else
-	for (i = 0; i < w->num_points && i < MAX_SHIP_PTS; i++)
-#endif
-	{
-	    position pt = Ship_get_point_position(w, i, 0);
-	    sprintf(&buf[buflen], " %d,%d", (int)pt.x, (int)pt.y);
-	    buflen += strlen(&buf[buflen]);
-	}
-	engine = Ship_get_engine_position(w, 0);
-	m_gun = Ship_get_m_gun_position(w, 0);
-	sprintf(&buf[buflen], ")(EN: %d,%d)(MG: %d,%d)",
-		(int)engine.x, (int)engine.y,
-		(int)m_gun.x, (int)m_gun.y);
-	buflen += strlen(&buf[buflen]);
-
-	/*
-	 * If the calculations are correct then only from here on
-	 * there is danger for overflowing the MSG_LEN size
-	 * of the buffer.  Therefore first copy a new pair of
-	 * parentheses into a temporary buffer and when the closing
-	 * parenthesis is reached then determine if there is enough
-	 * room in the main buffer or else copy it into the extended
-	 * buffer.  This scheme allows cooperation with versions which
-	 * didn't had the extended buffer yet for which the extended
-	 * buffer will simply be discarded.
-	 */
-	if (w->num_l_gun > 0) {
-	    strcpy(&tmp[0], "(LG:");
-	    tmplen = strlen(&tmp[0]);
-	    for (i = 0; i < w->num_l_gun && i < MAX_GUN_PTS; i++) {
-		position l_gun = Ship_get_l_gun_position(w, i, 0);
-		sprintf(&tmp[tmplen], " %d,%d",
-			(int)l_gun.x, (int)l_gun.y);
-		tmplen += strlen(&tmp[tmplen]);
-	    }
-	    strcpy(&tmp[tmplen], ")");
-	    tmplen++;
-	    if (buflen + tmplen < MSG_LEN) {
-		strcpy(&buf[buflen], tmp);
-		buflen += tmplen;
-	    }
-	    else if (extlen + tmplen < MSG_LEN) {
-		strcpy(&ext[extlen], tmp);
-		extlen += tmplen;
-	    }
-	}
-	if (w->num_r_gun > 0) {
-	    strcpy(&tmp[0], "(RG:");
-	    tmplen = strlen(&tmp[0]);
-	    for (i = 0; i < w->num_r_gun && i < MAX_GUN_PTS; i++) {
-		position r_gun = Ship_get_r_gun_position(w, i, 0);
-		sprintf(&tmp[tmplen], " %d,%d",
-			(int)r_gun.x, (int)r_gun.y);
-		tmplen += strlen(&tmp[tmplen]);
-	    }
-	    strcpy(&tmp[tmplen], ")");
-	    tmplen++;
-	    if (buflen + tmplen < MSG_LEN) {
-		strcpy(&buf[buflen], tmp);
-		buflen += tmplen;
-	    }
-	    else if (extlen + tmplen < MSG_LEN) {
-		strcpy(&ext[extlen], tmp);
-		extlen += tmplen;
-	    }
-	}
-	if (w->num_l_rgun > 0) {
-	    strcpy(&tmp[0], "(LR:");
-	    tmplen = strlen(&tmp[0]);
-	    for (i = 0; i < w->num_l_rgun && i < MAX_GUN_PTS; i++) {
-		position l_rgun = Ship_get_l_rgun_position(w, i, 0);
-		sprintf(&tmp[tmplen], " %d,%d",
-			(int)l_rgun.x, (int)l_rgun.y);
-		tmplen += strlen(&tmp[tmplen]);
-	    }
-	    strcpy(&tmp[tmplen], ")");
-	    tmplen++;
-	    if (buflen + tmplen < MSG_LEN) {
-		strcpy(&buf[buflen], tmp);
-		buflen += tmplen;
-	    }
-	    else if (extlen + tmplen < MSG_LEN) {
-		strcpy(&ext[extlen], tmp);
-		extlen += tmplen;
-	    }
-	}
-	if (w->num_r_rgun > 0) {
-	    strcpy(&tmp[0], "(RR:");
-	    tmplen = strlen(&tmp[0]);
-	    for (i = 0; i < w->num_r_rgun && i < MAX_GUN_PTS; i++) {
-		position r_rgun = Ship_get_r_rgun_position(w, i, 0);
-		sprintf(&tmp[tmplen], " %d,%d",
-			(int)r_rgun.x, (int)r_rgun.y);
-		tmplen += strlen(&tmp[tmplen]);
-	    }
-	    strcpy(&tmp[tmplen], ")");
-	    tmplen++;
-	    if (buflen + tmplen < MSG_LEN) {
-		strcpy(&buf[buflen], tmp);
-		buflen += tmplen;
-	    }
-	    else if (extlen + tmplen < MSG_LEN) {
-		strcpy(&ext[extlen], tmp);
-		extlen += tmplen;
-	    }
-	}
-	if (w->num_l_light > 0) {
-	    strcpy(&tmp[0], "(LL:");
-	    tmplen = strlen(&tmp[0]);
-	    for (i = 0; i < w->num_l_light && i < MAX_LIGHT_PTS; i++) {
-		position l_light = Ship_get_l_light_position(w, i, 0);
-		sprintf(&tmp[tmplen], " %d,%d",
-			(int)l_light.x, (int)l_light.y);
-		tmplen += strlen(&tmp[tmplen]);
-	    }
-	    strcpy(&tmp[tmplen], ")");
-	    tmplen++;
-	    if (buflen + tmplen < MSG_LEN) {
-		strcpy(&buf[buflen], tmp);
-		buflen += tmplen;
-	    }
-	    else if (extlen + tmplen < MSG_LEN) {
-		strcpy(&ext[extlen], tmp);
-		extlen += tmplen;
-	    }
-	}
-	if (w->num_r_light > 0) {
-	    strcpy(&tmp[0], "(RL:");
-	    tmplen = strlen(&tmp[0]);
-	    for (i = 0; i < w->num_r_light && i < MAX_LIGHT_PTS; i++) {
-		position r_light = Ship_get_r_light_position(w, i, 0);
-		sprintf(&tmp[tmplen], " %d,%d",
-			(int)r_light.x, (int)r_light.y);
-		tmplen += strlen(&tmp[tmplen]);
-	    }
-	    strcpy(&tmp[tmplen], ")");
-	    tmplen++;
-	    if (buflen + tmplen < MSG_LEN) {
-		strcpy(&buf[buflen], tmp);
-		buflen += tmplen;
-	    }
-	    else if (extlen + tmplen < MSG_LEN) {
-		strcpy(&ext[extlen], tmp);
-		extlen += tmplen;
-	    }
-	}
-	if (w->num_m_rack > 0) {
-	    strcpy(&tmp[0], "(MR:");
-	    tmplen = strlen(&tmp[0]);
-	    for (i = 0; i < w->num_m_rack && i < MAX_RACK_PTS; i++) {
-		position m_rack = Ship_get_m_rack_position(w, i, 0);
-		sprintf(&tmp[tmplen], " %d,%d",
-			(int)m_rack.x, (int)m_rack.y);
-		tmplen += strlen(&tmp[tmplen]);
-	    }
-	    strcpy(&tmp[tmplen], ")");
-	    tmplen++;
-	    if (buflen + tmplen < MSG_LEN) {
-		strcpy(&buf[buflen], tmp);
-		buflen += tmplen;
-	    }
-	    else if (extlen + tmplen < MSG_LEN) {
-		strcpy(&ext[extlen], tmp);
-		extlen += tmplen;
-	    }
-	}
-    }
-    else {
-	/* 3.1 version had 16 points maximum.  just ignore the excess. */
-	int num_points = MIN(w->num_points, 16);
-#if 0
-	if (num_points < w->num_points) {
-	    printf("Truncating ship to 16 points for old 3.1 server\n");
-	}
-#endif
-	if (shape_version != 0x3100) {
-	    errno = 0;
-	    error("Unknown ship shape version: %x", shape_version);
-	}
-
-	for (i = 1, ll = rl = 0; i < num_points; i++) {
-	    position pti = Ship_get_point_position(w, i, 0);
-	    position ptll = Ship_get_point_position(w, i, 0);
-	    position ptrl = Ship_get_point_position(w, i, 0);
-	    if (pti.y > ptll.y
-		|| (pti.y == ptll.y
-		    && pti.x < ptll.x)) {
-		ll = i;
-	    }
-	    if (pti.y < ptrl.y
-		|| (pti.y == ptrl.y
-		    && pti.x < ptrl.x)) {
-		rl = i;
-	    }
-	}
-	sprintf(buf, "(%d,%d,%d)", num_points, ll, rl);
-	buflen = strlen(buf);
-	for (i = 0; i < num_points; i++) {
-	    position pti = Ship_get_point_position(w, i, 0);
-	    sprintf(&buf[buflen], "(%d,%d)",
-		    (int)pti.x, (int)pti.y);
-	    buflen += strlen(&buf[buflen]);
-	}
-    }
-    if (buflen >= MSG_LEN || extlen >= MSG_LEN) {
-	errno = 0;
-	error("BUG: convert ship: buffer overflow (%d,%d)", buflen, extlen);
-    }
-    if (debugShapeParsing) {
-	xpprintf("ship 2 str: %s %s\n", buf, ext);
-    }
-}
-
 
 void Calculate_shield_radius(shipobj *w)
 {
