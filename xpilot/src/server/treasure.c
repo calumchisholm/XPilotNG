@@ -294,8 +294,8 @@ void Ball_hits_goal(ballobject_t *ball, group_t *gp)
 	    /*undo treasure counts from Punish_team so we don't 
 	      have to touch that function and possibly break it*/
 	    world->teams[td->team].TreasuresLeft++;
-	}
 	    world->teams[options.specialBallTeam].TreasuresLeft--;
+	}
 	
 	td->team=options.specialBallTeam;
 	return;
