@@ -1097,6 +1097,13 @@ void Add_message(char *message)
 #endif
 
     msg_set[0]->pixelLen = XTextWidth(messageFont, msg_set[0]->txt, msg_set[0]->len);
+
+    /* Print message to standard output. */
+    if (messagesToStdout == 2 ||
+	messagesToStdout == 1 && *message &&
+	message[strlen(message) - 1] == ']')
+
+	xpprintf("%s\n", message);
 }
 
 
@@ -1128,7 +1135,7 @@ void Delete_pending_messages(void)
 
 /*
  * after a pending cut has been completed,
- * add the (buffered) messages which were ocming in meanwhile.
+ * add the (buffered) messages which were coming in meanwhile.
  */
 void Add_pending_messages(void)
 {
