@@ -1840,7 +1840,10 @@ void Detach_ball(int ind, int obj)
 
 void Kill_player(int ind)
 {
-    Explode_fighter(ind);
+    /* Don't create an explosion if the player is being transported back
+     * to home base after being killed. */
+    if (BIT(Players[ind]->status, PLAYING))
+	Explode_fighter(ind);
     Player_death_reset(ind);
 }
 
