@@ -88,7 +88,6 @@ extern sock_t		contactSocket;
 extern time_t		serverTime;
 extern server		Server;
 extern char		*serverAddr;
-extern double		laserRepeatRate;
 extern long		DEF_BITS, KILL_BITS, DEF_HAVE, DEF_USED, USED_KILL;
 extern int		ShutdownServer, ShutdownDelay;
 extern long		main_loops;
@@ -141,6 +140,7 @@ extern struct options {
     bool	shotsGravity;
     bool	shotHitFuelDrainUsesKineticEnergy;
     double	fireRepeatRate;
+    double	laserRepeatRate;
     bool	Log;
     bool	silent;
     bool	RawMode;

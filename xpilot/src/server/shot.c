@@ -1377,9 +1377,10 @@ void Fire_laser(player *pl)
     clpos	m_gun, pos;
     world_t *world = &World;
 
-    if (frame_time <= pl->laser_time + laserRepeatRate - timeStep + 1e-3)
+    if (frame_time
+	<= pl->laser_time + options.laserRepeatRate - timeStep + 1e-3)
  	return;
-    pl->laser_time = MAX(frame_time, pl->laser_time + laserRepeatRate);
+    pl->laser_time = MAX(frame_time, pl->laser_time + options.laserRepeatRate);
 
     if (pl->item[ITEM_LASER] > pl->num_pulses
 	&& pl->velocity < options.pulseSpeed) {

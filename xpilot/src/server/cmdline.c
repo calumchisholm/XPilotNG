@@ -27,7 +27,6 @@
 char cmdline_version[] = VERSION;
 
 
-double		laserRepeatRate = 2;	/* Ticks per laser fire (0=off) */
 #if 0
 char		*playerPasswordsFileName;
 int		playerPasswordsFileSizeLimit;
@@ -226,6 +225,16 @@ static option_desc opts[] = {
 	valReal,
 	tuner_dummy,
 	"Max length of laser pulse.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"laserRepeatRate",
+	"laserRepeat",
+	"2.0",
+	&options.laserRepeatRate,
+	valReal,
+	tuner_dummy,
+	"Number of ticks per automatic laser pulse fire (0=off).\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     /* kps - this is stupid */
