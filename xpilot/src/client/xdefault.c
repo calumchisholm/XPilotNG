@@ -38,6 +38,7 @@ static bool testxcolors = false;
 
 #ifndef OLD_OPTIONS
 
+static bool Set_texturedObjects(xp_option_t *opt, bool val);
 
 #define DISPLAY_ENV	"DISPLAY"
 #define DISPLAY_DEF	":0.0"
@@ -80,14 +81,60 @@ static const char *Get_geometry(xp_option_t *opt)
     return geometry;
 }
 
+static bool Set_texturedObjects(xp_option_t *opt, bool val);
 
+static bool Set_fullColor(xp_option_t *opt, bool val)
+{
+    (void)opt;
+
+    if (val == fullColor)
+	return true;
+
+    if (val == true) {
+	/* see if we can use fullColor at all. */
+	fullColor = true;
+	if (Colors_init_bitmaps() == -1) {
+	    /* no we can't have fullColor. */
+	    warn("Unable to enable fullColor.");
+	    fullColor = false;
+	}
+    } else {
+	Colors_free_bitmaps();
+	fullColor = false;
+	Set_texturedObjects(NULL, false);
+    }
+
+    return true;
+}
+
+static bool Set_texturedObjects(xp_option_t *opt, bool val)
+{
+    (void)opt;
+
+    if (val == texturedObjects)
+	return true;
+
+    if (val == true) {
+	/* Can't use texturedObjects without fullColor */
+	texturedObjects = true;
+	if (!fullColor) {
+	    /* no we can't have texturedObjects. */
+	    warn("Unable to enable texturedObjects without fullColor on.");
+	    texturedObjects = false;
+	}
+    }
+    else
+	texturedObjects = false;
+
+    return true;
+}
 
 xp_option_t xdefault_options[] = {
     XP_BOOL_OPTION(
 	"fullColor",
 	true,
 	&fullColor,
-	NULL,            /* kps - need a setfunc here */
+	Set_fullColor,
 	"Whether to use a colors as close as possible to the specified ones\n"
 	"or use a few standard colors for everything. May require more\n"
 	"resources from your system.\n"),
@@ -96,7 +143,7 @@ xp_option_t xdefault_options[] = {
 	"texturedObjects",
 	true,
 	&texturedObjects,
-	NULL,
+	Set_texturedObjects,
 	"Whether to draw certain game objects with textures.\n"
 	"Be warned that this requires more graphics speed.\n"
 	"fullColor must be on for this to work.\n"

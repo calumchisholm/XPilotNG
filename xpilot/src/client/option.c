@@ -148,19 +148,10 @@ static bool Set_bool_option(xp_option_t *opt, bool value)
     assert(opt->type == xp_bool_option);
     assert(opt->bool_ptr);
 
-    /*
-     * NOTE: this function assigns the value directly, before calling the
-     * setfunc. If you have an option where you have a setfunc and you would
-     * not want the value to be assinged directly, you must still provide
-     * a bool pointer for this code to assign to. Note that this code
-     * assumes that after the set method (opt->bool_setfunc) returns,
-     * this pointer points to the new value for this option.
-     */
-    *opt->bool_ptr = value;
-
     if (opt->bool_setfunc)
 	retval = opt->bool_setfunc(opt, value);
-
+    else
+	*opt->bool_ptr = value;
     /*
      * printf("Value of option %s is now %s.\n", opt->name, opt->bool_ptr
      * ? "true" : "false");
@@ -184,11 +175,10 @@ static bool Set_int_option(xp_option_t *opt, int value)
 
     LIMIT(value, opt->int_minval, opt->int_maxval);
 
-    *opt->int_ptr = value;
-
     if (opt->int_setfunc)
 	retval = opt->int_setfunc(opt, value);
-
+    else
+	*opt->int_ptr = value;
     /*
      * printf("Value of option %s is now %d.\n", opt->name,
      * *opt->int_ptr); 
@@ -212,10 +202,10 @@ static bool Set_double_option(xp_option_t *opt, double value)
 
     LIMIT(value, opt->dbl_minval, opt->dbl_maxval);
 
-    *opt->dbl_ptr = value;
-
     if (opt->dbl_setfunc)
 	retval = opt->dbl_setfunc(opt, value);
+    else
+	*opt->dbl_ptr = value;
 
     /*
      * printf("Value of option %s is now %.3f.\n", opt->name,
@@ -237,11 +227,10 @@ static bool Set_string_option(xp_option_t *opt, const char *value)
      * The reason string options don't assume a static area is that that
      * would not allow dynamically allocated strings of arbitrary size.
      */
-    if (opt->str_ptr)
-	strlcpy(opt->str_ptr, value, opt->str_size);
-
     if (opt->str_setfunc)
 	retval = opt->str_setfunc(opt, value);
+    else
+	strlcpy(opt->str_ptr, value, opt->str_size);
 
     /*
      * if (opt->str_ptr) printf("Value of option %s is now \"%s\".\n",

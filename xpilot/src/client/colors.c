@@ -704,9 +704,13 @@ void Colors_init_style_colors(void)
  */
 int Colors_init_bitmaps(void)
 {
+    /* kps hack */
+    if (dbuf_state == NULL)
+	return 0;
+
     if (dbuf_state->type == COLOR_SWITCH) {
 	if (fullColor) {
-	    printf("Can't do texturedObjects if colorSwitch\n");
+	    warn("Can't do texturedObjects if colorSwitch.");
 	    fullColor = false;
 	    texturedObjects = false;
 	}

@@ -40,6 +40,7 @@ char myClass[] = "XPilot";
  */
 static bool Set_nickName(xp_option_t *opt, const char *value)
 {
+    (void)opt;
     assert(value);
 
     /*
@@ -73,6 +74,7 @@ static bool Set_userName(xp_option_t *opt, const char *value)
 {
     char *cp = getenv("XPILOTUSER");
 
+    (void)opt;
     assert(value);
 
     if (cp)
@@ -103,6 +105,7 @@ static bool Set_hostName(xp_option_t *opt, const char *value)
 {
     char *cp = getenv("XPILOTHOST");
 
+    (void)opt;
     assert(value);
 
     /* kps - remove hostname */
@@ -277,6 +280,7 @@ static bool Set_power(xp_option_t *opt, double val)
 {
     (void)opt;
     Send_power(val);
+    power = val;
     controlTime = CONTROL_TIME;
     return true;
 }
@@ -284,6 +288,7 @@ static bool Set_turnSpeed(xp_option_t *opt, double val)
 {
     (void)opt;
     Send_turnspeed(val);
+    turnspeed = val;
     controlTime = CONTROL_TIME;
     return true;
 }
@@ -291,6 +296,7 @@ static bool Set_turnResistance(xp_option_t *opt, double val)
 {
     (void)opt;
     Send_turnresistance(val);
+    turnresistance = val;
     return true;
 }
 
@@ -298,6 +304,7 @@ static bool Set_altPower(xp_option_t *opt, double val)
 {
     (void)opt;
     Send_power_s(val);
+    power_s = val;
     controlTime = CONTROL_TIME;
     return true;
 }
@@ -305,6 +312,7 @@ static bool Set_altTurnSpeed(xp_option_t *opt, double val)
 {
     (void)opt;
     Send_turnspeed_s(val);
+    turnspeed_s = val;
     controlTime = CONTROL_TIME;
     return true;
 }
@@ -312,6 +320,7 @@ static bool Set_altTurnResistance(xp_option_t *opt, double val)
 {
     (void)opt;
     Send_turnresistance_s(val);
+    turnresistance_s = val;
     return true;
 }
 
@@ -325,6 +334,7 @@ static bool Set_toggleShield(xp_option_t *opt, bool val)
 static bool Set_maxFPS(xp_option_t *opt, int val)
 {
     (void)opt; (void)val;
+    maxFPS = val;
     if (oldMaxFPS != maxFPS) {
 	oldMaxFPS = maxFPS;
 	Send_fps_request(maxFPS);
