@@ -88,7 +88,7 @@ The default value is: 55.000.
 .IP
 Set the ship's turn speed.
 Valid values are in the range 4-64.
-The default value is: 10.000.
+The default value is: 16.000.
 .HP
 \fB\-turnResistance\fR <value>
 .IP
@@ -103,13 +103,13 @@ The default value is: 0.000.
 .IP
 Set the ship's alternate engine power.
 See also the keySwapSettings option.
-The default value is: 35.000.
+The default value is: 55.000.
 .HP
 \fB\-altTurnSpeed\fR <value>
 .IP
 Set the ship's alternate turn speed.
 See also the keySwapSettings option.
-The default value is: 25.000.
+The default value is: 16.000.
 .HP
 \fB\-altTurnResistance\fR <value>
 .IP
@@ -368,13 +368,6 @@ The default value is: 0.000.
 The number of decimals to use when displaying scores.
 The default value is: 1.
 .HP
-\fB\-receiveWindowSize\fR <value>
-.TP
-Too complicated.
-Keep it on 3.
-.IP
-The default value is: 3.
-.HP
 \fB\-markingLights\fR <value>
 .IP
 Should the fighters have marking lights, just like airplanes?
@@ -507,7 +500,7 @@ There is no default value for this option.
 \fB\-msg11\fR <value>
 .IP
 Talkmessage 11.
-There is no default value for this option.
+The default value is: \equit.
 .HP
 \fB\-msg12\fR <value>
 .IP
@@ -557,22 +550,22 @@ There is no default value for this option.
 \fB\-keyTurnLeft\fR <value>
 .IP
 Turn left (anti-clockwise).
-The default key is: a.
+The default keys are: a Left.
 .HP
 \fB\-keyTurnRight\fR <value>
 .IP
 Turn right (clockwise).
-The default key is: s.
+The default keys are: s Right.
 .HP
 \fB\-keyThrust\fR <value>
 .IP
 Thrust.
-The default keys are: Shift_R Shift_L.
+The default keys are: Shift_L Up.
 .HP
 \fB\-keyShield\fR <value>
 .IP
 Raise or toggle the shield.
-The default keys are: space Caps_Lock.
+The default keys are: Caps_Lock Down.
 .HP
 \fB\-keyFireShot\fR <value>
 .IP
@@ -618,22 +611,22 @@ The default key is: equal.
 \fB\-keyLockClose\fR <value>
 .IP
 Lock on closest player.
-The default key is: Up.
+There is no default value for this option.
 .HP
 \fB\-keyLockNextClose\fR <value>
 .IP
 Lock on next closest player.
-The default key is: Down.
+There is no default value for this option.
 .HP
 \fB\-keyLockNext\fR <value>
 .IP
 Lock on next player.
-The default keys are: Next Right.
+The default key is: Next.
 .HP
 \fB\-keyLockPrev\fR <value>
 .IP
 Lock on previous player.
-The default keys are: Prior Left.
+The default key is: Prior.
 .HP
 \fB\-keyRefuel\fR <value>
 .IP
@@ -675,7 +668,7 @@ The default key is: Pause.
 .IP
 Swap control settings.
 These are the power, turn speed and turn resistance settings.
-The default key is: Escape.
+There is no default value for this option.
 .HP
 \fB\-keySwapScaleFactor\fR <value>
 .IP
@@ -691,12 +684,12 @@ The default keys are: Home h.
 \fB\-keyConnector\fR <value>
 .IP
 Connect to a ball.
-The default keys are: f Control_L.
+The default keys are: f Control_L Control_R.
 .HP
 \fB\-keyDropBall\fR <value>
 .IP
 Drop a ball.
-The default key is: d.
+The default keys are: d Delete BackSpace.
 .HP
 \fB\-keyTankNext\fR <value>
 .IP
@@ -941,7 +934,7 @@ The default key is: Down.
 \fB\-keyPointerControl\fR <value>
 .IP
 Toggle pointer control.
-The default key is: KP_Enter.
+The default keys are: space KP_Enter.
 .HP
 \fB\-keySendMsg1\fR <value>
 .IP
@@ -996,7 +989,7 @@ The default key is: F10.
 \fB\-keySendMsg11\fR <value>
 .IP
 Sends the talkmessage stored in msg11.
-There is no default value for this option.
+The default key is: Escape.
 .HP
 \fB\-keySendMsg12\fR <value>
 .IP
@@ -1072,6 +1065,16 @@ There is no default value for this option.
 .IP
 Set the initial window geometry.
 The default value is: 1280x1024.
+.HP
+\fB\-gameFontSize\fR <value>
+.IP
+Height of font used for game strings.
+The default value is: 16.
+.HP
+\fB\-mapFontSize\fR <value>
+.IP
+Height of font used for message strings.
+The default value is: 16.
 .HP
 \fB\-messagesColorRGBA\fR <value>
 .IP
