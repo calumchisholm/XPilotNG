@@ -95,9 +95,11 @@ int Mapdata_setup (const char *urlstr) {
             sprintf(buf, "%s%s", home, DATADIR);
         else sprintf(buf, "%s%c%s", home, PATHSEP, DATADIR);
 
-        if (mkdir(buf, S_IRWXU | S_IRWXG | S_IRWXO) == -1) {
-            error("failed to create directory %s", dir);
-            goto end;
+        if (access(buf, F_OK) != 0) {
+            if (mkdir(buf, S_IRWXU | S_IRWXG | S_IRWXO) == -1) {
+                error("failed to create directory %s", dir);
+                goto end;
+            }
         }
 
         dir = buf;
