@@ -438,6 +438,11 @@ void Gui_paint_paused(int x, int y, int count)
 void Gui_paint_appearing(int x, int y, int id, int count)
 {
     const unsigned hsize = 3 * BLOCK_SZ / 7;
+    other_t *other = Other_by_id(id);
+    int color = other ? Life_color(other) : 0;
+
+    if (!color)
+	color = RED;
 
     /* Make a note we are doing the base warning */
     if (version >= 0x4F12) {
@@ -446,7 +451,7 @@ void Gui_paint_appearing(int x, int y, int id, int count)
 	    base->appeartime = loops + (count * clientFPS) / 120;
     }
 
-    SET_FG(colors[RED].pixel);
+    SET_FG(colors[color].pixel);
     rd.fillRectangle(dpy, drawPixmap, gameGC,
 		     SCALEX(x - (int)hsize),
 		     SCALEY(y - (int)hsize + (int)(count / 180. * hsize + 1)),
