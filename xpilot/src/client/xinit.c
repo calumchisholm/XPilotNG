@@ -238,22 +238,22 @@ const char *Item_get_text(int i)
  * Return font that is used for this GC, even if setting a new
  * font failed (return default font in that case).
  */
-static XFontStruct* Set_font(Display* dpy, GC gc,
+static XFontStruct* Set_font(Display* display, GC gc,
 			     const char* fontName,
 			     const char *resName)
 {
     XFontStruct*	font;
 
 #ifndef _WINDOWS
-    if ((font = XLoadQueryFont(dpy, fontName)) == NULL) {
+    if ((font = XLoadQueryFont(display, fontName)) == NULL) {
 	error("Couldn't find font '%s' for %s, using default font",
 	      fontName, resName);
-	font = XQueryFont(dpy, XGContextFromGC(gc));
+	font = XQueryFont(display, XGContextFromGC(gc));
     } else
-	XSetFont(dpy, gc, font->fid);
+	XSetFont(display, gc, font->fid);
 #else
     font = WinXLoadFont(fontName);
-    XSetFont(dpy, gc, font->fid);
+    XSetFont(display, gc, font->fid);
 #endif
 
     return font;
@@ -1072,7 +1072,7 @@ static int Score_callback(int widget_desc, void *data, const char **str)
     Config(false, CONFIG_NONE);
     if (showRealName != false) {
 	showRealName = false;
-	scoresChanged = 1;
+	scoresChanged = true;
     }
     return 0;
 }
@@ -1082,7 +1082,7 @@ static int Player_callback(int widget_desc, void *data, const char **str)
     Config(false, CONFIG_NONE);
     if (showRealName != true) {
 	showRealName = true;
-	scoresChanged = 1;
+	scoresChanged = true;
     }
     return 0;
 }
@@ -1161,7 +1161,7 @@ void Quit(void)
 }
 
 
-int FatalError(Display *dpy)
+int FatalError(Display *display)
 {
     Net_cleanup();
     /*

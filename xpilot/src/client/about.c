@@ -52,19 +52,19 @@ static int itemsplit = -1;
  * if necessary at whitespaces.  The function returns the
  * vertical position it ended at.
  */
-int DrawShadowText(Display* dpy, Window w, GC gc,
-		    int x_border, int y_start, const char *str,
-		    unsigned long fg, unsigned long bg)
+int DrawShadowText(Display *display, Window w, GC gc,
+		   int x_border, int y_start, const char *str,
+		   unsigned long fg, unsigned long bg)
 {
-    XFontStruct*	font = XQueryFont(dpy, XGContextFromGC(gc));
+    XFontStruct		*font = XQueryFont(display, XGContextFromGC(gc));
     int			y, x;
     XWindowAttributes	wattr;
 
-    if (str==NULL || *str=='\0')
+    if (str == NULL || *str == '\0')
 	return 0;
 
     /* Get width of window */
-    XGetWindowAttributes(dpy, w, &wattr);
+    XGetWindowAttributes(display, w, &wattr);
 
     /* Start position */
     x = x_border;
@@ -88,7 +88,7 @@ int DrawShadowText(Display* dpy, Window w, GC gc,
 	}
 
 	/* Draw word and move cursor to point to after this word */
-	ShadowDrawString(dpy, w, gc, x, y, word, fg, bg);
+	ShadowDrawString(display, w, gc, x, y, word, fg, bg);
 	x += wordLen;
 
 	/* Handle whitespace */
