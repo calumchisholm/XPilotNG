@@ -59,17 +59,17 @@ static void Refuel(player *pl)
 {
     int i;
     DFLOAT l, dist = 1e19;
-
+    fuel_t *fs;
 
     if (!BIT(pl->have, HAS_REFUEL))
 	return;
 
     CLR_BIT(pl->used, HAS_REFUEL);
-    for (i=0; i<World.NumFuels; i++) {
-	l = Wrap_length(pl->pos.cx - World.fuel[i].pos.cx,
-			pl->pos.cy - World.fuel[i].pos.cy) / CLICK;
-	if (BIT(pl->used, HAS_REFUEL) == 0
-	    || l < dist) {
+    for (i = 0; i < World.NumFuels; i++) {
+	fs = &World.fuel[i];
+	l = Wrap_length(pl->pos.cx - fs->pos.cx,
+			pl->pos.cy - fs->pos.cy);
+	if (BIT(pl->used, HAS_REFUEL) == 0 || l < dist) {
 	    SET_BIT(pl->used, HAS_REFUEL);
 	    pl->fs = i;
 	    dist = l;
@@ -82,19 +82,18 @@ static void Repair(player *pl)
 {
     int i;
     DFLOAT l, dist = 1e19;
-    int cx, cy;
-    target_t *targ = World.targets;
+    target_t *targ;
 
     if (!BIT(pl->have, HAS_REPAIR))
 	return;
 
     CLR_BIT(pl->used, HAS_REPAIR);
-    for (i = 0; i < World.NumTargets; i++, targ++) {
+    for (i = 0; i < World.NumTargets; i++) {
+	targ = &World.targets[i];
 	if (targ->team == pl->team
 	    && targ->dead_time <= 0) {
-	    cx = targ->pos.cx;
-	    cy = targ->pos.cy;
-	    l = Wrap_length(pl->pos.cx - cx, pl->pos.cy - cy);
+	    l = Wrap_length(pl->pos.cx - targ->pos.cx,
+			    pl->pos.cy - targ->pos.cy);
 	    if (BIT(pl->used, HAS_REPAIR) == 0 || l < dist) {
 		SET_BIT(pl->used, HAS_REPAIR);
 		pl->repair_target = i;
