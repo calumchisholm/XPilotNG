@@ -42,8 +42,6 @@
  * Therefore a fixed point sub-pixel resolution is used called clicks.
  */
 
-/* calculate the click coordinate of the center of a block */
-#define BLOCK_CENTER(B)		((int)((B) * BLOCK_CLICKS) + BLOCK_CLICKS / 2)
 
 /*
  * Two inline function for edge wrap of x and y coordinates measured
@@ -132,6 +130,19 @@ static inline blpos Clpos_to_blpos(clpos pos)
     bpos.by = CLICK_TO_BLOCK(pos.cy);
 
     return bpos;
+}
+
+#define BLOCK_CENTER(B) ((int)((B) * BLOCK_CLICKS) + BLOCK_CLICKS / 2)
+
+/* calculate the clpos of the center of a block */
+static inline clpos Block_get_center_clpos(blpos bpos)
+{
+    clpos pos;
+
+    pos.cx = (bpos.bx * BLOCK_CLICKS) + BLOCK_CLICKS / 2;
+    pos.cy = (bpos.by * BLOCK_CLICKS) + BLOCK_CLICKS / 2;
+
+    return pos;
 }
 
 #endif
