@@ -134,7 +134,7 @@ void tuner_teamcannons(void)
     if (teamCannons) {
 	for (i = 0; i < World.NumCannons; i++) {
 	    cannon_t *cannon = Cannons(i);
-	    team = Find_closest_team(cannon->pos);
+	    team = Find_closest_team(&World, cannon->pos);
 	    if (team == TEAM_NOT_SET)
 		warn("Couldn't find a matching team for the cannon.");
 	    cannon->team = team;
@@ -179,7 +179,7 @@ void tuner_wormtime(void)
     else {
 	for (i = 0; i < World.NumWormholes; i++) {
 	    if (Wormholes(i)->temporary)
-		remove_temp_wormhole(i);
+		remove_temp_wormhole(&World, i);
 	    else
 		Wormholes(i)->countdown = WORMCOUNT;
 	}

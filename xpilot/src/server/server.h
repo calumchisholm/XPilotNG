@@ -469,27 +469,27 @@ void filter_mods(modifiers *mods);
 /*
  * Prototypes for map.c
  */
-void Free_map(void);
+void World_free(world_t *world);
 bool Grok_map(world_t *world);
-bool Grok_map_options(void);
+bool Grok_map_options(world_t *world);
 
-int Map_place_base(clpos pos, int dir, int team);
-int Map_place_cannon(clpos pos, int dir, int team);
-int Map_place_check(clpos pos, int ind);
-int Map_place_fuel(clpos pos, int team);
-int Map_place_grav(clpos pos, double force, int type);
-int Map_place_target(clpos pos, int team);
-int Map_place_treasure(clpos pos, int team, bool empty);
-int Map_place_wormhole(clpos pos, wormType type);
-int Map_place_item_concentrator(clpos pos);
-int Map_place_asteroid_concentrator(clpos pos);
+int World_place_base(world_t *world, clpos pos, int dir, int team);
+int World_place_cannon(world_t *world, clpos pos, int dir, int team);
+int World_place_check(world_t *world, clpos pos, int ind);
+int World_place_fuel(world_t *world, clpos pos, int team);
+int World_place_grav(world_t *world, clpos pos, double force, int type);
+int World_place_target(world_t *world, clpos pos, int team);
+int World_place_treasure(world_t *world, clpos pos, int team, bool empty);
+int World_place_wormhole(world_t *world, clpos pos, wormType type);
+int World_place_item_concentrator(world_t *world, clpos pos);
+int World_place_asteroid_concentrator(world_t *world, clpos pos);
 
-void Find_base_direction(void);
-void Compute_gravity(void);
+void Find_base_direction(world_t *world);
+void Compute_gravity(world_t *world);
 double Wrap_findDir(double dx, double dy);
 double Wrap_cfindDir(int dx, int dy);
 double Wrap_length(int dx, int dy);
-int Find_closest_team(clpos pos);
+int Find_closest_team(world_t *world, clpos pos);
 
 
 /*
@@ -634,8 +634,8 @@ void Make_item(clpos pos,
 void Explode_fighter(player *pl);
 void Throw_items(player *pl);
 void Detonate_items(player *pl);
-void add_temp_wormholes(int xin, int yin, int xout, int yout);
-void remove_temp_wormhole(int ind);
+void add_temp_wormholes(world_t *world, int xin, int yin, int xout, int yout);
+void remove_temp_wormhole(world_t *world, int ind);
 
 
 /*

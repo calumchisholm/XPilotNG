@@ -31,6 +31,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 {
     static double scale = 1;
     static int xptag = 0;
+    world_t *world = &World;
 
     (void)data;
     if (!strcasecmp(el, "XPilotMap")) {
@@ -181,7 +182,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 		pos.cy = atoi(*(attr + 1)) * scale;
 	    attr += 2;
 	}
-	Map_place_check(pos, -1);
+	World_place_check(world, pos, -1);
 	return;
     }
 
@@ -198,7 +199,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 		pos.cy = atoi(*(attr + 1)) * scale;
 	    attr += 2;
 	}
-	Map_place_fuel(pos, team);
+	World_place_fuel(world, pos, team);
 	return;
     }
 
@@ -221,7 +222,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    warn("Illegal team number in base tag.\n");
 	    exit(1);
 	}
-	Map_place_base(pos, dir, team);
+	World_place_base(world, pos, dir, team);
 	return;
     }
 
@@ -238,7 +239,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 		pos.cy = atoi(*(attr + 1)) * scale;
 	    attr += 2;
 	}
-	Map_place_treasure(pos, team, false);
+	World_place_treasure(world, pos, team, false);
 	return;
     }
 
@@ -257,7 +258,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 		dir = (RES * atoi(*(attr + 1))) / 128;
 	    attr += 2;
 	}
-	cannon_ind = Map_place_cannon(pos, dir, team);
+	cannon_ind = World_place_cannon(world, pos, dir, team);
 	P_start_cannon(cannon_ind);
 	return;
     }
@@ -275,7 +276,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 		pos.cy = atoi(*(attr + 1)) * scale;
 	    attr += 2;
 	}
-	target_ind = Map_place_target(pos, team);
+	target_ind = World_place_target(world, pos, team);
 	P_start_target(target_ind);
 	return;
     }
@@ -290,7 +291,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 		pos.cy = atoi(*(attr + 1)) * scale;
 	    attr += 2;
 	}
-	Map_place_item_concentrator(pos);
+	World_place_item_concentrator(world, pos);
 	return;
     }
 
@@ -304,7 +305,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 		pos.cy = atoi(*(attr + 1)) * scale;
 	    attr += 2;
 	}
-	Map_place_asteroid_concentrator(pos);
+	World_place_asteroid_concentrator(world, pos);
 	return;
     }
 
@@ -347,7 +348,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    warn("Illegal type in grav tag.\n");
 	    exit(1);
 	}
-	Map_place_grav(pos, force, type);
+	World_place_grav(world, pos, force, type);
 	return;
     }
 
@@ -373,7 +374,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 
 	    attr += 2;
 	}
-	Map_place_wormhole(pos, type);
+	World_place_wormhole(world, pos, type);
 	return;
     }
 
@@ -385,7 +386,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 		fric = atof(*(attr + 1));
 	    attr += 2;
 	}
-	/*Map_place_...(team);*/
+	/*World_place_...(world, team);*/
 	return;
     }
 
@@ -448,7 +449,7 @@ static void tagend(void *data, const char *el)
 	/* ok, got to the end of options */
 	Options_parse();
 	/* kps - this can fail - fix */
-	Grok_map_options();
+	Grok_map_options(&World);
     }
     return;
 }

@@ -505,7 +505,7 @@ static void Xpmap_place_cannon(world_t *world, blpos blk, int dir, bool create)
 
     World_set_block(world, blk, CANNON);
     if (create)
-	Map_place_cannon(pos, dir, TEAM_NOT_SET);
+	World_place_cannon(world, pos, dir, TEAM_NOT_SET);
 }
 
 /*
@@ -528,14 +528,14 @@ static void Xpmap_place_base(world_t *world, blpos blk, int team, bool create)
 {
     World_set_block(world, blk, BASE);
     if (create)
-	Map_place_base(Xpmap_get_clpos(blk), DIR_UP, team);
+	World_place_base(world, Xpmap_get_clpos(blk), DIR_UP, team);
 }
 
 static void Xpmap_place_fuel(world_t *world, blpos blk, bool create)
 {
     World_set_block(world, blk, FUEL);
     if (create)
-	Map_place_fuel(Xpmap_get_clpos(blk), TEAM_NOT_SET);
+	World_place_fuel(world, Xpmap_get_clpos(blk), TEAM_NOT_SET);
 }
 
 static void Xpmap_place_treasure(world_t *world, blpos blk, bool empty,
@@ -543,7 +543,7 @@ static void Xpmap_place_treasure(world_t *world, blpos blk, bool empty,
 {
     World_set_block(world, blk, TREASURE);
     if (create)
-	Map_place_treasure(Xpmap_get_clpos(blk), TEAM_NOT_SET, empty);
+	World_place_treasure(world, Xpmap_get_clpos(blk), TEAM_NOT_SET, empty);
 }
 
 static void Xpmap_place_wormhole(world_t *world, blpos blk, wormType type,
@@ -551,14 +551,14 @@ static void Xpmap_place_wormhole(world_t *world, blpos blk, wormType type,
 {
     World_set_block(world, blk, WORMHOLE);
     if (create)
-	Map_place_wormhole(Xpmap_get_clpos(blk), type);
+	World_place_wormhole(world, Xpmap_get_clpos(blk), type);
 }
 
 static void Xpmap_place_target(world_t *world, blpos blk, bool create)
 {
     World_set_block(world, blk, TARGET);
     if (create)
-	Map_place_target(Xpmap_get_clpos(blk), TEAM_NOT_SET);
+	World_place_target(world, Xpmap_get_clpos(blk), TEAM_NOT_SET);
 }
 
 static void Xpmap_place_check(world_t *world, blpos blk, int ind, bool create)
@@ -570,7 +570,7 @@ static void Xpmap_place_check(world_t *world, blpos blk, int ind, bool create)
 
     World_set_block(world, blk, CHECK);
     if (create)
-	Map_place_check(Xpmap_get_clpos(blk), ind);
+	World_place_check(world, Xpmap_get_clpos(blk), ind);
 }
 
 static void Xpmap_place_item_concentrator(world_t *world, blpos blk,
@@ -578,7 +578,7 @@ static void Xpmap_place_item_concentrator(world_t *world, blpos blk,
 {
     World_set_block(world, blk, ITEM_CONCENTRATOR);
     if (create)
-	Map_place_item_concentrator(Xpmap_get_clpos(blk));
+	World_place_item_concentrator(world, Xpmap_get_clpos(blk));
 }
 
 static void Xpmap_place_asteroid_concentrator(world_t *world, blpos blk,
@@ -586,7 +586,7 @@ static void Xpmap_place_asteroid_concentrator(world_t *world, blpos blk,
 {
     World_set_block(world, blk, ASTEROID_CONCENTRATOR);
     if (create)
-	Map_place_asteroid_concentrator(Xpmap_get_clpos(blk));
+	World_place_asteroid_concentrator(world, Xpmap_get_clpos(blk));
 }
 
 static void Xpmap_place_grav(world_t *world, blpos blk,
@@ -594,7 +594,7 @@ static void Xpmap_place_grav(world_t *world, blpos blk,
 {
     World_set_block(world, blk, type);
     if (create)
-	Map_place_grav(Xpmap_get_clpos(blk), force, type);
+	World_place_grav(world, Xpmap_get_clpos(blk), force, type);
 }
 
 static void Xpmap_place_block(world_t *world, blpos blk, int type)
@@ -768,7 +768,7 @@ void Xpmap_find_map_object_teams(world_t *world)
 	for (i = 0; i < world->NumTreasures; i++) {
 	    treasure_t *treasure = Treasures(i);
 
-	    team = Find_closest_team(treasure->pos);
+	    team = Find_closest_team(world, treasure->pos);
 	    treasure->team = team;
 	    if (team == TEAM_NOT_SET)
 		warn("Couldn't find a matching team for the treasure.");
@@ -784,7 +784,7 @@ void Xpmap_find_map_object_teams(world_t *world)
 	for (i = 0; i < world->NumTargets; i++) {
 	    target_t *targ = Targets(i);
 
-	    team = Find_closest_team(targ->pos);
+	    team = Find_closest_team(world, targ->pos);
 	    if (team == TEAM_NOT_SET)
 		warn("Couldn't find a matching team for the target.");
 	    targ->team = team;
@@ -794,7 +794,7 @@ void Xpmap_find_map_object_teams(world_t *world)
 	    for (i = 0; i < world->NumCannons; i++) {
 		cannon_t *cannon = Cannons(i);
 
-		team = Find_closest_team(cannon->pos);
+		team = Find_closest_team(world, cannon->pos);
 		if (team == TEAM_NOT_SET)
 		    warn("Couldn't find a matching team for the cannon.");
 		cannon->team = team;
@@ -804,7 +804,7 @@ void Xpmap_find_map_object_teams(world_t *world)
 	for (i = 0; i < world->NumFuels; i++) {
 	    fuel_t *fs = Fuels(i);
 
-	    team = Find_closest_team(fs->pos);
+	    team = Find_closest_team(world, fs->pos);
 	    if (team == TEAM_NOT_SET)
 		warn("Couldn't find a matching team for fuelstation.");
 	    fs->team = team;

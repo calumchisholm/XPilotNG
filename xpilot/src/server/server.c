@@ -95,8 +95,8 @@ int main(int argc, char **argv)
     Init_recording();
     plock_server(pLockServer);           /* Lock the server into memory */
     Make_table();			/* Make trigonometric tables */
-    Compute_gravity();
-    Find_base_direction();
+    Compute_gravity(&World);
+    Find_base_direction(&World);
 
     Walls_init();
 
@@ -331,7 +331,7 @@ int End_game(void)
 
     Free_players();
     Free_shots();
-    Free_map();
+    World_free(&World);
     Free_cells();
     Free_options();
     Log_game("END");			    /* Log end */
