@@ -25,25 +25,37 @@
 #define SERVER_H
 
 #ifndef OBJECT_H
-/* need player */
-#include "object.h"
+# include "object.h"
 #endif
 
 #ifndef LIST_H
-/* need list_t */
-#include "list.h"
+# include "list.h"
 #endif
 
 #ifndef DEFAULTS_H
-/* need optOrigin */
-#include "defaults.h"
+# include "defaults.h"
 #endif
 
+#ifndef WALLS_H
+# include "walls.h"
+#endif
 
 #ifndef MAX
 #define MAX(a,b)  ((a) > (b) ? (a) : (b))
 #define MIN(a,b)  ((a) < (b) ? (a) : (b))
 #endif
+
+/*
+ * When using this, add a final realloc later to free wasted memory
+ */
+#define STORE(T,P,N,M,V)						\
+    if (N >= M && ((M <= 0)						\
+	? (P = (T *) malloc((M = 1) * sizeof(*P)))			\
+	: (P = (T *) realloc(P, (M += M) * sizeof(*P)))) == NULL) {	\
+	warn("No memory");						\
+	exit(1);							\
+    } else								\
+	(P[N++] = V)
 
 typedef struct {
     char	owner[80];

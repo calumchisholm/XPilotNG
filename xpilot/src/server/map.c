@@ -27,16 +27,6 @@ char map_version[] = VERSION;
 
 #define GRAV_RANGE  10
 
-
-#define STORE(T,P,N,M,V)						\
-    if (N >= M && ((M <= 0)						\
-	? (P = (T *) malloc((M = 1) * sizeof(*P)))			\
-	: (P = (T *) realloc(P, (M += M) * sizeof(*P)))) == NULL) {	\
-	warn("No memory");						\
-	exit(1);							\
-    } else								\
-	(P[N++] = V)
-/* !@# add a final realloc later to free wasted memory */
 int max_asteroidconcs = 0, max_bases = 0, max_cannons = 0, max_checks = 0,
     max_fuels = 0, max_gravs = 0, max_itemconcs = 0,
     max_targets = 0, max_treasures = 0, max_wormholes = 0;

@@ -46,17 +46,6 @@ int num_pstyles, num_bstyles, num_estyles = 1; /* "Internal" edgestyle */
 int max_bases, max_balls, max_polys,max_echanges; /* !@# make static after testing done */
 static int current_estyle, current_group, is_decor;
 
-#define STORE(T,P,N,M,V)						\
-    if (N >= M && ((M <= 0)						\
-	? (P = (T *) malloc((M = 1) * sizeof(*P)))			\
-	: (P = (T *) realloc(P, (M += M) * sizeof(*P)))) == NULL) {	\
-	warn("No memory");						\
-	exit(1);							\
-    } else								\
-	(P[N++] = V)
-/* !@# add a final realloc later to free wasted memory */
-
-
 static void Check_groupcount(void)
 {
     if (current_group == 1000) {

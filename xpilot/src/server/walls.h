@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -26,7 +25,11 @@
 #define WALLS_H
 
 #ifndef CLICK_H
-#include "click.h"
+# include "click.h"
+#endif
+
+#ifndef OBJECT_H
+# include "object.h"
 #endif
 
 /*
@@ -98,6 +101,64 @@ struct move_parameters {
     unsigned long	obj_treasure_mask;	/* objects treasure crash? */
 };
 
-/*void Move_segment(move_state_t *ms);*/
+/* kps change 100, 30 etc to something sane */
+struct polystyle {
+    char id[100];
+    int color;
+    int texture_id;
+    int defedge_id;
+    int flags;
+};
+
+struct edgestyle {
+    char id[100];
+    int width;
+    int color;
+    int style;
+};
+
+struct bmpstyle {
+    char id[100];
+    char filename[32];
+    int flags;
+};
+
+typedef struct {
+    int style;
+    int group;
+    int edges;
+    clpos pos;
+    int num_points;
+    int estyles_start;
+    int num_echanges;
+    int is_decor;
+} poly_t;
+
+typedef struct move {
+    clvec start;
+    clvec delta;
+    int hitmask;
+    object *obj;
+} move_t;
+
+typedef struct group group_t;
+
+struct group {
+    int type;
+    int team;
+    int hitmask;
+    bool (*hitfunc)(group_t *groupptr, move_t *move);
+    int mapobj_ind;
+};
+
+extern struct polystyle pstyles[256];
+extern struct edgestyle estyles[256];
+extern struct bmpstyle  bstyles[256];
+extern poly_t *pdata;
+extern int *estyleptr;
+extern int *edgeptr;
+extern group_t groups[];
+#define groupptr_by_id(group) (&groups[(group)])
+extern int num_pstyles, num_estyles, num_bstyles;
 
 #endif
