@@ -39,7 +39,6 @@
 # define HAVE_SETJMP_H 1
 # define HAVE_STDLIB_H 1
 # define HAVE_STRING_H 1
-# define HAVE_SYS_FILE_H 1
 # define HAVE_SYS_STAT_H 1
 # define HAVE_SYS_TYPES_H 1
 # ifndef _WINDOWS
@@ -50,6 +49,7 @@
 #  define HAVE_NETINET_TCP_H 1
 #  define HAVE_NET_IF_H 1
 #  define HAVE_NETDB_H 1
+#  define HAVE_SYS_FILE_H 1
 #  define HAVE_SYS_IOCTL_H 1
 #  define HAVE_SYS_PARAM_H 1
 #  define HAVE_SYS_SELECT_H 1
