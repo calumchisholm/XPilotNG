@@ -1072,27 +1072,21 @@ static bool Set_maxColors (xp_option_t *opt, int val)
 
 static bool Set_color (xp_option_t *opt, const char *val)
 {
-    char *buf = Option_get_private_data(opt);
+    char *buf = Option_get_private_data(opt), *tmpval, *tmp;
 
-    /*warn("Set_color: name = %s, val = %s, buf = %p", opt->name, val, buf);*/
+    /*warn("Set_color: name=%s, val=\"%s\", buf=%p", opt->name, val, buf);*/
 
-    strlcpy(buf, val, MAX_COLOR_LEN);
-
-    /* kps - HACK */
-    {
-	char *s, *semicolon;
-	/* this should be done in the option.c code */
-	semicolon = strchr(buf, ';');
-	if (semicolon)
-	    *semicolon = '\0';
-
-	/* XParseColor doesn't want spaces after the color spec */
-	s = buf;
-	while (*s && !isspace(*s))
-	    s++;
-	*s = '\0';
+    assert(val != NULL);
+    /* remove whitespace */
+    tmp = xp_safe_strdup(val);
+    tmpval = strtok(tmp, " \t");
+    if (tmpval == NULL) {
+	xp_free(tmp);
+	return false;
     }
-    /* kps - HACK */
+
+    strlcpy(buf, tmpval, MAX_COLOR_LEN);
+    xp_free(tmp);
 
     return true;
 }
