@@ -1268,7 +1268,8 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
     }
 
     if (connp->version < MY_VERSION) {
-	sprintf(msg, "Server runs version %s. %s", VERSION, sender);
+	sprintf(msg, "Server runs %s version %s. %s",
+		PACKAGE_NAME, VERSION, sender);
 	Set_player_message(pl, msg);
 	if (!FEATURE(connp, F_FASTRADAR)) {
 	    sprintf(msg,

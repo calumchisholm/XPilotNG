@@ -1415,6 +1415,6 @@ static int Cmd_setpass(char *arg, player_t *pl, int oper, char *msg)
 static int Cmd_version(char *arg, player_t *pl, int oper, char *msg)
 {
     UNUSED_PARAM(arg); UNUSED_PARAM(pl); UNUSED_PARAM(oper);
-    sprintf(msg, "XPilot version %s.", VERSION);
+    sprintf(msg, "%s version %s.", PACKAGE_NAME, VERSION);
     return CMD_RESULT_SUCCESS;
 }
