@@ -273,8 +273,8 @@ static GLWidget *Init_PlayerListWidget(server_info_t *sip)
     }
     if (!(header = 
 	  Init_LabelWidget("Players", 
-			   &(info->header_bg), 
 			   &(info->header_fg),
+			   &(info->header_bg), 
 			   CENTER,CENTER))) {
 	error("failed to create header for player list");
 	free(players_str);
@@ -304,8 +304,8 @@ static GLWidget *Init_PlayerListWidget(server_info_t *sip)
 	 LI_FORWARD(iter)) {
 	player = (char*)SI_DATA(iter);
 	row = Init_LabelWidget(player,
-			       &(info->item_bg),
 			       &(info->item_fg),
+			       &(info->item_bg),
 			       LEFT,CENTER);
 	if (!row) break;
 	AppendGLWidgetList(&(tmp->children), row);
@@ -376,15 +376,15 @@ static void add_status_entry(char *name, char *value, GLWidget *parent)
     
     if ((name_label = 
 	 Init_LabelWidget(name, 
-			  &(info->name_bg), 
 			  &(info->name_fg),
+			  &(info->name_bg), 
 			  LEFT,CENTER))) {
 	AppendGLWidgetList(&(parent->children), name_label);
     }
     if ((value_label = 
 	 Init_LabelWidget(value, 
-			  &(info->value_bg), 
 			  &(info->value_fg),
+			  &(info->value_bg), 
 			  LEFT,CENTER))) {
 	AppendGLWidgetList(&(parent->children), value_label);
     }
@@ -633,7 +633,7 @@ static GLWidget *Init_MetaRowWidget(server_info_t *sip,
     tmp->buttondata     = tmp;
 
 #define COLUMN(TEXT) \
-    if ((col = Init_LabelWidget((TEXT), NULL, &(row->fg), LEFT, CENTER))) { \
+    if ((col = Init_LabelWidget((TEXT), &(row->fg), NULL, LEFT, CENTER))) { \
         col->button = Button_MetaRowWidget; \
         col->buttondata = tmp; \
 	AppendGLWidgetList(&(tmp->children), col); \
@@ -668,7 +668,7 @@ static GLWidget *Init_MetaHeaderWidget(void)
     tmp->SetBounds = SetBounds_MetaRowWidget;
 
 #define HEADER(TEXT) \
-    if ((col = Init_LabelWidget((TEXT), &(info->bg), &(info->fg), LEFT, CENTER))) { \
+    if ((col = Init_LabelWidget((TEXT), &(info->fg), &(info->bg), LEFT, CENTER))) { \
 	AppendGLWidgetList(&(tmp->children), col); \
     }
     HEADER("Server");

@@ -122,7 +122,7 @@ void SetBounds_GLWidget( GLWidget *widget, SDL_Rect *b )
 }
 
 /* Eventually this will be the only visible initializer I guess */
-GLWidget *Init_OptionWidget( font_data *font, xp_option_t *opt )
+GLWidget *Init_OptionWidget( xp_option_t *opt, int *fgcolor, int *bgcolor )
 {
     if (!opt) {
     	error("Faulty parameter to Init_DoubleChooserWidget: opt is a NULL pointer!");
@@ -131,11 +131,11 @@ GLWidget *Init_OptionWidget( font_data *font, xp_option_t *opt )
     
     switch ( Option_get_type(opt) ) {
     	case xp_bool_option:
-	    return Init_BoolChooserWidget(font,opt);
+	    return Init_BoolChooserWidget(opt,fgcolor,bgcolor);
     	case xp_int_option:
-	    return Init_IntChooserWidget(font,opt);
+	    return Init_IntChooserWidget(opt,fgcolor,bgcolor);
     	case xp_double_option:
-	    return Init_DoubleChooserWidget(font,opt);
+	    return Init_DoubleChooserWidget(opt,fgcolor,bgcolor);
     	default:
 	    return NULL;
     }
@@ -737,7 +737,7 @@ void Close_LabelWidget( GLWidget *widget )
     free_string_texture(&(((LabelWidget *)widget->wid_info)->tex));
 }
 
-bool LabelWidget_SetColor( GLWidget *widget , int *bgcolor, int *fgcolor )
+bool LabelWidget_SetColor( GLWidget *widget , int *fgcolor, int *bgcolor )
 {
     LabelWidget *wi;
     
@@ -769,7 +769,7 @@ void Paint_LabelWidget( GLWidget *widget )
     b = &(tmp->bounds);
     wid_info = (LabelWidget *)(tmp->wid_info);
     
-    if ( wid_info->bgcolor && *(wid_info->bgcolor) ) {
+    if ( (wid_info->bgcolor) && *(wid_info->bgcolor) ) {
     	set_alphacolor(*(wid_info->bgcolor));
     
     	glBegin(GL_QUADS);
@@ -787,7 +787,7 @@ void Paint_LabelWidget( GLWidget *widget )
 	wid_info->valign == CENTER ? tmp->bounds.y + tmp->bounds.h / 2 :
 	tmp->bounds.y + tmp->bounds.h;
 
-    if (wid_info->fgcolor)
+    if ( wid_info->fgcolor )
     	disp_text(&(wid_info->tex), 
 		  *(wid_info->fgcolor), 
 		  wid_info->align, 
@@ -805,7 +805,7 @@ void Paint_LabelWidget( GLWidget *widget )
 		  true);
 }
 
-GLWidget *Init_LabelWidget( const char *text , int *bgcolor, int *fgcolor, int align, int valign  )
+GLWidget *Init_LabelWidget( const char *text , int *fgcolor, int *bgcolor, int align, int valign  )
 {
     GLWidget *tmp;
 
@@ -963,8 +963,6 @@ void Close_BoolChooserWidget( GLWidget *widget )
 	return;
     }
     
-    free_string_texture( &(((BoolChooserWidget *)(widget->wid_info))->nametex) );
-    
     --num_BoolChooserWidget;
     if (!num_BoolChooserWidget) {
     	free_string_texture(BoolChooserWidget_ontex);
@@ -1001,6 +999,15 @@ void SetBounds_BoolChooserWidget( GLWidget *widget, SDL_Rect *b )
     b2.y = widget->bounds.y + 1;
 	    
     SetBounds_GLWidget(tmp,&b2);
+
+    tmp = ((BoolChooserWidget *)(widget->wid_info))->name;
+    
+    b2.h = widget->bounds.h;
+    b2.w = tmp->bounds.w;
+    b2.x = widget->bounds.x + 2;
+    b2.y = widget->bounds.y;
+	    
+    SetBounds_GLWidget(tmp,&b2);
 }
 
 void BoolChooserWidget_SetValue( bool state, void *data )
@@ -1011,27 +1018,27 @@ void BoolChooserWidget_SetValue( bool state, void *data )
 
 void Paint_BoolChooserWidget( GLWidget *widget )
 {
-    /* static int bg_color     = 0x0000ff88; */
-    static int name_color   = 0xffff66ff;
+    /*static int name_color   = 0xffff66ff;*/
     BoolChooserWidget *wid_info;
 
     if (!widget) return;
     
-    wid_info = (BoolChooserWidget *)(widget->wid_info);
-    
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    /*set_alphacolor(bg_color);
-    glBegin(GL_QUADS);
-    	glVertex2i(widget->bounds.x 	    	    ,widget->bounds.y	    	    	);
-    	glVertex2i(widget->bounds.x+widget->bounds.w,widget->bounds.y	    	    	);
-    	glVertex2i(widget->bounds.x+widget->bounds.w,widget->bounds.y+widget->bounds.h	);
-    	glVertex2i(widget->bounds.x 	    	    ,widget->bounds.y+widget->bounds.h	);
-    glEnd();*/
-    disp_text(&(wid_info->nametex), name_color, LEFT, CENTER, widget->bounds.x+2/*|_text*/, draw_height - widget->bounds.y - widget->bounds.h/2, true);
+    if ( !(wid_info = (BoolChooserWidget *)(widget->wid_info))) return;
+
+    if ( (wid_info->bgcolor) && *(wid_info->bgcolor) ) {
+    	glEnable(GL_BLEND);
+    	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    	set_alphacolor( *(wid_info->bgcolor) );
+    	glBegin(GL_QUADS);
+    	    glVertex2i(widget->bounds.x 	    	    ,widget->bounds.y	    	    	);
+    	    glVertex2i(widget->bounds.x+widget->bounds.w,widget->bounds.y	    	    	);
+    	    glVertex2i(widget->bounds.x+widget->bounds.w,widget->bounds.y+widget->bounds.h	);
+    	    glVertex2i(widget->bounds.x 	    	    ,widget->bounds.y+widget->bounds.h	);
+    	glEnd();
+    }
 }
 
-GLWidget *Init_BoolChooserWidget( font_data *font, xp_option_t *opt )
+GLWidget *Init_BoolChooserWidget( xp_option_t *opt, int *fgcolor, int *bgcolor )
 {
     GLWidget *tmp;
     BoolChooserWidget *wid_info;
@@ -1066,8 +1073,8 @@ GLWidget *Init_BoolChooserWidget( font_data *font, xp_option_t *opt )
 	    error("Failed to malloc BoolChooserWidget_ontex in Init_BoolChooserWidget");
 	    return NULL;
 	}
-	if (render_text(font,"True",BoolChooserWidget_ontex)) {
-    	    if (!render_text(font,"False",BoolChooserWidget_offtex)) {
+	if (render_text(&gamefont,"True",BoolChooserWidget_ontex)) {
+    	    if (!render_text(&gamefont,"False",BoolChooserWidget_offtex)) {
 	    	error("Failed to render 'False' in Init_BoolChooserWidget");
 		free_string_texture(BoolChooserWidget_ontex);
 		free(BoolChooserWidget_ontex);
@@ -1100,28 +1107,29 @@ GLWidget *Init_BoolChooserWidget( font_data *font, xp_option_t *opt )
     
     wid_info = (BoolChooserWidget *)(tmp->wid_info);
     
-    if ( !render_text(font,opt->name,&(wid_info->nametex)) ) {
-    	error("Failed to render '%s' in Init_BoolChooserWidget",opt->name);
-	free(tmp->wid_info);
-	free(tmp);
+    if ( !(wid_info->name = Init_LabelWidget(opt->name,fgcolor,bgcolor,LEFT,CENTER)) ) {
+    	error("Failed to make a LabelWidget for Init_BoolChooserWidget");
+	Close_Widget(&tmp);
 	return NULL;
     }
+    AppendGLWidgetList(&(tmp->children),wid_info->name);
     
     if ( !(wid_info->buttonwidget = Init_LabeledRadiobuttonWidget(BoolChooserWidget_ontex,
     	    	    	    	    	BoolChooserWidget_offtex, BoolChooserWidget_SetValue,
 					wid_info, *(opt->bool_ptr))) ) {
     	error("Failed to make a LabeledRadiobuttonWidget for Init_BoolChooserWidget");
-	free(tmp->wid_info);
-	free(tmp);
-	return NULL;
+	Close_Widget(&tmp);
+    	return NULL;
     }
     AppendGLWidgetList(&(tmp->children),wid_info->buttonwidget);
         
     tmp->WIDGET     	= BOOLCHOOSERWIDGET;
-    tmp->bounds.w   	= 2+wid_info->nametex.width+5+wid_info->buttonwidget->bounds.w+2;
-    tmp->bounds.h   	= 1+ MAX( wid_info->nametex.height,wid_info->buttonwidget->bounds.h) +1 ;
+    tmp->bounds.w   	= 2 + wid_info->name->bounds.w+5+wid_info->buttonwidget->bounds.w + 2;
+    tmp->bounds.h   	= 1 + MAX( wid_info->name->bounds.h,wid_info->buttonwidget->bounds.h) + 1 ;
     
     wid_info->opt 	= opt;
+    wid_info->fgcolor 	= fgcolor;
+    wid_info->bgcolor 	= bgcolor;
 
     tmp->Draw	    	= Paint_BoolChooserWidget;
     tmp->Close  	= Close_BoolChooserWidget;
@@ -1151,14 +1159,14 @@ void Close_IntChooserWidget ( GLWidget *widget )
 	return;
     }
     
-    free_string_texture( &(((IntChooserWidget *)widget->wid_info)->nametex) );
     free_string_texture( &(((IntChooserWidget *)widget->wid_info)->valuetex) );
 }
 
 void SetBounds_IntChooserWidget( GLWidget *widget, SDL_Rect *b )
 {
     IntChooserWidget *tmp;
-    SDL_Rect rab,lab;
+    GLWidget *tmp2;
+    SDL_Rect rab,lab,b2;
 
     if (!widget) return;
     if (!b) return;
@@ -1182,6 +1190,15 @@ void SetBounds_IntChooserWidget( GLWidget *widget, SDL_Rect *b )
 	    
     SetBounds_GLWidget(tmp->leftarrow,&lab);
     SetBounds_GLWidget(tmp->rightarrow,&rab);
+
+    tmp2 = ((IntChooserWidget *)(widget->wid_info))->name;
+    
+    b2.h = widget->bounds.h;
+    b2.w = tmp2->bounds.w;
+    b2.x = widget->bounds.x + 2;
+    b2.y = widget->bounds.y;
+	    
+    SetBounds_GLWidget(tmp2,&b2);
 }
 
 void IntChooserWidget_Add( void *data )
@@ -1209,7 +1226,7 @@ void IntChooserWidget_Add( void *data )
 	tmp->direction = 2;
 	snprintf(valuetext,15,"%i",*(tmp->opt->int_ptr));
 	free_string_texture(&(tmp->valuetex));
-	if(!render_text(tmp->font,valuetext,&(tmp->valuetex)))
+	if(!render_text(&gamefont,valuetext,&(tmp->valuetex)))
 	    error("Failed to make value (%s=%i) texture for IntChooserWidget!\n",tmp->opt->name,*(tmp->opt->int_ptr));
     } else {
     	((ArrowWidget *)tmp->rightarrow->wid_info)->locked = true;
@@ -1242,7 +1259,7 @@ void IntChooserWidget_Subtract( void *data )
 	tmp->direction = -2;
 	snprintf(valuetext,15,"%i",*(tmp->opt->int_ptr));
 	free_string_texture(&(tmp->valuetex));
-	if(!render_text(tmp->font,valuetext,&(tmp->valuetex)))
+	if(!render_text(&gamefont,valuetext,&(tmp->valuetex)))
 	    error("Failed to make value (%s=%i) texture for IntChooserWidget!\n",tmp->opt->name,*(tmp->opt->int_ptr));
     } else {
     	((ArrowWidget *)tmp->leftarrow->wid_info)->locked = true;
@@ -1251,9 +1268,6 @@ void IntChooserWidget_Subtract( void *data )
 
 void Paint_IntChooserWidget( GLWidget *widget )
 {
-    /* static int bg_color     = 0x0000ff88; */
-    static int name_color   = 0xffff66ff;
-    static int value_color  = 0x00ff00ff;
     IntChooserWidget *wid_info;
 
     if (!widget) {
@@ -1271,20 +1285,24 @@ void Paint_IntChooserWidget( GLWidget *widget )
     if (wid_info->direction > 0) --(wid_info->direction);
     else if (wid_info->direction < 0) ++(wid_info->direction);
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    /*set_alphacolor(bg_color);
-    glBegin(GL_QUADS);
-    	glVertex2i(widget->bounds.x 	    	    ,widget->bounds.y	    	    	);
-    	glVertex2i(widget->bounds.x+widget->bounds.w,widget->bounds.y	    	    	);
-    	glVertex2i(widget->bounds.x+widget->bounds.w,widget->bounds.y+widget->bounds.h	);
-    	glVertex2i(widget->bounds.x 	    	    ,widget->bounds.y+widget->bounds.h	);
-    glEnd();*/
-    disp_text(&(wid_info->nametex), name_color, LEFT, CENTER, widget->bounds.x+2/*|_text*/, draw_height - widget->bounds.y - widget->bounds.h/2, true);
-    disp_text(&(wid_info->valuetex), value_color, RIGHT, CENTER, wid_info->rightarrow->bounds.x-1/*value_>*/-2/*>_|*/, draw_height - widget->bounds.y - widget->bounds.h/2, true );
+    if ( (wid_info->bgcolor) && *(wid_info->bgcolor) ) {
+    	glEnable(GL_BLEND);
+    	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    	set_alphacolor(*(wid_info->bgcolor));
+    	glBegin(GL_QUADS);
+    	    glVertex2i(widget->bounds.x 	    	    ,widget->bounds.y	    	    	);
+    	    glVertex2i(widget->bounds.x+widget->bounds.w,widget->bounds.y	    	    	);
+    	    glVertex2i(widget->bounds.x+widget->bounds.w,widget->bounds.y+widget->bounds.h	);
+    	    glVertex2i(widget->bounds.x 	    	    ,widget->bounds.y+widget->bounds.h	);
+    	glEnd();
+    }
+    if ( wid_info->fgcolor )
+    	disp_text(&(wid_info->valuetex), *(wid_info->fgcolor), RIGHT, CENTER, wid_info->rightarrow->bounds.x-1/*value_>*/-2/*>_|*/, draw_height - widget->bounds.y - widget->bounds.h/2, true );
+    else
+    	disp_text(&(wid_info->valuetex), whiteRGBA, RIGHT, CENTER, wid_info->rightarrow->bounds.x-1/*value_>*/-2/*>_|*/, draw_height - widget->bounds.y - widget->bounds.h/2, true );
 }
 
-GLWidget *Init_IntChooserWidget( font_data *font, xp_option_t *opt )
+GLWidget *Init_IntChooserWidget( xp_option_t *opt, int *fgcolor, int *bgcolor )
 {
     int valuespace;
     GLWidget *tmp;
@@ -1324,59 +1342,60 @@ GLWidget *Init_IntChooserWidget( font_data *font, xp_option_t *opt )
     /* hehe ugly hack to guess max size of value strings
      * monospace font is preferred
      */
-    if (render_text(font,"555.55",&tmp_tex)) {
+    if (render_text(&gamefont,"555.55",&tmp_tex)) {
     	free_string_texture(&tmp_tex);
 	valuespace = tmp_tex.width+4;
     } else {
     	valuespace = 50;
     }
-
+    
     wid_info = tmp->wid_info;
-    tmp->WIDGET     = INTCHOOSERWIDGET;
-    if (render_text(font,opt->name,&(wid_info->nametex))) {
-	snprintf(valuetext,15,"%i",*(opt->int_ptr));
-    	if(render_text(font,valuetext,&(wid_info->valuetex))) {
-    	    wid_info->font  	= font;
-	    wid_info->opt   	= opt;
-	    wid_info->valuespace = valuespace;
-	    wid_info->direction = 0;
 
-	    if (!(wid_info->leftarrow  = Init_ArrowWidget(LEFTARROW,12,16,IntChooserWidget_Subtract,tmp))) {
-		free_string_texture(&(wid_info->nametex));
-	    	free_string_texture(&(wid_info->valuetex));
-		free(tmp->wid_info);
-		free(tmp);
-		error("Init_IntChooserWidget couldn't init leftarrow!");
-		return NULL;
-	    } 	
-	    AppendGLWidgetList(&(tmp->children),wid_info->leftarrow);
-	    if (*(wid_info->opt->int_ptr) <= wid_info->opt->int_minval)	((ArrowWidget *)(wid_info->leftarrow->wid_info))->locked = true;
-
-    	    if (!(wid_info->rightarrow = Init_ArrowWidget(RIGHTARROW,12,16,IntChooserWidget_Add,tmp))) {
-	    	free_string_texture(&(wid_info->nametex));
-	    	free_string_texture(&(wid_info->valuetex));
-		free(tmp->wid_info);
-		free(tmp);
-	    	error("Init_IntChooserWidget couldn't init rightarrow!");
-		return NULL;
-	    }
-	    AppendGLWidgetList(&(tmp->children),wid_info->rightarrow);
-	    if (*(wid_info->opt->int_ptr) >= wid_info->opt->int_maxval)	((ArrowWidget *)(wid_info->rightarrow->wid_info))->locked = true;
-
-    	    tmp->bounds.w   = 2/*|_text*/+ wid_info->nametex.width +5/*text___<*/ + valuespace/*__value*/ + 2/*<_value_>*/
-	    	    	     + wid_info->leftarrow->bounds.w + wid_info->rightarrow->bounds.w +2/*>_|*/;
-    	    tmp->bounds.h   = wid_info->nametex.height;
-
-    	    tmp->Draw	    	= Paint_IntChooserWidget;
-    	    tmp->Close  	= Close_IntChooserWidget;
-    	    tmp->SetBounds  	= SetBounds_IntChooserWidget;
-
-	    return tmp;
-    	} else free_string_texture(&(wid_info->nametex));
+    snprintf(valuetext,15,"%i",*(opt->int_ptr));
+    if(!render_text(&gamefont,valuetext,&(wid_info->valuetex))) {
+    	Close_Widget(&tmp);
+	error("Init_IntChooserWidget: Failed to render value string");
+	return NULL;
     }
-    free(tmp);
-    error("Failed to initialize Init_IntChooserWidget %s (couldn't render text)",opt->name);
-    return NULL;
+
+    tmp->WIDGET     = INTCHOOSERWIDGET;
+    tmp->Draw	    	= Paint_IntChooserWidget;
+    tmp->Close  	= Close_IntChooserWidget;
+    tmp->SetBounds  	= SetBounds_IntChooserWidget;
+    wid_info->opt   	= opt;
+    wid_info->valuespace = valuespace;
+    wid_info->direction = 0;
+    wid_info->fgcolor 	= fgcolor;
+    wid_info->bgcolor 	= bgcolor;
+    
+    
+    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->name = Init_LabelWidget(opt->name,fgcolor,bgcolor,LEFT,CENTER))) ) {
+    	Close_Widget(&tmp);
+    	error("Init_IntChooserWidget: Failed to initialize label [%s]",opt->name);
+	return NULL;
+    }
+    
+    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->leftarrow  = Init_ArrowWidget(LEFTARROW,12,16,IntChooserWidget_Subtract,tmp))) ) {
+    	Close_Widget(&tmp);
+    	error("Init_IntChooserWidget couldn't init leftarrow!");
+    	return NULL;
+    } 	
+    
+    if (*(wid_info->opt->int_ptr) <= wid_info->opt->int_minval)	((ArrowWidget *)(wid_info->leftarrow->wid_info))->locked = true;
+
+    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->rightarrow = Init_ArrowWidget(RIGHTARROW,12,16,IntChooserWidget_Add,tmp))) ) {
+    	Close_Widget(&tmp);
+    	error("Init_IntChooserWidget couldn't init rightarrow!");
+    	return NULL;
+    }
+    
+    if (*(wid_info->opt->int_ptr) >= wid_info->opt->int_maxval)	((ArrowWidget *)(wid_info->rightarrow->wid_info))->locked = true;
+
+    tmp->bounds.w   = 2/*|_text*/+ wid_info->name->bounds.w +5/*text___<*/ + valuespace/*__value*/ + 2/*<_value_>*/
+    	    	    + wid_info->leftarrow->bounds.w + wid_info->rightarrow->bounds.w +2/*>_|*/;
+    tmp->bounds.h   = wid_info->name->bounds.h;
+
+    return tmp;
 }
 /*************************/
 /* End: IntChooserWidget */
@@ -1399,14 +1418,14 @@ void Close_DoubleChooserWidget ( GLWidget *widget )
 	return;
     }
     
-    free_string_texture( &(((DoubleChooserWidget *)widget->wid_info)->nametex) );
     free_string_texture( &(((DoubleChooserWidget *)widget->wid_info)->valuetex) );
 }
 
 void SetBounds_DoubleChooserWidget( GLWidget *widget, SDL_Rect *b )
 {
     DoubleChooserWidget *tmp;
-    SDL_Rect rab,lab;
+    GLWidget *tmp2;
+    SDL_Rect rab,lab,b2;
     
     if (!widget) return;
     if (!b) return;
@@ -1430,6 +1449,15 @@ void SetBounds_DoubleChooserWidget( GLWidget *widget, SDL_Rect *b )
 	    
     SetBounds_GLWidget(tmp->leftarrow,&lab);
     SetBounds_GLWidget(tmp->rightarrow,&rab);
+
+    tmp2 = ((DoubleChooserWidget *)(widget->wid_info))->name;
+    
+    b2.h = widget->bounds.h;
+    b2.w = tmp2->bounds.w;
+    b2.x = widget->bounds.x + 2;
+    b2.y = widget->bounds.y;
+	    
+    SetBounds_GLWidget(tmp2,&b2);
 }
 
 void DoubleChooserWidget_Add( void *data )
@@ -1457,7 +1485,7 @@ void DoubleChooserWidget_Add( void *data )
 	tmp->direction = 2;
 	snprintf(valuetext,15,"%1.2f",*(tmp->opt->dbl_ptr));
 	free_string_texture(&(tmp->valuetex));
-	if(!render_text(tmp->font,valuetext,&(tmp->valuetex)))
+	if(!render_text(&gamefont,valuetext,&(tmp->valuetex)))
 	    error("Failed to make value (%s=%1.2f) texture for doubleChooserWidget!\n",tmp->opt->name,*(tmp->opt->dbl_ptr));
     } else {
     	((ArrowWidget *)tmp->rightarrow->wid_info)->locked = true;
@@ -1488,7 +1516,7 @@ void DoubleChooserWidget_Subtract( void *data )
 	tmp->direction = -2;
 	snprintf(valuetext,15,"%1.2f",*(tmp->opt->dbl_ptr));
 	free_string_texture(&(tmp->valuetex));
-	if(!render_text(tmp->font,valuetext,&(tmp->valuetex)))
+	if(!render_text(&gamefont,valuetext,&(tmp->valuetex)))
 	    error("Failed to make value (%s=%1.2f) texture for doubleChooserWidget!\n",tmp->opt->name,*(tmp->opt->dbl_ptr));
     } else {
     	((ArrowWidget *)tmp->leftarrow->wid_info)->locked = true;
@@ -1497,32 +1525,42 @@ void DoubleChooserWidget_Subtract( void *data )
 
 void Paint_DoubleChooserWidget( GLWidget *widget )
 {
-    /* static int bg_color     = 0x0000ff88; */
-    static int name_color   = 0xffff66ff;
-    static int value_color  = 0x00ff00ff;
     DoubleChooserWidget *wid_info;
 
-    if (!widget) return;
+    if (!widget) {
+    	error("Paint_DoubleChooserWidget: argument is NULL!");
+	return;
+    }
     
     wid_info = (DoubleChooserWidget *)(widget->wid_info);
+
+    if (!wid_info) {
+    	error("Paint_DoubleChooserWidget: wid_info missing");
+	return;
+    }
 
     if (wid_info->direction > 0) --(wid_info->direction);
     else if (wid_info->direction < 0) ++(wid_info->direction);
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    /*set_alphacolor(bg_color);
-    glBegin(GL_QUADS);
-    	glVertex2i(widget->bounds.x 	    	    ,widget->bounds.y	    	    	);
-    	glVertex2i(widget->bounds.x+widget->bounds.w,widget->bounds.y	    	    	);
-    	glVertex2i(widget->bounds.x+widget->bounds.w,widget->bounds.y+widget->bounds.h	);
-    	glVertex2i(widget->bounds.x 	    	    ,widget->bounds.y+widget->bounds.h	);
-    glEnd();*/
-    disp_text(&(wid_info->nametex), name_color, LEFT, CENTER, widget->bounds.x+2/*|_text*/, draw_height - widget->bounds.y - widget->bounds.h/2, true);
-    disp_text(&(wid_info->valuetex), value_color, RIGHT, CENTER, wid_info->rightarrow->bounds.x-1/*value_>*/-2/*>_|*/, draw_height - widget->bounds.y - widget->bounds.h/2, true );
+    if ( (wid_info->bgcolor) && *(wid_info->bgcolor) ) {
+    	glEnable(GL_BLEND);
+    	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    	set_alphacolor(*(wid_info->bgcolor));
+    	glBegin(GL_QUADS);
+    	    glVertex2i(widget->bounds.x 	    	    ,widget->bounds.y	    	    	);
+    	    glVertex2i(widget->bounds.x+widget->bounds.w,widget->bounds.y	    	    	);
+    	    glVertex2i(widget->bounds.x+widget->bounds.w,widget->bounds.y+widget->bounds.h	);
+    	    glVertex2i(widget->bounds.x 	    	    ,widget->bounds.y+widget->bounds.h	);
+    	glEnd();
+    }
+
+    if ( wid_info->fgcolor )
+    	disp_text(&(wid_info->valuetex), *(wid_info->fgcolor), RIGHT, CENTER, wid_info->rightarrow->bounds.x-1/*value_>*/-2/*>_|*/, draw_height - widget->bounds.y - widget->bounds.h/2, true );
+    else
+    	disp_text(&(wid_info->valuetex), whiteRGBA, RIGHT, CENTER, wid_info->rightarrow->bounds.x-1/*value_>*/-2/*>_|*/, draw_height - widget->bounds.y - widget->bounds.h/2, true );
 }
 
-GLWidget *Init_DoubleChooserWidget( font_data *font, xp_option_t *opt )
+GLWidget *Init_DoubleChooserWidget( xp_option_t *opt, int *fgcolor, int *bgcolor )
 {
     int valuespace;
     GLWidget *tmp;
@@ -1562,7 +1600,7 @@ GLWidget *Init_DoubleChooserWidget( font_data *font, xp_option_t *opt )
     /* hehe ugly hack to guess max size of value strings
      * monospace font is preferred
      */
-    if (render_text(font,"555.55",&tmp_tex)) {
+    if (render_text(&gamefont,"555.55",&tmp_tex)) {
     	free_string_texture(&tmp_tex);
 	valuespace = tmp_tex.width+4;
     } else {
@@ -1570,51 +1608,51 @@ GLWidget *Init_DoubleChooserWidget( font_data *font, xp_option_t *opt )
     }
     
     wid_info = tmp->wid_info;
-    tmp->WIDGET     = DOUBLECHOOSERWIDGET;
-    if (render_text(font,opt->name,&(wid_info->nametex))) {
-	snprintf(valuetext,15,"%1.2f",*(opt->dbl_ptr));
-    	if(render_text(font,valuetext,&(wid_info->valuetex))) {
-    	    wid_info->font  	= font;
-	    wid_info->opt   	= opt;
-	    wid_info->valuespace = valuespace;
-	    wid_info->direction = 0;
-    	    
-	    if (!(wid_info->leftarrow  = Init_ArrowWidget(LEFTARROW,12,16,DoubleChooserWidget_Subtract,tmp))) {
-	    	free_string_texture(&(wid_info->nametex));
-	    	free_string_texture(&(wid_info->valuetex));
-		free(tmp->wid_info);
-		free(tmp);
-		error("Init_DoubleChooserWidget couldn't init leftarrow!");
-		return NULL;
-	    } 	
-	    AppendGLWidgetList(&(tmp->children),wid_info->leftarrow);
-	    if (*(wid_info->opt->dbl_ptr) <= wid_info->opt->dbl_minval ) ((ArrowWidget *)(wid_info->leftarrow->wid_info))->locked = true;
 
-    	    if (!(wid_info->rightarrow = Init_ArrowWidget(RIGHTARROW,12,16,DoubleChooserWidget_Add,tmp))) {
-	    	free_string_texture(&(wid_info->nametex));
-	    	free_string_texture(&(wid_info->valuetex));
-		free(tmp->wid_info);
-		free(tmp);
-	    	error("Init_DoubleChooserWidget couldn't init rightarrow!");
-		return NULL;
-	    }
-	    if (*(wid_info->opt->dbl_ptr) >= wid_info->opt->dbl_maxval) ((ArrowWidget *)(wid_info->rightarrow->wid_info))->locked = true;
-	    AppendGLWidgetList(&(tmp->children),wid_info->rightarrow);
-
-    	    tmp->bounds.w   = 2/*|_text*/+ wid_info->nametex.width +5/*text___<*/ + valuespace/*__value*/ + 2/*<_value_>*/
-	    	    	     + wid_info->leftarrow->bounds.w + wid_info->rightarrow->bounds.w +2/*>_|*/;
-    	    tmp->bounds.h   = wid_info->nametex.height;
-
-    	    tmp->Draw	    	= Paint_DoubleChooserWidget;
-    	    tmp->Close  	= Close_DoubleChooserWidget;
-    	    tmp->SetBounds  	= SetBounds_DoubleChooserWidget;
-
-	    return tmp;
-    	} else free_string_texture(&(wid_info->nametex));
+    snprintf(valuetext,15,"%1.2f",*(opt->dbl_ptr));
+    if(!render_text(&gamefont,valuetext,&(wid_info->valuetex))) {
+    	Close_Widget(&tmp);
+	error("Init_DoubleChooserWidget: Failed to render value string");
+	return NULL;
     }
-    free(tmp);
-    error("Failed to initialize Init_DoubleChooserWidget %s (couldn't render text)",opt->name);
-    return NULL;
+
+    tmp->WIDGET     = DOUBLECHOOSERWIDGET;
+    tmp->Draw	    	= Paint_DoubleChooserWidget;
+    tmp->Close  	= Close_DoubleChooserWidget;
+    tmp->SetBounds  	= SetBounds_DoubleChooserWidget;
+    wid_info->opt   	= opt;
+    wid_info->valuespace = valuespace;
+    wid_info->direction = 0;
+    wid_info->fgcolor 	= fgcolor;
+    wid_info->bgcolor 	= bgcolor;
+    
+    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->name = Init_LabelWidget(opt->name,fgcolor,bgcolor,LEFT,CENTER))) ) {
+    	Close_Widget(&tmp);
+    	error("Init_DoubleChooserWidget: Failed to initialize label [%s]",opt->name);
+	return NULL;
+    }
+    
+    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->leftarrow  = Init_ArrowWidget(LEFTARROW,12,16,DoubleChooserWidget_Subtract,tmp))) ) {
+    	Close_Widget(&tmp);
+    	error("Init_DoubleChooserWidget: couldn't init leftarrow!");
+    	return NULL;
+    } 	
+    
+    if (*(wid_info->opt->dbl_ptr) <= wid_info->opt->dbl_minval)	((ArrowWidget *)(wid_info->leftarrow->wid_info))->locked = true;
+
+    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->rightarrow = Init_ArrowWidget(RIGHTARROW,12,16,DoubleChooserWidget_Add,tmp))) ) {
+    	Close_Widget(&tmp);
+    	error("Init_DoubleChooserWidget: couldn't init rightarrow!");
+    	return NULL;
+    }
+    
+    if (*(wid_info->opt->dbl_ptr) >= wid_info->opt->dbl_maxval)	((ArrowWidget *)(wid_info->rightarrow->wid_info))->locked = true;
+
+    tmp->bounds.w   = 2/*|_text*/+ wid_info->name->bounds.w +5/*text___<*/ + valuespace/*__value*/ + 2/*<_value_>*/
+    	    	    + wid_info->leftarrow->bounds.w + wid_info->rightarrow->bounds.w +2/*>_|*/;
+    tmp->bounds.h   = wid_info->name->bounds.h;
+
+    return tmp;
 }
 /****************************/
 /* End: DoubleChooserWidget */
@@ -2446,6 +2484,7 @@ GLWidget *Init_ConfMenuWidget( font_data *font, Uint16 x, Uint16 y )
     SDL_Rect bounds;
     int i;
     xp_option_t *opt;
+    static int name_color   = 0xffff66ff;
 
     tmp	= Init_EmptyBaseGLWidget();
     if ( !tmp ) {
@@ -2472,7 +2511,7 @@ GLWidget *Init_ConfMenuWidget( font_data *font, Uint16 x, Uint16 y )
     
     for ( i=0 ; i < num_options; ++i ) {
     	opt = Option_by_index(i);
-	item = Init_OptionWidget(font,opt);
+	item = Init_OptionWidget(opt,&name_color, &nullRGBA);
 	if (item) {
 	    AppendGLWidgetList( &(dummy->next), item );
 	}

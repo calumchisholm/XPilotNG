@@ -81,7 +81,7 @@ void Close_WidgetTree ( GLWidget **widget );
 /* to reshape the widget, and automagically reshape and place sub-widgets */
 void SetBounds_GLWidget(GLWidget *wid, SDL_Rect *b );
 /* Initializes the appropriate config widget (if implemented), returns NULL otherwise */
-GLWidget *Init_OptionWidget( font_data *font, xp_option_t *opt );
+GLWidget *Init_OptionWidget( xp_option_t *opt, int *fgcolor, int *bgcolor );
 
 bool AppendGLWidgetList( GLWidget **list, GLWidget *widget );
 void PrependGLWidgetList( GLWidget **list, GLWidget *widget );
@@ -172,14 +172,14 @@ void ScrollbarWidget_SetSlideSize( GLWidget *widget, GLfloat size );
 #define LABELWIDGET 3
 typedef struct {
     string_tex_t    tex;
-    int     	    *bgcolor;
     int     	    *fgcolor;
+    int     	    *bgcolor;
     int             align;  /* horizontal alignemnt */
     int             valign; /* vertical alignment   */
 } LabelWidget;
-GLWidget *Init_LabelWidget( const char *text , int *bgcolor, int *fgcolor, int align, int valign );
+GLWidget *Init_LabelWidget( const char *text , int *fgcolor, int *bgcolor, int align, int valign );
 
-bool LabelWidget_SetColor( GLWidget *widget , int *bgcolor, int *fgcolor );
+bool LabelWidget_SetColor( GLWidget *widget , int *fgcolor, int *bgcolor );
 
 /********************/
 /* End: LabelWidget */
@@ -211,10 +211,12 @@ GLWidget *Init_LabeledRadiobuttonWidget( string_tex_t *ontex, string_tex_t *offt
 typedef struct {
     xp_option_t     *opt;
     GLWidget	    *buttonwidget;
-    string_tex_t    nametex;
+    GLWidget	    *name;
+    int     	    *fgcolor;
+    int     	    *bgcolor;
 } BoolChooserWidget;
 
-GLWidget *Init_BoolChooserWidget( font_data *font, xp_option_t *opt );
+GLWidget *Init_BoolChooserWidget( xp_option_t *opt, int *fgcolor, int *bgcolor );
 /**************************/
 /* End: BoolChooserWidget */
 /**************************/
@@ -224,17 +226,18 @@ GLWidget *Init_BoolChooserWidget( font_data *font, xp_option_t *opt );
 /***************************/
 #define INTCHOOSERWIDGET 6
 typedef struct {
-    string_tex_t    nametex;
+    GLWidget	    *name;
     xp_option_t     *opt;
     int     	    valuespace;
     string_tex_t    valuetex;
-    font_data 	    *font;
     GLWidget	    *leftarrow;
     GLWidget	    *rightarrow;
     int     	    direction;
+    int     	    *fgcolor;
+    int     	    *bgcolor;
 } IntChooserWidget;
 
-GLWidget *Init_IntChooserWidget( font_data *font, xp_option_t *opt );
+GLWidget *Init_IntChooserWidget( xp_option_t *opt, int *fgcolor, int *bgcolor );
 /*************************/
 /* End: IntChooserWidget */
 /*************************/
@@ -244,17 +247,18 @@ GLWidget *Init_IntChooserWidget( font_data *font, xp_option_t *opt );
 /******************************/
 #define DOUBLECHOOSERWIDGET 7
 typedef struct {
-    string_tex_t    nametex;
+    GLWidget	    *name;
     xp_option_t     *opt;
     int     	    valuespace;
     string_tex_t    valuetex;
-    font_data 	    *font;
     GLWidget	    *leftarrow;
     GLWidget	    *rightarrow;
     int     	    direction;
+    int     	    *fgcolor;
+    int     	    *bgcolor;
 } DoubleChooserWidget;
 
-GLWidget *Init_DoubleChooserWidget( font_data *font, xp_option_t *opt );
+GLWidget *Init_DoubleChooserWidget( xp_option_t *opt, int *fgcolor, int *bgcolor );
 /****************************/
 /* End: DoubleChooserWidget */
 /****************************/

@@ -1840,7 +1840,7 @@ void Paint_messages(void)
 	    }
 	    if (strlen(msg->txt)) {
 	    	if ( strcmp(msg->txt, wi->tex.text) ) {
-		    tmp2 = Init_LabelWidget(msg->txt,&nullRGBA,&messagesColorRGBA,LEFT,CENTER);
+		    tmp2 = Init_LabelWidget(msg->txt,&messagesColorRGBA,&nullRGBA,LEFT,CENTER);
 		    ListWidget_Insert(msg_list[i],tmp,tmp2);
 		    if (ListWidget_NELEM(msg_list[i])>maxMessages) {
 		    	tmp = ListWidget_GetItemByIndex(msg_list[i],maxMessages);
@@ -1854,7 +1854,7 @@ void Paint_messages(void)
 	    }
 	} else {
 	    if (strlen(msg->txt)) {
-		tmp2 = Init_LabelWidget(msg->txt,&nullRGBA,&messagesColorRGBA,LEFT,CENTER);
+		tmp2 = Init_LabelWidget(msg->txt,&messagesColorRGBA,&nullRGBA,LEFT,CENTER);
 		ListWidget_Append(msg_list[i],tmp2);
 	    }
 	}
@@ -1876,7 +1876,7 @@ void Paint_messages(void)
 	    }
 	}
 	
-	if (tmp2) LabelWidget_SetColor(tmp2, &nullRGBA, msg_color);
+	if (tmp2) LabelWidget_SetColor(tmp2, msg_color, &nullRGBA);
     }
     	
     old_maxMessages = maxMessages;
