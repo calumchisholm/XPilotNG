@@ -1827,6 +1827,8 @@ static void Poly_to_lines()
 
     linec = 0;
     for (i = 0; i < polyc; i++) {
+	if (pdata[i].is_decor)
+	    continue;
 	group = pdata[i].group;
 	np = pdata[i].num_points;
 	styleptr = estyleptr + pdata[i].estyles_start;

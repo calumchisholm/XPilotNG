@@ -254,6 +254,7 @@ typedef struct {
     int num_points;
     int estyles_start;
     int num_echanges;
+    int is_decor;
 } poly_t;
 
 extern struct polystyle pstyles[256];

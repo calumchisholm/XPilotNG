@@ -190,7 +190,7 @@ poly_t *pdata;
 
 int num_pstyles, num_bstyles, num_estyles = 1; /* "Internal" edgestyle */
 static int max_bases, max_balls, max_fuels, max_checks, max_polys,max_echanges;
-static int current_estyle, current_group;
+static int current_estyle, current_group, is_decor;
 
 static int get_bmp_id(const char *s)
 {
@@ -246,7 +246,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 {
     static double scale = 1;
 
-    if (!strcasecmp(el, "polystyle")) {
+    if (!strcasecmp(el, "Polystyle")) {
 	pstyles[num_pstyles].id[sizeof(pstyles[0].id) - 1] = 0;
 	pstyles[num_pstyles].color = 0;
 	pstyles[num_pstyles].texture_id = 0;
@@ -276,7 +276,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	num_pstyles++;
     }
 
-    if (!strcasecmp(el, "edgestyle")) {
+    if (!strcasecmp(el, "Edgestyle")) {
 	estyles[num_estyles].id[sizeof(estyles[0].id) - 1] = 0;
 	estyles[num_estyles].width = 0;
 	estyles[num_estyles].color = 0;
@@ -296,7 +296,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	num_estyles++;
     }
 
-    if (!strcasecmp(el, "bmpstyle")) {
+    if (!strcasecmp(el, "Bmpstyle")) {
 	bstyles[num_bstyles].flags = 0;
 	bstyles[num_bstyles].filename[sizeof(bstyles[0].filename) - 1] = 0;
 	bstyles[num_bstyles].id[sizeof(bstyles[0].id) - 1] = 0;
@@ -345,6 +345,9 @@ static void tagstart(void *data, const char *el, const char **attr)
 	groups[current_group].hit_mask = NONBALL_BIT | (((NOTEAM_BIT << 1) - 1) & ~(1 << team));
     }
 
+    if (!strcasecmp(el, "Decor"))
+	is_decor = 1;
+
     if (!strcasecmp(el, "Polygon")) {
 	int x, y, style = -1;
 	poly_t t;
@@ -370,6 +373,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	t.edges = edges;
 	t.style = style;
 	t.estyles_start = ecount;
+	t.is_decor = is_decor;
 	current_estyle = pstyles[style].defedge_id;
 	STORE(poly_t, pdata, polyc, max_polys, t);
 	return;
@@ -512,6 +516,8 @@ static void tagstart(void *data, const char *el, const char **attr)
 static void tagend(void *data, const char *el)
 {
     void cmdhack(void);
+    if (!strcasecmp(el, "Decor"))
+	is_decor = 0;
     if (!strcasecmp(el, "BallArea") || !strcasecmp(el, "BallTarget"))
 	current_group = 0;
     if (!strcasecmp(el, "Polygon")) {
