@@ -145,21 +145,21 @@ int	manyLivesColor;		/* Color to associate with >2 lives */
 
 static void Paint_clock(bool redraw);
 
-void Game_over_action(u_byte stat)
+void Game_over_action(u_byte status)
 {
-    static u_byte old_stat = 0;
+    static u_byte old_status = 0;
 
-    if (BIT(old_stat, GAME_OVER) && !BIT(stat, GAME_OVER)
-	&& !BIT(stat,PAUSE))
+    if (BIT(old_status, GAME_OVER) && !BIT(status, GAME_OVER)
+	&& !BIT(status,PAUSE))
 	XMapRaised(dpy, top);
 
     /* GAME_OVER -> PLAYING */
-    if (BIT(old_stat, PLAYING|PAUSE|GAME_OVER) != PLAYING) {
-	if (BIT(stat, PLAYING|PAUSE|GAME_OVER) == PLAYING)
+    if (BIT(old_status, PLAYING|PAUSE|GAME_OVER) != PLAYING) {
+	if (BIT(status, PLAYING|PAUSE|GAME_OVER) == PLAYING)
 	    Reset_shields();
     }
 
-    old_stat = stat;
+    old_status = status;
 }
 
 

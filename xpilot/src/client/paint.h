@@ -283,12 +283,12 @@ void Init_paint(void);
 void Add_message(char *message);
 int Handle_start(long server_loops);
 int Handle_end(long server_loops);
-int Handle_self(int x, int y, int vx, int vy, int dir,
-    float power, float turnspeed, float turnresistance,
-    int lock_id, int lock_dist, int lock_dir,
-    int nextCheckPoint, int autopilotLight,
-    u_byte *newNumItems,
-    int currentTank, int fuel_sum, int fuel_max, int packet_size);
+int Handle_self(int x, int y, int vx, int vy, int newHeading,
+		float newPower, float newTurnspeed, float newTurnresistance,
+		int newLockId, int newLockDist, int newLockBearing,
+		int newNextCheckPoint, int newAutopilotLight,
+		u_byte *newNumItems, int newCurrentTank,
+		int newFuelSum, int newFuelMax, int newPacketSize);
 int Handle_self_items(u_byte *newNumItems);
 int Handle_modifiers(char *m);
 int Handle_damaged(int damaged);
@@ -322,7 +322,8 @@ int Handle_vbase(int x, int y, int xi, int yi, int type);
 int Handle_vdecor(int x, int y, int xi, int yi, int type);
 int Handle_message(char *msg);
 int Handle_eyes(int id);
-void Paint_item_symbol(u_byte type, Drawable d, GC mygc, int x, int y, int color);
+void Paint_item_symbol(u_byte type, Drawable d, GC mygc,
+		       int x, int y, int color);
 void Paint_item(u_byte type, Drawable d, GC mygc, int x, int y);
 void Paint_shots(void);
 void Paint_ships(void);
@@ -348,7 +349,7 @@ void Paint_recording(void);
 void Paint_client_fps(void);
 void Paint_frame(void);
 int Handle_time_left(long sec);
-void Game_over_action(u_byte stat);
+void Game_over_action(u_byte status);
 int Team_color(int);
 int Life_color(other_t *other);
 
