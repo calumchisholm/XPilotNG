@@ -1896,6 +1896,18 @@ void Paint_messages(void)
 		}
 	    }
 	}
+
+	/* kps ugly hack */
+	if (newbie && msg->txt) {
+	    const char *help = "[*Newbie help*]";
+	    size_t sz = strlen(msg->txt);
+	    size_t hsz = strlen(help);
+
+	    if (sz > hsz
+		&& !strcmp(help, &msg->txt[sz - hsz]))
+		msg_color = &whiteRGBA;
+	}
+
 	
 	if (tmp2) LabelWidget_SetColor(tmp2, msg_color, &nullRGBA);
     }
