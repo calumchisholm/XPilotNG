@@ -433,6 +433,7 @@ static int Bitmap_create_begin(Drawable d, xp_pixmap_t * pm, int bmp)
  */
 static int Bitmap_create_end(Drawable d)
 {
+    (void)d;
     return 0;
 }
 

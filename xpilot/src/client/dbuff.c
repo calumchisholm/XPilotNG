@@ -220,8 +220,7 @@ void dbuff_init_buffer(dbuff_state_t *state)
 	}
 	drawPixmap = state->mbx.mbx_draw[state->colormap_index];
     }
-#endif
-#ifdef DBE
+#elif defined DBE
     if (state->type == MULTIBUFFER) {
 	if (state->colormap_index == 2) {
 	    state->colormap_index = 0;
@@ -236,6 +235,8 @@ void dbuff_init_buffer(dbuff_state_t *state)
 	}
 	drawPixmap = state->dbe.dbe_draw;
     }
+#else
+    (void)state;
 #endif
 }
 
@@ -321,6 +322,8 @@ void dbuff_list(Display *display)
 {
 #ifdef DBE
     dbuff_list_dbe(display);
+#else
+    (void)display;
 #endif
 }
 

@@ -718,6 +718,7 @@ int sock_readable(sock_t *sock)
 
 static void sock_catch_alarm(int signum)
 {
+    (void)signum;
     printf("DNS lookup cancelled\n");
 
     longjmp(env, 1);

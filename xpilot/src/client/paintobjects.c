@@ -411,6 +411,7 @@ static void Paint_teamshots(int i, int t_, int x_areas, int y_areas, int areas)
 {
     int		x, y, j /*, color */;
 
+    (void)areas;
     /*
      * Teamshots are in range DEBRIS_TYPES to DEBRIS_TYPES*2-1 in fastshot.
      */

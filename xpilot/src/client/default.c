@@ -3797,5 +3797,6 @@ static void Get_test_resources(XrmDatabase rDB)
 #else
 static void Get_test_resources(XrmDatabase rDB)
 {
+    (void)rDB;
 }
 #endif

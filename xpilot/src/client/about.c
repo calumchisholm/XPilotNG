@@ -433,7 +433,7 @@ static bool		keys_created = false;
 
 int Keys_callback(int widget_desc, void *data, const char **unused)
 {
-    (void)widget_desc; (void)data;
+    (void)widget_desc; (void)data; (void)unused;
     if (keys_created == false) {
 	unsigned	bufsize = (maxKeyDefs * 64);
 	char		*buf = calloc(bufsize, 1),
