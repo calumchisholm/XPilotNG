@@ -1937,7 +1937,7 @@ static option_desc options[] = {
 	"True",
 	&allowShipShapes,
 	valBool,
-	tuner_none,
+	tuner_dummy,
 	"Are players allowed to define their own ship shape?\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
