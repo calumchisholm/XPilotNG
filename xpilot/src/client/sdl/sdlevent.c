@@ -184,11 +184,12 @@ int Process_event(SDL_Event *evt)
 	    } else {
     	    	GLWidget *tmp = FindGLWidget(MainWidget,evt->button.x,evt->button.y);
 		if (tmp != hovertarget) {
-		    if (tmp && tmp->hover)
-    	    	    	tmp->hover(true,evt->button.x,evt->button.y,tmp->hoverdata);
     	    	    if (hovertarget && hovertarget->hover) {
 		    	hovertarget->hover(false,evt->button.x,evt->button.y,hovertarget->hoverdata);
 		    }
+		    tmp = FindGLWidget(MainWidget,evt->button.x,evt->button.y);
+		    if (tmp && tmp->hover)
+    	    	    	tmp->hover(true,evt->button.x,evt->button.y,tmp->hoverdata);
 		    hovertarget = tmp;
 		}
 	    }

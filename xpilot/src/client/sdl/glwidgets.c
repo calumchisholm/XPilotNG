@@ -31,6 +31,7 @@
 
 static void option_callback( void *opt, const char *value );
 static void confmenu_callback( void );
+static void hover_optionWidget( int over, Uint16 x , Uint16 y , void *data );
 
 GLWidget *Init_EmptyBaseGLWidget( void )
 {
@@ -130,6 +131,81 @@ void SetBounds_GLWidget( GLWidget *widget, SDL_Rect *b )
     	widget->bounds.y = b->y;
     	widget->bounds.w = b->w;
     	widget->bounds.h = b->h;
+    }
+}
+
+static void hover_optionWidget( int over, Uint16 x , Uint16 y , void *data )
+{
+    static GLWidget *hoverWidget, *labelWidget;
+    xp_option_t *opt;
+    static SDL_Rect b;
+    const char *help;
+    static char line[256];
+    int start = 0, end = 0;
+    bool eternalLoop = true;
+    static Uint32 bgColor = 0x0000ff88;
+    
+    if (!data) {
+    	error("NULL option passed to hover_optionWidget\n");
+	return;
+    }
+    
+    opt = (xp_option_t *)data;
+    
+    if (over) {
+    	if (help = Option_get_help(opt)) {
+    	    if (!(hoverWidget = Init_ListWidget( x, y, &nullRGBA, &nullRGBA, &nullRGBA, DOWN, LEFT ,false ))) {
+	    	error("hover_optionWidget: Failed to create ListWidget\n");
+		return;
+	    }
+	    
+    	    if (!(labelWidget = Init_LabelWidget( Option_get_name(opt), &yellowRGBA, &bgColor, CENTER, CENTER ))) {
+    	    	error("hover_optionWidget: Failed to create LabelWidget\n");
+    	    	Close_Widget(&hoverWidget);
+    	    	return;
+    	    }
+    	    ListWidget_Append( hoverWidget , labelWidget );
+	    
+	    for ( end=0 ; end < 1000000; ++end) {
+	    	if ( help[end] != '\n' && help[end] != '\0') {
+		    continue;
+		}
+
+    	    	if (start != end ) {
+		    strncpy(&line[0],help+start,MIN(255,end-start));
+		    line[MIN(255,end-start)]='\0';
+
+    	    	    if (!(labelWidget = Init_LabelWidget( &line[0], &whiteRGBA, &bgColor, CENTER, CENTER ))) {
+    	    	    	error("hover_optionWidget: Failed to create LabelWidget\n");
+		    	Close_Widget(&hoverWidget);
+    	    	    	return;
+    	    	    }
+    	    	    ListWidget_Append( hoverWidget , labelWidget );
+		}
+		
+    	    	start = end+1;
+		if (help[end] == '\0') {
+		    eternalLoop = false;
+		    break;
+		}
+	    }
+	    
+	    if (eternalLoop) error("hover_optionWidget: string parse never ends! (infinite loop prevented)\n");
+
+	    AppendGLWidgetList( &(MainWidget->children), hoverWidget );
+
+   	    b.h = hoverWidget->bounds.h;
+    	    b.w = hoverWidget->bounds.w;
+    	    b.x = x - hoverWidget->bounds.w - 10;
+    	    b.y = y - hoverWidget->bounds.h/2;
+	    
+    	    SetBounds_GLWidget(hoverWidget,&b);
+    	}
+    } else {
+    	if (!hoverWidget)
+	    return;
+    	DelGLWidgetListItem( &(MainWidget->children), hoverWidget );
+    	Close_Widget(&hoverWidget);
     }
 }
 
@@ -1264,6 +1340,9 @@ GLWidget *Init_BoolChooserWidget( const char *name, bool *value, Uint32 *fgcolor
     }
     AppendGLWidgetList(&(tmp->children),wid_info->name);
     
+    wid_info->name->hover   	= hover_optionWidget;
+    wid_info->name->hoverdata	= data;
+    
     if ( !(wid_info->buttonwidget = Init_LabeledRadiobuttonWidget(BoolChooserWidget_ontex,
     	    	    	    	    	BoolChooserWidget_offtex, BoolChooserWidget_SetValue,
 					tmp, *(value))) ) {
@@ -1535,6 +1614,9 @@ GLWidget *Init_IntChooserWidget( const char *name, int *value, int minval, int m
 	return NULL;
     }
     
+    wid_info->name->hover   	= hover_optionWidget;
+    wid_info->name->hoverdata	= data;
+    
     if ( !AppendGLWidgetList(&(tmp->children),(wid_info->leftarrow  = Init_ArrowWidget(LEFTARROW,buttonsize,buttonsize,IntChooserWidget_Subtract,tmp))) ) {
     	Close_Widget(&tmp);
     	error("Init_IntChooserWidget couldn't init leftarrow!");
@@ -1795,6 +1877,9 @@ GLWidget *Init_DoubleChooserWidget( const char *name, double *value, double minv
 	return NULL;
     }
     
+    wid_info->name->hover   	= hover_optionWidget;
+    wid_info->name->hoverdata	= data;
+    
     if ( !AppendGLWidgetList(&(tmp->children),(wid_info->leftarrow  = Init_ArrowWidget(LEFTARROW,buttonsize,buttonsize,DoubleChooserWidget_Subtract,tmp))) ) {
     	Close_Widget(&tmp);
     	error("Init_DoubleChooserWidget: couldn't init leftarrow!");
@@ -2001,6 +2086,10 @@ GLWidget *Init_ColorChooserWidget( const char *name, Uint32 *value, Uint32 *fgco
     	error("Init_ColorChooserWidget: Failed to initialize label [%s]",name);
 	return NULL;
     }
+
+    wid_info->name->hover   	= hover_optionWidget;
+    wid_info->name->hoverdata	= data;
+    
     if ( !AppendGLWidgetList(&(tmp->children),(wid_info->button = Init_ButtonWidget( wid_info->value, &whiteRGBA, action_ColorChooserWidget, tmp ))) ) {
     	Close_Widget(&tmp);
     	error("Init_ColorChooserWidget: Failed to initialize button");
