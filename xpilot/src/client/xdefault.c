@@ -36,6 +36,7 @@ bool	showNastyShots = false;	/* show original flavor shots or the new
 int pre_acc_num, new_acc_num;   /* pre are the Saved mouse settings */
 int pre_acc_denom, new_acc_denom; 
 int pre_threshold, new_threshold; 
+bool mouseAccelInClient = false;
 
 #ifdef DEVELOPMENT
 static bool testxsync = false;
@@ -142,8 +143,10 @@ bool Set_acc(xp_option_t *opt, int value)
     new_acc_num = value;
     if (dpy) {
 #ifndef _WINDOWS
-      XChangePointerControl(dpy, True, True, value,
-			    new_acc_denom, new_threshold);
+      if (mouseAccelInClient) {
+	XChangePointerControl(dpy, True, True, value,
+			      new_acc_denom, new_threshold);
+      }
 #endif
     }
     return true;
@@ -159,8 +162,10 @@ bool Set_accdenom(xp_option_t *opt, int value)
     new_acc_denom = value;
     if (dpy) {
 #ifndef _WINDOWS
+      if (mouseAccelInClient) {
 	XChangePointerControl(dpy, True, True, new_acc_num,
-			    value, new_threshold);
+			      value, new_threshold);
+      }
 #endif
     }
     return true;
@@ -176,8 +181,10 @@ bool Set_accthresh(xp_option_t *opt, int value)
     new_threshold = value;
     if (dpy) {
 #ifndef _WINDOWS
-      XChangePointerControl(dpy, True, True, new_acc_num,
-			    new_acc_denom, value);
+      if (mouseAccelInClient) {
+	XChangePointerControl(dpy, True, True, new_acc_num,
+			      new_acc_denom, value);
+      }
 #endif
     }
     return true;
@@ -359,6 +366,14 @@ xp_option_t xdefault_options[] = {
 	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Use the new Nasty Looking Shots or the original rectangle shots,\n"
 	"You will probably want to increase your shotSize if you use this.\n"),
+    
+    XP_BOOL_OPTION(
+        "mouseAccelInClient",
+	false,
+	&mouseAccelInClient,
+	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
+	"Set to true if you want to set the mouse turn rates to be linear\n"),
 
     XP_INT_OPTION(
         "mouseAccelNum",
@@ -368,7 +383,7 @@ xp_option_t xdefault_options[] = {
 	&new_acc_num,
 	Set_acc,
 	XP_OPTFLAG_CONFIG_DEFAULT,
-	"Set the mouse acceleration\n"),
+	"Fine tune the mouse acceleration\n"),
 
     XP_INT_OPTION(
         "mouseAccelDenom",

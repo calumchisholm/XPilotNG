@@ -35,13 +35,15 @@ extern Cursor	pointerControlCursor;
 /* XPilot Mouse settings */
 extern int new_acc_num, new_acc_denom, new_threshold;
 extern int pre_acc_num, pre_acc_denom, pre_threshold;
+extern bool mouseAccelInClient;
+
 keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
 {
     keys_t ret = Generic_lookup_key((xp_keysym_t)ks, reset);
 
     UNUSED_PARAM(event);
     IFWINDOWS( Trace("Lookup_key: got key ks=%04X ret=%d\n", ks, ret) );
-
+  
 #ifdef DEVELOPMENT
     if (reset && ret == KEY_DUMMY) {
 	static XComposeStatus compose;
@@ -141,7 +143,7 @@ static void Talk_set_state(bool on)
 bool Key_press_pointer_control(void)
 {
 #ifndef _WINDOWS
-  if (pointerControl) {
+  if ((pointerControl) && (mouseAccelInClient)) {
     XChangePointerControl(dpy, True, True, pre_acc_num, pre_acc_denom, pre_threshold);
   } else {
     XChangePointerControl(dpy, True, True, new_acc_num, new_acc_denom, new_threshold);
