@@ -78,9 +78,8 @@
 <Polystyle id="xpyellow" color="FFBB11" defedge="xpyellowhidden" flags="1"/>
 <Polystyle id="emptyyellow" color="FF" defedge="yellow" flags="0"/>
 <Polystyle id="emptywhite" color="FF" defedge="white" flags="0"/>
-<Polystyle id="t2ball" color="44FF44" defedge="dummy"/>
-<Polystyle id="t3ball" color="FF4444" defedge="dummy"/>
-<Polystyle id="t4ball" color="FFFF00" defedge="dummy"/>
+<Polystyle id="t2ball" color="88FF88" defedge="dummy"/>
+<Polystyle id="t4ball" color="FFFF88" defedge="dummy"/>
 <Polygon x="87757" y="0" style="tex47rock">
 <Offset x="141" y="-282"/>
 <Offset x="3787" y="-3786"/>
