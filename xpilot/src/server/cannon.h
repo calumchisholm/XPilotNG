@@ -84,6 +84,9 @@ extern long CANNON_USE_ITEM;
 /* sector in which cannonfire is possible */
 #define CANNON_SPREAD		(RES / 3)
 
+/* cannon smartness is 0 to this value */
+#define CANNON_SMARTNESS_MAX	3
+
 void Cannon_update(world_t *world, bool tick);
 void Cannon_init(cannon_t *cannon);
 void Cannon_init_items(cannon_t *cannon);
@@ -101,6 +104,8 @@ void Cannon_set_option(cannon_t *cannon, const char *name, const char *value);
 
 static inline int Cannon_get_smartness(cannon_t *c)
 {
+    if (c->smartness != -1)
+	return c->smartness;
     return options.cannonSmartness;
 }
 
@@ -127,6 +132,8 @@ static inline double Cannon_get_shot_life(cannon_t *cannon)
 
 static inline double Cannon_get_shot_speed(cannon_t *cannon)
 {
+    if (cannon->shot_speed > 0)
+	return cannon->shot_speed;
     return options.cannonShotSpeed;
 }
 

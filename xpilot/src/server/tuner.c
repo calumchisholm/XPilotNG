@@ -138,7 +138,7 @@ void tuner_worldlives(world_t *world)
 void tuner_cannonsmartness(world_t *world)
 {
     UNUSED_PARAM(world);
-    LIMIT(options.cannonSmartness, 0, 3);
+    LIMIT(options.cannonSmartness, 0, CANNON_SMARTNESS_MAX);
 }
 
 void tuner_teamcannons(world_t *world)

@@ -119,7 +119,6 @@ extern struct options {
     bool	teamCannons;
     int		cannonSmartness;
     bool	cannonsUseItems;
-    bool	cannonsDefend;
     bool	cannonFlak;
     double	cannonDeadTicks;
     double	minCannonShotLife;

@@ -1194,18 +1194,6 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-	"cannonsDefend",
-	"cannonsDefend",
-	"yes",
-	&options.cannonsDefend,
-	valBool,
-	tuner_none,
-	"Do cannons actively use defensive items like emergency shields and\n"
-	"phasing devices?\n"
-	"This only works if cannons are actually allowed to use items.\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    {
 	"cannonFlak",
 	"cannonAAA",
 	"yes",

@@ -68,7 +68,6 @@ void Cannon_update(world_t *world, bool tick)
 	 */
 	if (tick) {
 	    if (options.cannonsUseItems
-		&& options.cannonsDefend
 		&& rfrac() < 0.65)
 		Cannon_check_defense(c);
 
@@ -939,6 +938,22 @@ void Cannon_set_option(cannon_t *cannon, const char *name, const char *value)
     item = Item_by_option_name(name);
     if (item != NO_ITEM) {
 	cannon->initial_items[item] = atoi(value);
+	return;
+    }
+
+    if (!strcasecmp(name, "cannonsmartness")) {
+	int smartness = atoi(value);
+
+	LIMIT(smartness, 0, CANNON_SMARTNESS_MAX);
+	cannon->smartness = smartness;
+	return;
+    }
+
+    if (!strcasecmp(name, "cannonshotspeed")) {
+	float shot_speed = atof(value);
+
+	/* limit ? */
+	cannon->shot_speed = shot_speed;
 	return;
     }
 

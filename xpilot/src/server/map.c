@@ -128,6 +128,8 @@ int World_place_cannon(world_t *world, clpos_t pos, int dir, int team)
     }
     for (i = 0; i < NUM_ITEMS; i++)
 	t.initial_items[i] = -1;
+    t.shot_speed = -1;
+    t.smartness = -1;
     STORE(cannon_t, world->cannons, world->NumCannons, world->MaxCannons, t);
     cannon = Cannon_by_index(world, ind);
     assert(Cannon_by_id(world, t.id) == cannon);

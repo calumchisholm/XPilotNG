@@ -119,7 +119,9 @@ typedef struct cannon {
     double	phasing_left;
     int		group;
     double	score;
-    int		id;
+    short	id;
+    short	smartness;
+    float	shot_speed;
     int		initial_items[NUM_ITEMS];
 } cannon_t;
 
