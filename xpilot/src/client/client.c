@@ -115,7 +115,7 @@ char	*packet_measure;	/* packet measurement in a second */
 long	packet_loop;		/* start of measurement */
 
 bool	showRealName = false;	/* Show realname instead of nick name */
-char	name[MAX_CHARS];	/* Nick-name of player */
+char	nickname[MAX_CHARS];	/* Nick-name of player */
 char	realname[MAX_CHARS];	/* Real name of player */
 char	servername[MAX_CHARS];	/* Name of server connecting to */
 unsigned	version;	/* Version of the server */
@@ -1065,7 +1065,8 @@ int Handle_player(int id, int player_team, int mychar, char *player_name,
 	other = &Others[num_others++];
     }
     if (self == NULL
-	&& (myself || (version < 0x4F10 && strcmp(name, player_name) == 0))) {
+	&& (myself
+	    || (version < 0x4F10 && strcmp(nickname, player_name) == 0))) {
 	if (other != &Others[0]) {
 	    /* Make `self' the first member of Others[]. */
 	    *other = Others[0];

@@ -168,7 +168,7 @@ static void sigcatch(int signum)
 }
 
 int Join(char *server_addr, char *server_name, int port, char *real,
-	 char *nick, int my_team, char *display, unsigned version)
+	 char *nick, int my_team, char *display, unsigned server_version)
 {
     signal(SIGINT, sigcatch);
     signal(SIGTERM, sigcatch);
@@ -179,9 +179,9 @@ int Join(char *server_addr, char *server_name, int port, char *real,
 
     IFWINDOWS( received_self = FALSE );
     IFWINDOWS( Progress("Client_init") );
-    if (Client_init(server_name, version) == -1) {
+    if (Client_init(server_name, server_version) == -1)
 	return -1;
-    }
+
     IFWINDOWS( Progress("Net_init %s", server_addr) );
     if (Net_init(server_addr, port) == -1) {
 	Client_cleanup();

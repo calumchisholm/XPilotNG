@@ -151,7 +151,7 @@ static void RWriteHeader(void)
     putc('\n', recordFP);
 
     /* Write player's nick, login, host, server, FPS and the date. */
-    RWriteString(name);
+    RWriteString(nickname);
     RWriteString(realname);
     RWriteString(hostname);
     RWriteString(servername);

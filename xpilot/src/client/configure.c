@@ -2007,7 +2007,7 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
 			";\n"
 			"; General configuration options\n"
 			";\n");
-    Config_save_resource(fp, "name", name);
+    Config_save_resource(fp, "name", nickname);
     Config_save_float(fp, "power", power);
     Config_save_float(fp, "turnSpeed", turnspeed);
     Config_save_float(fp, "turnResistance", turnresistance);

@@ -31,8 +31,8 @@ extern int Handle_motd(long off, char *buf, int len, long filesize);
 extern void aboutCleanup(void);
 
 #ifdef _WINDOWS
-extern	void Motd_destroy();
-extern	void Keys_destroy();
+extern	void Motd_destroy(void);
+extern	void Keys_destroy(void);
 #endif
 
 extern int motd_viewer;		/* so Windows can clean him up */
@@ -70,7 +70,7 @@ extern	char* Get_xpilotini_file(int level);
  */
 extern int Join(char *server_addr, char *server_name, int port,
 		char *real, char *nick, int my_team,
-		char *display, unsigned version);
+		char *display, unsigned server_version);
 
 /*
  * mapdata.c

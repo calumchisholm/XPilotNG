@@ -3006,11 +3006,11 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     }
 
     strlcpy(realname, realName, sizeof(realname));
-    strlcpy(name, nickName, sizeof(name));
+    strlcpy(nickname, nickName, sizeof(nickname));
 
     Get_int_resource(rDB, "team", my_team);
 
-    IFWINDOWS( Config_get_name(name) );
+    IFWINDOWS( Config_get_name(nickname) );
     IFWINDOWS( Config_get_team(my_team) );
 
     if (*my_team < 0 || *my_team > 9)

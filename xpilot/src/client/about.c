@@ -34,7 +34,7 @@ char about_version[] = VERSION;
 #define ABOUT_WINDOW_WIDTH	600
 #define ABOUT_WINDOW_HEIGHT	700
 
-static bool		about_created;
+static bool		about_created = false;
 
 
 #define NUM_ABOUT_PAGES		4
@@ -411,7 +411,7 @@ void About(Window w)
 	    about_page = NUM_ABOUT_PAGES-1;
 	Expose_about_window();
     }
-	WinXFlush(about_w);
+    WinXFlush(about_w);
 }
 
 
@@ -484,7 +484,7 @@ int Keys_callback(int widget_desc, void *data, const char **unused)
     return 0;
 }
 
-void Keys_destroy()
+void Keys_destroy(void)
 {
     Widget_destroy(keys_viewer);
     keys_viewer = NO_WIDGET;
@@ -511,7 +511,7 @@ int Motd_callback(int widget_desc, void *data, const char **str)
     return 0;
 }
 
-void Motd_destroy()
+void Motd_destroy(void)
 {
     Widget_destroy(motd_viewer);
     motd_viewer = NO_WIDGET;
@@ -573,9 +573,8 @@ int Handle_motd(long off, char *buf, int len, long filesize)
 	if (motd_viewer == NO_WIDGET)
 	    warn("Can't create MOTD viewer");
     }
-    else if (len > 0) {
+    else if (len > 0)
 	Widget_update_viewer(motd_viewer, motd_buf, off + len);
-    }
 
     return 0;
 }
