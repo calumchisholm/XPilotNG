@@ -3463,7 +3463,7 @@ static option_desc opts[] = {
     },
     {
 	"maraTurnqueue",
-	"maraTurnqueue",
+	"maraTurns",
 	"false",
 	&options.maraTurnqueue,
 	valBool,
@@ -3471,6 +3471,19 @@ static option_desc opts[] = {
 	"This is a temporary option to test Mara's \"turnqueue\" hack.\n"
 	"The idea is that if a ship is turning when it hits the wall,\n"
 	"the turn will be completed after the bounce.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"oldAcceleration",
+	"oldThrust",
+	"0.0",
+	&options.oldAcceleration,
+	valReal,
+	tuner_dummy,
+	"This option adds an error to movement code allowing you to\n"
+	"mimic the broken dynamics model of the old 1:1 gamespeed:fps\n"
+	"servers by each frame adding the errors the old servers made.\n"
+	"(for this effect use 1.0)\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {

@@ -39,13 +39,12 @@ static bool do_update_this_frame = false; /* less frequent update this frame */
 static inline void update_object_speed(world_t *world, object_t *obj)
 {
     if (BIT(obj->status, GRAVITY)) {
-	vector_t gravity = World_gravity(world, obj->pos);
-
-	obj->vel.x += (obj->acc.x + gravity.x) * timeStep;
-	obj->vel.y += (obj->acc.y + gravity.y) * timeStep;
+		vector_t gravity = World_gravity(world, obj->pos);
+		obj->vel.x += (obj->acc.x + gravity.x) * timeStep;
+		obj->vel.y += (obj->acc.y + gravity.y) * timeStep;
     } else {
-	obj->vel.x += obj->acc.x * timeStep;
-	obj->vel.y += obj->acc.y * timeStep;
+		obj->vel.x += obj->acc.x * timeStep;
+		obj->vel.y += obj->acc.y * timeStep;
     }
 }
 
@@ -472,6 +471,7 @@ static void Misc_object_update(world_t *world)
 {
     int i;
     object_t *obj;
+    vector_t oldvel;
 
     for (i = 0; i < NumObjs; i++) {
 	obj = Obj[i];
@@ -502,11 +502,13 @@ static void Misc_object_update(world_t *world)
 	    pulse->len += options.pulseSpeed * timeStep;
 	    LIMIT(pulse->len, 0, options.pulseLength);
 	}
-
+    	
+	oldvel.x = obj->vel.x;
+	oldvel.y = obj->vel.y;
 	update_object_speed(world, obj);
 
 	if (!BIT(obj->type, OBJ_ASTEROID))
-	    Move_object(obj);
+	    Move_object(obj,oldvel);
     }
 }
 
@@ -779,9 +781,12 @@ static void Update_players(world_t *world)
 {
     int i;
     player_t *pl;
+    object_t *obj;
+    vector_t oldvel;
 
     for (i = 0; i < NumPlayers; i++) {
 	pl = Players(i);
+	obj = OBJ_PTR(pl);
 
 	if (BIT(pl->status, PAUSE)) {
 	    if (options.pauseTax > 0.0 && (frame_loops % FPS) == 0) {
@@ -834,7 +839,7 @@ static void Update_players(world_t *world)
 	    else {
 		/* Player didn't recover yet. */
 		Transport_to_home(pl);
-		Move_player(pl);
+		Move_player(pl,obj->vel);
 		continue;
 	    }
 	}
@@ -920,9 +925,11 @@ static void Update_players(world_t *world)
 	    else
 		Traverse_wormhole(pl);
 	}
-
-	update_object_speed(world, OBJ_PTR(pl));
-	Move_player(pl);
+    	
+    	oldvel.x = obj->vel.x;
+    	oldvel.y = obj->vel.y;
+	update_object_speed(world, obj);
+	Move_player(pl,oldvel);
 
 	/*
 	 * kps - hack to measure distance travelled, use e.g. with

@@ -2383,15 +2383,23 @@ void Treasure_init(world_t *world)
 }
 
 
-static void Move_asteroid(object_t *obj)
+static void Move_asteroid(object_t *obj, vector_t oldvel)
 {
     move_t mv;
     struct collans ans;
     world_t *world = &World;
     wireobject_t *asteroid = (wireobject_t *)obj;
+    vector_t deltavel;
+	
+    deltavel.x = obj->vel.x - oldvel.x;
+    deltavel.y = obj->vel.y - oldvel.y;
+	    
+    mv.delta.cx = FLOAT_TO_CLICK( (obj->vel.x - deltavel.x/2.0) * timeStep);
+    mv.delta.cy = FLOAT_TO_CLICK( (obj->vel.y - deltavel.y/2.0) * timeStep);
 
-    mv.delta.cx = FLOAT_TO_CLICK(obj->vel.x * timeStep);
-    mv.delta.cy = FLOAT_TO_CLICK(obj->vel.y * timeStep);
+    obj->vel.x -= deltavel.x/2.0;
+    obj->vel.y -= deltavel.y/2.0;
+
     mv.obj = obj;
     obj->extmove.cx = mv.delta.cx;
     obj->extmove.cy = mv.delta.cy;
@@ -2433,21 +2441,33 @@ static void Move_asteroid(object_t *obj)
 	    }
 	}
     }
+
+    obj->vel.x += deltavel.x/2.0;
+    obj->vel.y += deltavel.y/2.0;
+
     Object_position_set_clvec(world, obj, mv.start);
     Cell_add_object(world, obj);
     return;
 }
 
 
-static void Move_ball(object_t *obj)
+static void Move_ball(object_t *obj, vector_t oldvel)
 {
     move_t mv;
     struct collans ans;
     int owner;
     world_t *world = &World;
+    vector_t deltavel;
 
-    mv.delta.cx = FLOAT_TO_CLICK(obj->vel.x * timeStep);
-    mv.delta.cy = FLOAT_TO_CLICK(obj->vel.y * timeStep);
+    deltavel.x = obj->vel.x - oldvel.x;
+    deltavel.y = obj->vel.y - oldvel.y;
+	    
+    mv.delta.cx = FLOAT_TO_CLICK( (obj->vel.x - deltavel.x/2.0) * timeStep);
+    mv.delta.cy = FLOAT_TO_CLICK( (obj->vel.y - deltavel.y/2.0) * timeStep);
+
+    obj->vel.x -= deltavel.x/2.0;
+    obj->vel.y -= deltavel.y/2.0;
+
     mv.obj = obj;
     obj->extmove.cx = mv.delta.cx;
     obj->extmove.cy = mv.delta.cy;
@@ -2505,13 +2525,17 @@ static void Move_ball(object_t *obj)
 	    }
 	}
     }
+
+    obj->vel.x += deltavel.x/2.0;
+    obj->vel.y += deltavel.y/2.0;
+
     Object_position_set_clvec(world, obj, mv.start);
     Cell_add_object(world, obj);
     return;
 }
 
 
-void Move_object(object_t *obj)
+void Move_object(object_t *obj, vector_t oldvel)
 {
     int t;
     move_t mv;
@@ -2519,6 +2543,7 @@ void Move_object(object_t *obj)
     int trycount = 5000;
     int team;            /* !@# should make TEAM_NOT_SET 0 */
     world_t *world = &World;
+    vector_t deltavel;
 
     mv.obj = obj;
     Object_position_remember(obj);
@@ -2526,13 +2551,13 @@ void Move_object(object_t *obj)
     obj->collmode = 1;
 
     if (obj->type == OBJ_ASTEROID) {
-	Move_asteroid(obj);
+	Move_asteroid(obj,oldvel);
 	return;
     }
 
 #if 1
     if (obj->type == OBJ_BALL) {
-	Move_ball(obj);
+	Move_ball(obj,oldvel);
 	return;
     }
 #else
@@ -2552,8 +2577,16 @@ void Move_object(object_t *obj)
     mv.hitmask |= HITMASK(team);
     mv.start.cx = obj->pos.cx;
     mv.start.cy = obj->pos.cy;
-    mv.delta.cx = FLOAT_TO_CLICK(obj->vel.x * timeStep);
-    mv.delta.cy = FLOAT_TO_CLICK(obj->vel.y * timeStep);
+
+    deltavel.x = obj->vel.x - oldvel.x;
+    deltavel.y = obj->vel.y - oldvel.y;
+	    
+    mv.delta.cx = FLOAT_TO_CLICK( (obj->vel.x - deltavel.x/2.0) * timeStep);
+    mv.delta.cy = FLOAT_TO_CLICK( (obj->vel.y - deltavel.y/2.0) * timeStep);
+
+    obj->vel.x -= deltavel.x/2.0;
+    obj->vel.y -= deltavel.y/2.0;
+
     obj->extmove.cx = mv.delta.cx;
     obj->extmove.cy = mv.delta.cy;
     while (mv.delta.cx || mv.delta.cy) {
@@ -2582,6 +2615,9 @@ void Move_object(object_t *obj)
 	    }
 	}
     }
+    obj->vel.x += deltavel.x/2.0;
+    obj->vel.y += deltavel.y/2.0;
+
     Object_position_set_clvec(world, obj, mv.start);
     Cell_add_object(world, obj);
     return;
@@ -2589,7 +2625,7 @@ void Move_object(object_t *obj)
 
 bool in_move_player = false;
 
-void Move_player(player_t *pl)
+void Move_player(player_t *pl, vector_t oldvel)
 {
     clpos_t  pos;
     move_t mv;
@@ -2597,6 +2633,7 @@ void Move_player(player_t *pl)
     double fric = friction;
     vector_t oldv;
     world_t *world = &World;
+    vector_t offvel,deltavel;
 
     if (!Player_is_playing(pl)) {
 	if (!BIT(pl->status, KILLED|PAUSE)) {
@@ -2654,12 +2691,41 @@ void Move_player(player_t *pl)
     pl->collmode = 1;
 
     mv.obj = OBJ_PTR(pl);
-    mv.delta.cx = FLOAT_TO_CLICK(pl->vel.x * timeStep);
-    mv.delta.cy = FLOAT_TO_CLICK(pl->vel.y * timeStep);
+
+    offvel.x = 0.0;
+    offvel.y = 0.0;
+    if (options.oldAcceleration != 0.0) {
+    	if (BIT(mv.obj->status, GRAVITY)) {
+    	    deltavel = World_gravity(world, mv.obj->pos);
+    	    offvel.x = options.oldAcceleration*(pl->acc.x + deltavel.x) / 2.0;
+    	    offvel.y = options.oldAcceleration*(pl->acc.y + deltavel.y) / 2.0;
+    	} else {
+    	    offvel.x = options.oldAcceleration*pl->acc.x / 2.0;
+    	    offvel.y = options.oldAcceleration*pl->acc.y / 2.0;
+    	}
+    }
+    
+    deltavel.x = pl->vel.x - oldvel.x;
+    deltavel.y = pl->vel.y - oldvel.y;
+	    
+    mv.delta.cx = FLOAT_TO_CLICK( (pl->vel.x - deltavel.x/2.0 + offvel.x) * timeStep);
+    mv.delta.cy = FLOAT_TO_CLICK( (pl->vel.y - deltavel.y/2.0 + offvel.y) * timeStep);
 #if 0
     pl->extmove.cx = mv.delta.cx;
     pl->extmove.cy = mv.delta.cy;
 #endif
+
+    /* if we assume the ship will only bounce once
+     * and roughly midway through the frame
+     * half the accelleration should be saved
+     * until after the bounce
+     * ofcourse to be accurate we should redo accelleration
+     * after each bounce, that might mean several bounces in a row
+     * on the same wall in one frame though, and when already touching
+     * a wall, you'd need some special code to prevent infinate loops
+     */
+    pl->vel.x -= deltavel.x/2.0;
+    pl->vel.y -= deltavel.y/2.0;
 
     if (BIT(pl->used, HAS_PHASING_DEVICE)) {
 	pos.cx = pl->pos.cx + mv.delta.cx;
@@ -2689,8 +2755,7 @@ void Move_player(player_t *pl)
 		    Bounce_player(pl, &mv, ans.line, ans.point);
 		    if (BIT(pl->status, KILLED))
 			break;
-		}
-		else if (!Shape_away(&mv, (shape_t *)pl->ship, pl->dir,
+		} else if (!Shape_away(&mv, (shape_t *)pl->ship, pl->dir,
 				     ans.line, &ans)) {
 		    if (SIDE(pl->vel.x, pl->vel.y, ans.line) < 0) {
 			Bounce_player(pl, &mv, ans.line, ans.point);
@@ -2716,6 +2781,10 @@ void Move_player(player_t *pl)
 	}
 	Player_position_set_clvec(pl, mv.start);
     }
+
+    pl->vel.x += deltavel.x/2.0;
+    pl->vel.y += deltavel.y/2.0;
+
     pl->velocity = VECTOR_LENGTH(pl->vel);
     /* !@# Better than ignoring collisions after wall touch for players,
      * but might cause some erroneous hits */
