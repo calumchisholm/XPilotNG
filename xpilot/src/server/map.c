@@ -72,7 +72,7 @@ static void Realloc_map_objects(world_t *world)
 	   world->NumItemConcs, world->MaxItemConcs);
     SHRINK(asteroid_concentrator_t, world->asteroidConcs,
 	   world->NumAsteroidConcs, world->MaxAsteroidConcs);
-    SHRINK(frictionarea_t, world->frictionAreas,
+    SHRINK(friction_area_t, world->frictionAreas,
 	   world->NumFrictionAreas, world->MaxFrictionAreas);
 }
 
@@ -244,14 +244,15 @@ int World_place_grav(world_t *world, clpos pos, double force, int type)
     return ind;
 }
 
-int World_place_frictionarea(world_t *world, double fric)
+int World_place_friction_area(world_t *world, clpos pos, double fric)
 {
-    frictionarea_t t;
+    friction_area_t t;
     int ind = world->NumFrictionAreas;
 
+    t.pos = pos;
     t.friction_setting = fric;
     /*t.friction = ... ; handled in timing setup */
-    STORE(frictionarea_t, world->frictionAreas,
+    STORE(friction_area_t, world->frictionAreas,
 	  world->NumFrictionAreas, world->MaxFrictionAreas, t);
     return ind;
 }

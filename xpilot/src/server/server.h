@@ -482,7 +482,7 @@ int World_place_treasure(world_t *world, clpos pos, int team, bool empty);
 int World_place_wormhole(world_t *world, clpos pos, wormType type);
 int World_place_item_concentrator(world_t *world, clpos pos);
 int World_place_asteroid_concentrator(world_t *world, clpos pos);
-int World_place_frictionarea(world_t *world, double fric);
+int World_place_friction_area(world_t *world, clpos pos, double fric);
 
 void World_add_temporary_wormholes(world_t *world, clpos pos1, clpos pos2);
 void Wormhole_line_init(void);
@@ -583,7 +583,7 @@ hitmask_t Wormhole_hitmask(wormhole_t *wormhole);
 bool Wormhole_hitfunc(group_t *groupptr, move_t *move);
 void World_remove_wormhole(world_t *world, wormhole_t *wormhole);
 
-bool Frictionarea_hitfunc(group_t *groupptr, move_t *move);
+bool Friction_area_hitfunc(group_t *groupptr, move_t *move);
 
 void Team_immunity_init(void);
 void Hitmasks_init(void);
@@ -964,8 +964,8 @@ int P_start_wormhole(int wormhole_ind);
 void P_end_wormhole(void);
 void P_start_decor(void);
 void P_end_decor(void);
-int P_start_frictionarea(int area_ind);
-void P_end_frictionarea(void);
+int P_start_friction_area(int fa_ind);
+void P_end_friction_area(void);
 int P_get_bmp_id(const char *s);
 int P_get_edge_id(const char *s);
 int P_get_poly_id(const char *s);

@@ -2750,7 +2750,7 @@ void Move_player(player *pl)
 	group = is_inside(pl->pos.cx, pl->pos.cy, NONBALL_BIT, (object *)pl);
 	if (group != NO_GROUP) {
 	    for (i = 0; i < world->NumFrictionAreas; i++) {
-		frictionarea_t *fa = FrictionAreas(world, i);
+		friction_area_t *fa = FrictionAreas(world, i);
 
 		if (fa->group == group) {
 		    fric = fa->friction;

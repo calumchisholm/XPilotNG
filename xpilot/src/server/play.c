@@ -680,7 +680,7 @@ void World_remove_wormhole(world_t *world, wormhole_t *wormhole)
 /* kps - this is really ugly */
 extern bool in_move_player;
 
-bool Frictionarea_hitfunc(group_t *groupptr, move_t *move)
+bool Friction_area_hitfunc(group_t *groupptr, move_t *move)
 {
     (void)groupptr; (void)move;
 

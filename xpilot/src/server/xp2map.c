@@ -381,14 +381,15 @@ static void tagstart(void *data, const char *el, const char **attr)
     if (!strcasecmp(el, "FrictionArea")) {
 	double fric = 0.0;
 	int area_ind;
+	clpos pos = { 0, 0 }; /* unused place holder */
 
 	while (*attr) {
 	    if (!strcasecmp(*attr, "friction"))
 		fric = atof(*(attr + 1));
 	    attr += 2;
 	}
-	area_ind = World_place_frictionarea(world, fric);
-	P_start_frictionarea(area_ind);
+	area_ind = World_place_friction_area(world, pos, fric);
+	P_start_friction_area(area_ind);
 	return;
     }
 
@@ -445,7 +446,7 @@ static void tagend(void *data, const char *el)
     else if (!strcasecmp(el, "Target"))
 	P_end_target();
     else if (!strcasecmp(el, "FrictionArea"))
-	P_end_frictionarea();
+	P_end_friction_area();
     else if (!strcasecmp(el, "Polygon"))
 	P_end_polygon();
 

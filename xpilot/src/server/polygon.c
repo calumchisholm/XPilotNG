@@ -294,20 +294,20 @@ void P_end_wormhole(void)
     current_group = 0;
 }
 
-int P_start_frictionarea(int area_ind)
+int P_start_friction_area(int fa_ind)
 {
     world_t *world = &World;
-    frictionarea_t *fa = FrictionAreas(world, area_ind);
+    friction_area_t *fa = FrictionAreas(world, fa_ind);
 
     fa->group = Create_group(FRICTION,
 			     TEAM_NOT_SET,
 			     0,
-			     Frictionarea_hitfunc,
-			     area_ind);
+			     Friction_area_hitfunc,
+			     fa_ind);
     return fa->group;
 }
 
-void P_end_frictionarea(void)
+void P_end_friction_area(void)
 {
     current_group = 0;
 }

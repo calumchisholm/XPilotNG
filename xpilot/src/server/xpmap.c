@@ -31,6 +31,7 @@ static void Xpmap_treasure_to_polygon(int treasure_ind);
 static void Xpmap_target_to_polygon(int target_ind);
 static void Xpmap_cannon_to_polygon(int cannon_ind);
 static void Xpmap_wormhole_to_polygon(int wormhole_ind);
+static void Xpmap_friction_area_to_polygon(int fa_ind);
 
 static bool		compress_maps = true;
 
@@ -614,6 +615,15 @@ static void Xpmap_place_grav(world_t *world, blpos blk,
 	World_place_grav(world, Xpmap_get_clpos(blk), force, type);
 }
 
+static void Xpmap_place_friction_area(world_t *world, blpos blk, bool create)
+{
+    World_set_block(world, blk, FRICTION);
+    if (create)
+	World_place_friction_area(world,
+				  Xpmap_get_clpos(blk),
+				  options.blockFriction);
+}
+
 static void Xpmap_place_block(world_t *world, blpos blk, int type)
 {
     World_set_block(world, blk, type);
@@ -748,7 +758,7 @@ void Xpmap_tags_to_internal_data(world_t *world, bool create)
 		break;
 
 	    case 'z':
-		Xpmap_place_block(world, blk, FRICTION);
+		Xpmap_place_friction_area(world, blk, create);
 		break;
 
 	    case 'b':
@@ -1123,6 +1133,19 @@ static void Xpmap_wormhole_to_polygon(int wormhole_ind)
     P_end_wormhole();
 }
 
+static void Xpmap_friction_area_to_polygon(int fa_ind)
+{
+    int ps, es;
+    world_t *world = &World;
+    friction_area_t *fa = FrictionAreas(world, fa_ind);
+
+    ps = P_get_poly_id("fa_ps");
+    es = P_get_edge_id("fa_es");
+
+    P_start_friction_area(fa_ind);
+    Xpmap_block_polygon(fa->pos, ps, es);
+    P_end_friction_area();
+}
 
 /*
  * Add a wall polygon
@@ -1339,6 +1362,9 @@ void Xpmap_blocks_to_polygons(world_t *world)
     P_edgestyle("wormhole_es", 2, 0x00FFFF, 0);
     P_polystyle("wormhole_ps", 0x00FFFF, 2, P_get_edge_id("wormhole_es"), 0);
 
+    P_edgestyle("fa_es", 2, 0xFF1F00, 0);
+    P_polystyle("fa_ps", 0xCF1F00, 2, P_get_edge_id("fa_es"), 0);
+
     Xpmap_walls_to_polygons(world);
 
     if (options.polygonMode)
@@ -1355,6 +1381,9 @@ void Xpmap_blocks_to_polygons(world_t *world)
 
     for (i = 0; i < world->NumWormholes; i++)
 	Xpmap_wormhole_to_polygon(i);
+
+    for (i = 0; i < world->NumFrictionAreas; i++)
+	Xpmap_friction_area_to_polygon(i);
 
     /*xpprintf("Created %d polygons.\n", num_polys);*/
 }

@@ -224,11 +224,12 @@ typedef struct asteroid_concentrator {
     clpos	pos;
 } asteroid_concentrator_t;
 
-typedef struct frictionarea {
+typedef struct friction_area {
+    clpos	pos;
     double	friction_setting;	/* Setting from map */
     double	friction;		/* Changes with gameSpeed */
     int		group;
-} frictionarea_t;
+} friction_area_t;
 
 extern bool is_polygon_map;
 
@@ -276,7 +277,7 @@ typedef struct {
     int		NumAsteroidConcs, MaxAsteroidConcs;
     asteroid_concentrator_t	*asteroidConcs;
     int		NumFrictionAreas, MaxFrictionAreas;
-    frictionarea_t		*frictionAreas;
+    friction_area_t		*frictionAreas;
 } world_t;
 
 extern world_t		World;
@@ -393,7 +394,7 @@ static inline item_concentrator_t *ItemConcs(world_t *world, int ind)
     return &world->itemConcs[ind];
 }
 
-static inline frictionarea_t *FrictionAreas(world_t *world, int ind)
+static inline friction_area_t *FrictionAreas(world_t *world, int ind)
 {
     return &world->frictionAreas[ind];
 }

@@ -3012,7 +3012,7 @@ static option_desc opts[] = {
 	"0.0",
 	&options.blockFriction,
 	valReal,
-	tuner_dummy,
+	Timing_setup,
 	"Fraction of velocity ship loses each frame when it is in friction \n"
 	"blocks.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
@@ -3613,10 +3613,13 @@ void Timing_setup(void)
      */
     timeStep = options.gameSpeed / FPS;
 
+    /*
+     * EXPERIMENTAL FEATURE:
+     * Negative values for friction give an "acceleration area".
+     * kps - maybe we should remove FrictionArea and add AccelerationArea.
+     */
+    LIMIT(options.frictionSetting, -1, 1);
     friction = options.frictionSetting;
-
-    /* If friction > 1, the result is silly - allow such settings but
-     * don't bother making it "FPSMultiplier independent" */
     if (friction < 1)
 	friction = 1. - pow(1. - friction, timeStep);
 
@@ -3625,10 +3628,17 @@ void Timing_setup(void)
 	int i;
 	double fric;
 
-	for (i = 0; i < world->NumFrictionAreas; i++) {
-	    frictionarea_t *fa = FrictionAreas(world, i);
+	LIMIT(options.blockFriction, -1, 1);
 
-	    fric = fa->friction_setting;
+	for (i = 0; i < world->NumFrictionAreas; i++) {
+	    friction_area_t *fa = FrictionAreas(world, i);
+
+	    if (is_polygon_map)
+		fric = fa->friction_setting;
+	    else
+		fric = options.blockFriction;
+
+	    LIMIT(fric, -1, 1);
 	    if (fric < 1)
 		fric = 1. - pow(1. - fric, timeStep);
 	    fa->friction = fric;
