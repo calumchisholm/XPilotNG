@@ -62,10 +62,10 @@ typedef enum {
 
 typedef enum {
     NotABounce = 0,
-    BounceHorLo = 0x01,
-    BounceHorHi = 0x02,
-    BounceVerLo = 0x04,
-    BounceVerHi = 0x08,
+    BounceLeft = 0x01,
+    BounceRight = 0x02,
+    BounceDown = 0x04,
+    BounceUp = 0x08,
     BounceLeftDown = 0x10,
     BounceLeftUp = 0x20,
     BounceRightDown = 0x40,

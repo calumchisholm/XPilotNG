@@ -300,7 +300,7 @@ void Treasure_init(void)
 
 static void Bounce_edge(move_state_t *ms, move_bounce_t bounce)
 {
-    if (bounce == BounceHorLo) {
+    if (bounce == BounceLeft) {
 	if (ms->mip->edge_bounce) {
 	    ms->todo.cx = -ms->todo.cx;
 	    ms->vel.x = -ms->vel.x;
@@ -316,7 +316,7 @@ static void Bounce_edge(move_state_t *ms, move_bounce_t bounce)
 	    }
 	}
     }
-    else if (bounce == BounceHorHi) {
+    else if (bounce == BounceRight) {
 	if (ms->mip->edge_bounce) {
 	    ms->todo.cx = -ms->todo.cx;
 	    ms->vel.x = -ms->vel.x;
@@ -332,7 +332,7 @@ static void Bounce_edge(move_state_t *ms, move_bounce_t bounce)
 	    }
 	}
     }
-    else if (bounce == BounceVerLo) {
+    else if (bounce == BounceDown) {
 	if (ms->mip->edge_bounce) {
 	    ms->todo.cy = -ms->todo.cy;
 	    ms->vel.y = -ms->vel.y;
@@ -348,7 +348,7 @@ static void Bounce_edge(move_state_t *ms, move_bounce_t bounce)
 	    }
 	}
     }
-    else if (bounce == BounceVerHi) {
+    else if (bounce == BounceUp) {
 	if (ms->mip->edge_bounce) {
 	    ms->todo.cy = -ms->todo.cy;
 	    ms->vel.y = -ms->vel.y;
@@ -373,28 +373,28 @@ static void Bounce_wall(move_state_t *ms, move_bounce_t bounce)
 	ms->crash = CrashWall;
 	return;
     }
-    if (bounce == BounceHorLo) {
+    if (bounce == BounceLeft) {
 	ms->todo.cx = -ms->todo.cx;
 	ms->vel.x = -ms->vel.x;
 	if (!ms->mip->pl) {
 	    ms->dir = MOD2(RES/2 - ms->dir, RES);
 	}
     }
-    else if (bounce == BounceHorHi) {
+    else if (bounce == BounceRight) {
 	ms->todo.cx = -ms->todo.cx;
 	ms->vel.x = -ms->vel.x;
 	if (!ms->mip->pl) {
 	    ms->dir = MOD2(RES/2 - ms->dir, RES);
 	}
     }
-    else if (bounce == BounceVerLo) {
+    else if (bounce == BounceDown) {
 	ms->todo.cy = -ms->todo.cy;
 	ms->vel.y = -ms->vel.y;
 	if (!ms->mip->pl) {
 	    ms->dir = MOD2(RES - ms->dir, RES);
 	}
     }
-    else if (bounce == BounceVerHi) {
+    else if (bounce == BounceUp) {
 	ms->todo.cy = -ms->todo.cy;
 	ms->vel.y = -ms->vel.y;
 	if (!ms->mip->pl) {
@@ -565,7 +565,7 @@ static void Move_segment(move_state_t *ms)
 		block.x += World.x;
 	    }
 	    else {
-		Bounce_edge(ms, BounceHorLo);
+		Bounce_edge(ms, BounceLeft);
 		return;
 	    }
 	}
@@ -573,7 +573,7 @@ static void Move_segment(move_state_t *ms)
     else if (enter.cx == mp.click_width - 1
 	     && !mi->edge_wrap
 	     && ms->vel.x > 0) {
-	Bounce_edge(ms, BounceHorHi);
+	Bounce_edge(ms, BounceRight);
 	return;
     }
     if (offset.cy == 0) {
@@ -583,7 +583,7 @@ static void Move_segment(move_state_t *ms)
 		block.y += World.y;
 	    }
 	    else {
-		Bounce_edge(ms, BounceVerLo);
+		Bounce_edge(ms, BounceDown);
 		return;
 	    }
 	}
@@ -591,7 +591,7 @@ static void Move_segment(move_state_t *ms)
     else if (enter.cy == mp.click_height - 1
 	     && !mi->edge_wrap
 	     && ms->vel.y > 0) {
-	Bounce_edge(ms, BounceVerHi);
+	Bounce_edge(ms, BounceUp);
 	return;
     }
 
@@ -1033,22 +1033,22 @@ static void Move_segment(move_state_t *ms)
 	}
 	if (offset.cx == 0) {
 	    if (ms->vel.x > 0) {
-		wall_bounce |= BounceHorLo;
+		wall_bounce |= BounceLeft;
 	    }
 	}
 	else if (offset.cx == BLOCK_CLICKS) {
 	    if (ms->vel.x < 0) {
-		wall_bounce |= BounceHorHi;
+		wall_bounce |= BounceRight;
 	    }
 	}
 	if (offset.cy == 0) {
 	    if (ms->vel.y > 0) {
-		wall_bounce |= BounceVerLo;
+		wall_bounce |= BounceDown;
 	    }
 	}
 	else if (offset.cy == BLOCK_CLICKS) {
 	    if (ms->vel.y < 0) {
-		wall_bounce |= BounceVerHi;
+		wall_bounce |= BounceUp;
 	    }
 	}
 	if (wall_bounce) {
@@ -1074,7 +1074,7 @@ static void Move_segment(move_state_t *ms)
 	/* test for bounces first. */
 	if (offset.cx == 0) {
 	    if (ms->vel.x > 0) {
-		wall_bounce |= BounceHorLo;
+		wall_bounce |= BounceLeft;
 	    }
 	    if (offset.cy == BLOCK_CLICKS && ms->vel.x + ms->vel.y < 0) {
 		wall_bounce |= BounceLeftDown;
@@ -1082,7 +1082,7 @@ static void Move_segment(move_state_t *ms)
 	}
 	if (offset.cy == 0) {
 	    if (ms->vel.y > 0) {
-		wall_bounce |= BounceVerLo;
+		wall_bounce |= BounceDown;
 	    }
 	    if (offset.cx == BLOCK_CLICKS && ms->vel.x + ms->vel.y < 0) {
 		wall_bounce |= BounceLeftDown;
@@ -1138,7 +1138,7 @@ static void Move_segment(move_state_t *ms)
     case REC_LU:
 	if (offset.cx == 0) {
 	    if (ms->vel.x > 0) {
-		wall_bounce |= BounceHorLo;
+		wall_bounce |= BounceLeft;
 	    }
 	    if (offset.cy == 0 && ms->vel.x < ms->vel.y) {
 		wall_bounce |= BounceLeftUp;
@@ -1146,7 +1146,7 @@ static void Move_segment(move_state_t *ms)
 	}
 	if (offset.cy == BLOCK_CLICKS) {
 	    if (ms->vel.y < 0) {
-		wall_bounce |= BounceVerHi;
+		wall_bounce |= BounceUp;
 	    }
 	    if (offset.cx == BLOCK_CLICKS && ms->vel.x < ms->vel.y) {
 		wall_bounce |= BounceLeftUp;
@@ -1197,7 +1197,7 @@ static void Move_segment(move_state_t *ms)
     case REC_RD:
 	if (offset.cx == BLOCK_CLICKS) {
 	    if (ms->vel.x < 0) {
-		wall_bounce |= BounceHorHi;
+		wall_bounce |= BounceRight;
 	    }
 	    if (offset.cy == BLOCK_CLICKS && ms->vel.x > ms->vel.y) {
 		wall_bounce |= BounceRightDown;
@@ -1205,7 +1205,7 @@ static void Move_segment(move_state_t *ms)
 	}
 	if (offset.cy == 0) {
 	    if (ms->vel.y > 0) {
-		wall_bounce |= BounceVerLo;
+		wall_bounce |= BounceDown;
 	    }
 	    if (offset.cx == 0 && ms->vel.x > ms->vel.y) {
 		wall_bounce |= BounceRightDown;
@@ -1256,7 +1256,7 @@ static void Move_segment(move_state_t *ms)
     case REC_RU:
 	if (offset.cx == BLOCK_CLICKS) {
 	    if (ms->vel.x < 0) {
-		wall_bounce |= BounceHorHi;
+		wall_bounce |= BounceRight;
 	    }
 	    if (offset.cy == 0 && ms->vel.x + ms->vel.y > 0) {
 		wall_bounce |= BounceRightUp;
@@ -1264,7 +1264,7 @@ static void Move_segment(move_state_t *ms)
 	}
 	if (offset.cy == BLOCK_CLICKS) {
 	    if (ms->vel.y < 0) {
-		wall_bounce |= BounceVerHi;
+		wall_bounce |= BounceUp;
 	    }
 	    if (offset.cx == 0 && ms->vel.x + ms->vel.y > 0) {
 		wall_bounce |= BounceRightUp;
@@ -1341,7 +1341,7 @@ static void Move_segment(move_state_t *ms)
 	    CLR_BIT(wall_bounce, bit);
 	    switch (bit) {
 
-	    case BounceHorLo:
+	    case BounceLeft:
 		blk2.x = block.x - 1;
 		if (blk2.x < 0) {
 		    if (!mi->edge_wrap) {
@@ -1356,7 +1356,7 @@ static void Move_segment(move_state_t *ms)
 		}
 		break;
 
-	    case BounceHorHi:
+	    case BounceRight:
 		blk2.x = block.x + 1;
 		if (blk2.x >= World.x) {
 		    if (!mi->edge_wrap) {
@@ -1371,7 +1371,7 @@ static void Move_segment(move_state_t *ms)
 		}
 		break;
 
-	    case BounceVerLo:
+	    case BounceDown:
 		blk2.x = block.x;
 		blk2.y = block.y - 1;
 		if (blk2.y < 0) {
@@ -1386,7 +1386,7 @@ static void Move_segment(move_state_t *ms)
 		}
 		break;
 
-	    case BounceVerHi:
+	    case BounceUp:
 		blk2.x = block.x;
 		blk2.y = block.y + 1;
 		if (blk2.y >= World.y) {
@@ -1409,16 +1409,16 @@ static void Move_segment(move_state_t *ms)
 	if (!count) {
 	    wall_bounce = save_wall_bounce;
 	    switch (wall_bounce) {
-	    case BounceHorLo|BounceVerLo:
+	    case BounceLeft|BounceDown:
 		wall_bounce = BounceLeftDown;
 		break;
-	    case BounceHorLo|BounceVerHi:
+	    case BounceLeft|BounceUp:
 		wall_bounce = BounceLeftUp;
 		break;
-	    case BounceHorHi|BounceVerLo:
+	    case BounceRight|BounceDown:
 		wall_bounce = BounceRightDown;
 		break;
-	    case BounceHorHi|BounceVerHi:
+	    case BounceRight|BounceUp:
 		wall_bounce = BounceRightUp;
 		break;
 	    default:
@@ -1948,11 +1948,11 @@ void Move_player_old(int ind)
 		}
 
 		switch (ms[worst].bounce) {
-		case BounceHorLo: wall_dir = 4*RES/8; break;
-		case BounceHorHi: wall_dir = 0*RES/8; break;
-		case BounceVerLo: wall_dir = 6*RES/8; break;
+		case BounceLeft: wall_dir = 4*RES/8; break;
+		case BounceRight: wall_dir = 0*RES/8; break;
+		case BounceDown: wall_dir = 6*RES/8; break;
 		default:
-		case BounceVerHi: wall_dir = 2*RES/8; break;
+		case BounceUp: wall_dir = 2*RES/8; break;
 		case BounceLeftDown: wall_dir = 1*RES/8; break;
 		case BounceLeftUp: wall_dir = 7*RES/8; break;
 		case BounceRightDown: wall_dir = 3*RES/8; break;
