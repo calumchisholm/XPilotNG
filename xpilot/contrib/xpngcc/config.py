@@ -1,9 +1,13 @@
 import os
+import sys
 
 meta = ('meta.xpilot.org', 4401)
 client = 'xpilot-ng-x11'
 server = 'xpilot-ng-server'
-xpilotrc = os.environ['HOME'] + '/.xpilotrc'
+if (sys.platform == "win32"):
+	xpilotrc = 'C:\\Program Files\\XPilotNG-SDL\\xpilotrc.txt'
+else:
+	xpilotrc = os.environ['HOME'] + '/.xpilotrc'
 record_url = 'http://xpilot.sourceforge.net/ballruns/'
 xpreplay = 'xpilot-ng-replay'
 jxpmap_url = 'http://xpilot.sf.net/jxpmap/jxpmap.jnlp'
