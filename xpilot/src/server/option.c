@@ -297,7 +297,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 		strncpy(bstyles[num_bstyles].id, *(attr + 1),
 			sizeof(bstyles[0].id) - 1);
 	    if (!strcasecmp(*attr, "filename"))
-		strncpy(bstyles[num_bstyles].id, *(attr + 1),
+		strncpy(bstyles[num_bstyles].filename, *(attr + 1),
 			sizeof(bstyles[0].filename) - 1);
 	    if (!strcasecmp(*attr, "scalable"))
 		if (!strcasecmp(*(attr + 1), "yes"))
