@@ -48,10 +48,18 @@ extern char textFontName[FONT_LEN];
 extern char talkFontName[FONT_LEN];
 extern char motdFontName[FONT_LEN];
 
+#define NUM_DASHES		2
+#define NUM_CDASHES		2
+#define DASHES_LENGTH		12
+
+extern char	dashes[NUM_DASHES];
+extern char	cdashes[NUM_CDASHES];
+
 extern Display	*dpy;			/* Display of player (pointer) */
 extern Display	*kdpy;			/* Keyboard display */
 extern short	about_page;		/* Which page is the player on? */
 extern int	radar_exposures;	/* Is radar window exposed? */
+extern bool     radar_score_mapped;     /* Is the radar and score window mapped */
 
 #define	ITEM_HUD	0		/* one color for the HUD */
 #define	ITEM_PLAYFIELD	1		/* and one color for the playfield */
@@ -72,6 +80,7 @@ extern Window	about_close_b;		/* About close button */
 extern Window	about_next_b;		/* About next page button */
 extern Window	about_prev_b;		/* About prev page button */
 extern Window	talkWindow;		/* Talk window */
+extern bool	talk_mapped;		/* Is talk window visible */
 extern XColor	colors[MAX_COLORS];	/* Colors */
 extern Colormap	colormap;		/* Private colormap */
 extern int	maxColors;		/* Max. number of colors to use */
@@ -89,6 +98,15 @@ static inline void SET_FG(unsigned long fg)
     if (fg != current_foreground)
 	XSetForeground(dpy, gameGC, current_foreground = fg);
 }
+
+extern short	scaleArray[];
+extern void	Init_scale_array(void);
+
+#define	WINSCALE(x)	((x) >= 0 ? scaleArray[(x)] : -scaleArray[-(x)])
+#define	UWINSCALE(x)	((unsigned)(scaleArray[(x)]))
+#define SCALEX(co) ((int) (WINSCALE(co) - WINSCALE(world.x)))
+#define SCALEY(co) ((int) (WINSCALE(world.y + ext_view_height) - WINSCALE(co)))
+
 
 static inline void Check_name_string(other_t *other)
 {
