@@ -628,30 +628,6 @@ void Contact(int fd, void *arg)
     }
     return;
 
-    case MAX_ROBOT_pack:
-    {
-	/*
-	 * Set the maximum of robots wanted in the server
-	 */
-	int max_robots;
-
-	if (Packet_scanf(&ibuf, "%d", &max_robots) <= 0
-	    || max_robots < 0)
-	    status = E_INVAL;
-	else {
-	    options.maxRobots = max_robots;
-	    if (options.maxRobots < options.minRobots)
-		options.minRobots = options.maxRobots;
-	    while (options.maxRobots < NumRobots)
-		Robot_delete(NULL, true);
-	}
-
-	Sockbuf_clear(&ibuf);
-	Packet_printf(&ibuf, "%u%c%c", my_magic, reply_to, status);
-    }
-    break;
-
-
     default:
 	/*
 	 * Incorrect packet type.

@@ -157,7 +157,7 @@
 #define	REPLY_pack		0x10
 #define	REPORT_STATUS_pack	0x21
 #define	OPTION_LIST_pack	0x28
-#define	CORE_pack		0x30
+/*#define	CORE_pack		0x30*/
 #define	CONTACT_pack		0x31
 /* The owner-only commands have a common bit high. */
 #define PRIVILEGE_PACK_MASK	0x40
@@ -165,7 +165,7 @@
 #define	MESSAGE_pack		0x63
 #define	SHUTDOWN_pack		0x64
 #define	KICK_PLAYER_pack	0x65
-#define	MAX_ROBOT_pack		0x66
+/*#define	MAX_ROBOT_pack		0x66*/
 #define	OPTION_TUNE_pack	0x67
 #define	CREDENTIALS_pack	0x69
 

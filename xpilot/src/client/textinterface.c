@@ -201,14 +201,11 @@ static void Command_help(void)
 	   "M    -   send a Message.               (only owner)\n"
 	   "L    -   Lock/unLock server access.    (only owner)\n"
 	   "D(*) -   shutDown/cancel shutDown.     (only owner)\n"
-	   "R(#) -   set maximum number of Robots. (only owner)\n"
 	   "O    -   Modify a server option.       (only owner)\n"
 	   "V    -   View the server options.\n"
 	   "J(&) or just Return enters the game.\n");
     printf("(*) If you don't specify any delay, you will signal that\n"
 	   "    the server should stop an ongoing shutdown.\n"
-	   "(#) Not specifying the maximum number of robots is\n"
-	   "    the same as specifying 0 robots.\n"
 	   "(&) You may specify a team number after the J.\n");
 }
 
@@ -352,22 +349,6 @@ static bool Process_commands(sockbuf_t *ibuf,
 		}
 		linebuf[MAX_NAME_LEN - 1] = '\0';
 		Packet_printf(ibuf, "%c%ld%s", KICK_PLAYER_pack, key, linebuf);
-		break;
-
-	    case 'R':
-		printf("Enter maximum number of robots: ");
-		fflush(stdout);
-		if (!getline(linebuf, MAX_LINE, stdin)) {
-		    printf("Nothing changed.\n");
-		    continue;
-		}
-		if (sscanf(linebuf, "%d", &max_robots) <= 0
-		    || max_robots < 0) {
-		    printf("Invalid number of robots \"%s\".\n", linebuf);
-		    continue;
-		}
-		Packet_printf(ibuf, "%c%ld%d",
-			      MAX_ROBOT_pack, key, max_robots);
 		break;
 
 	    case 'M':				/* Send a message to server. */
