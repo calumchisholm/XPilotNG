@@ -131,12 +131,50 @@ static void Usage(void)
 /* kps tries to make this work without Xrm */
 
 
-bool helpsetfunc(const char *name,
-		 const char *value,
-		 void *private)
+bool help_setfunc(const char *name, const char *value, void *private)
 {
     return true;
 }
+
+bool power_setfunc(const char *name, const char *value, void *private)
+{
+    double dval;
+
+    assert(value);
+    dval = atof(value);
+    if (dval < MIN_PLAYER_POWER || dval > MAX_PLAYER_POWER)
+	return false;
+    power = dval;
+    warn("power is now %f\n", power);
+    return true;
+}
+
+bool turnspeed_setfunc(const char *name, const char *value, void *private)
+{
+    double dval;
+    
+    assert(value);
+    dval = atof(value);
+    if (dval < MIN_PLAYER_TURNSPEED || dval > MAX_PLAYER_TURNSPEED)
+	return false;
+    turnspeed = dval;
+    warn("turnspeed is now %f\n", turnspeed);
+    return true;
+}
+
+bool turnres_setfunc(const char *name, const char *value, void *private)
+{
+    double dval;
+    
+    assert(value);
+    dval = atof(value);
+    if (dval < MIN_PLAYER_TURNRESISTANCE || dval > MAX_PLAYER_TURNRESISTANCE)
+	return false;
+    turnresistance = dval;
+    warn("turnres is now %f\n", turnresistance);
+    return true;
+}
+
 
 cl_option_t default_options[] = {
     {
@@ -146,9 +184,46 @@ cl_option_t default_options[] = {
 	KEY_DUMMY,
 	"Display this help message.\n",
 	0,
-	helpsetfunc,
-	default_options
-    }
+	help_setfunc,
+	NULL
+    },
+    {
+	"power",
+	NULL,
+	"55.0",
+	KEY_DUMMY,
+	"Set the engine power.\n"
+	"Valid values are in the range 5-55.\n",
+	0,
+	power_setfunc,
+	NULL
+    },
+    {
+	"turnSpeed",
+	NULL,
+	"35.0",
+	KEY_DUMMY,
+	"Set the ship's turn speed.\n"
+	"Valid values are in the range 4-64.\n"
+	"See also turnResistance.\n",
+	0,
+	turnspeed_setfunc,
+	NULL
+    },
+    {
+	"turnResistance",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Set the ship's turn resistance.\n"
+	"This determines the speed at which a ship stops turning.\n"
+	"Valid values are in the range 0.0-1.0.\n"
+	"This should always be 0, other values are for compatibility.\n"
+	"See also turnSpeed.\n",
+	0,
+	turnres_setfunc,
+	NULL
+    },
 };
 
 static inline cl_option_t *Option_by_index(int ind)
@@ -162,6 +237,10 @@ static inline cl_option_t *Find_option(const char *name)
 {
     int i;
 
+    /*
+     * This could be speeded up with a hash table or just by
+     * hashing the option name.
+     */
     for (i = 0; i < num_options; i++) {
 	if (!strcasecmp(name, options[i].name))
 	    return &options[i];
@@ -224,19 +303,22 @@ static void Store_option_struct(cl_option_t *opt)
  * "\set scalefactor 1.5"
  */
 
-void Set_option(const char *name, const char *value)
+bool Set_option(const char *name, const char *value)
 {
     cl_option_t *opt;
+    bool set_ok;
 
     opt = Find_option(name);
 
     if (!opt) {
 	/*Store_option(name, value);
 	  opt = Find_option(name);*/
-	return;
+	return false;
     }
 
-    printf("setting option '%s' to '%s'\n", opt->name, opt->noArg);
+    set_ok = opt->setfunc(opt->name, value, opt->private);
+
+    return set_ok;
 }
 
 
