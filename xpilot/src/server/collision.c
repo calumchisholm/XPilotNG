@@ -402,7 +402,7 @@ static void PlayerCollision(void)
 		     * not the team the ball belongs to. the latter is
 		     * found through the ball's treasure */
 		    ball->team = pl->team;
-		    if (ball->owner == NO_ID)
+		    if (ball->treasure->have)
 			ball->life = 1e6;  /* for frame counter */
 		    ball->owner = pl->id;
 		    SET_BIT(ball->status, GRAVITY);
@@ -438,8 +438,6 @@ static void PlayerCollision(void)
 				       pl->pos.cy - obj->pos.cy);
 		    if (dist < mindist) {
 			ballobject *ball = BALL_PTR(obj);
-			int bteam = ball->treasure->team;
-
 			/*
 			 * The treasure's team cannot connect before
 			 * somebody else has owned the ball.
@@ -447,14 +445,12 @@ static void PlayerCollision(void)
 			 * taking and hiding with the ball... this was
 			 * considered bad gamesmanship.
 			 */
-			/* mara: this also causes balls to be impossible to
-			   grab when the owner leaves...*/
-			if (!BIT(World.rules->mode, TEAM_PLAY)
-			    || ball->owner != NO_ID
-			    || pl->team != bteam) {
-			    pl->ball = ball;
-			    mindist = dist;
-			}
+			if (BIT(World.rules->mode, TEAM_PLAY)
+			    && ball->treasure->have
+			    && pl->team == ball->treasure->team)
+			    continue;
+			pl->ball = ball;
+			mindist = dist;
 		    }
 		}
 	    }
