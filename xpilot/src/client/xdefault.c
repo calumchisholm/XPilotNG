@@ -131,6 +131,7 @@ xp_option_t xdefault_options[] = {
 	true,
 	&fullColor,
 	Set_fullColor,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Whether to use a colors as close as possible to the specified ones\n"
 	"or use a few standard colors for everything. May require more\n"
 	"resources from your system.\n"),
@@ -140,6 +141,7 @@ xp_option_t xdefault_options[] = {
 	true,
 	&texturedObjects,
 	Set_texturedObjects,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Whether to draw certain game objects with textures.\n"
 	"Be warned that this requires more graphics speed.\n"
 	"fullColor must be on for this to work.\n"
@@ -150,6 +152,7 @@ xp_option_t xdefault_options[] = {
 	"1024x768",
 	NULL, 0,
 	Set_geometry, NULL, Get_geometry,
+	XP_OPTFLAG_DEFAULT,
 	"Set the window size and position in standard X geometry format.\n"
 	"The maximum allowed window size is 1922x1440.\n"),
 
@@ -159,6 +162,7 @@ xp_option_t xdefault_options[] = {
 	displayName,
 	sizeof displayName,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"Set the X display.\n"),
 
     XP_STRING_OPTION(
@@ -167,6 +171,7 @@ xp_option_t xdefault_options[] = {
 	keyboardName,
 	sizeof keyboardName,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"Set the X keyboard input if you want keyboard input from\n"
 	"another display.  The default is to use the keyboard input from\n"
 	"the X display.\n"),
@@ -177,6 +182,7 @@ xp_option_t xdefault_options[] = {
 	visualName,
 	sizeof visualName,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"Specify which visual to use for allocating colors.\n"
 	"To get a listing of all possible visuals on your dislay\n"
 	"set the argument for this option to list.\n"),
@@ -186,6 +192,7 @@ xp_option_t xdefault_options[] = {
 	true,
 	&colorSwitch,
 	NULL,
+	XP_OPTFLAG_DEFAULT,
 	"Use color buffering or not.\n"
 	"Usually color buffering is faster, especially on 8-bit\n"
 	"PseudoColor displays.\n"),
@@ -195,6 +202,7 @@ xp_option_t xdefault_options[] = {
 	false,
 	&multibuffer,
 	NULL,
+	XP_OPTFLAG_DEFAULT,
 	"Use the X windows multibuffer extension if present.\n"),
 
     XP_BOOL_OPTION(
@@ -202,6 +210,7 @@ xp_option_t xdefault_options[] = {
 	false,
 	&ignoreWindowManager,
 	NULL,
+	XP_OPTFLAG_DEFAULT,
 	"Ignore the window manager when opening the top level player window.\n"
 	"This can be handy if you want to have your XPilot window on a\n"
 	"preferred position without window manager borders.\n"
@@ -213,6 +222,7 @@ xp_option_t xdefault_options[] = {
 	true,
 	&titleFlip,
 	NULL,
+	XP_OPTFLAG_DEFAULT,
 	"Should the title bar change or not.\n"
 	"Some window managers like twm may have problems with\n"
 	"flipping title bars.  Hence this option to turn it off.\n"),
@@ -223,6 +233,7 @@ xp_option_t xdefault_options[] = {
 	gameFontName,
 	sizeof gameFontName,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"The font used on the HUD and for most other text.\n"),
 
     XP_STRING_OPTION(
@@ -231,6 +242,7 @@ xp_option_t xdefault_options[] = {
 	scoreListFontName,
 	sizeof scoreListFontName,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"The font used on the score list.\n"
 	"This must be a non-proportional font.\n"),
 
@@ -240,6 +252,7 @@ xp_option_t xdefault_options[] = {
 	buttonFontName,
 	sizeof buttonFontName,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"The font used on all buttons.\n"),
 
     XP_STRING_OPTION(
@@ -248,6 +261,7 @@ xp_option_t xdefault_options[] = {
 	textFontName,
 	sizeof textFontName,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"The font used in the help and about windows.\n"),
 
     XP_STRING_OPTION(
@@ -256,6 +270,7 @@ xp_option_t xdefault_options[] = {
 	talkFontName,
 	sizeof talkFontName,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"The font used in the talk window.\n"),
 
     XP_STRING_OPTION(
@@ -264,6 +279,7 @@ xp_option_t xdefault_options[] = {
 	motdFontName,
 	sizeof motdFontName,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"The font used in the MOTD window and key list window.\n"
 	"This must be a non-proportional font.\n"),
 
@@ -273,6 +289,7 @@ xp_option_t xdefault_options[] = {
 	messageFontName,
 	sizeof messageFontName,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"The font used for drawing messages.\n"),
 
     XP_BOOL_OPTION(
@@ -280,6 +297,7 @@ xp_option_t xdefault_options[] = {
 	false,
 	&showNastyShots,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Use the new Nasty Looking Shots or the original rectangle shots,\n"
 	"You will probably want to increase your shotSize if you use this.\n"),
 
@@ -288,21 +306,25 @@ xp_option_t xdefault_options[] = {
     XP_NOARG_OPTION(
         "testxsync",
 	&testxsync,
+	XP_OPTFLAG_DEFAULT,
         "Test XSynchronize() ?\n"),
 
     XP_NOARG_OPTION(
         "testxdebug",
 	&testxdebug,
+	XP_OPTFLAG_DEFAULT,
         "Test X_error_handler() ?\n"),
 
     XP_NOARG_OPTION(
         "testxafter",
 	&testxafter,
+	XP_OPTFLAG_DEFAULT,
         "Test XAfterFunction ?\n"),
 
     XP_NOARG_OPTION(
         "testxcolors",
 	&testxcolors,
+	XP_OPTFLAG_DEFAULT,
         "Do Colors_debug() ?\n"),
 #endif
 

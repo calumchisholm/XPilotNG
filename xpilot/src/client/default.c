@@ -446,27 +446,32 @@ xp_option_t default_options[] = {
     XP_NOARG_OPTION(
 	"help",
 	&xpArgs.help,
+	XP_OPTFLAG_DEFAULT,
 	"Display this help message.\n"),
 
     XP_NOARG_OPTION(
 	"version",
 	&xpArgs.version,
+	XP_OPTFLAG_DEFAULT,
 	"Show the source code version.\n"),
 
     XP_NOARG_OPTION(
 	"join",
 	&xpArgs.auto_connect,
+	XP_OPTFLAG_DEFAULT,
 	"Join the game immediately, no questions asked.\n"),
 
     XP_NOARG_OPTION(
 	"text",
 	&xpArgs.text,
+	XP_OPTFLAG_DEFAULT,
 	"Use the simple text interface to contact a server\n"
 	"instead of the graphical user interface.\n"),
 
     XP_NOARG_OPTION(
 	"list",
 	&xpArgs.list_servers,
+	XP_OPTFLAG_DEFAULT,
 	"List all servers running on the local network.\n"),
 
     XP_STRING_OPTION(
@@ -474,6 +479,7 @@ xp_option_t default_options[] = {
 	"",
 	NULL, 0,
 	Set_shipShape, NULL, Get_shipShape,
+	XP_OPTFLAG_DEFAULT,
 	"Define the ship shape to use.  Because the argument to this option\n"
 	"is rather large (up to 500 bytes) the recommended way to set\n"
 	"this option is in the .xpilotrc file in your home directory.\n"
@@ -488,6 +494,7 @@ xp_option_t default_options[] = {
 	CONF_SHIP_FILE,
 	NULL, 0,
 	Set_shipShapeFile, NULL, Get_shipShapeFile,
+	XP_OPTFLAG_DEFAULT,
 	"An optional file where shipshapes can be stored.\n"
 	"If this resource is defined and it refers to an existing file\n"
 	"then shipshapes can be referenced to by their name.\n"
@@ -507,6 +514,7 @@ xp_option_t default_options[] = {
 	xpArgs.shutdown_reason,
 	sizeof xpArgs.shutdown_reason,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"Shutdown the server with a message.\n"
 	"The message used is the first argument to this option.\n"),
 
@@ -515,6 +523,7 @@ xp_option_t default_options[] = {
 	"",
 	NULL, 0,
 	Set_nickName, NULL, Get_nickName,
+	XP_OPTFLAG_DEFAULT,
 	"Set the nickname.\n"),
 
     XP_STRING_OPTION(
@@ -522,6 +531,7 @@ xp_option_t default_options[] = {
 	"",
 	NULL, 0,
 	Set_userName, NULL, Get_userName,
+	XP_OPTFLAG_DEFAULT,
 	"Set the username.\n"),
 
     XP_STRING_OPTION(
@@ -529,6 +539,7 @@ xp_option_t default_options[] = {
 	"",
 	NULL, 0,
 	Set_hostName, NULL, Get_hostName,
+	XP_OPTFLAG_DEFAULT,
 	"Set the hostname.\n"),
 
     XP_INT_OPTION(
@@ -538,6 +549,7 @@ xp_option_t default_options[] = {
 	TEAM_NOT_SET,
 	&connectParam.team,
 	Set_team,
+	XP_OPTFLAG_DEFAULT,
 	"Set the team to join.\n"),
 
     XP_INT_OPTION(
@@ -547,6 +559,7 @@ xp_option_t default_options[] = {
 	65535,
 	&connectParam.contact_port,
 	NULL,
+	XP_OPTFLAG_DEFAULT,
 	"Set the port number of the server.\n"
 	"Almost all servers use the default port, which is the recommended\n"
 	"policy.  You can find out about which port is used by a server by\n"
@@ -559,6 +572,7 @@ xp_option_t default_options[] = {
 	65535,
 	&clientPortStart,
 	NULL,
+	XP_OPTFLAG_DEFAULT,
 	"Use UDP ports clientPortStart - clientPortEnd (for firewalls).\n"
 	/* TODO: describe what value 0 means */),
 
@@ -569,6 +583,7 @@ xp_option_t default_options[] = {
 	65535,
 	&clientPortEnd,
 	NULL,
+	XP_OPTFLAG_DEFAULT,
 	"Use UDP ports clientPortStart - clientPortEnd (for firewalls).\n"),
     /*
      * kps - steering stuff, note that set functions might have to be
@@ -582,6 +597,7 @@ xp_option_t default_options[] = {
 	MAX_PLAYER_POWER,
 	&power,
 	Set_power,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Set the engine power.\n"
 	"Valid values are in the range 5-55.\n"),
 
@@ -592,6 +608,7 @@ xp_option_t default_options[] = {
 	MAX_PLAYER_TURNSPEED,
 	&turnspeed,
 	Set_turnSpeed,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Set the ship's turn speed.\n"
 	"Valid values are in the range 4-64.\n"
 	"See also turnResistance.\n"),
@@ -603,6 +620,7 @@ xp_option_t default_options[] = {
 	MAX_PLAYER_TURNRESISTANCE,
 	&turnresistance,
 	Set_turnResistance,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Set the ship's turn resistance.\n"
 	"This determines the speed at which a ship stops turning.\n"
 	"Valid values are in the range 0.0-1.0.\n"
@@ -616,6 +634,7 @@ xp_option_t default_options[] = {
 	MAX_PLAYER_POWER,
 	&power_s,
 	Set_altPower,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Set the ship's alternate engine power.\n"
 	"See also the keySwapSettings option.\n"),
 
@@ -626,6 +645,7 @@ xp_option_t default_options[] = {
 	MAX_PLAYER_TURNSPEED,
 	&turnspeed_s,
 	Set_altTurnSpeed,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Set the ship's alternate turn speed.\n"
 	"See also the keySwapSettings option.\n"),
 
@@ -636,6 +656,7 @@ xp_option_t default_options[] = {
 	MAX_PLAYER_TURNRESISTANCE,
 	&turnresistance_s,
 	Set_altTurnResistance,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Set the ship's alternate turn resistance.\n"
 	"See also the keySwapSettings option.\n"),
 
@@ -646,6 +667,7 @@ xp_option_t default_options[] = {
 	MAX_SCALEFACTOR,
 	&scaleFactor,
 	Set_scaleFactor,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Specifies scaling factor for the drawing window.\n"),
 
     XP_DOUBLE_OPTION(
@@ -655,6 +677,7 @@ xp_option_t default_options[] = {
 	MAX_SCALEFACTOR,
 	&scaleFactor_s,
 	Set_altScaleFactor,
+	XP_OPTFLAG_CONFIG_DEFAULT,
         "Specifies alternative scaling factor for the drawing window.\n"),
 
     XP_INT_OPTION(
@@ -664,6 +687,7 @@ xp_option_t default_options[] = {
 	MAX_SUPPORTED_FPS,
 	&maxFPS,
 	Set_maxFPS,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Set maximum FPS supported by the client. The server will try to\n"
 	"send at most this many frames per second to the client.\n"),
 
@@ -674,6 +698,7 @@ xp_option_t default_options[] = {
 	1.0,
 	&sparkProb,
 	Set_sparkProb,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"The probablilty that sparks are drawn.\n"
 	"This gives a sparkling effect.\n"
 	"Valid values are in the range [0.0-1.0]\n"),
@@ -687,6 +712,7 @@ xp_option_t default_options[] = {
 	SHIP_SZ,
 	&hudRadarDotSize,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Which size to use for drawing the hudradar dots.\n"),
 
     XP_DOUBLE_OPTION(
@@ -696,6 +722,7 @@ xp_option_t default_options[] = {
 	4.0,
 	&hudRadarScale,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"The relative size of the hudradar.\n"),
 	
     XP_DOUBLE_OPTION(
@@ -705,6 +732,7 @@ xp_option_t default_options[] = {
 	5.0,
 	&hudRadarLimit,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Hudradar dots closer than this to your ship are not drawn.\n"
 	"A value of 1.0 means that the dots are not drawn for ships in\n"
 	"your active view area.\n"),
@@ -717,6 +745,7 @@ xp_option_t default_options[] = {
 	MIN_HUD_SIZE * 6,
 	&hudSize,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Which size to use for drawing the hud.\n"),
 
     XP_INT_OPTION(
@@ -726,6 +755,7 @@ xp_option_t default_options[] = {
 	3,
 	&baseWarningType,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Which type of base warning you prefer.\n"
 	"A value of 0 disables base warning.\n"
 	"A value of 1 draws a time meter on a base when a ship is appearing.\n"
@@ -739,6 +769,7 @@ xp_option_t default_options[] = {
 	true,
 	&instruments.showMapRadar,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Paint radar dots' positions on the map.\n"),
 
     XP_BOOL_OPTION(
@@ -746,6 +777,7 @@ xp_option_t default_options[] = {
 	true,
 	&instruments.showSlidingRadar,
 	Set_showSlidingRadar,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"If the game is in edgewrap mode then the radar will keep your\n"
 	"position on the radar in the center and raw the rest of the radar\n"
 	"around it.  Note that this requires a fast graphics system.\n"),
@@ -755,6 +787,7 @@ xp_option_t default_options[] = {
 	true,
 	&instruments.showShipShapes,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Should others' shipshapes be displayed or not.\n"),
 
     XP_BOOL_OPTION(
@@ -762,6 +795,7 @@ xp_option_t default_options[] = {
 	true,
 	&instruments.showMyShipShape,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Should your own shipshape be displayed or not.\n"),
 
     XP_BOOL_OPTION(
@@ -769,6 +803,7 @@ xp_option_t default_options[] = {
 	true,
 	&instruments.useBallMessageScan,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Scan messages for BALL, SAFE, COVER and POP and paint\n"
 	"warning circles inside ship.\n"),
 
@@ -777,6 +812,7 @@ xp_option_t default_options[] = {
 	false,
 	&instruments.showLivesByShip,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Paint remaining lives next to ships.\n"),
 
     XP_BOOL_OPTION(
@@ -784,6 +820,7 @@ xp_option_t default_options[] = {
 	true,
 	&instruments.showMessages,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Should game messages appear on screen.\n"),
 
     XP_BOOL_OPTION(
@@ -791,6 +828,7 @@ xp_option_t default_options[] = {
 	true,
 	&instruments.showItems,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Should owned items be displayed permanently on the HUD?\n"),
 
     XP_DOUBLE_OPTION(
@@ -800,6 +838,7 @@ xp_option_t default_options[] = {
 	MAX_SHOW_ITEMS_TIME,
 	&showItemsTime,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"If showItems is false, the time in seconds to display item\n"
 	"information on the HUD when it has changed.\n"),
 
@@ -808,6 +847,7 @@ xp_option_t default_options[] = {
 	false,
 	&instruments.showFilledWorld,
 	Set_showFilledWorld,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Draws the walls solid, filled with one color,\n"
 	"unless overridden by texture.\n"
 	"Be warned that this option needs fast graphics.\n"),
@@ -817,6 +857,7 @@ xp_option_t default_options[] = {
 	true,
 	&instruments.showTexturedWalls,
 	Set_showTexturedWalls,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Allows drawing polygon bitmaps specified by the (new-style) map.\n"
 	"Be warned that this needs a reasonably fast graphics system.\n"),
 
@@ -825,6 +866,7 @@ xp_option_t default_options[] = {
 	false,
 	&instruments.showOutlineWorld,
 	Set_showOutlineWorld,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Draws only the outline of all the wall blocks\n"
 	"on block based maps.\n"),
 
@@ -833,6 +875,7 @@ xp_option_t default_options[] = {
 	true,
 	&instruments.showDecor,
 	Set_showDecor,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Should decorations be displayed on the screen and radar?\n"),
 
     XP_BOOL_OPTION(
@@ -840,6 +883,7 @@ xp_option_t default_options[] = {
 	false,
 	&instruments.showOutlineDecor,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Draws only the outline of the map decoration.\n"),
 
     XP_BOOL_OPTION(
@@ -847,6 +891,7 @@ xp_option_t default_options[] = {
 	false,
 	&instruments.showFilledDecor,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Draws filled decorations.\n"),
 
     XP_BOOL_OPTION(
@@ -854,6 +899,7 @@ xp_option_t default_options[] = {
 	false,
 	&instruments.showTexturedDecor,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Draws the map decoration filled with a texture pattern.\n"),
 
     XP_BOOL_OPTION(
@@ -861,6 +907,7 @@ xp_option_t default_options[] = {
 	false,
 	&instruments.useClientRanker,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Scan messages and make personal kill/death ranking.\n"),
 
     XP_BOOL_OPTION(
@@ -868,6 +915,7 @@ xp_option_t default_options[] = {
 	false,
 	&instruments.useAMPMFormatClock,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Use AMPM format for clock display instead of 24 hour format.\n"),
 
     /* stuff drawn on map */
@@ -879,6 +927,7 @@ xp_option_t default_options[] = {
 	MAX_SHOT_SIZE,
 	&shot_size,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"The size of shots in pixels.\n"),
 
     XP_INT_OPTION(
@@ -888,6 +937,7 @@ xp_option_t default_options[] = {
 	MAX_TEAMSHOT_SIZE,
 	&teamshot_size,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"The size of team shots in pixels.\n"
 	"Note that team shots are drawn in teamShotColor.\n"),
 
@@ -898,6 +948,7 @@ xp_option_t default_options[] = {
 	MAX_SPARK_SIZE,
 	&spark_size,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Size of sparks in pixels.\n"),
 
     XP_INT_OPTION(
@@ -907,6 +958,7 @@ xp_option_t default_options[] = {
 	10,
 	&map_point_distance,
 	Set_backgroundPointDist,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"The distance between points in the background measured in blocks.\n"
 	"These are drawn in empty map regions to keep feeling for which\n"
 	"direction the ship is moving to.\n"),
@@ -918,6 +970,7 @@ xp_option_t default_options[] = {
 	MAX_MAP_POINT_SIZE,
 	&map_point_size,
 	Set_backgroundPointSize,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Specifies the size of the background points.  0 means no points.\n"),
 
     XP_DOUBLE_OPTION(
@@ -927,6 +980,7 @@ xp_option_t default_options[] = {
 	10.0,
 	&scoreObjectTime,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"How many seconds score objects remain visible on the map.\n"),
 
     /* mouse stuff */
@@ -935,6 +989,7 @@ xp_option_t default_options[] = {
 	false,
 	&initialPointerControl,
 	NULL,
+	XP_OPTFLAG_DEFAULT,
 	"Enable mouse control.  This allows ship direction control by\n"
 	"moving the mouse to the left for an anti-clockwise turn and\n"
 	"moving the mouse to the right for a clockwise turn.\n"
@@ -949,6 +1004,7 @@ xp_option_t default_options[] = {
 	255,
 	&charsPerSecond,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Rate at which messages appear on screen in characters per second.\n"),
 
     XP_INT_OPTION(
@@ -958,6 +1014,7 @@ xp_option_t default_options[] = {
 	MAX_MSGS,
 	&maxMessages,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"The maximum number of messages to display at the same time.\n"),
 
     XP_BOOL_OPTION(
@@ -965,6 +1022,7 @@ xp_option_t default_options[] = {
 	false,
 	&instruments.showReverseScroll,
 	Set_showReverseScroll,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Reverse scroll direction of messages.\n"),
 
     XP_INT_OPTION(
@@ -974,6 +1032,7 @@ xp_option_t default_options[] = {
 	2,
 	&messagesToStdout,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Send messages to standard output.\n"
 	"0: Don't.\n"
 	"1: Only player messages.\n"
@@ -984,6 +1043,7 @@ xp_option_t default_options[] = {
 	true,
 	&selectionAndHistory,
 	NULL,
+	XP_OPTFLAG_DEFAULT,
 	"Provide cut&paste for the player messages and the talk window and\n"
 	"a `history' for the talk window.\n"),
 
@@ -994,6 +1054,7 @@ xp_option_t default_options[] = {
 	MAX_HIST_MSGS,
 	&maxLinesInHistory,
 	NULL,
+	XP_OPTFLAG_DEFAULT,
 	"Number of your messages saved in the `history' of the talk window.\n"
 	"`history' is accessible with `keyTalkCursorUp/Down'.\n"),
 
@@ -1005,6 +1066,7 @@ xp_option_t default_options[] = {
 	false,
 	&toggle_shield,
 	Set_toggleShield,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Are shields toggled by a keypress only?\n"),
 
     XP_BOOL_OPTION(
@@ -1012,6 +1074,7 @@ xp_option_t default_options[] = {
 	true,
 	&auto_shield,
 	Set_autoShield,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Are shields lowered automatically for weapon fire?\n"),
 
     XP_BOOL_OPTION(
@@ -1019,6 +1082,7 @@ xp_option_t default_options[] = {
 	false,
 	&autoServerMotdPopup,
 	NULL,
+	XP_OPTFLAG_DEFAULT,
 	"Automatically popup the MOTD of the server on startup.\n"),
 
     XP_DOUBLE_OPTION(
@@ -1028,6 +1092,7 @@ xp_option_t default_options[] = {
 	1000.0,
 	&fuelNotify,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"The limit when the HUD fuel bar will become visible.\n"),
 
     XP_DOUBLE_OPTION(
@@ -1037,6 +1102,7 @@ xp_option_t default_options[] = {
 	1000.0,
 	&fuelWarning,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"The limit when the HUD fuel bar will start flashing.\n"),
 
     XP_DOUBLE_OPTION(
@@ -1046,6 +1112,7 @@ xp_option_t default_options[] = {
 	1000.0,
 	&fuelCritical,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"The limit when the HUD fuel bar will flash faster.\n"),
 
     XP_DOUBLE_OPTION(
@@ -1055,6 +1122,7 @@ xp_option_t default_options[] = {
 	+10.0,
 	&hud_move_fact,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"How much to move HUD to indicate the current velocity.\n"),
 
     XP_DOUBLE_OPTION(
@@ -1064,6 +1132,7 @@ xp_option_t default_options[] = {
 	+10.0,
 	&ptr_move_fact,
     	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Uses a red line to indicate the current velocity and direction.\n"),
 
     XP_INT_OPTION(
@@ -1073,6 +1142,7 @@ xp_option_t default_options[] = {
 	2,
 	&showScoreDecimals,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"The number of decimals to use when displaying scores.\n"),
 
     /* kps - remove option later */
@@ -1083,6 +1153,7 @@ xp_option_t default_options[] = {
 	MAX_RECEIVE_WINDOW_SIZE,
 	&receive_window_size,
 	NULL,
+	XP_OPTFLAG_DEFAULT,
 	"Too complicated.  Keep it on 3.\n"),
 
     /* eye candy stuff */
@@ -1091,6 +1162,7 @@ xp_option_t default_options[] = {
 	false,
 	&markingLights,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Should the fighters have marking lights, just like airplanes?\n"),
 
     /* modbanks */
@@ -1099,6 +1171,7 @@ xp_option_t default_options[] = {
 	"",
 	modBankStr[0], sizeof modBankStr[0],
 	NULL, NULL, NULL, /* kps - add set and get functions */
+	XP_OPTFLAG_DEFAULT,
 	"The default weapon modifier values for the first modifier bank.\n"),
 
     XP_STRING_OPTION(
@@ -1106,6 +1179,7 @@ xp_option_t default_options[] = {
 	"",
 	modBankStr[1], sizeof modBankStr[1],
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"The default weapon modifier values for the second modifier bank.\n"),
 
     XP_STRING_OPTION(
@@ -1113,6 +1187,7 @@ xp_option_t default_options[] = {
 	"",
 	modBankStr[2], sizeof modBankStr[2],
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"The default weapon modifier values for the third modifier bank.\n"),
 
     XP_STRING_OPTION(
@@ -1120,6 +1195,7 @@ xp_option_t default_options[] = {
 	"",
 	modBankStr[3], sizeof modBankStr[3],
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"The default weapon modifier values for the fourth modifier bank.\n"),
 
     XP_STRING_OPTION(
@@ -1127,6 +1203,7 @@ xp_option_t default_options[] = {
 	CONF_TEXTUREDIR, /* was conf_texturedir_string */
 	NULL, 0,
 	Set_texturePath, NULL, Get_texturePath,
+	XP_OPTFLAG_DEFAULT,
 	"Search path for texture files.\n"
 	"This is a list of one or more directories separated by colons.\n"),
 
@@ -1137,6 +1214,7 @@ xp_option_t default_options[] = {
 	false,
 	&threadedDraw,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Tell Windows to do the heavy BitBlt in another thread\n"),
 
     XP_INT_OPTION(
@@ -1146,6 +1224,7 @@ xp_option_t default_options[] = {
 	100,
 	&RadarDivisor,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Specifies how many frames between radar window updates.\n"),
 #endif
 
@@ -1155,6 +1234,7 @@ xp_option_t default_options[] = {
 	clientRankFile,
 	sizeof clientRankFile,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"An optional file where clientside kill/death rank is stored.\n"),
 
     XP_STRING_OPTION(
@@ -1163,6 +1243,7 @@ xp_option_t default_options[] = {
 	clientRankHTMLFile,
 	sizeof clientRankHTMLFile,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"An optional file where clientside kill/death rank is\n"
 	"published in HTML format.\n"),
 
@@ -1172,6 +1253,7 @@ xp_option_t default_options[] = {
 	clientRankHTMLNOJSFile,
 	sizeof clientRankHTMLNOJSFile,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"An optional file where clientside kill/death rank is\n"
 	"published in HTML format, w/o JavaScript.\n"),
 
@@ -1181,6 +1263,7 @@ xp_option_t default_options[] = {
 	CONF_SOUNDFILE,
 	sounds, sizeof sounds,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"Specifies the sound file.\n"),
 
     XP_INT_OPTION(
@@ -1190,6 +1273,7 @@ xp_option_t default_options[] = {
 	255,
 	&maxVolume,
 	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Specifies the volume to play sounds with.\n"),
 
     XP_STRING_OPTION(
@@ -1198,6 +1282,7 @@ xp_option_t default_options[] = {
 	audioServer, sizeof audioServer,
 	NULL, NULL, NULL,
 	KEY_DUMMY,
+	XP_OPTFLAG_DEFAULT,
 	"Specifies the audio server to use.\n"),
 #endif
 

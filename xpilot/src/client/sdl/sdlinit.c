@@ -178,6 +178,7 @@ static xp_option_t sdlinit_options[] = {
 	NULL,
 	0,
 	Set_geometry, NULL, Get_geometry,
+	XP_OPTFLAG_DEFAULT,
 	"Set the initial window geometry.\n")
 };
 

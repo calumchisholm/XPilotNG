@@ -2050,6 +2050,7 @@ static const char *get_rgba_color_option(xp_option_t *opt)
 		     set_rgba_color_option, \
 		     &variable, \
 		     get_rgba_color_option, \
+		     XP_OPTFLAG_DEFAULT, \
 		     "The color of " description ".\n")
     
 
@@ -2114,6 +2115,7 @@ static xp_option_t sdlgui_options[] = {
 	60, 0, 600,
 	&meterWidth,
 	NULL,
+	XP_OPTFLAG_DEFAULT,
 	"Set the width of the meters.\n"),
 
     XP_INT_OPTION(
@@ -2121,6 +2123,7 @@ static xp_option_t sdlgui_options[] = {
 	10, 0, 100,
 	&meterHeight,
 	NULL,
+	XP_OPTFLAG_DEFAULT,
 	"Set the height of a meter.\n"),
 
     XP_DOUBLE_OPTION(
@@ -2128,6 +2131,7 @@ static xp_option_t sdlgui_options[] = {
 	1.0, 1.0, 10.0,
 	&shipLineWidth,
 	NULL,
+	XP_OPTFLAG_DEFAULT,
 	"Set the line width of ships.\n"),
 
 };

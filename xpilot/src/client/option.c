@@ -676,7 +676,7 @@ void Xpilotrc_read(const char *path)
     /*
      * Read options from xpilotrc.
      */
-    warn("Using xpilotrc file %s\n", path);
+    warn("Reading options from xpilotrc file %s.\n", path);
     if (strlen(path) > 0 && ((fp = fopen(path, "r")) != NULL)) {
 	while (fgets(buf, sizeof buf, fp)) {
 	    char *cp;
@@ -693,10 +693,14 @@ void Xpilotrc_read(const char *path)
 	}
 	fclose(fp);
     }
+}
 
-
+void Xpilotrc_write(void)
+{
 
 }
+
+
 
 void Parse_options(int *argcp, char **argvp)
 {

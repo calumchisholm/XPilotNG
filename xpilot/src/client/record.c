@@ -933,6 +933,7 @@ xp_option_t record_options[] = {
 	"",
 	NULL, 0,
 	setRecordFile, NULL, getRecordFile,
+	XP_OPTFLAG_DEFAULT,
 	"An optional file where a recording of a game can be made.\n"
 	"If this file is undefined then recording isn't possible.\n"),
 

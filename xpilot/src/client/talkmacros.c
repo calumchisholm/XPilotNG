@@ -417,6 +417,7 @@ xp_option_t talk_macro_options[] = {
 	"Hello world!",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
+	XP_OPTFLAG_DEFAULT,
 	"Talkmessage 1.\n"),
 
     /*
@@ -428,6 +429,7 @@ xp_option_t talk_macro_options[] = {
 	"#=[#t|2|/team 4|/team 2]",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
+	XP_OPTFLAG_DEFAULT,
 	"Talkmessage 2.\n"),
 
     XP_STRING_OPTION(
@@ -435,6 +437,7 @@ xp_option_t talk_macro_options[] = {
 	"",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
+	XP_OPTFLAG_DEFAULT,
 	"Talkmessage 3.\n"),
 
     XP_STRING_OPTION(
@@ -442,6 +445,7 @@ xp_option_t talk_macro_options[] = {
 	"",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
+	XP_OPTFLAG_DEFAULT,
 	"Talkmessage 4.\n"),
 
     XP_STRING_OPTION(
@@ -449,6 +453,7 @@ xp_option_t talk_macro_options[] = {
 	"***    BALL! Our ball is gone! Save it!   ***",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
+	XP_OPTFLAG_DEFAULT,
 	"Talkmessage 5.\n"),
 
     XP_STRING_OPTION(
@@ -456,6 +461,7 @@ xp_option_t talk_macro_options[] = {
 	"*** SAFE! Our ball is safe. ***",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
+	XP_OPTFLAG_DEFAULT,
 	"Talkmessage 6.\n"),
 
     XP_STRING_OPTION(
@@ -463,6 +469,7 @@ xp_option_t talk_macro_options[] = {
 	"*** COVER! The enemy ball is approaching our base. ***",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
+	XP_OPTFLAG_DEFAULT,
 	"Talkmessage 7.\n"),
 
     XP_STRING_OPTION(
@@ -470,6 +477,7 @@ xp_option_t talk_macro_options[] = {
 	"*** POP! The enemy ball is back at the enemy base. ***",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
+	XP_OPTFLAG_DEFAULT,
 	"Talkmessage 8.\n"),
 
     XP_STRING_OPTION(
@@ -477,6 +485,7 @@ xp_option_t talk_macro_options[] = {
 	"",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
+	XP_OPTFLAG_DEFAULT,
 	"Talkmessage 9.\n"),
 
     XP_STRING_OPTION(
@@ -484,6 +493,7 @@ xp_option_t talk_macro_options[] = {
 	"",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
+	XP_OPTFLAG_DEFAULT,
 	"Talkmessage 10.\n"),
 
     XP_STRING_OPTION(
@@ -491,6 +501,7 @@ xp_option_t talk_macro_options[] = {
 	"",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
+	XP_OPTFLAG_DEFAULT,
 	"Talkmessage 11.\n"),
 
     XP_STRING_OPTION(
@@ -498,6 +509,7 @@ xp_option_t talk_macro_options[] = {
 	"",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
+	XP_OPTFLAG_DEFAULT,
 	"Talkmessage 12.\n"),
 
     XP_STRING_OPTION(
@@ -505,6 +517,7 @@ xp_option_t talk_macro_options[] = {
 	"",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
+	XP_OPTFLAG_DEFAULT,
 	"Talkmessage 13.\n"),
 
     XP_STRING_OPTION(
@@ -512,6 +525,7 @@ xp_option_t talk_macro_options[] = {
 	"",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
+	XP_OPTFLAG_DEFAULT,
 	"Talkmessage 14.\n"),
 
     XP_STRING_OPTION(
@@ -519,6 +533,7 @@ xp_option_t talk_macro_options[] = {
 	"",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
+	XP_OPTFLAG_DEFAULT,
 	"Talkmessage 15.\n"),
 
     XP_STRING_OPTION(
@@ -526,6 +541,7 @@ xp_option_t talk_macro_options[] = {
 	"",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
+	XP_OPTFLAG_DEFAULT,
 	"Talkmessage 16.\n"),
 
     XP_STRING_OPTION(
@@ -533,6 +549,7 @@ xp_option_t talk_macro_options[] = {
 	"",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
+	XP_OPTFLAG_DEFAULT,
 	"Talkmessage 17.\n"),
 
     XP_STRING_OPTION(
@@ -540,6 +557,7 @@ xp_option_t talk_macro_options[] = {
 	"",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
+	XP_OPTFLAG_DEFAULT,
 	"Talkmessage 18.\n"),
 
     XP_STRING_OPTION(
@@ -547,6 +565,7 @@ xp_option_t talk_macro_options[] = {
 	"",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
+	XP_OPTFLAG_DEFAULT,
 	"Talkmessage 19.\n"),
 
     XP_STRING_OPTION(
@@ -554,6 +573,7 @@ xp_option_t talk_macro_options[] = {
 	"",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
+	XP_OPTFLAG_DEFAULT,
 	"Talkmessage 20.\n"),
 };
 

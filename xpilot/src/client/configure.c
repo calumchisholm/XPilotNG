@@ -523,36 +523,38 @@ static int config_creator_new(xp_option_t *opt, int widget_desc, int *height)
     if (opt == NULL)
 	return Config_create_save(widget_desc, height);
 
-    switch (Option_get_type(opt)) {
-    case xp_bool_option:
-	return Config_create_bool(widget_desc, height,
-				  Option_get_name(opt),
-				  *opt->bool_ptr,
-				  Update_bool_option, opt);
-    case xp_int_option:
-	/* kps tmp hack */
-	if (opt->int_minval == 0 && opt->int_maxval == MAX_COLORS-1)
-	    return Config_create_color(widget_desc, height, *opt->int_ptr,
-				       Option_get_name(opt), opt->int_ptr,
-				       opt->int_minval, opt->int_maxval,
-				       Update_int_option, opt);
-	else
+    if (Option_get_flags(opt) & XP_OPTFLAG_CONFIG_COLORS) {
+	assert (Option_get_type(opt) == xp_int_option);
+	return Config_create_color(widget_desc, height, *opt->int_ptr,
+				   Option_get_name(opt), opt->int_ptr,
+				   opt->int_minval, opt->int_maxval,
+				   Update_int_option, opt);
+    }
+
+    if (Option_get_flags(opt) & XP_OPTFLAG_CONFIG_DEFAULT) {
+	switch (Option_get_type(opt)) {
+	case xp_bool_option:
+	    return Config_create_bool(widget_desc, height,
+				      Option_get_name(opt),
+				      *opt->bool_ptr,
+				      Update_bool_option, opt);
+	case xp_int_option:
 	    return Config_create_int(widget_desc, height,
 				     Option_get_name(opt), opt->int_ptr,
 				     opt->int_minval, opt->int_maxval,
 				     Update_int_option, opt);
 
-    case xp_double_option:
-	return Config_create_double(widget_desc, height,
-				    Option_get_name(opt), opt->dbl_ptr,
-				    opt->dbl_minval, opt->dbl_maxval,
-				    Update_double_option, opt);
-    default:
-	return Config_create_bool(widget_desc, height,
-				  Option_get_name(opt),
-				  true, NULL, NULL);
-	return 0;
+	case xp_double_option:
+	    return Config_create_double(widget_desc, height,
+					Option_get_name(opt), opt->dbl_ptr,
+					opt->dbl_minval, opt->dbl_maxval,
+					Update_double_option, opt);
+	default:
+	    return 0;
+	}
     }
+
+    return 0;
 }
 
 static void Config_save_failed(const char *reason, const char **strptr)
@@ -935,16 +937,12 @@ void Config_init(void)
 
     for (i = 0; i < num_options; i++) {
 	xp_option_t *opt = Option_by_index(i);
-	xp_option_type_t type = Option_get_type(opt);
 
 	/* kps - temporary hack */
-	if (type == xp_int_option
-	    && opt->int_minval == 0 && opt->int_maxval == MAX_COLORS-1) {
+	if (Option_get_flags(opt) & XP_OPTFLAG_CONFIG_COLORS) {
 	    STORE(int, color_option_indices,
 		  num_color_options, max_color_options, i);
-	} else if (type == xp_int_option
-		   || type == xp_double_option
-		   || type == xp_bool_option) {
+	} else if (Option_get_flags(opt) & XP_OPTFLAG_CONFIG_DEFAULT) {
 	    STORE(int, default_option_indices,
 		  num_default_options, max_default_options, i);
 	}

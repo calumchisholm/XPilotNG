@@ -37,12 +37,22 @@ typedef enum {
 
 typedef struct xp_option xp_option_t;
 
-
 typedef bool (*xp_bool_option_setfunc_t)   (xp_option_t *opt, bool val);
 typedef bool (*xp_int_option_setfunc_t)    (xp_option_t *opt, int val);
 typedef bool (*xp_double_option_setfunc_t) (xp_option_t *opt, double val);
 typedef bool (*xp_string_option_setfunc_t) (xp_option_t *opt, const char *val);
 typedef const char *(*xp_string_option_getfunc_t)(xp_option_t *opt);
+
+typedef int xp_option_flags_t;
+
+/* flag bits */
+/* option shows up in default menu in X client */
+#define XP_OPTFLAG_CONFIG_DEFAULT  (1 << 1)
+/* option shows up in colors menu in X client */
+#define XP_OPTFLAG_CONFIG_COLORS   (1 << 2)
+/* default flags, nothing here yet */
+#define XP_OPTFLAG_DEFAULT         (0)
+
 
 /*
  * NOTE: DON'T ACCESS THIS STRUCTURE DIRECTLY, USE THE INITIALIZER MACROS,
@@ -52,6 +62,8 @@ struct xp_option {
     xp_option_type_t type;
 
     const char *name;
+    xp_option_flags_t flags;
+
     const char *help;
     void *private_data;   /* currently only used for string options */
 
@@ -163,6 +175,12 @@ static inline xp_option_type_t Option_get_type(xp_option_t *opt)
     return opt->type;
 }
 
+static inline xp_option_flags_t Option_get_flags(xp_option_t *opt)
+{
+    assert(opt);
+    return opt->flags;
+}
+
 static inline keys_t Option_get_key(xp_option_t *opt)
 {
     assert(opt);
@@ -182,16 +200,15 @@ static inline xp_option_t *Option_by_index(int ind)
     return &options[ind];
 }
 
-
-
 /*
  * Macros for initalizing options.
  */
 
-#define XP_NOARG_OPTION(name, valptr, help) \
+#define XP_NOARG_OPTION(name, valptr, flags, help) \
 { \
     xp_noarg_option,\
 	name,\
+	flags,\
 	help,\
 	NULL,\
 	valptr,\
@@ -202,10 +219,11 @@ static inline xp_option_t *Option_by_index(int ind)
 	XP_KEY_OPTION_DUMMY,\
 }
 
-#define XP_BOOL_OPTION(name, defval, valptr, setfunc, help) \
+#define XP_BOOL_OPTION(name, defval, valptr, setfunc, flags, help) \
 { \
     xp_bool_option,\
 	name,\
+	flags,\
 	help,\
 	NULL,\
 	XP_NOARG_OPTION_DUMMY,\
@@ -218,10 +236,11 @@ static inline xp_option_t *Option_by_index(int ind)
 	XP_KEY_OPTION_DUMMY,\
 }
 
-#define XP_INT_OPTION(name, defval, minval, maxval, valptr, setfunc, help) \
+#define XP_INT_OPTION(name, defval, minval, maxval, valptr, setfunc, flags, help) \
 { \
     xp_int_option,\
 	name,\
+	flags,\
 	help,\
 	NULL,\
 	XP_NOARG_OPTION_DUMMY,\
@@ -237,16 +256,17 @@ static inline xp_option_t *Option_by_index(int ind)
 }
 
 #define COLOR_INDEX_OPTION(name, defval, valptr, help) \
-XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, NULL, help)
+XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, NULL, XP_OPTFLAG_CONFIG_COLORS, help)
 
 #define COLOR_INDEX_OPTION_WITH_SETFUNC(name, defval, valptr, setfunc, help) \
-XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, setfunc, help)
+XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, setfunc, XP_OPTFLAG_CONFIG_COLORS, help)
 
 
-#define XP_DOUBLE_OPTION(name, defval, minval, maxval, valptr, setfunc, help) \
+#define XP_DOUBLE_OPTION(name, defval, minval, maxval, valptr, setfunc, flags, help) \
 { \
     xp_double_option,\
 	name,\
+	flags,\
 	help,\
 	NULL,\
 	XP_NOARG_OPTION_DUMMY,\
@@ -261,10 +281,11 @@ XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, setfunc, help)
 	XP_KEY_OPTION_DUMMY,\
 }
 
-#define XP_STRING_OPTION(name, defval, valptr, size, setfunc, private_data, getfunc, help) \
+#define XP_STRING_OPTION(name, defval, valptr, size, setfunc, private_data, getfunc, flags, help) \
 { \
     xp_string_option,\
 	name,\
+	flags,\
 	help,\
 	private_data,\
 	XP_NOARG_OPTION_DUMMY,\
@@ -283,6 +304,7 @@ XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, setfunc, help)
 { \
     xp_key_option,\
 	name,\
+	XP_OPTFLAG_DEFAULT,\
 	help,\
 	NULL,\
 	XP_NOARG_OPTION_DUMMY,\

@@ -1102,6 +1102,7 @@ static xp_option_t color_options[] = {
 	MAX_COLORS,
 	&maxColors,
 	Set_maxColors,
+	XP_OPTFLAG_DEFAULT,
 	"The number of colors to use.  Valid values are 4, 8 and 16.\n"),
 
     /* 16 user definable color values */
@@ -1111,6 +1112,7 @@ static xp_option_t color_options[] = {
 	color_names[0],
 	MAX_COLOR_LEN,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"The color value for the first color.\n"),
 
     XP_STRING_OPTION(
@@ -1119,6 +1121,7 @@ static xp_option_t color_options[] = {
 	color_names[1],
 	MAX_COLOR_LEN,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"The color value for the second color.\n"),
 
     XP_STRING_OPTION(
@@ -1127,6 +1130,7 @@ static xp_option_t color_options[] = {
 	color_names[2],
 	MAX_COLOR_LEN,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"The color value for the third color.\n"),
 
     XP_STRING_OPTION(
@@ -1135,6 +1139,7 @@ static xp_option_t color_options[] = {
 	color_names[3],
 	MAX_COLOR_LEN,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"The color value for the fourth color.\n"),
 
     XP_STRING_OPTION(
@@ -1143,6 +1148,7 @@ static xp_option_t color_options[] = {
 	color_names[4],
 	MAX_COLOR_LEN,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"The color value for the fifth color.\n"
 	"This is only used if maxColors is set to 8 or 16.\n"),
 
@@ -1152,6 +1158,7 @@ static xp_option_t color_options[] = {
 	color_names[5],
 	MAX_COLOR_LEN,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"The color value for the sixth color.\n"
 	"This is only used if maxColors is set to 8 or 16.\n"),
 
@@ -1161,6 +1168,7 @@ static xp_option_t color_options[] = {
 	color_names[6],
 	MAX_COLOR_LEN,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"The color value for the seventh color.\n"
 	"This is only used if maxColors is set to 8 or 16.\n"),
 
@@ -1170,6 +1178,7 @@ static xp_option_t color_options[] = {
 	color_names[7],
 	MAX_COLOR_LEN,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"The color value for the eighth color.\n"
 	"This is only used if maxColors is set to 8 or 16.\n"),
 
@@ -1179,6 +1188,7 @@ static xp_option_t color_options[] = {
 	color_names[8],
 	MAX_COLOR_LEN,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"The color value for the nineth color.\n"
 	"This is only used if maxColors is set to 16.\n"),
 
@@ -1188,6 +1198,7 @@ static xp_option_t color_options[] = {
 	color_names[9],
 	MAX_COLOR_LEN,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"The color value for the tenth color.\n"
 	"This is only used if maxColors is set to 16.\n"),
 
@@ -1197,6 +1208,7 @@ static xp_option_t color_options[] = {
 	color_names[10],
 	MAX_COLOR_LEN,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"The color value for the eleventh color.\n"
 	"This is only used if maxColors is set to 16.\n"),
 
@@ -1206,6 +1218,7 @@ static xp_option_t color_options[] = {
 	color_names[11],
 	MAX_COLOR_LEN,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"The color value for the twelfth color.\n"
 	"This is only used if maxColors is set to 16.\n"),
 
@@ -1215,6 +1228,7 @@ static xp_option_t color_options[] = {
 	color_names[12],
 	MAX_COLOR_LEN,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"The color value for the thirteenth color.\n"
 	"This is only used if maxColors is set to 16.\n"),
 
@@ -1224,6 +1238,7 @@ static xp_option_t color_options[] = {
 	color_names[13],
 	MAX_COLOR_LEN,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"The color value for the fourteenth color.\n"
 	"This is only used if maxColors is set to 16.\n"),
 
@@ -1233,6 +1248,7 @@ static xp_option_t color_options[] = {
 	color_names[14],
 	MAX_COLOR_LEN,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"The color value for the fifteenth color.\n"
 	"This is only used if maxColors is set to 16.\n"),
 
@@ -1242,6 +1258,7 @@ static xp_option_t color_options[] = {
 	color_names[15],
 	MAX_COLOR_LEN,
 	NULL, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"The color value for the sixteenth color.\n"
 	"This is only used if maxColors is set to 16.\n"),
 
@@ -1252,6 +1269,7 @@ static xp_option_t color_options[] = {
 	sparkColors,
 	sizeof sparkColors,
 	Set_sparkColors, NULL, NULL,
+	XP_OPTFLAG_DEFAULT,
 	"Which color numbers to use for spark and debris particles.\n"),
 
     COLOR_INDEX_OPTION(

@@ -1136,6 +1136,7 @@ xp_option_t key_options[] = {
 	"keyFireShot",
 	NULL, 0,
 	setPointerButtonBinding, NULL, getPointerButtonBinding,
+	XP_OPTFLAG_DEFAULT,
 	"The keys to activate when pressing the first mouse button.\n"),
 
     XP_STRING_OPTION(
@@ -1143,6 +1144,7 @@ xp_option_t key_options[] = {
 	"keyThrust",
 	NULL, 0,
 	setPointerButtonBinding, NULL, getPointerButtonBinding,
+	XP_OPTFLAG_DEFAULT,
 	"The keys to activate when pressing the second mouse button.\n"),
 
     XP_STRING_OPTION(
@@ -1150,6 +1152,7 @@ xp_option_t key_options[] = {
 	"keyDropBall",
 	NULL, 0,
 	setPointerButtonBinding, NULL, getPointerButtonBinding,
+	XP_OPTFLAG_DEFAULT,
 	"The keys to activate when pressing the third mouse button.\n"),
 
     XP_STRING_OPTION(
@@ -1157,6 +1160,7 @@ xp_option_t key_options[] = {
 	"",
 	NULL, 0,
 	setPointerButtonBinding, NULL, getPointerButtonBinding,
+	XP_OPTFLAG_DEFAULT,
 	"The keys to activate when pressing the fourth mouse button.\n"),
 
     XP_STRING_OPTION(
@@ -1164,6 +1168,7 @@ xp_option_t key_options[] = {
 	"",
 	NULL, 0,
 	setPointerButtonBinding, NULL, getPointerButtonBinding,
+	XP_OPTFLAG_DEFAULT,
 	"The keys to activate when pressing the fifth mouse button.\n"),
 };
 
