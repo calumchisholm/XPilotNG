@@ -186,7 +186,7 @@ void Move_init(void)
     mp.obj_treasure_mask = mp.obj_bounce_mask | OBJ_BALL | OBJ_PULSE;
 }
 
-void Object_hits_target(object *obj, target_t *targ, long player_cost)
+static void Object_hits_target(object *obj, target_t *targ, long player_cost)
 {
     int			j;
     player		*kp;

@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -45,8 +44,9 @@ extern int keys_viewer;
  */
 void List_visuals(void);
 int Colors_init(void);
-int Colors_init_block_bitmaps(void);
-void Colors_free_block_bitmaps(void);
+int Colors_init_bitmaps(void);
+void Colors_free_bitmaps(void);
+void Colors_init_style_colors(void);
 void Colors_cleanup(void);
 void Colors_debug(void);
 
@@ -73,22 +73,22 @@ extern int Join(char *server_addr, char *server_name, int port,
 		char *display, unsigned version);
 
 /*
+ * mapdata.c
+ */
+extern int Mapdata_setup(const char *);
+
+
+/*
  * metaclient.c
  */
 extern int metaclient(int, char **);
 
-/*
- * math.c
- */
-#if 0
-extern int ON(char *optval);
-extern int OFF(char *optval);
-#endif
 
 /*
  * paintdata.c
  */
 extern void paintdataCleanup(void);		/* memory cleanup */
+
 
 /*
  * paintobjects.c

@@ -220,7 +220,7 @@ void crippleTalk(char *msg)
     msgEnd = i - 1;
 
     for (i = 0; i < msgEnd; i++) {
-	if (isalpha(msg[i]) || isdigit(msg[i]))
+	if (isalpha((int)msg[i]) || isdigit((int)msg[i]))
 	    msg[i] = '*';
     }
 }

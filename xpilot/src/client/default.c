@@ -2602,17 +2602,18 @@ static int Get_resource(XrmDatabase db,
 
 
 static int Get_string_resource(XrmDatabase db,
-			       const char *resource, char *result, unsigned size)
+			       const char *resource, char *result,
+			       unsigned size)
 {
     char		*src, *dst;
     int			index, val;
 
     val = Find_resource(db, resource, result, size, &index);
     src = dst = result;
-    while ((*src & 0x7f) == *src && isgraph(*src) == 0 && *src != '\0')
+    while ((*src & 0x7f) == *src && isgraph((int)*src) == 0 && *src != '\0')
 	src++;
 
-    while ((*src & 0x7f) != *src || isgraph(*src) != 0)
+    while ((*src & 0x7f) != *src || isgraph((int)*src) != 0)
 	*dst++ = *src++;
 
     *dst = '\0';

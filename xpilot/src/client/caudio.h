@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -31,7 +30,17 @@
 
 extern	int	Handle_audio(int type, int volume);
 extern	void	audioInit(char *display);
-extern	void	audioCleanup();
-extern	void	audioEvents();
+extern	void	audioCleanup(void);
+extern	void	audioEvents(void);
+
+extern int audioDeviceInit(char *display);
+extern void audioDevicePlay(char *filename, int type,
+			    int volume, void **private);
+extern void audioDeviceEvents(void);
 
 #endif
+
+
+
+
+

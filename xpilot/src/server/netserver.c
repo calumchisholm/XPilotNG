@@ -740,7 +740,7 @@ int Check_connection(char *real, char *nick, char *dpy, char *addr)
     return -1;
 }
 
-void Create_client_socket(sock_t *socket, int *port)
+static void Create_client_socket(sock_t *socket, int *port)
 {
     int i;
 
@@ -1234,7 +1234,7 @@ static void LegalizeName(char *string)
 	char ch = *string;
 	if (ch == '\"')
 	    ch = '\'';
-	else if (!isprint(ch) || strchr("{[]}:,", ch))
+	else if (!isprint((int)ch) || strchr("{[]}:,", ch))
 	    ch = 'x';
 	*string++ = ch;
     }
@@ -1244,7 +1244,7 @@ static void LegalizeHost(char *string)
 {
     while ( *string != '\0' ) {
 	char ch = *string;
-	if ( !isalnum(ch) && ch != '.' )
+	if ( !isalnum((int)ch) && ch != '.' )
 	    ch = '.';
 	*string++ = ch;
     }
@@ -3117,7 +3117,7 @@ static int str2num (char **strp, int min, int max)
     char *str = *strp;
     int num = 0;
 
-    while (isdigit(*str)) {
+    while (isdigit((int)*str)) {
 	num *= 10;
 	num += *str++ - '0';
     }

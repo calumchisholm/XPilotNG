@@ -1726,7 +1726,7 @@ static int Config_update_fullColor(int widget_desc, void *data, bool *val)
 	if (fullColor == false) {
 	    /* see if we can use fullColor at all. */
 	    fullColor = true;
-	    if (Colors_init_block_bitmaps() == -1) {
+	    if (Colors_init_bitmaps() == -1) {
 		/* no we can't have fullColor. */
 		fullColor = false;
 		/* and redraw our widget as false. */
@@ -1735,7 +1735,7 @@ static int Config_update_fullColor(int widget_desc, void *data, bool *val)
 	    }
 	}
 	else {
-	    Colors_free_block_bitmaps();
+	    Colors_free_bitmaps();
 	    fullColor = false;
 	    texturedObjects = false;
 	}

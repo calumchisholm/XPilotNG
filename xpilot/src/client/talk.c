@@ -564,7 +564,7 @@ int Talk_do_event(XEvent *event)
 	    case '\033':     /* canceled */
 		break;
 	    default:
-		if (isprint(ch)) {
+		if (isprint((int)ch)) {
 		    /*
 		     * the string is modified.
 		     * next Get_msg_from_history() will store it in the history
@@ -812,7 +812,7 @@ int Talk_do_event(XEvent *event)
 	    break;
 
 	default:
-	    if ((ch & 0x7F) == ch && !isprint(ch)) {
+	    if ((ch & 0x7F) == ch && !isprint((int)ch)) {
 		/*
 		 * Unknown special character.
 		 */

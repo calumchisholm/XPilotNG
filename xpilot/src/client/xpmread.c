@@ -131,9 +131,8 @@ static char *xpm_next_token(XPM_read *xpmr)
 
     do {
 	/* skip whitespace */
-	while (isascii(*ptr) && isspace(*ptr)) {
+	while (isascii((int)*ptr) && isspace((int)*ptr))
 	    ptr++;
-	}
 
 	/* where token starts */
 	tok = ptr;
@@ -160,19 +159,17 @@ static char *xpm_next_token(XPM_read *xpmr)
 	if (*ptr == '"') {
 	    /* find end of string. */
 	    for (ptr++; *ptr; ptr++) {
-		if (*ptr == '"') {
+		if (*ptr == '"')
 		    break;
-		}
 	    }
 	}
 	/* if it's something else. */
-#define ISKEYWORD(c)	(isupper(c) || islower(c) || (c) == '_')
-#define ISKEYWORDEXT(c)	(ISKEYWORD(c) || isdigit(c))
-	else if (isascii(*ptr) && ISKEYWORD(*ptr)) {
+#define ISKEYWORD(c)	(isupper((int)(c)) || islower((int)(c)) || (c) == '_')
+#define ISKEYWORDEXT(c)	(ISKEYWORD((int)(c)) || isdigit((int)(c)))
+	else if (isascii((int)*ptr) && ISKEYWORD(*ptr)) {
 	    for (ptr++; *ptr; ptr++) {
-		if (!isascii(*ptr) || !ISKEYWORDEXT(*ptr)) {
+		if (!isascii((int)*ptr) || !ISKEYWORDEXT(*ptr))
 		    break;
-		}
 	    }
 	    /* one too far in all cases, so backup one position. */
 	    ptr--;
@@ -241,41 +238,34 @@ static int xpm_parse_data(XPM_read *xpmr)
 
     if (sscanf(xpmr->token, "%u %u %u %u",
 	       &xpmr->xpm->width, &xpmr->xpm->height,
-	       &xpmr->xpm->ncolors, &xpmr->xpm->cpp) != 4) {
+	       &xpmr->xpm->ncolors, &xpmr->xpm->cpp) != 4)
 	return xpm_read_error(xpmr, "Incorrect values specification");
-    }
 
-    if (xpmr->xpm->ncolors > 256) {
+    if (xpmr->xpm->ncolors > 256)
 	return xpm_read_error(xpmr, "Too many colors defined");
-    }
 
     size = xpmr->xpm->ncolors * sizeof(XPM_color);
-    if (!(xpmr->xpm->colors = (XPM_color *)malloc(size))) {
+    if (!(xpmr->xpm->colors = (XPM_color *)malloc(size)))
 	return xpm_read_error(xpmr, "Not enough memory");
-    }
     memset(xpmr->xpm->colors, 0, size);
 
     size = xpmr->xpm->ncolors * sizeof(char *);
-    if (!(xpmr->chars_ptr = (char **)malloc(size))) {
+    if (!(xpmr->chars_ptr = (char **)malloc(size)))
 	return xpm_read_error(xpmr, "Not enough memory");
-    }
     memset(xpmr->chars_ptr, 0, size);
 
     size = xpmr->xpm->ncolors * (xpmr->xpm->cpp + 1);
-    if (!(xpmr->chars_mem = (char *)malloc(size))) {
+    if (!(xpmr->chars_mem = (char *)malloc(size)))
 	return xpm_read_error(xpmr, "Not enough memory");
-    }
     memset(xpmr->chars_mem, 0, size);
 
     for (i = 0; i < xpmr->xpm->ncolors; i++) {
 	xpmr->chars_ptr[i] = &xpmr->chars_mem[i * (xpmr->xpm->cpp + 1)];
-	if (!xpm_next_string(xpmr)) {
+	if (!xpm_next_string(xpmr))
 	    return xpm_read_error(xpmr, "Premature end-of-data");
-	}
 	for (j = 0; j < xpmr->xpm->cpp; j++) {
-	    if (!(xpmr->chars_ptr[i][j] = xpmr->token[j])) {
+	    if (!(xpmr->chars_ptr[i][j] = xpmr->token[j]))
 		return xpm_read_error(xpmr, "Incomplete color specification");
-	    }
 	}
 	xpmr->chars_ptr[i][j] = '\0';
 	num_keys = 0;
@@ -284,46 +274,40 @@ static int xpm_parse_data(XPM_read *xpmr)
 	     key = strtok(NULL, " \t")) {
 	     for (k = 0; k < XPM_nkeys; k++) {
 		 if (!strcmp(xpm_key_strings[k], key)) {
-		     if (xpmr->xpm->colors[i].keys[k]) {
+		     if (xpmr->xpm->colors[i].keys[k])
 			 /* key already defined for this color! */
 			 break;
-		     }
 		     xpmr->xpm->colors[i].keys[k] = xp_strdup(str);
 		     num_keys++;
 		     break;
 		 }
 	     }
 	}
-	if (num_keys == 0) {
+	if (num_keys == 0)
 	    return xpm_read_error(xpmr, "Incomplete color specification");
-	}
     }
 
     size = xpmr->xpm->width * xpmr->xpm->height;
-    if (!(xpmr->xpm->pixels = (unsigned char *)malloc(size))) {
+    if (!(xpmr->xpm->pixels = (unsigned char *)malloc(size)))
 	return xpm_read_error(xpmr, "Not enough memory");
-    }
     pixelp = xpmr->xpm->pixels;
     for (j = 0; j < xpmr->xpm->height; j++) {
-	if (!xpm_next_string(xpmr)) {
+	if (!xpm_next_string(xpmr))
 	    return xpm_read_error(xpmr, "Premature end-of-data");
-	}
 	str = xpmr->token;
 	for (i = 0; i < xpmr->xpm->width; i++) {
 	    for (k = 0; k < xpmr->xpm->ncolors; k++) {
 		for (m = 0; m < xpmr->xpm->cpp; m++) {
-		    if (xpmr->chars_ptr[k][m] != str[m]) {
+		    if (xpmr->chars_ptr[k][m] != str[m])
 			break;
-		    }
 		}
 		if (m == xpmr->xpm->cpp) {
 		    *pixelp = k;
 		    break;
 		}
 	    }
-	    if (k == xpmr->xpm->ncolors) {
+	    if (k == xpmr->xpm->ncolors)
 		return xpm_read_error(xpmr, "Unmatched pixel");
-	    }
 	    pixelp++;
 	    str += xpmr->xpm->cpp;
 	}
@@ -336,19 +320,16 @@ static int xpm_parse_buffer(XPM_read *xpmr)
 {
     static const char	XPM_header[] = "/* XPM */";
 
-    if ((xpmr->ptr = strstr(xpmr->ptr, XPM_header)) == NULL) {
+    if ((xpmr->ptr = strstr(xpmr->ptr, XPM_header)) == NULL)
 	return xpm_read_error(xpmr, "Can't find XPM header");
-    }
     xpmr->ptr += strlen(XPM_header);
 
     while (xpm_next_token(xpmr)) {
-	if (!strcmp(xpmr->token, "{")) {	/* no matching "}" */
+	if (!strcmp(xpmr->token, "{"))	/* no matching "}" */
 	    break;
-	}
     }
-    if (!xpm_next_string(xpmr)) {
+    if (!xpm_next_string(xpmr))
 	return xpm_read_error(xpmr, "Premature end-of-data");
-    }
 
     return xpm_parse_data(xpmr);
 }
@@ -359,9 +340,9 @@ static int xpm_load_data(XPM_read *xpmr)
     unsigned		size;
     struct stat		st;
 
-    if ((fd = open(xpmr->filename, O_RDONLY)) == -1) {
+    if ((fd = open(xpmr->filename, O_RDONLY)) == -1)
 	return xpm_read_error(xpmr, NULL);
-    }
+
     if (fstat(fd, &st)) {
 	close(fd);
 	return xpm_read_error(xpmr, xpmr->filename);
@@ -575,9 +556,8 @@ static Pixmap xpm_image_to_pixmap(XPM *xpm, XImage *img)
 	pixgc = XCreateGC(dpy, pixmap, 0, NULL);
 	XPutImage(dpy, pixmap, pixgc, img, 0, 0, 0, 0, xpm->width, xpm->height);
 	XFreeGC(dpy, pixgc);
-    } else {
+    } else
 	error("Can't create XPM pixmap");
-    }
     return pixmap;
 }
 
@@ -586,9 +566,8 @@ static Pixmap xpm_convert_to_pixmap(XPM *xpm)
     Pixmap		pixmap;
     XImage		*img;
 
-    if (!(img = xpm_convert_to_image(xpm))) {
+    if (!(img = xpm_convert_to_image(xpm)))
 	return None;
-    }
     pixmap = xpm_image_to_pixmap(xpm, img);
     free(img->data);
     img->data = NULL;
@@ -603,9 +582,8 @@ Pixmap xpm_pixmap_from_data(const char **data)
     Pixmap		pixmap;
 
     memset(&xpm, 0, sizeof(xpm));
-    if (xpm_read_xpm_from_data(data, &xpm)) {
+    if (xpm_read_xpm_from_data(data, &xpm))
 	return None;
-    }
     pixmap = xpm_convert_to_pixmap(&xpm);
     xpm_free_xpm(&xpm);
     return pixmap;
@@ -617,9 +595,8 @@ Pixmap xpm_pixmap_from_file(char *filename)
     Pixmap		pixmap;
 
     memset(&xpm, 0, sizeof(xpm));
-    if (xpm_read_xpm_from_file(filename, &xpm)) {
+    if (xpm_read_xpm_from_file(filename, &xpm))
 	return None;
-    }
     pixmap = xpm_convert_to_pixmap(&xpm);
     xpm_free_xpm(&xpm);
     return pixmap;
@@ -652,9 +629,8 @@ int xpm_picture_from_file(xp_picture_t *pic, char *filename)
 	    if (xpm.colors[i].keys[k]) {
 		color_name = xpm.colors[i].keys[k];
 		if (XParseColor(dpy, DefaultColormap(dpy, DefaultScreen(dpy)),
-				color_name, &xcolor)) {
+				color_name, &xcolor))
 		    break;
-		}
 		printf("Can't parse color \"%s\"\n", color_name);
 		color_name = NULL;
 	    }
@@ -663,10 +639,10 @@ int xpm_picture_from_file(xp_picture_t *pic, char *filename)
 	    for (k = key + 1; k <= XPM_c; k++) {
 		if (xpm.colors[i].keys[k]) {
 		    color_name = xpm.colors[i].keys[k];
-		    if (XParseColor(dpy, DefaultColormap(dpy, DefaultScreen(dpy)),
-				    color_name, &xcolor)) {
+		    if (XParseColor(dpy,
+				    DefaultColormap(dpy, DefaultScreen(dpy)),
+				    color_name, &xcolor))
 			break;
-		    }
 		    printf("Can't parse color \"%s\"\n", color_name);
 		    color_name = NULL;
 		}
@@ -674,17 +650,13 @@ int xpm_picture_from_file(xp_picture_t *pic, char *filename)
 	}
 	if (!color_name) {
 	    if (xpm.colors[i].keys[XPM_s]
-		&& !strcmp(xpm.colors[i].keys[XPM_s], "None")) {
+		&& !strcmp(xpm.colors[i].keys[XPM_s], "None"))
 		colors[i] = 0;
-	    }
-	    else {
+	    else
 		return false;
-	    }
-	}
-	else {
+	} else
             colors[i] =
                 RGB24(xcolor.red >> 8, xcolor.green >> 8, xcolor.blue >> 8);
-	}
     }
 
     pic->height = xpm.height;

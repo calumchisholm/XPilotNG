@@ -230,7 +230,7 @@ static int Check_names(char *nick_name, char *real_name, char *host_name)
      */
     /* strip trailing whitespace. */
     for (ptr = &nick_name[strlen(nick_name)]; ptr-- > nick_name; ) {
-	if (isascii(*ptr) && isspace(*ptr))
+	if (isascii((int)*ptr) && isspace((int)*ptr))
 	    *ptr = '\0';
 	else
 	    break;

@@ -281,42 +281,38 @@ static void Init_spark_colors(void)
 
      /* hack but protocol will allow max 9 (MM) */ 
     for (src = sparkColors; *src && (num_spark_colors < 9); src++) {
-	if (isascii(*src) && isdigit(*src)) {
+	if (isascii((int)*src) && isdigit((int)*src)) {
 	    dst = &buf[0];
 	    do {
 		*dst++ = *src++;
 	    } while (*src &&
-		     isascii(*src) &&
-		     isdigit(*src) &&
+		     isascii((int)*src) &&
+		     isdigit((int)*src) &&
 		     ((dst - buf) < (sizeof(buf) - 1)));
 	    *dst = '\0';
 	    src--;
 	    if (sscanf(buf, "%u", &col) == 1) {
-		if (col < (unsigned)maxColors) {
+		if (col < (unsigned)maxColors)
 		    spark_color[num_spark_colors++] = col;
-		}
 	    }
 	}
     }
     if (num_spark_colors == 0) {
 	if (maxColors <= 8) {
 	    /* 3 colors ranging from 5 up to 7 */
-	    for (i = 5; i < maxColors; i++) {
+	    for (i = 5; i < maxColors; i++)
 		spark_color[num_spark_colors++] = i;
-	    }
 	}
 	else {
 	    /* 7 colors ranging from 5 till 11 */
-	    for (i = 5; i < 12; i++) {
+	    for (i = 5; i < 12; i++)
 		spark_color[num_spark_colors++] = i;
-	    }
 	}
 	/* default spark colors always include RED. */
 	spark_color[num_spark_colors++] = RED;
     }
-    for (i = num_spark_colors; i < MAX_COLORS; i++) {
+    for (i = num_spark_colors; i < MAX_COLORS; i++)
 	spark_color[i] = spark_color[num_spark_colors - 1];
-    }
 }
 
 /*

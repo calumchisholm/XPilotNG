@@ -545,7 +545,7 @@ int Colors_init(void)
 
     Colors_init_radar_hack();
 
-    Colors_init_block_bitmaps();
+    Colors_init_bitmaps();
 
     return 0;
 }
@@ -585,7 +585,7 @@ static void Colors_init_radar_hack(void)
  * on error return -1,
  * on success return 0.
  */
-static int Colors_init_block_bitmap_colors(void)
+static int Colors_init_bitmap_colors(void)
 {
     int r = -1;
 
@@ -645,14 +645,14 @@ void Colors_init_style_colors(void)
 
 
 /*
- * See if we can use block bitmaps.
+ * See if we can use bitmaps.
  * If we can then setup the colors
  * and allocate the bitmaps.
  *
  * on error return -1,
  * on success return 0.
  */
-int Colors_init_block_bitmaps(void)
+int Colors_init_bitmaps(void)
 {
     if (dbuf_state->type == COLOR_SWITCH) {
 	if (fullColor) {
@@ -662,7 +662,7 @@ int Colors_init_block_bitmaps(void)
 	}
     }
     if (fullColor) {
-	if (Colors_init_block_bitmap_colors() == -1) {
+	if (Colors_init_bitmap_colors() == -1) {
 	    fullColor = false;
 	    texturedObjects = false;
 	}
@@ -925,7 +925,7 @@ static void Colors_free_true_color(void)
 /*
  * Deallocate everything related to colors.
  */
-void Colors_free_block_bitmaps(void)
+void Colors_free_bitmaps(void)
 {
     Colors_free_color_cube();
     Colors_free_true_color();
@@ -940,7 +940,7 @@ void Colors_free_block_bitmaps(void)
  */
 void Colors_cleanup(void)
 {
-    Colors_free_block_bitmaps();
+    Colors_free_bitmaps();
 
     if (dbuf_state) {
 	end_dbuff(dbuf_state);

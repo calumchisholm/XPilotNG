@@ -464,14 +464,12 @@ void Parse_robot_file(void)
 		    }
 		    if (key > 0) {
 			char *ptr = strchr(buf, ':') + 1;
-			while (isspace(*ptr)) {
+			while (isspace((int)*ptr))
 			    ptr++;
-			}
 			strlcpy(dst, ptr, size);
 			ptr = &dst[strlen(dst)];
-			while (--ptr >= dst && isspace(*ptr)) {
+			while (--ptr >= dst && isspace((int)*ptr))
 			    *ptr = '\0';
-			}
 		    }
 		}
 		if (end_of_record && got_name) {
@@ -479,11 +477,12 @@ void Parse_robot_file(void)
 		    if (num_robs == max_robs) {
 			if (max_robs == 0) {
 			    max_robs = 10;
-			    robs = (robot_t *)malloc(max_robs * sizeof(robot_t));
+			    robs = (robot_t *)
+				malloc(max_robs* sizeof(robot_t));
 			} else {
 			    max_robs += 10;
-			    robs = (robot_t *)realloc(robs,
-						      max_robs * sizeof(robot_t));
+			    robs = (robot_t *)
+				realloc(robs, max_robs * sizeof(robot_t));
 			}
 			if (!robs) {
 			    error("Not enough memory to parse robotsfile");
@@ -660,18 +659,17 @@ static void Robot_talks(enum robot_talk_t says_what,
 	return;
     }
 
-    if (next_msg == -1) {
+    if (next_msg == -1)
 	next_msg = (int)(rfrac() * 997);
-    }
-    if (++next_msg > 997) {
+
+    if (++next_msg > 997)
 	next_msg = 0;
-    }
+
     i = next_msg % n;
-    if (two == 2) {
+    if (two == 2)
 	sprintf(msg, msgsp[i], other_name, robot_name);
-    } else {
+    else
 	sprintf(msg, msgsp[i], robot_name);
-    }
     Set_message(msg);
 }
 
@@ -688,9 +686,8 @@ static void Robot_create(void)
     robot_type_t	*rob_type;
     char		msg[MSG_LEN];
 
-    if (peek_ID() == 0) {
+    if (peek_ID() == 0)
 	return;
-    }
 
     if ((new_data = (robot_data_t *)malloc(sizeof(robot_data_t))) == NULL) {
 	perror("malloc robot_data");
@@ -700,39 +697,34 @@ static void Robot_create(void)
 
     most_used = 0;
     for (i = 0; i < MAX_ROBOTS; i++) {
-	if (Robots[i].used > Robots[most_used].used) {
+	if (Robots[i].used > Robots[most_used].used)
 	    most_used = i;
-	}
     }
     for (i = 0; i < NumPlayers; i++) {
 	player *pl_i = Players(i);
 	if (IS_ROBOT_PTR(pl_i)) {
 	    data = (robot_data_t *)pl_i->robot_data_ptr;
-	    if (Robots[data->robots_ind].used < Robots[most_used].used) {
+	    if (Robots[data->robots_ind].used < Robots[most_used].used)
 		Robots[data->robots_ind].used = Robots[most_used].used;
-	    }
 	}
     }
     least_used = 0;
     for (i = 0; i < MAX_ROBOTS; i++) {
-	if (Robots[i].used < Robots[least_used].used) {
+	if (Robots[i].used < Robots[least_used].used)
 	    least_used = i;
-	}
     }
     num = (int)(rfrac() * MAX_ROBOTS);
     while (Robots[num].used > Robots[least_used].used) {
-	if (++num >= MAX_ROBOTS) {
+	if (++num >= MAX_ROBOTS)
 	    num = 0;
-	}
     }
     rob = &Robots[num];
     rob->used++;
     new_data->robots_ind = num;
     new_data->robot_types_ind = 0;
     for (i = 1; i < num_robot_types; i++) {
-	if (!strcmp(robot_types[i].name, rob->driver)) {
+	if (!strcmp(robot_types[i].name, rob->driver))
 	    new_data->robot_types_ind = i;
-	}
     }
     rob_type = &robot_types[new_data->robot_types_ind];
 
@@ -778,10 +770,9 @@ static void Robot_create(void)
     NumRobots++;
 
     if (BIT(World.rules->mode, TEAM_PLAY) && teamShareScore) {
-	if (World.teams[robot->team].NumMembers == 1) {
+	if (World.teams[robot->team].NumMembers == 1)
 	    /* reset team score on first player */
 	    World.teams[robot->team].score = 0;
-	}
 	TEAM_SCORE(robot->team, 0);
     }
 
@@ -798,17 +789,17 @@ static void Robot_create(void)
 #ifndef	SILENT
     if (logRobots)
 	xpprintf("%s %s (%d, %s) starts at startpos %d.\n",
-	   showtime(), robot->name, NumPlayers, robot->realname, robot->home_base->ind);
+		 showtime(), robot->name, NumPlayers, robot->realname,
+		 robot->home_base->ind);
 #endif
 
     if (round_delay > 0 || NumPlayers == 1) {
 	round_delay = roundDelaySeconds * FPS;
 	round_delay_send = round_delay + FPS;  /* delay him an extra second */
-	if (maxRoundTime > 0 && roundDelaySeconds == 0) {
+	if (maxRoundTime > 0 && roundDelaySeconds == 0)
 	    roundtime = maxRoundTime * FPS;
-	} else {
+	else
 	    roundtime = -1;
-	}
 	sprintf(msg, "Player entered. Delaying %d seconds until next %s.",
 		roundDelaySeconds,
 		(BIT(World.rules->mode, TIMING)? "race" : "round"));
@@ -922,9 +913,8 @@ void Robot_war(player *pl, player *kp)
 {
     int			i;
 
-    if (kp->id == pl->id) {
+    if (kp->id == pl->id)
 	return;
-    }
 
     if (IS_ROBOT_PTR(kp)) {
 	Robot_talks(ROBOT_TALK_KILL, kp->name, pl->name);
@@ -932,9 +922,8 @@ void Robot_war(player *pl, player *kp)
 	if (Robot_war_on_player(kp) == pl->id)
 	    for (i = 0; i < NumPlayers; i++) {
 		player *pl_i = Players(i);
-		if (pl_i->conn != NULL) {
+		if (pl_i->conn != NULL)
 		    Send_war(pl_i->conn, kp->id, NO_ID);
-		}
 	    }
 	Robot_set_war(kp, -1);
     }
@@ -955,9 +944,8 @@ void Robot_war(player *pl, player *kp)
 	if (Robot_war_on_player(pl) != kp->id) {
 	    for (i = 0; i < NumPlayers; i++) {
 		player *pl_i = Players(i);
-		if (pl_i->conn != NULL) {
+		if (pl_i->conn != NULL)
 		    Send_war(pl_i->conn, pl->id, kp->id);
-		}
 	    }
 	    sound_play_all(DECLARE_WAR_SOUND);
 	    Robot_set_war(pl, kp->id);
@@ -1011,14 +999,14 @@ static int Robot_check_leave(player *pl)
 	&& !BIT(World.rules->mode, LIMITED_LIVES)
 	&& (BIT(pl->status, PLAYING) || pl->count <= 0)) {
 	msg[0] = '\0';
-	if (robotLeaveLife > 0 && pl->life >= robotLeaveLife) {
+	if (robotLeaveLife > 0 && pl->life >= robotLeaveLife)
 	    sprintf(msg, "%s retired.", pl->name);
-	} else if (robotLeaveScore != 0 && pl->score < robotLeaveScore) {
+	else if (robotLeaveScore != 0 && pl->score < robotLeaveScore)
 	    sprintf(msg, "%s left out of disappointment.", pl->name);
-	} else if (robotLeaveRatio != 0 && pl->score / (pl->life + 1)
-		   < robotLeaveRatio) {
+	else if (robotLeaveRatio != 0
+		 && pl->score / (pl->life + 1) < robotLeaveRatio)
 	    sprintf(msg, "%s played too badly.", pl->name);
-	}
+
 	if (msg[0] != '\0') {
 	    Robot_talks(ROBOT_TALK_LEAVE, pl->name, "");
 	    Set_message(msg);
@@ -1053,11 +1041,10 @@ static void Tank_play(player *pl)
 {
     int		t = frame_loops % (TANK_NOTHRUST_TIME + TANK_THRUST_TIME);
 
-    if (t == 0) {
+    if (t == 0)
 	SET_BIT(pl->status, THRUSTING);
-    } else if (t == TANK_THRUST_TIME) {
+    else if (t == TANK_THRUST_TIME)
 	CLR_BIT(pl->status, THRUSTING);
-    }
 }
 
 void Robot_update(void)
@@ -1091,9 +1078,8 @@ void Robot_update(void)
 	if (NumRobots > 0) {
 	    if ((num_playing_ships > World.NumBases)
 		|| (num_any_ships > NUM_IDS)
-		|| (num_playing_ships > maxRobots && NumRobots > minRobots)) {
+		|| (num_playing_ships > maxRobots && NumRobots > minRobots))
 		Robot_delete(NULL, false);
-	    }
 	}
     }
 
@@ -1111,10 +1097,9 @@ void Robot_update(void)
 	    continue;
 	}
 
-	if (!IS_ROBOT_PTR(pl)) {
+	if (!IS_ROBOT_PTR(pl))
 	    /* Ignore non-robots. */
 	    continue;
-	}
 
 	if (BIT(pl->status, PLAYING|GAME_OVER) != PLAYING) {
 	    /* Only check for leave if not being transported to homebase. */
@@ -1130,9 +1115,8 @@ void Robot_update(void)
 	    continue;
 	}
 
-	if (round_delay > 0) {
+	if (round_delay > 0)
 	    continue;
-	}
 
 	/*
 	 * Let the robot code control this robot.

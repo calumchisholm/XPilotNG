@@ -882,7 +882,7 @@ static void Xpmap_wall_poly(int bx, int by, char startblock,
     P_end_polygon();
 }
 
-void Xpmap_walls_to_polygons(void)
+static void Xpmap_walls_to_polygons(void)
 {
     int x, y, x0 = 0;
     int numblocks = 0;

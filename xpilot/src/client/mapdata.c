@@ -41,8 +41,8 @@ static int Url_parse (const char *urlstr, URL *url);
 static void Url_free_parsed (URL *url);
 
 
-int Mapdata_setup (const char *urlstr) {
-
+int Mapdata_setup(const char *urlstr)
+{
     URL url;
     char *name, *dir, *ptr;
     char path[1024], buf[1024];

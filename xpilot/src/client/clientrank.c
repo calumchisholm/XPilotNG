@@ -57,7 +57,7 @@ static void swapi(int *i1, int *i2)
 }
 
 
-void Time_Sort(void)
+static void Time_Sort(void)
 {
     int i;
 
@@ -78,7 +78,7 @@ void Time_Sort(void)
 
 /* This function checks wether the strings contains certain characters
    that might be hazardous to include on a webpage (ie they screw it up). */
-void LegalizeName(char string[])
+static void LegalizeName(char string[])
 {
     const int length = strlen(string);
     int i;
@@ -95,7 +95,7 @@ void LegalizeName(char string[])
 }
 
 /* Sort the ranks and save them to the webpage. */
-void Rank_score(void)
+static void Rank_score(void)
 {
     static const char HEADER[] =
 	"<html><head><title>Xpilot Clientrank - Evolved by Mara</title>\n"
@@ -258,7 +258,7 @@ void Init_saved_scores(void)
 	Time_Sort();
 }
 
-int Get_saved_score(char *nick)
+static int Get_saved_score(char *nick)
 {
     int oldest = 0;
     int i;
@@ -276,7 +276,7 @@ int Get_saved_score(char *nick)
 }
 
 
-int Find_player(char *nick)
+static int Find_player(char *nick)
 {
     int i;
     for (i = 0; i < 10; i++) {

@@ -47,7 +47,7 @@ int max_asteroidconcs = 0, max_bases = 0, max_cannons = 0, max_checks = 0,
 World_map World;
 bool is_polygon_map = false;
 
-static void Generate_random_map(void);
+/*static void Generate_random_map(void);*/
 static void Find_base_order(void);
 static void Reset_map_object_counters(void);
 
@@ -86,6 +86,7 @@ static void Realloc_map_objects(void)
 	   World.NumAsteroidConcs, max_asteroidconcs);
 }
 
+#if 0
 void asciidump(void *p, size_t size)
 {
     int i;
@@ -96,15 +97,13 @@ void asciidump(void *p, size_t size)
        if (!(i % 64))
            printf("\n%p ", up + i);
        c = *(up + i);
-       if (isprint(c))
+       if (isprint((int)c))
            printf("%c", c);
        else
            printf(".");
     }
     printf("\n\n");
 }
-
-
 void hexdump(void *p, size_t size)
 {
     int i;
@@ -117,6 +116,7 @@ void hexdump(void *p, size_t size)
     }
     printf("\n\n");
 }
+#endif
 
 int Map_place_cannon(clpos pos, int dir, int team)
 {
@@ -604,7 +604,7 @@ bool Grok_map_options(void)
     return true;
 }
 
-
+#if 0
 /*
  * Use wildmap to generate a random map.
  */
@@ -620,7 +620,7 @@ static void Generate_random_map(void)
 	    &mapWidth, &mapHeight);
     Grok_map_size();
 }
-
+#endif
 
 /*
  * Return the team that is closest to this click position.

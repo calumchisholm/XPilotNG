@@ -71,9 +71,6 @@ static long		keyboard_change[KEYBOARD_STORE],
 static char		talk_str[MAX_CHARS];
 
 
-extern void Colors_init_style_colors(void);
-extern void Mapdata_setup(const char *);
-
 
 /*
  * Initialize the function dispatch tables.
@@ -1134,7 +1131,8 @@ static int Net_packet(void)
     return 0;
 }
 
-static void Net_keyboard_track() {
+static void Net_keyboard_track(void)
+{
     int i, ind = -1;
     long maxtime = 0;
 

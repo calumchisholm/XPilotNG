@@ -31,6 +31,8 @@
 
 char audio_version[] = VERSION;
 
+#ifdef SOUND
+
 int audioDeviceInit(char *display)
 {
     printf("debug audio: init\n");
@@ -49,3 +51,4 @@ void audioDeviceEvents(void)
     /* printf("debug audio: events\n"); */
 }
 
+#endif /* SOUND */

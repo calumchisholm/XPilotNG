@@ -235,7 +235,7 @@ static int shape2wire(char *ship_shape_str, shipobj *ship)
 	str++;
 
 	if (shape_version == 0) {
-	    if (isdigit(*str)) {
+	    if (isdigit((int)*str)) {
 		shape_version = 0x3100;
 		if (verboseShapeParsing)
 		    xpprintf("ship shape is in old format\n");
@@ -1368,14 +1368,14 @@ static int Get_shape_keyword(char *keyw)
     int			i;
 
     /* non-abbreviated keywords start with a lower case letter. */
-    if (islower(*keyw)) {
+    if (islower((int)*keyw)) {
 	for (i = 0; i < NUM_SHAPE_KEYS; i++) {
 	    if (!strcmp(keyw, shape_keys[i]))
 		break;
 	}
     }
     /* abbreviated keywords start with an upper case letter. */
-    else if (isupper(*keyw)) {
+    else if (isupper((int)*keyw)) {
 	for (i = 0; i < NUM_SHAPE_KEYS; i++) {
 	    if (!strcmp(keyw, abbrev_keys[i]))
 		break;

@@ -383,7 +383,8 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
     }
 }
 
-void Paint_hudradar(DFLOAT hrscale, DFLOAT xlimit, DFLOAT ylimit, int sz)
+static void Paint_hudradar(DFLOAT hrscale, DFLOAT xlimit, DFLOAT ylimit,
+			   int sz)
 {
     int i, x, y;
     int hrw = hrscale * 256;
@@ -456,7 +457,7 @@ void Paint_hudradar(DFLOAT hrscale, DFLOAT xlimit, DFLOAT ylimit, int sz)
 		      		   }*//*doesn't work (yet) since client only knows visible bases */
 
 
-void Paint_HUD_items(int hud_pos_x, int hud_pos_y)
+static void Paint_HUD_items(int hud_pos_x, int hud_pos_y)
 {
     const int		BORDER = 3;
     char		str[50];

@@ -352,7 +352,7 @@ int Cannon_hitmask(cannon_t *cannon)
     return 0;
 }
 
-void Cannon_set_hitmask(int group, cannon_t *cannon)
+static void Cannon_set_hitmask(int group, cannon_t *cannon)
 {
     assert(group == cannon->group);
 
@@ -441,7 +441,7 @@ int Target_hitmask(target_t *targ)
     return HITMASK(targ->team);
 }
 
-void Target_set_hitmask(int group, target_t *targ)
+static void Target_set_hitmask(int group, target_t *targ)
 {
     assert(targ->group == group);
     P_set_hitmask(targ->group, Target_hitmask(targ));

@@ -80,7 +80,7 @@ int DrawShadowText(Display* dpy, Window w, GC gc,
 	char word[LINE_MAX];
 	int wordLen, i;
 
-	for (i=0; *str && !isspace(*str) && i < LINE_MAX-1; str++, i++)
+	for (i = 0; *str && !isspace((int)*str) && i < LINE_MAX-1; str++, i++)
 	    word[i] = *str;
 	word[i] = '\0';
 
@@ -98,7 +98,7 @@ int DrawShadowText(Display* dpy, Window w, GC gc,
 	x += wordLen;
 
 	/* Handle whitespace */
-	for (; isspace(*str); str++)
+	for (; isspace((int)*str); str++)
 	    switch (*str) {
 		/* New paragraph */
 	    case '\n':
@@ -162,13 +162,11 @@ void Expose_about_window(void)
 			       5*BORDER + 2*ITEM_SIZE, old_y,
 			       Item_get_text(i),
 			       colors[WHITE].pixel, colors[BLACK].pixel);
-	    if (y - old_y < 2 * ITEM_TRIANGLE_SIZE) {
+	    if (y - old_y < 2 * ITEM_TRIANGLE_SIZE)
 		y = old_y + 2 * ITEM_TRIANGLE_SIZE;
-	    }
 	    box_end = y + BORDER / 2;
-	    if (i == last) {
+	    if (i == last)
 		box_end += BORDER / 2;
-	    }
 
 	    /* Paint the item on the left side */
 	    XSetForeground(dpy, textGC, colors[BLACK].pixel);
@@ -207,9 +205,8 @@ void Expose_about_window(void)
 	 * No page split, obviously font is small enough or not enough
 	 * items.
 	 */
-	if (about_page == 0 && itemsplit == -1) {
+	if (about_page == 0 && itemsplit == -1)
 	    itemsplit = NUM_ITEMS-1;
-	}
 	break;
 
     case 2:
@@ -482,16 +479,14 @@ int Keys_callback(int widget_desc, void *data, const char **unused)
 				 "XPilot - key reference", "XPilot:keys",
 				 motdFont);
 	if (keys_viewer == NO_WIDGET) {
-	    errno = 0;
-	    error("Can't create key viewer");
+	    warn("Can't create key viewer");
 	    return 0;
 	}
 
 	keys_created = true;
     }
-    else if (keys_viewer != NO_WIDGET) {
+    else if (keys_viewer != NO_WIDGET)
 	Widget_map(keys_viewer);
-    }
     return 0;
 }
 
@@ -517,9 +512,8 @@ int Motd_callback(int widget_desc, void *data, const char **str)
 	Net_ask_for_motd(0, MAX_MOTD_SIZE);
 	Net_flush();
     }
-    if (motd_viewer != NO_WIDGET) {
+    if (motd_viewer != NO_WIDGET)
 	Widget_map(motd_viewer);
-    }
     return 0;
 }
 
@@ -546,23 +540,20 @@ int Handle_motd(long off, char *buf, int len, long filesize)
 	    return -1;
 	}
 	memset(motd_buf, ' ', motd_size);
-	for (i = 39; i < motd_size; i += 40) {
+	for (i = 39; i < motd_size; i += 40)
 	    motd_buf[i] = '\n';
-	}
     }
     else if (filesize < motd_size) {
 	motd_size = filesize;
 	motd_buf[motd_size] = '\0';
     }
     if (off < motd_size && len > 0) {
-	if (off + len > motd_size) {
+	if (off + len > motd_size)
 	    len = motd_size - off;
-	}
 	memcpy(motd_buf + off, buf, len);
     }
-    else if (len == 0 && off > 0) {
+    else if (len == 0 && off > 0)
 	return 0;
-    }
     if (motd_size == 0) {
 	if (motd_auto_popup) {
 	    if (motd_buf != NULL) {
@@ -585,10 +576,8 @@ int Handle_motd(long off, char *buf, int len, long filesize)
 				 2,
 				 title, "XPilot:motd",
 				 motdFont);
-	if (motd_viewer == NO_WIDGET) {
-	    errno = 0;
-	    error("Can't create MOTD viewer");
-	}
+	if (motd_viewer == NO_WIDGET)
+	    warn("Can't create MOTD viewer");
     }
     else if (len > 0) {
 	Widget_update_viewer(motd_viewer, motd_buf, off + len);
