@@ -2110,6 +2110,14 @@ cl_option_t options[] = {
 	0
     },
     {
+        "keyToggleFullScreen",
+        NULL,
+        "F11",
+        KEY_TOGGLE_FULLSCREEN,
+        "Toggles the fullscreen mode on and off.\n",
+	0
+    },
+    {
 	"keySelectItem",
 	NULL,
 	"KP_0 KP_Insert",
@@ -2508,7 +2516,7 @@ cl_option_t options[] = {
     {
 	"keySendMsg11",
 	NULL,
-	"F11",
+	"",
 	KEY_MSG_11,
 	"Sends the talkmessage stored in msg11.\n",
 	0

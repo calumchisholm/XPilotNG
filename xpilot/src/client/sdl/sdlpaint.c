@@ -150,10 +150,11 @@ int Resize_Window( int width, int height )
     window_guiarea->bounds.w = width;
     window_guiarea->bounds.h = height;
     
-    SDL_SetVideoMode( width,
- 		      height,
- 		      draw_depth, 
-		      videoFlags ); 
+    if (!SDL_SetVideoMode( width,
+			   height,
+			   draw_depth, 
+			   videoFlags ))
+	return -1;
     
 
     //    /* change to the projection matrix and set our viewing volume. */
@@ -299,7 +300,7 @@ int Paint_init(void)
 	return -1;
 
     //    scale = 1.171875;
-    scale = 0.7;
+    scale = 0.8;
     scaleFactor = 1.0 / scale;
     scaleFactor_s = 1.0;
     scoresChanged = true;

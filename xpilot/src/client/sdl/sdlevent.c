@@ -83,6 +83,58 @@ bool Key_press_toggle_radar_score(void)
     return false;
 }
 
+static bool next_dimension(int *w, int *h)
+{
+    static int dimensions[5][2] = { 
+	{ 640, 480 },
+	{ 800, 600 },
+	{ 1024, 768 },
+	{ 1280, 1024 },
+	{ 1600, 1200 }
+    };
+    int i;
+
+    for (i = 4; i >= 0; i--) {
+	if (*w > dimensions[i][0]) {
+	    *w = dimensions[i][0];
+	    *h = dimensions[i][1];
+	    return true;
+	}
+    }
+    return false;
+}
+
+bool Key_press_toggle_fullscreen(void)
+{
+    extern int videoFlags;
+    int w, h, ow, oh;
+    bool reset;
+
+    if (videoFlags & SDL_FULLSCREEN) {
+	videoFlags ^= SDL_FULLSCREEN;
+	Resize_Window(draw_width, draw_height);
+	return false;
+    }
+
+    ow = draw_width;
+    oh = draw_height;
+    w = ow + 1;
+    h = oh;
+    reset = false;
+
+    videoFlags ^= SDL_FULLSCREEN;
+    while(next_dimension(&w, &h)) {
+	if (Resize_Window(w, h) == 0) return false;
+	reset = true;
+    }
+    videoFlags ^= SDL_FULLSCREEN;
+    if (reset) {
+	Resize_Window(ow, oh);
+    }
+    Add_message("Failed to change video mode [*Client reply*]");
+    return false;
+}
+
 int Process_event(SDL_Event *evt)
 {
     int key_change = 0;

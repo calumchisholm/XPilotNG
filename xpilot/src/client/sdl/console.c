@@ -42,7 +42,7 @@ int Console_init(void)
     CON_SetExecuteFunction(console, command_handler);
     CON_Topmost(console);
     CON_Alpha(console, 200);
-    CON_SetPrompt(console, "xpilot> ");
+    CON_SetPrompt(console, "xp> ");
     Console_print("XPilot console ready");
     /*Console_print("Type /help to get help on commands.");
     Console_show();*/

@@ -260,6 +260,9 @@ bool Key_press(keys_t key)
     case KEY_PRINT_MSGS_STDOUT:
 	return Key_press_msgs_stdout();
 
+    case KEY_TOGGLE_FULLSCREEN:
+	return Key_press_toggle_fullscreen();
+
     case KEY_SELECT_ITEM:
     case KEY_LOSE_ITEM:
 	if (!Key_press_select_lose_item())

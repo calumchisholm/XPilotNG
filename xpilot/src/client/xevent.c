@@ -269,6 +269,11 @@ bool Key_press_toggle_record(void)
     return false;	/* server doesn't need to know */
 }
 
+bool Key_press_toggle_fullscreen(void)
+{
+    return false;
+}
+
 void Key_event(XEvent *event)
 {
     KeySym 		ks;
