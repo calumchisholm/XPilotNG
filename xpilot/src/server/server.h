@@ -432,6 +432,7 @@ void Deflector(player_t *pl, bool on);
 void Emergency_thrust(player_t *pl, bool on);
 void Emergency_shield(player_t *pl, bool on);
 void Phasing(player_t *pl, bool on);
+void Thrust(player_t *pl, bool on);
 
 /*
  * Prototypes for parser.c

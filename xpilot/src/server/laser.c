@@ -169,7 +169,7 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 
 	    CLR_BIT(pl->used,
 		    HAS_SHIELD|HAS_LASER|OBJ_SHOT);
-	    Player_thrust(pl, false);
+	    Thrust(pl, false);
 	    pl->stunned += 5;
 	}
     } else if (Mods_get(pulse->mods, ModsLaser) & MODS_LASER_BLIND) {

@@ -410,7 +410,7 @@ void Tank_handle_detach(player_t *pl)
 
     /* The tank uses shield and thrust */
     tank->obj_status = GRAVITY;
-    Player_thrust(tank, true);
+    Thrust(tank, true);
     tank->have = DEF_HAVE;
     tank->used = (DEF_USED & ~USED_KILL & pl->have) | HAS_SHIELD;
 

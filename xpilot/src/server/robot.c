@@ -1005,9 +1005,9 @@ static void Tank_play(player_t *pl)
     int		t = frame_loops % (TANK_NOTHRUST_TIME + TANK_THRUST_TIME);
 
     if (t == 0)
-	Player_thrust(pl, true);
+	Thrust(pl, true);
     else if (t == TANK_THRUST_TIME)
-	Player_thrust(pl, false);
+	Thrust(pl, false);
 }
 
 

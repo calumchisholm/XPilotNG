@@ -198,7 +198,7 @@ void Emergency_thrust(player_t *pl, bool on)
 /*
  * Turn emergency shield on or off.
  */
-void Emergency_shield (player_t *pl, bool on)
+void Emergency_shield(player_t *pl, bool on)
 {
     if (on) {
 	if (BIT(pl->have, HAS_EMERGENCY_SHIELD)) {
@@ -229,6 +229,17 @@ void Emergency_shield (player_t *pl, bool on)
 }
 
 /*
+ * Turn thrust on or off.
+ */
+void Thrust(player_t *pl, bool on)
+{
+    if (on)
+	SET_BIT(pl->obj_status, THRUSTING);
+    else
+	CLR_BIT(pl->obj_status, THRUSTING);
+}
+
+/*
  * Turn autopilot on or off.  This always clears the thrusting bit.  During
  * automatic pilot mode any changes to the current power, turnacc, turnspeed
  * and turnresistance settings will be temporary.
@@ -236,7 +247,7 @@ void Emergency_shield (player_t *pl, bool on)
 void Autopilot(player_t *pl, bool on)
 {
     if (on) {
-	Player_thrust(pl, false);
+	Thrust(pl, false);
 	pl->auto_power_s = pl->power;
 	pl->auto_turnspeed_s = pl->turnspeed;
 	pl->auto_turnresistance_s = pl->turnresistance;
@@ -246,7 +257,7 @@ void Autopilot(player_t *pl, bool on)
 	pl->turnresistance = 0.2;
 	sound_play_sensors(pl->pos, AUTOPILOT_ON_SOUND);
     } else {
-	Player_thrust(pl, false);
+	Thrust(pl, false);
 	pl->power = pl->auto_power_s;
 	pl->turnacc = 0.0;
 	pl->turnspeed = pl->auto_turnspeed_s;
@@ -396,7 +407,7 @@ static void do_Autopilot (player_t *pl)
      * will impart some sideways velocity.
      */
     if (pl->turnspeed != turnspeed && vad > RES/32) {
-	Player_thrust(pl, false);
+	Thrust(pl, false);
 	return;
     }
 
@@ -405,9 +416,9 @@ static void do_Autopilot (player_t *pl)
      * we don't want to over thrust.
      */
     if (pl->power > power)
-	Player_thrust(pl, false);
+	Thrust(pl, false);
     else
-	Player_thrust(pl, true);
+	Thrust(pl, true);
 }
 
 
@@ -932,7 +943,7 @@ static void Update_players(world_t *world)
 	    CLR_BIT(pl->used, HAS_SHIELD);
 	    CLR_BIT(pl->used, USES_CLOAKING_DEVICE);
 	    CLR_BIT(pl->used, USES_DEFLECTOR);
-	    Player_thrust(pl, false);
+	    Thrust(pl, false);
 	}
 	if (pl->fuel.sum > (pl->fuel.max - REFUEL_RATE * timeStep))
 	    CLR_BIT(pl->used, USES_REFUEL);
@@ -1151,7 +1162,7 @@ void Update_objects(world_t *world)
 		pl->stunned = 0;
 	    CLR_BIT(pl->used, HAS_SHIELD|HAS_LASER|HAS_SHOT);
 	    pl->did_shoot = false;
-	    Player_thrust(pl, false);
+	    Thrust(pl, false);
 	}
 	if (BIT(pl->used, HAS_SHOT) || pl->did_shoot)
 	    Fire_normal_shots(pl);

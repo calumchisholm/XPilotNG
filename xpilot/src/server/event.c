@@ -962,7 +962,7 @@ int Handle_keyboard(player_t *pl)
 	    case KEY_THRUST:
 		if (Player_uses_autopilot(pl))
 		    Autopilot(pl, false);
-		Player_thrust(pl, true);
+		Thrust(pl, true);
 		break;
 
 	    case KEY_CLOAK:
@@ -1070,7 +1070,7 @@ int Handle_keyboard(player_t *pl)
 	    case KEY_THRUST:
 		if (Player_uses_autopilot(pl))
 		    Autopilot(pl, false);
-		Player_thrust(pl, false);
+		Thrust(pl, false);
 		break;
 
 	    case KEY_REPROGRAM:

@@ -209,7 +209,7 @@ void Go_home(player_t *pl)
 	if (pl->item[ITEM_DEFLECTOR] > 0)
 	    Deflector(pl, true);
     }
-    Player_thrust(pl, false);
+    Thrust(pl, false);
     pl->updateVisibility = true;
     for (i = 0; i < NumPlayers; i++) {
 	pl->visibility[i].lastChange = 0;

@@ -434,14 +434,6 @@ static inline void Player_set_alliance(player_t *pl, int alliance)
     updateScores = true;
 }
 
-static inline void Player_thrust(player_t *pl, bool on)
-{
-    if (on)
-	SET_BIT(pl->obj_status, THRUSTING);
-    else
-	CLR_BIT(pl->obj_status, THRUSTING);
-}
-
 static inline bool Player_is_thrusting(player_t *pl)
 {
     if (BIT(pl->obj_status, THRUSTING))
