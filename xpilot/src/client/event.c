@@ -422,10 +422,11 @@ static bool Quit_mode_key_press(keys_t key)
     if (key == KEY_YES)
 	Client_exit(0);
 
-    /* all other keys exit quit mode */
-    clData.quitMode = false;
-    Clear_alert_messages();
-    quit_mode_exit_key = key;
+    if (key == KEY_NO || key == KEY_EXIT) {
+	clData.quitMode = false;
+	Clear_alert_messages();
+	quit_mode_exit_key = key;
+    }
 	
     return false;
 }

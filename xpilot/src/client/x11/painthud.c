@@ -518,6 +518,26 @@ static void Paint_HUD_items(int hud_pos_x, int hud_pos_y)
 
 }
 
+static bool have_hudmsg = false;
+static char hudmsg[MSG_LEN];
+
+void Del_HUD_message(void);
+void Add_HUD_message(const char *message);
+
+void Del_HUD_message(void)
+{
+    have_hudmsg = false;
+}
+
+void Add_HUD_message(const char *message)
+{
+    if (!message)
+	return;
+
+    strlcpy(hudmsg, message, sizeof(hudmsg));
+    have_hudmsg = true;
+}
+
 void Paint_HUD(void)
 {
     const int		BORDER = 3;
@@ -639,6 +659,19 @@ void Paint_HUD(void)
 
     /* Update the lock display */
     Paint_lock(hud_pos_x, hud_pos_y);
+
+    /* kps tmp hack to draw "alert" messages */
+    if (have_hudmsg) {
+	int len = strlen(hudmsg);
+	int width = XTextWidth(gameFont, hudmsg, len);
+
+	SET_FG(colors[WHITE].pixel);
+	rd.drawString(dpy, drawPixmap, gameGC,
+		      WINSCALE(hud_pos_x) - width / 2,
+		      WINSCALE(hud_pos_y - hudSize /*+ HUD_OFFSET*/ - BORDER )
+		      - gameFont->descent,
+		      hudmsg, len);
+    }
 
     /* Draw last score on hud if it is an message attached to it */
     if (hudColor) {

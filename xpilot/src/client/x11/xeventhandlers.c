@@ -29,12 +29,16 @@
 time_t	back_in_play_since;
 #endif
 
+extern void Add_HUD_message(const char *message);
+extern void Del_HUD_message(void);
+
 void Add_alert_message(const char *message, double timeout)
 {
-    Add_message(message);
+    Add_HUD_message(message);
 }
 void Clear_alert_messages(void)
 {
+    Del_HUD_message();
 }
 /*
  * code for the following three functions and the selectionEvents
