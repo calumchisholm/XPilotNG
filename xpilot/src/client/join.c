@@ -29,10 +29,6 @@
 
 char join_version[] = VERSION;
 
-#ifndef SCORE_UPDATE_DELAY
-# define SCORE_UPDATE_DELAY	4
-#endif
-
 static int Handle_input(int new_input)
 {
 #ifndef _WINDOWS
@@ -78,20 +74,8 @@ static void Input_loop(void)
     FD_SET(netfd, &rfds);
     max = (clientfd > netfd) ? clientfd : netfd;
     for (tfds = rfds; ; rfds = tfds) {
-	if ((scoresChanged != 0 && ++scoresChanged > SCORE_UPDATE_DELAY)
-	    || result > 1) {
-	    if (scoresChanged > 2 * SCORE_UPDATE_DELAY) {
-		Paint_score_table();
-		tv.tv_sec = 10;
-		tv.tv_usec = 0;
-	    } else {
-		tv.tv_sec = 0;
-		tv.tv_usec = 0;
-	    }
-	} else {
-	    tv.tv_sec = 10;
-	    tv.tv_usec = 0;
-	}
+	tv.tv_sec = 1;
+	tv.tv_usec = 0;
 	if ((n = select(max + 1, &rfds, NULL, NULL, &tv)) == -1) {
 	    if (errno == EINTR)
 		continue;
@@ -99,13 +83,7 @@ static void Input_loop(void)
 	    return;
 	}
 	if (n == 0) {
-	    if (scoresChanged > SCORE_UPDATE_DELAY) {
-		Paint_score_table();
-		if (Handle_input(2) == -1)
-		    return;
-		continue;
-	    }
-	    else if (result <= 1) {
+	    if (result <= 1) {
 		warn("No response from server");
 		continue;
 	    }

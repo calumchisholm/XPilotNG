@@ -118,6 +118,7 @@ void Paint_frame(void)
 #endif
 
     Paint_frame_start();
+    Paint_score_table();
 
     /*
      * Switch between two different window titles.
