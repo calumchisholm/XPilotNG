@@ -26,15 +26,15 @@
 char play_version[] = VERSION;
 
 int tagItPlayerId = NO_ID;	/* player who is 'it' */
- 
+
 void Transfer_tag(player *oldtag_pl, player *newtag_pl)
 {
     char	msg[MSG_LEN];
- 
+
     if (tagItPlayerId != oldtag_pl->id
  	|| oldtag_pl->id == newtag_pl->id)
  	return;
-     
+
     tagItPlayerId = newtag_pl->id;
     sprintf(msg, " < %s killed %s and gets to be 'it' now. >",
 	    newtag_pl->name, oldtag_pl->name);
@@ -225,7 +225,8 @@ void Make_debris(
     modifiers		mods;
     world_t *world = &World;
 
-    pos = World_wrap_clpos(world, pos);
+    pos.cx = WRAP_XCLICK(pos.cx);
+    pos.cy = WRAP_YCLICK(pos.cy);
     if (!World_contains_clpos(world, pos))
 	return;
 

@@ -599,8 +599,8 @@ double Wrap_cfindDir(int dcx, int dcy)
 {
     world_t *world = &World;
 
-    dcx = WRAP_DCX(world, dcx);
-    dcy = WRAP_DCY(world, dcy);
+    dcx = WRAP_DCX(dcx);
+    dcy = WRAP_DCY(dcy);
     return findDir((double)dcx, (double)dcy);
 }
 
@@ -608,8 +608,8 @@ double Wrap_length(int dcx, int dcy)
 {
     world_t *world = &World;
 
-    dcx = WRAP_DCX(world, dcx);
-    dcy = WRAP_DCY(world, dcy);
+    dcx = WRAP_DCX(dcx);
+    dcy = WRAP_DCY(dcy);
     return LENGTH(dcx, dcy);
 }
 

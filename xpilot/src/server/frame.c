@@ -535,9 +535,9 @@ static void Frame_map(connection_t *conn, player *pl)
 
 	fs = Fuels(world, i);
 	if (BIT(fs->conn_mask, conn_bit) == 0) {
-	    if ((CENTER_XCLICK(world, fs->pos.cx - pl->pos.cx) <
+	    if ((CENTER_XCLICK(fs->pos.cx - pl->pos.cx) <
 		 (view_width << CLICK_SHIFT) + BLOCK_CLICKS) &&
-		(CENTER_YCLICK(world, fs->pos.cy - pl->pos.cy) <
+		(CENTER_YCLICK(fs->pos.cy - pl->pos.cy) <
 		 (view_height << CLICK_SHIFT) + BLOCK_CLICKS)) {
 		Send_fuel(conn, i, fs->fuel);
 		pl->last_fuel_update = i;
@@ -682,9 +682,9 @@ static void Frame_shots(connection_t *conn, player *pl)
 	    if (clpos_inview(&cv, pos))
 		ldir = MOD2(pulse->dir + RES/2, RES);
 	    else {
-		pos.cx = WRAP_XCLICK(world, pos.cx
+		pos.cx = WRAP_XCLICK(pos.cx
 				     - tcos(pulse->dir) * pulse->len * CLICK);
-		pos.cy = WRAP_YCLICK(world, pos.cy
+		pos.cy = WRAP_YCLICK(pos.cy
 				     - tsin(pulse->dir) * pulse->len * CLICK);
 		ldir = pulse->dir;
 		if (!clpos_inview(&cv, pos))
