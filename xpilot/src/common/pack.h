@@ -96,7 +96,7 @@
  * 4.2.1.0: high bit in radar size means player is a teammate.
  * 4.3.0.0: transmit phasing separately from cloaking
  */
-#define	MAGIC		0x4F08F4ED
+#define	MAGIC		0x4F09F4ED
 
 #define MAGIC2VERSION(M)	(((M) >> 16) & 0xFFFF)
 #define VERSION2MAGIC(V)	((((V) & 0xFFFF) << 16) | (MAGIC & 0xFFFF))
@@ -105,13 +105,13 @@
 /*
  * Which client versions can join this server.
  */
-#define MIN_CLIENT_VERSION	0x4F08
+#define MIN_CLIENT_VERSION	0x4F09
 #define MAX_CLIENT_VERSION	MY_VERSION
 
 /*
  * Which server versions can this client join.
  */
-#define MIN_SERVER_VERSION	0x4F08
+#define MIN_SERVER_VERSION	0x4F09
 #define MAX_SERVER_VERSION	MY_VERSION
 
 /*
