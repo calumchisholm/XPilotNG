@@ -2,7 +2,7 @@
 <GeneralOptions>
 <Option name="allowAlliances" value="yes"/>
 <Option name="allowClusters" value="yes"/>
-<Option name="allowHeatSeekers" value="True"/>
+<Option name="allowHeatSeekers" value="yes"/>
 <Option name="allowLaserModifiers" value="yes"/>
 <Option name="allowModifiers" value="yes"/>
 <Option name="allowNukes" value="yes"/>
@@ -10,12 +10,12 @@
 <Option name="allowPlayerCrashes" value="yes"/>
 <Option name="allowPlayerKilling" value="yes"/>
 <Option name="allowShields" value="no"/>
-<Option name="allowShipShapes" value="True"/>
-<Option name="allowSmartMissiles" value="True"/>
-<Option name="allowTorpedoes" value="True"/>
+<Option name="allowShipShapes" value="yes"/>
+<Option name="allowSmartMissiles" value="yes"/>
+<Option name="allowTorpedoes" value="yes"/>
 <Option name="announceAlliances" value="no"/>
 <Option name="asteroidCollisionMayKill" value="yes"/>
-<Option name="asteroidsOnRadar" value="False"/>
+<Option name="asteroidsOnRadar" value="no"/>
 <Option name="asteroidsWallBounce" value="yes"/>
 <Option name="ballCollisions" value="no"/>
 <Option name="ballKillScoreMult" value="10.0"/>
@@ -34,7 +34,7 @@
 <Option name="debrisWallBounce" value="no"/>
 <Option name="defaultShipShape" value="(NM:Default)(AU:Unknown)(SH: 15,0 -9,8 -9,-8)(MG: 15,0)(LG: 15,0)(RG: 15,0)(EN: -9,0)(LR: -9,8)(RR: -9,-8)(LL: -9,8)(RL: -9,-8)(MR: 15,0)"/>
 <Option name="detonateItemOnKillProb" value="1.0"/>
-<Option name="distinguishMissiles" value="True"/>
+<Option name="distinguishMissiles" value="yes"/>
 <Option name="ecmsReprogramMines" value="yes"/>
 <Option name="ecmsReprogramRobots" value="yes"/>
 <Option name="edgeBounce" value="yes"/>
@@ -43,7 +43,7 @@
 <Option name="extraBorder" value="no"/>
 <Option name="friction" value="0"/>
 <Option name="heatKillScoreMult" value="0.4"/>
-<Option name="identifyMines" value="True"/>
+<Option name="identifyMines" value="yes"/>
 <Option name="initialAfterburners" value="3"/>
 <Option name="initialFuel" value="500"/>
 <Option name="itemAfterburnerProb" value="5e-9"/>
@@ -63,7 +63,7 @@
 <Option name="itemTractorBeamProb" value="0"/>
 <Option name="itemTransporterProb" value="0"/>
 <Option name="keepShots" value="no"/>
-<Option name="laserIsStunGun" value="False"/>
+<Option name="laserIsStunGun" value="no"/>
 <Option name="limitedLives" value="no"/>
 <Option name="limitedVisibility" value="no"/>
 <Option name="mapAuthor" value="PeaceMaker, poly by Throat"/>
@@ -77,18 +77,18 @@
 <Option name="maxShieldedWallBounceSpeed" value="120"/>
 <Option name="maxUnshieldedWallBounceSpeed" value="120"/>
 <Option name="mineScoreMult" value="0.33"/>
-<Option name="minesOnRadar" value="False"/>
+<Option name="minesOnRadar" value="no"/>
 <Option name="minesWallBounce" value="no"/>
 <Option name="missileLife" value="400.0"/>
-<Option name="missilesOnRadar" value="True"/>
+<Option name="missilesOnRadar" value="yes"/>
 <Option name="missilesWallBounce" value="no"/>
 <Option name="movingItemProb" value="0.4"/>
 <Option name="ngControls" value="true"/>
 <Option name="nukeMinMines" value="5"/>
 <Option name="nukeMinSmarts" value="2"/>
-<Option name="nukesOnRadar" value="True"/>
+<Option name="nukesOnRadar" value="yes"/>
 <Option name="objectWallBounceBrakeFactor" value="0.9"/>
-<Option name="playersOnRadar" value="True"/>
+<Option name="playersOnRadar" value="yes"/>
 <Option name="playerStartsShielded" value="yes"/>
 <Option name="playerWallBounceBrakeFactor" value="0.55"/>
 <Option name="pulsesWallBounce" value="yes"/>
@@ -97,8 +97,8 @@
 <Option name="robotLeaveLife" value="7"/>
 <Option name="runoverKillScoreMult" value="1.33"/>
 <Option name="selfKillScoreMult" value="0.3"/>
-<Option name="shieldedItemPickup" value="False"/>
-<Option name="shieldedMining" value="False"/>
+<Option name="shieldedItemPickup" value="no"/>
+<Option name="shieldedMining" value="no"/>
 <Option name="shipMass" value="20"/>
 <Option name="shotHitFuelDrainUsesKineticEnergy" value="yes"/>
 <Option name="shotsWallBounce" value="no"/>
@@ -122,7 +122,7 @@
 <Option name="treasureCollisionMayKill" value="yes"/>
 <Option name="treasureKillTeam" value="no"/>
 <Option name="treasuresOnRadar" value="yes"/>
-<Option name="useDebris" value="no"/>
+<Option name="useDebris" value="yes"/>
 <Option name="wreckageCollisionMayKill" value="no"/>
 </GeneralOptions>
 <BmpStyle id="bakedmud.pnm" filename="bakedmud.pnm" scalable="yes"/>
