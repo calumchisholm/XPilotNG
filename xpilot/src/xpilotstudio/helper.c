@@ -54,12 +54,12 @@ void GetSetEnterableInfo(){
 	case IDM_MAP_CIRCULAR_GRAVITY:
 		variantSet = iSelectionPolarity - IDM_MAP_POSITIVE;
 		break;
-	case IDM_MAP_WALL:
+/*	case IDM_MAP_WALL:
 	case IDM_MAP_BALLTARGET:
 	case IDM_MAP_BALLAREA:
 	case IDM_MAP_DECOR:
 		variantSet = iSelectionWallType;
-		break;
+		break;*/
 	default:
 		variantSet = 0;
 		break;

@@ -88,7 +88,6 @@ charlie                  default_settings[NUMPREFS] = {
 	{ "treasurecollisionmaykill","no" },
 	{ "wreckagecollisionmaykill","no" },
 	{ "ignore20maxfps","yes" },
-	{ "oneplayeronly","no" },
 	{ "timing","no" },
 	{ "edgewrap","no" },
 	{ "gravitypoint","0,0" },
@@ -223,14 +222,14 @@ charlie                  default_settings[NUMPREFS] = {
 	{ "racelaps","3" },
 	{ "lockotherteam","yes" },
 	{ "loseitemdestroys","no" },
-	{ "usewreckage","yes"},
-	{ "maxoffensiveitems","100" },
-	{ "maxdefensiveitems","100" },
 	{ "rounddelay","0" },
 	{ "maxroundtime","0" },
 	{ "numberofrounds","0" },
-	{ "analyticalcollisiondetection", "yes" },
 	{ "plockserver","no" },
 	{ "timerresolution","0" },
-	{ "password","\0" }
+	{ "password","\0" },
+	{ "playerlimit","0" },
+	{ "recordmode","0" },
+	{ "constantscoring","no" },
+	{ "elimination","no" }
 };

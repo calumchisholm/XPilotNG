@@ -63,7 +63,8 @@ extern int iSelectionShape;
 extern int iSelectionWormhole;
 extern int iSelectionPolarity;
 extern int iSelectionMapModify;
-extern int iSelectionWallType;
+//extern int iSelectionWallType;
+extern int bSegHidden;
 
 extern int iSelectionShipTools;
 extern int iSelectionShipSyms;

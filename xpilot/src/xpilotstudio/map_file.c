@@ -40,7 +40,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 		&lpTempMapDocument->MapGeometry.balltargets,
 		&lpTempMapDocument->MapGeometry.decors,
 	};
-    int x, y, dir, variant;
+    int x, y, dir, variant, hidden;
 
 	if (!strcasecmp(el, "Walls")) {
 		type = 0;
@@ -130,6 +130,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 			AddItemToItemlist(&lpTempMapDocument->MapGeometry.fuels,
 			x, y,
 			team, 0, 0, IDM_MAP_FUEL);
+		lpTempMapDocument->MapGeometry.num_fuels++;
 		return;
     }
 	if (!strcasecmp(el, "Target")) {
@@ -241,7 +242,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 			0, 0, variant, IDM_MAP_WORMHOLE);
 		return;
     }
-	if (!strcasecmp(el, "Checkpoint")) {
+	if (!strcasecmp(el, "Check")) {
 		lpTempMapDocument->MapGeometry.num_checkpoints++;
 		while (*attr) {
 			if (!strcasecmp(*attr, "x"))
@@ -266,14 +267,14 @@ static void tagstart(void *data, const char *el, const char **attr)
 			if (!strcasecmp(*attr, "hidden"))
 			{
 				if (!strcasecmp(*(attr + 1), "yes"))
-					variant = 1;
+					hidden = 1;
 				else
-					variant = 0;
+					hidden = 0;
 			}
 			attr += 2;
 		}
 		AddItemToPolygonlist(lpTempMapDocument, polylist[type].pglp,
-		x, y, 0, 0, team, variant, 1, FALSE);
+		x, y, 0, 0, team, hidden, 1, FALSE);
     return;
 }
 
@@ -374,7 +375,7 @@ int SaveMap(LPMAPDOCUMENT lpMapDocument, char * pstrFileName, int saveData, int 
 	strcpy(timestrn+24, "\0");
 
 	//Now output the document header.
-	fprintf(ofile, "<XpilotMap>\n");
+	fprintf(ofile, "<XPilotMap>\n");
 	fprintf(ofile,"<!-- Created by %s on %s -->\n",szAppName,timestrn);
 	if (lpMapDocument->MapStruct.comments != NULL)
 	{
@@ -388,9 +389,10 @@ int SaveMap(LPMAPDOCUMENT lpMapDocument, char * pstrFileName, int saveData, int 
 			  fprintf(ofile,"\n");
 	fprintf(ofile,"-->\n\n");
 	}
-	fprintf(ofile,"<Featurecount bases=\"%d\" balls=\"%d\" checkpoints=\"%d\"/>\n",
+	fprintf(ofile,"<Featurecount bases=\"%d\" balls=\"%d\" fuels=\"%d\" checks=\"%d\"/>\n",
 		lpMapDocument->MapGeometry.num_bases,
 		lpMapDocument->MapGeometry.num_balls,
+		lpMapDocument->MapGeometry.num_fuels,
 		lpMapDocument->MapGeometry.num_checkpoints);
 	fprintf(ofile, "<GeneralOptions>\n");
 	for ( n=0; n< NUMPREFS; n++ )
@@ -558,7 +560,7 @@ int SaveMap(LPMAPDOCUMENT lpMapDocument, char * pstrFileName, int saveData, int 
 		WriteItemList(ofile, itmlp, IDM_MAP_CHECKPOINT);
 	}
 	//Output the footer and close the file.
-	fprintf(ofile, "</XpilotMap>\n");
+	fprintf(ofile, "</XPilotMap>\n");
 	fclose(ofile);
 
 	strcpy(lpMapDocument->MapStruct.mapFileName, pstrFileName);
@@ -754,7 +756,7 @@ int FindOption(LPMAPDOCUMENT lpMapDocument, char *name)
 /***************************************************************************/
 void WritePolygonList(FILE *ofile, polygonlist *pglp, int type)
 {
-	int i, outputvariant = FALSE, count;
+	int i, count;
 
 	/*Special information tags that affect all polygons
 	in this list are entered here.*/
@@ -762,7 +764,6 @@ void WritePolygonList(FILE *ofile, polygonlist *pglp, int type)
 	{
 		case IDM_MAP_WALL:
 		fprintf(ofile, "<Walls>\n");
-		outputvariant = TRUE;
 		break;
 		case IDM_MAP_DECOR:
 		fprintf(ofile, "<Decorations>\n");
@@ -784,29 +785,25 @@ void WritePolygonList(FILE *ofile, polygonlist *pglp, int type)
 
 		if (!IsCounterClockwise(pglp))
 			ReversePolygonOrientation(pglp);
-		count = CountEdgesOfType(&pglp, IDM_MAP_HIDDEN);
 
-		fprintf(ofile, "<Polygon x=\"%d\" y=\"%d\" hidedges=\"%d\">\n",
-			pglp->vertex[0].x, pglp->vertex[0].y, count);
+		fprintf(ofile, "<Polygon x=\"%d\" y=\"%d\"",
+			pglp->vertex[0].x, pglp->vertex[0].y);
+		//Are there any hidden edges?
+		count = CountEdgesOfType(&pglp, IDM_MAP_HIDDEN);
+		if (count > 0)
+			fprintf(ofile, " hidedges=\"%d\"", count);
+		//ToDo: Add counts and attributes for other types of edges here.
+
+		//Close the tag.
+		fprintf(ofile, ">\n");
 
 		for(i = 1; i< pglp->num_verts; i++)
 		{
 			fprintf(ofile, "<Offset x=\"%d\" y=\"%d\"", pglp->vertex[i].delta_x, pglp->vertex[i].delta_y);
-			if (outputvariant)
-			{
-				switch (pglp->vertex[i].variant)
-				{
-				case IDM_MAP_HIDDEN:
-					fprintf(ofile, " hidden=\"yes\"/>\n");
-					break;
-				//just close the tag by default
-				default:
-					fprintf(ofile, "/>\n");
-					break;
-				}
-			}
-			else
-				fprintf(ofile, "/>\n");
+			if (pglp->vertex[i].hidden)
+				fprintf(ofile, " hidden=\"yes\"");
+
+			fprintf(ofile, "/>\n");
 		}
 		/*Close out the polygon Tag*/
 		fprintf(ofile, "</Polygon>\n");
@@ -893,7 +890,7 @@ void WriteItemList(FILE *ofile, itemlist *itmlp, int type)
 				itmlp->variant);
 			break;
 		case IDM_MAP_CHECKPOINT:
-			fprintf(ofile, "<Checkpoint x=\"%d\" y=\"%d\"/>\n",
+			fprintf(ofile, "<Check x=\"%d\" y=\"%d\"/>\n",
 				itmlp->pos.x, itmlp->pos.y);
 			break;
 		}

@@ -35,12 +35,12 @@ typedef struct {
    int		shotsGravity;
    int		idleRun;
    int		noQuit;
-   char		contactPort[7];
    char		mapWidth[8];
    char		mapHeight[8];
    max_str_t	mapFileName;
    max_str_t	mapName;
    max_str_t	mapAuthor;
+   char		contactPort[7];
    int		allowPlayerCrashes;
    int		allowPlayerBounces;
    int		allowPlayerKilling;
@@ -74,8 +74,8 @@ typedef struct {
    int		reset;
    int		resetOnHuman;
    int		teamPlay;
-   int		teamCannons;
    int		teamFuel;
+   int		teamCannons;
    char		cannonSmartness[1];
    int		cannonsUseItems;
    int		keepShots;
@@ -89,7 +89,6 @@ typedef struct {
    int		treasureCollisionMayKill;
    int		wreckageCollisionMayKill;
    int		ignore20MaxFPS;
-   int		onePlayerOnly;
    int		timing;
    int		edgeWrap;
    char		gravityPoint[8];
@@ -177,8 +176,8 @@ typedef struct {
    char		itemEmergencyShieldProb[20];
    char		initialFuel[20];
    char		initialTanks[20];
-   char		initialArmor[20];
    char		initialECMs[20];
+   char		initialArmor[20];
    char		initialMines[20];
    char		initialMissiles[20];
    char		initialCloaks[20];
@@ -224,16 +223,18 @@ typedef struct {
    char		raceLaps[7];
    int		lockOtherTeam;
    int		loseItemDestroys;
-   int		useWreckage;
-   char		maxOffensiveItems[20];
-   char		maxDefensiveItems[20];
    char		roundDelay[7];
    char		maxRoundTime[20];
-   int		analyticalCollisionDetection;
    int		pLockServer;
    char		timerResolution[20];
    max_str_t	password;
    char		numberOfRounds[7];
+/* I don't know if these are final*/
+   char		playerLimit[7];
+   char		recordMode[7];
+   int		constantScoring;
+   int		elimination;
+/**********************************/
    /*This isn't actually a map or server option, but I
    think it's relevant to the option structure, so here it is.*/
    char		*comments; /*Any comments attatched to the options struct.*/
@@ -244,7 +245,7 @@ some Windows functions will still have to use the windows POINT struct.*/
 typedef struct {
 	int x, y;
 	int delta_x, delta_y;
-	int variant; //The type of line this is. Only changes up to the x,y point.
+	int hidden; //Is the segment drawn to this point hidden?
 } XP_POINT;
 
 /*This creates a list of polygons, and should be used for simple
@@ -273,6 +274,7 @@ typedef struct {
 	polygonlist *balltargets; //List of Ball Target Polygons
 	itemlist *targets; //List of Target Items
 	itemlist *fuels; //List of Fuel Items
+	int num_fuels; //The total number of Fuels
 	itemlist *cannons; //List of Cannon Items
 	itemlist *balls; //List of Ball Items
 	int num_balls; //The total number of Balls

@@ -208,31 +208,22 @@ void DrawPolygonList(LPMAPDOCUMENT lpMapDocument, polygonlist *pglp, int type,
 		{
 			x += pglptemp->vertex[i].delta_x;
 			y -= pglptemp->vertex[i].delta_y;
-			switch (pglptemp->vertex[i].variant)
-			{
-			case IDM_MAP_NORMAL: //Normal Walls
-				break;
-			case IDM_MAP_HIDDEN:
+
+			if (pglptemp->vertex[i].hidden)
 				if (!pglptemp->selected)
+#ifdef _WINDOWS
 					htempPen = SelectObject(mapDC, hPenHidden);
-				break;
-			}
+#endif
+
 #ifdef _WINDOWS
 			LineTo(mapDC, x-offsx,
 				y-offsy);
 #endif
-			switch (pglptemp->vertex[i].variant)
-			{
-			case IDM_MAP_NORMAL: //Normal Walls
-				break;
-			case IDM_MAP_HIDDEN:
+			if (pglptemp->vertex[i].hidden)
 				if (!pglptemp->selected)
 #ifdef _WINDOWS
 					SelectObject(mapDC, htempPen);
 #endif
-				break;
-			}
-
 		}
 		
 		if (fDrawing || pglptemp->selected)

@@ -115,6 +115,7 @@ LPMAPDOCUMENT CreateNewMapDoc() {
 			{ "firerepeatrate"		,"firerepeat",19,POSINT,lpMapDocument->MapStruct.fireRepeatRate,0, FALSE, IDC_FIREREPEATRATE},
 			{ "friction"			,"friction",19,POSFLOAT,lpMapDocument->MapStruct.friction,0, FALSE, IDC_FRICTION},
 			{ "edgewrap"			,"edgewrap",0,YESNO,0,&lpMapDocument->MapStruct.edgeWrap, FALSE, IDC_EDGEWRAP},
+			{ "playerlimit"     	,"playerlimit",6,POSINT,lpMapDocument->MapStruct.playerLimit,0, FALSE, IDC_PLAYERLIMIT},
 			
 			{ "playerstartsshielded"	,"playerstartshielded",0,YESNO,0,&lpMapDocument->MapStruct.playerStartsShielded, FALSE, IDC_PLAYERSTARTSSHIELDED},
 			{ "shotswallbounce"		,"shotswallbounce",0,YESNO,0,&lpMapDocument->MapStruct.shotsWallBounce, FALSE, IDC_SHOTSWALLBOUNCE},
@@ -137,7 +138,6 @@ LPMAPDOCUMENT CreateNewMapDoc() {
 			{ "limitedvisibility"		,"limitedvisibility",0,YESNO,0,&lpMapDocument->MapStruct.limitedVisibility, FALSE, IDC_LIMITEDVISIBILITY},
 			{ "minvisibilitydistance"	,"minvisibility",19,POSFLOAT,lpMapDocument->MapStruct.minVisibilityDistance,0, FALSE, IDC_MINVISIBILITYDISTANCE},
 			{ "maxvisibilitydistance"	,"maxvisibility",19,POSFLOAT,lpMapDocument->MapStruct.maxVisibilityDistance,0, FALSE, IDC_MAXVISIBILITYDISTANCE},
-			{ "oneplayeronly"		,"oneplayeronly",0,YESNO,0,&lpMapDocument->MapStruct.onePlayerOnly, FALSE, IDC_ONEPLAYERONLY},
 			{ "teamplay"			,"teams",0,YESNO,0,&lpMapDocument->MapStruct.teamPlay, FALSE, IDC_TEAMPLAY},
 			{ "teamimmunity"		,"teamimmunity",0,YESNO,0,&lpMapDocument->MapStruct.teamImmunity, FALSE, IDC_TEAMIMMUNITY},
 			{ "teamcannons"			,"teamcannons",0,YESNO,0,&lpMapDocument->MapStruct.teamCannons, FALSE, IDC_TEAMCANNONS},
@@ -215,10 +215,10 @@ LPMAPDOCUMENT CreateNewMapDoc() {
 			{ "allowviewing"		,"allowviewing",0,YESNO,0,&lpMapDocument->MapStruct.allowViewing, FALSE, IDC_ALLOWVIEWING},
 			{ "framespersecond"		,"fps",6,POSINT,lpMapDocument->MapStruct.framesPerSecond,0, FALSE, IDC_FRAMESPERSECOND},
 			{ "ignore20maxfps"	,"ignore20maxfps",0,YESNO,0,&lpMapDocument->MapStruct.ignore20MaxFPS, FALSE, IDC_IGNORE20MAXFPS},
-			{ "analyticalcollisiondetection"	,"analyticalcollisiondetection",0,YESNO,0,&lpMapDocument->MapStruct.analyticalCollisionDetection, FALSE, IDC_ANALYTICALCOLLISIONDETECTION},
 			{ "password"			,"password",255,STRING,lpMapDocument->MapStruct.password,0, FALSE, IDC_PASSWORD},
 			{ "timerresolution"		,"timerresolution",6,POSINT,lpMapDocument->MapStruct.timerResolution,0, FALSE, IDC_TIMERRESOLUTION},
-			{ "usewreckage"			,"usewreckage",0,YESNO,0,&lpMapDocument->MapStruct.useWreckage, FALSE, IDC_USEWRECKAGE},
+			{ "elimination"			,"elimination",0,YESNO,0,&lpMapDocument->MapStruct.elimination, FALSE, IDC_ELIMINATION},
+			{ "recordmode"		,"recordmode",6,POSINT,lpMapDocument->MapStruct.recordMode,0, FALSE, IDC_RECORDMODE},
 			
 			
 			{ "initialfuel"			,"initialfuel",19,POSFLOAT,lpMapDocument->MapStruct.initialFuel,0, FALSE, IDC_INITIALFUEL},
@@ -243,8 +243,6 @@ LPMAPDOCUMENT CreateNewMapDoc() {
 			{ "initialmirrors"		,"initialmirrors",19,POSFLOAT,lpMapDocument->MapStruct.initialMirrors,0, FALSE, IDC_INITIALMIRRORS},
 			{ "initialarmor"		,"initialarmors",19,POSFLOAT,lpMapDocument->MapStruct.initialArmor,0, FALSE, IDC_INITIALARMOR},
 			
-			{ "maxoffensiveitems"		,"maxoffensiveitems",19,POSINT,lpMapDocument->MapStruct.maxOffensiveItems,0, FALSE, IDC_MAXOFFENSIVEITEMS},
-			{ "maxdefensiveitems"		,"maxdefensiveitems",19,POSINT,lpMapDocument->MapStruct.maxDefensiveItems,0, FALSE, IDC_MAXDEFENSIVEITEMS},
 			{ "maxfuel"			,"maxfuel",19,POSINT,lpMapDocument->MapStruct.maxFuel,0, FALSE, IDC_MAXFUEL},
 			{ "maxtanks"			,"maxtanks",19,POSINT,lpMapDocument->MapStruct.maxTanks,0, FALSE, IDC_MAXTANKS},
 			{ "maxecms"			,"maxecms",19,POSINT,lpMapDocument->MapStruct.maxECMs,0, FALSE, IDC_MAXECMS},
@@ -309,6 +307,7 @@ LPMAPDOCUMENT CreateNewMapDoc() {
 			{ "shovekillscoremult"		,"shovekillscoremult",19,POSFLOAT,lpMapDocument->MapStruct.shoveKillScoreMult,0, FALSE, IDC_SHOVEKILLSCOREMULT},
 			{ "crashscoremult"		,"crashscoremult",19,POSFLOAT,lpMapDocument->MapStruct.crashScoreMult,0, FALSE, IDC_CRASHKILLSCOREMULT},
 			{ "minescoremult"		,"minescoremult",19,POSFLOAT,lpMapDocument->MapStruct.mineScoreMult,0, FALSE, IDC_MINEKILLSCOREMULT},
+			{ "constantscoring"	,"constantscoring",0,YESNO,0,&lpMapDocument->MapStruct.constantScoring, FALSE, IDC_CONSTANTSCORING},
 			};			
 			
 			for (i = 0; i < NUMPREFS; i++)

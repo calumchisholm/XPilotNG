@@ -96,6 +96,7 @@ int CreateItem(LPMAPDOCUMENT lpMapDocument, int x, int y, int dx, int dy,
 	case IDM_MAP_FUEL:
 		fDrawing = FALSE;
 		num = 1;
+		lpMapDocument->MapGeometry.num_fuels++;
 		break;
 	case IDM_MAP_CANNON:
 		fDrawing = FALSE;
@@ -142,7 +143,7 @@ int CreateItem(LPMAPDOCUMENT lpMapDocument, int x, int y, int dx, int dy,
 	if (ispoly)
 	{
 			return (AddItemToPolygonlist(lpMapDocument, addpolylist[num].pglp,
-			x, y, dx, dy, teamSet, variantSet, 0, closing));
+			x, y, dx, dy, teamSet, bSegHidden, 0, closing));
 	}
 	else
 	{
@@ -211,7 +212,6 @@ int AddItemToItemlist(itemlist **varitmlp, int x, int y,
 	case IDM_MAP_WORMHOLE:
 	case IDM_MAP_CIRCULAR_GRAVITY:
 	case IDM_MAP_GRAVITY:
-//	case IDM_MAP_CHECKPOINT:
 		item->variant = variant;
 		break;
 	default:
@@ -227,9 +227,7 @@ int AddItemToItemlist(itemlist **varitmlp, int x, int y,
 /*   x                                                                     */
 /*   y                                                                     */
 /*   team                                                                  */
-/*   variant                                                               */
-/*		0: Normal Walls                                                    */
-/*		1: Hidden Walls                                                    */
+/*   hidden : is this wall hidden?                                         */
 /*   coordtype                                                             */
 /*		TRUE if coordinates are specified as offsets, as loaded from a file*/
 /*		FALSE if coordinates are x,y, as drawn by user                     */
@@ -240,7 +238,7 @@ int AddItemToItemlist(itemlist **varitmlp, int x, int y,
 /* Purpose : Create and add a vertex to the polygon list                   */
 /***************************************************************************/
 int AddItemToPolygonlist(LPMAPDOCUMENT lpMapDocument, polygonlist **varpglp, int x, int y,
-								  int dx, int dy, int team, int variant,
+								  int dx, int dy, int team, int hidden,
 								  int coordtype, int closing)
 {
 	polygonlist *polygon = NULL;
@@ -336,7 +334,7 @@ int AddItemToPolygonlist(LPMAPDOCUMENT lpMapDocument, polygonlist **varpglp, int
 		free(vert);
 		return TRUE;
 	}
-	vert->variant = variant;
+	vert->hidden = hidden;
 
 	AddVertexToList(polygon, vert);
 	polygon->team = team;
@@ -368,7 +366,7 @@ int AddVertexToList(polygonlist *polygon, XP_POINT *vert)
 		polygon->vertex[polygon->num_verts-1].y = vert->y;
 		polygon->vertex[polygon->num_verts-1].delta_x = vert->delta_x;
 		polygon->vertex[polygon->num_verts-1].delta_y = vert->delta_y;
-		polygon->vertex[polygon->num_verts-1].variant = vert->variant;
+		polygon->vertex[polygon->num_verts-1].hidden = vert->hidden;
 		free(vert);
 	}
 	return FALSE;
@@ -633,10 +631,10 @@ void ReversePolygonOrientation(polygonlist *pglp)
 	{
 		vertex[j].x = pglp->vertex[i].x;
 		vertex[j].y = pglp->vertex[i].y;
-		//Be sure to shift the variant to the correct item, because
-		//the variant is specified at the ending point, which will
+		//Be sure to shift the special attributes to the correct item,
+		//because the variant is specified at the ending point, which will
 		//have changed to be a different index.
-		vertex[j].variant = pglp->vertex[i+1].variant;
+		vertex[j].hidden = pglp->vertex[i+1].hidden;
 	}
 	//Now reload the main struct, recalculating when necessary.
 	prevx = prevy = 0;
@@ -646,7 +644,7 @@ void ReversePolygonOrientation(polygonlist *pglp)
 		pglp->vertex[i].y = vertex[i].y;
 		pglp->vertex[i].delta_x = pglp->vertex[i].x - prevx;
 		pglp->vertex[i].delta_y = pglp->vertex[i].y - prevy;
-		pglp->vertex[i].variant = vertex[i].variant;
+		pglp->vertex[i].hidden = vertex[i].hidden;
 		prevx = pglp->vertex[i].x;
 		prevy = pglp->vertex[i].y;
 	}
@@ -778,6 +776,22 @@ void DeleteMapItem(LPMAPDOCUMENT lpMapDocument)
 	}
 	else if (lpMapDocument->selecteditem)
 	{
+		switch (lpMapDocument->selectedtype)
+		{
+		case IDM_MAP_BALL:
+			lpMapDocument->MapGeometry.num_balls--;
+			break;
+		case IDM_MAP_BASE:
+			lpMapDocument->MapGeometry.num_bases--;
+			break;
+		case IDM_MAP_CHECKPOINT:
+			lpMapDocument->MapGeometry.num_checkpoints--;
+			break;
+		case IDM_MAP_FUEL:
+			lpMapDocument->MapGeometry.num_fuels--;
+			break;
+		}
+
 		itmlp = *deletelist[num].itmlp;
 		if (itmlp == lpMapDocument->selecteditem)
 		{
@@ -995,10 +1009,19 @@ int CountEdgesOfType(polygonlist **polygon, int type)
 
 	for (i = 0; i < pglp->num_verts; i++)
 	{
-		if (pglp->vertex[i].variant != type)
-			continue;
-		else
-			count++;
+		switch (type)
+		{
+		case IDM_MAP_HIDDEN:
+			if (pglp->vertex[i].hidden == TRUE)
+				count++;
+			break;
+		case IDM_MAP_NORMAL:
+			//Update this if statement if any new attributes are added.
+			//Normal walls have no attributes as true;
+			if (pglp->vertex[i].hidden == FALSE)
+				count++;
+			break;
+		}
 	}
 	return count;
 }

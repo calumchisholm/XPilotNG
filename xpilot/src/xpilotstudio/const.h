@@ -47,8 +47,6 @@
 
 #define UNTITLED "(untitled)"
 
-/*The total number of map options supported...must be updated to add new prefs*/
-#define NUMPREFS 208
 
 /*Option Types*/
 #define MAPWIDTH         0
@@ -90,6 +88,8 @@
 #define IDM_MAP_NEGATIVE		711
 
 //Variant types for walls.
+//Walls cannot be set to normal, this constant is provided
+//to enable checking that none of the others such as hidden are set.
 #define IDM_MAP_NORMAL			720
 #define IDM_MAP_HIDDEN			721
 
@@ -115,6 +115,9 @@
 #define IDM_LEFTLIGHT			908
 #define IDM_RIGHTLIGHT			909
 
+/*The total number of map options supported...must be updated to add new prefs*/
+#define NUMPREFS 207
+
 #define IDC_MAPWIDTH                    1001
 #define IDC_MAPHEIGHT                   1002
 #define IDC_MAPNAME                     1003
@@ -138,6 +141,7 @@
 #define IDC_FIREREPEATRATE              1021
 #define IDC_FRICTION                    1022
 #define IDC_EDGEWRAP	                1023
+#define IDC_PLAYERLIMIT					1024
 
 /*Mapdata2 PropSheet*/
 #define IDC_PLAYERSTARTSSHIELDED	        2001
@@ -162,30 +166,29 @@
 #define IDC_LIMITEDVISIBILITY           3001
 #define IDC_MINVISIBILITYDISTANCE       3002
 #define IDC_MAXVISIBILITYDISTANCE       3003
-#define IDC_ONEPLAYERONLY               3004
-#define IDC_TEAMPLAY                    3005
-#define IDC_TEAMIMMUNITY                3006
-#define IDC_TEAMCANNONS   				3007
-#define IDC_TEAMFUEL   					3008
-#define IDC_TARGETKILLTEAM              3009
-#define IDC_TARGETTEAMCOLLISION         3010
-#define IDC_TARGETSYNC                  3011
-#define IDC_TREASUREKILLTEAM            3012
-#define IDC_TREASURECOLLISIONDESTROYS	3013
-#define IDC_TREASURECOLLISIONMAYKILL    3014
-#define IDC_WRECKAGECOLLISIONMAYKILL    3015
-#define IDC_DISTINGUISHMISSILES         3016
-#define IDC_KEEPSHOTS   				3017
-#define IDC_IDENTIFYMINES   		    3018
-#define IDC_PLAYERSONRADAR              3019
-#define IDC_MISSILESONRADAR             3020
-#define IDC_MINESONRADAR                3021
-#define IDC_NUKESONRADAR                3022
-#define IDC_TREASURESONRADAR            3023
-#define IDC_SHIELDEDITEMPICKUP          3024
-#define IDC_SHIELDEDMINING              3025
-#define IDC_CLOAKEDEXHAUST              3026
-#define IDC_CLOAKEDSHIELD               3027
+#define IDC_TEAMPLAY                    3004
+#define IDC_TEAMIMMUNITY                3005
+#define IDC_TEAMCANNONS   				3006
+#define IDC_TEAMFUEL   					3007
+#define IDC_TARGETKILLTEAM              3008
+#define IDC_TARGETTEAMCOLLISION         3009
+#define IDC_TARGETSYNC                  3010
+#define IDC_TREASUREKILLTEAM            3011
+#define IDC_TREASURECOLLISIONDESTROYS	3012
+#define IDC_TREASURECOLLISIONMAYKILL    3013
+#define IDC_WRECKAGECOLLISIONMAYKILL    3014
+#define IDC_DISTINGUISHMISSILES         3015
+#define IDC_KEEPSHOTS   				3016
+#define IDC_IDENTIFYMINES   		    3017
+#define IDC_PLAYERSONRADAR              3018
+#define IDC_MISSILESONRADAR             3019
+#define IDC_MINESONRADAR                3020
+#define IDC_NUKESONRADAR                3021
+#define IDC_TREASURESONRADAR            3022
+#define IDC_SHIELDEDITEMPICKUP          3023
+#define IDC_SHIELDEDMINING              3024
+#define IDC_CLOAKEDEXHAUST              3025
+#define IDC_CLOAKEDSHIELD               3026
 
 /*Mapdata4 PropSheet*/
 #define IDC_CANNONSUSEITEMS     		4001
@@ -239,13 +242,13 @@
 #define IDC_LOCKOTHERTEAM					5020
 #define IDC_ALLOWVIEWING					5021
 #define IDC_FRAMESPERSECOND					5022
-#define IDC_ANALYTICALCOLLISIONDETECTION	5023
-#define IDC_IGNORE20MAXFPS					5024
-#define IDC_USEWRECKAGE						5025
-#define IDC_NUMBEROFROUNDS					5026
-#define IDC_TIMERRESOLUTION					5027
-#define IDC_PASSWORD						5028
-#define IDC_SEARCHDOMAINFORXPILOT			5029
+#define IDC_IGNORE20MAXFPS					5023
+#define IDC_NUMBEROFROUNDS					5024
+#define IDC_TIMERRESOLUTION					5025
+#define IDC_PASSWORD						5026
+#define IDC_SEARCHDOMAINFORXPILOT			5027
+#define IDC_ELIMINATION						5028
+#define IDC_RECORDMODE						5029
 
 /*Initial Items PropSheet*/
 #define IDC_INITIALFUEL                 6001
@@ -273,29 +276,27 @@
 
 
 /*Max Items PropSheet*/
-#define IDC_MAXOFFENSIVEITEMS           7001
-#define IDC_MAXDEFENSIVEITEMS           7002
-#define IDC_MAXFUEL                     7003
-#define IDC_MAXTANKS                    7004
-#define IDC_MAXECMS                     7005
-#define IDC_MAXMINES                    7006
-#define IDC_MAXMISSILES                 7007
-#define IDC_MAXCLOAKS                   7008
-#define IDC_MAXSENSORS                  7009
-#define IDC_MAXWIDEANGLES               7010
-#define IDC_MAXREARSHOTS                7011
-#define IDC_MAXAFTERBURNERS             7012
-#define IDC_MAXTRANSPORTERS             7013
-#define IDC_MAXDEFLECTORS               7014
-#define IDC_MAXPHASINGS                 7015
-#define IDC_MAXHYPERJUMPS               7016
-#define IDC_MAXEMERGENCYTHRUSTS         7017
-#define IDC_MAXLASERS                   7018
-#define IDC_MAXTRACTORBEAMS             7019
-#define IDC_MAXAUTOPILOTS               7020
-#define IDC_MAXEMERGENCYSHIELDS         7021
-#define IDC_MAXMIRRORS					7022
-#define IDC_MAXARMOR					7023
+#define IDC_MAXFUEL                     7001
+#define IDC_MAXTANKS                    7002
+#define IDC_MAXECMS                     7003
+#define IDC_MAXMINES                    7004
+#define IDC_MAXMISSILES                 7005
+#define IDC_MAXCLOAKS                   7006
+#define IDC_MAXSENSORS                  7007
+#define IDC_MAXWIDEANGLES               7008
+#define IDC_MAXREARSHOTS                7009
+#define IDC_MAXAFTERBURNERS             7010
+#define IDC_MAXTRANSPORTERS             7011
+#define IDC_MAXDEFLECTORS               7012
+#define IDC_MAXPHASINGS                 7013
+#define IDC_MAXHYPERJUMPS               7014
+#define IDC_MAXEMERGENCYTHRUSTS         7015
+#define IDC_MAXLASERS                   7016
+#define IDC_MAXTRACTORBEAMS             7017
+#define IDC_MAXAUTOPILOTS               7018
+#define IDC_MAXEMERGENCYSHIELDS         7019
+#define IDC_MAXMIRRORS					7020
+#define IDC_MAXARMOR					7021
 
 /*Item Probabilities PropSheet*/
 #define IDC_ITEMENERGYPACKPROB          8001
@@ -341,6 +342,7 @@
 #define IDC_SHOVEKILLSCOREMULT          9011
 #define IDC_CRASHKILLSCOREMULT          9012
 #define IDC_MINEKILLSCOREMULT           9013
+#define IDC_CONSTANTSCORING				9014
 
 /********************ShipEditor************************/
 #define MAXLINELEN 150	/* max line length of files */

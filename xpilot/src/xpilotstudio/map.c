@@ -30,8 +30,9 @@ int iSelectionMapTools = 0;
 int iSelectionShape = 0;
 int iSelectionWormhole = 0;
 int iSelectionPolarity = 0;
-int iSelectionWallType = 0;
+//int iSelectionWallType = 0;
 int iSelectionMapModify = 0;
+int bSegHidden = FALSE;
 
 int fDrawing = 0;
 int fCreatingPolygon;
@@ -119,7 +120,7 @@ int DoModifyCommand(LPMAPDOCUMENT lpMapDocument, int x, int y, int iSelectionMap
 			vert->delta_x = min(x - lpMapDocument->selectedpoly->vertex[lpMapDocument->selectedpoly->num_verts-1].x,
 				lpMapDocument->width - lpMapDocument->selectedpoly->vertex[lpMapDocument->selectedpoly->num_verts-1].x + x);
 			vert->delta_y = y - lpMapDocument->selectedpoly->vertex[lpMapDocument->selectedpoly->num_verts-1].y;
-			vert->variant = variantSet;
+			vert->hidden = bSegHidden;
 			AddVertexToList(lpMapDocument->selectedpoly, vert);
 		}
 		else
