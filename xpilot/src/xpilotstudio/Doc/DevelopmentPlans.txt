@@ -1,0 +1,118 @@
+1. One editor for maps, robots, ships, server config files...client config files, and
+anything else that should be editable for Xpilot.
+
+2. OS independent. Same software for both *NIX and Windows 9*/NT/2000.
+
+3. Multiple document interface. Documents would each have its own set of tools for each
+type of document.
+
+4. Use OS clipboard for cutting, pasting..etc. Wishfull thinking....
+
+5. Ability to test each item edited. Playtest maps. Preview ships. Etc.
+
+6. Extendable capacity for server options / ship items / robot types.
+
+************Ship/Robot Editing***************
+1. Same ship format for robots and players. Then have a robot definition file
+that simply calls out a robots name, its shipname, and its type. That way robots could
+be easily assigned ships from the standard shipfile. Robot files might need some kind of
+declaration at the beginning.
+
+shipFile: xpilotships.shp
+..
+robot: Droidion
+ship: DroidionCruiser
+type: Psycopath
+
+
+2. Polygon based? Possible format, or use a variant of the XML based scheme that will
+be used for maps.
+{
+[NAME: BETASHIP] /*just the name of the ship*/
+[AUTHOR: JLM] /*the authors name*/
+[SHAPE: 'numberofpolygons';
+('color','numberofvertexes', 'attachpointx', 'attachpointy', 'hotspotx', 'hotspoty', ('x','y'), ('x','y')..)
+('color','numberofvertexes', 'attachpointx', 'attachpointy', 'hotspotx', 'hotspoty', ('x','y'), ('x','y')..)
+('color','numberofvertexes', 'attachpointx', 'attachpointy', 'hotspotx', 'hotspoty', ('x','y'), ('x','y')..)
+..]
+[ENGINE: 'attachpointx', 'attachpointy']
+[GUN: 'attachpointx', 'attachpointy', 'firingangle1', 'firingangle2', 'firingangle3']
+[GUN: 'attachpointx', 'attachpointy', 'firingangle1', 'firingangle2', 'firingangle3']
+..
+[MISSILEPORT: 'attachpointx', 'attachpointy', 'firingangle1', 'firingangle2', 'firingangle3']
+[MISSILEPORT: 'attachpointx', 'attachpointy', 'firingangle1', 'firingangle2', 'firingangle3']
+..
+[LASERDOCK: 'attachpointx', 'attachpointy', 'firingangle1', 'firingangle2', 'firingangle3']
+[LASERDOCK: 'attachpointx', 'attachpointy', 'firingangle1', 'firingangle2', 'firingangle3']
+..
+[LIGHT: 'attachpointx', 'attachpointy', 'type', 'color', 'order']
+[LIGHT: 'attachpointx', 'attachpointy', 'type', 'color', 'order']
+.
+}
+
+Notes:
+Using a polygon based ship should add a bit to the ship shaping experience.
+Basically i envision it as follows:
+Main Coord-Sys of ship is centered similar to old format, with ship facing to the right.
+Each polygon is attached, by its hotspot point, to a specified attachment point on the main grid.
+
+Each polygon is individually defined, with its own coordsys defined from the center,
+and an hotspot placed somewhere.
+
+Each polygon can have 'X' number of points. Some reasonable limit should be defined.
+There can be 'X' number of polygons...once again a reasonable limit should be defined.
+One engine, attached similarly to the current format.
+'X' Number of guns, with an attachment point, and three or more possible firing angles.
+There is probably already a method in place for determining the order in which guns fire.
+'X' Number of missle ports, with an attachment point, and three or more possible firing angles.
+'X' Number of laserdocks, with an attachment point, and three or more possible firing angles.
+Lasers would then be attached to the laserdock in the order in which they are specified.
+'X' Number of lights, with an attachment point, the type of light..strobe, rabid flashing,
+constant..etc, the color of the light, and the firing order, so that an alternating light
+scheme could be created.
+
+
+3. Ability to generate not just shipdefinitions, but also robot lists.
+
+4. All selection should be graphical: selection of ships for robot...etc.
+
+************Map Editing***************
+1:New Map Format:
+The new editor will be using XML based storage for accessing files. 
+
+Instead of using a character array with each character being one map block, have all space
+assumed to be empty. Then use individual calls for each map item like this:
+<WALLS>
+<POLYGON>
+<POINT x="n" y="n2">
+<POINT x="n" y="n2">
+...
+</POLYGON>
+<POLYGON>
+...
+</POLYGON>
+</WALLS>
+
+There will be separate sections for all item types organinzed by <XML> tags for cannons,
+targets, fuels, treasures, etc.
+
+Walls would have to be closed and have no crossing lines, or interfere with other
+wall sections.
+
+Regions, which have been discussed and desired could be specified in the same format.
+Regions would also have to be closed and have no crossing lines, and not interfere with other
+regions.
+ 
+2: Need ability to save both map and thumbnail view as images. Preferably jpeg, bmp, png, etc.
+All formats should be system independant: meaning you can save to any format from *NIX or Windows9*/NT/2K.
+
+3: Versatile zooming features, such as zoom in/out, zoom by window, dynamic zoom, zoom all
+and ability to move the screen center by dragging a box in the thumbnail view which shows the
+current position.
+
+4: Wouldn't it be nice if we could import say...dxf or dwg files? Of course this would
+mean the files would have to contain only straight lines, unless theres some way to extend
+the xpilot server to accept circles or arcs in the map, which isn't likely.
+************Help***************
+1. Html based help, so that only one set of help files is created, but is usable on any system
+that can use HTML. These files then could also be placed on the 'net.
