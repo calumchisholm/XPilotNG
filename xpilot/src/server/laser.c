@@ -36,6 +36,7 @@ void Laser_pulse_hits_player(player *pl, pulseobject *pulse)
     player		*kp;
     double		sc;
     char		msg[MSG_LEN];
+    world_t *world = &World;
 
     kp = Player_by_id(pulse->id);
 
@@ -126,7 +127,7 @@ void Laser_pulse_hits_player(player *pl, pulseobject *pulse)
 	    } else {
 		sc = Rate(CANNON_SCORE, pl->score) / 4;
 		Score(pl, -sc, pl->pos, "Cannon");
-		if (BIT(World.rules->mode, TEAM_PLAY)
+		if (BIT(world->rules->mode, TEAM_PLAY)
 		    && pl->team != pulse->team)
 		    TEAM_SCORE(pulse->team, sc);
 		sprintf(msg,

@@ -62,6 +62,7 @@ int main(int argc, char **argv)
 {
     int			timer_tick_rate;
     char		*addr;
+    world_t *world = &World;
 
     /*
      * Make output always linebuffered.  By default pipes
@@ -95,14 +96,14 @@ int main(int argc, char **argv)
     Init_recording();
     plock_server(pLockServer);           /* Lock the server into memory */
     Make_table();			/* Make trigonometric tables */
-    Compute_gravity(&World);
+    Compute_gravity();
     Find_base_direction(&World);
 
     Walls_init();
 
     /* Allocate memory for players, shots and messages */
-    Alloc_players(World.NumBases + MAX_PSEUDO_PLAYERS + MAX_OBSERVERS);
-    observerStart = World.NumBases + MAX_PSEUDO_PLAYERS;
+    Alloc_players(world->NumBases + MAX_PSEUDO_PLAYERS + MAX_OBSERVERS);
+    observerStart = world->NumBases + MAX_PSEUDO_PLAYERS;
     Alloc_shots(MAX_TOTAL_SHOTS);
     Alloc_cells();
 
@@ -375,6 +376,7 @@ int Pick_team(int pick_for_type)
     int			available_teams[MAX_TEAMS];
     long		team_score[MAX_TEAMS];
     long		losing_score;
+    world_t *world = &World;
 
     /* If game_lock is on, can't join playing teams (might be able to join
      * paused). */
@@ -382,7 +384,7 @@ int Pick_team(int pick_for_type)
 	return TEAM_NOT_SET;
 
     for (i = 0; i < MAX_TEAMS; i++) {
-	free_bases[i] = World.teams[i].NumBases - World.teams[i].NumMembers;
+	free_bases[i] = world->teams[i].NumBases - world->teams[i].NumMembers;
 	playing[i] = 0;
 	team_score[i] = 0;
 	available_teams[i] = 0;
@@ -480,6 +482,7 @@ void Server_info(char *str, size_t max_size)
     char		name[MAX_CHARS];
     char		lblstr[MAX_CHARS];
     char		msg[MSG_LEN];
+    world_t *world = &World;
 
     sprintf(str,
 	    "SERVER VERSION..: %s\n"
@@ -499,8 +502,8 @@ void Server_info(char *str, size_t max_size)
 	    (game_lock && ShutdownServer != -1) ?
 	    "locked and shutting down" : "ok",
 	    FPS,
-	    World.name, World.author, World.width, World.height,
-	    NumPlayers, World.NumBases);
+	    world->name, world->author, world->width, world->height,
+	    NumPlayers, world->NumBases);
 
     if (strlen(str) >= max_size) {
 	warn("Server_info string overflow (%d)", max_size);
@@ -524,7 +527,7 @@ void Server_info(char *str, size_t max_size)
     }
     for (i = 0; i < NumPlayers; i++) {
 	pl = Players(i);
-	if (BIT(World.rules->mode, LIMITED_LIVES))
+	if (BIT(world->rules->mode, LIMITED_LIVES))
 	    ratio = pl->score;
 	else
 	    ratio = pl->score / (pl->life + 1);
@@ -613,6 +616,7 @@ void Log_game(const char *heading)
     char timenow[81];
     struct tm *ptr;
     time_t lt;
+    world_t *world = &World;
 
     if (!Log)
 	return;
@@ -625,7 +629,7 @@ void Log_game(const char *heading)
 	    timenow,
 	    Server.owner,
 	    Server.host,
-	    World.name,
+	    world->name,
 	    heading);
 
     if ((fp = fopen(Conf_logfile(), "a")) == NULL) {
@@ -642,6 +646,7 @@ void Game_Over(void)
     long		maxsc, minsc;
     int			i, win, lose;
     char		msg[128];
+    world_t *world = &World;
 
     Set_message("Game over...");
 
@@ -652,7 +657,7 @@ void Game_Over(void)
      */
     gameDuration = -1.0;
 
-    if (BIT(World.rules->mode, TEAM_PLAY)) {
+    if (BIT(world->rules->mode, TEAM_PLAY)) {
 	int teamscore[MAX_TEAMS];
 	maxsc = -32767;
 	minsc = 32767;

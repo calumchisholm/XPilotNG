@@ -39,13 +39,14 @@ static void Refuel(player *pl)
     int i;
     double l, dist = 1e19;
     fuel_t *fs;
+    world_t *world = &World;
 
     if (!BIT(pl->have, HAS_REFUEL))
 	return;
 
     CLR_BIT(pl->used, HAS_REFUEL);
-    for (i = 0; i < World.NumFuels; i++) {
-	fs = Fuels(i);
+    for (i = 0; i < world->NumFuels; i++) {
+	fs = Fuels(world, i);
 	l = Wrap_length(pl->pos.cx - fs->pos.cx,
 			pl->pos.cy - fs->pos.cy);
 	if (BIT(pl->used, HAS_REFUEL) == 0 || l < dist) {
@@ -62,13 +63,14 @@ static void Repair(player *pl)
     int i;
     double l, dist = 1e19;
     target_t *targ;
+    world_t *world = &World;
 
     if (!BIT(pl->have, HAS_REPAIR))
 	return;
 
     CLR_BIT(pl->used, HAS_REPAIR);
-    for (i = 0; i < World.NumTargets; i++) {
-	targ = Targets(i);
+    for (i = 0; i < world->NumTargets; i++) {
+	targ = Targets(world, i);
 	if (targ->team == pl->team
 	    && targ->dead_time <= 0) {
 	    l = Wrap_length(pl->pos.cx - targ->pos.cx,
@@ -99,6 +101,8 @@ bool team_dead(int team)
  */
 static bool Player_lock_allowed(player *pl, player *lock_pl)
 {
+    world_t *world = &World;
+
     /* we can never lock on ourselves, nor on NULL. */
     if (lock_pl == NULL || pl->id == lock_pl->id)
 	return false;
@@ -112,7 +116,7 @@ static bool Player_lock_allowed(player *pl, player *lock_pl)
 	return true;
 
     /* if there is no team play then we can always lock on anyone. */
-    if (!BIT(World.rules->mode, TEAM_PLAY))
+    if (!BIT(world->rules->mode, TEAM_PLAY))
 	return true;
 
     /* we can always lock on players from our own team. */
@@ -175,18 +179,19 @@ int Player_lock_closest(player *pl, bool next)
 
 void Pause_player(player *pl, bool on)
 {
+    world_t *world = &World;
     int i;
 
     if (on && !BIT(pl->status, PAUSE)) { /* Turn pause mode on */
 	if (pl->team != TEAM_NOT_SET)
-	    World.teams[pl->team].SwapperId = -1;
+	    world->teams[pl->team].SwapperId = -1;
 	/* Minimum pause time is 10 seconds at gamespeed 12. */
 	pl->count = 10 * 12;
 	pl->updateVisibility = 1;
 	CLR_BIT(pl->status, SELF_DESTRUCT|PLAYING);
 	SET_BIT(pl->status, PAUSE);
 	if (baselessPausing) {
-	    World.teams[pl->team].NumMembers--;
+	    world->teams[pl->team].NumMembers--;
 	    pl->team = 0;
 	    for (i = 0; i < NumPlayers; i++) {
 		player *pl_i = Players(i);
@@ -207,8 +212,8 @@ void Pause_player(player *pl, bool on)
 	if (BIT(pl->have, HAS_BALL))
 	    Detach_ball(pl, NULL);
 	for (i = 0; i < MAX_TEAMS ; i++) {
-	    if (World.teams[i].SwapperId == pl->id)
-		World.teams[i].SwapperId = -1;
+	    if (world->teams[i].SwapperId == pl->id)
+		world->teams[i].SwapperId = -1;
 	}
     }
     else if (!on && BIT(pl->status, PAUSE)) { /* Turn pause mode off */
@@ -223,7 +228,7 @@ void Pause_player(player *pl, bool on)
 	    pl->idleCount = 0;
 	    CLR_BIT(pl->status, PAUSE);
 	    updateScores = true;
-	    if (BIT(World.rules->mode, LIMITED_LIVES))
+	    if (BIT(world->rules->mode, LIMITED_LIVES))
 		/* Its always too late */
 		toolate = true;
 
@@ -236,10 +241,10 @@ void Pause_player(player *pl, bool on)
 		pl->mychar = ' ';
 		Go_home(pl);
 		SET_BIT(pl->status, PLAYING);
-		if (BIT(World.rules->mode, LIMITED_LIVES))
-		    pl->life = World.rules->lives;
+		if (BIT(world->rules->mode, LIMITED_LIVES))
+		    pl->life = world->rules->lives;
 	    }
-	    if (BIT(World.rules->mode, TIMING)) {
+	    if (BIT(world->rules->mode, TIMING)) {
 		pl->round = 0;
 		pl->check = 0;
 		pl->time = 0;
@@ -254,10 +259,11 @@ void Pause_player(player *pl, bool on)
 
 int Handle_keyboard(player *pl)
 {
-    int	    	i, j, k, key, pressed, dx, dy;
-    clpos	pos;
-    double  	minv;
-    int	    	ind = GetInd(pl->id);
+    int i, j, k, key, pressed, dx, dy;
+    clpos pos;
+    double minv;
+    int ind = GetInd(pl->id);
+    world_t *world = &World;
 
     for (key = 0; key < NUM_KEYS; key++) {
 	if (pl->last_keyv[key / BITV_SIZE] == pl->prev_keyv[key / BITV_SIZE]) {
@@ -486,8 +492,8 @@ int Handle_keyboard(player *pl)
 
 	    case KEY_CHANGE_HOME:
 		msg[0] = '\0';
-		for (i = 0; i < World.NumBases; i++) {
-		    base_t *base = Bases(i);
+		for (i = 0; i < world->NumBases; i++) {
+		    base_t *base = Bases(world, i);
 		    dx = ABS(CENTER_XCLICK(base->pos.cx - pl->pos.cx));
 		    dy = ABS(CENTER_YCLICK(base->pos.cy - pl->pos.cy));
 		    if (dx < BLOCK_CLICKS / 2 && dy < BLOCK_CLICKS / 2) {
@@ -569,7 +575,7 @@ int Handle_keyboard(player *pl)
 		break;
 
 	    case KEY_TOGGLE_NUCLEAR:
-		if (BIT(World.rules->mode, ALLOW_NUKES)) {
+		if (BIT(world->rules->mode, ALLOW_NUKES)) {
 		    switch (pl->mods.nuclear) {
 		    case NUCLEAR:
 			pl->mods.nuclear |= FULLNUCLEAR;
@@ -585,17 +591,17 @@ int Handle_keyboard(player *pl)
 		break;
 
 	    case KEY_TOGGLE_CLUSTER:
-		if (BIT(World.rules->mode, ALLOW_CLUSTERS))
+		if (BIT(world->rules->mode, ALLOW_CLUSTERS))
 		    TOGGLE_BIT(pl->mods.warhead, CLUSTER);
 		break;
 
 	    case KEY_TOGGLE_IMPLOSION:
-		if (BIT(World.rules->mode, ALLOW_MODIFIERS))
+		if (BIT(world->rules->mode, ALLOW_MODIFIERS))
 		    TOGGLE_BIT(pl->mods.warhead, IMPLOSION);
 		break;
 
 	    case KEY_TOGGLE_VELOCITY:
-		if (BIT(World.rules->mode, ALLOW_MODIFIERS)) {
+		if (BIT(world->rules->mode, ALLOW_MODIFIERS)) {
 		    /* NB. These may be bit fields, dont modify this code */
 		    if (pl->mods.velocity == MODS_VELOCITY_MAX)
 			pl->mods.velocity = 0;
@@ -605,7 +611,7 @@ int Handle_keyboard(player *pl)
 		break;
 
 	    case KEY_TOGGLE_MINI:
-		if (BIT(World.rules->mode, ALLOW_MODIFIERS)) {
+		if (BIT(world->rules->mode, ALLOW_MODIFIERS)) {
 		    /* NB. These may be bit fields, dont modify this code */
 		    if (pl->mods.mini == MODS_MINI_MAX)
 			pl->mods.mini = 0;
@@ -615,7 +621,7 @@ int Handle_keyboard(player *pl)
 		break;
 
 	    case KEY_TOGGLE_SPREAD:
-		if (BIT(World.rules->mode, ALLOW_MODIFIERS)) {
+		if (BIT(world->rules->mode, ALLOW_MODIFIERS)) {
 		    /* NB. These may be bit fields, dont modify this code */
 		    if (pl->mods.spread == MODS_SPREAD_MAX)
 			pl->mods.spread = 0;
@@ -625,7 +631,7 @@ int Handle_keyboard(player *pl)
 		break;
 
 	    case KEY_TOGGLE_LASER:
-		if (BIT(World.rules->mode, ALLOW_LASER_MODIFIERS)) {
+		if (BIT(world->rules->mode, ALLOW_LASER_MODIFIERS)) {
 		    /* NB. These may be bit fields, dont modify this code */
 		    if (pl->mods.laser == MODS_LASER_MAX)
 			pl->mods.laser = 0;
@@ -635,7 +641,7 @@ int Handle_keyboard(player *pl)
 		break;
 
 	    case KEY_TOGGLE_POWER:
-		if (BIT(World.rules->mode, ALLOW_MODIFIERS)) {
+		if (BIT(world->rules->mode, ALLOW_MODIFIERS)) {
 		    /* NB. These may be bit fields, dont modify this code */
 		    if (pl->mods.power == MODS_POWER_MAX)
 			pl->mods.power = 0;
@@ -999,13 +1005,15 @@ int Handle_keyboard(player *pl)
 
 void filter_mods(modifiers * mods)
 {
-    if (!BIT(World.rules->mode, ALLOW_NUKES))
+    world_t *world = &World;
+
+    if (!BIT(world->rules->mode, ALLOW_NUKES))
 	mods->nuclear = 0;
 
-    if (!BIT(World.rules->mode, ALLOW_CLUSTERS))
+    if (!BIT(world->rules->mode, ALLOW_CLUSTERS))
 	CLR_BIT(mods->warhead, CLUSTER);
 
-    if (!BIT(World.rules->mode, ALLOW_MODIFIERS)) {
+    if (!BIT(world->rules->mode, ALLOW_MODIFIERS)) {
 	CLR_BIT(mods->warhead, IMPLOSION);
 	mods->velocity = 0;
 	mods->mini = 0;
@@ -1013,6 +1021,6 @@ void filter_mods(modifiers * mods)
 	mods->power = 0;
     }
 
-    if (!BIT(World.rules->mode, ALLOW_LASER_MODIFIERS))
+    if (!BIT(world->rules->mode, ALLOW_LASER_MODIFIERS))
 	mods->laser = 0;
 }

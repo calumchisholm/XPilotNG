@@ -90,6 +90,7 @@ void Place_general_mine(player *pl, int team, long status,
     double		life, drain, mass;
     int			i, minis;
     vector		mv;
+    world_t *world = &World;
 
     if (NumObjs + mods.mini >= MAX_TOTAL_SHOTS)
 	return;
@@ -243,10 +244,11 @@ void Place_general_mine(player *pl, int team, long status,
  */
 void Detonate_mines(player *pl)
 {
+    world_t *world = &World;
     int			i;
     int			closest = -1;
     double		dist;
-    double		min_dist = World.hypotenuse * CLICK + 1;
+    double		min_dist = world->hypotenuse * CLICK + 1;
 
     if (BIT(pl->used, HAS_PHASING_DEVICE))
 	return;
@@ -492,6 +494,7 @@ void Fire_general_shot(player *pl, int team, bool cannon,
     vector		mv;
     clpos		shotpos;
     object		*mini_objs[MODS_MINI_MAX + 1];
+    world_t *world = &World;
 
     if (NumObjs >= MAX_TOTAL_SHOTS)
 	return;
@@ -595,7 +598,7 @@ void Fire_general_shot(player *pl, int team, bool cannon,
 	    else {
 		if (!BIT(pl->lock.tagged, LOCK_PLAYER)
 		|| ((pl->lock.distance > pl->sensor_range)
-		    && BIT(World.rules->mode, LIMITED_VISIBILITY))) {
+		    && BIT(world->rules->mode, LIMITED_VISIBILITY))) {
 		    lock = NO_ID;
 		} else
 		    lock = pl->lock.pl_id;
@@ -614,7 +617,7 @@ void Fire_general_shot(player *pl, int team, bool cannon,
 	    else {
 		if (!BIT(pl->lock.tagged, LOCK_PLAYER)
 		|| ((pl->lock.distance > pl->sensor_range)
-		    && BIT(World.rules->mode, LIMITED_VISIBILITY))
+		    && BIT(world->rules->mode, LIMITED_VISIBILITY))
 		|| !pl->visibility[GetInd(pl->lock.pl_id)].canSee)
 		    return;
 		lock = pl->lock.pl_id;
@@ -1088,6 +1091,7 @@ void Delete_shot(int ind)
     int			i;
     int			intensity, type, color;
     double		modv, speed_modv, life_modv, num_modv, mass;
+    world_t *world = &World;
 
     switch (shot->type) {
 
@@ -1308,7 +1312,7 @@ void Delete_shot(int ind)
 	    break;
 	}
 
-	World.items[shot->info].num--;
+	world->items[shot->info].num--;
 
 	break;
 
@@ -1327,13 +1331,13 @@ void Delete_shot(int ind)
 
     if (addMine || addHeat) {
 	CLEAR_MODS(mods);
-	if (BIT(World.rules->mode, ALLOW_CLUSTERS) && (rfrac() <= 0.333f))
+	if (BIT(world->rules->mode, ALLOW_CLUSTERS) && (rfrac() <= 0.333f))
 	    SET_BIT(mods.warhead, CLUSTER);
-	if (BIT(World.rules->mode, ALLOW_MODIFIERS) && (rfrac() <= 0.333f))
+	if (BIT(world->rules->mode, ALLOW_MODIFIERS) && (rfrac() <= 0.333f))
 	    SET_BIT(mods.warhead, IMPLOSION);
-	if (BIT(World.rules->mode, ALLOW_MODIFIERS))
+	if (BIT(world->rules->mode, ALLOW_MODIFIERS))
 	    mods.velocity = (int)(rfrac() * (MODS_VELOCITY_MAX + 1));
-	if (BIT(World.rules->mode, ALLOW_MODIFIERS))
+	if (BIT(world->rules->mode, ALLOW_MODIFIERS))
 	    mods.power = (int)(rfrac() * (MODS_POWER_MAX + 1));
 	if (addMine) {
 	    long gravity_status = ((rfrac() < 0.5f) ? GRAVITY : 0);
@@ -1565,6 +1569,7 @@ void Update_missile(missileobject *shot)
     double		x_dif = 0.0;
     double		y_dif = 0.0;
     double		shot_speed;
+    world_t *world = &World;
 
     if (shot->type == OBJ_HEAT_SHOT) {
 	acc = SMART_SHOT_ACC * HEAT_SPEED_FACT;
@@ -1722,18 +1727,18 @@ void Update_missile(missileobject *shot)
 	for (i = SMART_SHOT_LOOK_AH; i > 0 && foundw == 0; i--) {
 	    xi = (int)((x += vx) / BLOCK_SZ);
 	    yi = (int)((y += vy) / BLOCK_SZ);
-	    if (BIT(World.rules->mode, WRAP_PLAY)) {
-		if (xi < 0) xi += World.x;
-		else if (xi >= World.x) xi -= World.x;
-		if (yi < 0) yi += World.y;
-		else if (yi >= World.y) yi -= World.y;
+	    if (BIT(world->rules->mode, WRAP_PLAY)) {
+		if (xi < 0) xi += world->x;
+		else if (xi >= world->x) xi -= world->x;
+		if (yi < 0) yi += world->y;
+		else if (yi >= world->y) yi -= world->y;
 	    }
-	    if (xi < 0 || xi >= World.x || yi < 0 || yi >= World.y)
+	    if (xi < 0 || xi >= world->x || yi < 0 || yi >= world->y)
 		break;
 
 	    /* kps - fix */
 	    if (!is_polygon_map) {
-		switch(World.block[xi][yi]) {
+		switch(world->block[xi][yi]) {
 		case TARGET:
 		case TREASURE:
 		case FUEL:
@@ -1767,9 +1772,9 @@ void Update_missile(missileobject *shot)
 		xt = xi + sur[(i+j+si)&7].dx;
 		yt = yi + sur[(i+j+si)&7].dy;
 
-		if (xt >= 0 && xt < World.x && yt >= 0 && yt < World.y)
+		if (xt >= 0 && xt < world->x && yt >= 0 && yt < world->y)
 		    if (!is_polygon_map) {
-			switch (World.block[xt][yt]) {
+			switch (world->block[xt][yt]) {
 			case TARGET:
 			case TREASURE:
 			case FUEL:

@@ -143,11 +143,12 @@ static clpos P_cv;
 void P_start_polygon(clpos pos, int style)
 {
     poly_t t;
+    world_t *world = &World;
 
     if (!INSIDE_MAP(pos.cx, pos.cy)) {
 	warn("Polygon start point (%d, %d) is not inside the map"
 	     "(0 <= x < %d, 0 <= y < %d)",
-	     pos.cx, pos.cy, World.cwidth, World.cheight);
+	     pos.cx, pos.cy, world->cwidth, world->cheight);
 	exit(1);
     }
     if (style == -1) {
@@ -258,7 +259,8 @@ void P_end_balltarget(void)
 
 int P_start_target(int target_ind)
 {
-    target_t *targ = Targets(target_ind);
+    world_t *world = &World;
+    target_t *targ = Targets(world, target_ind);
 
     targ->group = Create_group(TARGET,
 			       targ->team,
@@ -275,7 +277,8 @@ void P_end_target(void)
 
 int P_start_cannon(int cannon_ind)
 {
-    cannon_t *cannon = Cannons(cannon_ind);
+    world_t *world = &World;
+    cannon_t *cannon = Cannons(world, cannon_ind);
 
     cannon->group = Create_group(CANNON,
 				 cannon->team,
@@ -292,7 +295,8 @@ void P_end_cannon(void)
 
 int P_start_wormhole(int wormhole_ind)
 {
-    wormhole_t *wormhole = Wormholes(wormhole_ind);
+    world_t *world = &World;
+    wormhole_t *wormhole = Wormholes(world, wormhole_ind);
 
     return Create_group(WORMHOLE,
 			TEAM_NOT_SET,

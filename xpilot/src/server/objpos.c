@@ -81,9 +81,10 @@ void Player_position_init_clpos(player *pl, clpos pos)
 void Player_position_limit(player *pl)
 {
     clpos pos = pl->pos, oldpos = pos;
+    world_t *world = &World;
 
-    LIMIT(pos.cx, 0, World.cwidth - 1);
-    LIMIT(pos.cy, 0, World.cheight - 1);
+    LIMIT(pos.cx, 0, world->cwidth - 1);
+    LIMIT(pos.cy, 0, world->cheight - 1);
     if (pos.cx != oldpos.cx || pos.cy != oldpos.cy)
 	Player_position_set_clpos(pl, pos);
 }

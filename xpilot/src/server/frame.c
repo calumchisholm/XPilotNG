@@ -131,12 +131,12 @@ static inline bool clpos_inview(click_visibility_t *v, clpos pos)
     return true;
 }
 
-#define DEBRIS_STORE(xd,yd,color,offset) \
+#define DEBRIS_STORE(world,xd,yd,color,offset) \
     int			i;						  \
     if (xd < 0)								  \
-	xd += World.width;						  \
+	xd += world->width;						  \
     if (yd < 0)								  \
-	yd += World.height;						  \
+	yd += world->height;						  \
     if ((unsigned) xd >= (unsigned)view_width || (unsigned) yd >= (unsigned)view_height) {	  \
 	/*								  \
 	 * There's some rounding error or so somewhere.			  \
@@ -166,27 +166,27 @@ static inline bool clpos_inview(click_visibility_t *v, clpos pos)
     ptr_[num_].y = (unsigned char) yd;					  \
     num_++;
 
-static void fastshot_store(int cx, int cy, int color, int offset)
+static void fastshot_store(world_t *world, int cx, int cy, int color, int offset)
 {
     int xf = CLICK_TO_PIXEL(cx),
 	yf = CLICK_TO_PIXEL(cy);
 #define ptr_		(fastshot_ptr[i])
 #define num_		(fastshot_num[i])
 #define max_		(fastshot_max[i])
-    DEBRIS_STORE(xf, yf, color, offset);
+    DEBRIS_STORE(world, xf, yf, color, offset);
 #undef ptr_
 #undef num_
 #undef max_
 }
 
-static void debris_store(int cx, int cy, int color)
+static void debris_store(world_t *world, int cx, int cy, int color)
 {
     int xf = CLICK_TO_PIXEL(cx),
 	yf = CLICK_TO_PIXEL(cy);
 #define ptr_		(debris_ptr[i])
 #define num_		(debris_num[i])
 #define max_		(debris_max[i])
-    DEBRIS_STORE(xf, yf, color, 0);
+    DEBRIS_STORE(world, xf, yf, color, 0);
 #undef ptr_
 #undef num_
 #undef max_
@@ -250,8 +250,9 @@ static void Frame_radar_buffer_send(connection_t *conn)
     int			send_y;
     shuffle_t		*radar_shuffle;
     size_t		shuffle_bufsize;
+    world_t *world = &World;
 
-    radar_height = (radar_width * World.height) / World.width;
+    radar_height = (radar_width * world->height) / world->width;
 
     if (num_radar > MIN(256, MAX_SHUFFLE_INDEX))
 	num_radar = MIN(256, MAX_SHUFFLE_INDEX);
@@ -275,10 +276,10 @@ static void Frame_radar_buffer_send(connection_t *conn)
     if (!FEATURE(conn, F_FASTRADAR)) {
 	for (i = 0; i < num_radar; i++) {
 	    p = &radar_ptr[radar_shuffle[i]];
-	    radar_x = (radar_width * p->x) / World.width;
-	    radar_y = (radar_height * p->y) / World.height;
-	    send_x = (World.width * radar_x) / radar_width;
-	    send_y = (World.height * radar_y) / radar_height;
+	    radar_x = (radar_width * p->x) / world->width;
+	    radar_y = (radar_height * p->y) / world->height;
+	    send_x = (world->width * radar_x) / radar_width;
+	    send_y = (world->height * radar_y) / radar_height;
 	    Send_radar(conn, send_x, send_y, p->size);
 	}
     }
@@ -291,8 +292,8 @@ static void Frame_radar_buffer_send(connection_t *conn)
 	    num_radar = 256;
 	for (i = 0; i < num_radar; i++) {
 	    p = &radar_ptr[radar_shuffle[i]];
-	    radar_x = (radar_width * p->x) / World.width;
-	    radar_y = (radar_height * p->y) / World.height;
+	    radar_x = (radar_width * p->x) / world->width;
+	    radar_y = (radar_height * p->y) / world->height;
 	    if (radar_y >= 1024)
 		continue;
 	    buf[buf_index++] = (unsigned char)(radar_x);
@@ -347,6 +348,7 @@ static int num2str(int num, char *str, int i)
 
 static int Frame_status(connection_t *conn, player *pl)
 {
+    world_t *world = &World;
     static char		mods[MAX_CHARS];
     int			n,
 			lock_ind,
@@ -373,7 +375,7 @@ static int Frame_status(connection_t *conn, player *pl)
 	lock_id = pl->lock.pl_id;
 	lock_ind = GetInd(lock_id);
 
-	if ((!BIT(World.rules->mode, LIMITED_VISIBILITY)
+	if ((!BIT(world->rules->mode, LIMITED_VISIBILITY)
 	     || pl->lock.distance <= pl->sensor_range)
 #ifndef SHOW_CLOAKERS_RANGE
 	    && (pl->visibility[lock_ind].canSee
@@ -482,15 +484,16 @@ static void Frame_map(connection_t *conn, player *pl)
     int			bytes_left = 2000;
     int			max_packet;
     int			packet_count;
+    world_t *world = &World;
 
     packet_count = 0;
     max_packet = MAX(5, bytes_left / target_packet_size);
     i = MAX(0, pl->last_target_update);
-    for (k = 0; k < World.NumTargets; k++) {
+    for (k = 0; k < world->NumTargets; k++) {
 	target_t *targ;
-	if (++i >= World.NumTargets)
+	if (++i >= world->NumTargets)
 	    i = 0;
-	targ = Targets(i);
+	targ = Targets(world, i);
 	if (BIT(targ->update_mask, conn_bit)
 	    || (BIT(targ->conn_mask, conn_bit) == 0
 		&& clpos_inview(&cv, targ->pos))) {
@@ -505,12 +508,12 @@ static void Frame_map(connection_t *conn, player *pl)
     packet_count = 0;
     max_packet = MAX(5, bytes_left / cannon_packet_size);
     i = MAX(0, pl->last_cannon_update);
-    for (k = 0; k < World.NumCannons; k++) {
+    for (k = 0; k < world->NumCannons; k++) {
 	cannon_t *cannon;
 
-	if (++i >= World.NumCannons)
+	if (++i >= world->NumCannons)
 	    i = 0;
-	cannon = Cannons(i);
+	cannon = Cannons(world, i);
 	if (clpos_inview(&cv, cannon->pos)) {
 	    if (BIT(cannon->conn_mask, conn_bit) == 0) {
 		Send_cannon(conn, i, (int)cannon->dead_time);
@@ -525,12 +528,12 @@ static void Frame_map(connection_t *conn, player *pl)
     packet_count = 0;
     max_packet = MAX(5, bytes_left / fuel_packet_size);
     i = MAX(0, pl->last_fuel_update);
-    for (k = 0; k < World.NumFuels; k++) {
+    for (k = 0; k < world->NumFuels; k++) {
 	fuel_t *fs;
-	if (++i >= World.NumFuels)
+	if (++i >= world->NumFuels)
 	    i = 0;
 
-	fs = Fuels(i);
+	fs = Fuels(world, i);
 	if (BIT(fs->conn_mask, conn_bit) == 0) {
 	    if ((CENTER_XCLICK(fs->pos.cx - pl->pos.cx) <
 		 (view_width << CLICK_SHIFT) + BLOCK_CLICKS) &&
@@ -548,11 +551,11 @@ static void Frame_map(connection_t *conn, player *pl)
     packet_count = 0;
     max_packet = MAX(5, bytes_left / wormhole_packet_size);
     i = MAX(0, pl->last_wormhole_update);
-    for (k = 0; k < World.NumWormholes; k++) {
+    for (k = 0; k < world->NumWormholes; k++) {
 	wormhole_t *worm;
-	if (++i >= World.NumWormholes)
+	if (++i >= world->NumWormholes)
 	    i = 0;
-	worm = Wormholes(i);
+	worm = Wormholes(world, i);
 	if (wormholeVisible
 	    && worm->temporary
 	    && (worm->type == WORM_IN
@@ -654,6 +657,7 @@ static void Frame_shots(connection_t *conn, player *pl)
     object			*shot;
     object			**obj_list;
     int				hori_blocks, vert_blocks;
+    world_t *world = &World;
 
     hori_blocks = (view_width + (BLOCK_SZ - 1)) / (2 * BLOCK_SZ);
     vert_blocks = (view_height + (BLOCK_SZ - 1)) / (2 * BLOCK_SZ);
@@ -730,7 +734,8 @@ static void Frame_shots(connection_t *conn, player *pl)
 		    color = debris_colors - 1;
 	    }
 
-	    debris_store(shot->pos.cx - cv.world.cx,
+	    debris_store(world,
+			 shot->pos.cx - cv.world.cx,
 			 shot->pos.cy - cv.world.cy,
 			 color);
 	    break;
@@ -756,7 +761,7 @@ static void Frame_shots(connection_t *conn, player *pl)
 		|| (shot->id != NO_ID
 		    && BIT(Player_by_id(shot->id)->status, PAUSE))
 		|| (shot->id == NO_ID
-		    && BIT(World.rules->mode, TEAM_PLAY)
+		    && BIT(world->rules->mode, TEAM_PLAY)
 		    && shot->team == pl->team)) {
 		color = BLUE;
 		teamshot = DEBRIS_TYPES;
@@ -770,7 +775,8 @@ static void Frame_shots(connection_t *conn, player *pl)
 	    } else
 		teamshot = 0;
 
-	    fastshot_store(shot->pos.cx - cv.world.cx,
+	    fastshot_store(world,
+			   shot->pos.cx - cv.world.cx,
 			   shot->pos.cy - cv.world.cy,
 			   color, teamshot);
 	    break;
@@ -858,7 +864,8 @@ static void Frame_shots(connection_t *conn, player *pl)
 
 static void Frame_ships(connection_t *conn, player *pl)
 {
-    int				i, k;
+    int i, k;
+    world_t *world = &World;
 
     for (i = 0; i < NumEcms; i++) {
 	ecm_t *ecm = Ecms[i];
@@ -873,8 +880,8 @@ static void Frame_ships(connection_t *conn, player *pl)
 
 	Send_trans(conn, victim->pos, pos);
     }
-    for (i = 0; i < World.NumCannons; i++) {
-	cannon_t *cannon = Cannons(i);
+    for (i = 0; i < world->NumCannons; i++) {
+	cannon_t *cannon = Cannons(world, i);
 	if (cannon->tractor_count > 0) {
 	    player *t = cannon->tractor_target_pl;
 
@@ -935,13 +942,13 @@ static void Frame_ships(connection_t *conn, player *pl)
 	}
 
 	if (BIT(pl_i->used, HAS_REFUEL)) {
-	    fuel_t *fs = Fuels(pl_i->fs);
+	    fuel_t *fs = Fuels(world, pl_i->fs);
 	    if (clpos_inview(&cv, fs->pos))
 		Send_refuel(conn, fs->pos, pl_i->pos);
 	}
 
 	if (BIT(pl_i->used, HAS_REPAIR)) {
-	    target_t *targ = Targets(pl_i->repair_target);
+	    target_t *targ = Targets(world, pl_i->repair_target);
 	    if (clpos_inview(&cv, targ->pos))
 		/* same packet as refuel */
 		Send_refuel(conn, pl_i->pos, targ->pos);
@@ -974,6 +981,7 @@ static void Frame_radar(connection_t *conn, player *pl)
     int			i, k, mask, shownuke, size;
     object		*shot;
     clpos		pos;
+    world_t *world = &World;
 
     Frame_radar_buffer_reset();
 
@@ -1028,7 +1036,7 @@ static void Frame_radar(connection_t *conn, player *pl)
 #endif
 
     if (playersOnRadar
-	|| BIT(World.rules->mode, TEAM_PLAY)
+	|| BIT(world->rules->mode, TEAM_PLAY)
 	|| NumPseudoPlayers > 0
 	|| NumAlliances > 0) {
 	for (k = 0; k < num_player_shuffle; k++) {
@@ -1051,7 +1059,7 @@ static void Frame_radar(connection_t *conn, player *pl)
 		continue;
 	    }
 	    pos = pl_i->pos;
-	    if (BIT(World.rules->mode, LIMITED_VISIBILITY)
+	    if (BIT(world->rules->mode, LIMITED_VISIBILITY)
 		&& Wrap_length(pl->pos.cx - pos.cx,
 			       pl->pos.cy - pos.cy) > pl->sensor_range * CLICK)
 		continue;
@@ -1084,6 +1092,8 @@ static void Frame_lose_item_state(player *pl)
 
 static void Frame_parameters(connection_t *conn, player *pl)
 {
+    world_t *world = &World;
+
     Get_display_parameters(conn, &view_width, &view_height,
 			   &debris_colors, &spark_rand);
     debris_x_areas = (view_width + 255) >> 8;
@@ -1095,15 +1105,15 @@ static void Frame_parameters(connection_t *conn, player *pl)
     cv.world.cx = pl->pos.cx - view_cwidth / 2;	/* Scroll */
     cv.world.cy = pl->pos.cy - view_cheight / 2;
     cv.realWorld = cv.world;
-    if (BIT (World.rules->mode, WRAP_PLAY)) {
-	if (cv.world.cx < 0 && cv.world.cx + view_cwidth < World.cwidth)
-	    cv.world.cx += World.cwidth;
-	else if (cv.world.cx > 0 && cv.world.cx + view_cwidth >= World.cwidth)
-	    cv.realWorld.cx -= World.cwidth;
-	if (cv.world.cy < 0 && cv.world.cy + view_cheight < World.cheight)
-	    cv.world.cy += World.cheight;
-	else if (cv.world.cy > 0 && cv.world.cy + view_cheight >=World.cheight)
-	    cv.realWorld.cy -= World.cheight;
+    if (BIT (world->rules->mode, WRAP_PLAY)) {
+	if (cv.world.cx < 0 && cv.world.cx + view_cwidth < world->cwidth)
+	    cv.world.cx += world->cwidth;
+	else if (cv.world.cx > 0 && cv.world.cx + view_cwidth >= world->cwidth)
+	    cv.realWorld.cx -= world->cwidth;
+	if (cv.world.cy < 0 && cv.world.cy + view_cheight < world->cheight)
+	    cv.world.cy += world->cheight;
+	else if (cv.world.cy > 0 && cv.world.cy + view_cheight >=world->cheight)
+	    cv.realWorld.cy -= world->cheight;
     }
 }
 

@@ -52,8 +52,10 @@ void tuner_ballmass(void)
 
 void tuner_maxrobots(void)
 {
+    world_t *world = &World;
+
     if (maxRobots < 0)
-	maxRobots = World.NumBases;
+	maxRobots = world->NumBases;
 
     if (maxRobots < minRobots)
 	minRobots = maxRobots;
@@ -109,12 +111,14 @@ void tuner_playerstartsshielded(void)
 
 void tuner_worldlives(void)
 {
+    world_t *world = &World;
+
     if (worldLives < 0)
 	worldLives = 0;
 
     Set_world_rules();
 
-    if (BIT(World.rules->mode, LIMITED_LIVES)) {
+    if (BIT(world->rules->mode, LIMITED_LIVES)) {
 	Reset_all_players();
 	if (gameDuration == -1)
 	    gameDuration = 0;
@@ -130,19 +134,20 @@ void tuner_teamcannons(void)
 {
     int i;
     int team;
+    world_t *world = &World;
 
     if (teamCannons) {
-	for (i = 0; i < World.NumCannons; i++) {
-	    cannon_t *cannon = Cannons(i);
-	    team = Find_closest_team(&World, cannon->pos);
+	for (i = 0; i < world->NumCannons; i++) {
+	    cannon_t *cannon = Cannons(world, i);
+	    team = Find_closest_team(world, cannon->pos);
 	    if (team == TEAM_NOT_SET)
 		warn("Couldn't find a matching team for the cannon.");
 	    cannon->team = team;
 	}
     }
     else {
-	for (i = 0; i < World.NumCannons; i++)
-	    Cannons(i)->team = TEAM_NOT_SET;
+	for (i = 0; i < world->NumCannons; i++)
+	    Cannons(world, i)->team = TEAM_NOT_SET;
     }
 }
 
@@ -150,17 +155,18 @@ void tuner_cannonsuseitems(void)
 {
     int i, j;
     cannon_t *c;
+    world_t *world = &World;
 
     Move_init();
 
-    for (i = 0; i < World.NumCannons; i++) {
-	c = Cannons(i);
+    for (i = 0; i < world->NumCannons; i++) {
+	c = Cannons(world, i);
 	for (j = 0; j < NUM_ITEMS; j++) {
 	    c->item[j] = 0;
 
 	    if (cannonsUseItems)
 		Cannon_add_item(c, j,
-				(int)(rfrac() * (World.items[j].initial + 1)));
+				(int)(rfrac() * (world->items[j].initial + 1)));
 	}
     }
 }
@@ -168,20 +174,21 @@ void tuner_cannonsuseitems(void)
 void tuner_wormtime(void)
 {
     int i;
+    world_t *world = &World;
 
     if (wormTime < 0)
 	wormTime = 0;
 
     if (wormTime) {
-	for (i = 0; i < World.NumWormholes; i++)
-	    Wormholes(i)->countdown = wormTime;
+	for (i = 0; i < world->NumWormholes; i++)
+	    Wormholes(world, i)->countdown = wormTime;
     }
     else {
-	for (i = 0; i < World.NumWormholes; i++) {
-	    if (Wormholes(i)->temporary)
-		remove_temp_wormhole(&World, i);
+	for (i = 0; i < world->NumWormholes; i++) {
+	    if (Wormholes(world, i)->temporary)
+		remove_temp_wormhole(world, i);
 	    else
-		Wormholes(i)->countdown = WORMCOUNT;
+		Wormholes(world, i)->countdown = WORMCOUNT;
 	}
     }
 }
@@ -206,7 +213,9 @@ void tuner_gameduration(void)
 
 void tuner_racelaps(void)
 {
-    if (BIT(World.rules->mode, TIMING)) {
+    world_t *world = &World;
+
+    if (BIT(world->rules->mode, TIMING)) {
 	Reset_all_players();
 	if (gameDuration == -1)
 	    gameDuration = 0;
@@ -215,10 +224,12 @@ void tuner_racelaps(void)
 
 void tuner_allowalliances(void)
 {
-    if (BIT(World.rules->mode, TEAM_PLAY))
-	CLR_BIT(World.rules->mode, ALLIANCES);
+    world_t *world = &World;
 
-    if (!BIT(World.rules->mode, ALLIANCES) && NumAlliances > 0)
+    if (BIT(world->rules->mode, TEAM_PLAY))
+	CLR_BIT(world->rules->mode, ALLIANCES);
+
+    if (!BIT(world->rules->mode, ALLIANCES) && NumAlliances > 0)
 	Dissolve_all_alliances();
 }
 

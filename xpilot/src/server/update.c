@@ -59,6 +59,7 @@ static void Transport_to_home(player *pl)
     clpos		startpos;
     double		dx, dy, t, m;
     const int		T = RECOVERY_DELAY;
+    world_t *world = &World;
 
     if (pl->home_base == NULL) {
 	pl->vel.x = 0;
@@ -66,14 +67,14 @@ static void Transport_to_home(player *pl)
 	return;
     }
 
-    if (BIT(World.rules->mode, TIMING) && pl->round) {
+    if (BIT(world->rules->mode, TIMING) && pl->round) {
 	int check;
 
 	if (pl->check)
 	    check = pl->check - 1;
 	else
-	    check = World.NumChecks - 1;
-	startpos = Checks(check)->pos;
+	    check = world->NumChecks - 1;
+	startpos = Checks(world, check)->pos;
     } else
 	startpos = pl->home_base->pos;
 
@@ -440,6 +441,7 @@ static void Fuel_update(void)
     int i;
     double fuel;
     int frames_per_update;
+    world_t *world = &World;
 
     if (NumPlayers == 0)
 	return;
@@ -447,8 +449,8 @@ static void Fuel_update(void)
     fuel = (NumPlayers * STATION_REGENERATION * timeStep);
     frames_per_update = MAX_STATION_FUEL / (fuel * BLOCK_SZ);
 
-    for (i = 0; i < World.NumFuels; i++) {
-	fuel_t *fs = Fuels(i);
+    for (i = 0; i < world->NumFuels; i++) {
+	fuel_t *fs = Fuels(world, i);
 
 	if (fs->fuel == MAX_STATION_FUEL)
 	    continue;
@@ -510,17 +512,18 @@ static void Misc_object_update(void)
 static void Target_update(void)
 {
     int i, j;
+    world_t *world = &World;
 
-    for (i = 0; i < World.NumTargets; i++) {
-	target_t *targ = Targets(i);
+    for (i = 0; i < world->NumTargets; i++) {
+	target_t *targ = Targets(world, i);
 
 	if (targ->dead_time > 0) {
 	    if ((targ->dead_time -= timeStep) <= 0) {
 		Target_restore_on_map(targ);
 
 		if (targetSync) {
-		    for (j = 0; j < World.NumTargets; j++) {
-			target_t *t = Targets(j);
+		    for (j = 0; j < world->NumTargets; j++) {
+			target_t *t = Targets(world, j);
 			if (t->team == targ->team)
 			    Target_restore_on_map(t);
 		    }
@@ -692,14 +695,15 @@ static void Use_items(player *pl)
  */
 static void Do_refuel(player *pl)
 {
-    fuel_t *fs = Fuels(pl->fs);
+    world_t *world = &World;
+    fuel_t *fs = Fuels(world, pl->fs);
 
     if ((Wrap_length(pl->pos.cx - fs->pos.cx,
 		     pl->pos.cy - fs->pos.cy)
 	 > 90.0 * CLICK)
 	|| (pl->fuel.sum >= pl->fuel.max)
 	|| BIT(pl->used, HAS_PHASING_DEVICE)
-	|| (BIT(World.rules->mode, TEAM_PLAY)
+	|| (BIT(world->rules->mode, TEAM_PLAY)
 	    && teamFuel
 	    && fs->team != pl->team)) {
 	CLR_BIT(pl->used, HAS_REFUEL);
@@ -735,7 +739,8 @@ static void Do_refuel(player *pl)
  */
 static void Do_repair(player *pl)
 {
-    target_t *targ = Targets(pl->repair_target);
+    world_t *world = &World;
+    target_t *targ = Targets(world, pl->repair_target);
 
     if ((Wrap_length(pl->pos.cx - targ->pos.cx,
 		     pl->pos.cy - targ->pos.cy) > 90.0 * CLICK)
@@ -778,24 +783,25 @@ static void Do_warping(player *pl)
     clpos dest;
     int wh_dest, wcx, wcy, nearestFront, nearestRear;
     double proximity, proxFront, proxRear;
+    world_t *world = &World;
 
     if (pl->wormHoleHit != -1) {
-	wormhole_t *wh_hit = Wormholes(pl->wormHoleHit);
+	wormhole_t *wh_hit = Wormholes(world, pl->wormHoleHit);
 
 	if (wh_hit->countdown > 0)
 	    wh_dest = wh_hit->lastdest;
 	else if (rfrac() < 0.1) {
 	    do
-		wh_dest = (int)(rfrac() * World.NumWormholes);
-	    while (World.wormholes[wh_dest].type == WORM_IN
+		wh_dest = (int)(rfrac() * world->NumWormholes);
+	    while (world->wormholes[wh_dest].type == WORM_IN
 		   || pl->wormHoleHit == wh_dest
-		   || World.wormholes[wh_dest].temporary);
+		   || world->wormholes[wh_dest].temporary);
 	} else {
 	    nearestFront = nearestRear = -1;
 	    proxFront = proxRear = 1e20;
 
-	    for (wh_dest = 0; wh_dest < World.NumWormholes; wh_dest++) {
-		wormhole_t *wh = Wormholes(wh_dest);
+	    for (wh_dest = 0; wh_dest < world->NumWormholes; wh_dest++) {
+		wormhole_t *wh = Wormholes(world, wh_dest);
 
 		if (wh_dest == pl->wormHoleHit
 		    || wh->type == WORM_IN
@@ -828,15 +834,15 @@ static void Do_warping(player *pl)
 		    wh_dest = nearestFront;
 		else {
 		    do
-			wh_dest = (int)(rfrac() * World.NumWormholes);
-		    while (World.wormholes[wh_dest].type == WORM_IN
+			wh_dest = (int)(rfrac() * world->NumWormholes);
+		    while (world->wormholes[wh_dest].type == WORM_IN
 			   || wh_dest == pl->wormHoleHit);
 		}
 	    }
 	}
 
 	sound_play_sensors(pl->pos, WORM_HOLE_SOUND);
-	dest = World.wormholes[wh_dest].pos;
+	dest = world->wormholes[wh_dest].pos;
 
     } else { /* wormHoleHit == -1 */
 	int counter;
@@ -844,8 +850,8 @@ static void Do_warping(player *pl)
 
 	/* try to find empty space to hyperjump to */
 	for (counter = 20; counter > 0; counter--) {
-	    dest.cx = (int)(rfrac() * World.cwidth);
-	    dest.cy = (int)(rfrac() * World.cheight);
+	    dest.cx = (int)(rfrac() * world->cwidth);
+	    dest.cy = (int)(rfrac() * world->cheight);
 	    if (shape_is_inside(dest.cx, dest.cy, hitmask,
 				(object *)pl, (shape_t *)pl->ship,
 				pl->dir)
@@ -860,10 +866,10 @@ static void Do_warping(player *pl)
 #if 0 /* kps - temporary wormholes disabled currently */
 	if (counter
 	    && wormTime
-	    && BIT(1U << World.block[OBJ_X_IN_BLOCKS(pl)]
+	    && BIT(1U << world->block[OBJ_X_IN_BLOCKS(pl)]
 		   [OBJ_Y_IN_BLOCKS(pl)],
 		   SPACE_BIT)
-	    && BIT(1U << World.block[CLICK_TO_BLOCK(dest.cx)]
+	    && BIT(1U << world->block[CLICK_TO_BLOCK(dest.cx)]
 		   [CLICK_TO_BLOCK(dest.cy)],
 		   SPACE_BIT))
 	    add_temp_wormholes(OBJ_X_IN_BLOCKS(pl),
@@ -924,9 +930,9 @@ static void Do_warping(player *pl)
     pl->forceVisible += 15;
 
     if ((wh_dest != pl->wormHoleHit) && (pl->wormHoleHit != -1)) {
-	World.wormholes[pl->wormHoleHit].lastdest = wh_dest;
-	if (!World.wormholes[wh_dest].temporary)
-	    World.wormholes[pl->wormHoleHit].countdown
+	world->wormholes[pl->wormHoleHit].lastdest = wh_dest;
+	if (!world->wormholes[wh_dest].temporary)
+	    world->wormholes[pl->wormHoleHit].countdown
 		= (wormTime ? wormTime : WORMCOUNT);
     }
 
@@ -1127,6 +1133,7 @@ void Update_objects(void)
 {
     int i;
     player *pl;
+    world_t *world = &World;
 
     /*
      * Since the amount per frame of some things could get too small to
@@ -1178,9 +1185,9 @@ void Update_objects(void)
      */
     if (do_update_this_frame) {
 	for (i = 0; i < NUM_ITEMS; i++)
-	    if (World.items[i].num < World.items[i].max
-		&& World.items[i].chance > 0
-		&& (rfrac() * World.items[i].chance) < 1.0f)
+	    if (world->items[i].num < world->items[i].max
+		&& world->items[i].chance > 0
+		&& (rfrac() * world->items[i].chance) < 1.0f)
 		Place_item(NULL, i);
     }
 
@@ -1193,8 +1200,8 @@ void Update_objects(void)
     Target_update();
     Update_players();
 
-    for (i = World.NumWormholes - 1; i >= 0; i--) {
-	wormhole_t *wh = Wormholes(i);
+    for (i = world->NumWormholes - 1; i >= 0; i--) {
+	wormhole_t *wh = Wormholes(world, i);
 
 	if ((wh->countdown -= timeStep) <= 0)
 	    wh->countdown = 0;

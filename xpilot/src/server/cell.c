@@ -97,19 +97,20 @@ static void Init_cell_dist(void)
     int cell_max_right;
     int cell_max_up;
     int cell_max_down;
+    world_t *world = &World;
 
     Free_cell_dist();
 
-    if (BIT(World.rules->mode, WRAP_PLAY)) {
-	cell_max_right = MIN(MAX_CELL_DIST, (World.x / 2));
-	cell_max_left = MIN(MAX_CELL_DIST, ((World.x - 1) / 2));
-	cell_max_up = MIN(MAX_CELL_DIST, (World.y / 2));
-	cell_max_down = MIN(MAX_CELL_DIST, ((World.y - 1) / 2));
+    if (BIT(world->rules->mode, WRAP_PLAY)) {
+	cell_max_right = MIN(MAX_CELL_DIST, (world->x / 2));
+	cell_max_left = MIN(MAX_CELL_DIST, ((world->x - 1) / 2));
+	cell_max_up = MIN(MAX_CELL_DIST, (world->y / 2));
+	cell_max_down = MIN(MAX_CELL_DIST, ((world->y - 1) / 2));
     } else {
-	cell_max_right = MIN(MAX_CELL_DIST, (World.x - 1));
-	cell_max_left = MIN(MAX_CELL_DIST, (World.x - 1));
-	cell_max_up = MIN(MAX_CELL_DIST, (World.y - 1));
-	cell_max_down = MIN(MAX_CELL_DIST, (World.y - 1));
+	cell_max_right = MIN(MAX_CELL_DIST, (world->x - 1));
+	cell_max_left = MIN(MAX_CELL_DIST, (world->x - 1));
+	cell_max_up = MIN(MAX_CELL_DIST, (world->y - 1));
+	cell_max_down = MIN(MAX_CELL_DIST, (world->y - 1));
     }
     cell_dist_width = cell_max_left + 1 + cell_max_right;
     cell_dist_height = cell_max_down + 1 + cell_max_up;
@@ -153,19 +154,20 @@ void Alloc_cells(void)
     unsigned size;
     cell_node *cell_ptr;
     int x, y;
+    world_t *world = &World;
 
     Free_cells();
 
-    size = sizeof(cell_node *) * World.x;
-    size += sizeof(cell_node) * World.x * World.y;
+    size = sizeof(cell_node *) * world->x;
+    size += sizeof(cell_node) * world->x * world->y;
     if (!(Cells = (cell_node **) malloc(size))) {
 	error("No Cell mem");
 	End_game();
     }
-    cell_ptr = (cell_node *) & Cells[World.x];
-    for (x = 0; x < World.x; x++) {
+    cell_ptr = (cell_node *) & Cells[world->x];
+    for (x = 0; x < world->x; x++) {
 	Cells[x] = cell_ptr;
-	for (y = 0; y < World.y; y++) {
+	for (y = 0; y < world->y; y++) {
 	    /* init list to point to itself. */
 	    cell_ptr->next = cell_ptr;
 	    cell_ptr->prev = cell_ptr;
@@ -194,6 +196,7 @@ void Cell_add_object(object * obj)
     int bx, by;
     cell_node *obj_node_ptr, *cell_node_ptr;
     cell_node *prev, *next;
+    world_t *world = &World;
 
     bx = OBJ_X_IN_BLOCKS(obj);
     by = OBJ_Y_IN_BLOCKS(obj);
@@ -209,7 +212,7 @@ void Cell_add_object(object * obj)
     next->prev = prev;
     prev->next = next;
 
-    if (bx < 0 || bx >= World.x || by < 0 || by >= World.y) {
+    if (bx < 0 || bx >= world->x || by < 0 || by >= world->y) {
 	/* put obj on list with only itself. */
 	obj_node_ptr->next = obj_node_ptr;
 	obj_node_ptr->prev = obj_node_ptr;
@@ -259,8 +262,9 @@ void Cell_get_objects(int x,
     object *obj;
     cell_node *cell_node_ptr, *next;
     float dist;
+    world_t *world = &World;
 
-    wrap = (BIT(World.rules->mode, WRAP_PLAY) != 0);
+    wrap = (BIT(world->rules->mode, WRAP_PLAY) != 0);
     dist = (float) (range * SQRT2);
     count = 0;
     for (i = 0; i < (int)cell_dist_size && count < max_obj_count; i++) {
@@ -271,23 +275,23 @@ void Cell_get_objects(int x,
 	    yw = y + cell_dist[i].y;
 	    if (xw < 0) {
 		if (wrap)
-		    xw += World.x;
+		    xw += world->x;
 		else
 		    continue;
-	    } else if (xw >= World.x) {
+	    } else if (xw >= world->x) {
 		if (wrap)
-		    xw -= World.x;
+		    xw -= world->x;
 		else
 		    continue;
 	    }
 	    if (yw < 0) {
 		if (wrap)
-		    yw += World.y;
+		    yw += world->y;
 		else
 		    continue;
-	    } else if (yw >= World.y) {
+	    } else if (yw >= world->y) {
 		if (wrap)
-		    yw -= World.y;
+		    yw -= world->y;
 		else
 		    continue;
 	    }

@@ -117,12 +117,13 @@ static int Punish_team(player *pl, treasure_t *td, clpos pos)
     int			win_team_members = 0, lose_team_members = 0;
     int			somebody_flag = 0;
     double		sc, por;
+    world_t *world = &World;
 
     Check_team_members (td->team);
     if (td->team == pl->team)
 	return 0;
 
-    if (BIT(World.rules->mode, TEAM_PLAY)) {
+    if (BIT(world->rules->mode, TEAM_PLAY)) {
 	for (i = 0; i < NumPlayers; i++) {
 	    player *pl_i = Players(i);
 
@@ -154,8 +155,8 @@ static int Punish_team(player *pl, treasure_t *td, clpos pos)
     }
 
     td->destroyed++;
-    World.teams[td->team].TreasuresLeft--;
-    World.teams[pl->team].TreasuresDestroyed++;
+    world->teams[td->team].TreasuresLeft--;
+    world->teams[pl->team].TreasuresDestroyed++;
 
     sc  = 3 * Rate(win_score, lose_score);
     por = (sc * lose_team_members) / (2 * win_team_members + 1);
@@ -340,6 +341,7 @@ void Ball_hits_goal(ballobject *ball, group_t *gp)
     player *owner;
     treasure_t *td;
     char msg[MSG_LEN];
+    world_t *world = &World;
 
     /*
      * Player already quit ?
@@ -351,7 +353,7 @@ void Ball_hits_goal(ballobject *ball, group_t *gp)
     /*
      * If it's not team play, nothing interesting happens.
      */
-    if (!BIT(World.rules->mode, TEAM_PLAY))
+    if (!BIT(world->rules->mode, TEAM_PLAY))
 	return;
 
     td = ball->treasure;
@@ -361,7 +363,7 @@ void Ball_hits_goal(ballobject *ball, group_t *gp)
     }
     owner = Player_by_id(ball->owner);
     if (gp->team == owner->team) {
-	treasure_t *tt = Treasures(gp->mapobj_ind);
+	treasure_t *tt = Treasures(world, gp->mapobj_ind);
 
 	Ball_is_destroyed(ball);
 
@@ -392,6 +394,7 @@ void Ball_hits_goal(ballobject *ball, group_t *gp)
 bool Balltarget_hitfunc(group_t *gp, move_t *move)
 {
     ballobject *ball = NULL;
+    world_t *world = &World;
 
     /* this can happen if is_inside is called for a balltarget with
        a NULL obj */
@@ -410,7 +413,7 @@ bool Balltarget_hitfunc(group_t *gp, move_t *move)
     if (ball->owner == NO_ID)
 	return true;
 
-    if (BIT(World.rules->mode, TEAM_PLAY)) {
+    if (BIT(world->rules->mode, TEAM_PLAY)) {
 	/*
 	 * The only case a ball does not hit a balltarget is when
 	 * the ball and the target are of the same team, but the
@@ -436,9 +439,11 @@ bool Balltarget_hitfunc(group_t *gp, move_t *move)
  */
 hitmask_t Cannon_hitmask(cannon_t *cannon)
 {
+    world_t *world = &World;
+
     if (cannon->dead_time > 0)
 	return ALL_BITS;
-    if (BIT(World.rules->mode, TEAM_PLAY) && teamImmunity)
+    if (BIT(world->rules->mode, TEAM_PLAY) && teamImmunity)
 	return HITMASK(cannon->team);
     return 0;
 }
@@ -454,8 +459,9 @@ static void Cannon_set_hitmask(int group, cannon_t *cannon)
 void Cannon_restore_on_map(cannon_t *cannon)
 {
     blpos blk = Clpos_to_blpos(cannon->pos);
+    world_t *world = &World;
 
-    World_set_block(&World, blk, CANNON);
+    World_set_block(world, blk, CANNON);
 
     cannon->conn_mask = 0;
     cannon->last_change = frame_loops;
@@ -467,11 +473,12 @@ void Cannon_restore_on_map(cannon_t *cannon)
 void Cannon_remove_from_map(cannon_t *cannon)
 {
     blpos blk = Clpos_to_blpos(cannon->pos);
+    world_t *world = &World;
 
     cannon->dead_time = cannonDeadTime;
     cannon->conn_mask = 0;
 
-    World_set_block(&World, blk, SPACE);
+    World_set_block(world, blk, SPACE);
 
     P_set_hitmask(cannon->group, Cannon_hitmask(cannon));
 }
@@ -486,7 +493,8 @@ extern struct move_parameters mp;
 bool Cannon_hitfunc(group_t *gp, move_t *move)
 {
     object *obj = move->obj;
-    cannon_t *cannon = Cannons(gp->mapobj_ind);
+    world_t *world = &World;
+    cannon_t *cannon = Cannons(world, gp->mapobj_ind);
     unsigned long cannon_mask;
 
     /* this should never happen if hitmasks are ok */
@@ -546,12 +554,13 @@ static void Target_set_hitmask(int group, target_t *targ)
 void Target_init(void)
 {
     int group;
+    world_t *world = &World;
 
     for (group = 0; group < num_groups; group++) {
 	group_t *gp = groupptr_by_id(group);
 
 	if (gp->type == TARGET)
-	    Target_set_hitmask(group, Targets(gp->mapobj_ind));
+	    Target_set_hitmask(group, Targets(world, gp->mapobj_ind));
     }
 
 #if 0
@@ -562,8 +571,9 @@ void Target_init(void)
 void Target_restore_on_map(target_t *targ)
 {
     blpos blk = Clpos_to_blpos(targ->pos);
+    world_t *world = &World;
 
-    World_set_block(&World, blk, TARGET);
+    World_set_block(world, blk, TARGET);
 
     targ->conn_mask = 0;
     targ->update_mask = (unsigned)-1;
@@ -577,6 +587,7 @@ void Target_restore_on_map(target_t *targ)
 void Target_remove_from_map(target_t *targ)
 {
     blpos blk = Clpos_to_blpos(targ->pos);
+    world_t *world = &World;
 
     targ->update_mask = (unsigned) -1;
     /* is this necessary? (done also in Target_restore_on_map() ) */
@@ -587,7 +598,7 @@ void Target_remove_from_map(target_t *targ)
      * Destroy target.
      * Turn it into a space to simplify other calculations.
      */
-    World_set_block(&World, blk, SPACE);
+    World_set_block(world, blk, SPACE);
 
     /*P_set_hitmask(targ->group, ALL_BITS);*/
     P_set_hitmask(targ->group, Target_hitmask(targ));
@@ -606,7 +617,8 @@ hitmask_t Wormhole_hitmask(wormhole_t *wormhole)
 bool Wormhole_hitfunc(group_t *gp, move_t *move)
 {
     object *obj = move->obj;
-    wormhole_t *wormhole = Wormholes(gp->mapobj_ind);
+    world_t *world = &World;
+    wormhole_t *wormhole = Wormholes(world, gp->mapobj_ind);
 
     return false;
 
@@ -661,9 +673,10 @@ bool Wormhole_hitfunc(group_t *gp, move_t *move)
 
 void Wormhole_remove_from_map(wormhole_t *wormhole)
 {
+    world_t *world = &World;
     blpos blk = Clpos_to_blpos(wormhole->pos);
 
-    World_set_block(&World, blk, wormhole->lastblock);
+    World_set_block(world, blk, wormhole->lastblock);
 }
 
 extern void Describe_group(int group);
@@ -673,12 +686,13 @@ extern void Describe_group(int group);
 void Team_immunity_init(void)
 {
     int group;
+    world_t *world = &World;
 
     for (group = 0; group < num_groups; group++) {
 	group_t *gp = groupptr_by_id(group);
 
 	if (gp->type == CANNON) {
-	    cannon_t *cannon = Cannons(gp->mapobj_ind);
+	    cannon_t *cannon = Cannons(world, gp->mapobj_ind);
 	    assert(cannon->group == group);
 	    Cannon_set_hitmask(group, cannon);
 	}

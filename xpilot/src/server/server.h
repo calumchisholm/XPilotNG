@@ -381,6 +381,7 @@ extern bool		polygonMode;
 
 extern shape_t		ball_wire;
 
+#if 0
 #define Bases(ind)		(&World.bases[(ind)])
 #define Fuels(ind)		(&World.fuels[(ind)])
 #define Cannons(ind)		(&World.cannons[(ind)])
@@ -392,6 +393,53 @@ extern shape_t		ball_wire;
 #define AsteroidConcs(ind)	(&World.asteroidConcs[(ind)])
 #define ItemConcs(ind)		(&World.itemConcs[(ind)])
 #define Teams(team)		(&World.teams[(team)])
+#else
+static inline base_t *Bases(world_t *world, int ind)
+{
+    return &world->bases[ind];
+}
+static inline fuel_t *Fuels(world_t *world, int ind)
+{
+    return &world->fuels[ind];
+}
+static inline cannon_t *Cannons(world_t *world, int ind)
+{
+    return &world->cannons[ind];
+}
+static inline check_t *Checks(world_t *world, int ind)
+{
+    return &world->checks[ind];
+}
+static inline grav_t *Gravs(world_t *world, int ind)
+{
+    return &world->gravs[ind];
+}
+static inline target_t *Targets(world_t *world, int ind)
+{
+    return &world->targets[ind];
+}
+static inline treasure_t *Treasures(world_t *world, int ind)
+{
+    return &world->treasures[ind];
+}
+static inline wormhole_t *Wormholes(world_t *world, int ind)
+{
+    return &world->wormholes[ind];
+}
+static inline asteroid_concentrator_t *AsteroidConcs(world_t *world, int ind)
+{
+    return &world->asteroidConcs[ind];
+}
+static inline item_concentrator_t *ItemConcs(world_t *world, int ind)
+{
+    return &world->itemConcs[ind];
+}
+static inline team_t *Teams(world_t *world, int team)
+{
+    return &world->teams[team];
+}
+
+#endif
 
 /* determine if a block is one of SPACE_BLOCKS */
 #define EMPTY_SPACE(s)	BIT(1U << (s), SPACE_BLOCKS)
@@ -485,7 +533,7 @@ int World_place_item_concentrator(world_t *world, clpos pos);
 int World_place_asteroid_concentrator(world_t *world, clpos pos);
 
 void Find_base_direction(world_t *world);
-void Compute_gravity(world_t *world);
+void Compute_gravity(void);
 double Wrap_findDir(double dx, double dy);
 double Wrap_cfindDir(int dx, int dy);
 double Wrap_length(int dx, int dy);

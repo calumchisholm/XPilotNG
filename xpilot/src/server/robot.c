@@ -684,6 +684,7 @@ static void Robot_create(void)
     robot_data_t	*data, *new_data;
     robot_type_t	*rob_type;
     char		msg[MSG_LEN];
+    world_t *world = &World;
 
     if (peek_ID() == 0)
 	return;
@@ -746,10 +747,10 @@ static void Robot_create(void)
     robot->power = MAX_PLAYER_POWER;
     robot->power_s = MAX_PLAYER_POWER;
     robot->check = 0;
-    if (BIT(World.rules->mode, TEAM_PLAY)) {
+    if (BIT(world->rules->mode, TEAM_PLAY)) {
 	robot->team = Pick_team(PickForRobot);
-	World.teams[robot->team].NumMembers++;
-	World.teams[robot->team].NumRobots++;
+	world->teams[robot->team].NumMembers++;
+	world->teams[robot->team].NumRobots++;
     }
     if (robot->mychar != 'W')
 	robot->mychar = 'R';
@@ -768,10 +769,10 @@ static void Robot_create(void)
     NumPlayers++;
     NumRobots++;
 
-    if (BIT(World.rules->mode, TEAM_PLAY) && teamShareScore) {
-	if (World.teams[robot->team].NumMembers == 1)
+    if (BIT(world->rules->mode, TEAM_PLAY) && teamShareScore) {
+	if (world->teams[robot->team].NumMembers == 1)
 	    /* reset team score on first player */
-	    World.teams[robot->team].score = 0.0;
+	    world->teams[robot->team].score = 0.0;
 	TEAM_SCORE(robot->team, 0.0);
     }
 
@@ -799,7 +800,7 @@ static void Robot_create(void)
 	    roundtime = -1;
 	sprintf(msg, "Player entered. Delaying %d seconds until next %s.",
 		roundDelaySeconds,
-		(BIT(World.rules->mode, TIMING)? "race" : "round"));
+		(BIT(world->rules->mode, TIMING)? "race" : "round"));
 	Set_message(msg);
     }
 
@@ -990,10 +991,11 @@ static void Robot_play(player *pl)
 static int Robot_check_leave(player *pl)
 {
     char		msg[MSG_LEN];
+    world_t *world = &World;
 
     if (robotsLeave
 	&& pl->life > 0
-	&& !BIT(World.rules->mode, LIMITED_LIVES)
+	&& !BIT(world->rules->mode, LIMITED_LIVES)
 	&& (BIT(pl->status, PLAYING) || pl->count <= 0)) {
 	msg[0] = '\0';
 	if (robotLeaveLife > 0 && pl->life >= robotLeaveLife)
@@ -1052,18 +1054,19 @@ void Robot_update(void)
     int			num_any_ships;
     bool		tick_this_update = false;
     static int		ticks_per_second = 0;
+    world_t *world = &World;
 
     num_any_ships = NumPlayers + login_in_progress;
     num_playing_ships = num_any_ships - NumPseudoPlayers;
     if ((num_playing_ships < maxRobots
 	 || NumRobots < minRobots)
-	&& num_playing_ships < World.NumBases
+	&& num_playing_ships < world->NumBases
 	&& num_any_ships < NUM_IDS
 	&& NumRobots < MAX_ROBOTS
-	&& !(BIT(World.rules->mode, TEAM_PLAY)
+	&& !(BIT(world->rules->mode, TEAM_PLAY)
 	     && restrictRobots
-	     && World.teams[robotTeam].NumMembers >=
-		World.teams[robotTeam].NumBases)) {
+	     && world->teams[robotTeam].NumMembers >=
+		world->teams[robotTeam].NumBases)) {
 
 	new_robot_delay += timeStep;
 	if (new_robot_delay >= ROBOT_CREATE_DELAY) {
@@ -1074,7 +1077,7 @@ void Robot_update(void)
     else {
 	new_robot_delay = 0;
 	if (NumRobots > 0) {
-	    if ((num_playing_ships > World.NumBases)
+	    if ((num_playing_ships > world->NumBases)
 		|| (num_any_ships > NUM_IDS)
 		|| (num_playing_ships > maxRobots && NumRobots > minRobots))
 		Robot_delete(NULL, false);

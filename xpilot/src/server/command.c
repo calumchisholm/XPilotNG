@@ -123,9 +123,12 @@ static void Send_info_about_player(player * pl)
 
 static void Set_swapper_state(player * pl)
 {
+    world_t *world = &World;
+
     if (BIT(pl->have, HAS_BALL))
 	Detach_ball(pl, NULL);
-    if (BIT(World.rules->mode, LIMITED_LIVES)) {
+
+    if (BIT(world->rules->mode, LIMITED_LIVES)) {
 	int i;
 
 	for (i = 0; i < NumPlayers; i++) {
@@ -502,6 +505,7 @@ static int Cmd_advance(char *arg, player *pl, int oper, char *msg)
 
 static int Cmd_ally(char *arg, player *pl, int oper, char *msg)
 {
+    world_t *world = &World;
     char		*command;
     int			result = CMD_RESULT_SUCCESS;
     static const char	usage[] = "Usage: "
@@ -528,7 +532,7 @@ static int Cmd_ally(char *arg, player *pl, int oper, char *msg)
 
     (void)pl; (void)oper;
 
-    if (!BIT(World.rules->mode, ALLIANCES)) {
+    if (!BIT(world->rules->mode, ALLIANCES)) {
 	strlcpy(msg, "Alliances are not allowed.", MSG_LEN);
 	result = CMD_RESULT_ERROR;
     }
@@ -1029,6 +1033,7 @@ static int Cmd_queue(char *arg, player *pl, int oper, char *msg)
 static int Cmd_reset(char *arg, player *pl, int oper, char *msg)
 {
     int			i;
+    world_t *world = &World;
 
     if (!oper)
 	return CMD_RESULT_NOT_OPERATOR;
@@ -1037,7 +1042,7 @@ static int Cmd_reset(char *arg, player *pl, int oper, char *msg)
 	for (i = NumPlayers - 1; i >= 0; i--)
 	    Rank_SetScore(Players(i), 0);
 	for (i = 0; i < MAX_TEAMS; i++)
-	    World.teams[i].score = 0;
+	    world->teams[i].score = 0;
 	Reset_all_players();
 	if (gameDuration == -1)
 	    gameDuration = 0;
@@ -1098,6 +1103,7 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
     int			team;
     int			swap_allowed;
     char		*arg2;
+    world_t *world = &World;
 
     (void)oper;
 
@@ -1108,7 +1114,7 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
     swap_allowed = false;
     team = pl->team;
 
-    if (!BIT(World.rules->mode, TEAM_PLAY))
+    if (!BIT(world->rules->mode, TEAM_PLAY))
 	sprintf(msg, "No team play going on.");
     else if (pl->team >= MAX_TEAMS)
 	sprintf(msg, "You do not currently have a team.");
@@ -1137,8 +1143,8 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
 
 	for (i = 0; i < MAX_TEAMS ; i++) {
 	    /* Can't queue to two teams at once. */
-	    if (World.teams[i].SwapperId == pl->id)
-		World.teams[i].SwapperId = -1;
+	    if (world->teams[i].SwapperId == pl->id)
+		world->teams[i].SwapperId = -1;
 	}
 
 	if (game_lock && pl->home_base == NULL)
@@ -1147,7 +1153,7 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
 	    sprintf(msg, "Team %d is not a valid team.", team);
 	else if (team == pl->team && pl->home_base != NULL)
 	    sprintf(msg, "You already are on team %d.", team);
-	else if (World.teams[team].NumBases == 0)
+	else if (world->teams[team].NumBases == 0)
 	    sprintf(msg, "There are no bases for team %d on this map.", team);
 	else if (reserveRobotTeam && team == robotTeam)
 	    sprintf(msg, "You cannot join the robot team on this server.");
@@ -1159,15 +1165,15 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
     if (!swap_allowed)
 	return CMD_RESULT_ERROR;
 
-    if (World.teams[team].NumBases > World.teams[team].NumMembers) {
+    if (world->teams[team].NumBases > world->teams[team].NumMembers) {
 	sprintf(msg, "%s has swapped to team %d.", pl->name, team);
 	Set_message(msg);
 	if (pl->home_base) {
-	    World.teams[pl->team].NumMembers--;
+	    world->teams[pl->team].NumMembers--;
 	    TEAM_SCORE(pl->team, -(pl->score));
 	}
 	pl->team = team;
-	World.teams[pl->team].NumMembers++;
+	world->teams[pl->team].NumMembers++;
 	TEAM_SCORE(pl->team, pl->score);
 	Set_swapper_state(pl);
 	if (pl->home_base == NULL) {
@@ -1182,18 +1188,18 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
 	return CMD_RESULT_SUCCESS;
     }
 
-    i = World.teams[pl->team].SwapperId;
+    i = world->teams[pl->team].SwapperId;
     while (i != -1 && pl->home_base != NULL) {
 	if ((i = Player_by_id(i)->team) != team)
-	    i = World.teams[i].SwapperId;
+	    i = world->teams[i].SwapperId;
 	else {
 	    /* Found a cycle, now change the teams */
 	    base_t *xbase = pl->home_base, *xbase2;
 	    int xteam = pl->team, xteam2;
 	    player *pl2 = pl;
 	    do {
-		pl2 = Player_by_id(World.teams[xteam].SwapperId);
-		World.teams[xteam].SwapperId = -1;
+		pl2 = Player_by_id(world->teams[xteam].SwapperId);
+		world->teams[xteam].SwapperId = -1;
 		xbase2 = pl2->home_base;
 		xteam2 = pl2->team;
 		pl2->team = xteam;
@@ -1250,7 +1256,7 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
 	}
     }
     sprintf(msg,"You are queued for swap to team %d.", team);
-    World.teams[team].SwapperId = pl->id;
+    world->teams[team].SwapperId = pl->id;
     return CMD_RESULT_SUCCESS;
 }
 

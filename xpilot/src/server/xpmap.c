@@ -305,7 +305,7 @@ setup_t *Xpmap_init_setup(world_t *world)
 		break;
 	    case CHECK:
 		for (i = 0; i < world->NumChecks; i++) {
-		    check_t *check = Checks(i);
+		    check_t *check = Checks(world, i);
 		    blpos bpos = Clpos_to_blpos(check->pos);
 		    if (x != bpos.bx || y != bpos.by)
 			continue;
@@ -766,7 +766,7 @@ void Xpmap_find_map_object_teams(world_t *world)
 	int team = TEAM_NOT_SET;
 
 	for (i = 0; i < world->NumTreasures; i++) {
-	    treasure_t *treasure = Treasures(i);
+	    treasure_t *treasure = Treasures(world, i);
 
 	    team = Find_closest_team(world, treasure->pos);
 	    treasure->team = team;
@@ -782,7 +782,7 @@ void Xpmap_find_map_object_teams(world_t *world)
 	}
 
 	for (i = 0; i < world->NumTargets; i++) {
-	    target_t *targ = Targets(i);
+	    target_t *targ = Targets(world, i);
 
 	    team = Find_closest_team(world, targ->pos);
 	    if (team == TEAM_NOT_SET)
@@ -792,7 +792,7 @@ void Xpmap_find_map_object_teams(world_t *world)
 
 	if (teamCannons) {
 	    for (i = 0; i < world->NumCannons; i++) {
-		cannon_t *cannon = Cannons(i);
+		cannon_t *cannon = Cannons(world, i);
 
 		team = Find_closest_team(world, cannon->pos);
 		if (team == TEAM_NOT_SET)
@@ -802,7 +802,7 @@ void Xpmap_find_map_object_teams(world_t *world)
 	}
 	
 	for (i = 0; i < world->NumFuels; i++) {
-	    fuel_t *fs = Fuels(i);
+	    fuel_t *fs = Fuels(world, i);
 
 	    team = Find_closest_team(world, fs->pos);
 	    if (team == TEAM_NOT_SET)
@@ -825,7 +825,7 @@ void Xpmap_find_base_direction(world_t *world)
     int	i;
 
     for (i = 0; i < world->NumBases; i++) {
-	base_t *base = Bases(i);
+	base_t *base = Bases(world, i);
 	int x, y, dir, att;
 	vector gravity = World_gravity(base->pos);
 
@@ -918,7 +918,8 @@ static void Xpmap_treasure_to_polygon(int treasure_ind)
     int cx, cy, i, r, n;
     double angle;
     int polystyle, edgestyle;
-    treasure_t *treasure = Treasures(treasure_ind);
+    world_t *world = &World;
+    treasure_t *treasure = Treasures(world, treasure_ind);
     clpos pos[N + 1];
 
     polystyle = P_get_poly_id("treasure_ps");
@@ -994,7 +995,8 @@ static void Xpmap_block_polygon(clpos bpos, int polystyle, int edgestyle)
 static void Xpmap_target_to_polygon(int target_ind)
 {
     int ps, es;
-    target_t *targ = Targets(target_ind);
+    world_t *world = &World;
+    target_t *targ = Targets(world, target_ind);
 
     ps = P_get_poly_id("target_ps");
     es = P_get_edge_id("target_es");
@@ -1058,8 +1060,9 @@ static void Xpmap_cannon_polygon(cannon_t *cannon,
 
 static void Xpmap_cannon_to_polygon(int cannon_ind)
 {
+    world_t *world = &World;
     int ps, es;
-    cannon_t *cannon = Cannons(cannon_ind);
+    cannon_t *cannon = Cannons(world, cannon_ind);
 
     ps = P_get_poly_id("cannon_ps");
     es = P_get_edge_id("cannon_es");
@@ -1072,9 +1075,10 @@ static void Xpmap_cannon_to_polygon(int cannon_ind)
 #define N 12
 static void Xpmap_wormhole_to_polygon(int wormhole_ind)
 {
+    world_t *world = &World;
     int ps, es, i, r;
     double angle;
-    wormhole_t *wormhole = Wormholes(wormhole_ind);
+    wormhole_t *wormhole = Wormholes(world, wormhole_ind);
     clpos pos[N + 1], wpos;
 
     /* don't make a polygon for an out wormhole */

@@ -145,9 +145,11 @@ static inline bool can_hit(group_t *gp, move_t *move)
 
 void Move_init(void)
 {
-    LIMIT(maxObjectWallBounceSpeed, 0, World.hypotenuse);
-    LIMIT(maxShieldedWallBounceSpeed, 0, World.hypotenuse);
-    LIMIT(maxUnshieldedWallBounceSpeed, 0, World.hypotenuse);
+    world_t *world = &World;
+
+    LIMIT(maxObjectWallBounceSpeed, 0, world->hypotenuse);
+    LIMIT(maxShieldedWallBounceSpeed, 0, world->hypotenuse);
+    LIMIT(maxUnshieldedWallBounceSpeed, 0, world->hypotenuse);
 
     LIMIT(playerWallBrakeFactor, 0, 1);
     LIMIT(objectWallBrakeFactor, 0, 1);
@@ -198,6 +200,7 @@ static void Object_hits_target(object *obj, target_t *targ, double player_cost)
 			targets_total = 0;
     double 		drainfactor;
     vector 		zero_vel = {0.0, 0.0};
+    world_t *world = &World;
 
     /* a normal shot or a direct mine hit work, cannons don't */
     /* KK: should shots/mines by cannons of opposing teams work? */
@@ -278,7 +281,7 @@ static void Object_hits_target(object *obj, target_t *targ, double player_cost)
 	/* min,max life   */ 10.0, 100.0
 	);
 
-    if (BIT(World.rules->mode, TEAM_PLAY)) {
+    if (BIT(world->rules->mode, TEAM_PLAY)) {
 	for (j = 0; j < NumPlayers; j++) {
 	    player *pl_j = Players(j);
 
@@ -302,10 +305,10 @@ static void Object_hits_target(object *obj, target_t *targ, double player_cost)
 	}
     }
     if (somebody_flag) {
-	for (j = 0; j < World.NumTargets; j++) {
-	    if (World.targets[j].team == targ->team) {
+	for (j = 0; j < world->NumTargets; j++) {
+	    if (world->targets[j].team == targ->team) {
 		targets_total++;
-		if (World.targets[j].dead_time <= 0)
+		if (world->targets[j].dead_time <= 0)
 		    targets_remaining++;
 	    }
 	}
@@ -370,6 +373,8 @@ static void Object_hits_target(object *obj, target_t *targ, double player_cost)
 
 void Object_crash(object *obj, int crashtype, int mapobj_ind)
 {
+    world_t *world = &World;
+
     switch (crashtype) {
 
     case CrashWormHole:
@@ -388,7 +393,7 @@ void Object_crash(object *obj, int crashtype, int mapobj_ind)
 
     case CrashTarget:
 	obj->life = 0;
-	Object_hits_target(obj, Targets(mapobj_ind), -1.0);
+	Object_hits_target(obj, Targets(world, mapobj_ind), -1.0);
 	break;
 
     case CrashWall:
@@ -402,7 +407,7 @@ void Object_crash(object *obj, int crashtype, int mapobj_ind)
 
     case CrashCannon:
         {
-	    cannon_t *c = Cannons(mapobj_ind);
+	    cannon_t *c = Cannons(world, mapobj_ind);
 	    obj->life = 0;
 	    if (BIT(obj->type, OBJ_ITEM))
 		Cannon_add_item(c, obj->info, obj->count);
@@ -430,6 +435,7 @@ void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt)
 {
     const char		*howfmt = NULL;
     const char          *hudmsg = NULL;
+    world_t *world = &World;
 
     msg[0] = '\0';
 
@@ -474,7 +480,7 @@ void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt)
 	howfmt = "%s smashed%s against a target";
 	hudmsg = "[Target]";
 	sound_play_sensors(pl->pos, PLAYER_HIT_WALL_SOUND);
-	Object_hits_target(OBJ_PTR(pl), Targets(mapobj_ind), -1.0);
+	Object_hits_target(OBJ_PTR(pl), Targets(world, mapobj_ind), -1.0);
 	break;
 
     case CrashTreasure:
@@ -485,7 +491,7 @@ void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt)
 
     case CrashCannon:
         {
-	    cannon_t *cannon = Cannons(mapobj_ind);
+	    cannon_t *cannon = Cannons(world, mapobj_ind);
 	    if (!Player_used_emergency_shield(pl)) {
 		howfmt = "%s smashed%s against a cannon";
 		hudmsg = "[Cannon]";
@@ -618,7 +624,7 @@ void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt)
     }
 
     if (BIT(pl->status, KILLED) && pl->score < 0 && IS_ROBOT_PTR(pl)) {
-	pl->home_base = Bases(0);
+	pl->home_base = Bases(world, 0);
 	Pick_startpos(pl);
     }
 }
@@ -680,6 +686,7 @@ static int Bounce_object(object *obj, move_t *move, int line, int point)
     double c, s, wall_brake_factor = objectWallBrakeFactor;
     int group, type;
     int mapobj_ind;
+    world_t *world = &World;
 
     group = linet[line >= num_lines ? point : line].group;
     type = groups[group].type;
@@ -705,7 +712,7 @@ static int Bounce_object(object *obj, move_t *move, int line, int point)
 
     if (type == TARGET) {
 	obj->life = 0;
-	Object_hits_target(obj, Targets(mapobj_ind), -1.0);
+	Object_hits_target(obj, Targets(world, mapobj_ind), -1.0);
 	return 0;
     }
 
@@ -793,6 +800,7 @@ static void Bounce_player(player *pl, move_t *move, int line, int point)
     double fx, fy;
     double c, s;
     int group, type, mapobj_ind;
+    world_t *world = &World;
 
     if (line >= num_lines) {
 	double x, y, l2;
@@ -899,7 +907,7 @@ static void Bounce_player(player *pl, move_t *move, int line, int point)
 	    sound_play_sensors(pl->pos, PLAYER_BOUNCED_SOUND);
 	    if (type == TARGET) {
 		cost *= wallBounceFuelDrainMult / 4.0;
-		Object_hits_target(OBJ_PTR(pl), Targets(mapobj_ind), cost);
+		Object_hits_target(OBJ_PTR(pl), Targets(world, mapobj_ind), cost);
 	    }
 	}
     }
@@ -1663,6 +1671,7 @@ static void store_4byte(int value, unsigned char **start, int *offset, int *sz)
 
 int Polys_to_client(unsigned char **start)
 {
+    world_t *world = &World;
     int i, j, startx, starty, dx, dy;
     int *edges;
     int size, offset;
@@ -1725,26 +1734,26 @@ int Polys_to_client(unsigned char **start)
 	    starty = dy;
 	}
     }
-    STORE1(World.NumBases);
-    for (i = 0; i < World.NumBases; i++) {
-	if (World.bases[i].team == TEAM_NOT_SET)
+    STORE1(world->NumBases);
+    for (i = 0; i < world->NumBases; i++) {
+	if (world->bases[i].team == TEAM_NOT_SET)
 	    STORE1(0);
 	else
-	    STORE1(World.bases[i].team);
-	STORE2(World.bases[i].pos.cx >> CLICK_SHIFT);
-	STORE2(World.bases[i].pos.cy >> CLICK_SHIFT);
+	    STORE1(world->bases[i].team);
+	STORE2(world->bases[i].pos.cx >> CLICK_SHIFT);
+	STORE2(world->bases[i].pos.cy >> CLICK_SHIFT);
 	/* Send the direction like RES was 128. */
-	STORE1(128 * World.bases[i].dir / RES);
+	STORE1(128 * world->bases[i].dir / RES);
     }
-    STORE2(World.NumFuels);
-    for (i = 0; i < World.NumFuels; i++) {
-	STORE2(World.fuels[i].pos.cx >> CLICK_SHIFT);
-	STORE2(World.fuels[i].pos.cy >> CLICK_SHIFT);
+    STORE2(world->NumFuels);
+    for (i = 0; i < world->NumFuels; i++) {
+	STORE2(world->fuels[i].pos.cx >> CLICK_SHIFT);
+	STORE2(world->fuels[i].pos.cy >> CLICK_SHIFT);
     }
-    STORE1(World.NumChecks);
-    for (i = 0; i < World.NumChecks; i++) {
-	STORE2(World.checks[i].pos.cx >> CLICK_SHIFT);
-	STORE2(World.checks[i].pos.cy >> CLICK_SHIFT);
+    STORE1(world->NumChecks);
+    for (i = 0; i < world->NumChecks; i++) {
+	STORE2(world->checks[i].pos.cx >> CLICK_SHIFT);
+	STORE2(world->checks[i].pos.cy >> CLICK_SHIFT);
     }
     return offset;
 }
@@ -2060,8 +2069,9 @@ static void allocate_inside(void)
 static double edge_distance(int bx, int by, int ox, int oy, int dx, int dy,
 			  int *dir)
 {
-    int last_width = (World.cwidth - 1) % B_CLICKS + 1;
-    int last_height = (World.cheight - 1) % B_CLICKS + 1;
+    world_t *world = &World;
+    int last_width = (world->cwidth - 1) % B_CLICKS + 1;
+    int last_height = (world->cheight - 1) % B_CLICKS + 1;
     double xdist, ydist, dist;
     ox = CENTER_XCLICK(ox - bx * B_CLICKS);
     oy = CENTER_YCLICK(oy - by * B_CLICKS);
@@ -2508,11 +2518,12 @@ static void Poly_to_lines(void)
 
 void Walls_init(void)
 {
+    world_t *world = &World;
     double x, y, l2;
     int i;
 
-    mapx = (World.cwidth + B_MASK) >> B_SHIFT;
-    mapy = (World.cheight + B_MASK) >> B_SHIFT;
+    mapx = (world->cwidth + B_MASK) >> B_SHIFT;
+    mapy = (world->cheight + B_MASK) >> B_SHIFT;
 
     /* Break polygons down to a list of separate lines. */
     Poly_to_lines();
@@ -2550,8 +2561,10 @@ void Walls_init(void)
 void Treasure_init(void)
 {
     int i;
-    for (i = 0; i < World.NumTreasures; i++)
-	Make_treasure_ball(Treasures(i));
+    world_t *world = &World;
+
+    for (i = 0; i < world->NumTreasures; i++)
+	Make_treasure_ball(Treasures(world, i));
 }
 
 
@@ -2560,6 +2573,7 @@ static void Move_ball(object *obj)
     move_t mv;
     struct collans ans;
     int owner;
+    world_t *world = &World;
 
     mv.delta.cx = FLOAT_TO_CLICK(obj->vel.x * timeStep);
     mv.delta.cy = FLOAT_TO_CLICK(obj->vel.y * timeStep);
@@ -2573,14 +2587,14 @@ static void Move_ball(object *obj)
 
 	pos.cx = obj->pos.cx + mv.delta.cx;
 	pos.cy = obj->pos.cy + mv.delta.cy;
-	while (pos.cx >= World.cwidth)
-	    pos.cx -= World.cwidth;
+	while (pos.cx >= world->cwidth)
+	    pos.cx -= world->cwidth;
 	while (pos.cx < 0)
-	    pos.cx += World.cwidth;
-	while (pos.cy >= World.cheight)
-	    pos.cy -= World.cheight;
+	    pos.cx += world->cwidth;
+	while (pos.cy >= world->cheight)
+	    pos.cy -= world->cheight;
 	while (pos.cy < 0)
-	    pos.cy += World.cheight;
+	    pos.cy += world->cheight;
 	Object_position_set_clpos(obj, pos);
 	Cell_add_object(obj);
 	return;
@@ -2705,6 +2719,7 @@ void Move_player(player *pl)
     struct collans ans;
     double fric;
     vector oldv;
+    world_t *world = &World;
 
     if (!Player_is_playing(pl)) {
 	if (!BIT(pl->status, KILLED|PAUSE)) {
@@ -2759,14 +2774,14 @@ void Move_player(player *pl)
     if (BIT(pl->used, HAS_PHASING_DEVICE)) {
 	pos.cx = pl->pos.cx + mv.delta.cx;
 	pos.cy = pl->pos.cy + mv.delta.cy;
-	while (pos.cx >= World.cwidth)
-	    pos.cx -= World.cwidth;
+	while (pos.cx >= world->cwidth)
+	    pos.cx -= world->cwidth;
 	while (pos.cx < 0)
-	    pos.cx += World.cwidth;
-	while (pos.cy >= World.cheight)
-	    pos.cy -= World.cheight;
+	    pos.cx += world->cwidth;
+	while (pos.cy >= world->cheight)
+	    pos.cy -= world->cheight;
 	while (pos.cy < 0)
-	    pos.cy += World.cheight;
+	    pos.cy += world->cheight;
 	Player_position_set_clpos(pl, pos);
     }
     else {

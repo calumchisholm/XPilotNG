@@ -29,7 +29,9 @@ char score_version[] = VERSION;
 
 void Score(player *pl, double points, clpos pos, const char *msg)
 {
-    if (BIT(World.rules->mode, TEAM_PLAY)) {
+    world_t *world = &World;
+
+    if (BIT(world->rules->mode, TEAM_PLAY)) {
 	if (!teamShareScore)
 	    Rank_AddScore(pl, points);
 	TEAM_SCORE(pl->team, points);
@@ -48,13 +50,15 @@ void Score(player *pl, double points, clpos pos, const char *msg)
 
 void TEAM_SCORE(int team, double points)
 {
+    world_t *world = &World;
+
     if (team == TEAM_NOT_SET)	/* could happen if teamCannons is off */
 	return;
 
-    World.teams[team].score += points;
+    world->teams[team].score += points;
     if (teamShareScore) {
 	int i;
-	double share = World.teams[team].score / World.teams[team].NumMembers;
+	double share = world->teams[team].score / world->teams[team].NumMembers;
 	for (i = 0; i < NumPlayers; i++) {
 	    player *pl_i = Players(i);
 	    if (pl_i->team == team)

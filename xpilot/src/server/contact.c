@@ -85,10 +85,13 @@ int Contact_init(void)
  */
 static int Kick_robot_players(int team)
 {
+    world_t *world = &World;
+
     if (NumRobots == 0)		/* no robots available for kicking */
 	return 0;
+
     if (team == TEAM_NOT_SET) {
-	if (BIT(World.rules->mode, TEAM_PLAY) && reserveRobotTeam) {
+	if (BIT(world->rules->mode, TEAM_PLAY) && reserveRobotTeam) {
 	    /* kick robot with lowest score from any team but robotTeam */
 	    int low_score = INT_MAX;
 	    player *low_pl = NULL;
@@ -114,7 +117,7 @@ static int Kick_robot_players(int team)
 	    return 1;
 	}
     } else {
-	if (World.teams[team].NumRobots > 0) {
+	if (world->teams[team].NumRobots > 0) {
 	    /* kick robot with lowest score from this team */
 	    int low_score = INT_MAX;
 	    player *low_pl = NULL;
@@ -747,6 +750,7 @@ void Queue_loop(void)
     int				qpos = 0;
     int				login_port;
     static long			last_unqueued_loops;
+    world_t *world = &World;
 
     for (qp = qp_list; qp && qp->login_port > 0; ) {
 	next = qp->next;
@@ -786,7 +790,7 @@ void Queue_loop(void)
 
 	/* slow down the rate at which players enter the game. */
 	if (last_unqueued_loops + 2 + (FPS >> 2) < main_loops) {
-	    int lim = MIN(playerLimit, baselessPausing ? 1e6 : World.NumBases);
+	    int lim = MIN(playerLimit, baselessPausing ? 1e6 : world->NumBases);
 	    /* is there a homebase available? */
 	    if (NumPlayers - NumPseudoPlayers + login_in_progress < lim
 		|| !game_lock && ((Kick_robot_players(TEAM_NOT_SET)
@@ -795,13 +799,13 @@ void Queue_loop(void)
 		    NumPlayers - NumPseudoPlayers + login_in_progress < lim))){
 
 		/* find a team for this fellow. */
-		if (BIT(World.rules->mode, TEAM_PLAY)) {
+		if (BIT(world->rules->mode, TEAM_PLAY)) {
 		    /* see if he has a reasonable suggestion. */
 		    if (qp->team >= 0 && qp->team < MAX_TEAMS) {
 			if (game_lock ||
 			        (qp->team == robotTeam && reserveRobotTeam) ||
-			        (World.teams[qp->team].NumMembers
-				 >= World.teams[qp->team].NumBases &&
+			        (world->teams[qp->team].NumMembers
+				 >= world->teams[qp->team].NumBases &&
 				 !Kick_robot_players(qp->team) &&
 				 !Kick_paused_players(qp->team)))
 			    qp->team = TEAM_NOT_SET;
@@ -809,7 +813,7 @@ void Queue_loop(void)
 		    if (qp->team == TEAM_NOT_SET) {
 			qp->team = Pick_team(PickForHuman);
 			if (qp->team == TEAM_NOT_SET && !game_lock) {
-			    if (NumRobots > World.teams[robotTeam].NumRobots) {
+			    if (NumRobots > world->teams[robotTeam].NumRobots) {
 				Kick_robot_players(TEAM_NOT_SET);
 				qp->team = Pick_team(PickForHuman);
 			    }

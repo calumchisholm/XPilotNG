@@ -3848,11 +3848,13 @@ option_desc* Find_option_by_name(const char* name)
 
 void Check_playerlimit(void)
 {
+    world_t *world = &World;
+
     if (playerLimit == 0)
-	playerLimit = World.NumBases + 10;
+	playerLimit = world->NumBases + 10;
 
     if (playerLimit_orig == 0)
-	playerLimit_orig = MAX(playerLimit, World.NumBases + 10);
+	playerLimit_orig = MAX(playerLimit, world->NumBases + 10);
 
     if (playerLimit > playerLimit_orig)
 	playerLimit = playerLimit_orig;
@@ -3860,7 +3862,9 @@ void Check_playerlimit(void)
 
 static void Check_baseless(void)
 {
-    if (!BIT(World.rules->mode, TEAM_PLAY))
+    world_t *world = &World;
+
+    if (!BIT(world->rules->mode, TEAM_PLAY))
 	baselessPausing = false;
 }
 

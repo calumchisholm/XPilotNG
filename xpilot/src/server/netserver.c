@@ -1028,18 +1028,19 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
     char		msg[MSG_LEN];
     char		old_nick[MAX_NAME_LEN] /*, *p */;
     const char		sender[] = "[*Server notice*]";
+    world_t *world = &World;
 
-    if (BIT(World.rules->mode, TEAM_PLAY)) {
+    if (BIT(world->rules->mode, TEAM_PLAY)) {
 	if (connp->team < 0 || connp->team >= MAX_TEAMS
 		    || (reserveRobotTeam && (connp->team == robotTeam)))
 	    connp->team = TEAM_NOT_SET;
-	else if (World.teams[connp->team].NumBases <= 0)
+	else if (world->teams[connp->team].NumBases <= 0)
 	    connp->team = TEAM_NOT_SET;
 	else {
 	    Check_team_members(connp->team);
-	    if (World.teams[connp->team].NumMembers
-		- World.teams[connp->team].NumRobots
-		>= World.teams[connp->team].NumBases)
+	    if (world->teams[connp->team].NumMembers
+		- world->teams[connp->team].NumRobots
+		>= world->teams[connp->team].NumBases)
 		connp->team = TEAM_NOT_SET;
 	}
 	if (connp->team == TEAM_NOT_SET)
@@ -1116,7 +1117,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
     pl->version = connp->version;
 
     if (pl->rectype < 2) {
-	if (BIT(World.rules->mode, TEAM_PLAY) && pl->team == TEAM_NOT_SET) {
+	if (BIT(world->rules->mode, TEAM_PLAY) && pl->team == TEAM_NOT_SET) {
 	    SET_BIT(pl->status, PAUSE);
 	    pl->mychar = 'P';
 	    pl->home_base = NULL;
@@ -1128,11 +1129,11 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	}
 	Rank_get_saved_score(pl);
 	if (pl->team != TEAM_NOT_SET && pl->home_base != NULL) {
-	    World.teams[pl->team].NumMembers++;
+	    world->teams[pl->team].NumMembers++;
 	    if (teamShareScore) {
-		if (World.teams[pl->team].NumMembers == 1)
+		if (world->teams[pl->team].NumMembers == 1)
 		    /* reset team score on first player */
-		    World.teams[pl->team].score = 0;
+		    world->teams[pl->team].score = 0;
 	    }
 	    TEAM_SCORE(pl->team, pl->score);
 	}
@@ -1204,10 +1205,10 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
     /*
      * And about all the teams.
      */
-    if (BIT(World.rules->mode, TEAM_PLAY)) {
+    if (BIT(world->rules->mode, TEAM_PLAY)) {
 	for (i = 0; i < MAX_TEAMS; i++) {
-	    if (World.teams[i].NumMembers > 0)
-		Send_team_score(pl->conn, i, World.teams[i].score);
+	    if (world->teams[i].NumMembers > 0)
+		Send_team_score(pl->conn, i, world->teams[i].score);
 	}
     }
     /*
@@ -1241,13 +1242,13 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 
     if (NumPlayers == 1)
 	sprintf(msg, "Welcome to \"%s\", made by %s.",
-		World.name, World.author);
-    else if (BIT(World.rules->mode, TEAM_PLAY))
+		world->name, world->author);
+    else if (BIT(world->rules->mode, TEAM_PLAY))
 	sprintf(msg, "%s (%s, team %d) has entered \"%s\", made by %s.",
-		pl->name, pl->username, pl->team, World.name, World.author);
+		pl->name, pl->username, pl->team, world->name, world->author);
     else
 	sprintf(msg, "%s (%s) has entered \"%s\", made by %s.",
-		pl->name, pl->username, World.name, World.author);
+		pl->name, pl->username, world->name, world->author);
 
     if (pl->rectype < 2)
 	Set_message(msg);
@@ -1291,7 +1292,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	if (!FEATURE(connp, F_ASTEROID) && maxAsteroidDensity > 0) {
 	    sprintf(msg,
 		    "Your client will see the %d asteroids as balls. %s",
-		    (int)World.asteroids.max,
+		    (int)world->asteroids.max,
 		    sender);
 	    Set_player_message(pl, msg);
 	}
@@ -1306,8 +1307,8 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
     }
 
     conn_bit = (1 << connp->ind);
-    for (i = 0; i < World.NumCannons; i++) {
-	cannon_t *cannon = Cannons(i);
+    for (i = 0; i < world->NumCannons; i++) {
+	cannon_t *cannon = Cannons(world, i);
 	/*
 	 * The client assumes at startup that all cannons are active.
 	 */
@@ -1316,8 +1317,8 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	else
 	    CLR_BIT(cannon->conn_mask, conn_bit);
     }
-    for (i = 0; i < World.NumFuels; i++) {
-	fuel_t *fs = Fuels(i);
+    for (i = 0; i < world->NumFuels; i++) {
+	fuel_t *fs = Fuels(world, i);
 	/*
 	 * The client assumes at startup that all fuelstations are filled.
 	 */
@@ -1326,8 +1327,8 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	else
 	    CLR_BIT(fs->conn_mask, conn_bit);
     }
-    for (i = 0; i < World.NumTargets; i++) {
-	target_t *targ = Targets(i);
+    for (i = 0; i < world->NumTargets; i++) {
+	target_t *targ = Targets(world, i);
 	/*
 	 * The client assumes at startup that all targets are not damaged.
 	 */
@@ -1350,11 +1351,11 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
     if (resetOnHuman > 0
 	&& (NumPlayers - NumPseudoPlayers - NumRobots) <= resetOnHuman
 	&& !round_delay) {
-	if (BIT(World.rules->mode, TIMING))
+	if (BIT(world->rules->mode, TIMING))
 	    Race_game_over();
-	else if (BIT(World.rules->mode, TEAM_PLAY))
+	else if (BIT(world->rules->mode, TEAM_PLAY))
 	    Team_game_over(-1, "");
-	else if (BIT(World.rules->mode, LIMITED_LIVES))
+	else if (BIT(world->rules->mode, LIMITED_LIVES))
 	    Individual_game_over(-1);
     }
 
@@ -1366,7 +1367,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	else
 	    roundtime = -1;
 	sprintf(msg, "Player entered. Delaying %d seconds until next %s.",
-		roundDelaySeconds, (BIT(World.rules->mode, TIMING) ?
+		roundDelaySeconds, (BIT(world->rules->mode, TIMING) ?
 			     "race" : "round"));
 	Set_message(msg);
     }
@@ -1831,6 +1832,7 @@ int Send_team_score(connection_t *connp, int team, double score)
 int Send_timing(connection_t *connp, int id, int check, int round)
 {
     int			num_checks = OLD_MAX_CHECKS;
+    world_t *world = &World;
 
     if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
 	warn("Connection not ready for timing(%d,%d)",
@@ -1838,7 +1840,7 @@ int Send_timing(connection_t *connp, int id, int check, int round)
 	return 0;
     }
     if (is_polygon_map)
-	num_checks = World.NumChecks;
+	num_checks = world->NumChecks;
     return Packet_printf(&connp->c, "%c%hd%hu", PKT_TIMING,
 			 id, round * num_checks + check);
 }
@@ -2642,6 +2644,7 @@ static int Receive_ack_cannon(connection_t *connp)
     unsigned char	ch;
     int			n;
     unsigned short	num;
+    world_t *world = &World;
 
     if ((n = Packet_scanf(&connp->r, "%c%ld%hu",
 			  &ch, &loops_ack, &num)) <= 0) {
@@ -2649,12 +2652,12 @@ static int Receive_ack_cannon(connection_t *connp)
 	    Destroy_connection(connp, "read error");
 	return n;
     }
-    if (num >= World.NumCannons) {
+    if (num >= world->NumCannons) {
 	Destroy_connection(connp, "bad cannon ack");
 	return -1;
     }
-    if (loops_ack > World.cannons[num].last_change)
-	SET_BIT(World.cannons[num].conn_mask, 1 << connp->ind);
+    if (loops_ack > world->cannons[num].last_change)
+	SET_BIT(world->cannons[num].conn_mask, 1 << connp->ind);
 
     return 1;
 }
@@ -2665,6 +2668,7 @@ static int Receive_ack_fuel(connection_t *connp)
     unsigned char	ch;
     int			n;
     unsigned short	num;
+    world_t *world = &World;
 
     if ((n = Packet_scanf(&connp->r, "%c%ld%hu",
 			  &ch, &loops_ack, &num)) <= 0) {
@@ -2672,12 +2676,12 @@ static int Receive_ack_fuel(connection_t *connp)
 	    Destroy_connection(connp, "read error");
 	return n;
     }
-    if (num >= World.NumFuels) {
+    if (num >= world->NumFuels) {
 	Destroy_connection(connp, "bad fuel ack");
 	return -1;
     }
-    if (loops_ack > World.fuels[num].last_change)
-	SET_BIT(World.fuels[num].conn_mask, 1 << connp->ind);
+    if (loops_ack > world->fuels[num].last_change)
+	SET_BIT(world->fuels[num].conn_mask, 1 << connp->ind);
     return 1;
 }
 
@@ -2687,6 +2691,7 @@ static int Receive_ack_target(connection_t *connp)
     unsigned char	ch;
     int			n;
     unsigned short	num;
+    world_t *world = &World;
 
     if ((n = Packet_scanf(&connp->r, "%c%ld%hu",
 			  &ch, &loops_ack, &num)) <= 0) {
@@ -2694,7 +2699,7 @@ static int Receive_ack_target(connection_t *connp)
 	    Destroy_connection(connp, "read error");
 	return n;
     }
-    if (num >= World.NumTargets) {
+    if (num >= world->NumTargets) {
 	Destroy_connection(connp, "bad target ack");
 	return -1;
     }
@@ -2710,9 +2715,9 @@ static int Receive_ack_target(connection_t *connp)
      * destroyed targets could have been displayed with
      * a diagonal cross through them.
      */
-    if (loops_ack > World.targets[num].last_change) {
-	SET_BIT(World.targets[num].conn_mask, 1 << connp->ind);
-	CLR_BIT(World.targets[num].update_mask, 1 << connp->ind);
+    if (loops_ack > world->targets[num].last_change) {
+	SET_BIT(world->targets[num].conn_mask, 1 << connp->ind);
+	CLR_BIT(world->targets[num].update_mask, 1 << connp->ind);
     }
     return 1;
 }
@@ -2886,6 +2891,7 @@ static int Receive_modifier_bank(connection_t *connp)
     char		*cp;
     modifiers		mods;
     int			n;
+    world_t *world = &World;
 
     if ((n = Packet_scanf(&connp->r, "%c%c%s", &ch, &bank, str)) <= 0) {
 	if (n == -1)
@@ -2895,22 +2901,22 @@ static int Receive_modifier_bank(connection_t *connp)
     pl = Player_by_id(connp->id);
     if (bank < NUM_MODBANKS) {
 	CLEAR_MODS(mods);
-	if (BIT(World.rules->mode, ALLOW_MODIFIERS)) {
+	if (BIT(world->rules->mode, ALLOW_MODIFIERS)) {
 	    for (cp = str; *cp; cp++) {
 		switch (*cp) {
 		case 'F': case 'f':
-		    if (!BIT(World.rules->mode, ALLOW_NUKES))
+		    if (!BIT(world->rules->mode, ALLOW_NUKES))
 			break;
 		    if (*(cp+1) == 'N' || *(cp+1) == 'n')
 			SET_BIT(mods.nuclear, FULLNUCLEAR);
 		    break;
 		case 'N': case 'n':
-		    if (!BIT(World.rules->mode, ALLOW_NUKES))
+		    if (!BIT(world->rules->mode, ALLOW_NUKES))
 			break;
 		    SET_BIT(mods.nuclear, NUCLEAR);
 		    break;
 		case 'C': case 'c':
-		    if (!BIT(World.rules->mode, ALLOW_CLUSTERS))
+		    if (!BIT(world->rules->mode, ALLOW_CLUSTERS))
 			break;
 		    SET_BIT(mods.warhead, CLUSTER);
 		    break;
@@ -2935,7 +2941,7 @@ static int Receive_modifier_bank(connection_t *connp)
 		    break;
 		case 'L': case 'l':
 		    cp++;
-		    if (!BIT(World.rules->mode, ALLOW_LASER_MODIFIERS))
+		    if (!BIT(world->rules->mode, ALLOW_LASER_MODIFIERS))
 			break;
 		    if (*cp == 'S' || *cp == 's')
 			SET_BIT(mods.laser, STUN);

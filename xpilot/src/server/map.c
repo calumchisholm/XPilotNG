@@ -88,7 +88,7 @@ int World_place_cannon(world_t *world, clpos pos, int dir, int team)
     t.conn_mask = (unsigned)-1;
     t.group = -1;
     STORE(cannon_t, world->cannons, world->NumCannons, max_cannons, t);
-    cannon = Cannons(ind);
+    cannon = Cannons(world, ind);
     Cannon_init(cannon);
     return ind;
 }
@@ -363,7 +363,7 @@ static void Verify_wormhole_consistency(world_t *world)
 
 	xpprintf("Inconsistent use of wormholes, removing them.\n");
 	for (i = 0; i < world->NumWormholes; i++)
-	    Wormhole_remove_from_map(Wormholes(i));
+	    Wormhole_remove_from_map(Wormholes(world, i));
 	world->NumWormholes = 0;
     }
 
@@ -371,9 +371,9 @@ static void Verify_wormhole_consistency(world_t *world)
 	for (i = 0; i < world->NumWormholes; i++) {
 	    int j = (int)(rfrac() * world->NumWormholes);
 
-	    while (Wormholes(j)->type == WORM_IN)
+	    while (Wormholes(world, j)->type == WORM_IN)
 		j = (int)(rfrac() * world->NumWormholes);
-	    Wormholes(i)->lastdest = j;
+	    Wormholes(world, i)->lastdest = j;
 	}
     }
 }
@@ -478,7 +478,7 @@ bool Grok_map(world_t *world)
     }
 
     if (!silent)
-	xpprintf("world->...: %s\nBases....: %d\nMapsize..: %dx%d pixels\n"
+	xpprintf("World....: %s\nBases....: %d\nMapsize..: %dx%d pixels\n"
 		 "Team play: %s\n",
 		 world->name, world->NumBases, world->width, world->height,
 		 BIT(world->rules->mode, TEAM_PLAY) ? "on" : "off");
@@ -524,7 +524,7 @@ int Find_closest_team(world_t *world, clpos pos)
     double closest = FLT_MAX, l;
 
     for (i = 0; i < world->NumBases; i++) {
-	base_t *base = Bases(i);
+	base_t *base = Bases(world, i);
 	if (base->team == TEAM_NOT_SET)
 	    continue;
 
@@ -571,9 +571,9 @@ static void Find_base_order(world_t *world)
 	exit(-1);
     }
 
-    chkpos = Checks(0)->pos;
+    chkpos = Checks(world, 0)->pos;
     for (i = 0; i < n; i++) {
-	clpos bpos = Bases(i)->pos;
+	clpos bpos = Bases(world, i)->pos;
 	dist = Wrap_length(bpos.cx - chkpos.cx, bpos.cy - chkpos.cy) / CLICK;
 	for (j = 0; j < i; j++) {
 	    if (world->baseorder[j].dist > dist)
@@ -781,8 +781,10 @@ static void Compute_local_gravity(world_t *world)
 }
 
 
-void Compute_gravity(world_t *world)
+void Compute_gravity(void)
 {
+    world_t *world = &World;
+
     Compute_global_gravity(world);
     Compute_local_gravity(world);
 }
@@ -829,7 +831,7 @@ void add_temp_wormholes(world_t *world, int xin, int yin, int xout, int yout)
 
 void remove_temp_wormhole(world_t *world, int ind)
 {
-    Wormhole_remove_from_map(Wormholes(ind));
+    Wormhole_remove_from_map(Wormholes(world, ind));
 
     world->NumWormholes--;
     if (ind != world->NumWormholes)
