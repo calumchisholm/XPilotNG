@@ -291,21 +291,21 @@ static void PlayerCollision(void)
 			    sc2 = Rate(pl->score, pl_j->score)
 				* options.crashScoreMult;
 			    Score_players(pl, -sc, pl_j->name,
-					  pl_j, -sc2, pl->name);
+					  pl_j, -sc2, pl->name, false);
 			} else if (Player_is_tank(pl)) {
 			    player *i_tank_owner_pl
 				= Player_by_id(pl->lock.pl_id);
 			    sc = Rate(i_tank_owner_pl->score, pl_j->score)
 				* options.tankKillScoreMult;
 			    Score_players(i_tank_owner_pl, sc, pl_j->name,
-					  pl_j, -sc, pl->name);
+					  pl_j, -sc, pl->name, true);
 			} else if (Player_is_tank(pl_j)) {
 			    player *j_tank_owner_pl
 				= Player_by_id(pl_j->lock.pl_id);
 			    sc = Rate(j_tank_owner_pl->score, pl->score)
 				* options.tankKillScoreMult;
 			    Score_players(j_tank_owner_pl, sc, pl->name,
-					  pl, -sc, pl_j->name);
+					  pl, -sc, pl_j->name, true);
 			} /* don't bother scoring two tanks */
 		    } else {
 			int i_tank_owner = i;
@@ -329,7 +329,7 @@ static void PlayerCollision(void)
 			    sc = Rate(pl->score, pl_j->score)
 				* options.runoverKillScoreMult;
 			Score_players(i_tank_owner_pl, sc, pl_j->name,
-				      pl_j, -sc, pl->name);
+				      pl_j, -sc, pl->name, true);
 		    }
 
 		} else {
@@ -356,7 +356,7 @@ static void PlayerCollision(void)
 				* options.runoverKillScoreMult;
 
 			Score_players(j_tank_owner_pl, sc, pl->name,
-				      pl, -sc, pl_j->name);
+				      pl, -sc, pl_j->name, true);
 		    }
 		}
 
@@ -728,7 +728,7 @@ static void Player_collides_with_ball(player *pl, object *obj)
 	} else {
 	    Rank_AddKill(kp);
 	    sc = Rate(kp->score, pl->score) * options.ballKillScoreMult;
-	    Score_players(kp, sc, pl->name, pl, -sc, kp->name);
+	    Score_players(kp, sc, pl->name, pl, -sc, kp->name, true);
 	    Robot_war(pl, kp);
 	}
     }
@@ -971,7 +971,7 @@ static void Player_collides_with_mine(player *pl, object *obj)
 	 * Maybe not.
 	 */
 	sc = Rate(kp->score, pl->score) * options.mineScoreMult;
-	Score_players(kp, sc, pl->name, pl, -sc, kp->name);
+	Score_players(kp, sc, pl->name, pl, -sc, kp->name, false);
     }
     Set_message(msg);
 }
@@ -1007,7 +1007,7 @@ static void Player_collides_with_debris(player *pl, object *obj)
 	} else {
 	    Rank_AddKill(kp);
 	    sc = Rate(kp->score, pl->score) * options.explosionKillScoreMult;
-	    Score_players(kp, sc, pl->name, pl, -sc, kp->name);
+	    Score_players(kp, sc, pl->name, pl, -sc, kp->name, true);
 	}
 	obj->life = 0.0;
 	return;
@@ -1213,7 +1213,7 @@ static void Player_collides_with_killing_shot(player *pl, object *obj)
 	    } else if (obj->id == NO_ID || kp->id == pl->id)
 		Score(pl, -sc, pl->pos, (obj->id == NO_ID ? "" : pl->name));
 	    else {
-		Score_players(kp, sc, pl->name, pl, -sc, kp->name);
+		Score_players(kp, sc, pl->name, pl, -sc, kp->name, true);
 		Robot_war(pl, kp);
 	    }
 	    Set_message(msg);

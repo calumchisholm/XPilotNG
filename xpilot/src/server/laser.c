@@ -110,7 +110,7 @@ void Laser_pulse_hits_player(player *pl, pulseobject *pulse)
 		} else {
 		    sc = Rate(kp->score, pl->score)
 			* options.laserKillScoreMult;
-		    Score_players(kp, sc, pl->name, pl, -sc, kp->name);
+		    Score_players(kp, sc, pl->name, pl, -sc, kp->name, true);
 		}
 	    } else {
 		sc = Rate(CANNON_SCORE, pl->score) / 4;

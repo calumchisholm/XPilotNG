@@ -110,7 +110,8 @@ double Rate(double winner, double loser)
  * KK 7-11-1: And for killing a member of your alliance
  */
 void Score_players(player *winner_pl, double winner_score, char *winner_msg,
-		   player *loser_pl, double loser_score, char *loser_msg)
+		   player *loser_pl, double loser_score, char *loser_msg,
+		   bool transfer_tag)
 {
     if (Players_are_teammates(winner_pl, loser_pl)
 	|| Players_are_allies(winner_pl, loser_pl)
@@ -122,7 +123,9 @@ void Score_players(player *winner_pl, double winner_score, char *winner_msg,
 	    loser_score = -loser_score;
     }
 
-    if (options.tagGame && winner_score > 0.0 && loser_score < 0.0) {
+    if (options.tagGame
+	&& winner_score > 0.0 && loser_score < 0.0
+	&& transfer_tag) {
 	if (tagItPlayerId == winner_pl->id) {
 	    winner_score *= options.tagItKillScoreMult;
 	    loser_score *= options.tagItKillScoreMult;

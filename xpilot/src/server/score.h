@@ -37,22 +37,8 @@ void TEAM_SCORE(int team, double points);
 void Alliance_score(int id, double points);
 double Rate(double winner, double loser);
 
-/*
- * Cause `winner' to get `winner_score' points added with message
- * `winner_msg', and similarly with the `loser' and equivalent
- * variables.
- *
- * In general the winner_score should be positive, and the loser_score
- * negative, but this need not be true.
- *
- * If the winner and loser players are on the same team, the scores are
- * made negative, since you shouldn't gain points by killing team members,
- * or being killed by a team member (it is both players faults).
- *
- * KK 28-4-98: Same for killing your own tank.
- * KK 7-11-1: And for killing a member of your alliance
- */
 void Score_players(player *winner_pl, double winner_score, char *winner_msg,
-		   player *loser_pl, double loser_score, char *loser_msg);
+		   player *loser_pl, double loser_score, char *loser_msg,
+		   bool transfer_tag);
 
 #endif
