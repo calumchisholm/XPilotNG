@@ -156,9 +156,19 @@ int World_place_base(world_t *world, clpos_t pos, int dir, int team)
     /*
      * The direction of the base should be so that it points
      * up with respect to the gravity in the region.  This
-     * is fixed in Find_base_dir() when the gravity has
+     * is fixed in Find_base_direction() when the gravity has
      * been computed.
      */
+    if (dir < 0 || dir >= RES) {
+	warn("Base with direction %d in map.", dir);
+	warn("Valid base directions are from 0 to %d.", RES-1);
+	while (dir < 0)
+	    dir += RES;
+	while (dir >= RES)
+	    dir -= RES;
+	warn("Using direction %d for this base.", dir);
+    }
+
     t.dir = dir;
     if (BIT(world->rules->mode, TEAM_PLAY)) {
 	if (team < 0 || team >= MAX_TEAMS)

@@ -498,12 +498,20 @@ setup_t *Xpmap_init_setup(world_t *world)
 		if (team == TEAM_NOT_SET)
 		    team = 0;
 		dir = world->bases[base++].dir;
+		/* other code should take care of this */
+		assert(dir >= 0);
+		assert(dir < RES);
+		/* round to nearest direction */
+		dir = (((dir + (RES/8)) / (RES/4)) * (RES/4)) % RES;
+		assert(dir == DIR_UP || dir == DIR_RIGHT
+		       || dir == DIR_DOWN || dir == DIR_LEFT);
 		switch (dir) {
 		case DIR_UP:    *mapptr = SETUP_BASE_UP + team; break;
 		case DIR_RIGHT: *mapptr = SETUP_BASE_RIGHT + team; break;
 		case DIR_DOWN:  *mapptr = SETUP_BASE_DOWN + team; break;
 		case DIR_LEFT:  *mapptr = SETUP_BASE_LEFT + team; break;
 		default:
+		    /* should never happen */
 		    warn("Bad base at (%d,%d), (dir = %d).", x, y, dir);
 		    *mapptr = SETUP_BASE_UP + team;
 		    break;
