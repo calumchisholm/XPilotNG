@@ -26,7 +26,59 @@
 char command_version[] = VERSION;
 
 
-/* kps - add player *Get_player_by_name(char *name) */
+
+player *Get_player_by_string(char *str, int *error, char **errorstr_p)
+{
+    int i;
+    player *pl = NULL;
+
+    if (str == NULL || strlen(str) == 0)
+	goto match_none;
+
+    /* kps - do we want to match on id ? */
+
+    /* Look for an exact match on player nickname. */
+    for (i = 0; i < NumPlayers; i++) {
+	player *pl_i = Players(i);
+	if (strcasecmp(pl_i->name, str) == 0)
+	    return pl_i;
+    }
+
+    /* Check if 'str' is a substring of any player's name. */
+    for (i = 0; i < NumPlayers; i++) {
+	player *pl_i = Players(i);
+	char *name = pl_i->name;
+	int j;
+
+	for (j = 0; j < 1 + (int)strlen(name) - (int)strlen(str); j++) {
+	    if (!strncasecmp(name + j, str, strlen(str))) {
+		if (pl)
+		    goto match_several;
+		pl = pl_i;
+		break;
+	    }
+	}
+    }
+    if (!pl)
+	goto match_none;
+
+    return pl;
+
+ match_none:
+    if (error != NULL)
+	*error = -1;
+    if (errorstr_p != NULL)
+	*errorstr_p = "Name does not match any player.";
+    return NULL;
+
+ match_several:
+    if (error != NULL)
+	*error = -2;
+    if (errorstr_p != NULL)
+	*errorstr_p = "Name matches several players.";
+    return NULL;
+}
+
 
 int Get_player_index_by_name(char *name)
 {
@@ -755,15 +807,30 @@ static int Cmd_help(char *arg, player *pl, int oper, char *msg)
 static int Cmd_kick(char *arg, player *pl, int oper, char *msg)
 {
     int			i;
+    player		*kicked_pl;
+    char		*errorstr;
 
-    if (!oper) {
+    if (!oper)
 	return CMD_RESULT_NOT_OPERATOR;
-    }
 
-    if (!arg || !*arg) {
+    if (!arg || !*arg)
 	return CMD_RESULT_NO_NAME;
-    }
 
+#if 1
+    kicked_pl = Get_player_by_string(arg, NULL, &errorstr);
+    if (kicked_pl) {
+	sprintf(msg, "%s kicked %s out! [*Server notice*]",
+		pl->name, kicked_pl->name);
+	if (kicked_pl->conn == NOT_CONNECTED)
+	    Delete_player(kicked_pl);
+	else
+	    Destroy_connection(kicked_pl->conn, "kicked out");
+	Set_message(msg);
+	strcpy(msg, "");
+	return CMD_RESULT_SUCCESS;
+    } else
+	strcpy(msg, errorstr);
+#else
     i = Get_player_index_by_name(arg);
     if (i >= 0) {
 	player *pl_i = Players(i);
@@ -788,6 +855,7 @@ static int Cmd_kick(char *arg, player *pl, int oper, char *msg)
     else {
 	sprintf(msg, "Error.");
     }
+#endif
 
     return CMD_RESULT_ERROR;
 }
