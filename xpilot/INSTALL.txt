@@ -1,18 +1,18 @@
-$Id$
+
 
 Following are the installation instructions for the 
 UNIX version of XPilot.  For the Windows version
 see contrib/NT/README.txt for instructions.
 
 To compile XPilot, you'll need at least:
-   
+
     expat XML library version 1.1
 
     zlib compression library version 1.1.3 (most systems seem to have older)
 
     An ANSI C compiler
 
-    X11     (any revision from R4 up to R6 works OK)
+    X11     (any revision from R4 up to R6 is fine)
 
 Also note that XPilot isn't gentle with the X server,
 so a fast machine (with a graphics accelerator that
@@ -20,7 +20,7 @@ does line drawing in hardware), in a fast network
 is the ideal situation.
 
 
-INSTALLATION
+INSTALL EXPAT AND ZLIB
 
 First install expat and zlib if you don't have them installed.
 Note that zlib seems to be installed already on most systems but
@@ -41,6 +41,13 @@ are installed in the same way:
    - for expat the variable to change is EXPATDIR
    - for zlib the variable is ZLIBDIR
 
+NEW STYLE INSTALLATION
+
+The doc subdirectory contains an RPM spec file which you can use
+to build an XPilot RPM file.  The doc subdirectory also contains
+a patch with preferred settings for Local.config under Linux.
+
+OLD STYLE INSTALLATION
 
 The rest of the installation just requires three steps -- geez, how easy
 can it be? :)
