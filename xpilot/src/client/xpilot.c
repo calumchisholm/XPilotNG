@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
 	result = Contact_servers(argc - 1, &argv[1],
 				 xpArgs.auto_connect, xpArgs.list_servers,
 				 auto_shutdown, xpArgs.shutdown_reason,
-				 0, 0, 0, 0,
+				 0, NULL, NULL, NULL, NULL,
 				 &connectParam);
     }
     else {

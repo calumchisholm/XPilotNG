@@ -865,6 +865,7 @@ extern int Contact_servers(int count, char **servers,
 			   int auto_shutdown, char *shutdown_message,
 			   int find_max, int *num_found,
 			   char **server_addresses, char **server_names,
+			   unsigned *server_versions,
 			   Connect_param_t *conpar);
 
 /*

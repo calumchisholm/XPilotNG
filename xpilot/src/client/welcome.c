@@ -289,6 +289,7 @@ static int Localnet_cb(int widget, void *user_data, const char **text)
     char *server_addrs;
     char *name_ptrs[MAX_LOCAL_SERVERS];
     char *addr_ptrs[MAX_LOCAL_SERVERS];
+    unsigned server_versions[MAX_LOCAL_SERVERS];
     int max_width = 0;
     int button;
     int button_width;
@@ -325,7 +326,8 @@ static int Localnet_cb(int widget, void *user_data, const char **text)
 	addr_ptrs[i] = &server_addrs[i * MAX_HOST_LEN];
     }
     Contact_servers(0, NULL, 0, 2, 0, NULL,
-		    MAX_LOCAL_SERVERS, &n, addr_ptrs, name_ptrs, conpar);
+		    MAX_LOCAL_SERVERS, &n,
+		    addr_ptrs, name_ptrs, server_versions, conpar);
     LIMIT(n, 0, MAX_LOCAL_SERVERS);
 
     Widget_destroy_children(subform_widget);
@@ -364,6 +366,7 @@ static int Localnet_cb(int widget, void *user_data, const char **text)
 		    MAX_HOST_LEN);
 	    strlcpy(localnet_conpars[i].server_addr, addr_ptrs[i],
 		    MAX_HOST_LEN);
+	    localnet_conpars[i].server_version = server_versions[i];
 	    button_width = max_width + 20;
 	    button_height = textFont->ascent + textFont->descent + 10;
 	    button_x = 20;
@@ -430,7 +433,7 @@ static int Internet_server_join_cb(int widget, void *user_data,
     strlcpy(conpar->server_addr, sip->ip_str, sizeof(conpar->server_addr));
     conpar->contact_port = sip->port;
     result = Contact_servers(1, &server_addr_ptr, 1, 0, 0, NULL,
-			     0, NULL, NULL, NULL, conpar);
+			     0, NULL, NULL, NULL, NULL, conpar);
     if (result) {
 	/* structure copy */
 	*global_conpar = *conpar;
