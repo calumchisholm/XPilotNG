@@ -355,7 +355,7 @@ void xevent_pointer(void)
 	return;
 
     if (mouseMovement != 0) {
-	Send_pointer_move(mouseMovement);
+	Client_pointer_move(mouseMovement);
 	delta.x = draw_width / 2 - mousePosition.x;
 	delta.y = draw_height / 2 - mousePosition.y;
 	if (ABS(delta.x) > 3 * draw_width / 8

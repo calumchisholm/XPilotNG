@@ -150,6 +150,10 @@ int	recordFPS = 0;		/* Optimal FPS to record at. */
 time_t	currentTime;	        /* Current value of time() */
 bool	newSecond = false;      /* True if time() incremented this frame */
 
+int	maxMouseTurnsPS = 0;
+int	mouseMovementInterval = 0;
+int	cumulativeMouseMovement = 0;
+
 int	clientPortStart = 0;	/* First UDP port for clients */
 int	clientPortEnd = 0;	/* Last one (these are for firewalls) */
 
@@ -2343,11 +2347,6 @@ void Client_cleanup(void)
     Paint_cleanup();
 }
 
-int Client_wrap_mode(void)
-{
-    return (BIT(Setup->mode, WRAP_PLAY) != 0);
-}
-
 int Check_client_fps(void)
 {
     if (oldMaxFPS != maxFPS) {
@@ -2355,5 +2354,19 @@ int Check_client_fps(void)
 	oldMaxFPS = maxFPS;
 	return Send_fps_request(maxFPS);
     }
+    return 0;
+}
+
+int Client_pointer_move(int movement)
+{
+    if (maxMouseTurnsPS == 0)
+	return Send_pointer_move(movement);
+
+    /*
+     * maxMouseTurnsPS is not 0: player wants to limit amount
+     * of pointer move packets sent to server.
+     */
+    cumulativeMouseMovement += movement;
+
     return 0;
 }

@@ -560,6 +560,10 @@ extern int	clientFPS;	        /* How many fps we actually get */
 extern int	recordFPS;		/* Optimal FPS to record at. */
 extern time_t	currentTime;	        /* Current value of time() */
 extern bool	newSecond;              /* True if time() incremented this frame */
+extern int	maxMouseTurnsPS;
+extern int	mouseMovementInterval;
+extern int	cumulativeMouseMovement;
+
 extern char	modBankStr[][MAX_CHARS];/* modifier banks strings */
 
 extern int	clientPortStart;	/* First UDP port for clients */
@@ -776,7 +780,7 @@ void Client_cleanup(void);
 int Client_start(void);
 int Client_fps_request(void);
 int Client_power(void);
-int Client_wrap_mode(void);
+int Client_pointer_move(int movement);
 
 int Init_playing_windows(void);
 void Raise_window(void);

@@ -41,14 +41,9 @@ static int Handle_input(int new_input)
 #ifndef _WINDOWS
 static void Input_loop(void)
 {
-    fd_set		rfds;
-    fd_set		tfds;
-    int			max,
-			n,
-			netfd,
-			result,
-			clientfd;
-    struct timeval	tv;
+    fd_set rfds, tfds;
+    int max, n, netfd, result, clientfd;
+    struct timeval tv;
 
     if ((result = Net_input()) == -1) {
 	error("Bad server input");
@@ -74,8 +69,45 @@ static void Input_loop(void)
     FD_SET(netfd, &rfds);
     max = (clientfd > netfd) ? clientfd : netfd;
     for (tfds = rfds; ; rfds = tfds) {
+
 	tv.tv_sec = 1;
 	tv.tv_usec = 0;
+
+	if (maxMouseTurnsPS > 0) {
+	    struct timeval now;
+	    static int last_send_interval_num = -1;
+	    int interval_num; /* 0 ... maxMouseTurnsPS - 1 */
+	    int next_interval_start;
+	    /*
+	     * Let's see if we've sent any pointer move this interval,
+	     * if not and there is something to send, do that now.
+	     */
+	    gettimeofday(&now, NULL);
+	    interval_num = ((int)now.tv_usec) / mouseMovementInterval;
+
+	    /* if we didn't send mouse movement yet, send now */
+	    if (interval_num != last_send_interval_num
+		&& cumulativeMouseMovement != 0) {
+		Send_pointer_move(cumulativeMouseMovement);
+		cumulativeMouseMovement = 0;
+		last_send_interval_num = interval_num;
+	    }
+
+	    if (cumulativeMouseMovement != 0) {
+		/* calculate how long to wait to next interval */
+		next_interval_start
+		    = (interval_num + 1) * mouseMovementInterval;
+		tv.tv_sec = 0;
+		/* mouseMovementInterval / 20
+		   makes sure we are inside the interval */
+		tv.tv_usec = mouseMovementInterval / 20
+		    + next_interval_start - (int)now.tv_usec;
+	    } else {
+		tv.tv_sec = 1;
+		tv.tv_usec = 0;
+	    }
+	}
+
 	if ((n = select(max + 1, &rfds, NULL, NULL, &tv)) == -1) {
 	    if (errno == EINTR)
 		continue;
@@ -83,6 +115,10 @@ static void Input_loop(void)
 	    return;
 	}
 	if (n == 0) {
+	    if (maxMouseTurnsPS > 0 &&
+		cumulativeMouseMovement != 0)
+		continue;
+
 	    if (result <= 1) {
 		warn("No response from server");
 		continue;

@@ -30,8 +30,6 @@
 char default_version[] = VERSION;
 
 static double	hudScale;	/* Scale for HUD drawing */
-int maxMouseTurnsPS = 0;
-long movement_interval = 0;
 
 static bool Set_nickName(xp_option_t *opt, const char *value)
 {
@@ -387,9 +385,10 @@ static bool Set_maxMouseTurnsPS(xp_option_t *opt, int val)
 {
     UNUSED_PARAM(opt);
     maxMouseTurnsPS = val;
-    if (maxMouseTurnsPS) {
-    	movement_interval = 1000000 / maxMouseTurnsPS;
-    } else movement_interval = 0;
+    if (maxMouseTurnsPS > 0)
+	/* +1 microsecond to make sure it is not too short */
+	mouseMovementInterval = (1000000 / maxMouseTurnsPS) + 1;
+    /*warn("mouseMovementInterval = %d", mouseMovementInterval);*/
     return true;
 }
 
