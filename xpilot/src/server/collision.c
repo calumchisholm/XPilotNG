@@ -705,7 +705,7 @@ static void PlayerObjectCollision(player *pl)
 		     &obj_list, &obj_count);
 
     for (j = 0; j < obj_count; j++) {
-	bool hit1, hit2;
+	bool hit;
 
 	obj = obj_list[j];
 
@@ -767,54 +767,13 @@ static void PlayerObjectCollision(player *pl)
 	 */
 	radius = (SHIP_SZ + obj->pl_radius) * CLICK;
 
-	if (radius >= range) {
-	    hit1 = hit2 = true;
-	} else {
-	    /*
-	     * kps - why is radius used in the NG functions and range
-	     * in the old one ?
-	     */
-	    hit1 = in_range(OBJ_PTR(pl), obj, radius);
-
-	    if (is_polygon_map || !useOldCode) {
-		switch (obj->collmode) {
-		case 0:
-		    hit2 = in_range_simple(pl->pos.cx, pl->pos.cy,
-					   obj->pos.cx, obj->pos.cy,
-					   radius);
-		    break;
-		case 1:
-		    hit2 = in_range_acd(pl->prevpos.cx - obj->prevpos.cx,
-					pl->prevpos.cy - obj->prevpos.cy,
-					pl->extmove.cx - obj->extmove.cx,
-					pl->extmove.cy - obj->extmove.cy,
-					radius);
-		    break;
-		case 2:
-		    hit2 = in_range_partial(pl->prevpos.cx - obj->prevpos.cx,
-					    pl->prevpos.cy - obj->prevpos.cy,
-					    pl->extmove.cx - obj->extmove.cx,
-					    pl->extmove.cy - obj->extmove.cy,
-					    radius, obj->wall_time);
-		    break;
-		default:
-		    warn("Unimplemented collision mode %d", obj->collmode);
-		    hit2 = false;
-		}
-	    } else {
-		hit2 = in_range_acd_old(pl->prevpos.cx, pl->prevpos.cy,
-					pl->pos.cx, pl->pos.cy,
-					obj->prevpos.cx, obj->prevpos.cy,
-					obj->pos.cx, obj->pos.cy,
-					range);
-
-
-	    }
-	}
-
-	assert(hit1 == hit2);
-	if (!hit1)
-	    continue;
+	/*
+	 * kps - why was radius used in 4.3.1X and range in 4.5.4 ?
+	 */
+	if (radius >= range)
+	    hit = true;
+	else
+	    hit = in_range(OBJ_PTR(pl), obj, radius);
 
 #if 0
 	if ((is_polygon_map || !useOldCode) && obj->collmode != 1) {
@@ -831,21 +790,18 @@ static void PlayerObjectCollision(player *pl)
 	 */
 	switch (obj->type) {
 	case OBJ_BALL:
-	    if (! hit) {
+	    if (!hit)
 		continue;
-	    }
 	    Player_collides_with_ball(pl, obj, radius);
-	    if (BIT(pl->status, KILLED)) {
+	    if (BIT(pl->status, KILLED))
 		return;
-	    }
 	    continue;
 
 	case OBJ_ITEM:
 	    Player_collides_with_item(pl, obj);
 	    /* if life is non-zero then no collision occurred */
-	    if (obj->life != 0) {
+	    if (obj->life != 0)
 		continue;
-	    }
 	    break;
 
 	case OBJ_MINE:
@@ -855,9 +811,8 @@ static void PlayerObjectCollision(player *pl)
 	case OBJ_WRECKAGE:
 	case OBJ_DEBRIS:
 	    Player_collides_with_debris(pl, obj);
-	    if (BIT(pl->status, KILLED)) {
+	    if (BIT(pl->status, KILLED))
 		return;
-	    }
 	    break;
 
 	case OBJ_ASTEROID:
@@ -865,9 +820,8 @@ static void PlayerObjectCollision(player *pl)
 		Player_collides_with_asteroid(pl, WIRE_PTR(obj));
 		Delta_mv_elastic((object *)pl, (object *)obj);
 	    }
-	    if (BIT(pl->status, KILLED)) {
+	    if (BIT(pl->status, KILLED))
 		return;
-	    }
 	    continue;
 
 	case OBJ_CANNON_SHOT:
@@ -877,9 +831,8 @@ static void PlayerObjectCollision(player *pl)
 
 	case OBJ_PULSE:
 	    Laser_pulse_hits_player(pl, PULSE_PTR(obj));
-	    if (BIT(pl->status, KILLED)) {
+	    if (BIT(pl->status, KILLED))
 		return;
-	    }
 	    continue;
 
 	default:
@@ -890,9 +843,8 @@ static void PlayerObjectCollision(player *pl)
 
 	if (BIT(obj->type, KILLING_SHOTS)) {
 	    Player_collides_with_killing_shot(pl, obj);
-	    if (BIT(pl->status, KILLED)) {
+	    if (BIT(pl->status, KILLED))
 		return;
-	    }
 	}
 
 	if (hit)
