@@ -1686,7 +1686,9 @@ static int Config_update_texturedObjects(int widget_desc, void *data, bool *val)
 static int Config_update_scaleFactor(int widget_desc, void *data, DFLOAT *val)
 {
     Init_scale_array();
-    Resize(top, top_width, top_height);
+    
+    /* Resize removed because it is not needed here */
+
     Scale_dashes();
     Bitmap_update_scale();
     return 0;

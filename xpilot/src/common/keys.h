@@ -98,7 +98,7 @@ typedef enum {
     KEY_HYPERJUMP,		/* Was KEY_POINTER_CONTROL up to 3.2.5 */
     KEY_DETONATE_MINES,
     KEY_DEFLECTOR,		/* since 3.8.0 */
-    KEY_UNUSED_65,
+    KEY_TOGGLE_RADAR_SCORE,	/* 4.5.4X */
     KEY_UNUSED_66,
     KEY_UNUSED_67,
     KEY_UNUSED_68,

@@ -45,6 +45,7 @@ bool Key_press_show_items(keys_t key);
 bool Key_press_show_messages(keys_t key);
 bool Key_press_pointer_control(keys_t key);
 bool Key_press_toggle_record(keys_t key);
+bool Key_press_toggle_radar_score(keys_t key);
 bool Key_press_msgs_stdout(keys_t key);
 bool Key_press_select_lose_item(keys_t key);
 bool Key_press(keys_t key);

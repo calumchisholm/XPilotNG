@@ -1883,6 +1883,13 @@ option options[] = {
 	"Toggle recording of session (see recordFile).\n"
     },
     {
+        "keyToggleRadarScore",
+        NULL,
+        "",
+        KEY_TOGGLE_RADAR_SCORE,
+        "Toggles the radar and score windows on and off.\n"
+    },
+    {
 	"keySelectItem",
 	NULL,
 	"KP_0 KP_Insert",

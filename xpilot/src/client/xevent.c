@@ -469,6 +469,60 @@ bool Key_press_toggle_record(keys_t key)
     return false;	/* server doesn't need to know */
 }
 
+bool Key_press_toggle_radar_score(keys_t key)
+{
+    if (radar_score_mapped) {
+
+	/* change the draw area to be the size of the window */
+	draw_width = top_width; 
+	draw_height = top_height; 
+	
+	/*
+	 * We need to unmap the score and radar windows
+	 * if config is mapped, leave it there its useful
+	 * to have it popped up whilst in full screen
+	 * the user can close it with "close"
+	 */
+
+	XUnmapWindow(dpy, radar);
+	XUnmapWindow(dpy, players);
+	Widget_unmap(button_form);
+
+	/* Move the draw area */
+	XMoveWindow(dpy, draw, 0, 0);
+    
+	/* Set the global variable to show that */
+	/* the radar and score are now unmapped */
+	radar_score_mapped = false;  
+	
+	/* Generate resize event */
+	Resize(top, top_width, top_height);
+	
+    } else {
+
+	/*
+	 * We need to map the score and radar windows
+	 * move the window back, note how 258 is a hard coded
+	 * value in xinit.c, if they cant be bothered to declare
+	 * a constant, neither can I - kps fix
+	 */
+	draw_width = top_width - (258);
+	draw_height = top_height;
+	
+	XMoveWindow(dpy, draw, 258, 0);
+	Widget_map(button_form);
+	XMapWindow(dpy, radar);
+	XMapWindow(dpy, players);
+	
+	/* reflect that we are remapped to the client */
+	
+	radar_score_mapped = true;
+    }
+
+    return false;
+}
+
+
 #ifndef _WINDOWS
 bool Key_press_msgs_stdout(keys_t key)
 {
@@ -563,6 +617,10 @@ bool Key_press(keys_t key)
 
     case KEY_TOGGLE_RECORD:
 	return Key_press_toggle_record(key);
+
+    case KEY_TOGGLE_RADAR_SCORE:
+	return Key_press_toggle_radar_score(key);
+
 #ifndef _WINDOWS
     case KEY_PRINT_MSGS_STDOUT:
 	return Key_press_msgs_stdout(key);

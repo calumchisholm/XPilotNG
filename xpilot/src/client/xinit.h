@@ -54,6 +54,7 @@ extern bool		fullColor;
 extern bool		colorSwitch;
 extern bool		multibuffer;
 extern char		color_names[MAX_COLORS][MAX_COLOR_LEN];
+extern int		button_form;
 extern int		top_width, top_height;
 extern int		draw_width, draw_height;
 extern int		players_width, players_height;

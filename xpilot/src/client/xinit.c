@@ -118,6 +118,7 @@ int			top_width, top_height, top_x, top_y, top_posmask;
 int			draw_width, draw_height;
 int			players_width, players_height;
 char			*geometry;
+bool			radar_score_mapped;
 bool			autoServerMotdPopup;
 bool			refreshMotd;
 Cursor			pointerControlCursor;
@@ -262,7 +263,7 @@ static int Colors_callback(int, void *, const char **);
 static int Score_callback(int, void *, const char **);
 static int Player_callback(int, void *, const char **);
 
-static int button_form;
+int button_form;
 static int menu_button;
 
 const char *Item_get_text(int i)
@@ -805,6 +806,7 @@ int Init_playing_windows(void)
     radar = XCreateSimpleWindow(dpy, top, 0, 0,
 				256, RadarHeight, 0, 0,
 				colors[BLACK].pixel);
+    radar_score_mapped = true;
 
 #ifdef _WINDOWS
     WinXSetEventMask(draw, NoEventMask);
@@ -1118,16 +1120,18 @@ void Resize(Window w, int width, int height)
     /* ignore illegal resizes */
     LIMIT(width, MIN_TOP_WIDTH, MAX_TOP_WIDTH);
     LIMIT(height, MIN_TOP_HEIGHT, MAX_TOP_HEIGHT);
-    if (width == top_width && height == top_height) {
-	return;
-    }
     top_width = width;
     top_height = height;
     if (!draw) {
 	return;
     }
-    draw_width = top_width - 258;
+
+    if (radar_score_mapped)
+	draw_width = top_width - 258;
+    else
+	draw_width = top_width;
     draw_height = top_height;
+
     Send_display();
     Net_flush();
     XResizeWindow(dpy, draw, draw_width, draw_height);
