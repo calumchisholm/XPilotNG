@@ -268,18 +268,20 @@ void Meta_update(int change)
     len = strlen(string);
 
     for (i = 0; i < NumPlayers; i++) {
-	if (IS_HUMAN_IND(i) && !BIT(Players(i)->status, PAUSE)) {
+	player *pl_i = Players(i);
+
+	if (IS_HUMAN_IND(i) && !BIT(pl_i->status, PAUSE)) {
 	    if ((len + (4 * MAX_CHARS)) < sizeof(string)) {
 		sprintf(string + len,
 			"%s%s=%s@%s",
 			(first) ? "add players " : ",",
-			Players(i)->name,
-			Players(i)->realname,
-			Players(i)->hostname);
+			pl_i->name,
+			pl_i->realname,
+			pl_i->hostname);
 		len += strlen(&string[len]);
 
 		if (BIT(World.rules->mode, TEAM_PLAY)) {
-		    sprintf(string + len,"{%d}", Players(i)->team);
+		    sprintf(string + len,"{%d}", pl_i->team);
 		    len += strlen(&string[len]);
 		}
 

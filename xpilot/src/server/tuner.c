@@ -95,12 +95,13 @@ void tuner_playershielding(void)
 	SET_BIT(DEF_HAVE, HAS_SHIELD);
 
 	for (i = 0; i < NumPlayers; i++) {
-	    if (!IS_TANK_PTR(Players(i))) {
-		if (!BIT(Players(i)->used, HAS_SHOT))
-		    SET_BIT(Players(i)->used, HAS_SHIELD);
+	    player *pl_i = Players(i);
+	    if (!IS_TANK_PTR(pl_i)) {
+		if (!BIT(pl_i->used, HAS_SHOT))
+		    SET_BIT(pl_i->used, HAS_SHIELD);
 
-		SET_BIT(Players(i)->have, HAS_SHIELD);
-		Players(i)->shield_time = 0;
+		SET_BIT(pl_i->have, HAS_SHIELD);
+		pl_i->shield_time = 0;
 	    }
 	}
     }

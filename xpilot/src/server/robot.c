@@ -815,9 +815,10 @@ static void Robot_create(void)
     }
 
     for (i = 0; i < NumPlayers - 1; i++) {
-	if (Players(i)->conn != NOT_CONNECTED) {
-	    Send_player(Players(i)->conn, robot->id);
-	    Send_base(Players(i)->conn, robot->id, robot->home_base);
+	player *pl_i = Players(i);
+	if (pl_i->conn != NOT_CONNECTED) {
+	    Send_player(pl_i->conn, robot->id);
+	    Send_base(pl_i->conn, robot->id, robot->home_base);
 	}
     }
 
@@ -870,12 +871,14 @@ void Robot_delete(int ind, int kicked)
 	 */
 
 	for (i = 0; i < NumPlayers; i++) {
+	    player *pl_i = Players(i);
+
 	    if (!IS_ROBOT_IND(i))
 		continue;
 
-	    if (Players(i)->score < low_score) {
+	    if (pl_i->score < low_score) {
 		low_i = i;
-		low_score = Players(i)->score;
+		low_score = pl_i->score;
 	    }
 	}
 	if (low_i >= 0) {
@@ -969,8 +972,9 @@ void Robot_war(int ind, int killer)
 
 	if (Robot_war_on_player(killer) == pl->id)
 	    for (i = 0; i < NumPlayers; i++) {
-		if (Players(i)->conn != NOT_CONNECTED) {
-		    Send_war(Players(i)->conn, kp->id, NO_ID);
+		player *pl_i = Players(i);
+		if (pl_i->conn != NOT_CONNECTED) {
+		    Send_war(pl_i->conn, kp->id, NO_ID);
 		}
 	    }
 	Robot_set_war(killer, -1);
@@ -991,8 +995,9 @@ void Robot_war(int ind, int killer)
 
 	if (Robot_war_on_player(ind) != kp->id) {
 	    for (i = 0; i < NumPlayers; i++) {
-		if (Players(i)->conn != NOT_CONNECTED) {
-		    Send_war(Players(i)->conn, pl->id, kp->id);
+		player *pl_i = Players(i);
+		if (pl_i->conn != NOT_CONNECTED) {
+		    Send_war(pl_i->conn, pl->id, kp->id);
 		}
 	    }
 	    sound_play_all(DECLARE_WAR_SOUND);
