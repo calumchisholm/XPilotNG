@@ -2545,20 +2545,14 @@ static void Corner_init(void)
 void Ball_line_init(void)
 {
     int i;
-    static shapepos coords[24];
+    static shapepos coords[MAX_SHIP_PTS];
 
-    if (!treatBallAsPoint) {
-	ball_wire.num_points = 24;
-	for (i = 0; i < 24; i++) {
-	    ball_wire.pts[i] = coords + i;
-	    coords[i].clk.cx = cos(i * PI / 12) * BALL_RADIUS * CLICK;
-	    coords[i].clk.cy = sin(i * PI / 12) * BALL_RADIUS * CLICK;
-	}
-    } else {
-	ball_wire.num_points = 1;
-	ball_wire.pts[0] = coords;
-	coords[0].clk.cx = 0;
-	coords[0].clk.cy = 0;
+    LIMIT(ballRadius, 0, BALL_RADIUS);
+    ball_wire.num_points = MAX_SHIP_PTS;
+    for (i = 0; i < MAX_SHIP_PTS; i++) {
+	ball_wire.pts[i] = coords + i;
+	coords[i].clk.cx = cos(i * PI / MAX_SHIP_PTS) * ballRadius * CLICK;
+	coords[i].clk.cy = sin(i * PI / MAX_SHIP_PTS) * ballRadius * CLICK;
     }
 
     return;

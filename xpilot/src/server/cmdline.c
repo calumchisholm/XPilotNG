@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -276,7 +275,7 @@ DFLOAT		ballConnectorDamping;
 DFLOAT		maxBallConnectorRatio;
 DFLOAT		ballConnectorLength;
 bool		connectorIsString;	/* can the connector get shorter? */
-bool		treatBallAsPoint;	/* ball is treated as a single point */
+DFLOAT		ballRadius;		/* ball radius in pixels */
 
 DFLOAT		friction;		/* friction only affects ships */
 static DFLOAT	frictionSetting;	/* Above set through this */
@@ -1562,13 +1561,16 @@ static option_desc options[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-	"treatBallAsPoint",
-	"treatBallAsPoint",
-	"no",
-	&treatBallAsPoint,
-	valBool,
+	"ballRadius",
+	"ballRadius",
+	"10",
+	&ballRadius,
+	valReal,
 	Ball_line_init,
-	"Is the ball treated as single point?\n",
+	"What radius, measured in pixels, the treasure balls have on\n"
+	"the server. In traditional XPilot, the ball was treated as a\n"
+	"point (radius = 0), but visually appeared on the client with\n"
+	"a radius of 10 pixels.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {

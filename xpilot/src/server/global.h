@@ -270,7 +270,7 @@ extern DFLOAT		ballConnectorDamping;
 extern DFLOAT		maxBallConnectorRatio;
 extern DFLOAT		ballConnectorLength;
 extern bool		connectorIsString;
-extern bool		treatBallAsPoint;
+extern DFLOAT		ballRadius;
 
 extern DFLOAT 		dropItemOnKillProb;
 extern DFLOAT		detonateItemOnKillProb;
