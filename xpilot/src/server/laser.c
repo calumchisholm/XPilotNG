@@ -131,7 +131,7 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 	cannon = Cannon_by_id(pl->world, pulse->id);
 
     pl->forceVisible += 1;
-    if (pl->item[ITEM_MIRROR] > 0
+    if (Player_has_mirror(pl)
 	&& (rfrac() * (2 * pl->item[ITEM_MIRROR])) >= 1) {
 	pulse->pulse_dir = (int)(Wrap_cfindDir(pl->pos.cx - pulse->pos.cx,
 					       pl->pos.cy - pulse->pos.cy)
@@ -180,7 +180,7 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
     } else {
 	Player_add_fuel(pl, ED_LASER_HIT);
 	if (!BIT(pl->used, HAS_SHIELD)
-	    && pl->item[ITEM_ARMOR] <= 0) {
+	    && !Player_has_armor(pl)) {
 	    Player_set_state(pl, PL_STATE_KILLED);
 	    if (kp) {
 		Set_message_f("%s got roasted alive by %s's laser.%s",
@@ -219,7 +219,7 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 	    }
 	}
 	if (!BIT(pl->used, HAS_SHIELD)
-	    && pl->item[ITEM_ARMOR] > 0)
+	    && Player_has_armor(pl))
 	    Player_hit_armor(pl);
     }
 }

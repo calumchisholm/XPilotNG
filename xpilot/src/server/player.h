@@ -87,21 +87,43 @@ extern bool		updateScores;
  * Different types of attributes a player can have.
  * These are the bits of the player->have and player->used fields.
  */
-#define USES_EMERGENCY_THRUST	(1U<<30)
-#define USES_AUTOPILOT		(1U<<29)
-#define USES_TRACTOR_BEAM	(1U<<28)
+#define HAS_EMERGENCY_THRUST	(1U<<30)
+#define HAS_AUTOPILOT		(1U<<29)
+#define HAS_TRACTOR_BEAM	(1U<<28)
 #define HAS_LASER		(1U<<27)
-#define USES_CLOAKING_DEVICE	(1U<<26)
+#define HAS_CLOAKING_DEVICE	(1U<<26)
 #define HAS_SHIELD		(1U<<25)
-#define USES_REFUEL		(1U<<24)
-#define USES_REPAIR		(1U<<23)
-#define USES_COMPASS		(1U<<22)
-#define USES_CONNECTOR		(1U<<20)
+#define HAS_REFUEL		(1U<<24)
+#define HAS_REPAIR		(1U<<23)
+#define HAS_COMPASS		(1U<<22)
+#define HAS_AFTERBURNER		(1U<<21)
+#define HAS_CONNECTOR		(1U<<20)
 #define HAS_EMERGENCY_SHIELD	(1U<<19)
-#define USES_DEFLECTOR		(1U<<18)
-#define USES_PHASING_DEVICE	(1U<<17)
+#define HAS_DEFLECTOR		(1U<<18)
+#define HAS_PHASING_DEVICE	(1U<<17)
+#define HAS_MIRROR		(1U<<16)
+#define HAS_ARMOR		(1U<<15)
 #define HAS_SHOT		(1U<<4)
 #define HAS_BALL		(1U<<3)
+
+#define USES_EMERGENCY_THRUST	HAS_EMERGENCY_THRUST
+#define USES_AUTOPILOT		HAS_AUTOPILOT
+#define USES_TRACTOR_BEAM	HAS_TRACTOR_BEAM
+#define USES_LASER		HAS_LASER
+#define USES_CLOAKING_DEVICE	HAS_CLOAKING_DEVICE
+#define USES_SHIELD		HAS_SHIELD
+#define USES_REFUEL		HAS_REFUEL
+#define USES_REPAIR		HAS_REPAIR
+#define USES_COMPASS		HAS_COMPASS
+#define USES_AFTERBURNER	HAS_AFTERBURNER
+#define USES_CONNECTOR		HAS_CONNECTOR
+#define USES_EMERGENCY_SHIELD	HAS_EMERGENCY_SHIELD
+#define USES_DEFLECTOR		HAS_DEFLECTOR
+#define USES_PHASING_DEVICE	HAS_PHASING_DEVICE
+#define USES_MIRROR		HAS_MIRROR
+#define USES_ARMOR		HAS_ARMOR
+#define USES_SHOT		HAS_SHOT
+#define USES_BALL		HAS_BALL
 
 /*
  * Possible player status bits.
@@ -434,6 +456,84 @@ static inline void Player_set_alliance(player_t *pl, int alliance)
     updateScores = true;
 }
 
+/*
+ * Should be:
+ * if (pl->item[ITEM_AFTERBURNER] > 0) return true; else return false;
+ */
+static inline bool Player_has_afterburner(player_t *pl)
+{
+    if (BIT(pl->have, HAS_AFTERBURNER))
+	return true;
+    return false;
+}
+
+/*
+ * Should be:
+ * if (pl->item[ITEM_ARMOR] > 0) return true; else return false;
+ */
+static inline bool Player_has_armor(player_t *pl)
+{
+    if (BIT(pl->have, HAS_ARMOR))
+	return true;
+    return false;
+}
+
+/*
+ * Should be:
+ * if (pl->item[ITEM_AUTOPILOT] > 0) return true; else return false;
+ */
+static inline bool Player_has_autopilot(player_t *pl)
+{
+    if (BIT(pl->have, HAS_AUTOPILOT))
+	return true;
+    return false;
+}
+
+/*
+ * Should be:
+ * if (pl->item[ITEM_CLOAK] > 0) return true; else return false;
+ */
+static inline bool Player_has_cloaking_device(player_t *pl)
+{
+    if (BIT(pl->have, HAS_CLOAKING_DEVICE))
+	return true;
+    return false;
+}
+
+/*
+ * Should be:
+ * if (pl->item[ITEM_DEFLECTOR] > 0) return true; else return false;
+ */
+static inline bool Player_has_deflector(player_t *pl)
+{
+    if (BIT(pl->have, HAS_DEFLECTOR))
+	return true;
+    return false;
+}
+
+/*
+ * Should be:
+ * if (pl->item[ITEM_MIRROR] > 0) return true; else return false;
+ */
+static inline bool Player_has_mirror(player_t *pl)
+{
+    if (BIT(pl->have, HAS_MIRROR))
+	return true;
+    return false;
+}
+
+
+/*
+ * Should be:
+ * if (pl->item[ITEM_TRACTOR_BEAM] > 0) return true; else return false;
+ */
+static inline bool Player_has_tractor_beam(player_t *pl)
+{
+    if (BIT(pl->have, HAS_TRACTOR_BEAM))
+	return true;
+    return false;
+}
+
 static inline bool Player_is_thrusting(player_t *pl)
 {
     if (BIT(pl->obj_status, THRUSTING))
@@ -497,11 +597,10 @@ static inline bool Player_owns_tank(player_t *pl, player_t *tank)
 
 /*
  * Used where we wish to know if a player is simply on the same team.
- * Replacement for TEAM
  */
 static inline bool Players_are_teammates(player_t *pl1, player_t *pl2)
 {
-    world_t *world = &World;
+    world_t *world = pl1->world;
 
     if (BIT(world->rules->mode, TEAM_PLAY)
 	&& pl1->team != TEAM_NOT_SET
@@ -512,7 +611,6 @@ static inline bool Players_are_teammates(player_t *pl1, player_t *pl2)
 
 /*
  * Used where we wish to know if two players are members of the same alliance.
- * Replacement for ALLIANCE
  */
 static inline bool Players_are_allies(player_t *pl1, player_t *pl2)
 {
@@ -560,10 +658,16 @@ static inline bool Player_uses_emergency_shield(player_t *pl)
 
 static inline bool Player_has_emergency_thrust(player_t *pl)
 {
+#if 0
     if (pl->item[ITEM_EMERGENCY_THRUST] > 0
 	|| pl->emergency_thrust_left > 0.0)
 	return true;
     return false;
+#else
+    if (BIT(pl->have, HAS_EMERGENCY_THRUST))
+	return true;
+    return false;
+#endif
 }
 
 static inline bool Player_uses_emergency_thrust(player_t *pl)
@@ -575,9 +679,15 @@ static inline bool Player_uses_emergency_thrust(player_t *pl)
 
 static inline bool Player_has_phasing_device(player_t *pl)
 {
+#if 0
     if (pl->item[ITEM_PHASING] > 0
 	|| pl->phasing_left > 0.0)
 	return true;
+#else
+    if (BIT(pl->have, HAS_PHASING_DEVICE))
+	return true;
+    return false;
+#endif
     return false;
 }
 

@@ -67,7 +67,7 @@ void Pick_startpos(player_t *pl)
     world_t *world = pl->world;
 
     if (Player_is_tank(pl)) {
-	pl->home_base = NULL;
+	pl->home_base = Base_by_index(world, 0);
 	return;
     }
 
@@ -198,7 +198,7 @@ void Go_home(player_t *pl)
     memset(pl->prev_keyv, 0, sizeof(pl->prev_keyv));
     Emergency_shield(pl, false);
     Player_used_kill(pl);
-    Player_init_items(pl);
+    /*Player_init_items(pl);*/
 
     if (options.playerStartsShielded) {
 	SET_BIT(pl->used, HAS_SHIELD);
@@ -206,7 +206,7 @@ void Go_home(player_t *pl)
 	    pl->shield_time = SHIELD_TIME;
 	    SET_BIT(pl->have, HAS_SHIELD);
 	}
-	if (pl->item[ITEM_DEFLECTOR] > 0)
+	if (Player_has_deflector(pl))
 	    Deflector(pl, true);
     }
     Thrust(pl, false);
@@ -367,8 +367,8 @@ void Player_remove_tank(player_t *pl, int which_tank)
 
 void Player_hit_armor(player_t *pl)
 {
-    assert(pl->item[ITEM_ARMOR] > 0);
-    --pl->item[ITEM_ARMOR];
+    if (--pl->item[ITEM_ARMOR] <= 0)
+	CLR_BIT(pl->have, HAS_ARMOR);
 }
 
 /*
@@ -414,10 +414,11 @@ void Player_set_mass(player_t *pl)
  * Give player the initial number of tanks and amount of fuel.
  * Upto the maximum allowed.
  */
-static void Player_init_fuel(player_t *pl, int num_tanks, double total_fuel)
+static void Player_init_fuel(player_t *pl, double total_fuel)
 {
     double fuel = total_fuel;
     int i;
+    world_t *world = pl->world;
 
     pl->fuel.num_tanks  = 0;
     pl->fuel.current    = 0;
@@ -429,12 +430,13 @@ static void Player_init_fuel(player_t *pl, int num_tanks, double total_fuel)
 
     fuel -= pl->fuel.sum;
 
-    for (i = 1; i <= num_tanks; i++) {
+    for (i = 1; i <= world->items[ITEM_TANK].initial; i++) {
 	Player_add_tank(pl, fuel);
 	fuel -= pl->fuel.tank[i];
     }
 }
 
+#if 0
 /*
  * Set initial items for a player.
  * Number of initial items can depend on which base the player starts from.
@@ -468,6 +470,7 @@ void Player_init_items(player_t *pl)
 
     Player_init_fuel(pl, num_tanks, total_fuel);
 }
+#endif
 
 int Init_player(world_t *world, int ind, shipshape_t *ship, int type)
 {
@@ -492,6 +495,14 @@ int Init_player(world_t *world, int ind, shipshape_t *ship, int type)
     pl->mass = options.shipMass;
     pl->emptymass = options.shipMass;
 
+    for (i = 0; i < NUM_ITEMS; i++) {
+	if (!BIT(1U << i, ITEM_BIT_FUEL | ITEM_BIT_TANK))
+	    pl->item[i] = world->items[i].initial;
+    }
+
+    pl->fuel.sum = world->items[ITEM_FUEL].initial;
+    Player_init_fuel(pl, pl->fuel.sum);
+
     if (options.allowShipShapes && ship)
 	pl->ship = ship;
     else {
@@ -515,7 +526,7 @@ int Init_player(world_t *world, int ind, shipshape_t *ship, int type)
     else if (type == PL_TYPE_TANK)
 	pl->pl_type_mychar = 'T';
 
-    Player_init_items(pl);
+    /*Player_init_items(pl);*/
     Compute_sensor_range(pl);
 
     pl->obj_status = GRAVITY;
@@ -524,6 +535,9 @@ int Init_player(world_t *world, int ind, shipshape_t *ship, int type)
     Player_set_state(pl, PL_STATE_ALIVE);
     pl->have = DEF_HAVE;
     pl->used = DEF_USED;
+
+    if (pl->item[ITEM_CLOAK] > 0)
+	SET_BIT(pl->have, HAS_CLOAKING_DEVICE);
 
     Mods_clear(&pl->mods);
     for (i = 0; i < NUM_MODBANKS; i++)
@@ -575,7 +589,8 @@ int Init_player(world_t *world, int ind, shipshape_t *ship, int type)
 
     pl->id		= peek_ID();
     GetIndArray[pl->id]	= ind;
-    assert(Is_player_id(pl->id));
+    if (!Is_player_id(pl->id))
+	warn("Init_player: Not a player id: %d", pl->id);
 
     for (i = 0; i < MAX_RECORDED_SHOVES; i++)
 	pl->shove_record[i].pusher_id = NO_ID;
@@ -1573,6 +1588,7 @@ void Kill_player(player_t *pl, bool add_rank_death)
 
 void Player_death_reset(player_t *pl, bool add_rank_death)
 {
+    int i;
     world_t *world = pl->world;
 
     if (Player_is_tank(pl)) {
@@ -1615,6 +1631,11 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
 	Player_set_state(pl, PL_STATE_APPEARING);
     }
 
+    for (i = 0; i < NUM_ITEMS; i++) {
+	if (!BIT(1U << i, ITEM_BIT_FUEL | ITEM_BIT_TANK))
+	    pl->item[i] = world->items[i].initial;
+    }
+
     pl->forceVisible	= 0;
     assert(pl->recovery_count == RECOVERY_DELAY);
     pl->ecmcount	= 0;
@@ -1626,8 +1647,7 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
     pl->stunned		= 0;
     pl->lock.distance	= 0;
 
-    assert(pl->home_base != NULL);
-    Player_init_items(pl);
+    Player_init_fuel(pl, (double)world->items[ITEM_FUEL].initial);
 
     if (add_rank_death) {
 	Rank_add_death(pl);
@@ -1637,7 +1657,7 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
     pl->have	= DEF_HAVE;
     pl->used	|= DEF_USED;
     pl->used	&= ~(USED_KILL);
-    /*pl->used	&= pl->have;*/
+    pl->used	&= pl->have;
 }
 
 /* determines if two players are immune to eachother */

@@ -1033,7 +1033,7 @@ static bool Check_robot_target(player_t *pl, clpos_t item_pos, int new_mode)
 		 && pl->fuel.sum + ED_LASER > my_data->fuel_l3
 		 && new_mode == RM_ATTACK)
 	    Robotdef_fire_laser(pl);
-	else if (pl->item[ITEM_TRACTOR_BEAM] > 0)
+	else if (Player_has_tractor_beam(pl))
 	    Robotdef_do_tractor_beam(pl);
 
 	if (BIT(pl->used, HAS_LASER)) {
@@ -1200,10 +1200,10 @@ static bool Detect_ship(player_t *pl, player_t *ship)
 
     if (BIT(ship->used, HAS_SHOT)
 	|| BIT(ship->used, HAS_LASER)
-	|| Player_is_refueling(pl)
-	|| Player_is_repairing(pl)
-	|| Player_uses_connector(pl)
-	|| Player_uses_tractor_beam(pl))
+	|| Player_is_refueling(ship)
+	|| Player_is_repairing(ship)
+	|| Player_uses_connector(ship)
+	|| Player_uses_tractor_beam(ship))
 	return true;
 
     if (BIT(ship->have, HAS_BALL))
@@ -1834,7 +1834,7 @@ static void Robot_default_play(player_t *pl)
 
     my_data->robot_count--;
 
-    CLR_BIT(pl->used, HAS_SHOT | HAS_SHIELD | USES_CLOAKING_DEVICE | HAS_LASER);
+    CLR_BIT(pl->used, USES_SHOT|USES_SHIELD|USES_CLOAKING_DEVICE|USES_LASER);
     if (BIT(pl->have, HAS_EMERGENCY_SHIELD)
 	&& !BIT(pl->used, HAS_EMERGENCY_SHIELD))
 	Emergency_shield(pl, true);
@@ -1849,7 +1849,7 @@ static void Robot_default_play(player_t *pl)
     item_dist = Visibility_distance;
     item_imp = ROBOT_IGNORE_ITEM;
 
-    if (pl->item[ITEM_CLOAK] > 0
+    if (Player_has_cloaking_device(pl)
 	&& pl->fuel.sum > my_data->fuel_l2)
 	SET_BIT(pl->used, USES_CLOAKING_DEVICE);
 
@@ -1857,7 +1857,7 @@ static void Robot_default_play(player_t *pl)
 	&& !Player_uses_emergency_thrust(pl))
 	Emergency_thrust(pl, true);
 
-    if (pl->item[ITEM_DEFLECTOR] > 0
+    if (Player_has_deflector(pl)
 	&& !BIT(world->rules->mode, TIMING))
 	Deflector(pl, true);
 

@@ -237,7 +237,8 @@ static void PlayerCollision(world_t *world)
 		 * The choosing of the first line may not be easy however.
 		 */
 
-		if (Team_immune(world, pl->id, pl_j->id) || PSEUDO_TEAM(pl, pl_j))
+		if (Team_immune(world, pl->id, pl_j->id)
+		    || PSEUDO_TEAM(pl, pl_j))
 		    continue;
 
 		sound_play_sensors(pl->pos, PLAYER_HIT_PLAYER_SOUND);
@@ -252,7 +253,7 @@ static void PlayerCollision(world_t *world)
 		    }
 		    pl->forceVisible = 20;
 		    pl_j->forceVisible = 20;
-		    Obj_repel((object_t *)pl, (object_t *)pl_j,
+		    Obj_repel(OBJ_PTR(pl), OBJ_PTR(pl_j),
 			      PIXEL_TO_CLICK(2*SHIP_SZ));
 		}
 		if (!BIT(world->rules->mode, CRASH_WITH_PLAYER))
@@ -260,20 +261,20 @@ static void PlayerCollision(world_t *world)
 
 		if (pl->fuel.sum <= 0.0
 		    || (!BIT(pl->used, HAS_SHIELD)
-			&& pl->item[ITEM_ARMOR] <= 0))
+			&& !Player_has_armor(pl)))
 		    Player_set_state(pl, PL_STATE_KILLED);
 
 		if (pl_j->fuel.sum <= 0.0
 		    || (!BIT(pl_j->used, HAS_SHIELD)
-			&& pl_j->item[ITEM_ARMOR] <= 0))
+			&& !Player_has_armor(pl_j)))
 		    Player_set_state(pl_j, PL_STATE_KILLED);
 
 		if (!BIT(pl->used, HAS_SHIELD)
-		    && pl->item[ITEM_ARMOR] > 0)
+		    && Player_has_armor(pl))
 		    Player_hit_armor(pl);
 
 		if (!BIT(pl_j->used, HAS_SHIELD)
-		    && pl_j->item[ITEM_ARMOR] > 0)
+		    && Player_has_armor(pl_j))
 		    Player_hit_armor(pl_j);
 
 		if (Player_is_killed(pl_j)) {
@@ -381,7 +382,7 @@ static void PlayerCollision(world_t *world)
 	}
 
 	/* Player picking up ball/treasure */
-	if (!Player_uses_connector(pl)
+	if (!BIT(pl->used, HAS_CONNECTOR)
 	    || Player_is_phasing(pl))
 	    pl->ball = NULL;
 	else if (pl->ball != NULL) {
@@ -580,7 +581,7 @@ static void PlayerObjectCollision(player_t *pl)
 	if (obj->type == OBJ_ITEM) {
 	    if (BIT(pl->used, HAS_SHIELD) && !options.shieldedItemPickup) {
 		SET_BIT(obj->obj_status, GRAVITY);
-		Delta_mv((object_t *)pl, obj);
+		Delta_mv(OBJ_PTR(pl), obj);
 		continue;
 	    }
 	}
@@ -663,7 +664,7 @@ static void PlayerObjectCollision(player_t *pl)
 	case OBJ_ASTEROID:
 	    if (hit) {
 		Player_collides_with_asteroid(pl, WIRE_PTR(obj));
-		Delta_mv_elastic((object_t *)pl, (object_t *)obj);
+		Delta_mv_elastic(OBJ_PTR(pl), obj);
 	    }
 	    if (Player_is_killed(pl))
 		return;
@@ -699,7 +700,7 @@ static void PlayerObjectCollision(player_t *pl)
 	}
 
 	if (hit)
-	    Delta_mv((object_t *)pl, (object_t *)obj);
+	    Delta_mv(OBJ_PTR(pl), obj);
     }
 }
 
@@ -720,10 +721,11 @@ static void Player_collides_with_ball(player_t *pl, ballobject_t *ball)
 	    ball->life = 0;
     }
     if (pl->fuel.sum > 0) {
-	if (!options.treasureCollisionMayKill || BIT(pl->used, HAS_SHIELD))
+	if (!options.treasureCollisionMayKill
+	    || BIT(pl->used, HAS_SHIELD))
 	    return;
-	if (!BIT(pl->used, HAS_SHIELD) &&
-	    pl->item[ITEM_ARMOR] > 0) {
+	if (!BIT(pl->used, HAS_SHIELD)
+	    && Player_has_armor(pl)) {
 	    Player_hit_armor(pl);
 	    return;
 	}
@@ -803,6 +805,8 @@ static void Player_collides_with_item(player_t *pl, itemobject_t *item)
     case ITEM_ARMOR:
 	pl->item[item_index]++;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
+	if (pl->item[item_index] > 0)
+	    SET_BIT(pl->have, HAS_ARMOR);
 	sound_play_sensors(pl->pos, ARMOR_PICKUP_SOUND);
 	break;
     case ITEM_TRANSPORTER:
@@ -813,11 +817,15 @@ static void Player_collides_with_item(player_t *pl, itemobject_t *item)
     case ITEM_MIRROR:
 	pl->item[ITEM_MIRROR] += item->item_count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
+	if (pl->item[item_index] > 0)
+	    SET_BIT(pl->have, HAS_MIRROR);
 	sound_play_sensors(pl->pos, MIRROR_PICKUP_SOUND);
 	break;
     case ITEM_DEFLECTOR:
 	pl->item[ITEM_DEFLECTOR] += item->item_count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
+	if (pl->item[item_index] > 0)
+	    SET_BIT(pl->have, HAS_DEFLECTOR);
 	sound_play_sensors(pl->pos, DEFLECTOR_PICKUP_SOUND);
 	break;
     case ITEM_HYPERJUMP:
@@ -828,6 +836,8 @@ static void Player_collides_with_item(player_t *pl, itemobject_t *item)
     case ITEM_PHASING:
 	pl->item[item_index] += item->item_count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
+	if (pl->item[item_index] > 0)
+	    SET_BIT(pl->have, HAS_PHASING_DEVICE);
 	sound_play_sensors(pl->pos, PHASING_DEVICE_PICKUP_SOUND);
 	break;
     case ITEM_SENSOR:
@@ -839,6 +849,8 @@ static void Player_collides_with_item(player_t *pl, itemobject_t *item)
     case ITEM_AFTERBURNER:
 	pl->item[item_index] += item->item_count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
+	if (pl->item[item_index] > 0)
+	    SET_BIT(pl->have, HAS_AFTERBURNER);
 	sound_play_sensors(pl->pos, AFTERBURNER_PICKUP_SOUND);
 	break;
     case ITEM_REARSHOT:
@@ -854,6 +866,8 @@ static void Player_collides_with_item(player_t *pl, itemobject_t *item)
     case ITEM_CLOAK:
 	pl->item[item_index] += item->item_count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
+	if (pl->item[item_index] > 0)
+	    SET_BIT(pl->have, HAS_CLOAKING_DEVICE);
 	pl->updateVisibility = true;
 	sound_play_sensors(pl->pos, CLOAKING_DEVICE_PICKUP_SOUND);
 	break;
@@ -874,6 +888,8 @@ static void Player_collides_with_item(player_t *pl, itemobject_t *item)
     case ITEM_EMERGENCY_THRUST:
 	pl->item[item_index] += item->item_count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
+	if (pl->item[item_index] > 0)
+	    SET_BIT(pl->have, HAS_EMERGENCY_THRUST);
 	sound_play_sensors(pl->pos, EMERGENCY_THRUST_PICKUP_SOUND);
 	break;
     case ITEM_EMERGENCY_SHIELD:
@@ -896,11 +912,15 @@ static void Player_collides_with_item(player_t *pl, itemobject_t *item)
     case ITEM_TRACTOR_BEAM:
 	pl->item[item_index] += item->item_count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
+	if (pl->item[item_index] > 0)
+	    SET_BIT(pl->have, HAS_TRACTOR_BEAM);
 	sound_play_sensors(pl->pos, TRACTOR_BEAM_PICKUP_SOUND);
 	break;
     case ITEM_AUTOPILOT:
 	pl->item[item_index] += item->item_count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
+	if (pl->item[item_index] > 0)
+	    SET_BIT(pl->have, HAS_AUTOPILOT);
 	sound_play_sensors(pl->pos, AUTOPILOT_PICKUP_SOUND);
 	break;
 
@@ -997,7 +1017,7 @@ static void Player_collides_with_debris(player_t *pl, object_t *obj)
 	|| (obj->type == OBJ_WRECKAGE
 	    && options.wreckageCollisionMayKill
 	    && !BIT(pl->used, HAS_SHIELD)
-	    && pl->item[ITEM_ARMOR] <= 0)) {
+	    && !Player_has_armor(pl))) {
 	Player_set_state(pl, PL_STATE_KILLED);
 	sprintf(msg, "%s succumbed to an explosion.", pl->name);
 	if (obj->id != NO_ID) {
@@ -1022,7 +1042,7 @@ static void Player_collides_with_debris(player_t *pl, object_t *obj)
     if (obj->type == OBJ_WRECKAGE
 	&& options.wreckageCollisionMayKill
 	&& !BIT(pl->used, HAS_SHIELD)
-	&& pl->item[ITEM_ARMOR] > 0)
+	&& Player_has_armor(pl))
 	Player_hit_armor(pl);
 }
 
@@ -1047,7 +1067,7 @@ static void Player_collides_with_asteroid(player_t *pl, wireobject_t *ast)
     if (options.asteroidCollisionMayKill
 	&& (pl->fuel.sum == 0.0
 	    || (!BIT(pl->used, HAS_SHIELD)
-		&& pl->item[ITEM_ARMOR] <= 0))) {
+		&& !Player_has_armor(pl)))) {
 	Player_set_state(pl, PL_STATE_KILLED);
 	if (pl->velocity > v)
 	    /* player moves faster than asteroid */
@@ -1067,10 +1087,9 @@ static void Player_collides_with_asteroid(player_t *pl, wireobject_t *ast)
     }
     if (options.asteroidCollisionMayKill
 	&& !BIT(pl->used, HAS_SHIELD)
-	&& pl->item[ITEM_ARMOR] > 0)
+	&& Player_has_armor(pl))
 	Player_hit_armor(pl);
 }
-
 
 static inline double Missile_hit_drain(missileobject_t *missile)
 {
@@ -1098,7 +1117,7 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
      */
 
     if (BIT(pl->used, HAS_SHIELD)
-	|| pl->item[ITEM_ARMOR] > 0
+	|| Player_has_armor(pl)
 	|| (obj->type == OBJ_TORPEDO
 	    && Mods_get(obj->mods, ModsNuclear)
 	    && (rfrac() >= 0.25))) {
@@ -1164,7 +1183,7 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 	if (pl->fuel.sum <= 0)
 	    CLR_BIT(pl->used, HAS_SHIELD);
 	if (!BIT(pl->used, HAS_SHIELD)
-	    && pl->item[ITEM_ARMOR] > 0)
+	    && Player_has_armor(pl))
 	    Player_hit_armor(pl);
 
     } else {

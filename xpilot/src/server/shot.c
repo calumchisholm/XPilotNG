@@ -1559,7 +1559,7 @@ void Update_missile(world_t *world, missileobject_t *missile)
 		     */
 		    l *= MAX_AFTERBURNER + 1 - pl_i->item[ITEM_AFTERBURNER];
 		    l /= MAX_AFTERBURNER + 1;
-		    if (pl_i->item[ITEM_AFTERBURNER] > 0)
+		    if (Player_has_afterburner(pl_i))
 			l *= 16 - pl_i->item[ITEM_AFTERBURNER];
 		    if (l < range) {
 			heat->heat_lock_id = pl_i->id;

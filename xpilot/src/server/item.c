@@ -35,8 +35,25 @@ char item_version[] = VERSION;
 
 static void Item_update_flags(player_t *pl)
 {
-    if (pl->item[ITEM_CLOAK] <= 0)
+    if (pl->item[ITEM_CLOAK] <= 0
+	&& BIT(pl->have, HAS_CLOAKING_DEVICE)) {
+	CLR_BIT(pl->have, HAS_CLOAKING_DEVICE);
 	pl->updateVisibility = true;
+    }
+    if (pl->item[ITEM_MIRROR] <= 0)
+	CLR_BIT(pl->have, HAS_MIRROR);
+    if (pl->item[ITEM_DEFLECTOR] <= 0)
+	CLR_BIT(pl->have, HAS_DEFLECTOR);
+    if (pl->item[ITEM_AFTERBURNER] <= 0)
+	CLR_BIT(pl->have, HAS_AFTERBURNER);
+    if (pl->item[ITEM_PHASING] <= 0
+	&& !Player_is_phasing(pl)
+	&& pl->phasing_left <= 0)
+	CLR_BIT(pl->have, HAS_PHASING_DEVICE);
+    if (pl->item[ITEM_EMERGENCY_THRUST] <= 0
+	&& !BIT(pl->used, HAS_EMERGENCY_THRUST)
+	&& pl->emergency_thrust_left <= 0)
+	CLR_BIT(pl->have, HAS_EMERGENCY_THRUST);
     if (pl->item[ITEM_EMERGENCY_SHIELD] <= 0
 	&& !BIT(pl->used, HAS_EMERGENCY_SHIELD)
 	&& pl->emergency_shield_left <= 0) {
@@ -48,9 +65,15 @@ static void Item_update_flags(player_t *pl)
 	    }
 	}
     }
-    if (pl->item[ITEM_AUTOPILOT] <= 0
-	&& Player_uses_autopilot(pl))
-	Autopilot(pl, false);
+    if (pl->item[ITEM_TRACTOR_BEAM] <= 0)
+	CLR_BIT(pl->have, HAS_TRACTOR_BEAM);
+    if (pl->item[ITEM_AUTOPILOT] <= 0) {
+	if (Player_uses_autopilot(pl))
+	    Autopilot(pl, false);
+	CLR_BIT(pl->have, HAS_AUTOPILOT);
+    }
+    if (pl->item[ITEM_ARMOR] <= 0)
+	CLR_BIT(pl->have, HAS_ARMOR);
 }
 
 /*
@@ -647,6 +670,8 @@ void Do_general_transporter(world_t *world, int id, clpos_t pos,
     switch (item) {
     case ITEM_AFTERBURNER:
 	what = "an afterburner";
+	if (victim->item[item] <= 0)
+	    CLR_BIT(victim->have, HAS_AFTERBURNER);
 	break;
     case ITEM_MISSILE:
 	amount = (double)MIN(victim->item[item], 3);
@@ -656,62 +681,72 @@ void Do_general_transporter(world_t *world, int id, clpos_t pos,
 	else
 	    sprintf(msg, "%s stole %d missiles from %s",
 		    (pl ? pl->name : "A cannon"), (int)amount, victim->name);
-        break;
+	break;
     case ITEM_CLOAK:
 	what = "a cloaking device";
 	victim->updateVisibility = true;
 	if (victim->item[item] <= 0)
 	    Cloak(victim, false);
-        break;
+	break;
     case ITEM_WIDEANGLE:
 	what = "a wideangle";
-        break;
+	break;
     case ITEM_REARSHOT:
 	what = "a rearshot";
-        break;
+	break;
     case ITEM_MINE:
 	what = "a mine";
-        break;
+	break;
     case ITEM_SENSOR:
 	what = "a sensor";
 	victim->updateVisibility = true;
-        break;
+	break;
     case ITEM_ECM:
 	what = "an ECM";
-        break;
+	break;
     case ITEM_ARMOR:
 	what = "an armor";
+	if (victim->item[item] <= 0)
+	    CLR_BIT(victim->have, HAS_ARMOR);
 	break;
     case ITEM_TRANSPORTER:
 	what = "a transporter";
-        break;
+	break;
     case ITEM_MIRROR:
 	what = "a mirror";
+	if (victim->item[item] <= 0)
+	    CLR_BIT(victim->have, HAS_MIRROR);
 	break;
     case ITEM_DEFLECTOR:
 	what = "a deflector";
 	if (victim->item[item] <= 0)
 	    Deflector(victim, false);
-        break;
+	break;
     case ITEM_HYPERJUMP:
 	what = "a hyperjump";
-        break;
+	break;
     case ITEM_PHASING:
 	what = "a phasing device";
-	if (!Player_has_phasing_device(victim))
-	    Phasing(victim, false);
-        break;
+	if (victim->item[item] <= 0) {
+	    if (Player_is_phasing(victim))
+		Phasing(victim, false);
+	    CLR_BIT(victim->have, HAS_PHASING_DEVICE);
+	}
+	break;
     case ITEM_LASER:
 	what = "a laser";
-        break;
+	break;
     case ITEM_EMERGENCY_THRUST:
 	what = "an emergency thrust";
-	if (!Player_has_emergency_thrust(victim))
-	    Emergency_thrust(victim, false);
-        break;
+	if (victim->item[item] <= 0) {
+	    if (BIT(victim->used, HAS_EMERGENCY_THRUST))
+		Emergency_thrust(victim, false);
+	    CLR_BIT(victim->have, HAS_EMERGENCY_THRUST);
+	}
+	break;
     case ITEM_EMERGENCY_SHIELD:
 	what = "an emergency shield";
-	if (!victim->item[item]) {
+	if (victim->item[item] <= 0) {
 	    if (BIT(victim->used, HAS_EMERGENCY_SHIELD))
 		Emergency_shield(victim, false);
 	    CLR_BIT(victim->have, HAS_EMERGENCY_SHIELD);
@@ -720,24 +755,27 @@ void Do_general_transporter(world_t *world, int id, clpos_t pos,
 		CLR_BIT(victim->used, HAS_SHIELD);
 	    }
 	}
-        break;
+	break;
     case ITEM_TRACTOR_BEAM:
 	what = "a tractor beam";
-        break;
+	if (victim->item[item] <= 0)
+	    CLR_BIT(victim->have, HAS_TRACTOR_BEAM);
+	break;
     case ITEM_AUTOPILOT:
 	what = "an autopilot";
 	if (victim->item[item] <= 0) {
 	    if (Player_uses_autopilot(victim))
 		Autopilot(victim, false);
+	    CLR_BIT(victim->have, HAS_AUTOPILOT);
 	}
-        break;
+	break;
     case ITEM_TANK:
 	/* for tanks, amount is the amount of fuel in the stolen tank */
 	what = "a tank";
 	i = (int)(rfrac() * victim->fuel.num_tanks) + 1;
 	amount = victim->fuel.tank[i];
 	Player_remove_tank(victim, i);
-        break;
+	break;
     case ITEM_FUEL:
 	{
 	    /* choose percantage between 10 and 50. */
@@ -748,7 +786,7 @@ void Do_general_transporter(world_t *world, int id, clpos_t pos,
 		    amount, percent, victim->name);
 	}
 	Player_add_fuel(victim, -amount);
-        break;
+	break;
     default:
 	warn("Do_general_transporter: unknown item type.");
 	break;
@@ -777,30 +815,39 @@ void Do_general_transporter(world_t *world, int id, clpos_t pos,
 	pl->item[item] += (int)amount;
     switch(item) {
     case ITEM_AFTERBURNER:
+	SET_BIT(pl->have, HAS_AFTERBURNER);
 	LIMIT(pl->item[item], 0, MAX_AFTERBURNER);
 	break;
     case ITEM_CLOAK:
+	SET_BIT(pl->have, HAS_CLOAKING_DEVICE);
 	pl->updateVisibility = true;
 	break;
     case ITEM_SENSOR:
 	pl->updateVisibility = true;
 	break;
     case ITEM_MIRROR:
+	SET_BIT(pl->have, HAS_MIRROR);
 	break;
     case ITEM_ARMOR:
+	SET_BIT(pl->have, HAS_ARMOR);
 	break;
     case ITEM_DEFLECTOR:
+	SET_BIT(pl->have, HAS_DEFLECTOR);
 	break;
     case ITEM_PHASING:
+	SET_BIT(pl->have, HAS_PHASING_DEVICE);
 	break;
     case ITEM_EMERGENCY_THRUST:
+	SET_BIT(pl->have, HAS_EMERGENCY_THRUST);
 	break;
     case ITEM_EMERGENCY_SHIELD:
 	SET_BIT(pl->have, HAS_EMERGENCY_SHIELD);
 	break;
     case ITEM_TRACTOR_BEAM:
+	SET_BIT(pl->have, HAS_TRACTOR_BEAM);
 	break;
     case ITEM_AUTOPILOT:
+	SET_BIT(pl->have, HAS_AUTOPILOT);
 	break;
     case ITEM_TANK:
 	/* for tanks, amount is the amount of fuel in the stolen tank */

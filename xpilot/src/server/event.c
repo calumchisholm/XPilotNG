@@ -254,6 +254,9 @@ static void Player_refuel(player_t *pl)
     double l, dist = 1e19;
     world_t *world = pl->world;
 
+    if (!BIT(pl->have, HAS_REFUEL))
+	return;
+
     CLR_BIT(pl->used, USES_REFUEL);
     for (i = 0; i < world->NumFuels; i++) {
 	fuel_t *fs = Fuel_by_index(world, i);
@@ -275,6 +278,9 @@ static void Player_repair(player_t *pl)
     int i;
     double l, dist = 1e19;
     world_t *world = pl->world;
+
+    if (!BIT(pl->have, HAS_REPAIR))
+	return;
 
     CLR_BIT(pl->used, USES_REPAIR);
     for (i = 0; i < world->NumTargets; i++) {
@@ -316,6 +322,8 @@ static void Player_toggle_compass(player_t *pl)
 {
     int i, k, ind = GetInd(pl->id);
 
+    if (!BIT(pl->have, HAS_COMPASS))
+	return;
     TOGGLE_BIT(pl->used, USES_COMPASS);
 
     if (!Player_uses_compass(pl))
@@ -395,8 +403,15 @@ void Pause_player(player_t *pl, bool on)
 	 * kps - possibly add option to make items reset
 	 * to initial when pausing
 	 */
-	if (options.pauseResetsItems)
-	    Player_init_items(pl);
+	if (options.pauseResetsItems) {
+	    world_t *world = pl->world;
+	    int i;
+
+	    for (i = 0; i < NUM_ITEMS; i++) {
+		if (!BIT(1U << i, ITEM_BIT_FUEL | ITEM_BIT_TANK))
+		    pl->item[i] = world->items[i].initial;
+	    }
+	}
 #endif
 
 	pl->forceVisible	= 0;
@@ -780,7 +795,7 @@ int Handle_keyboard(player_t *pl)
 	    }
 
 	    case KEY_TOGGLE_AUTOPILOT:
-		if (pl->item[ITEM_AUTOPILOT] > 0)
+		if (Player_has_autopilot(pl))
 		    Autopilot(pl, !Player_uses_autopilot(pl));
 		break;
 
@@ -942,18 +957,19 @@ int Handle_keyboard(player_t *pl)
 		break;
 
 	    case KEY_CONNECTOR:
-		SET_BIT(pl->used, USES_CONNECTOR);
+		if (BIT(pl->have, HAS_CONNECTOR))
+		    SET_BIT(pl->used, USES_CONNECTOR);
 		break;
 
 	    case KEY_PRESSOR_BEAM:
-		if (pl->item[ITEM_TRACTOR_BEAM] > 0) {
+		if (Player_has_tractor_beam(pl)) {
 		    pl->tractor_is_pressor = true;
 		    SET_BIT(pl->used, USES_TRACTOR_BEAM);
 		}
 		break;
 
 	    case KEY_TRACTOR_BEAM:
-		if (pl->item[ITEM_TRACTOR_BEAM] > 0) {
+		if (Player_has_tractor_beam(pl)) {
 		    pl->tractor_is_pressor = false;
 		    SET_BIT(pl->used, USES_TRACTOR_BEAM);
 		}

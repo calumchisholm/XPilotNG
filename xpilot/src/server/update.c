@@ -100,36 +100,35 @@ static void Transport_to_home(player_t *pl)
 void Phasing(player_t *pl, bool on)
 {
     if (on) {
-	if (!Player_is_phasing(pl)
-	    && Player_has_phasing_device(pl)) {
-	    if (pl->phasing_left <= 0) {
-		pl->phasing_left = PHASING_TIME;
-		pl->item[ITEM_PHASING]--;
-	    }
-	    SET_BIT(pl->used, USES_PHASING_DEVICE);
-	    CLR_BIT(pl->used, USES_REFUEL);
-	    CLR_BIT(pl->used, USES_REPAIR);
-	    if (Player_uses_connector(pl))
-		pl->ball = NULL;
-	    CLR_BIT(pl->used, USES_TRACTOR_BEAM);
-	    CLR_BIT(pl->obj_status, GRAVITY);
-	    sound_play_sensors(pl->pos, PHASING_ON_SOUND);
+	if (pl->phasing_left <= 0) {
+	    pl->phasing_left = PHASING_TIME;
+	    pl->item[ITEM_PHASING]--;
 	}
+	SET_BIT(pl->used, USES_PHASING_DEVICE);
+	CLR_BIT(pl->used, USES_REFUEL);
+	CLR_BIT(pl->used, USES_REPAIR);
+	if (BIT(pl->used, USES_CONNECTOR))
+	    pl->ball = NULL;
+	CLR_BIT(pl->used, USES_TRACTOR_BEAM);
+	CLR_BIT(pl->obj_status, GRAVITY);
+	sound_play_sensors(pl->pos, PHASING_ON_SOUND);
     } else {
-	if (Player_is_phasing(pl)) {
-	    hitmask_t hitmask = NONBALL_BIT | HITMASK(pl->team); /* kps-? */
-	    int group;
+	hitmask_t hitmask = NONBALL_BIT | HITMASK(pl->team); /* kps - ok ? */
+	int group;
 
-	    CLR_BIT(pl->used, USES_PHASING_DEVICE);
-	    SET_BIT(pl->obj_status, GRAVITY);
-	    sound_play_sensors(pl->pos, PHASING_OFF_SOUND);
-	    /* kps - ok to have this check here ? */
-	    if ((group = shape_is_inside(pl->pos.cx, pl->pos.cy, hitmask,
-					 OBJ_PTR(pl), (shape_t *)pl->ship,
-					 pl->dir)) != NO_GROUP)
-		/* kps - check for crashes against targets etc ??? */
-		Player_crash(pl, CrashWall, NO_IND, 0);
+	CLR_BIT(pl->used, USES_PHASING_DEVICE);
+	if (pl->phasing_left <= 0) {
+	    if (pl->item[ITEM_PHASING] <= 0)
+		CLR_BIT(pl->have, HAS_PHASING_DEVICE);
 	}
+	SET_BIT(pl->obj_status, GRAVITY);
+	sound_play_sensors(pl->pos, PHASING_OFF_SOUND);
+	/* kps - ok to have this check here ? */
+	if ((group = shape_is_inside(pl->pos.cx, pl->pos.cy, hitmask,
+				     OBJ_PTR(pl), (shape_t *)pl->ship,
+				     pl->dir)) != NO_GROUP)
+	    /* kps - check for crashes against targets etc ??? */
+	    Player_crash(pl, CrashWall, NO_IND, 0);
     }
 }
 
@@ -151,6 +150,8 @@ void Cloak(player_t *pl, bool on)
 	    pl->updateVisibility = true;
 	    CLR_BIT(pl->used, USES_CLOAKING_DEVICE);
 	}
+	if (!pl->item[ITEM_CLOAK])
+	    CLR_BIT(pl->have, HAS_CLOAKING_DEVICE);
     }
 }
 
@@ -170,6 +171,8 @@ void Deflector(player_t *pl, bool on)
 	    CLR_BIT(pl->used, USES_DEFLECTOR);
 	    sound_play_player(pl, DEFLECTOR_SOUND);
 	}
+	if (!pl->item[ITEM_DEFLECTOR])
+	    CLR_BIT(pl->have, HAS_DEFLECTOR);
     }
 }
 
@@ -192,6 +195,10 @@ void Emergency_thrust(player_t *pl, bool on)
 	    CLR_BIT(pl->used, USES_EMERGENCY_THRUST);
 	    sound_play_sensors(pl->pos, EMERGENCY_THRUST_OFF_SOUND);
 	}
+	if (pl->emergency_thrust_left <= 0) {
+	    if (pl->item[ITEM_EMERGENCY_THRUST] <= 0)
+		CLR_BIT(pl->have, HAS_EMERGENCY_THRUST);
+	}
     }
 }
 
@@ -207,8 +214,8 @@ void Emergency_shield(player_t *pl, bool on)
 		pl->item[ITEM_EMERGENCY_SHIELD]--;
 	    }
 	    SET_BIT(pl->have, HAS_SHIELD);
-	    if (!BIT(pl->used, HAS_EMERGENCY_SHIELD)) {
-		SET_BIT(pl->used, HAS_EMERGENCY_SHIELD);
+	    if (!BIT(pl->used, USES_EMERGENCY_SHIELD)) {
+		SET_BIT(pl->used, USES_EMERGENCY_SHIELD);
 		sound_play_sensors(pl->pos, EMERGENCY_SHIELD_ON_SOUND);
 	    }
 	}
@@ -219,10 +226,10 @@ void Emergency_shield(player_t *pl, bool on)
 	}
 	if (!BIT(DEF_HAVE, HAS_SHIELD)) {
 	    CLR_BIT(pl->have, HAS_SHIELD);
-	    CLR_BIT(pl->used, HAS_SHIELD);
+	    CLR_BIT(pl->used, USES_SHIELD);
 	}
-	if (BIT(pl->used, HAS_EMERGENCY_SHIELD)) {
-	    CLR_BIT(pl->used, HAS_EMERGENCY_SHIELD);
+	if (BIT(pl->used, USES_EMERGENCY_SHIELD)) {
+	    CLR_BIT(pl->used, USES_EMERGENCY_SHIELD);
 	    sound_play_sensors(pl->pos, EMERGENCY_SHIELD_OFF_SOUND);
 	}
     }
@@ -480,8 +487,6 @@ static void legacy_mode_ball_hack(world_t *world, ballobject_t *ball)
     /*warn("set loose ticks to 0 for ball %p", ball);*/
 }
 
-
-
 static void Misc_object_update(world_t *world)
 {
     int i;
@@ -641,11 +646,11 @@ static void Use_items(player_t *pl)
     if (pl->shield_time > 0) {
 	if ((pl->shield_time -= timeStep) <= 0) {
 	    pl->shield_time = 0;
-	    if (!BIT(pl->used, HAS_EMERGENCY_SHIELD))
-		CLR_BIT(pl->used, HAS_SHIELD);
+	    if (!BIT(pl->used, USES_EMERGENCY_SHIELD))
+		CLR_BIT(pl->used, USES_SHIELD);
 	}
-	if (BIT(pl->used, HAS_SHIELD) == 0) {
-	    if (!BIT(pl->used, HAS_EMERGENCY_SHIELD))
+	if (BIT(pl->used, USES_SHIELD) == 0) {
+	    if (!BIT(pl->used, USES_EMERGENCY_SHIELD))
 		CLR_BIT(pl->have, HAS_SHIELD);
 	    pl->shield_time = 0;
 	}
@@ -671,9 +676,9 @@ static void Use_items(player_t *pl)
 	}
     }
 
-    if (BIT(pl->used, HAS_EMERGENCY_SHIELD)) {
+    if (BIT(pl->used, USES_EMERGENCY_SHIELD)) {
 	if (pl->fuel.sum > 0
-	    && BIT(pl->used, HAS_SHIELD)
+	    && BIT(pl->used, USES_SHIELD)
 	    && ((pl->emergency_shield_left -= timeStep) <= 0)) {
 	    if (pl->item[ITEM_EMERGENCY_SHIELD])
 		Emergency_shield(pl, true);
@@ -689,7 +694,7 @@ static void Use_items(player_t *pl)
      * Compute energy drainage
      */
     if (do_update_this_frame) {
-	if (BIT(pl->used, HAS_SHIELD))
+	if (BIT(pl->used, USES_SHIELD))
 	    Player_add_fuel(pl, ED_SHIELD);
 
 	if (Player_is_phasing(pl))
@@ -847,9 +852,10 @@ static void Update_players(world_t *world)
 	}
 
         if (Player_is_alive(pl)
-	    && !BIT(pl->used, HAS_SHIELD)) {
+	    && !BIT(pl->used, USES_SHIELD)) {
 	    if (options.survivalScore != 0.0) {
-	        Player_add_score(pl, pl->survival_time*options.survivalScore/FPS);
+		Player_add_score(pl, pl->survival_time * 
+				 options.survivalScore/FPS);
 		updateScores = true;
 	    }
 	    pl->survival_time+= timePerFrame;
@@ -940,7 +946,7 @@ static void Update_players(world_t *world)
 	    Do_repair(pl);
 
 	if (pl->fuel.sum <= 0) {
-	    CLR_BIT(pl->used, HAS_SHIELD);
+	    CLR_BIT(pl->used, USES_SHIELD);
 	    CLR_BIT(pl->used, USES_CLOAKING_DEVICE);
 	    CLR_BIT(pl->used, USES_DEFLECTOR);
 	    Thrust(pl, false);
@@ -1116,8 +1122,7 @@ static void Update_players(world_t *world)
 
 	Compute_sensor_range(pl);
 
-	/* idiotic hack */
-	/*pl->used &= pl->have;*/
+	pl->used &= pl->have;
     }
 }
 
@@ -1160,16 +1165,18 @@ void Update_objects(world_t *world)
 	    pl->stunned -= timeStep;
 	    if (pl->stunned <= 0)
 		pl->stunned = 0;
-	    CLR_BIT(pl->used, HAS_SHIELD|HAS_LASER|HAS_SHOT);
+	    CLR_BIT(pl->used, USES_SHIELD);
+	    CLR_BIT(pl->used, USES_LASER);
+	    CLR_BIT(pl->used, USES_SHOT);
 	    pl->did_shoot = false;
 	    Thrust(pl, false);
 	}
-	if (BIT(pl->used, HAS_SHOT) || pl->did_shoot)
+	if (BIT(pl->used, USES_SHOT) || pl->did_shoot)
 	    Fire_normal_shots(pl);
-	if (BIT(pl->used, HAS_LASER)) {
+	if (BIT(pl->used, USES_LASER)) {
 	    if (pl->item[ITEM_LASER] <= 0
 		|| Player_is_phasing(pl))
-		CLR_BIT(pl->used, HAS_LASER);
+		CLR_BIT(pl->used, USES_LASER);
 	    else
 		Fire_laser(pl);
 	}
