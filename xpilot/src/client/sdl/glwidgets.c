@@ -96,8 +96,9 @@ void Close_Widget (GLWidget **widget)
     if ((*widget)->Close) (*widget)->Close(*widget);
 
     if ((*widget)->wid_info) free((*widget)->wid_info);
-    free(*widget);
-    *widget = NULL;
+    GLWidget *tmp = *widget;
+    *widget = (*widget)->next;
+    free(tmp);
 }
 
 /* IMPORTANT: compound widgets need to edit this function */
@@ -232,11 +233,8 @@ void DrawGLWidgetsi( GLWidget *list, int x, int y, int w, int h)
     	w2 = MIN(x+w,curr->bounds.x+curr->bounds.w) - x2;
     	h2 = MIN(y+h,curr->bounds.y+curr->bounds.h) - y2;
 	
-	/*TODO scissor should really be before this call,
-	 *but radar and scorelist paint stuff outside their boundaries =(
-	 */
+	glScissor(x2-1, draw_height - y2 - h2-1, w2+2, h2+2);
 	if (curr->Draw) curr->Draw(curr);
-	glScissor(x2, draw_height - y2 - h2, w2, h2);
 	
 	DrawGLWidgetsi(curr->children,x2, y2, w2, h2);
 	glScissor(x, draw_height - y - h, w, h);
@@ -438,23 +436,28 @@ void Paint_SlideWidget(GLWidget *widget)
     static int normalcolor  = 0xff0000ff;
     static int presscolor   = 0x00ff00ff;
     static int lockcolor  = 0x333333ff;
+    int color;
      
     GLWidget *tmp = widget;
     SDL_Rect *b = &(tmp->bounds);
     SlideWidget *wid_info = (SlideWidget *)(tmp->wid_info);
     
     if (wid_info->locked) {
-    	set_alphacolor( lockcolor );
+    	color = lockcolor;
     } else if (wid_info->sliding) {
-    	set_alphacolor( presscolor );
+    	color = presscolor;
     } else {
-    	set_alphacolor( normalcolor );
+    	color = normalcolor;
     }
 
     glBegin(GL_QUADS);
-    	glVertex2i(b->x     	, b->y);
+    	set_alphacolor(color);
+	glVertex2i(b->x     	, b->y);
+    	set_alphacolor(color);
     	glVertex2i(b->x + b->w	, b->y);
+    	set_alphacolor(color & 0xffffff77);
     	glVertex2i(b->x + b->w	, b->y + b->h);
+    	set_alphacolor(color & 0xffffff77);
     	glVertex2i(b->x     	, b->y + b->h);
     glEnd();
 }
@@ -552,7 +555,7 @@ void SetBounds_ScrollbarWidget(GLWidget *widget, SDL_Rect *b)
 
 void Paint_ScrollbarWidget(GLWidget *widget)
 {
-    /*static int bgcolor  = 0x0000ff88;
+    static int bgcolor  = 0x00000044;
      
     SDL_Rect *b = &(widget->bounds);
     
@@ -563,7 +566,7 @@ void Paint_ScrollbarWidget(GLWidget *widget)
     	glVertex2i(b->x + b->w	, b->y);
     	glVertex2i(b->x + b->w	, b->y + b->h);
     	glVertex2i(b->x     	, b->y + b->h);
-    glEnd();*/
+    glEnd();
 }
 
 void motion_ScrollbarWidget( Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void *data)
@@ -1477,7 +1480,7 @@ void ConfMenu_poschange( GLfloat pos , void *data) {
 
     SDL_Rect bounds;
     
-    GLWidget *curr = widget->children;
+    GLWidget *curr = widget->children->children;
     bounds.y = widget->bounds.y+5 - pos*(wid_info->list_height);
     while (curr) {
     	if (curr != wid_info->scrollbar) {
@@ -1523,11 +1526,14 @@ void Paint_ConfMenuWidget( GLWidget *widget )
     	glVertex2i(widget->bounds.x+widget->bounds.w,widget->bounds.y+widget->bounds.h	);
     	glVertex2i(widget->bounds.x 	    	    ,widget->bounds.y+widget->bounds.h	);
     glEnd();
-    set_alphacolor(edgeColor);
     glBegin(GL_LINE_LOOP);
+    	set_alphacolor(edgeColor);
     	glVertex2i(widget->bounds.x 	    	    ,widget->bounds.y	    	    	);
+    	set_alphacolor(bgColor | 0x000000ff);
     	glVertex2i(widget->bounds.x+widget->bounds.w,widget->bounds.y	    	    	);
+    	set_alphacolor(edgeColor);
     	glVertex2i(widget->bounds.x+widget->bounds.w,widget->bounds.y+widget->bounds.h	);
+    	set_alphacolor(bgColor | 0x000000ff);
     	glVertex2i(widget->bounds.x 	    	    ,widget->bounds.y+widget->bounds.h	);
     glEnd();
 }
@@ -1557,22 +1563,28 @@ GLWidget *Init_ConfMenuWidget( font_data *font, Uint16 x, Uint16 y )
     xp_option_t *opt;
     GLWidget *item;
     
+    /* Lets make an empty widget to hold the kids */
+    tmp->children	= Init_EmptyBaseGLWidget();
+    if ( !(tmp->children) ) {
+        error("Failed to malloc in Init_ConfMenu");
+	return NULL;
+    }
     wid_info->list_height=0;
     for ( i=0 ; i < num_options; ++i ) {
     	opt = Option_by_index(i);
 	item = Init_OptionWidget(font,opt);
 	if (item) {
-	    AppendGLWidgetList( &(tmp->children), item );
+	    AppendGLWidgetList( &(tmp->children->children), item );
 	    if (item->bounds.w > itemwidth) itemwidth = item->bounds.w;
 	    (wid_info->list_height) += item->bounds.h;
 	}
     }
     tmp->bounds.h   	= MIN((wid_info->list_height)+10,512);
-    
-    bounds.x = tmp->bounds.x+5;
-    bounds.y = tmp->bounds.y+5;
+    tmp->children->bounds.h = tmp->bounds.h - 10;
+    tmp->children->bounds.x = bounds.x = tmp->bounds.x+5;
+    tmp->children->bounds.y = bounds.y = tmp->bounds.y+5;
     bounds.w = itemwidth;
-    GLWidget *curr = tmp->children;
+    GLWidget *curr = tmp->children->children;
     while (curr) {
     	bounds.h = curr->bounds.h;
     	SetBounds_GLWidget(curr,&bounds);
@@ -1589,7 +1601,7 @@ GLWidget *Init_ConfMenuWidget( font_data *font, Uint16 x, Uint16 y )
 	    bounds.w = wid_info->scrollbar->bounds.w;
 	    tmp->bounds.w = wid_info->scrollbar->bounds.w + 10 + itemwidth;
 	    SetBounds_GLWidget(wid_info->scrollbar,&bounds);
-	    AppendGLWidgetList( &(tmp->children), wid_info->scrollbar );
+	    AppendGLWidgetList( &(tmp->children->children), wid_info->scrollbar );
 	} else {
 	    error("Failed to make a scrollbar for Init_ConfMenu\n");
 	    Close_Widget(&tmp);
@@ -1597,8 +1609,10 @@ GLWidget *Init_ConfMenuWidget( font_data *font, Uint16 x, Uint16 y )
 	}
     } else {
     	wid_info->scrollbar = NULL;
-    	tmp->bounds.w = itemwidth;
+    	tmp->bounds.w = itemwidth +10;
     }
+
+    tmp->children->bounds.w = tmp->bounds.w - 10;
    
     return tmp;
 }

@@ -18,7 +18,9 @@ struct glwidget_struct {
     int     	    WIDGET;
     void    	    *wid_info;
 
-    SDL_Rect	    bounds;
+    SDL_Rect	    bounds; /* atm this really is 'inner bounds' which
+    	    	    	     * the children aren't allowed to exceed
+			     */
     void    	    (*Draw)( GLWidget *widget );
     
     void    	    (*Close)( GLWidget *widget );

@@ -1186,7 +1186,7 @@ void Paint_client_fps(void)
 
     x = draw_width - 20;
     /* Better make sure it's below the meters */
-    y = draw_height - 9*((20>gamefont.h)?20:gamefont.h);
+    y = draw_height - 9*(MAX(meterHeight,gamefont.h) + 6);
 ;
     HUDprint(&gamefont,hudColorRGBA,RIGHT,DOWN,x,y,"FPS: %d",clientFPS);
 }
@@ -1194,11 +1194,11 @@ void Paint_client_fps(void)
 static void Paint_meter(int xoff, int y, string_tex_t *tex, int val, int max,
 			int meter_color)
 {
-    const int	mw1_4 = meterWidth/4,
-		mw2_4 = meterWidth/2,
-		mw3_4 = 3*meterWidth/4,
-		mw4_4 = meterWidth,
-		BORDER = 5;
+    int	mw1_4 = meterWidth/4,
+    	mw2_4 = meterWidth/2,
+    	mw3_4 = 3*meterWidth/4,
+    	mw4_4 = meterWidth,
+    	BORDER = 5;
     int		x, xstr;
     int x_alignment;
     int color;
@@ -1248,12 +1248,12 @@ static void Paint_meter(int xoff, int y, string_tex_t *tex, int val, int max,
 	color = meter_color;
 
     /*HUDprint(&gamefont,color,x_alignment,UP,xstr,draw_height - y - meterHeight,title);*/
-    disp_text(tex,color,x_alignment,UP,xstr,draw_height - y - meterHeight,true);
+    disp_text(tex,color,x_alignment,CENTER,xstr,draw_height - y - meterHeight/2,true);
 }
 
 void Paint_meters(void)
 {
-    int spacing = (20>gamefont.h)?20:gamefont.h;
+    int spacing = MAX(meterHeight,gamefont.h) + 6;
     int y = spacing, color;
     static bool setup_texs = true;
 

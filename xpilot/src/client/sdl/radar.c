@@ -286,13 +286,13 @@ GLWidget *Init_RadarWidget(int x, int y, int w, int h)
     tmp->WIDGET     	= RADARWIDGET;
     tmp->bounds.x   	= x;
     tmp->bounds.y   	= y;
-    tmp->bounds.w   	= w;
-    tmp->bounds.h   	= h * RadarHeight / RadarWidth;
+    tmp->bounds.w   	= w+1;
+    tmp->bounds.h   	= h * RadarHeight / RadarWidth+1;
 		    
     radar_surface =
 	SDL_CreateRGBSurface(SDL_SWSURFACE | SDL_SRCALPHA,
-                             pow2_ceil(tmp->bounds.w),
-			     pow2_ceil(tmp->bounds.h), 32,
+                             pow2_ceil(tmp->bounds.w-1),
+			     pow2_ceil(tmp->bounds.h-1), 32,
                              RMASK, GMASK, BMASK, AMASK);
     if (!radar_surface) {
         error("Could not create radar surface: %s", SDL_GetError());
@@ -367,8 +367,8 @@ static void Radar_paint( GLWidget *widget )
 
     radar_bounds.x = ((GLWidget *)widget)->bounds.x;
     radar_bounds.y = ((GLWidget *)widget)->bounds.y;
-    radar_bounds.w = ((GLWidget *)widget)->bounds.w;
-    radar_bounds.h = ((GLWidget *)widget)->bounds.h;
+    radar_bounds.w = ((GLWidget *)widget)->bounds.w-1;
+    radar_bounds.h = ((GLWidget *)widget)->bounds.h-1;
 
     xf = (float)radar_bounds.w / (float)Setup->width;
     yf = (float)radar_bounds.h / (float)Setup->height;

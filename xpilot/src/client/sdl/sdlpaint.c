@@ -171,31 +171,29 @@ void Scorelist_paint(GLWidget *widget)
 	     * so I have to repaint it */
 	    scoresChanged = 1;
 	    Paint_score_table();
-	    widget->bounds.w = scoreListWin.w;
-	    widget->bounds.h = scoreListWin.h;
+	    widget->bounds.w = scoreListWin.w+2;
+	    widget->bounds.h = scoreListWin.h+2;
 	}
 	sdl_window_refresh(&scoreListWin);
     }
     glColor4ub(0, 0x20, 0, 0x90);
     glEnable(GL_BLEND);
     glBegin(GL_QUADS);
-    glVertex2i(scoreListWin.x, scoreListWin.y + scoreListWin.h + 2);    
-    glVertex2i(scoreListWin.x, scoreListWin.y);
-    glVertex2i(scoreListWin.x + scoreListWin.w, scoreListWin.y);
-    glVertex2i(scoreListWin.x + scoreListWin.w, 
-               scoreListWin.y + scoreListWin.h + 2);
+    	glVertex2i(scoreListWin.x, scoreListWin.y + scoreListWin.h + 2);    
+    	glVertex2i(scoreListWin.x, scoreListWin.y);
+    	glVertex2i(scoreListWin.x + scoreListWin.w, scoreListWin.y);
+    	glVertex2i(scoreListWin.x + scoreListWin.w,scoreListWin.y + scoreListWin.h + 2);
     glEnd();
     sdl_window_paint(&scoreListWin);
     glBegin(GL_LINE_LOOP);
-    glColor4ub(0, 0, 0, 0xff);
-    glVertex2i(scoreListWin.x, scoreListWin.y + scoreListWin.h + 2);    
-    glColor4ub(0, 0x90, 0x00, 0xff);
-    glVertex2i(scoreListWin.x, scoreListWin.y);
-    glColor4ub(0, 0, 0, 0xff);
-    glVertex2i(scoreListWin.x + scoreListWin.w, scoreListWin.y);
-    glColor4ub(0, 0x90, 0x00, 0xff);
-    glVertex2i(scoreListWin.x + scoreListWin.w, 
-               scoreListWin.y + scoreListWin.h + 2);
+    	glColor4ub(0, 0, 0, 0xff);
+    	glVertex2i(scoreListWin.x, scoreListWin.y + scoreListWin.h + 2);    
+    	glColor4ub(0, 0x90, 0x00, 0xff);
+    	glVertex2i(scoreListWin.x, scoreListWin.y);
+    	glColor4ub(0, 0, 0, 0xff);
+    	glVertex2i(scoreListWin.x + scoreListWin.w, scoreListWin.y);
+    	glColor4ub(0, 0x90, 0x00, 0xff);
+    	glVertex2i(scoreListWin.x + scoreListWin.w, scoreListWin.y + scoreListWin.h + 2);
     glEnd();
 }
 
