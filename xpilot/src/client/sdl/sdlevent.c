@@ -83,54 +83,59 @@ bool Key_press_toggle_radar_score(void)
     return false;
 }
 
-static bool next_dimension(int *w, int *h)
+static bool find_size(int *w, int *h)
 {
-    static int dimensions[5][2] = { 
-	{ 640, 480 },
-	{ 800, 600 },
-	{ 1024, 768 },
-	{ 1280, 1024 },
-	{ 1600, 1200 }
-    };
+    extern int videoFlags;
+    SDL_Rect **modes;
     int i;
 
-    for (i = 0; i < NELEM(dimensions); i++) {
-	if (*w <= dimensions[i][0]) {
-	    *w = dimensions[i][0];
-	    *h = dimensions[i][1];
-	    return true;
+    modes = SDL_ListModes(NULL, videoFlags);
+    if (modes == NULL) return false;
+    if (modes == (SDL_Rect**)-1) return true;
+
+    if (!modes[1]) {
+	*w = modes[0]->w;
+	*h = modes[0]->h;
+    } else {
+	for (i = 1; modes[i]; i++) {
+	    if (*w > modes[i]->w) {
+		*w = modes[i - 1]->w;
+		*h = modes[i - 1]->h;
+		break;
+	    }
 	}
     }
-    return false;
+
+    return true;
 }
 
 bool Key_press_toggle_fullscreen(void)
 {
     extern int videoFlags;
-    int w, h, ow, oh;
-    bool reset;
+    static int initial_w = -1, initial_h = -1;
+    int w, h;
+
+    if (initial_w == -1) {
+	initial_w = draw_width;
+	initial_h = draw_height;
+    }
 
     if (videoFlags & SDL_FULLSCREEN) {
 	videoFlags ^= SDL_FULLSCREEN;
-	Resize_Window(draw_width, draw_height);
+	Resize_Window(initial_w, initial_h);
 	return false;
     }
 
-    ow = draw_width;
-    oh = draw_height;
-    w = ow;
-    h = oh;
-    reset = false;
+    w = initial_w = draw_width;
+    h = initial_h = draw_height;
 
     videoFlags ^= SDL_FULLSCREEN;
-    while(next_dimension(&w, &h)) {
-	if (Resize_Window(w, h) == 0) return false;
-	reset = true;
-    }
+    if (find_size(&w, &h)
+	&& Resize_Window(w, h) == 0)
+	return false;
+    
     videoFlags ^= SDL_FULLSCREEN;
-    if (reset) {
-	Resize_Window(ow, oh);
-    }
+    Resize_Window(initial_w, initial_h);
     Add_message("Failed to change video mode [*Client reply*]");
     return false;
 }
