@@ -552,10 +552,10 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
     glPushMatrix();
     glLoadIdentity();
 
-    /* This makes the walls wobble in synchronization (pretty ok) */
-    glTranslatef((int)((xoff * Setup->width)*scale) - (int)(world.x*scale) + polygon.points[0].x*scale,
-		 (int)((yoff * Setup->height)*scale) - (int)(world.y*scale) + polygon.points[0].y*scale,
-	0);
+    glTranslatef(polygon.points[0].x * scale +
+		 rint((xoff * Setup->width - world.x) * scale),
+		 polygon.points[0].y * scale +
+		 rint((yoff * Setup->height - world.y) * scale), 0);
     glScalef(scale, scale, 0);
 
     if ((instruments.showTexturedWalls || instruments.showFilledWorld) &&
