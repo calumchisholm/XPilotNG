@@ -467,7 +467,6 @@ static void Widget_draw_button(widget_t *widget, bool inverse, const char *label
 static void Widget_draw_input(widget_t *widget, const char *str)
 {
     XClearWindow(dpy, widget->window);
-    IFWINDOWS( Trace("Widget_draw_input: w=%d <%s>\n", widget->window, str) );
     XDrawString(dpy, widget->window, textGC,
 		(widget->width
 		 - XTextWidth(textFont, str, (int)strlen(str))) / 2,
@@ -749,9 +748,6 @@ static void Widget_draw_expose(int widget_desc, XExposeEvent *expose)
 	    break;
 	intw = (widget_int_t *) widget->sub;
 	sprintf(buf, "%d", *intw->val);
-#ifdef _WINDOWS
-	SET_FG(WHITE);
-#endif
 	Widget_draw_input(widget, buf);
 	break;
 
@@ -775,9 +771,6 @@ static void Widget_draw_expose(int widget_desc, XExposeEvent *expose)
 	    sprintf(buf, "%.1f", *doublew->val);
 	else
 	    sprintf(buf, "%d", (int) *doublew->val);
-#ifdef _WINDOWS
-	SET_FG(WHITE);
-#endif
 	Widget_draw_input(widget, buf);
 	break;
 
@@ -1095,15 +1088,6 @@ static void Widget_button(XEvent *event, int widget_desc, bool pressed)
 					      intw->user_data, intw->val) == 1)
 			    Widget_draw(sub_widget_desc);
 		    }
-#ifdef _WINDOWS
-		    {
-			widget_t* widget = Widget_pointer(sub_widget_desc);
-			WinXFlush(widget->window);
-			widget = Widget_pointer(widget_desc);
-			WinXFlush(widget->window);
-		    }
-#endif
-
 		}
 		break;
 
@@ -1130,14 +1114,6 @@ static void Widget_button(XEvent *event, int widget_desc, bool pressed)
 						colorw->val) == 1)
 			    Widget_draw(sub_widget_desc);
 		    }
-#ifdef _WINDOWS
-		    {
-			widget_t* widget = Widget_pointer(sub_widget_desc);
-			WinXFlush(widget->window);
-			widget = Widget_pointer(widget_desc);
-			WinXFlush(widget->window);
-		    }
-#endif
 		}
 		break;
 
@@ -1185,15 +1161,6 @@ static void Widget_button(XEvent *event, int widget_desc, bool pressed)
 						 doublew->val) == 1)
 			    Widget_draw(sub_widget_desc);
 		    }
-#ifdef _WINDOWS
-		    {
-			widget_t* widget = Widget_pointer(sub_widget_desc);
-			WinXFlush(widget->window);
-			widget = Widget_pointer(widget_desc);
-			WinXFlush(widget->window);
-		    }
-#endif
-
 		}
 		break;
 	    default:
@@ -1979,9 +1946,6 @@ int Widget_create_popup(int width, int height, int border,
 	sattr.colormap = colormap;
 	mask |= CWColormap;
     }
-#ifdef _WINDOWS
-    border = 3;			/* make it a popup w/title window */
-#endif
     window = XCreateWindow(dpy,
 			   DefaultRootWindow(dpy),
 			   x, y,
