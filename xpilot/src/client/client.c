@@ -2224,6 +2224,7 @@ void Client_cleanup(void)
 {
     int		i;
 
+    Pointer_control_set_state(false);
     Platform_specific_cleanup();
     Free_selectionAndHistory();
     Free_msgs();
