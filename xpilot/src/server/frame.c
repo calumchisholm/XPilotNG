@@ -244,17 +244,17 @@ static void Frame_radar_buffer_add(int x, int y, int s)
 
 static void Frame_radar_buffer_send(int conn)
 {
-    int			i;
-    int			dest;
-    int			tmp;
-    radar_t		*p;
-    const int		radar_width = 256;
-    int			radar_height = (radar_width * World.y) / World.x;
-    int			radar_x;
-    int			radar_y;
-    int			send_x;
-    int			send_y;
-    unsigned short      radar_shuffle[MAX_TOTAL_SHOTS];
+    int		i;
+    int		dest;
+    int		tmp;
+    radar_t	*p;
+    const int	radar_width = 256;
+    int		radar_height = (radar_width * World.height) / World.width;
+    int		radar_x;
+    int		radar_y;
+    int		send_x;
+    int		send_y;
+    unsigned short radar_shuffle[MAX_TOTAL_SHOTS];
 
     for (i = 0; i < num_radar; i++) {
 	radar_shuffle[i] = i;

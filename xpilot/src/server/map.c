@@ -61,30 +61,6 @@ static char sourceid[] =
 World_map World;
 
 
-#ifdef DEBUG
-void Print_map(void)			/* Debugging only. */
-{
-    int x, y;
-
-    for (y=World.y-1; y>=0; y--) {
-	for (x=0; x<World.x; x++)
-	    switch (World.block[x][y]) {
-	    case SPACE:
-		putchar(' ');
-		break;
-	    case BASE:
-		putchar('_');
-		break;
-	    default:
-		putchar('X');
-		break;
-	    }
-	putchar('\n');
-    }
-}
-#endif
-
-
 void Init_map(void)
 {
     World.NumGravs	= 0;
@@ -181,8 +157,8 @@ void Grok_map(void)
 #endif
     World.width = mapWidth;
     World.height = mapHeight;
-    World.x = mapWidth / BLOCK_SZ; /* !@# */
-    World.y = mapHeight / BLOCK_SZ;
+    World.x = (mapWidth - 1) / BLOCK_SZ + 1; /* !@# */
+    World.y = (mapHeight - 1) / BLOCK_SZ + 1;
     World.diagonal = (int) LENGTH(World.x, World.y);
     World.cwidth = World.width * CLICK;
     World.cheight = World.height * CLICK;
