@@ -32,7 +32,7 @@ char rank_version[] = VERSION;
 
 #define PAGEHEAD \
 /* Head of page */ \
-"<h1>XPilot @ " RANKING_SERVER "</h1>" \
+"<h1>" PACKAGE_NAME " @ " RANKING_SERVER "</h1>" \
 "<a href=\"previous_ranks.html\">Previous rankings</a> " \
 "<a href=\"rank_explanation.html\">How does the ranking work?</a><hr>\n"
 
@@ -280,7 +280,7 @@ static const char *Rank_get_logout_message(ranknode_t *rank)
 void Rank_write_webpage(void)
 {
     static const char headernojs[] =
-	"<html><head><title>XPilot @ " RANKING_SERVER "</title>\n"
+	"<html><head><title>" PACKAGE_NAME " @ " RANKING_SERVER "</title>\n"
 	"</head><body>\n" PAGEHEAD TABLEHEAD;
 
     static const char footer[] = "</table>"
