@@ -25,110 +25,6 @@
 
 char collision_version[] = VERSION;
 
-
-/*
- * The very first "analytical" collision patch, XPilot 3.6.2
- * Faster than other patches and accurate below half warp-speed
- * Trivial common subexpressions are eliminated by any reasonable compiler,
- * and kept here for readability.
- * Written by Pontus (Rakk, Kepler) pontus@ctrl-c.liu.se Jan 1998
- * Kudos to Svenske and Mad Gurka for beta testing, and Murx for
- * invaluable insights.
- */
-
-/* kps - note: the arguments are all given in clicks here */
-static bool in_range_acd_old(
-	int p1x, int p1y, int p2x, int p2y,
-	int q1x, int q1y, int q2x, int q2y,
-	int r)
-{
-    long	fac1, fac2;
-    double	tmin, fminx, fminy;
-    long	top, bot;
-    bool	mpx, mpy, mqx, mqy;
-
-    /*
-     * Get the wrapped coordinates straight
-     */
-    if (BIT(World.rules->mode, WRAP_PLAY)) {
-	if ((mpx = (ABS(p2x - p1x) > World.cwidth / 2))) {
-	    if (p1x > p2x)
-		p1x -= World.cwidth;
-	    else
-		p2x -= World.cwidth;
-	}
-	if ((mpy = (ABS(p2y - p1y) > World.cheight / 2))) {
-	    if (p1y > p2y)
-		p1y -= World.cheight;
-	    else
-		p2y -= World.cheight;
-	}
-	if ((mqx = (ABS(q2x - q1x) > World.cwidth / 2))) {
-	    if (q1x > q2x)
-		q1x -= World.cwidth;
-	    else
-		q2x -= World.cwidth;
-	}
-	if ((mqy = (ABS(q2y - q1y) > World.cheight / 2))) {
-	    if (q1y > q2y)
-		q1y -= World.cheight;
-	    else
-		q2y -= World.cheight;
-	}
-
-	if (mpx && !mqx && (q2x > World.cwidth / 2 || q1x > World.cwidth / 2)) {
-	    q1x -= World.cwidth;
-	    q2x -= World.cwidth;
-	}
-
-	if (mqy && !mpy && (q2y > World.cheight / 2 || q1y > World.cheight / 2)) {
-	    q1y -= World.cheight;
-	    q2y -= World.cheight;
-	}
-
-	if (mqx && !mpx && (p2x > World.cwidth / 2 || p1x > World.cwidth / 2)) {
-	    p1x -= World.cwidth;
-	    p2x -= World.cwidth;
-	}
-
-	if (mqy && !mpy && (p2y > World.cheight / 2 || p1y > World.cheight / 2)) {
-	    p1y -= World.cheight;
-	    p2y -= World.cheight;
-	}
-    }
-
-    /* kps hack - change to pixels to not get overflows */
-    p1x = CLICK_TO_PIXEL(p1x);
-    p1y = CLICK_TO_PIXEL(p1y);
-    p2x = CLICK_TO_PIXEL(p2x);
-    p2y = CLICK_TO_PIXEL(p2y);
-    q1x = CLICK_TO_PIXEL(q1x);
-    q1y = CLICK_TO_PIXEL(q1y);
-    q2x = CLICK_TO_PIXEL(q2x);
-    q2y = CLICK_TO_PIXEL(q2y);
-    r   = CLICK_TO_PIXEL(r);
-    /* kps hack end */
-
-    /*
-     * Do the detection
-     */
-    if ((p2x - q2x) * (p2x - q2x) + (p2y - q2y) * (p2y - q2y) < r * r)
-	return true;
-    fac1 = -p1x + p2x + q1x - q2x;
-    fac2 = -p1y + p2y + q1y - q2y;
-    top = -(fac1 * (-p2x + q2x) + fac2 * (-p2y + q2y));
-    bot = (fac1 * fac1 + fac2 * fac2);
-    if (top < 0 || bot < 1 || top > bot)
-	return false;
-    tmin = ((double)top) / ((double)bot);
-    fminx = -p2x + q2x + fac1 * tmin;
-    fminy = -p2y + q2y + fac2 * tmin;
-    if (fminx * fminx + fminy * fminy < r * r)
-	return true;
-    else
-	return false;
-}
-
 /* new acd functions */
 /* doubles because the multiplies might overflow ints */
 static bool in_range_acd(double dx, double dy, double dvx, double dvy,
@@ -254,49 +150,34 @@ static bool in_range(object *obj1, object *obj2, double range)
 {
     bool hit;
 
-    if (is_polygon_map || !useOldCode) {
-	switch (obj2->collmode) {
-	case 0:
-	    hit = in_range_simple(obj1->pos.cx, obj1->pos.cy,
-				  obj2->pos.cx, obj2->pos.cy,
-				  range);
-	    break;
-	case 1:
-	    hit = in_range_acd(obj1->prevpos.cx - obj2->prevpos.cx,
+    switch (obj2->collmode) {
+    case 0:
+	hit = in_range_simple(obj1->pos.cx, obj1->pos.cy,
+			      obj2->pos.cx, obj2->pos.cy,
+			      range);
+	break;
+    case 1:
+	hit = in_range_acd(obj1->prevpos.cx - obj2->prevpos.cx,
+			   obj1->prevpos.cy - obj2->prevpos.cy,
+			   obj1->extmove.cx - obj2->extmove.cx,
+			   obj1->extmove.cy - obj2->extmove.cy,
+			   range);
+	break;
+    case 2:
+	hit = in_range_partial(obj1->prevpos.cx - obj2->prevpos.cx,
 			       obj1->prevpos.cy - obj2->prevpos.cy,
 			       obj1->extmove.cx - obj2->extmove.cx,
 			       obj1->extmove.cy - obj2->extmove.cy,
-			       range);
-	    break;
-	case 2:
-	    hit = in_range_partial(obj1->prevpos.cx - obj2->prevpos.cx,
-				   obj1->prevpos.cy - obj2->prevpos.cy,
-				   obj1->extmove.cx - obj2->extmove.cx,
-				   obj1->extmove.cy - obj2->extmove.cy,
-				   range, obj2->wall_time);
-	    break;
-	case 3:
-	default:
+			       range, obj2->wall_time);
+	break;
+    case 3:
+    default:
 #if 0
-	    warn("Unimplemented collision mode %d", obj2->collmode);
+	warn("Unimplemented collision mode %d", obj2->collmode);
 #endif
-	    return false;
-	}
-	if (!hit)
-	    return false;
-    } else {
-	if (obj2->life <= 0)
-	    return false;
-	
-	if (!in_range_acd_old(obj1->prevpos.cx, obj1->prevpos.cy,
-			      obj1->pos.cx, obj1->pos.cy,
-			      obj2->prevpos.cx, obj2->prevpos.cy,
-			      obj2->pos.cx, obj2->pos.cy, range)) {
-	    return false;
-	}
+	return false;
     }
-
-    return true;
+    return hit;
 }
 
 /*
@@ -565,7 +446,7 @@ static void PlayerCollision(void)
 		    sound_play_sensors(pl->pos.cx, pl->pos.cy,
 				       CONNECT_BALL_SOUND);
 		    pl->grabbedBallFrame = main_loops;
-		    if (is_polygon_map || !useOldCode) {
+		    {
 			/* The ball might already be inside the team's ball
 			 * target. */
 			extern shape ball_wire;
@@ -778,7 +659,7 @@ static void PlayerObjectCollision(player *pl)
 	    hit = in_range(OBJ_PTR(pl), obj, radius);
 
 #if 0
-	if ((is_polygon_map || !useOldCode) && obj->collmode != 1) {
+	if (obj->collmode != 1) {
 	    char MSG[80];
 	    sprintf(MSG, "Collision type=%d, hit=%d, cm=%d, time=%f, "
 		    "frame=%ld [*DEBUG*]", obj->type, hit, obj->collmode,
@@ -1531,13 +1412,6 @@ static void AsteroidCollision(void)
 	    obj = obj_list[j];
 	    assert(obj != NULL);
 
-	    if (is_polygon_map || !useOldCode) {
-		;
-	    } else {
-		if (obj->life <= 0)
-		    continue;
-	    }
-
 	    /* asteroids don't hit these objects */
 	    if (BIT(obj->type, OBJ_ITEM|OBJ_DEBRIS|OBJ_SPARK|OBJ_WRECKAGE)
 		&& obj->id == NO_ID
@@ -1716,13 +1590,6 @@ static void BallCollision(void)
 
 	    if (BIT(obj->type, ignored_object_types))
 		continue;
-
-	    if (is_polygon_map || !useOldCode) {
-		;
-	    } else {
-		if (obj->life <= 0)
-		    continue;
-	    }
 
 	    /* have we already done this ball pair? */
 	    if (obj->type == OBJ_BALL && obj <= OBJ_PTR(ball))
