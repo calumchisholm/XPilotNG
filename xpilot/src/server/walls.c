@@ -771,7 +771,8 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 	}
 	else {
 	    double change;
-	    double C1 = options.playerWallFriction, C2 = 0.5; /* 0.5 ??? */
+	    double C1 = options.playerWallFriction;
+	    double C2 = 1.0 - options.playerWallBrakeFactor;
 	    double perpendicular_change, parallel_speed;
 	    /*
 	     * uau:
