@@ -505,7 +505,6 @@ void Handle_player_command(player *pl, char *cmd_orig)
 
 static int Cmd_addr(char *arg, player *pl, int oper, char *msg)
 {
-    int ind;
     player *pl2 = NULL;
     char *errorstr;
 
@@ -809,7 +808,6 @@ static int Cmd_help(char *arg, player *pl, int oper, char *msg)
 
 static int Cmd_kick(char *arg, player *pl, int oper, char *msg)
 {
-    int			i;
     player		*kicked_pl;
     char		*errorstr;
 
