@@ -210,8 +210,10 @@ static bool in_range_partial(double dx, double dy, double dvx, double dvy,
 	return false;
     if (bot < 5 * CLICK * CLICK || top >= bot)
 	tmin = wall_time;
-    else
+    else {
 	tmin = top / bot;
+	tmin = MIN(tmin, wall_time);
+    }
     fminx = dx + dvx * tmin;
     fminy = dy + dvy * tmin;
     if (fminx * fminx + fminy * fminy < r * r)
