@@ -1,3 +1,249 @@
+2004-03-06 17:06  kps
+
+	* src/server/: auth.c, auth.h, cmdline.c, command.c, polygon.c,
+	  xp2map.c: Updated copyright infos.
+
+2004-03-06 16:57  darelcullen
+
+	* src/client/sdl/sdlmeta.c: prevent a crashbug, initialise header
+	  to null
+
+2004-03-06 15:41  kps
+
+	* src/: common/pack.h, server/alliance.c, server/asteroid.c,
+	  server/asteroid.h, server/auth.c, server/auth.h, server/cannon.c,
+	  server/cannon.h, server/cell.c, server/click.h, server/cmdline.c,
+	  server/collision.c, server/command.c, server/connection.h,
+	  server/contact.c, server/defaults.h, server/event.c,
+	  server/fileparser.c, server/frame.c, server/id.c, server/item.c,
+	  server/laser.c, server/map.c, server/map.h, server/metaserver.c,
+	  server/netserver.c, server/netserver.h, server/object.c,
+	  server/object.h, server/objpos.c, server/objpos.h,
+	  server/option.c, server/parser.c, server/play.c, server/player.c,
+	  server/polygon.c, server/rank.c, server/rank.h, server/recwrap.c,
+	  server/recwrap.h, server/robot.c, server/robot.h,
+	  server/robotdef.c, server/rules.c, server/saudio.c,
+	  server/saudio.h, server/sched.c, server/sched.h, server/score.c,
+	  server/score.h, server/server.c, server/server.h,
+	  server/serverconst.h, server/ship.c, server/shot.c,
+	  server/showtime.c, server/srecord.c, server/srecord.h,
+	  server/teamcup.c, server/teamcup.h, server/tuner.c,
+	  server/tuner.h, server/update.c, server/walls.c, server/walls.h,
+	  server/xp2map.c, server/xpmap.c, server/xpserver.h: Updated GPL
+	  boilerplates.
+
+2004-03-06 14:59  juhal
+
+	* src/client/sdl/: DT_drawtext.h, SDL_console.c, SDL_console.h,
+	  SDL_gfxPrimitives.c, SDL_gfxPrimitives.h,
+	  SDL_gfxPrimitives_font.h, glwidgets.c, glwidgets.h, radar.c,
+	  radar.h, sdlevent.c, sdlgui.c, sdlinit.c, sdlinit.h, sdlmeta.c,
+	  sdlmeta.h, sdlpaint.c, text.c, text.h: modified copyright notices
+	  to be more accurate
+
+2004-03-06 13:34  kps
+
+	* README, configure, configure.ac, src/common/astershape.h,
+	  src/common/audio.h, src/common/bit.h, src/common/checknames.c,
+	  src/common/checknames.h, src/common/commonproto.h,
+	  src/common/config.c, src/common/const.h, src/common/draw.h,
+	  src/common/item.h, src/common/keys.h, src/common/list.c,
+	  src/common/list.h, src/common/math.c, src/common/metaserver.h,
+	  src/common/net.c, src/common/net.h, src/common/pack.h,
+	  src/common/packet.h, src/common/portability.c,
+	  src/common/portability.h, src/common/rules.h, src/common/setup.h,
+	  src/common/shipshape.c, src/common/socklib.c,
+	  src/common/socklib.h, src/common/strcasecmp.c,
+	  src/common/strdup.c, src/common/strlcpy.c, src/common/types.h,
+	  src/common/version.h, src/common/version.h.in,
+	  src/common/wreckshape.h, src/common/xpcommon.h,
+	  src/common/xpconfig.h, src/common/xpmemory.c: GPL boilerplate
+	  update.
+
+2004-03-06 00:42  kps
+
+	* src/client/icon.h: Darel Cullen did the icon.
+
+2004-03-06 00:32  kps
+
+	* src/client/: bitmaps.h, caudio.h, client.h, clientcommand.h,
+	  clientrank.h, configure.h, connectparam.h, datagram.h, dbuff.h,
+	  gfx2d.h, guimap.h, guiobjects.h, icon.h, meta.h, netclient.h,
+	  option.h, paint.h, paintdata.h, record.h, recordfmt.h, talk.h,
+	  widget.h, xevent.h, xeventhandlers.h, xinit.h, xpaint.h,
+	  xpclient.h, xpclient_x11.h: Updated GPL boilerplate and copyright
+	  infos.
+
+2004-03-06 00:00  kps
+
+	* src/client/: about.c, bitmaps.c, caudio.c, caudio.h, client.c,
+	  clientcommand.c, clientrank.c, colors.c, configure.c, datagram.c,
+	  dbuff.c, debugaudio.c, default.c, esdaudio.c, event.c, gfx2d.c,
+	  guimap.c, guiobjects.c, join.c, mapdata.c, messages.c, meta.c,
+	  netclient.c, option.c, paint.c, paintdata.c, painthud.c,
+	  paintmap.c, paintobjects.c, paintradar.c, query.c, record.c,
+	  rplayaudio.c, talk.c, talkmacros.c, textinterface.c, welcome.c,
+	  widget.c, xdefault.c, xevent.c, xeventhandlers.c, xinit.c,
+	  xpaint.c, xpilot.c: Updated GPL boilerplates and copyright data.
+
+2004-03-05 17:45  kps
+
+	* src/client/sdl/: sdlevent.c, sdlgui.c, sdlpaint.c: Updated
+	  copyright info, removed unused code.
+
+2004-03-05 15:53  kps
+
+	* src/client/sdl/glwidgets.c: Removed incorrect copyright info
+	  (glwidgets.c is original code by Mara).
+
+2004-03-05 15:38  kps
+
+	* src/client/sdl/: DT_drawtext.c, DT_drawtext.h, SDL_console.c,
+	  SDL_console.h, SDL_gfxPrimitives.c, SDL_gfxPrimitives.h,
+	  SDL_gfxPrimitives_font.h, console.c, console.h, gameloop.c,
+	  gameloop_x.c, glwidgets.c, glwidgets.h, images.c, images.h,
+	  main.c, radar.c, radar.h, sdlevent.c, sdlgui.c, sdlinit.c,
+	  sdlinit.h, sdlkeys.c, sdlkeys.h, sdlmeta.c, sdlmeta.h,
+	  sdlpaint.c, sdlpaint.h, sdlwindow.c, sdlwindow.h, text.c, text.h,
+	  todo.c, win32hacks.c: Added GPL boilerplate with Juha Lindström
+	  as copyright holder.
+
+2004-03-05 12:42  uau
+
+	* src/client/sdl/sdlinit.c: Added '#include "SDL_ttf.h"' (the code
+	  uses TTF_Init).
+
+2004-03-05 12:38  uau
+
+	* src/client/sdl/sdlinit.c: Added missing "return 0;" at the end of
+	  Init_window().
+
+2004-03-04 21:23  juhal
+
+	* src/client/sdl/sdlmeta.c: added header to meta table
+
+2004-03-04 20:25  darelcullen
+
+	* src/client/paintdata.h: Seemed that this file was corrupt
+	  according to windows..
+
+2004-03-04 19:47  kps
+
+	* src/server/player.c: Ingore waiting players in
+	  Compute_end_of_round_values().
+
+2004-03-04 19:19  kps
+
+	* src/server/: player.c, walls.c: Don't require waiting players to
+	  have score 0 to ignore them when calculating scores in certain
+	  situations.
+
+2004-03-03 22:26  juhal
+
+	* src/client/sdl/sdlmeta.c: fixed expose bug reported by colonel
+
+2004-03-03 21:25  juhal
+
+	* src/client/sdl/sdlmeta.c: performance improvements (i hope)
+
+2004-03-03 21:02  juhal
+
+	* src/client/sdl/sdlmeta.c: [no log message]
+
+2004-03-03 20:25  juhal
+
+	* src/client/sdl/: glwidgets.c, glwidgets.h, main.c, sdlmeta.c,
+	  sdlmeta.h: first meta gui version that about works
+
+2004-03-03 20:05  kps
+
+	* config.h.in, configure, configure.ac, src/common/config.c,
+	  src/server/cmdline.c, src/server/metaserver.c,
+	  src/server/saudio.c, src/server/saudio.h, src/server/server.h:
+	  Server sound is now compiled in by default. Added server option
+	  'sound', which is true by default.
+
+2004-03-03 18:23  kps
+
+	* src/server/player.c: Make laser pulses disappear at end of round.
+
+2004-03-03 14:46  kps
+
+	* Makefile.in, aclocal.m4, configure, configure.ac,
+	  doc/Makefile.in, doc/man/Makefile.in, lib/Makefile.in,
+	  lib/fonts/Makefile.in, lib/maps/Makefile.in,
+	  lib/textures/Makefile.in, src/Makefile.in,
+	  src/client/Makefile.am, src/client/Makefile.in,
+	  src/client/dbuff.c, src/client/items/Makefile.in,
+	  src/client/sdl/Makefile.in, src/common/Makefile.in,
+	  src/common/NT/Makefile.in, src/common/NT/bindist/Makefile.in,
+	  src/replay/Makefile.in, src/replay/tools/Makefile.in,
+	  src/server/Makefile.in: Link with libXext if double or
+	  multibuffer is configured.
+
+2004-03-02 23:15  kps
+
+	* BUGS: Removed shipshape option related bug which is fixed.
+
+2004-03-02 23:13  kps
+
+	* BUGS, src/client/talk.c: Fixed bug where client would crash when
+	  text was copied into nonexistent selection.
+
+2004-03-02 20:07  kps
+
+	* BUGS, src/client/default.c, src/client/mapdata.c: TexturedWalls
+	  option can now be turned on successfully during game.  Note that
+	  if textures weren't downloaded, client will freeze while textures
+	  are downloaded.
+
+2004-03-02 19:06  kps
+
+	* BUGS, src/server/walls.c: Made lasers deadly to fireing player
+	  after wall bounce.
+
+2004-03-02 18:21  kps
+
+	* src/client/colors.c: Added Set_colors function. It tries to make
+	  sure the option value is such that XParseColor will accept it.
+
+2004-03-01 22:08  darelcullen
+
+	* BUGS: Bugs
+
+2004-03-01 22:03  darelcullen
+
+	* BUGS: Bugs
+
+2004-03-01 21:59  kps
+
+	* lib/maps/polybloods.xp2: Set ballstyles off by default, change
+	  ball colors to be more different.
+
+2004-02-29 23:40  kps
+
+	* src/server/: cmdline.c, frame.c, server.h: Added server option
+	  ballStyles which can be used to disable sending ball style to
+	  clients.
+
+2004-02-29 21:00  kps
+
+	* lib/maps/polybloods.xp2: Made ball colors a bit lighter.
+
+2004-02-29 20:56  kps
+
+	* lib/maps/polybloods.xp2: Green ball for team 2, yellow for team
+	  4. Set pausedfps to 0.
+
+2004-02-29 18:26  kps
+
+	* lib/maps/: Makefile.am, Makefile.in, sadistic_bastard_v2.xp2:
+	  Added polygon version of sadistic bastard map.
+
+2004-02-29 17:31  darelcullen
+
+	* ChangeLog: This weeks ChangeLog update
+
 2004-02-28 23:27  kps
 
 	* lib/textures/: Makefile.am, Makefile.in: Added ball_gray16 to
