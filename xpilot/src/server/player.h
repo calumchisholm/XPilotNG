@@ -63,6 +63,8 @@
 #include "option.h"
 #endif
 
+extern bool		updateScores;
+
 /*
  * These values are set in the player->pl_type field.
  */
@@ -133,8 +135,6 @@
 					/* and client input checked */
 #define LOCKBANK_MAX		4	/* Maximum number of locks in bank */
 
-typedef struct player player_t;
-
 /*
  * Fuel structure, used by player
  */
@@ -150,23 +150,6 @@ typedef struct visibility {
     bool	canSee;
     long	lastChange;
 } visibility_t;
-
-#define MAX_PLAYER_ECMS		8	/* Maximum simultaneous per player */
-typedef struct {
-    double	size;
-    clpos_t	pos;
-    int		id;
-} ecm_t;
-
-/*
- * Transporter info.
- */
-typedef struct {
-    clpos_t	pos;
-    player_t	*victim;
-    int		id;
-    double	count;
-} trans_t;
 
 /*
  * Shove-information.
@@ -190,7 +173,7 @@ struct ranknode;
  * this makes it possible to use the same basic operations on both of them
  * (mainly used in update.c).
  */
-struct player {
+typedef struct player {
 
     OBJECT_BASE
 
@@ -200,6 +183,7 @@ struct player {
     char	pl_type_mychar;		/* Special char for player type */
     uint16_t	pl_status;		/* PLAYING, etc. */
     uint16_t	pl_state;		/* one of PL_STATE_* */
+    int		pl_life;		/* Lives left (if lives limited) */
 
     double	turnspeed;		/* How fast player acc-turns */
     double	velocity;		/* Absolute speed */
@@ -346,7 +330,24 @@ struct player {
 
     world_t	*world;			/* World player is in */
 
-};
+} player_t;
+
+#define MAX_PLAYER_ECMS		8	/* Maximum simultaneous per player */
+typedef struct {
+    double	size;
+    clpos_t	pos;
+    int		id;
+} ecm_t;
+
+/*
+ * Transporter info.
+ */
+typedef struct {
+    clpos_t	pos;
+    player_t	*victim;
+    int		id;
+    double	count;
+} trans_t;
 
 extern int	playerArrayNumber;
 extern player_t	**PlayersArray;
@@ -402,34 +403,39 @@ static inline bool Player_is_paused(player_t *pl)
 #endif
 }
 
-static inline bool Player_add_score(player_t *pl, double points)
+static inline void Player_add_score(player_t *pl, double points)
 {
     pl->score += points;
     pl->update_score = true;
+    updateScores = true;
 }
 
-static inline bool Player_set_score(player_t *pl, double points)
+static inline void Player_set_score(player_t *pl, double points)
 {
     pl->score = points;
     pl->update_score = true;
+    updateScores = true;
 }
 
-static inline bool Player_set_mychar(player_t *pl, char mychar)
+static inline void Player_set_mychar(player_t *pl, char mychar)
 {
     pl->mychar = mychar;
     pl->update_score = true;
+    updateScores = true;
 }
 
-static inline bool Player_set_life(player_t *pl, double life)
+static inline void Player_set_life(player_t *pl, int life)
 {
-    pl->life = life;
+    pl->pl_life = life;
     pl->update_score = true;
+    updateScores = true;
 }
 
-static inline bool Player_set_alliance(player_t *pl, int alliance)
+static inline void Player_set_alliance(player_t *pl, int alliance)
 {
     pl->alliance = alliance;
     pl->update_score = true;
+    updateScores = true;
 }
 
 static inline void Player_thrust(player_t *pl, bool on)

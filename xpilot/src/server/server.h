@@ -87,7 +87,6 @@ extern long		main_loops;
 extern int		mapRule;
 extern bool		teamAssign;
 extern int		tagItPlayerId;
-extern bool		updateScores;
 extern bool		allowPlayerPasswords;
 extern bool		game_lock;
 extern bool		mute_baseless;

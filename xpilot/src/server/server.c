@@ -552,7 +552,7 @@ void Server_info(char *str, size_t max_size)
 	strlcpy(name, pl->name, MAX_CHARS);
 	snprintf(lblstr, sizeof(lblstr), "%c%c %-19s%03d%6d",
 		 pl->mychar, pl->team == TEAM_NOT_SET ? ' ' : (pl->team + '0'),
-		 name, (int)pl->life, (int)pl->score);
+		 name, pl->pl_life, (int)pl->score);
 	snprintf(msg, sizeof(msg), "%2d... %-36s%s@%s\n",
 		 i + 1, lblstr, pl->username, pl->hostname);
 	if (strlen(msg) + strlen(str) >= max_size)

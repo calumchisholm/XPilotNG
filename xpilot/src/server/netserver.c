@@ -1110,7 +1110,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
      */
     Send_player(pl->conn, pl->id);
     Send_score(pl->conn, pl->id, pl->score,
-	       (int)pl->life, pl->mychar, pl->alliance);
+	       pl->pl_life, pl->mychar, pl->alliance);
     if (pl->home_base) /* Spectators don't have bases */
 	Send_base(pl->conn, pl->id, pl->home_base->ind);
     /*
@@ -1128,7 +1128,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	pl_i = Player_by_index(i);
 	Send_player(pl->conn, pl_i->id);
 	Send_score(pl->conn, pl_i->id, pl_i->score,
-		   (int)pl_i->life, pl_i->mychar, pl_i->alliance);
+		   pl_i->pl_life, pl_i->mychar, pl_i->alliance);
 	if (!Player_is_tank(pl_i) && pl_i->home_base != NULL)
 	    Send_base(pl->conn, pl_i->id, pl_i->home_base->ind);
     }
@@ -1148,7 +1148,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	if (pl_i->conn != NULL) {
 	    Send_player(pl_i->conn, pl->id);
 	    Send_score(pl_i->conn, pl->id, pl->score,
-		       (int)pl->life, pl->mychar, pl->alliance);
+		       pl->pl_life, pl->mychar, pl->alliance);
 	    if (pl->home_base)
 		Send_base(pl_i->conn, pl->id, pl->home_base->ind);
 	}
