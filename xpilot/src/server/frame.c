@@ -888,9 +888,8 @@ static void Frame_shots(int conn, player *pl)
 	    {
 		int item_type = shot->info;
 
-		if (BIT(shot->status, RANDOM_ITEM)) {
+		if (BIT(shot->status, RANDOM_ITEM))
 		    item_type = Choose_random_item();
-		}
 
 		Send_item(conn, cx, cy, item_type);
 	    }
@@ -900,14 +899,12 @@ static void Frame_shots(int conn, player *pl)
 	    {
 		pulseobject *pulse = PULSE_PTR(shot);
 
-		if (Team_immune(pulse->id, pl->id)) {
+		if (Team_immune(pulse->id, pl->id))
 		    color = BLUE;
-		} else if (pulse->id == pl->id
-			   && selfImmunity) {
+		else if (pulse->id == pl->id && selfImmunity)
 		    color = BLUE;
-		} else {
+		else
 		    color = RED;
-		}
 		Send_laser(conn, color, lcx, lcy, (int)pulse->len, ldir);
 	    }
 	break;
