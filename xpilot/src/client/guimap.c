@@ -30,81 +30,67 @@ char guimap_version[] = VERSION;
 void Gui_paint_walls(int x, int y, int type, int xi, int yi)
 {
     if (!texturedObjects) {
-	if (type & BLUE_LEFT) {
+	if (type & BLUE_LEFT)
 	    Segment_add(wallColor,
 			X(x),
 			Y(y),
 			X(x),
 			Y(y+BLOCK_SZ));
-	}
-	if (type & BLUE_DOWN) {
+	if (type & BLUE_DOWN)
 	    Segment_add(wallColor,
 			X(x),
 			Y(y),
 			X(x+BLOCK_SZ),
 			Y(y));
-	}
-	if (type & BLUE_RIGHT) {
+	if (type & BLUE_RIGHT)
 	    Segment_add(wallColor,
 			X(x+BLOCK_SZ),
 			Y(y),
 			X(x+BLOCK_SZ),
 			Y(y+BLOCK_SZ));
-	}
-	if (type & BLUE_UP) {
+	if (type & BLUE_UP)
 	    Segment_add(wallColor,
 			X(x),
 			Y(y+BLOCK_SZ),
 			X(x+BLOCK_SZ),
 			Y(y+BLOCK_SZ));
-	}
-
-	if ((type & BLUE_FUEL) == BLUE_FUEL) {
-	}
-	else if (type & BLUE_OPEN) {
+	if ((type & BLUE_FUEL) == BLUE_FUEL)
+	    ;
+	else if (type & BLUE_OPEN)
 	    Segment_add(wallColor,
 			X(x),
 			Y(y),
 			X(x+BLOCK_SZ),
 			Y(y+BLOCK_SZ));
-	}
-	else if (type & BLUE_CLOSED) {
+	else if (type & BLUE_CLOSED)
 	    Segment_add(wallColor,
 			X(x),
 			Y(y+BLOCK_SZ),
 			X(x+BLOCK_SZ),
 			Y(y));
-	}
     }
     else {
 
-	if (type & BLUE_LEFT) {
+	if (type & BLUE_LEFT)
 	    Bitmap_paint(p_draw, BM_WALL_LEFT, WINSCALE(X(x - 1)),
 			 WINSCALE(Y(y + BLOCK_SZ)), 0);
-	}
-	if (type & BLUE_DOWN) {
+	if (type & BLUE_DOWN)
 	    Bitmap_paint(p_draw, BM_WALL_BOTTOM, WINSCALE(X(x)),
 			WINSCALE(Y(y + BLOCK_SZ - 1)), 0);
-	}
-	if (type & BLUE_RIGHT) {
+	if (type & BLUE_RIGHT)
 	    Bitmap_paint(p_draw, BM_WALL_RIGHT, WINSCALE(X(x + 1)),
 			WINSCALE(Y(y + BLOCK_SZ)), 0);
-	}
-	if (type & BLUE_UP) {
+	if (type & BLUE_UP)
 	    Bitmap_paint(p_draw, BM_WALL_TOP, WINSCALE(X(x)),
 			WINSCALE(Y(y + BLOCK_SZ + 1)), 0);
-	}
-	if ((type & BLUE_FUEL) == BLUE_FUEL) {
-	}
-
-	else if (type & BLUE_OPEN) {
+	if ((type & BLUE_FUEL) == BLUE_FUEL)
+	    ;
+	else if (type & BLUE_OPEN)
 	    Bitmap_paint(p_draw, BM_WALL_UR, WINSCALE(X(x)),
 			WINSCALE(Y(y + BLOCK_SZ)), 0);
-	}
-	else if (type & BLUE_CLOSED) {
+	else if (type & BLUE_CLOSED)
 	    Bitmap_paint(p_draw, BM_WALL_UL, WINSCALE(X(x)),
 			WINSCALE(Y(y + BLOCK_SZ)), 0);
-	}
     }
 }
 
