@@ -25,9 +25,6 @@
 
 char painthud_version[] = VERSION;
 
-extern score_object_t	score_objects[MAX_SCORE_OBJECTS];
-extern int		score_object;
-
 int	hudColor;		/* Color index for HUD drawing */
 int	hudHLineColor;		/* Color index for horiz. HUD line drawing */
 int	hudVLineColor;		/* Color index for vert. HUD line drawing */
@@ -783,18 +780,15 @@ void Paint_messages(void)
 	    continue;
 
 	/*
-	 * while there is something emphasized, freeze the life time counter
-	 * of a message if it is not drawn `flashed' (red) anymore
+	 * While there is something emphasized, freeze the life time counter
+	 * of a message if it is not drawn "flashed" (not in oldMessagesColor)
+	 * anymore.
 	 */
-	if (
-	    msg->lifeTime > MSG_FLASH_TIME
 #ifndef _WINDOWS
+	if (msg->lifeTime > MSG_FLASH_TIME
 	    || !selectionAndHistory
 	    || (selection.draw.state != SEL_PENDING
-		&& selection.draw.state != SEL_EMPHASIZED)
-#endif
-	    ) {
-
+		&& selection.draw.state != SEL_EMPHASIZED)) {
 	    if ((msg->lifeTime -= timePerFrame) <= 0.0) {
 		msg->txt[0] = '\0';
 		msg->len = 0;
@@ -802,24 +796,29 @@ void Paint_messages(void)
 		continue;
 	    }
 	}
-#ifdef _WINDOWS
-	else if ((msg->lifeTime -= timePerFrame) <= 0.0) {
-		msg->txt[0] = '\0';
-		msg->len = 0;
-		msg->lifeTime = 0.0;
-		continue;
-	    }
+#else
+	if ((msg->lifeTime -= timePerFrame) <= 0.0) {
+	    msg->txt[0] = '\0';
+	    msg->len = 0;
+	    msg->lifeTime = 0.0;
+	    continue;
+	}
 #endif
 
 	if (msg->lifeTime <= MSG_FLASH_TIME)
 	    msg_color = oldMessagesColor;
 	else {
-	    switch (msg->bmsinfo) {
-	    case BmsBall:	msg_color = msgScanBallColor;	break;
-	    case BmsSafe:	msg_color = msgScanSafeColor;	break;
-	    case BmsCover:	msg_color = msgScanCoverColor;	break;
-	    case BmsPop:	msg_color = msgScanPopColor;	break;
-	    default:		msg_color = messagesColor;	break;
+	    /* If paused, don't bother to paint messages in mscScan* colors. */
+	    if (self && strchr("P", self->mychar))
+		msg_color = messagesColor;
+	    else {
+		switch (msg->bmsinfo) {
+		case BmsBall:	msg_color = msgScanBallColor;	break;
+		case BmsSafe:	msg_color = msgScanSafeColor;	break;
+		case BmsCover:	msg_color = msgScanCoverColor;	break;
+		case BmsPop:	msg_color = msgScanPopColor;	break;
+		default:	msg_color = messagesColor;	break;
+		}
 	    }
 	}
 

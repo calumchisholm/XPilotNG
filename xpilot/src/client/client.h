@@ -433,6 +433,9 @@ extern int	maxMessages;
 extern int	messagesToStdout;
 extern bool	selectionAndHistory;
 
+extern score_object_t	score_objects[MAX_SCORE_OBJECTS];
+extern int		score_object;
+
 extern int      oldServer; /* Compatibility mode for old block-based servers */
 extern ipos	FOOpos;
 extern ipos	FOOvel;
