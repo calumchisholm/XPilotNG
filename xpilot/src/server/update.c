@@ -139,14 +139,6 @@ void Cloak(player_t *pl, bool on)
 {
     if (on) {
 	if (!BIT(pl->used, HAS_CLOAKING_DEVICE) && pl->item[ITEM_CLOAK] > 0) {
-	    if (!options.cloakedShield) {
-		if (BIT(pl->used, HAS_EMERGENCY_SHIELD))
-		    Emergency_shield(pl, false);
-		if (BIT(pl->used, HAS_DEFLECTOR))
-		    Deflector(pl, false);
-		CLR_BIT(pl->used, HAS_SHIELD);
-		CLR_BIT(pl->have, HAS_SHIELD);
-	    }
 	    sound_play_player(pl, CLOAK_SOUND);
 	    pl->updateVisibility = 1;
 	    SET_BIT(pl->used, HAS_CLOAKING_DEVICE);
@@ -159,16 +151,6 @@ void Cloak(player_t *pl, bool on)
 	}
 	if (!pl->item[ITEM_CLOAK])
 	    CLR_BIT(pl->have, HAS_CLOAKING_DEVICE);
-	if (!options.cloakedShield) {
-	    if (BIT(pl->have, HAS_EMERGENCY_SHIELD)) {
-		SET_BIT(pl->have, HAS_SHIELD);
-		Emergency_shield(pl, true);
-	    }
-	    if (BIT(DEF_HAVE, HAS_SHIELD) && !BIT(pl->have, HAS_SHIELD))
-		SET_BIT(pl->have, HAS_SHIELD);
-	    if (BITV_ISSET(pl->last_keyv, KEY_SHIELD))
-		SET_BIT(pl->used, HAS_SHIELD);
-	}
     }
 }
 
@@ -179,11 +161,8 @@ void Deflector(player_t *pl, bool on)
 {
     if (on) {
 	if (!BIT(pl->used, HAS_DEFLECTOR) && pl->item[ITEM_DEFLECTOR] > 0) {
-	    /* only allow deflector when cloaked shielding or not cloaked */
-	    if (options.cloakedShield || !BIT(pl->used, HAS_CLOAKING_DEVICE)) {
-		SET_BIT(pl->used, HAS_DEFLECTOR);
-		sound_play_player(pl, DEFLECTOR_SOUND);
-	    }
+	    SET_BIT(pl->used, HAS_DEFLECTOR);
+	    sound_play_player(pl, DEFLECTOR_SOUND);
 	}
     } else {
 	if (BIT(pl->used, HAS_DEFLECTOR)) {
@@ -232,12 +211,10 @@ void Emergency_shield (player_t *pl, bool on)
 		pl->emergency_shield_left += EMERGENCY_SHIELD_TIME;
 		pl->item[ITEM_EMERGENCY_SHIELD]--;
 	    }
-	    if (options.cloakedShield || !BIT(pl->used, HAS_CLOAKING_DEVICE)) {
-		SET_BIT(pl->have, HAS_SHIELD);
-		if (!BIT(pl->used, HAS_EMERGENCY_SHIELD)) {
-		    SET_BIT(pl->used, HAS_EMERGENCY_SHIELD);
-		    sound_play_sensors(pl->pos, EMERGENCY_SHIELD_ON_SOUND);
-		}
+	    SET_BIT(pl->have, HAS_SHIELD);
+	    if (!BIT(pl->used, HAS_EMERGENCY_SHIELD)) {
+		SET_BIT(pl->used, HAS_EMERGENCY_SHIELD);
+		sound_play_sensors(pl->pos, EMERGENCY_SHIELD_ON_SOUND);
 	    }
 	}
     } else {

@@ -1772,8 +1772,6 @@ static void Robot_default_play_check_objects(player_t *pl,
 	    && (int)(rfrac() * 100) <
 	       (85 + (my_data->defense / 7) - (my_data->attack / 50))) {
 	    SET_BIT(pl->used, HAS_SHIELD);
-	    if (!options.cloakedShield)
-		CLR_BIT(pl->used, HAS_CLOAKING_DEVICE);
 	    SET_BIT(pl->status, THRUSTING);
 
 	    if (BIT(shot->type, OBJ_TORPEDO|OBJ_SMART_SHOT|OBJ_ASTEROID
@@ -1874,8 +1872,6 @@ static void Robot_default_play(player_t *pl)
        put up shields and return */
     if (pl->damaged > 0) {
 	SET_BIT(pl->used, HAS_SHIELD);
-	if (!options.cloakedShield)
-	    CLR_BIT(pl->used, HAS_CLOAKING_DEVICE);
 	return;
     }
 
@@ -2024,8 +2020,6 @@ static void Robot_default_play(player_t *pl)
 
     if (ship_dist < 3*SHIP_SZ && BIT(pl->have, HAS_SHIELD)) {
 	SET_BIT(pl->used, HAS_SHIELD);
-	if (!options.cloakedShield)
-	   CLR_BIT(pl->used, HAS_CLOAKING_DEVICE);
     }
 
     if (ship_dist <= 10*BLOCK_SZ && pl->fuel.sum <= my_data->fuel_l3
@@ -2086,15 +2080,11 @@ static void Robot_default_play(player_t *pl)
 		&& options.playerStartsShielded != 0
 		&& BIT(pl->have, HAS_SHIELD)) {
 		SET_BIT(pl->used, HAS_SHIELD);
-		if (!options.cloakedShield)
-		    CLR_BIT(pl->used, HAS_CLOAKING_DEVICE);
 	    }
 	    else if (options.maxShieldedWallBounceSpeed >
 		    options.maxUnshieldedWallBounceSpeed
 		&& BIT(pl->have, HAS_SHIELD)) {
 		SET_BIT(pl->used, HAS_SHIELD);
-		if (!options.cloakedShield)
-		    CLR_BIT(pl->used, HAS_CLOAKING_DEVICE);
 	    }
 	    return;
 	}
@@ -2194,8 +2184,6 @@ static void Robot_default_play(player_t *pl)
 	    && options.playerStartsShielded != 0
 	    && BIT(pl->have, HAS_SHIELD)) {
 	    SET_BIT(pl->used, HAS_SHIELD);
-	    if (!options.cloakedShield)
-		CLR_BIT(pl->used, HAS_CLOAKING_DEVICE);
 	}
 	return;
     }
@@ -2207,8 +2195,6 @@ static void Robot_default_play(player_t *pl)
 	&& options.playerStartsShielded != 0
 	&& BIT(pl->have, HAS_SHIELD)) {
 	SET_BIT(pl->used, HAS_SHIELD);
-	if (!options.cloakedShield)
-	    CLR_BIT(pl->used, HAS_CLOAKING_DEVICE);
     }
 
     x_speed = pl->vel.x - 2 * World_gravity(world, pl->pos).x;

@@ -116,7 +116,6 @@
 <Option name="playersonradar" value="yes"/>
 <Option name="keepshots" value="no"/>
 <Option name="allownukes" value="no"/>
-<Option name="cloakedshield" value="yes"/>
 <Option name="shieldedmining" value="no"/>
 <Option name="allowplayercrashes" value="yes"/>
 <Option name="ballswallbounce" value="yes"/>

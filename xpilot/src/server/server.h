@@ -177,7 +177,6 @@ extern struct options {
     bool	asteroidsWallBounce;
     bool	pulsesWallBounce;
     bool	cloakedExhaust;
-    bool	cloakedShield;
     bool	ecmsReprogramMines;
     bool	ecmsReprogramRobots;
     double	maxObjectWallBounceSpeed;

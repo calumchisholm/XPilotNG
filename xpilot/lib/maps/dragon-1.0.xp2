@@ -160,7 +160,6 @@
 <Option name="itemconcentratorprob" value="1.0"/>
 <Option name="elimination" value="no"/>
 <Option name="laserrepeatrate" value="2.0"/>
-<Option name="cloakedshield" value="yes"/>
 <Option name="itemtankprob" value="0.5"/>
 <Option name="cannonitemprobmult" value="1.0"/>
 <Option name="maxunshieldedwallbouncespeed" value="90"/>

@@ -331,10 +331,6 @@ Do laser pulses bounce off walls?
 .IP
 Do engines of cloaked ships generate exhaust?
 .HP
--/+cloakedShield
-.IP
-Can players use shields when cloaked?
-.HP
 \fB\-maxObjectWallBounceSpeed\fR or maxObjectBounceSpeed <real>
 .IP
 The maximum allowed speed for objects to bounce off walls.
@@ -1549,6 +1545,12 @@ Port of the teamcup status server.
 \fB\-teamcupMatchNumber\fR or match <integer>
 .IP
 The number of the teamcup match.
+[ Flags: command ]
+.HP
+\fB\-mainLoopTime\fR <real>
+.IP
+Duration of last Main_loop() function call (in milliseconds).
+This option is read only.
 [ Flags: command ]
 .IP
 The probabilities are in the range [0.0-1.0] and they refer to the

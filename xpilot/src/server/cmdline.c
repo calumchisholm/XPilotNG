@@ -819,16 +819,6 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-	"cloakedShield",
-	"cloakedShield",
-	"yes",
-	&options.cloakedShield,
-	valBool,
-	tuner_dummy,
-	"Can players use shields when cloaked?\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    {
 	"maxObjectWallBounceSpeed",
 	"maxObjectBounceSpeed",
 	"40.0",

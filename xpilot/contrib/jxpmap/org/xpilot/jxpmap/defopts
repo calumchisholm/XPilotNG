@@ -75,7 +75,6 @@ debrisWallBounce:                        no
 asteroidsWallBounce:                     yes
 pulsesWallBounce:                        no
 cloakedExhaust:                          yes
-cloakedShield:                           yes
 maxObjectWallBounceSpeed:                40.0
 maxShieldedWallBounceSpeed:              50.0
 maxUnshieldedWallBounceSpeed:            20.0
