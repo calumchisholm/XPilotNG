@@ -28,6 +28,12 @@ xpilot_SOURCES = \
 	xdefault.c xevent.c xevent.h xeventhandlers.c xeventhandlers.h \
 	xinit.c xinit.h xpaint.c xpaint.h xpclient.h xpclient_x11.h xpilot.c
 
+noinst_LIBRARIES = libxpclient.a
+libxpclient_a_SOURCES = \
+	netclient.c client.c event.c usleep.c query.c textinterface.c \
+	datagram.c mapdata.c gfx2d.c messages.c clientrank.c talkmacros.c \
+	clientcommand.c paint.c paintmap.c paintobjects.c option.c default.c
+
 #xpilot_CFLAGS = @X_CFLAGS@
 xpilot_LDADD =  $(top_builddir)/src/common/libxpcommon.a @X_LIBS@ @X_PRE_LIBS@ @X_EXTRA_LIBS@ -lX11
 #EXTRA_xpilot_SOURCES = rplayaudio.c debugaudio.c

@@ -1303,6 +1303,33 @@ void Paint_meters(void)
 
 static void Paint_lock(int hud_pos_x, int hud_pos_y)
 {
+    other_t *target;
+    const int BORDER = 2;
+
+    if ((target = Other_by_id(lock_id)) == NULL)
+	return;
+
+    if (hudColorRGBA) {
+	int color = Life_color(target);
+	
+	if (!color)
+	    color = hudColorRGBA;
+	
+	HUDnprint(&gamefont,
+		  color,CENTER,CENTER,
+		  hud_pos_x,
+		  hud_pos_y -(- hudSize + HUD_OFFSET - BORDER),
+		  strlen(target->id_string),target->id_string);
+
+	/*rd.drawString(dpy, drawPixmap, gameGC,
+		      WINSCALE(hud_pos_x) - target->name_width / 2,
+		      WINSCALE(hud_pos_y - hudSize + HUD_OFFSET - BORDER )
+		      - gameFont->descent ,
+		      target->id_string, target->name_len);*/
+
+    }
+
+
 }
 
 static void Paint_hudradar(double hrscale, double xlimit, double ylimit, int sz)

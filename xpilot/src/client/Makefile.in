@@ -152,6 +152,13 @@ xpilot_SOURCES = \
 	xinit.c xinit.h xpaint.c xpaint.h xpclient.h xpclient_x11.h xpilot.c
 
 
+noinst_LIBRARIES = libxpclient.a
+libxpclient_a_SOURCES = \
+	netclient.c client.c event.c usleep.c query.c textinterface.c \
+	datagram.c mapdata.c gfx2d.c messages.c clientrank.c talkmacros.c \
+	clientcommand.c paint.c paintmap.c paintobjects.c option.c default.c
+
+
 #xpilot_CFLAGS = @X_CFLAGS@
 xpilot_LDADD = $(top_builddir)/src/common/libxpcommon.a @X_LIBS@ @X_PRE_LIBS@ @X_EXTRA_LIBS@ -lX11
 #EXTRA_xpilot_SOURCES = rplayaudio.c debugaudio.c
@@ -161,6 +168,18 @@ ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
+LIBRARIES = $(noinst_LIBRARIES)
+
+libxpclient_a_AR = $(AR) cru
+libxpclient_a_LIBADD =
+am_libxpclient_a_OBJECTS = netclient.$(OBJEXT) client.$(OBJEXT) \
+	event.$(OBJEXT) usleep.$(OBJEXT) query.$(OBJEXT) \
+	textinterface.$(OBJEXT) datagram.$(OBJEXT) mapdata.$(OBJEXT) \
+	gfx2d.$(OBJEXT) messages.$(OBJEXT) clientrank.$(OBJEXT) \
+	talkmacros.$(OBJEXT) clientcommand.$(OBJEXT) paint.$(OBJEXT) \
+	paintmap.$(OBJEXT) paintobjects.$(OBJEXT) option.$(OBJEXT) \
+	default.$(OBJEXT)
+libxpclient_a_OBJECTS = $(am_libxpclient_a_OBJECTS)
 bin_PROGRAMS = xpilot$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
 
@@ -211,7 +230,7 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-DIST_SOURCES = $(xpilot_SOURCES)
+DIST_SOURCES = $(libxpclient_a_SOURCES) $(xpilot_SOURCES)
 
 RECURSIVE_TARGETS = info-recursive dvi-recursive pdf-recursive \
 	ps-recursive install-info-recursive uninstall-info-recursive \
@@ -220,7 +239,7 @@ RECURSIVE_TARGETS = info-recursive dvi-recursive pdf-recursive \
 	check-recursive installcheck-recursive
 DIST_COMMON = $(srcdir)/Makefile.in Makefile.am
 DIST_SUBDIRS = $(SUBDIRS)
-SOURCES = $(xpilot_SOURCES)
+SOURCES = $(libxpclient_a_SOURCES) $(xpilot_SOURCES)
 
 all: all-recursive
 
@@ -231,6 +250,15 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am  $(top_srcdir)/configu
 	  $(AUTOMAKE) --gnu  src/client/Makefile
 Makefile: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)
+
+AR = ar
+
+clean-noinstLIBRARIES:
+	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
+libxpclient.a: $(libxpclient_a_OBJECTS) $(libxpclient_a_DEPENDENCIES) 
+	-rm -f libxpclient.a
+	$(libxpclient_a_AR) libxpclient.a $(libxpclient_a_OBJECTS) $(libxpclient_a_LIBADD)
+	$(RANLIB) libxpclient.a
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
@@ -500,7 +528,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(PROGRAMS)
+all-am: Makefile $(LIBRARIES) $(PROGRAMS)
 installdirs: installdirs-recursive
 installdirs-am:
 	$(mkinstalldirs) $(DESTDIR)$(bindir)
@@ -531,7 +559,8 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-recursive
 
-clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
+clean-am: clean-binPROGRAMS clean-generic clean-noinstLIBRARIES \
+	mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -rf ./$(DEPDIR)
@@ -579,21 +608,22 @@ uninstall-am: uninstall-binPROGRAMS uninstall-info-am
 uninstall-info: uninstall-info-recursive
 
 .PHONY: $(RECURSIVE_TARGETS) CTAGS GTAGS all all-am check check-am clean \
-	clean-binPROGRAMS clean-generic clean-recursive ctags \
-	ctags-recursive distclean distclean-compile distclean-generic \
-	distclean-recursive distclean-tags distdir dvi dvi-am \
-	dvi-recursive info info-am info-recursive install install-am \
-	install-binPROGRAMS install-data install-data-am \
-	install-data-recursive install-exec install-exec-am \
-	install-exec-recursive install-info install-info-am \
-	install-info-recursive install-man install-recursive \
-	install-strip installcheck installcheck-am installdirs \
-	installdirs-am installdirs-recursive maintainer-clean \
-	maintainer-clean-generic maintainer-clean-recursive mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-recursive \
-	pdf pdf-am pdf-recursive ps ps-am ps-recursive tags \
-	tags-recursive uninstall uninstall-am uninstall-binPROGRAMS \
-	uninstall-info-am uninstall-info-recursive uninstall-recursive
+	clean-binPROGRAMS clean-generic clean-noinstLIBRARIES \
+	clean-recursive ctags ctags-recursive distclean \
+	distclean-compile distclean-generic distclean-recursive \
+	distclean-tags distdir dvi dvi-am dvi-recursive info info-am \
+	info-recursive install install-am install-binPROGRAMS \
+	install-data install-data-am install-data-recursive \
+	install-exec install-exec-am install-exec-recursive \
+	install-info install-info-am install-info-recursive install-man \
+	install-recursive install-strip installcheck installcheck-am \
+	installdirs installdirs-am installdirs-recursive \
+	maintainer-clean maintainer-clean-generic \
+	maintainer-clean-recursive mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-recursive pdf pdf-am \
+	pdf-recursive ps ps-am ps-recursive tags tags-recursive \
+	uninstall uninstall-am uninstall-binPROGRAMS uninstall-info-am \
+	uninstall-info-recursive uninstall-recursive
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
