@@ -429,7 +429,9 @@ void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
 	}
     }
 
-    if (BIT(pl->pl_status, KILLED) && pl->score < 0 && Player_is_robot(pl)) {
+    if (Player_is_killed(pl)
+	&& pl->score < 0
+	&& Player_is_robot(pl)) {
 	pl->home_base = Base_by_index(world, 0);
 	Pick_startpos(pl);
     }
@@ -642,7 +644,7 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 
     if (type == CANNON) {
 	Player_crash(pl, CrashCannon, mapobj_ind, 1);
-	if (BIT(pl->pl_status, KILLED))
+	if (Player_is_killed(pl))
 	    return;
 	/* The player may bounce from the cannon if both have shields up. */
     }
@@ -2748,7 +2750,8 @@ void Move_player(player_t *pl)
     world_t *world = &World;
 
     if (!Player_is_playing(pl)) {
-	if (!BIT(pl->pl_status, KILLED|PAUSE)) {
+	if (!(Player_is_killed(pl)
+	      || Player_is_paused(pl))) {
 	    pos.cx = pl->pos.cx + FLOAT_TO_CLICK(pl->vel.x * timeStep);
 	    pos.cy = pl->pos.cy + FLOAT_TO_CLICK(pl->vel.y * timeStep);
 	    pos.cx = WRAP_XCLICK(pos.cx);
@@ -2829,14 +2832,14 @@ void Move_player(player_t *pl)
 	    if (ans.line != -1) {
 		if (SIDE(pl->vel.x, pl->vel.y, ans.line) < 0) {
 		    Bounce_player(pl, &mv, ans.line, ans.point);
-		    if (BIT(pl->pl_status, KILLED))
+		    if (Player_is_killed(pl))
 			break;
 		}
 		else if (!Shape_away(&mv, (shape_t *)pl->ship, pl->dir,
 				     ans.line, &ans)) {
 		    if (SIDE(pl->vel.x, pl->vel.y, ans.line) < 0) {
 			Bounce_player(pl, &mv, ans.line, ans.point);
-			if (BIT(pl->pl_status, KILLED))
+			if (Player_is_killed(pl))
 			    break;
 		    }
 		    else {

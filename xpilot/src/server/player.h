@@ -329,14 +329,18 @@ struct player {
 
 };
 
-
-/*
- * Prototypes for player.c
- */
 extern int	playerArrayNumber;
 extern player_t	**PlayersArray;
 
 int GetInd(int id);
+
+/* player was killed this frame ? */
+static inline bool Player_is_killed(player_t *pl)
+{
+    if (BIT(pl->pl_status, KILLED))
+	return true;
+    return false;
+}
 
 /*
  * Get player with index 'ind' from Players array.
@@ -351,20 +355,6 @@ static inline player_t *Player_by_index(int ind)
 static inline player_t *Player_by_id(int id)
 {
     return Player_by_index(GetInd(id));
-}
-
-static inline bool Player_is_playing(player_t *pl)
-{
-    if (BIT(pl->pl_status, PLAYING|PAUSE|GAME_OVER|KILLED) == PLAYING)
-	return true;
-    return false;
-}
-
-static inline bool Player_is_active(player_t *pl)
-{
-    if (BIT(pl->pl_status, PLAYING|PAUSE|GAME_OVER) == PLAYING)
-	return true;
-    return false;
 }
 
 static inline bool Player_is_waiting(player_t *pl)
@@ -454,12 +444,6 @@ static inline bool Players_are_allies(player_t *pl1, player_t *pl2)
     return false;
 }
 
-void Pick_startpos(player_t *pl);
-void Go_home(player_t *pl);
-void Compute_sensor_range(player_t *pl);
-void Player_add_tank(player_t *pl, double tank_fuel);
-void Player_remove_tank(player_t *pl, int which_tank);
-
 static inline bool Player_used_emergency_shield(player_t *pl)
 {
     if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) ==
@@ -468,6 +452,37 @@ static inline bool Player_used_emergency_shield(player_t *pl)
     return false;
 }
 
+
+static inline bool Player_is_playing(player_t *pl)
+{
+    if (Player_is_killed(pl))
+	return false;
+    if (Player_is_paused(pl))
+	return false;
+    if (BIT(pl->pl_status, PLAYING|GAME_OVER) == PLAYING)
+	return true;
+    return false;
+}
+
+static inline bool Player_is_active(player_t *pl)
+{
+    if (Player_is_paused(pl))
+	return false;
+    if (BIT(pl->pl_status, PLAYING|GAME_OVER) == PLAYING)
+	return true;
+    return false;
+}
+
+
+/*
+ * Prototypes for player.c
+ */
+
+void Pick_startpos(player_t *pl);
+void Go_home(player_t *pl);
+void Compute_sensor_range(player_t *pl);
+void Player_add_tank(player_t *pl, double tank_fuel);
+void Player_remove_tank(player_t *pl, int which_tank);
 void Player_hit_armor(player_t *pl);
 void Player_used_kill(player_t *pl);
 void Player_set_mass(player_t *pl);

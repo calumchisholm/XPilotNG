@@ -464,8 +464,13 @@ void PlayerCheckpointCollision(player_t *pl)
 {
     world_t *world = pl->world;
 
-    if (BIT(world->rules->mode, TIMING)
-	&& BIT(pl->pl_status, PAUSE|GAME_OVER) == 0) {
+    if (!BIT(world->rules->mode, TIMING))
+	return;
+
+    if (Player_is_paused(pl))
+	return;
+
+    if (BIT(pl->pl_status, GAME_OVER) == 0) {
 	check_t *check = Check_by_index(world, pl->check);
 
 	if (pl->round != 0)

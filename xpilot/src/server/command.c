@@ -984,10 +984,12 @@ static int Cmd_plinfo(char *arg, player_t *pl, int oper, char *msg, size_t size)
     }
 
     snprintf(msg, size,
-	     "%-15s Ver: 0x%x  MaxFPS: %d  Turnspeed: %.2f  Turnres: %.2f RTT: %.3f RTT_dev %.4f",
+	     "%-15s Ver: 0x%x MaxFPS: %d Turnspeed: %.2f Turnres: %.2f "
+	     "RTT: %.3f RTT_dev: %.4f",
 	     pl2->name, pl2->version,
-	     pl2->player_fps, pl2->turnspeed, pl2->turnresistance
-	     ,(pl2->conn->rtt_smoothed >> 3)*timePerFrame,(pl2->conn->rtt_dev >> 2)*timePerFrame);
+	     pl2->player_fps, pl2->turnspeed, pl2->turnresistance,
+	     (pl2->conn->rtt_smoothed >> 3) * timePerFrame,
+	     (pl2->conn->rtt_dev >> 2) * timePerFrame);
 
     return CMD_RESULT_SUCCESS;
 }

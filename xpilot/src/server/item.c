@@ -137,13 +137,13 @@ void Place_item(world_t *world, player_t *pl, int item)
     item_concentrator_t	*con;
 
     if (NumObjs >= MAX_TOTAL_SHOTS) {
-	if (pl && !BIT(pl->pl_status, KILLED))
+	if (pl && !Player_is_killed(pl))
 	    pl->item[item]--;
 	return;
     }
 
     if (pl) {
-	if (BIT(pl->pl_status, KILLED)) {
+	if (Player_is_killed(pl)) {
 	    num_lose = pl->item[item] - world->items[item].initial;
 	    if (num_lose <= 0)
 		return;
@@ -182,7 +182,7 @@ void Place_item(world_t *world, player_t *pl, int item)
 	grav = GRAVITY;
 	rand_item = 0;
 	pos = pl->prevpos;
-	if (!BIT(pl->pl_status, KILLED)) {
+	if (!Player_is_killed(pl)) {
 	    /*
 	     * Player is dropping an item on purpose.
 	     * Give the item some offset so that the
@@ -257,7 +257,7 @@ void Place_item(world_t *world, player_t *pl, int item)
 	if (pl) {
 	    vel.x += pl->vel.x;
 	    vel.y += pl->vel.y;
-	    if (!BIT(pl->pl_status, KILLED)) {
+	    if (!Player_is_killed(pl)) {
 		double vl = LENGTH(vel.x, vel.y);
 		int dvx = (int)(rfrac() * 8);
 		int dvy = (int)(rfrac() * 8);
@@ -362,7 +362,7 @@ void Detonate_items(player_t *pl)
     modifiers_t mods;
     world_t *world = pl->world;
 
-    if (!BIT(pl->pl_status, KILLED))
+    if (!Player_is_killed(pl))
 	return;
 
     /* ZE: Detonated items on tanks should belong to the tank's owner. */

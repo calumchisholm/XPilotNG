@@ -109,7 +109,7 @@ void Place_general_mine(world_t *world, player_t *pl, int team, int status,
 
     pos = World_wrap_clpos(world, pos);
 
-    if (pl && BIT(pl->pl_status, KILLED))
+    if (pl && Player_is_killed(pl))
 	life = rfrac() * 12;
     else if (BIT(status, FROMCANNON))
 	life = CANNON_SHOT_LIFE;
@@ -546,7 +546,7 @@ void Fire_general_shot(world_t *world, player_t *pl, cannon_t *cannon,
 		drain += CLUSTER_MASS_DRAIN(mass);
 	}
 
-	if (pl && BIT(pl->pl_status, KILLED))
+	if (pl && Player_is_killed(pl))
 	    life = rfrac() * 12;
 	else if (!cannon)
 	    life = options.missileLife;

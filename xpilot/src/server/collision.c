@@ -276,8 +276,8 @@ static void PlayerCollision(world_t *world)
 		    && BIT(pl_j->have, HAS_ARMOR))
 		    Player_hit_armor(pl_j);
 
-		if (BIT(pl_j->pl_status, KILLED)) {
-		    if (BIT(pl->pl_status, KILLED)) {
+		if (Player_is_killed(pl_j)) {
+		    if (Player_is_killed(pl)) {
 			Set_message_f("%s and %s crashed.",
 				      pl->name, pl_j->name);
 			if (!Player_is_tank(pl) && !Player_is_tank(pl_j)) {
@@ -333,7 +333,7 @@ static void PlayerCollision(world_t *world)
 		    }
 
 		} else {
-		    if (BIT(pl->pl_status, KILLED)) {
+		    if (Player_is_killed(pl)) {
 			int j_tank_owner = j;
 			player_t *j_tank_owner_pl;
 
@@ -361,13 +361,13 @@ static void PlayerCollision(world_t *world)
 		    }
 		}
 
-		if (BIT(pl_j->pl_status, KILLED)) {
+		if (Player_is_killed(pl_j)) {
 		    if (Player_is_robot(pl_j)
 			&& Robot_war_on_player(pl_j) == pl->id)
 			Robot_reset_war(pl_j);
 		}
 
-		if (BIT(pl->pl_status, KILLED)) {
+		if (Player_is_killed(pl)) {
 		    if (Player_is_robot(pl)
 			&& Robot_war_on_player(pl) == pl_j->id)
 			Robot_reset_war(pl);
@@ -638,7 +638,7 @@ static void PlayerObjectCollision(player_t *pl)
 	    if (!hit)
 		continue;
 	    Player_collides_with_ball(pl, obj);
-	    if (BIT(pl->pl_status, KILLED))
+	    if (Player_is_killed(pl))
 		return;
 	    continue;
 
@@ -656,7 +656,7 @@ static void PlayerObjectCollision(player_t *pl)
 	case OBJ_WRECKAGE:
 	case OBJ_DEBRIS:
 	    Player_collides_with_debris(pl, obj);
-	    if (BIT(pl->pl_status, KILLED))
+	    if (Player_is_killed(pl))
 		return;
 	    break;
 
@@ -665,7 +665,7 @@ static void PlayerObjectCollision(player_t *pl)
 		Player_collides_with_asteroid(pl, WIRE_PTR(obj));
 		Delta_mv_elastic((object_t *)pl, (object_t *)obj);
 	    }
-	    if (BIT(pl->pl_status, KILLED))
+	    if (Player_is_killed(pl))
 		return;
 	    continue;
 
@@ -676,7 +676,7 @@ static void PlayerObjectCollision(player_t *pl)
 
 	case OBJ_PULSE:
 	    Laser_pulse_hits_player(pl, PULSE_PTR(obj));
-	    if (BIT(pl->pl_status, KILLED))
+	    if (Player_is_killed(pl))
 		return;
 	    continue;
 
@@ -688,7 +688,7 @@ static void PlayerObjectCollision(player_t *pl)
 
 	if (BIT(OBJ_TYPEBIT(obj->type), KILLING_SHOTS)) {
 	    Player_collides_with_killing_shot(pl, obj);
-	    if (BIT(pl->pl_status, KILLED))
+	    if (Player_is_killed(pl))
 		return;
 	}
 

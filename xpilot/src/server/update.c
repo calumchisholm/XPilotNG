@@ -1159,11 +1159,9 @@ void Update_objects(world_t *world)
 	if (Player_is_playing(pl))
 	    Update_tanks(&(pl->fuel));
 
-	if (BIT(pl->pl_status, KILLED)) {
+	if (Player_is_killed(pl)) {
 	    Throw_items(pl);
-
 	    Detonate_items(pl);
-
 	    Kill_player(pl, true);
 	}
 
@@ -1193,20 +1191,12 @@ void Update_objects(world_t *world)
 	}
     }
 
-#if 0
-    warn("1. NumObjs = %d", NumObjs);
-#endif
-
     /*
      * Kill shots that ought to be dead.
      */
     for (i = NumObjs - 1; i >= 0; i--)
 	if ((Obj[i]->life -= timeStep) <= 0)
 	    Delete_shot(world, i);
-
-#if 0
-    warn("2. NumObjs = %d", NumObjs);
-#endif
 
      /*
       * In tag games, check if anyone is tagged. otherwise, tag someone.
