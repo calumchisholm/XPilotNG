@@ -206,7 +206,7 @@ noinst_LIBRARIES = libxpcommon.a
 libxpcommon_a_SOURCES = \
 	arraylist.c arraylist.h astershape.h audio.h \
 	bit.h \
-	checknames.c checknames.h commonproto.h config.c const.h \
+	checknames.c checknames.h click.h commonproto.h config.c const.h \
 	draw.h \
 	error.c error.h \
 	item.h \
@@ -216,7 +216,7 @@ libxpcommon_a_SOURCES = \
 	net.c net.h \
 	pack.h packet.h portability.c portability.h \
 	randommt.c rules.h \
-	setup.h shipshape.c socklib.c socklib.h \
+	setup.h shipshape.c shipshape.h socklib.c socklib.h \
 	strcasecmp.c strdup.c strlcpy.c \
 	types.h \
 	version.h \

@@ -50,7 +50,6 @@
 #include "player.h"
 #include "asteroid.h"
 #include "cannon.h"
-#include "click.h"
 #include "connection.h"
 #include "defaults.h"
 #include "map.h"

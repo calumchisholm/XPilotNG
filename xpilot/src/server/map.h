@@ -334,6 +334,73 @@ static inline clpos_t World_wrap_clpos(clpos_t pos)
     return pos;
 }
 
+
+/*
+ * Two inline function for edge wrap of x and y coordinates measured
+ * in clicks.
+ *
+ * Note that even when wrap play is off, ships will wrap around the map
+ * if there is not walls that hinder it.
+ */
+static inline int WRAP_XCLICK(int cx)
+{
+    return World_wrap_xclick(cx);
+}
+
+static inline int WRAP_YCLICK(int cy)
+{
+    return World_wrap_yclick(cy);
+}
+
+
+/*
+ * Two macros for edge wrap of differences in position.
+ * If the absolute value of a difference is bigger than
+ * half the map size then it is wrapped.
+ */
+#define WRAP_DCX(dcx)	\
+	(BIT(world->rules->mode, WRAP_PLAY) \
+	    ? ((dcx) < - (world->cwidth >> 1) \
+		? (dcx) + world->cwidth \
+		: ((dcx) > (world->cwidth >> 1) \
+		    ? (dcx) - world->cwidth \
+		    : (dcx))) \
+	    : (dcx))
+
+#define WRAP_DCY(dcy)	\
+	(BIT(world->rules->mode, WRAP_PLAY) \
+	    ? ((dcy) < - (world->cheight >> 1) \
+		? (dcy) + world->cheight \
+		: ((dcy) > (world->cheight >> 1) \
+		    ? (dcy) - world->cheight \
+		    : (dcy))) \
+	    : (dcy))
+
+#define TWRAP_XCLICK(x_) \
+     ((x_) > 0 ? (x_) % world->cwidth : \
+      ((x_) % world->cwidth + world->cwidth))
+
+#define TWRAP_YCLICK(y_) \
+     ((y_) > 0 ? (y_) % world->cheight : \
+      ((y_) % world->cheight + world->cheight))
+
+
+#define CENTER_XCLICK(X) \
+        (((X) < -(world->cwidth >> 1)) ? \
+             (X) + world->cwidth : \
+             (((X) >= (world->cwidth >> 1)) ? \
+                 (X) - world->cwidth : \
+                 (X)))
+
+#define CENTER_YCLICK(X) \
+        (((X) < -(world->cheight >> 1)) ? \
+	     (X) + world->cheight : \
+	     (((X) >= (world->cheight >> 1)) ? \
+	         (X) - world->cheight : \
+	         (X)))
+
+
+
 #define Num_asteroidConcs()	Arraylist_get_num_elements(world->asteroidConcs)
 #define Num_bases()		Arraylist_get_num_elements(world->bases)
 #define Num_cannons()		Arraylist_get_num_elements(world->cannons)

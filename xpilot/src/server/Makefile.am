@@ -2,7 +2,7 @@ AM_CPPFLAGS = -DCONF_DATADIR=\"$(pkgdatadir)/\" -I$(top_srcdir)/src/common
 bin_PROGRAMS = xpilot-ng-server
 xpilot_ng_server_SOURCES = \
 	alliance.c asteroid.c asteroid.h \
-	cannon.c cannon.h cell.c click.h cmdline.c collision.c \
+	cannon.c cannon.h cell.c cmdline.c collision.c \
 	command.c connection.h contact.c \
 	defaults.h \
 	event.c \
