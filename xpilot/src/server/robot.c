@@ -1053,7 +1053,6 @@ void Robot_update(void)
     bool		tick_this_update = false;
     static int		ticks_per_second = 0;
 
-
     num_any_ships = NumPlayers + login_in_progress;
     num_playing_ships = num_any_ships - NumPseudoPlayers;
     if ((num_playing_ships < maxRobots
