@@ -231,7 +231,7 @@ bool Key_press(keys_t key)
 
 	    snprintf(msg, sizeof(msg),
 		     "Steering with mouse is superior. "
-		     "Enable with one of: %s.", val);
+		     "Key(s) to enable mouse steering: %s.", val);
 
 	    Add_newbie_message(msg);
 	    thrusthelp = true;
@@ -313,7 +313,7 @@ bool Key_press(keys_t key)
 	    else
 		snprintf(msg, sizeof(msg),
 			 "Mouse steering disabled. "
-			 "Key(s) to disable it: %s.", val);
+			 "Key(s) to enable it: %s.", val);
 
     	    Add_newbie_message(msg);
 	}
@@ -596,35 +596,36 @@ static const char *getPointerButtonBinding(xp_option_t *opt)
 /*
  * Generic key options.
  */
+/* unused: a s */
 xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keyTurnLeft",
-	"a Left",
+	"Left",
 	KEY_TURN_LEFT,
 	"Turn left (anti-clockwise).\n"),
 
     XP_KEY_OPTION(
 	"keyTurnRight",
-	"s Right",
+	"Right",
 	KEY_TURN_RIGHT,
 	"Turn right (clockwise).\n"),
 
     XP_KEY_OPTION(
 	"keyThrust",
-	"Shift_L Up", /* Shift_R was here also */
+	"Up",
 	KEY_THRUST,
 	"Thrust.\n"),
 
     XP_KEY_OPTION(
 	"keyShield",
-	"Caps_Lock Down", /* was Caps_lock space */
+	"space",
 	KEY_SHIELD,
 	"Raise or toggle the shield.\n"),
 
     XP_KEY_OPTION(
 	"keyFireShot",
-	"Return",	/* Linefeed removed */
+	"Shift_L Shift_R Control_L Control_R",
 	KEY_FIRE_SHOT,
 	"Fire shot.\n"
 	"Note that shields must be down to fire.\n"),
@@ -679,7 +680,7 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keyLockNextClose",
-	"",		/* Down removed */
+	"Down",
 	KEY_LOCK_NEXT_CLOSE,
 	"Lock on next closest player.\n"),
 
@@ -697,7 +698,7 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keyRefuel",
-	"f Control_L Control_R",
+	"f",
 	KEY_REFUEL,
 	"Refuel.\n"),
 
@@ -740,7 +741,7 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keySwapSettings",
-	"", /* was Escape */
+	"",
 	KEY_SWAP_SETTINGS,
 	"Swap control settings.\n"
 	"These are the power, turn speed and turn resistance settings.\n"),
@@ -760,13 +761,13 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keyConnector",
-	"f Control_L Control_R",
+	"f",
 	KEY_CONNECTOR,
 	"Connect to a ball.\n"),
 
     XP_KEY_OPTION(
 	"keyDropBall",
-	"d Shift_R",
+	"d",
 	KEY_DROP_BALL,
 	"Drop a ball.\n"),
 
@@ -910,7 +911,7 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keyEmergencyShield",
-	"g",
+	"Caps_Lock",
 	KEY_EMERGENCY_SHIELD,
 	"Toggle emergency shield power.\n"),
 
@@ -1060,7 +1061,7 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keyPointerControl",
-	"space KP_Enter",
+	"Return KP_Enter",
 	KEY_POINTER_CONTROL,
 	"Toggle pointer control.\n"),
 
@@ -1206,7 +1207,7 @@ xp_option_t key_options[] = {
 
     XP_STRING_OPTION(
 	"pointerButton3",
-	"keyDropBall",
+	"keyThrust",
 	NULL, 0,
 	setPointerButtonBinding, NULL, getPointerButtonBinding,
 	XP_OPTFLAG_DEFAULT,
