@@ -160,17 +160,16 @@ void Cloak(player_t *pl, bool on)
 void Deflector(player_t *pl, bool on)
 {
     if (on) {
-	if (!BIT(pl->used, HAS_DEFLECTOR) && pl->item[ITEM_DEFLECTOR] > 0) {
-	    SET_BIT(pl->used, HAS_DEFLECTOR);
+	if (!BIT(pl->used, USES_DEFLECTOR)
+	    && pl->item[ITEM_DEFLECTOR] > 0) {
+	    SET_BIT(pl->used, USES_DEFLECTOR);
 	    sound_play_player(pl, DEFLECTOR_SOUND);
 	}
     } else {
-	if (BIT(pl->used, HAS_DEFLECTOR)) {
-	    CLR_BIT(pl->used, HAS_DEFLECTOR);
+	if (BIT(pl->used, USES_DEFLECTOR)) {
+	    CLR_BIT(pl->used, USES_DEFLECTOR);
 	    sound_play_player(pl, DEFLECTOR_SOUND);
 	}
-	if (!pl->item[ITEM_DEFLECTOR])
-	    CLR_BIT(pl->have, HAS_DEFLECTOR);
     }
 }
 
@@ -675,8 +674,8 @@ static void Use_items(player_t *pl)
 	}
     }
 
-    if (do_update_this_frame && BIT(pl->used, HAS_DEFLECTOR))
-	Do_deflector(pl);	/* !@# no real need for do_update_this_frame */
+    if (BIT(pl->used, USES_DEFLECTOR))
+	Do_deflector(pl);
 
     /*
      * Compute energy drainage
@@ -691,7 +690,7 @@ static void Use_items(player_t *pl)
 	if (BIT(pl->used, HAS_CLOAKING_DEVICE))
 	    Player_add_fuel(pl, ED_CLOAKING_DEVICE);
 
-	if (BIT(pl->used, HAS_DEFLECTOR))
+	if (BIT(pl->used, USES_DEFLECTOR))
 	    Player_add_fuel(pl, ED_DEFLECTOR);
     }
 }
@@ -933,7 +932,7 @@ static void Update_players(world_t *world)
 	    Do_repair(pl);
 
 	if (pl->fuel.sum <= 0) {
-	    CLR_BIT(pl->used, HAS_SHIELD|HAS_CLOAKING_DEVICE|HAS_DEFLECTOR);
+	    CLR_BIT(pl->used, HAS_SHIELD|HAS_CLOAKING_DEVICE|USES_DEFLECTOR);
 	    Player_thrust(pl, false);
 	}
 	if (pl->fuel.sum > (pl->fuel.max - REFUEL_RATE * timeStep))

@@ -206,7 +206,7 @@ void Go_home(player_t *pl)
 	    pl->shield_time = SHIELD_TIME;
 	    SET_BIT(pl->have, HAS_SHIELD);
 	}
-	if (BIT(pl->have, HAS_DEFLECTOR))
+	if (pl->item[ITEM_DEFLECTOR] > 0)
 	    Deflector(pl, true);
     }
     Player_thrust(pl, false);

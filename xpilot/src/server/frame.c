@@ -878,7 +878,7 @@ static void Frame_ships(connection_t *conn, player_t *pl)
 		      BIT(pl_i->used, HAS_CLOAKING_DEVICE) != 0,
 		      BIT(pl_i->used, HAS_EMERGENCY_SHIELD) != 0,
 		      BIT(pl_i->used, HAS_PHASING_DEVICE) != 0,
-		      BIT(pl_i->used, HAS_DEFLECTOR) != 0
+		      BIT(pl_i->used, USES_DEFLECTOR) != 0
 	    );
 	}
 

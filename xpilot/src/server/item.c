@@ -40,8 +40,6 @@ static void Item_update_flags(player_t *pl)
 	CLR_BIT(pl->have, HAS_CLOAKING_DEVICE);
 	pl->updateVisibility = true;
     }
-    if (pl->item[ITEM_DEFLECTOR] <= 0)
-	CLR_BIT(pl->have, HAS_DEFLECTOR);
     if (pl->item[ITEM_PHASING] <= 0
 	&& !BIT(pl->used, HAS_PHASING_DEVICE)
 	&& pl->phasing_left <= 0)
@@ -503,7 +501,7 @@ void Do_deflector(player_t *pl)
     double dx, dy, dist;
 
     if (pl->fuel.sum < -ED_DEFLECTOR) {
-	if (BIT(pl->used, HAS_DEFLECTOR))
+	if (BIT(pl->used, USES_DEFLECTOR))
 	    Deflector(pl, false);
 	return;
     }
@@ -816,7 +814,6 @@ void Do_general_transporter(world_t *world, int id, clpos_t pos,
     case ITEM_ARMOR:
 	break;
     case ITEM_DEFLECTOR:
-	SET_BIT(pl->have, HAS_DEFLECTOR);
 	break;
     case ITEM_PHASING:
 	SET_BIT(pl->have, HAS_PHASING_DEVICE);

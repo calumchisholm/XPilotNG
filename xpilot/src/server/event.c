@@ -1002,7 +1002,7 @@ int Handle_keyboard(player_t *pl)
 
 	    case KEY_DEFLECTOR:
 		if (pl->item[ITEM_DEFLECTOR] > 0)
-		    Deflector(pl, !BIT(pl->used, HAS_DEFLECTOR));
+		    Deflector(pl, !BIT(pl->used, USES_DEFLECTOR));
 		break;
 
 	    case KEY_HYPERJUMP:

@@ -1856,7 +1856,8 @@ static void Robot_default_play(player_t *pl)
 	&& !BIT(pl->used, HAS_EMERGENCY_THRUST))
 	Emergency_thrust(pl, true);
 
-    if (BIT(pl->have, HAS_DEFLECTOR) && !BIT(world->rules->mode, TIMING))
+    if (pl->item[ITEM_DEFLECTOR] > 0
+	&& !BIT(world->rules->mode, TIMING))
 	Deflector(pl, true);
 
     if (pl->fuel.sum
