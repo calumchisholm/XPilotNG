@@ -1097,10 +1097,10 @@ void Update_objects(void)
 		   + FUEL_MASS(pl->fuel.sum)
 		   + pl->item[ITEM_ARMOR] * ARMOR_MASS;
 
-	/* kps - ng wants if 0 here */
-	/* Turn back on after implemented */
-	/*#if 0*/
 
+	/*
+	 * Wormholes and warping
+	 */
 	if (BIT(pl->status, WARPING)) {
 	    position w;
 	    int wx, wy, proximity,
@@ -1116,64 +1116,64 @@ void Update_objects(void)
 
 	    if (pl->wormHoleHit != -1) {
 
-	    if (World.wormHoles[pl->wormHoleHit].countdown > 0) {
-		j = World.wormHoles[pl->wormHoleHit].lastdest;
-	    } else if (rfrac() < 0.10f) {
-		do
-		    j = (int)(rfrac() * World.NumWormholes);
-		while (World.wormHoles[j].type == WORM_IN
-		       || pl->wormHoleHit == j
-		       || World.wormHoles[j].temporary);
-	    } else {
-		nearestFront = nearestRear = -1;
-		proxFront = proxRear = 10000000;
-
-		for (j = 0; j < World.NumWormholes; j++) {
-		    if (j == pl->wormHoleHit
-			|| World.wormHoles[j].type == WORM_IN
-			|| World.wormHoles[j].temporary)
-			continue;
-
-		    wx = (World.wormHoles[j].pos.cx -
-			  World.wormHoles[pl->wormHoleHit].pos.cx) / CLICK;
-		    wy = (World.wormHoles[j].pos.cy -
-			  World.wormHoles[pl->wormHoleHit].pos.cy) / CLICK;
-		    wx = WRAP_DX(wx);
-		    wy = WRAP_DY(wy);
-
-		    proximity = (int)(pl->vel.y * wx + pl->vel.x * wy);
-		    proximity = ABS(proximity);
-
-		    if (pl->vel.x * wx + pl->vel.y * wy < 0) {
-			if (proximity < proxRear) {
-			    nearestRear = j;
-			    proxRear = proximity;
-			}
-		    } else if (proximity < proxFront) {
-			nearestFront = j;
-			proxFront = proximity;
-		    }
-		}
-
-#define RANDOM_REAR_WORM
-#ifndef RANDOM_REAR_WORM
-		j = nearestFront < 0 ? nearestRear : nearestFront;
-#else /* RANDOM_REAR_WORM */
-		if (nearestFront >= 0) {
-		    j = nearestFront;
-		} else {
+		if (World.wormHoles[pl->wormHoleHit].countdown > 0) {
+		    j = World.wormHoles[pl->wormHoleHit].lastdest;
+		} else if (rfrac() < 0.10f) {
 		    do
 			j = (int)(rfrac() * World.NumWormholes);
 		    while (World.wormHoles[j].type == WORM_IN
-			   || j == pl->wormHoleHit);
-		}
+			   || pl->wormHoleHit == j
+			   || World.wormHoles[j].temporary);
+		} else {
+		    nearestFront = nearestRear = -1;
+		    proxFront = proxRear = 10000000;
+
+		    for (j = 0; j < World.NumWormholes; j++) {
+			if (j == pl->wormHoleHit
+			    || World.wormHoles[j].type == WORM_IN
+			    || World.wormHoles[j].temporary)
+			    continue;
+
+			wx = (World.wormHoles[j].pos.cx -
+			      World.wormHoles[pl->wormHoleHit].pos.cx) / CLICK;
+			wy = (World.wormHoles[j].pos.cy -
+			      World.wormHoles[pl->wormHoleHit].pos.cy) / CLICK;
+			wx = WRAP_DX(wx);
+			wy = WRAP_DY(wy);
+			
+			proximity = (int)(pl->vel.y * wx + pl->vel.x * wy);
+			proximity = ABS(proximity);
+			
+			if (pl->vel.x * wx + pl->vel.y * wy < 0) {
+			    if (proximity < proxRear) {
+				nearestRear = j;
+				proxRear = proximity;
+			    }
+			} else if (proximity < proxFront) {
+			    nearestFront = j;
+			    proxFront = proximity;
+			}
+		    }
+		    
+#define RANDOM_REAR_WORM
+#ifndef RANDOM_REAR_WORM
+		    j = nearestFront < 0 ? nearestRear : nearestFront;
+#else /* RANDOM_REAR_WORM */
+		    if (nearestFront >= 0) {
+			j = nearestFront;
+		    } else {
+			do
+			    j = (int)(rfrac() * World.NumWormholes);
+			while (World.wormHoles[j].type == WORM_IN
+			       || j == pl->wormHoleHit);
+		    }
 #endif /* RANDOM_REAR_WORM */
-	    }
+		}
 
-	    sound_play_sensors(pl->pos.cx, pl->pos.cy, WORM_HOLE_SOUND);
+		sound_play_sensors(pl->pos.cx, pl->pos.cy, WORM_HOLE_SOUND);
 
-	    w.x = CLICK_TO_PIXEL(World.wormHoles[j].pos.cx);
-	    w.y = CLICK_TO_PIXEL(World.wormHoles[j].pos.cy);
+		w.x = CLICK_TO_PIXEL(World.wormHoles[j].pos.cx);
+		w.y = CLICK_TO_PIXEL(World.wormHoles[j].pos.cy);
 
 	    } else { /* wormHoleHit == -1 */
 		int counter;
@@ -1181,7 +1181,7 @@ void Update_objects(void)
 		    w.x = (int)(rfrac() * World.width);
 		    w.y = (int)(rfrac() * World.height);
 		    if (BIT(1U << World.block[(int)(w.x/BLOCK_SZ)]
-					     [(int)(w.y/BLOCK_SZ)],
+			    [(int)(w.y/BLOCK_SZ)],
 			    SPACE_BLOCKS)) {
 			break;
 		    }
