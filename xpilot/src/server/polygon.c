@@ -282,11 +282,12 @@ int P_start_wormhole(int wormhole_ind)
     world_t *world = &World;
     wormhole_t *wormhole = Wormholes(world, wormhole_ind);
 
-    return Create_group(WORMHOLE,
-			TEAM_NOT_SET,
-			Wormhole_hitmask(wormhole),
-			Wormhole_hitfunc,
-			wormhole_ind);
+    wormhole->group = Create_group(WORMHOLE,
+				   TEAM_NOT_SET,
+				   Wormhole_hitmask(wormhole),
+				   Wormhole_hitfunc,
+				   wormhole_ind);
+    return wormhole->group;
 }
 
 void P_end_wormhole(void)

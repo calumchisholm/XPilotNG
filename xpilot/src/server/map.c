@@ -86,7 +86,7 @@ int World_place_cannon(world_t *world, clpos pos, int dir, int team)
     t.team = team;
     t.dead_time = 0;
     t.conn_mask = (unsigned)-1;
-    t.group = -1;
+    t.group = NO_GROUP;
     STORE(cannon_t, world->cannons, world->NumCannons, world->MaxCannons, t);
     cannon = Cannons(world, ind);
     Cannon_init(cannon);
@@ -169,7 +169,7 @@ int World_place_target(world_t *world, clpos pos, int team)
     t.conn_mask = (unsigned)-1;
     t.update_mask = 0;
     t.last_change = frame_loops;
-    t.group = -1;
+    t.group = NO_GROUP;
     STORE(target_t, world->targets, world->NumTargets, world->MaxTargets, t);
     return ind;
 }
@@ -181,11 +181,12 @@ int World_place_wormhole(world_t *world, clpos pos, wormType type)
 
     t.pos = pos;
     t.countdown = 0;
-    t.lastdest = -1;
+    t.lastdest = NO_IND;
     t.temporary = false;
     t.type = type;
     t.lastblock = SPACE;
-    t.lastID = -1;
+    t.lastID = NO_ID;
+    t.group = NO_GROUP;
     STORE(wormhole_t, world->wormholes,
 	  world->NumWormholes, world->MaxWormholes, t);
     return ind;
@@ -205,7 +206,8 @@ static void alloc_old_checks(world_t *world)
 
     for (i = 0; i < OLD_MAX_CHECKS; i++)
 	STORE(check_t, world->checks, world->NumChecks, world->MaxChecks, t);
-    
+
+    SHRINK(check_t, world->checks, world->NumChecks, world->MaxChecks);
     world->NumChecks = 0;
 }
 

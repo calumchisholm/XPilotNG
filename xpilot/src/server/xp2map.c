@@ -355,6 +355,7 @@ static void tagstart(void *data, const char *el, const char **attr)
     if (!strcasecmp(el, "Wormhole")) {
 	clpos pos = DEFAULT_POS;
 	wormType type = WORM_NORMAL;
+	int wh_ind;
 
 	while (*attr) {
 	    if (!strcasecmp(*attr, "x"))
@@ -374,7 +375,8 @@ static void tagstart(void *data, const char *el, const char **attr)
 
 	    attr += 2;
 	}
-	World_place_wormhole(world, pos, type);
+	wh_ind = World_place_wormhole(world, pos, type);
+	P_start_wormhole(wh_ind);
 	return;
     }
 
@@ -443,10 +445,12 @@ static void tagend(void *data, const char *el)
 	P_end_balltarget();
     else if (!strcasecmp(el, "Cannon"))
 	P_end_cannon();
-    else if (!strcasecmp(el, "Target"))
-	P_end_target();
     else if (!strcasecmp(el, "FrictionArea"))
 	P_end_friction_area();
+    else if (!strcasecmp(el, "Target"))
+	P_end_target();
+    else if (!strcasecmp(el, "Wormhole"))
+	P_end_wormhole();
     else if (!strcasecmp(el, "Polygon"))
 	P_end_polygon();
 

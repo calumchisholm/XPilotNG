@@ -180,8 +180,8 @@ typedef struct wormhole {
     bool	temporary;	/* wormhole was left by hyperjump */
     wormType	type;
     int		lastID;
-    u_byte	lastblock;	/* block it occluded */
-    u_byte	pad[3];
+    int		lastblock;	/* block it occluded */
+    int		group;
 } wormhole_t;
 
 typedef struct treasure {
