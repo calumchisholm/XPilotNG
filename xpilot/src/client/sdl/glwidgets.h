@@ -452,6 +452,12 @@ void MainWidget_ShowMenu( GLWidget *widget, bool show );
 typedef struct {
     bool	showconf;
     GLWidget	*scrollpane;
+    int		widthConfig;
+    int		widthTeams;
+    int		numTeams;
+    int		widthTeamButton;
+    GLWidget	*teamLabels[MAX_TEAMS];
+    GLWidget	*teamButtons[MAX_TEAMS];
     GLWidget	*ql;
     GLWidget	*qb;
     GLWidget	*sl;
