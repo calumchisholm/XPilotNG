@@ -45,8 +45,9 @@ int videoFlags;
 SDL_Surface  *MainSDLSurface = NULL;
 
 font_data gamefont;
-font_data messagefont;
 font_data mapfont;
+int gameFontSize;
+int mapFontSize;
 
 /* ugly kps hack */
 bool file_exists(const char *path) 
@@ -91,9 +92,6 @@ int Init_playing_windows(void)
 int Init_window(void)
 {
     char gamefontname[] = CONF_FONTDIR "Test.ttf";
-    int gamefontsize = 12;
-    int messagefontsize = 16;
-    int mapfontsize = 12;
     int value;
 
     if (TTF_Init()) {
@@ -166,27 +164,25 @@ int Init_window(void)
 
     /* Set title for window */
     SDL_WM_SetCaption(TITLE, NULL);
+    
     /* this prevents a freetype crash if you pass non existant fonts */
     if (!file_exists(gamefontname)) {
-      error("cannot find your game fonts.\n" \
-            "Please check you have run make install, if you have check" \
-	    "the setting of Conf_Datadir() in the text above this error" \
-            "ensure that your fonts and texures are located there.");
+      error("cannot find your game font '%s'.\n" \
+            "Please check you have run make install, if you have:\n" \
+            "ensure that your fonts and texures are located in\n" \
+	    "%s\n",gamefontname,CONF_FONTDIR);
       return -1;
     }
       
-    if (fontinit(&gamefont,gamefontname,gamefontsize)) {
+    if (fontinit(&gamefont,gamefontname,gameFontSize)) {
     	error("Font initialization failed with %s", gamefontname);
 	return -1;
     }
-    if (fontinit(&messagefont,gamefontname,messagefontsize)) {
+    if (fontinit(&mapfont,gamefontname,mapFontSize)) {
     	error("Font initialization failed with %s", gamefontname);
 	return -1;
     }
-    if (fontinit(&mapfont,gamefontname,mapfontsize)) {
-    	error("Font initialization failed with %s", gamefontname);
-	return -1;
-    }
+
     return 0;
 }
 
@@ -196,7 +192,7 @@ void Quit(void)
     Gui_cleanup();
     Console_cleanup();
     fontclean(&gamefont);
-    fontclean(&messagefont);
+    fontclean(&mapfont);
     TTF_Quit();
     SDL_Quit();
 }
@@ -223,7 +219,7 @@ static bool Set_geometry(xp_option_t *opt, const char *s)
 static const char* Get_geometry(xp_option_t *opt)
 {
     static char buf[20]; /* should be enough */
-    sprintf(buf, "%dx%d", draw_width, draw_height);
+    snprintf(buf, 20, "%dx%d", draw_width, draw_height);
     return buf;
 }
 
@@ -235,7 +231,24 @@ static xp_option_t sdlinit_options[] = {
 	0,
 	Set_geometry, NULL, Get_geometry,
 	XP_OPTFLAG_DEFAULT,
-	"Set the initial window geometry.\n")
+	"Set the initial window geometry.\n"),
+    
+     XP_INT_OPTION(
+        "gameFontSize",
+	16, 12, 32,
+	&gameFontSize,
+	NULL,
+	XP_OPTFLAG_DEFAULT,
+	"Height of font used for game strings.\n"),
+
+    XP_INT_OPTION(
+        "mapFontSize",
+	16, 12, 64,
+	&mapFontSize,
+	NULL,
+	XP_OPTFLAG_DEFAULT,
+	"Height of font used for message strings.\n")
+
 };
 
 void Store_sdlinit_options(void)

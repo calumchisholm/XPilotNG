@@ -2038,6 +2038,7 @@ static xp_option_t sdlgui_options[] = {
 	NULL,
 	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Use antialized smooth lines.\n")
+
 };
 
 void Store_sdlgui_options(void)

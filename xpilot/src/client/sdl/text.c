@@ -42,18 +42,6 @@
     slouken@libsdl.org
 */
 
-/*
- * This code was created by Jeff Molofee '99 
- * (ported to Linux/SDL by Ti Leggett '01)
- *
- * If you've found this code useful, please let me know.
- *
- * Visit Jeff at http://nehe.gamedev.net/
- * 
- * or for port-specific comments, questions, bugreports etc. 
- * email to leggett@eecs.tulane.edu
- */
-
 /* $Id$ */
 /* modified for xpilot by Erik Andersson deity_at_home.se */
 
@@ -69,67 +57,23 @@
 
 #include "text.h"
 
-#define NUM_TEXTURES 1
 #define BUFSIZE 1024
 
 float modelview_matrix[16];
 int renderstyle;
 enum rendertype rendertype;
 
-int LoadBMP(font_data *ft_font, const char * fname);
 void pushScreenCoordinateMatrix(void);
 void pop_projection_matrix(void);
 int next_p2 ( int a );
 void print(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, int length, const char *text, bool onHUD);
 int FTinit(font_data *font, const char * fontname, int ptsize);
+
 int next_p2 ( int a )
 {
 	int rval=1;
 	while(rval<a) rval<<=1;
 	return rval;
-}
-
-int LoadBMP(font_data *ft_font, const char * fname)
-{
-    /* Status indicator */
-    int returnval = 0;
-
-    /* Create storage space for the texture */
-    SDL_Surface *TextureImage;
-
-    /* Load The Bitmap, Check For Errors, If Bitmap's Not Found Quit */
-    if ( ( TextureImage = SDL_LoadBMP( fname ) ))
-        {
-	    ft_font->h = TextureImage->h/16;
-	    ft_font->linespacing = ft_font->h*1.3;/*this is now recommended spacing*/
-	    ft_font->W[0] = TextureImage->w/16;
-	    /* Set the status to true */
-	    returnval = 1;
-
-	    /* Create The Texture */
-	    glGenTextures( NUM_TEXTURES, &ft_font->textures[0] );
-
-	    /* Load in texture 1 */
-	    /* Typical Texture Generation Using Data From The Bitmap */
-	    glBindTexture( GL_TEXTURE_2D, ft_font->textures[0] );
-
-	    /* Generate The Texture */
-	    glTexImage2D( GL_TEXTURE_2D, 0, 3, TextureImage->w,
-			  TextureImage->h, 0, GL_BGR,
-			  GL_UNSIGNED_BYTE, TextureImage->pixels );
-	    /* Nearest Filtering */
-	    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-	    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	    /* Linear Filtering */
-	    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-	    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-        }
-
-    /* Free up any memory we may have used */
-    if ( TextureImage )
-	SDL_FreeSurface( TextureImage );
-
-    return returnval;
 }
 
 GLuint SDL_GL_LoadTexture(SDL_Surface *surface, texcoord_t *texcoord)
@@ -285,81 +229,7 @@ int FTinit(font_data *font, const char * fontname, int ptsize)
 
 int fontinit(font_data *ft_font, const char * fname, unsigned int size)
 {
-    GLuint loop; /* Loop variable               */
-    float cx;    /* Holds Our X Character Coord */
-    float cy;    /* Holds Our Y Character Coord */    
-    
-    if (strlen(fname)<5) return 1; /*not long enough to be a useful name*/
-    if (strcasecmp(".bmp",&fname[strlen(fname)-4]) != 0)
-    /* if its not a .bmp file lets try freetype if available */
-    	return FTinit(ft_font,fname,size);
-    {
-    	xpprintf("fontfile has to be foo.bmp\n");
-    }
-    if(!LoadBMP(ft_font,fname))
-    	return 1;
-    
-    ft_font->list_base  = glGenLists( NUMCHARS );
-
-    /* Loop Through All NUM_CHARS Lists */
-    for ( loop = 0; loop < NUMCHARS; loop++ )
-        {
-	    /* NOTE:
-	     *  BMPs are stored with the top-leftmost pixel being the
-	     * last byte and the bottom-rightmost pixel being the first
-	     * byte. So an image that is displayed as
-	     *    1 0
-	     *    0 0
-	     * is represented data-wise like
-	     *    0 0
-	     *    0 1
-	     * And because SDL_LoadBMP loads the raw data without
-	     * translating to how it is thought of when viewed we need
-	     * to start at the bottom-right corner of the data and work
-	     * backwards to get everything properly. So the below code has
-	     * been modified to reflect this. Examine how this is done and
-	     * how the original tutorial is done to grasp the differences.
-	     *
-	     * As a side note BMPs are also stored as BGR instead of RGB
-	     * and that is why we load the texture using GL_BGR. It's
-	     * bass-ackwards I know but whattaya gonna do?
-	     */
-    	    ft_font->W[loop] = ft_font->W[0];
-	    /* X Position Of Current Character */
-	    cx = 1 - ( float )( loop % 16 ) / 16.0f;
-	    /* Y Position Of Current Character */
-	    cy = 1 - ( float )( loop / 16 ) / 16.0f;
-
-            /* Start Building A List */
-	    glNewList( ft_font->list_base + ( 255 - loop ), GL_COMPILE );
-	      /* Use A Quad For Each Character */
-	      glBegin( GL_QUADS );
-	        /* Texture Coord (Bottom Left) */
-	        glTexCoord2f( cx - 0.0625, cy );
-		/* Vertex Coord (Bottom Left) */
-		glVertex2i( 0, 0 );
-
-		/* Texture Coord (Bottom Right) */
-		glTexCoord2f( cx, cy );
-		/* Vertex Coord (Bottom Right) */
-		glVertex2i( 16, 0 );
-
-		/* Texture Coord (Top Right) */
-		glTexCoord2f( cx, cy - 0.0625f );
-		/* Vertex Coord (Top Right) */
-		glVertex2i( 16, 16 );
-
-		/* Texture Coord (Top Left) */
-		glTexCoord2f( cx - 0.0625f, cy - 0.0625f);
-		/* Vertex Coord (Top Left) */
-		glVertex2i( 0, 16 );
-	      glEnd( );
-
-	      /* Move To The Left Of The Character */
-	      glTranslated( 10, 0, 0 );
-	    glEndList( );
-        }
-    return 0;
+    return FTinit(ft_font,fname,size);
 }
 
 void fontclean(font_data *ft_font)

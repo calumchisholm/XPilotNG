@@ -115,8 +115,10 @@ void disp_text_fraq(string_tex_t *string_tex, int color, int XALIGN, int YALIGN,
 void free_string_texture(string_tex_t *string_tex);
 
 extern font_data gamefont;
-extern font_data messagefont;
 extern font_data mapfont;
+
+extern int gameFontSize;
+extern int mapFontSize;
 
 extern string_tex_t score_object_texs[];
 
