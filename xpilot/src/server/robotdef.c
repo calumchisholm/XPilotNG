@@ -759,9 +759,99 @@ static inline double Wrap_length_min(double dcx, double dcy, double min)
 }
 
 
+static void Robotdef_fire_laser(player_t *pl)
+{
+    robot_default_data_t *my_data = Robot_default_get_data(pl);
+    double x2, y2, x3, y3, x4, y4, x5, y5;
+    double ship_dist, dir3, dir4, dir5;
+    clpos_t m_gun;
+    player_t *ship;
+
+    if (BIT(my_data->robot_lock, LOCK_PLAYER)
+	&& Player_is_active(Player_by_id(my_data->robot_lock_id)))
+	ship = Player_by_id(my_data->robot_lock_id);
+    else if (BIT(pl->lock.tagged, LOCK_PLAYER))
+	ship = Player_by_id(pl->lock.pl_id);
+    else
+	return;
+
+    /* kps - this should be Player_is_playing() ? */
+    if (!Player_is_active(ship))
+	return;
+
+    m_gun = Ship_get_m_gun_clpos(pl->ship, pl->dir);
+    x2 = CLICK_TO_PIXEL(pl->pos.cx) + pl->vel.x
+	+ CLICK_TO_PIXEL(m_gun.cx);
+    y2 = CLICK_TO_PIXEL(pl->pos.cy) + pl->vel.y
+	+ CLICK_TO_PIXEL(m_gun.cy);
+    x3 = CLICK_TO_PIXEL(ship->pos.cx) + ship->vel.x;
+    y3 = CLICK_TO_PIXEL(ship->pos.cy) + ship->vel.y;
+
+    ship_dist = Wrap_length(PIXEL_TO_CLICK(x3 - x2),
+			    PIXEL_TO_CLICK(y3 - y2)) / CLICK;
+
+    if (ship_dist >= options.pulseSpeed * options.pulseLife + SHIP_SZ)
+	return;
+
+    dir3 = Wrap_findDir(x3 - x2, y3 - y2);
+    x4 = x3 + tcos(MOD2((int)(dir3 - RES/4), RES)) * SHIP_SZ;
+    y4 = y3 + tsin(MOD2((int)(dir3 - RES/4), RES)) * SHIP_SZ;
+    x5 = x3 + tcos(MOD2((int)(dir3 + RES/4), RES)) * SHIP_SZ;
+    y5 = y3 + tsin(MOD2((int)(dir3 + RES/4), RES)) * SHIP_SZ;
+    dir4 = Wrap_findDir(x4 - x2, y4 - y2);
+    dir5 = Wrap_findDir(x5 - x2, y5 - y2);
+    if ((dir4 > dir5)
+	? (pl->dir >= dir4 || pl->dir <= dir5)
+	: (pl->dir >= dir4 && pl->dir <= dir5))
+	SET_BIT(pl->used, HAS_LASER);
+}
+
+static void Robotdef_do_tractor_beam(player_t *pl)
+{
+    robot_default_data_t *my_data = Robot_default_get_data(pl);
+
+    CLR_BIT(pl->used, HAS_TRACTOR_BEAM);
+    pl->tractor_is_pressor = false;
+
+    if (BIT(pl->lock.tagged, LOCK_PLAYER)
+	&& pl->fuel.sum > my_data->fuel_l3
+	&& pl->lock.distance
+	< TRACTOR_MAX_RANGE(pl->item[ITEM_TRACTOR_BEAM])) {
+
+	double xvd, yvd, vel;
+	int dir, away;
+	player_t *ship = Player_by_id(pl->lock.pl_id);
+
+	xvd = ship->vel.x - pl->vel.x;
+	yvd = ship->vel.y - pl->vel.y;
+	vel = LENGTH(xvd, yvd);
+	dir = (int)(Wrap_cfindDir(pl->pos.cx - ship->pos.cx,
+				  pl->pos.cy - ship->pos.cy)
+		    - findDir(xvd, yvd));
+	dir = MOD2(dir, RES);
+	away = (dir >= RES/4 && dir <= 3*RES/4);
+
+	/*
+	 * vel  - The relative velocity of ship to us.
+	 * away - Heading away from us?
+	 */
+	if (pl->velocity <= my_data->robot_normal_speed) {
+	    if (pl->lock.distance < (SHIP_SZ * 4)
+		|| (!away && vel > my_data->robot_attack_speed)) {
+		SET_BIT(pl->used, HAS_TRACTOR_BEAM);
+		pl->tractor_is_pressor = true;
+	    } else if (away
+		       && vel < my_data->robot_max_speed
+		       && vel > my_data->robot_normal_speed)
+		SET_BIT(pl->used, HAS_TRACTOR_BEAM);
+	}
+	if (BIT(pl->used, HAS_TRACTOR_BEAM))
+	    SET_BIT(pl->lock.tagged, LOCK_VISIBLE);
+    }
+}
+
 static bool Check_robot_target(player_t *pl, clpos_t item_pos, int new_mode)
 {
-    player_t *ship;
     long item_dist;
     int item_dir, travel_dir, delta_dir;
     long dx, dy;
@@ -925,6 +1015,7 @@ static bool Check_robot_target(player_t *pl, clpos_t item_pos, int new_mode)
     if (new_mode == RM_ATTACK
 	|| (BIT(world->rules->mode, TIMING)
 	    && new_mode == RM_NAVIGATE)) {
+
 	if (pl->item[ITEM_ECM] > 0
 	    && item_dist < ECM_DISTANCE / 4)
 	    Fire_ecm(pl);
@@ -934,88 +1025,11 @@ static bool Check_robot_target(player_t *pl, clpos_t item_pos, int new_mode)
 	    Do_transporter(pl);
 	else if (pl->item[ITEM_LASER] > pl->num_pulses
 		 && pl->fuel.sum + ED_LASER > my_data->fuel_l3
-		 && new_mode == RM_ATTACK) {
-	    if (BIT(my_data->robot_lock, LOCK_PLAYER)
-		&& Player_is_active(Player_by_id(my_data->robot_lock_id)))
-		ship = Player_by_id(my_data->robot_lock_id);
-	    else if (BIT(pl->lock.tagged, LOCK_PLAYER))
-		ship = Player_by_id(pl->lock.pl_id);
-	    else
-		ship = NULL;
+		 && new_mode == RM_ATTACK)
+	    Robotdef_fire_laser(pl);
+	else if (BIT(pl->have, HAS_TRACTOR_BEAM))
+	    Robotdef_do_tractor_beam(pl);
 
-	    if (ship && Player_is_active(ship)) {
-
-		double	x2, y2, x3, y3, x4, y4, x5, y5;
-		double	ship_dist, dir3, dir4, dir5;
-		clpos_t m_gun;
-
-		m_gun = Ship_get_m_gun_clpos(pl->ship, pl->dir);
-		x2 = CLICK_TO_PIXEL(pl->pos.cx) + pl->vel.x
-		    + CLICK_TO_PIXEL(m_gun.cx);
-		y2 = CLICK_TO_PIXEL(pl->pos.cy) + pl->vel.y
-		    + CLICK_TO_PIXEL(m_gun.cy);
-		x3 = CLICK_TO_PIXEL(ship->pos.cx) + ship->vel.x;
-		y3 = CLICK_TO_PIXEL(ship->pos.cy) + ship->vel.y;
-
-		ship_dist = Wrap_length(PIXEL_TO_CLICK(x3 - x2),
-					PIXEL_TO_CLICK(y3 - y2)) / CLICK;
-
-		if (ship_dist < options.pulseSpeed * options.pulseLife + SHIP_SZ) {
-		    dir3 = Wrap_findDir(x3 - x2, y3 - y2);
-		    x4 = x3 + tcos(MOD2((int)(dir3 - RES/4), RES)) * SHIP_SZ;
-		    y4 = y3 + tsin(MOD2((int)(dir3 - RES/4), RES)) * SHIP_SZ;
-		    x5 = x3 + tcos(MOD2((int)(dir3 + RES/4), RES)) * SHIP_SZ;
-		    y5 = y3 + tsin(MOD2((int)(dir3 + RES/4), RES)) * SHIP_SZ;
-		    dir4 = Wrap_findDir(x4 - x2, y4 - y2);
-		    dir5 = Wrap_findDir(x5 - x2, y5 - y2);
-		    if ((dir4 > dir5)
-			? (pl->dir >= dir4 || pl->dir <= dir5)
-			: (pl->dir >= dir4 && pl->dir <= dir5))
-			SET_BIT(pl->used, HAS_LASER);
-		}
-	    }
-	}
-	else if (BIT(pl->have, HAS_TRACTOR_BEAM)) {
-	    CLR_BIT(pl->used, HAS_TRACTOR_BEAM);
-	    pl->tractor_is_pressor = false;
-
-	    if (BIT(pl->lock.tagged, LOCK_PLAYER)
-		&& pl->fuel.sum > my_data->fuel_l3
-		&& pl->lock.distance
-		   < TRACTOR_MAX_RANGE(pl->item[ITEM_TRACTOR_BEAM])) {
-
-		double xvd, yvd, vel;
-		long dir;
-		int away;
-
-		ship = Player_by_id(pl->lock.pl_id);
-		xvd = ship->vel.x - pl->vel.x;
-		yvd = ship->vel.y - pl->vel.y;
-		vel = LENGTH(xvd, yvd);
-		dir = (long)(Wrap_cfindDir(pl->pos.cx - ship->pos.cx,
-					   pl->pos.cy - ship->pos.cy)
-			     - findDir(xvd, yvd));
-		dir = MOD2(dir, RES);
-		away = (dir >= RES/4 && dir <= 3*RES/4);
-
-		/*
-		 * vel  - The relative velocity of ship to us.
-		 * away - Heading away from us?
-		 */
-		if (pl->velocity <= my_data->robot_normal_speed) {
-		    if (pl->lock.distance < (SHIP_SZ * 4)
-			|| (!away && vel > my_data->robot_attack_speed)) {
-			SET_BIT(pl->used, HAS_TRACTOR_BEAM);
-			pl->tractor_is_pressor = true;
-		    } else if (away
-			       && vel < my_data->robot_max_speed
-			       && vel > my_data->robot_normal_speed)
-			SET_BIT(pl->used, HAS_TRACTOR_BEAM);
-		}
-		if (BIT(pl->used, HAS_TRACTOR_BEAM))
-		    SET_BIT(pl->lock.tagged, LOCK_VISIBLE);
-	    }
-	}
 	if (BIT(pl->used, HAS_LASER)) {
 	    pl->turnacc = 0.0;
 	    Choose_weapon_modifier(pl, HAS_LASER);
