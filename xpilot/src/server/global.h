@@ -141,6 +141,7 @@ extern bool		missilesWallBounce;
 extern bool		sparksWallBounce;
 extern bool		debrisWallBounce;
 extern bool		asteroidsWallBounce;
+extern bool		pulsesWallBounce;
 extern bool		cloakedExhaust;
 extern bool		cloakedShield;
 extern bool		ecmsReprogramMines;
