@@ -121,7 +121,6 @@ static void Xpmap_missing_error(int line_num)
  * Grok block based map data.
  *
  * Create World.block using mapData.
- * Count objects on map.
  * Free mapData.
  */
 void Xpmap_grok_map_data(void)
