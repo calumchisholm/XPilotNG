@@ -413,28 +413,27 @@ static int Frame_status(int conn, int ind)
 
     CLR_BIT(pl->lock.tagged, LOCK_VISIBLE);
     if (BIT(pl->lock.tagged, LOCK_PLAYER) && BIT(pl->used, HAS_COMPASS)) {
+	player *lock_pl = Player_by_id(pl->lock.pl_id);
+
 	lock_id = pl->lock.pl_id;
-	/* kps - fix - lock_pl = Player_by_id(lock_id); */
 	lock_ind = GetInd(lock_id);
 
 	if ((!BIT(World.rules->mode, LIMITED_VISIBILITY)
 	     || pl->lock.distance <= pl->sensor_range)
 #ifndef SHOW_CLOAKERS_RANGE
 	    && (pl->visibility[lock_ind].canSee
-		|| OWNS_TANK(ind, lock_ind)
-		|| TEAM(ind, lock_ind)
-		|| ALLIANCE(ind, lock_ind))
+		|| OWNS_TANK(pl, lock_pl)
+		|| TEAM(pl, lock_pl)
+		|| ALLIANCE(pl, lock_pl))
 #endif
-	    && BIT(Players(lock_ind)->status, PLAYING|GAME_OVER) == PLAYING
+	    && BIT(lock_pl->status, PLAYING|GAME_OVER) == PLAYING
 	    && (playersOnRadar
-		|| click_inview(&cv,
-				Players(lock_ind)->pos.cx,
-				Players(lock_ind)->pos.cy))
+		|| click_inview(&cv, lock_pl->pos.cx, lock_pl->pos.cy))
 	    && pl->lock.distance != 0) {
 	    SET_BIT(pl->lock.tagged, LOCK_VISIBLE);
 	    lock_dir
-		= (int)Wrap_cfindDir(Players(lock_ind)->pos.cx - pl->pos.cx,
-				     Players(lock_ind)->pos.cy - pl->pos.cy);
+		= (int)Wrap_cfindDir(lock_pl->pos.cx - pl->pos.cx,
+				     lock_pl->pos.cy - pl->pos.cy);
 	    lock_dist = (int)pl->lock.distance;
 	}
     }
@@ -1005,9 +1004,9 @@ static void Frame_ships(int conn, int ind)
 
 	/* Don't transmit information if fighter is invisible */
 	if (pl->visibility[i].canSee
-	    || i == ind
-	    || TEAM(i, ind)
-	    || ALLIANCE(i, ind)) {
+	    || pl_i->id == pl->id
+	    || TEAM(pl_i, pl)
+	    || ALLIANCE(pl_i, pl)) {
 	    /*
 	     * Transmit ship information
 	     */
@@ -1153,9 +1152,9 @@ static void Frame_radar(int conn, int ind)
 	     */
 	    if (pl_i->conn == conn
 		|| !Player_is_active(pl_i) /* kps - active / playing ??? */
-		|| (!TEAM(i, ind)
-		    && !ALLIANCE(ind, i)
-		    && !OWNS_TANK(ind, i)
+		|| (!TEAM(pl_i, pl)
+		    && !ALLIANCE(pl, pl_i)
+		    && !OWNS_TANK(pl, pl_i)
 		    && (!playersOnRadar || !pl->visibility[i].canSee))) {
 		continue;
 	    }
@@ -1173,7 +1172,7 @@ static void Frame_radar(int conn, int ind)
 		continue;
 	    }
 	    size = 3;
-	    if (TEAM(i, ind) || ALLIANCE(ind, i) || OWNS_TANK(ind, i)) {
+	    if (TEAM(pl_i, pl) || ALLIANCE(pl, pl_i) || OWNS_TANK(pl, pl_i)) {
 		size |= 0x80;
 	    }
 	    Frame_radar_buffer_add(cx, cy, size);

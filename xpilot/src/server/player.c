@@ -2133,7 +2133,7 @@ void Player_death_reset(int ind, bool add_rank_death)
 /* determines if two players are immune to eachother */
 int Team_immune(int id1, int id2)
 {
-    int		ind1, ind2;
+    player 	*pl1, *pl2;
 
     if (id1 == id2) {
 	/* owned stuff is never team immune */
@@ -2148,15 +2148,15 @@ int Team_immune(int id1, int id2)
 	return 0;
     }
 
-    ind1 = GetInd(id1);
-    ind2 = GetInd(id2);
+    pl1 = Player_by_id(id1);
+    pl2 = Player_by_id(id2);
 
-    if (TEAM(ind1, ind2)) {
+    if (TEAM(pl1, pl2)) {
 	/* players are teammates */
 	return 1;
     }
 
-    if (ALLIANCE(ind1, ind2)) {
+    if (ALLIANCE(pl1, pl2)) {
 	/* players are allies */
 	return 1;
     }

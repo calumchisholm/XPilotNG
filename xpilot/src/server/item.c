@@ -1141,7 +1141,7 @@ void Fire_general_ecm(int ind, unsigned short team, int cx, int cy)
 	if (BIT(World.rules->mode, TEAM_PLAY) && p->team == team)
 	    continue;
 
-	if (pl && ALLIANCE(ind, i))
+	if (pl && ALLIANCE(pl, p))
 	    continue;
 
 	if (BIT(p->used, HAS_PHASING_DEVICE))

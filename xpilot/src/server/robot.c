@@ -982,8 +982,8 @@ void Robot_war(int ind, int killer)
 
     if (IS_ROBOT_PTR(pl)
 	&& (int)(rfrac() * 100) < kp->score - pl->score
-	&& !TEAM(ind, killer)
-	&& !ALLIANCE(ind, killer)) {
+	&& !TEAM(pl, kp)
+	&& !ALLIANCE(pl, kp)) {
 
 	Robot_talks(ROBOT_TALK_WAR, pl->name, kp->name);
 

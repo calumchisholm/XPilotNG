@@ -132,7 +132,9 @@ static void Set_swapper_state(player * pl)
 	int i;
 
 	for (i = 0; i < NumPlayers; i++) {
-	    if (!TEAM(ind, i) && !BIT(Players(i)->status, PAUSE)) {
+	    player *pl_i = Players(i);
+
+	    if (!TEAM(pl, pl_i) && !BIT(pl_i->status, PAUSE)) {
 		/* put team swapping player waiting mode. */
 		if (pl->mychar == ' ')
 		    pl->mychar = 'W';

@@ -97,42 +97,40 @@
 	    : (dy))
 
 
-#define PSEUDO_TEAM(i,j)\
-	(Players((i))->pseudo_team == Players((j))->pseudo_team)
+#define PSEUDO_TEAM(pl1,pl2)\
+	((pl1)->pseudo_team == (pl2)->pseudo_team)
 
 /*
  * Used where we wish to know if a player is simply on the same team.
  */
-/* #define TEAM(i, j)							\
-	(BIT(Players[i]->status|Players[j]->status, PAUSE)		\
-	|| (BIT(World.rules->mode, TEAM_PLAY)				\
-	   && (Players[i]->team == Players[j]->team)			\
-	   && (Players[i]->team != TEAM_NOT_SET))) */
-#define TEAM(i, j) \
+#define TEAM(pl1, pl2) \
 	(BIT(World.rules->mode, TEAM_PLAY) \
-	&& (Players(i)->team == Players(j)->team) \
-	&& (Players(i)->team != TEAM_NOT_SET))
+	&& ((pl1)->team != TEAM_NOT_SET) \
+	 && ((pl1)->team == (pl2)->team))
+
 
 /*
- * Used where we wish to know if a player is on the same team
+ * Not used where we wish to know if a player is on the same team
  * and has immunity to shots, thrust sparks, lasers, ecms, etc.
  */
-#define TEAM_IMMUNE(i, j)	(teamImmunity && TEAM(i, j))
+/*#define TEAM_IMMUNE(pl1, pl2)	(teamImmunity && TEAM((pl1), (pl2)))*/
+
+#define NO_ID			(-1)
 
 /*
  * Used where we wish to know if two players are members of the same alliance.
  */
-#define ALLIANCE(i, j)	\
-	((Players(i)->alliance != ALLIANCE_NOT_SET) \
-	&& (Players(j)->alliance == Players(i)->alliance))
+#define ALLIANCE(pl1, pl2) \
+	(((pl1)->alliance != ALLIANCE_NOT_SET) \
+	&& ((pl1)->alliance == (pl2)->alliance))
 
 /*
- * Used where we wish to know if a player (i) owns a tank (j).
+ * Used where we wish to know if a player pl owns a tank t.
  */
-#define OWNS_TANK(i, j) \
-	(IS_TANK_IND(j) \
-	&& (Players(j)->lock.pl_id != -1) \
-	&& (GetInd(Players(j)->lock.pl_id) == (i)))
+#define OWNS_TANK(pl, t) \
+	(IS_TANK_PTR(t) \
+	&& ((t)->lock.pl_id != NO_ID) \
+	&& ((t)->lock.pl_id == (pl)->id))
 
 #define Player_is_playing(pl) \
 (BIT((pl)->status, PLAYING|PAUSE|GAME_OVER|KILLED) == PLAYING)
@@ -144,7 +142,6 @@
 #define RECOVERY_DELAY		(12 * 3)
 #define ROBOT_CREATE_DELAY	(12 * 2)
 
-#define NO_ID			(-1)
 #define NUM_IDS			256
 #define MAX_PSEUDO_PLAYERS      16
 

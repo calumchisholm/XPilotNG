@@ -327,7 +327,8 @@ static void Robot_default_invite(int ind, int inv_ind)
 	/* if there is a human in our alliance, they should decide
 	   let robots refuse in this case */
 	for (i = 0; i < NumPlayers; i++) {
-	    if (IS_HUMAN_IND(i) && ALLIANCE(ind, i)) {
+	    player *pl_i = Players(i);
+	    if (IS_HUMAN_IND(i) && ALLIANCE(pl, pl_i)) {
 		accept = 0;
 		break;
 	    }
@@ -355,12 +356,13 @@ static void Robot_default_invite(int ind, int inv_ind)
 	int	member_count = Get_alliance_member_count(inviter->alliance);
 
 	for (i = 0; i < NumPlayers; i++) {
-	    if (Players(i)->alliance == inviter->alliance) {
-		if (Players(i)->id == war_id) {
+	    player *pl_i = Players(i);
+	    if (pl_i->alliance == inviter->alliance) {
+		if (pl_i->id == war_id) {
 		    accept = 0;
 		    break;
 		}
-		avg_score += Players(i)->score;
+		avg_score += pl_i->score;
 	    }
 	}
 	if (accept) {

@@ -124,6 +124,7 @@ bool team_dead(int team)
 static bool Player_lock_allowed(int ind, int lock)
 {
     player		*pl = Players(ind);
+    player		*lock_pl;
 
     /* we can never lock on ourselves, nor on -1. */
     if (ind == lock || lock == -1) {
@@ -139,7 +140,8 @@ static bool Player_lock_allowed(int ind, int lock)
 	return true;
 
     /* we can always lock on players from our own team. */
-    if (TEAM(ind, lock))
+    lock_pl = Players(lock);
+    if (TEAM(pl, lock_pl))
 	return true;
 
     /* if lockOtherTeam is true then we can always lock on other teams. */
@@ -195,9 +197,9 @@ int Player_lock_closest(int ind, int next)
 	if (i == lock
 	    || !Player_is_active(pl_i)
 	    || !Player_lock_allowed(ind, i)
-	    || OWNS_TANK(ind, i)
-	    || TEAM(ind,i)
-	    || ALLIANCE(ind, i)) {
+	    || OWNS_TANK(pl, pl_i)
+	    || TEAM(pl, pl_i)
+	    || ALLIANCE(pl, pl_i)) {
 	    continue;
 	}
 	l = Wrap_length(pl_i->pos.cx - pl->pos.cx,

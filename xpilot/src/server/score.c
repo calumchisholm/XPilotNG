@@ -130,23 +130,22 @@ DFLOAT Rate(DFLOAT winner, DFLOAT loser)
 void Score_players(int winner, DFLOAT winner_score, char *winner_msg,
 		   int loser, DFLOAT loser_score, char *loser_msg)
 {
-    player *pl_winner, *pl_loser;
+    player *winner_pl, *loser_pl;
 
-    pl_winner = Players(winner);
-    pl_loser = Players(loser);
-    if (TEAM(winner, loser)
-	|| (pl_winner->alliance != ALLIANCE_NOT_SET
-	    && pl_winner->alliance == pl_loser->alliance)
-	|| (IS_TANK_IND(loser)
-	    && GetInd(pl_loser->lock.pl_id) == winner)) {
+    winner_pl = Players(winner);
+    loser_pl = Players(loser);
+    if (TEAM(winner_pl, loser_pl)
+	|| ALLIANCE(winner_pl, loser_pl)
+	|| (IS_TANK_PTR(loser_pl)
+	    && loser_pl->lock.pl_id == winner_pl->id)) {
 	if (winner_score > 0)
 	    winner_score = -winner_score;
 	if (loser_score > 0)
 	    loser_score = -loser_score;
     }
-    Score(pl_winner, winner_score, pl_loser->pos.cx, pl_loser->pos.cy,
+    Score(winner_pl, winner_score, loser_pl->pos.cx, loser_pl->pos.cy,
 	  winner_msg);
-    Score(pl_loser, loser_score, pl_loser->pos.cx, pl_loser->pos.cy,
+    Score(loser_pl, loser_score, loser_pl->pos.cx, loser_pl->pos.cy,
 	  loser_msg);
 }
 

@@ -353,7 +353,7 @@ static void PlayerCollision(void)
 		 */
 
 		if (Team_immune(pl->id, pl_j->id)
-		    || PSEUDO_TEAM(i, j)) {
+		    || PSEUDO_TEAM(pl, pl_j)) {
 		    continue;
 		}
 		sound_play_sensors(pl->pos.cx, pl->pos.cy,
