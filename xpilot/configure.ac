@@ -142,7 +142,7 @@ have_libsdl_ttf=yes
 ])
 AC_MSG_RESULT($have_libsdl_ttf)
 if test x$have_libsdl_ttf = xyes; then
-    SDL_EXTRA_LIBS="$SDL_LIBS -lSDL_ttf"
+    SDL_EXTRA_LIBS="-lSDL_ttf"
 else
     AC_MSG_WARN(Unable to find libsdl-ttf headers and libraries)
 fi

@@ -5493,7 +5493,7 @@ rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
 echo "$as_me:$LINENO: result: $have_libsdl_ttf" >&5
 echo "${ECHO_T}$have_libsdl_ttf" >&6
 if test x$have_libsdl_ttf = xyes; then
-    SDL_EXTRA_LIBS="$SDL_LIBS -lSDL_ttf"
+    SDL_EXTRA_LIBS="-lSDL_ttf"
 else
     { echo "$as_me:$LINENO: WARNING: Unable to find libsdl-ttf headers and libraries" >&5
 echo "$as_me: WARNING: Unable to find libsdl-ttf headers and libraries" >&2;}
