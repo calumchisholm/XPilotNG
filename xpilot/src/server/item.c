@@ -127,11 +127,9 @@ int Choose_random_item(void)
 void Place_item(player *pl, int item)
 {
     int			num_lose, num_per_pack,
-			bx, by,
 			place_count,
 			dir, dist;
     long		grav, rand;
-    /*int			px, py;*/
     int			cx, cy;
     DFLOAT		vx, vy;
     item_concentrator_t	*con;
@@ -160,12 +158,13 @@ void Place_item(player *pl, int item)
 	    if (num_lose <= 0) {
 		return;
 	    }
-	    if (World.items[item].min_per_pack == World.items[item].max_per_pack) {
+	    if (World.items[item].min_per_pack
+		== World.items[item].max_per_pack) {
 		num_per_pack = World.items[item].max_per_pack;
 	    } else {
 		num_per_pack = World.items[item].min_per_pack
-			     + (int)(rfrac() * (1 + World.items[item].max_per_pack
-						- World.items[item].min_per_pack));
+		    + (int)(rfrac() * (1 + World.items[item].max_per_pack
+				       - World.items[item].min_per_pack));
 	    }
 	    if (num_per_pack > num_lose) {
 		num_per_pack = num_lose;
@@ -208,17 +207,9 @@ void Place_item(player *pl, int item)
 	cy = WRAP_YCLICK(cy);
 	if (!INSIDE_MAP(cx, cy))
 	    return;
-	bx = CLICK_TO_BLOCK(cx);
-	by = CLICK_TO_BLOCK(cy);
-
-	if (is_polygon_map || !useOldCode) {
-	    if (is_inside(cx, cy, NOTEAM_BIT | NONBALL_BIT, NULL) != NO_GROUP)
-		return;
-	} else {
-	    /*if (!BIT(1U << World.block[bx][by], SPACE_BLOCKS))*/
-	    if (!EMPTY_SPACE(World.block[bx][by]))
-		return;
-	}
+	/*if (!BIT(1U << World.block[bx][by], SPACE_BLOCKS))*/
+	if (is_inside(cx, cy, NOTEAM_BIT | NONBALL_BIT, NULL) != NO_GROUP)
+	    return;
 
     } else {
 	if (rfrac() < movingItemProb) {
@@ -232,7 +223,8 @@ void Place_item(player *pl, int item)
 	    rand = 0;
 	}
 	if (World.NumItemConcentrators > 0 && rfrac() < itemConcentratorProb) {
-	    con = &World.itemConcentrators[(int)(rfrac() * World.NumItemConcentrators)];
+	    con = &World.itemConcentrators
+		[(int)(rfrac() * World.NumItemConcentrators)];
 	} else {
 	    con = NULL;
 	}
@@ -252,7 +244,8 @@ void Place_item(player *pl, int item)
 	    if (con) {
 		/* change to use clicks */
 		dir = (int)(rfrac() * RES);
-		dist = (int)(rfrac() * ((itemConcentratorRadius * BLOCK_CLICKS) + 1));
+		dist = (int)(rfrac() * ((itemConcentratorRadius
+					 * BLOCK_CLICKS) + 1));
 		cx = con->pos.cx + dist * tcos(dir);
 		cy = con->pos.cy + dist * tsin(dir);
 		cx = WRAP_XCLICK(cx);
@@ -264,17 +257,10 @@ void Place_item(player *pl, int item)
 		cx = (int)(rfrac() * World.cwidth);
 		cy = (int)(rfrac() * World.cheight);
 	    }
-	    bx = CLICK_TO_BLOCK(cx);
-	    by = CLICK_TO_BLOCK(cy);
 
-	    if (is_polygon_map || !useOldCode) {
-		if (is_inside(cx, cy, NOTEAM_BIT | NONBALL_BIT, NULL)
-		    == NO_GROUP)
-		    break;
-	    } else {
-		if (BIT(1U << World.block[bx][by], SPACE_BLOCKS|CANNON_BIT))
-		    break;
-	    }
+	    /*if (BIT(1U << World.block[bx][by], SPACE_BLOCKS|CANNON_BIT))*/
+	    if (is_inside(cx, cy, NOTEAM_BIT | NONBALL_BIT, NULL) == NO_GROUP)
+		break;
 	}
     }
     vx = vy = 0;
@@ -303,6 +289,8 @@ void Place_item(player *pl, int item)
 		vy += tsin(dir) * vel;
 	    }
 	} else {
+	    int bx = CLICK_TO_BLOCK(cx),
+		by = CLICK_TO_BLOCK(cy);
 	    vx -= Gravity * World.gravity[bx][by].x;
 	    vy -= Gravity * World.gravity[bx][by].y;
 	    vx += (int)(rfrac() * 8)-3;
