@@ -38,7 +38,7 @@ int Mapdata_setup (const char *urlstr) {
     URL url;
     char *name, *dir, *ptr;
     char path[1024];
-    int i, rv = FALSE;
+    int rv = FALSE;
 
     if (!Url_parse(urlstr, &url)) {
         error("malformed URL: %s", urlstr);

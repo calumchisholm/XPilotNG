@@ -125,7 +125,7 @@ static struct rgb_cube_size {
  */
 #define RGB2COLOR(c) RGB(((c) >> 16) & 255, ((c) >> 8) & 255, ((c) & 255))
 
-unsigned long		(*RGB)(u_byte r, u_byte g, u_byte b);
+unsigned long		(*RGB)(u_byte r, u_byte g, u_byte b) = 0;
 static unsigned long	RGB_PC(u_byte r, u_byte g, u_byte b);
 static unsigned long	RGB_TC(u_byte r, u_byte g, u_byte b);
 
@@ -671,6 +671,24 @@ static int Colors_init_block_bitmap_colors(void)
 
 
 /*
+ * Converts the RGB colors used by polygon and edge styles 
+ * to device colors.
+ */
+void Colors_init_style_colors(void)
+{
+    int i;
+    if (blockBitmaps && RGB) {
+        for (i = 0; i < num_polygon_styles; i++)
+            polygon_styles[i].color = 
+                RGB2COLOR(polygon_styles[i].rgb);
+        for (i = 0; i < num_edge_styles; i++)
+            edge_styles[i].color =
+                RGB2COLOR(edge_styles[i].rgb);
+    }
+}
+
+
+/*
  * See if we can use block bitmaps.
  * If we can then setup the colors
  * and allocate the bitmaps.
@@ -691,15 +709,9 @@ int Colors_init_block_bitmaps(void)
 	    blockBitmaps = false;
 	}
     }
-    if (blockBitmaps) {
-        int i;
-        for (i = 0; i < num_polygon_styles; i++)
-            polygon_styles[i].color = 
-                RGB2COLOR(polygon_styles[i].rgb);
-        for (i = 0; i < num_edge_styles; i++)
-            edge_styles[i].color =
-                RGB2COLOR(edge_styles[i].rgb);
-    }
+
+    Colors_init_style_colors();
+
     return (blockBitmaps == true) ? 0 : -1;
 }
 

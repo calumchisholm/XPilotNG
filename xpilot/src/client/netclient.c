@@ -84,6 +84,7 @@
 #include "protoclient.h"
 #include "portability.h"
 #include "talk.h"
+#include "bitmaps.h"
 
 #ifdef	SOUND
 #include "audio.h"
@@ -130,6 +131,10 @@ static long		last_keyboard_change,
 			talk_sequence_num,
 			talk_last_send;
 static char		talk_str[MAX_CHARS];
+
+
+extern void Colors_init_style_colors(void);
+extern void Mapdata_setup(const char*);
 
 
 /*
@@ -512,6 +517,8 @@ static void parse_new(void)
 
     if (Setup->data_url[0])
 	Mapdata_setup(Setup->data_url);
+
+    Colors_init_style_colors();
 }
 
 
