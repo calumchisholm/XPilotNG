@@ -370,10 +370,12 @@ public class MapPolygon extends MapObject {
 
     public boolean checkAwtEvent (MapCanvas canvas, AWTEvent evt) {
 
-        if (evt.getID() == MouseEvent.MOUSE_PRESSED ||
-            evt.getID() == MouseEvent.MOUSE_CLICKED) {
-
+        if (evt.getID() == MouseEvent.MOUSE_PRESSED 
+        || evt.getID() == MouseEvent.MOUSE_CLICKED) {
+                
             MouseEvent me = (MouseEvent)evt;
+            if (me.isControlDown()) 
+                return super.checkAwtEvent(canvas, evt);
             Rectangle b = getBounds();
             Point p = me.getPoint();
             Polygon pl = polygon;
