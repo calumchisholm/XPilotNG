@@ -1808,7 +1808,7 @@ static void Config_save_resource(FILE *fp, const char *resource, char *value)
 
 static void Config_save_comment(FILE *fp, const char *comment)
 {
-    fprintf(fp, "; %s\n", comment);
+    fprintf(fp, "%s", comment);
 }
 
 static void Config_save_float(FILE *fp, const char *resource, DFLOAT value)
@@ -1928,7 +1928,12 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     }
 #endif
 
-    Config_save_comment(fp, "\n; Config\n;");
+    Config_save_comment(fp,
+			";\n"
+			"; Config\n"
+			";\n"
+			"; General configuration options\n"
+			";\n");
     Config_save_resource(fp, "name", name);
     Config_save_float(fp, "power", power);
     Config_save_float(fp, "turnSpeed", turnspeed);
@@ -2009,7 +2014,13 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     /* don't save maxFPS */
 
     /* colors */
-    Config_save_comment(fp, "\n; Colors\n;");
+    Config_save_comment(fp,
+			";\n"
+			"; Colors\n"
+			";\n"
+			"; The value 0 means transparent for the color "
+			"options.\n"
+			";\n");
     Config_save_int(fp, "maxColors", maxColors);
     Config_save_int(fp, "messagesColor", messagesColor);
     Config_save_int(fp, "oldMessagesColor", oldMessagesColor);
@@ -2043,18 +2054,32 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_int(fp, "fuelColor", fuelColor);
     Config_save_int(fp, "decorColor", decorColor);
 
-    Config_save_comment(fp, "\n; Keys\n;");
+    Config_save_comment(fp,
+			";\n"
+			"; Keys\n"
+			";\n"
+			"; The X Window System program xev can be used to\n"
+			"; find out the names of keyboard keys.\n"
+			";\n");
     Config_save_keys(fp);
 
-    Config_save_comment(fp, "\n; Modifiers\n;");
+    Config_save_comment(fp,
+			";\n"
+			"; Modifiers\n"
+			";\n"
+			"; These modify how your weapons work.\n"
+			";\n");
     for (i = 0; i < NUM_MODBANKS; i++) {
 	sprintf(buf, "modifierBank%d", i + 1);
 	Config_save_resource(fp, buf, modBankStr[i]);
     }
 
     IFWINDOWS( Config_save_window_positions() );
+    Config_save_comment(fp,
+			";\n"
+			"; Other options\n"
+			";\n");
 
-    Config_save_comment(fp, "\n; Other\n;");
 
 #ifndef _WINDOWS
     Xpilotrc_end(fp);
