@@ -346,9 +346,9 @@ public class MapModel extends ModelObject {
 
                     int x = Integer.parseInt(atts.getValue("x"));
                     int y = Integer.parseInt(atts.getValue("y"));
-                    Fuel o = new Fuel(x, y);
+                    MapObject o = SimpleMapObject.createFuel();
                     Rectangle r = o.getBounds();
-                    o.moveTo(r.x - r.width / 2, r.y - r.height / 2);
+                    o.moveTo(x - r.width / 2, y - r.height / 2);
                     addToFront(o);
 
                 } else if (name.equalsIgnoreCase("ball")) {
@@ -376,10 +376,49 @@ public class MapModel extends ModelObject {
 
                     int x = Integer.parseInt(atts.getValue("x"));
                     int y = Integer.parseInt(atts.getValue("y"));
-                    CheckPoint o = new CheckPoint(x, y);
+                    MapObject o = SimpleMapObject.createCheck();
                     Rectangle r = o.getBounds();
-                    o.moveTo(r.x - r.width / 2, r.y - r.height / 2);
+                    o.moveTo(x - r.width / 2, y - r.height / 2);
                     addToFront(o);
+                    
+                } else if (name.equalsIgnoreCase("itemconcentrator")) {
+
+                    int x = Integer.parseInt(atts.getValue("x"));
+                    int y = Integer.parseInt(atts.getValue("y"));
+                    MapObject o = SimpleMapObject.createItemConcentrator();
+                    Rectangle r = o.getBounds();
+                    o.moveTo(x - r.width / 2, y - r.height / 2);
+                    addToFront(o);
+
+                } else if (name.equalsIgnoreCase("asteroidconcentrator")) {
+
+                    int x = Integer.parseInt(atts.getValue("x"));
+                    int y = Integer.parseInt(atts.getValue("y"));
+                    MapObject o = SimpleMapObject.createAsteroidConcentrator();
+                    Rectangle r = o.getBounds();
+                    o.moveTo(x - r.width / 2, y - r.height / 2);
+                    addToFront(o);
+                    
+                } else if (name.equalsIgnoreCase("grav")) {
+
+                    int x = Integer.parseInt(atts.getValue("x"));
+                    int y = Integer.parseInt(atts.getValue("y"));
+                    String type = atts.getValue("type");
+                    String force = atts.getValue("force");
+                    Grav grav = new Grav(x, y, type, force);
+                    Rectangle r = grav.getBounds();
+                    grav.moveTo(r.x - r.width / 2, r.y - r.height / 2);
+                    addToFront(grav);
+
+                } else if (name.equalsIgnoreCase("wormhole")) {
+
+                    int x = Integer.parseInt(atts.getValue("x"));
+                    int y = Integer.parseInt(atts.getValue("y"));
+                    String type = atts.getValue("type");
+                    Wormhole hole = new Wormhole(x, y, type);
+                    Rectangle r = hole.getBounds();
+                    hole.moveTo(r.x - r.width / 2, r.y - r.height / 2);
+                    addToFront(hole);
 
                 } else if (name.equalsIgnoreCase("ballarea")) {
 

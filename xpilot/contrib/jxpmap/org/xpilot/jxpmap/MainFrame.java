@@ -143,7 +143,11 @@ public class MainFrame extends JFrame implements ActionListener {
         tb1.add(newToggle("newFuel", "/images/fuelicon.gif", "New fuel station"));
         tb1.add(newToggle("newBase", "/images/baseicon.gif", "New base"));
         tb1.add(newToggle("newBall", "/images/ballicon.gif", "New ball"));
-        tb1.add(newToggle("newCheckPoint", "/images/checkicon.gif", "New checkpoint"));        
+        tb1.add(newToggle("newCheckPoint", "/images/checkicon.gif", "New checkpoint"));
+        tb1.add(newToggle("newGrav", "/images/gravicon.gif", "New gravitation field"));
+        tb1.add(newToggle("newWormhole", "/images/wormicon.gif", "New wormhole"));
+        tb1.add(newToggle("newItemConcentrator", "/images/itemconicon.gif", "New item concentrator"));
+        tb1.add(newToggle("newAsteroidConcentrator", "/images/asteroidconicon.gif", "New asteroid concentrator"));
         tb1.addSeparator();
         tb1.add(newToggle("select", "/images/arrow.gif", "Select"));        
         tb1.add(newToggle("eraseMode", "/images/eraseicon.gif", "Erasing mode"));
@@ -260,46 +264,62 @@ public class MainFrame extends JFrame implements ActionListener {
     }
 
     private void newWall () {
-        newMapObject("newWall", new MapPolygon());
+        newMapObject(new MapPolygon());
     }
     
     private void newBallArea () {
-        newMapObject("newBallArea", new BallArea());
+        newMapObject(new BallArea());
     }
 
     private void newBallTarget () {
-        newMapObject("newBallTarget", new BallTarget());
+        newMapObject(new BallTarget());
     }
     
     private void newDecor () {
-        newMapObject("newDecor", new Decoration());
+        newMapObject(new Decoration());
     }
     
     private void newTarget () {
-        newMapObject("newTarget", new Target());
+        newMapObject(new Target());
     }    
     
     private void newFuel () {
-        newMapObject("newFuel", new Fuel());
+        newMapObject(SimpleMapObject.createFuel());
     }
 
     private void newBase () {
-        newMapObject("newBase", new Base());
+        newMapObject(new Base());
     }
 
     private void newBall () {
-        newMapObject("newBall", new Ball());    
+        newMapObject(new Ball());    
     }
 
     private void newCannon () {
-        newMapObject("newCannon", new Cannon());
+        newMapObject(new Cannon());
     }
 
     private void newCheckPoint () {
-        newMapObject("newCheckPoint", new CheckPoint());
-    }
+        newMapObject(SimpleMapObject.createCheck());
+   }
+   
+   private void newItemConcentrator () {
+       newMapObject(SimpleMapObject.createItemConcentrator());
+   }
+
+   private void newAsteroidConcentrator () {
+       newMapObject(SimpleMapObject.createAsteroidConcentrator());
+   }
+
+   private void newGrav () {
+       newMapObject(new Grav());
+   }
+
+   private void newWormhole () {
+       newMapObject(new Wormhole());
+   }
     
-    private void newMapObject (String cmd, MapObject o) {
+    private void newMapObject (MapObject o) {
         canvas.setErase(false);
         canvas.setCopy(false);
         canvas.setCanvasEventHandler(o.getCreateHandler(null));        

@@ -9,6 +9,7 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -416,6 +417,36 @@ public class MapCanvas extends JComponent {
             }
         });
     }
+    
+    public void setGravProperties(
+        final Grav grav,
+        final int newType,
+        final BigDecimal newForce) {
+        final int oldType = grav.getType();
+        final BigDecimal oldForce = grav.getForce();
+        doEdit(new AbstractMapEdit() {
+            public void unedit() {
+                grav.setType(oldType);
+                grav.setForce(oldForce);
+            }
+            public void edit() {
+                grav.setType(newType);
+                grav.setForce(newForce);
+            }
+        });
+    }
+    
+    public void setWormholeType(final Wormhole o, final int newType) {
+        final int oldType = o.getType();
+        doEdit(new AbstractMapEdit() {
+            public void unedit() {
+                o.setType(oldType);
+            }
+            public void edit() {
+                o.setType(newType);
+            }            
+        });
+    }    
 
     public void removeMapObject(final MapObject o) {
         final int i = getModel().indexOf(o);
