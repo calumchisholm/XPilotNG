@@ -31,10 +31,11 @@ char rank_version[] = VERSION;
 #define XPILOTSCOREFILE		"XPILOTSCOREFILE"
 #define XPILOTRANKINGPAGE	"XPILOTRANKINGPAGE"
 #define XPILOTNOJSRANKINGPAGE	"XPILOTNOJSRANKINGPAGE"
+#define RANKING_SERVER		"Ranking server"
 
 #define PAGEHEAD \
 /* Head of page */ \
-"<h1>XPilot @ Ranking server</h1>" \
+"<h1>XPilot @ " RANKING_SERVER "</h1>" \
 "<a href=\"previous_ranks.html\">Previous rankings</a> " \
 "<a href=\"rank_explanation.html\">How does the ranking work?</a><hr>\n"
 
@@ -212,7 +213,7 @@ void
 Rank_write_webpage(void)
 {
     static const char HEADER[] =
-"<html><head><title>XPilot @ Ranking server</title>\n"
+"<html><head><title>XPilot @ " RANKING_SERVER "</title>\n"
 
 /* In order to save space/bandwidth, the table is saved as one
    giant javascript file, instead of writing all the <TR>, <TD>, etc */
@@ -267,7 +268,7 @@ TABLEHEAD
 	    ;
 
     static const char HEADERNOJS[] =
-"<html><head><title>XPilot @ Ranking server</title>\n"
+"<html><head><title>XPilot @ " RANKING_SERVER "</title>\n"
 "</head><body>\n"
 
 PAGEHEAD
