@@ -130,12 +130,12 @@ int num_polys = 0;
 int num_groups = 0;
 int mapx, mapy;
 
-#if 1
+#if 0
 #define can_hit(gp, move) \
 (((gp)->hitmask & (move)->hitmask) ? false : \
  ((gp)->hitfunc == NULL ? true : (gp)->hitfunc(gp, move)))
 #else
-bool can_hit(struct group *gp, struct move *move)
+static inline bool can_hit(struct group *gp, struct move *move)
 {
     if (gp->hitmask & move->hitmask)
 	return false;
