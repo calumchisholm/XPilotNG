@@ -44,6 +44,7 @@
 #include "objpos.h"
 #include "click.h"
 #include "object.h"
+#include "error.h"
 #include "walls.h" /* for move_parameters */
 
 char play_version[] = VERSION;
@@ -416,7 +417,7 @@ bool Cannon_hit_func(struct group *group, struct move *move)
 
     /* cannon is dead ? */
     if (cannon->dead_time != 0) {
-	xpprintf("BUG: Cannon_hit_func called for dead cannon.\n");
+	warn("BUG: Cannon_hit_func called for dead cannon.\n");
 	return false;
     }
 
@@ -428,24 +429,38 @@ bool Cannon_hit_func(struct group *group, struct move *move)
     if (!BIT(cannon_mask, obj->type))
 	return false;
 
+    if (BIT(cannon->used, HAS_PHASING_DEVICE))
+	return false;
+
+#if 1
     if (BIT(obj->status, FROMCANNON)
 	&& !BIT(World.rules->mode, TEAM_PLAY))
 	return false;
 
-    if (BIT(cannon->used, HAS_PHASING_DEVICE))
-	return false;
-
-    /*
-     * kps - this should be taken care of by the hit_mask
-     * note that current hit masks don't bother about checking
-     * teamImmunity option
-     */
+    /* kps - this can be removed */
     if (BIT(World.rules->mode, TEAM_PLAY)
-	&& (teamImmunity
-	    || BIT(obj->status, FROMCANNON))
+	&& teamImmunity
+	&& obj->team == cannon->team) {
+	warn("BUG: Cannon_hit_func: hitmask bug.\n");
+	return false;
+    }
+
+    if (BIT(World.rules->mode, TEAM_PLAY)
+	&& BIT(obj->status, FROMCANNON)
 	&& obj->team == cannon->team) {
 	return false;
     }
+#else
+    /*
+     * kps - if no team play, both cannons have team == TEAM_NOT_SET,
+     * we could always use the following code, no matter if team play
+     * is true or not.
+     */
+     if (BIT(obj->status, FROMCANNON)
+         && obj->team == cannon->team) {
+         return false;
+     }
+#endif
 
     return true;
 }
