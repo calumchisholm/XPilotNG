@@ -165,7 +165,7 @@ char *getOption(const char *name)
 }
 
 
-static char	*FileName;
+static char *FileName;
 
 #include <expat.h>
 
