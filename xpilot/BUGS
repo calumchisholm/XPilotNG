@@ -1,4 +1,13 @@
 -----------------------------------------------------------------
+Problem : nuke shots last for a long long long time
+Found by: Colonel Blood, Ross Venable
+Solution:
+Fixed by:
+Files 
+affected:
+
+
+-----------------------------------------------------------------
 Problem : Joining a game with textures turned off (walls or objects)
 	  and then trying to turn them on in game, does not work!
 Found by: Colonel Blood
