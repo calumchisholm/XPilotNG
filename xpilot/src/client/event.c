@@ -52,7 +52,7 @@ int Key_update(void)
 static bool Key_check_talk_macro(keys_t key)
 {
     if (key >= KEY_MSG_1 && key < KEY_MSG_1 + TALK_FAST_NR_OF_MSGS)
-	Talk_macro(talk_fast_msgs[key - KEY_MSG_1]);
+	Talk_macro(key - KEY_MSG_1);
     return true;
 }
 

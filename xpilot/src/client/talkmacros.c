@@ -358,9 +358,13 @@ static int Talk_macro_parse_mesg(char *outbuf, char *inbuf, long pos,
 }
 
 
-int Talk_macro(char *str)
+int Talk_macro(int i)
 {
-    /* Comment: sizeof str === MAX_CHARS */
+    char *str;
+
+    assert(i >= 0);
+    assert(i < TALK_FAST_NR_OF_MSGS);
+    str = talk_fast_msgs[i];
     if (str == NULL)
 	return 1;
 

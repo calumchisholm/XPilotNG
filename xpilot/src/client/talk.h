@@ -32,7 +32,7 @@
 #define TALK_FAST_MIDDLE_DELIMITER	'|'
 #define TALK_FAST_SPECIAL_TALK_CHAR	'#'
 
-extern int Talk_macro(char *str);
+extern int Talk_macro(int ind);
 extern void Store_talk_macro_options(void);
 
 #endif
