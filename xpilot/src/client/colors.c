@@ -1310,28 +1310,28 @@ static xp_option_t color_options[] = {
 
     COLOR_INDEX_OPTION(
 	"zeroLivesColor",
-	1,
+	4,
 	&zeroLivesColor,
 	"Which color to associate with ships with zero lives left.\n"
 	"This can be used to paint for example ship and base names.\n"),
 
     COLOR_INDEX_OPTION(
 	"oneLifeColor",
-	3,
+	11,
 	&oneLifeColor,
 	"Which color to associate with ships with one life left.\n"
 	"This can be used to paint for example ship and base names.\n"),
 
     COLOR_INDEX_OPTION(
 	"twoLivesColor",
-	11,
+	4,
 	&twoLivesColor,
 	"Which color to associate with ships with two lives left.\n"
 	"This can be used to paint for example ship and base names.\n"),
 
     COLOR_INDEX_OPTION(
 	"manyLivesColor",
-	4,
+	13,
 	&manyLivesColor,
 	"Which color to associate with ships with more than two lives left.\n"
 	"This can be used to paint for example ship and base names.\n"),
@@ -1365,7 +1365,7 @@ static xp_option_t color_options[] = {
 
     COLOR_INDEX_OPTION(
 	"baseNameColor",
-	1,
+	2,
 	&baseNameColor,
 	"Which color number to use for drawing names of bases.\n"),
 
