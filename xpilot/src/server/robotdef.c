@@ -85,7 +85,6 @@ char robotdef_version[] = VERSION;
 /*
  * Map objects a robot can fly through without damage.
  */
-/*#define EMPTY_SPACE(s)	BIT(1 << (s), SPACE_BLOCKS)*/
 
 
 /*
