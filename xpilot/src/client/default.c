@@ -243,6 +243,17 @@ xp_option_t default_options[] = {
 	"Set maximum FPS supported by the client. The server will try to\n"
 	"send at most this many frames per second to the client.\n"),
 
+    XP_DOUBLE_OPTION(
+	"sparkProb",
+	0.25,
+	0.0,
+	1.0,
+	&spark_prob,
+	NULL,  /* put something here */
+	"The chance that sparks are drawn or not.\n"
+	"This gives a sparkling effect.\n"
+	"Valid values are in the range [0.0-1.0]\n"),
+
     /* instruments */
     
     XP_BOOL_OPTION(
@@ -342,6 +353,35 @@ xp_option_t default_options[] = {
 	"Note that team shots are drawn in teamShotColor.\n"),
 
     XP_INT_OPTION(
+	"sparkSize",
+	2,
+	MIN_SPARK_SIZE,
+	MAX_SPARK_SIZE,
+	&spark_size,
+	NULL,
+	"Size of sparks in pixels.\n"),
+
+    XP_INT_OPTION(
+	"backgroundPointDist",
+	8,
+	0,
+	10,
+	&map_point_distance,
+	NULL, /* need something here */
+	"The distance between points in the background measured in blocks.\n"
+	"These are drawn in empty map regions to keep feeling for which\n"
+	"direction the ship is moving to.\n"),
+
+    XP_INT_OPTION(
+	"backgroundPointSize",
+	2,
+	MIN_MAP_POINT_SIZE,
+	MAX_MAP_POINT_SIZE,
+	&map_point_size,
+	NULL,
+	"Specifies the size of the background points.  0 means no points.\n"),
+
+    XP_INT_OPTION(
 	"charsPerSecond",
 	100,
 	10,
@@ -349,7 +389,7 @@ xp_option_t default_options[] = {
 	&charsPerSecond,
 	NULL,
 	"Rate at which messages appear on screen in characters per second.\n"),
-	
+
     XP_INT_OPTION(
 	"maxMessages",
 	8,
@@ -570,24 +610,8 @@ xp_option_t default_options[] = {
 	"Should the fighters have marking lights, just like airplanes?\n",
 	0
     },
-    {
-	"sparkProb",
-	NULL,
-	"0.25",
-	KEY_DUMMY,
-	"The chance that sparks are drawn or not.\n"
-	"This gives a sparkling effect.\n"
-	"Valid values are in the range [0.0-1.0]\n",
-	0
-    },
-    {
-	"sparkSize",
-	NULL,
-	"2",
-	KEY_DUMMY,
-	"Size of sparks in pixels.\n",
-	0
-    },
+
+
 
     {
 	"clockAMPM",
@@ -638,24 +662,7 @@ xp_option_t default_options[] = {
     },
 #endif
 
-    {
-	"backgroundPointDist",
-	NULL,
-	"8",
-	KEY_DUMMY,
-	"The distance between points in the background measured in blocks.\n"
-	"These are drawn in empty map regions to keep feeling for which\n"
-	"direction the ship is moving to.\n",
-	0
-    },
-    {
-	"backgroundPointSize",
-	NULL,
-	"2",
-	KEY_DUMMY,
-	"Specifies the size of the background points.  0 means no points.\n",
-	0
-    },
+
     {
 	"titleFlip",
 	NULL,
