@@ -1,13 +1,4 @@
------------------------------------------------------------------
-Problem : nuke shots last for a long long long time
-Found by: Colonel Blood, Ross Venable
-Solution:
-Fixed by:
-Files 
-affected:
 
-
------------------------------------------------------------------
 Problem : Joining a game with textures turned off (walls or objects)
 	  and then trying to turn them on in game, does not work!
 Found by: Colonel Blood
@@ -31,7 +22,7 @@ affected:
 -----------------------------------------------------------------
 
 Problem : ngControls break server recordings,
-	  if ncContorls if off, they work.
+	  if ncControls if off, they work.
 Found by: kps
 Solution:
 Fixed by:
@@ -148,6 +139,15 @@ affected:
 
 
 FIXED:
+
+-----------------------------------------------------------------
+Problem : nuke shots last for a long long long time
+Found by: Colonel Blood, Ross Venable
+Solution: limit nuke shot life time to max 10 seconds
+Fixed by: kps
+Files 
+affected: src/server/shot.c
+
 
 -----------------------------------------------------------------
 Problem :Lasers can sometimes shoot through walls. appears to be 
