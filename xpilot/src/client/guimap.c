@@ -140,7 +140,6 @@ void Gui_paint_cannon(int x, int y, int type)
 	}
 	points[3] = points[0];
 	rd.drawLines(dpy, drawPixmap, gameGC, points, 4, 0);
-	Erase_points(0, points, 4);
     }
     else {
 	switch (type) {
@@ -192,27 +191,11 @@ void Gui_paint_fuel(int x, int y, int fuel)
 	}
 	SET_FG(colors[fuelColor].pixel);
 	size = (BLOCK_SZ - 2*FUEL_BORDER) * fuel / MAX_STATION_FUEL;
-	if (useErase) {
-	/* speedup for slow old cheap graphics cards like cg3.
-	    or Xterminals with slow connection */
-	    rd.drawLine(dpy, drawPixmap, gameGC,
-			WINSCALE(X(x + FUEL_BORDER)),
-			WINSCALE(Y(y + FUEL_BORDER + size)),
-			WINSCALE(X(x + FUEL_BORDER
-				   + (BLOCK_SZ - 2*FUEL_BORDER))),
-			WINSCALE(Y(y + FUEL_BORDER + size)));
-	} else
-	    rd.fillRectangle(dpy, drawPixmap, gameGC,
-			     SCALEX(x + FUEL_BORDER),
-			     SCALEY(y + FUEL_BORDER + size),
-			     WINSCALE(BLOCK_SZ - 2*FUEL_BORDER + 1),
-			     WINSCALE(size + 1));
-
-	if (!text_is_bigger)
-	    Erase_rectangle(WINSCALE(X(x)) - 1,
-			    WINSCALE(Y(y + BLOCK_SZ)) - 1,
-			    WINSCALE(BLOCK_SZ) + 2,
-			    WINSCALE(BLOCK_SZ) + 2);
+	rd.fillRectangle(dpy, drawPixmap, gameGC,
+			 SCALEX(x + FUEL_BORDER),
+			 SCALEY(y + FUEL_BORDER + size),
+			 WINSCALE(BLOCK_SZ - 2*FUEL_BORDER + 1),
+			 WINSCALE(size + 1));
 
 	/* Draw F in fuel cells */
 	XSetFunction(dpy, gameGC, GXxor);
@@ -221,10 +204,6 @@ void Gui_paint_fuel(int x, int y, int fuel)
 	y = SCALEY(y + BLOCK_SZ/2) + gameFont->ascent/2,
 	rd.drawString(dpy, drawPixmap, gameGC, x, y, s, 1);
 	XSetFunction(dpy, gameGC, GXcopy);
-
-	if (text_is_bigger)
-	    Erase_rectangle(x - 2, y - gameFont->ascent, text_width + 4,
-			    gameFont->ascent + gameFont->descent);
     }
     else {
 #define BITMAP_FUEL_BORDER 3
@@ -266,11 +245,6 @@ void Gui_paint_fuel(int x, int y, int fuel)
 			      SCALEX(x + BITMAP_FUEL_BORDER),
 			      SCALEY(y + size + BITMAP_FUEL_BORDER),
 			      &area);
-
-	    Erase_rectangle(WINSCALE(X(x)) - 1,
-			    WINSCALE(Y(y + BLOCK_SZ)) - 1,
-			    WINSCALE(BLOCK_SZ) + 2,
-			    WINSCALE(BLOCK_SZ) + 2);
 	}
     }
 }
@@ -464,26 +438,15 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 
     if (size) {
 	rd.drawString(dpy, drawPixmap, gameGC, x, y, s, other ? 2 : 1);
-	Erase_rectangle(x - 1, y - gameFont->ascent - 1,
-			size + 2,
-			gameFont->ascent + gameFont->descent + 2);
 	x += size;
     }
     if (other) {
 	rd.drawString(dpy, drawPixmap, gameGC, x, y,
 		      other->name, other->name_len);
-	Erase_rectangle(x - 1,
-			y - gameFont->ascent - 1,
-			other->name_width + 2,
-			gameFont->ascent + gameFont->descent + 2);
 	x += other->name_width;
     }
-    if (size2) {
+    if (size2)
 	rd.drawString(dpy, drawPixmap, gameGC, x, y, info, strlen(info));
-	Erase_rectangle(x - 1, y - gameFont->ascent - 1,
-			size2 + 2,
-			gameFont->ascent + gameFont->descent + 2);
-    }
 }
 
 
@@ -649,14 +612,6 @@ void Gui_paint_decor(int x, int y, int xi, int yi, int type,
 	    rd.fillPolygon(dpy, drawPixmap, gameGC,
 			   points, 5,
 			   Convex, CoordModeOrigin);
-	    if (useErase){
-		int left_x = MIN(fill_bottom_left, fill_top_left);
-		int right_x = MAX(fill_bottom_right, fill_top_right);
-		Erase_rectangle(WINSCALE(X(left_x)) - 1,
-				WINSCALE(Y(y + BLOCK_SZ)) - 1,
-				WINSCALE(right_x - left_x) + 4,
-				WINSCALE(BLOCK_SZ) + 3);
-	    }
 	    fill_top_left = fill_top_right =
 	    fill_bottom_left = fill_bottom_right = -1;
 	}
@@ -681,19 +636,13 @@ void Gui_paint_setup_check(int x, int y, bool isNext)
 	points[3].y = WINSCALE(Y(y+(BLOCK_SZ/2)));
 	points[4] = points[0];
 
-	if (isNext) {
+	if (isNext)
 	    rd.fillPolygon(dpy, drawPixmap, gameGC,
 			   points, 5,
 			   Convex, CoordModeOrigin);
-	    Erase_rectangle(WINSCALE(X(x)),
-			    WINSCALE(Y(y+BLOCK_SZ)),
-			    WINSCALE(BLOCK_SZ),
-			    WINSCALE(BLOCK_SZ));
-	} else {
+	else
 	    rd.drawLines(dpy, drawPixmap, gameGC,
 			 points, 5, 0);
-	    Erase_points(0, points, 5);
-	}
     } else {
 	if (isNext)
 	    Bitmap_paint(drawPixmap, BM_CHECKPOINT, WINSCALE(X(x)),
@@ -702,11 +651,6 @@ void Gui_paint_setup_check(int x, int y, bool isNext)
 	else
 	    Bitmap_paint(drawPixmap, BM_CHECKPOINT, WINSCALE(X(x)),
 			 WINSCALE(Y(y + BLOCK_SZ)), 0);
-
-	Erase_rectangle(WINSCALE(X(x)),
-			WINSCALE(Y(y+BLOCK_SZ)),
-			WINSCALE(BLOCK_SZ),
-			WINSCALE(BLOCK_SZ));
     }
 }
 
@@ -996,7 +940,6 @@ void Gui_paint_setup_item_concentrator(int x, int y)
 	    pts[3] = pts[0];
 	    rd.drawLines(dpy, drawPixmap, gameGC,
 			 pts, NELEM(pts), CoordModeOrigin);
-	    Erase_points(0, pts, NELEM(pts));
 	}
     } else
 	Bitmap_paint(drawPixmap, BM_CONCENTRATOR, WINSCALE(X(x)),
@@ -1068,7 +1011,6 @@ void Gui_paint_setup_asteroid_concentrator(int x, int y)
 	    pts[4] = pts[0];
 	    rd.drawLines(dpy, drawPixmap, gameGC,
 			 pts, NELEM(pts), CoordModeOrigin);
-	    Erase_points(0, pts, NELEM(pts));
 	}
     } else
 	Bitmap_paint(drawPixmap, BM_ASTEROIDCONC, WINSCALE(X(x)),
@@ -1117,9 +1059,6 @@ void Gui_paint_setup_target(int x, int y, int team, int damage, bool own)
 		     WINSCALE(Y(y+3*BLOCK_SZ/4)),
 		     WINSCALE(BLOCK_SZ/2),
 		     WINSCALE(BLOCK_SZ/2));
-    Erase_4point(WINSCALE(X(x+(BLOCK_SZ+2)/4)),
-		 WINSCALE(Y(y+3*BLOCK_SZ/4)),
-		 WINSCALE(BLOCK_SZ/2), WINSCALE(BLOCK_SZ/2));
 
     if (BIT(Setup->mode, TEAM_PLAY)) {
 	s[0] = '0' + team; s[1] = '\0';
@@ -1129,12 +1068,6 @@ void Gui_paint_setup_target(int x, int y, int team, int damage, bool own)
 		      WINSCALE(Y(y + BLOCK_SZ/2))
 			+ gameFont->ascent/2,
 		      s, 1);
-	Erase_rectangle(WINSCALE(X(x + BLOCK_SZ/2)) - size/2-1,
-			WINSCALE(Y(y + BLOCK_SZ/2))
-				+ gameFont->ascent/2
-				- gameFont->ascent - 1,
-			size + 2,
-			gameFont->ascent+ gameFont->descent+ 2);
     }
 
     if (damage != TARGET_DAMAGE) {
@@ -1191,11 +1124,6 @@ void Gui_paint_setup_treasure(int x, int y, int team, bool own)
 	    rd.drawString(dpy, drawPixmap, gameGC,
 			  WINSCALE(X(x + BLOCK_SZ/2)) - size/2,
 			  WINSCALE(Y(y + 2*BALL_RADIUS)), s, 1);
-	    Erase_rectangle(WINSCALE(X(x + BLOCK_SZ/2)) - size/2 - 1,
-			    WINSCALE(Y(y + 2*BALL_RADIUS))
-			      - gameFont->ascent - 1,
-			    size + 2,
-			    gameFont->ascent+ gameFont->descent+ 2);
 	}
     }
     else {
@@ -1215,11 +1143,6 @@ void Gui_paint_setup_treasure(int x, int y, int team, bool own)
 	    rd.drawString(dpy, drawPixmap, gameGC,
 			  WINSCALE(X(x + BLOCK_SZ/2)) - size/2,
 			  WINSCALE(Y(y + BALL_RADIUS + 5)), s, 1);
-	    Erase_rectangle(WINSCALE(X(x + BLOCK_SZ/2 )) - size/2 - 1,
-			    WINSCALE(Y(y + BALL_RADIUS + 5))
-			      - gameFont->ascent - 1,
-			    size + 2,
-			    gameFont->ascent+ gameFont->descent+ 2);
 	}
 
     }

@@ -427,13 +427,6 @@ int Init_top(void)
 	    && ProtocolVersion (dpy) == 11)
 	    shieldDrawMode = 1;
 
-	if (useErase) {
-	    /*
-	     * The NeWS X server doesn't orrectly erase shields.
-	     */
-	    if (!strcmp(ServerVendor(dpy), "X11/NeWS - Sun Microsystems Inc."))
-		shieldDrawMode = 1;
-	}
     }
 #endif
 

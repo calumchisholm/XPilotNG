@@ -577,14 +577,6 @@ void Paint_world(void)
 			if (wallTileDoit)
 			    XSetFillStyle(dpy, gameGC, FillSolid);
 
-			if (useErase){
-			    int left_x = MIN(fill_bottom_left, fill_top_left);
-			    int right_x = MAX(fill_bottom_right, fill_top_right);
-			    Erase_rectangle(WINSCALE(X(left_x)) - 1,
-					    WINSCALE(Y(y + BLOCK_SZ)) - 1,
-					    WINSCALE(right_x - left_x) + 4,
-					    WINSCALE(BLOCK_SZ) +3);
-			}
 			fill_top_left =
 			fill_top_right =
 			fill_bottom_left =
@@ -614,13 +606,6 @@ void Paint_world(void)
 	    if (wallTileDoit)
 		XSetFillStyle(dpy, gameGC, FillSolid);
 
-	    if (useErase){
-		int left_x = MIN(fill_bottom_left, fill_top_left);
-		Erase_rectangle(WINSCALE(X(left_x)) - 1,
-				WINSCALE(Y(y + BLOCK_SZ)) - 1,
-				WINSCALE(x - left_x) + 4,
-				WINSCALE(BLOCK_SZ) + 3);
-	    }
 	    fill_top_left =
 	    fill_top_right =
 	    fill_bottom_left =

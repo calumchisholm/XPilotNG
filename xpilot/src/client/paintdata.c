@@ -89,187 +89,6 @@ int		eyeTeam = TEAM_NOT_SET;
 
 unsigned long	current_foreground;
 
-erase_t		erase[2], *erp;
-
-void Erase_do_start(void)
-{
-    int			i;
-
-    if (damaged > 0) {
-	error("BUG: Erase_start while damaged");
-	return;
-    }
-
-    if (erase[0].flags == 0) {
-	printf("ERASE is On!\n");
-	erp = &erase[0];
-    }
-    if (BIT(erp->flags, ERASE_INITIALIZED) == 0) {
-	SET_FG(colors[BLACK].pixel);
-	XFillRectangle(dpy, drawPixmap, gameGC, 0, 0, draw_width, draw_height);
-	SET_BIT(erp->flags, ERASE_INITIALIZED);
-    }
-    erp->num_rect = 0;
-    erp->num_arc = 0;
-    for (i = 0; i <= MAX_LINE_WIDTH; i++)
-	erp->num_seg[i] = 0;
-}
-
-void Erase_do_end(void)
-{
-    int			i,
-			linewidth = false;
-
-    if (damaged > 0) {
-	error("BUG: Erase_do_end while damaged");
-	return;
-    }
-#ifndef _WINDOWS
-    /* BG fix 2000-03-19 use same erase buffer if not color switching. */
-    if (dbuf_state->type == COLOR_SWITCH) {
-	if (erp == &erase[0])
-	    erp = &erase[1];
-	else
-	    erp = &erase[0];
-    }
-#endif
-    SET_FG(colors[BLACK].pixel);
-
-    if (erp->num_rect != 0) {
-	XFillRectangles(dpy, drawPixmap, gameGC, erp->rect_ptr, erp->num_rect);
-	UNEXPAND(erp->rect_ptr, erp->num_rect, erp->max_rect);
-    }
-    if (erp->num_arc != 0) {
-	XDrawArcs(dpy, drawPixmap, gameGC, erp->arc_ptr, erp->num_arc);
-	UNEXPAND(erp->arc_ptr, erp->num_arc, erp->max_arc);
-    }
-    for (i = 0; i <= MAX_LINE_WIDTH; i++) {
-	if (erp->num_seg[i] != 0) {
-	    XSetLineAttributes(dpy, gameGC, i,
-			       LineSolid, CapProjecting, JoinMiter);
-	    linewidth = true;
-	    XDrawSegments(dpy, drawPixmap, gameGC,
-			  erp->seg_ptr[i], erp->num_seg[i]);
-	    UNEXPAND(erp->seg_ptr[i], erp->num_seg[i], erp->max_seg[i]);
-	}
-    }
-    if (linewidth == true) {
-	XSetLineAttributes(dpy, gameGC, 0,
-			   LineSolid, CapButt, JoinMiter);
-    }
-}
-
-void Erase_do_rectangle(int x, int y, int width, int height)
-{
-    XRectangle		*p;
-
-    EXPAND(erp->rect_ptr, erp->num_rect, erp->max_rect, XRectangle, 1);
-    p = &erp->rect_ptr[erp->num_rect++];
-    p->x = x;
-    p->y = y;
-    p->width = width;
-    p->height = height;
-}
-
-void Erase_do_rectangles(XRectangle *rectp, int n)
-{
-    EXPAND(erp->rect_ptr, erp->num_rect, erp->max_rect, XRectangle, n);
-    memcpy(&erp->rect_ptr[erp->num_rect], rectp, n * sizeof(XRectangle));
-    erp->num_rect += n;
-}
-
-void Erase_do_arc(int x, int y, int width, int height,
-		      int angle1, int angle2)
-{
-    XArc		*p;
-
-    EXPAND(erp->arc_ptr, erp->num_arc, erp->max_arc, XArc, 1);
-    p = &erp->arc_ptr[erp->num_arc++];
-    p->x = x;
-    p->y = y;
-    p->width = width;
-    p->height = height;
-    p->angle1 = angle1;
-    p->angle2 = angle2;
-}
-
-void Erase_do_arcs(XArc *arcp, int n)
-{
-    EXPAND(erp->arc_ptr, erp->num_arc, erp->max_arc, XArc, n);
-    memcpy(&erp->arc_ptr[erp->num_arc], arcp, n * sizeof(XArc));
-    erp->num_arc += n;
-}
-
-void Erase_do_segment(int width, int x_1, int y_1, int x_2, int y_2)
-{
-    XSegment		*p;
-
-    EXPAND(erp->seg_ptr[width], erp->num_seg[width], erp->max_seg[width],
-	   XSegment, 1);
-    p = &erp->seg_ptr[width][erp->num_seg[width]++];
-    p->x1 = x_1;
-    p->y1 = y_1;
-    p->x2 = x_2;
-    p->y2 = y_2;
-}
-
-void Erase_do_segments(XSegment *segp, int n)
-{
-    EXPAND(erp->seg_ptr[0], erp->num_seg[0], erp->max_seg[0],
-	   XSegment, n);
-    memcpy(&erp->seg_ptr[0][erp->num_seg[0]], segp, n * sizeof(XSegment));
-    erp->num_seg[0] += n;
-}
-
-void Erase_do_points(int width, XPoint *pointp, int n)
-{
-    XSegment		*p;
-    int			i;
-
-    EXPAND(erp->seg_ptr[width], erp->num_seg[width], erp->max_seg[width],
-	   XSegment, n - 1);
-    p = &erp->seg_ptr[width][erp->num_seg[width]];
-    for (i = 1; i < n; i++) {
-	p->x1 = pointp->x;
-	p->y1 = pointp->y;
-	pointp++;
-	p->x2 = pointp->x;
-	p->y2 = pointp->y;
-	p++;
-    }
-    erp->num_seg[width] += n - 1;
-}
-
-void Erase_do_4point(int x, int y, int width, int height)
-{
-    XSegment		*p;
-
-    EXPAND(erp->seg_ptr[0], erp->num_seg[0], erp->max_seg[0],
-	   XSegment, 4);
-    p = &erp->seg_ptr[0][erp->num_seg[0]];
-    p->x1 = x;
-    p->y1 = y;
-    p->x2 = x + width;
-    p->y2 = y;
-    p++;
-    p->x1 = x + width;
-    p->y1 = y;
-    p->x2 = x + width;
-    p->y2 = y + height;
-    p++;
-    p->x1 = x + width;
-    p->y1 = y + height;
-    p->x2 = x;
-    p->y2 = y + height;
-    p++;
-    p->x1 = x;
-    p->y1 = y + height;
-    p->x2 = x;
-    p->y2 = y;
-    p++;
-    erp->num_seg[0] += 4;
-}
-
 void Rectangle_start(void)
 {
     int i;
@@ -285,8 +104,8 @@ void Rectangle_end(void)
     for (i = 0; i < maxColors; i++) {
 	if (num_rect[i] > 0) {
 	    SET_FG(colors[i].pixel);
-	    rd.fillRectangles(dpy, drawPixmap, gameGC, rect_ptr[i], num_rect[i]);
-	    Erase_rectangles(rect_ptr[i], num_rect[i]);
+	    rd.fillRectangles(dpy, drawPixmap, gameGC,
+			      rect_ptr[i], num_rect[i]);
 	    RELEASE(rect_ptr[i], num_rect[i], max_rect[i]);
 	}
     }
@@ -321,7 +140,6 @@ void Arc_end(void)
 	if (num_arc[i] > 0) {
 	    SET_FG(colors[i].pixel);
 	    rd.drawArcs(dpy, drawPixmap, gameGC, arc_ptr[i], num_arc[i]);
-	    Erase_arcs(arc_ptr[i], num_arc[i]);
 	    RELEASE(arc_ptr[i], num_arc[i], max_arc[i]);
 	}
     }
@@ -362,7 +180,6 @@ void Segment_end(void)
 	    SET_FG(colors[i].pixel);
 	    rd.drawSegments(dpy, drawPixmap, gameGC,
 			    seg_ptr[i], num_seg[i]);
-	    Erase_segments(seg_ptr[i], num_seg[i]);
 	    RELEASE(seg_ptr[i], num_seg[i], max_seg[i]);
 	}
     }

@@ -802,20 +802,13 @@ option options[] = {
 	0
     },
     {
-	"erase",
-	"Yes",
-	"",
-	KEY_DUMMY,
-	"Use Erase(-hack) for slow X.\n",
-	0
-    },
-    {
 	"colorSwitch",
 	NULL,
 	"Yes",
 	KEY_DUMMY,
 	"Use color buffering or not.\n"
-	"Usually color buffering is faster, especially on 8-bit PseudoColor displays.\n",
+	"Usually color buffering is faster, especially on 8-bit\n"
+	"PseudoColor displays.\n",
 	0
     },
     {
@@ -3517,7 +3510,6 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 	CLR_BIT(instruments, SHOW_TEXTURED_WALLS);
     }
     Get_bool_resource(rDB, "pointerControl", &initialPointerControl);
-    Get_bool_resource(rDB, "erase", &useErase);
     Get_float_resource(rDB, "showItemsTime", &showItemsTime);
     LIMIT(showItemsTime, MIN_SHOW_ITEMS_TIME, MAX_SHOW_ITEMS_TIME);
 

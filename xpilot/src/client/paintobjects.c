@@ -141,14 +141,9 @@ static void Paint_items(void)
 	for (i = 0; i < num_itemtype; i++) {
 	    x = itemtype_ptr[i].x;
 	    y = itemtype_ptr[i].y;
-	    if (wrap(&x, &y)) {
-		Paint_item((u_byte)itemtype_ptr[i].type, drawPixmap, gameGC,
-			    WINSCALE(X(x)), WINSCALE(Y(y)));
-		Erase_rectangle(WINSCALE(X(x)) - ITEM_TRIANGLE_SIZE,
-				WINSCALE(Y(y)) - ITEM_TRIANGLE_SIZE,
-				2*ITEM_TRIANGLE_SIZE + 1,
-				2*ITEM_TRIANGLE_SIZE + 1);
-	    }
+	    if (wrap(&x, &y))
+		Paint_item(itemtype_ptr[i].type, drawPixmap, gameGC,
+			   WINSCALE(X(x)), WINSCALE(Y(y)));
 	}
 	RELEASE(itemtype_ptr, num_itemtype, max_itemtype);
     }

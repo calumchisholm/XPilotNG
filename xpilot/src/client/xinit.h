@@ -49,7 +49,6 @@ extern int		ButtonHeight;
 extern char		visualName[MAX_VISUAL_NAME];
 extern Visual		*visual;
 extern int		dispDepth;
-extern bool		useErase;	/* use the Erase hack for slow X */
 extern bool		texturedObjects;
 extern bool		fullColor;
 extern bool		colorSwitch;

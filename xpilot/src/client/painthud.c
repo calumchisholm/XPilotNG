@@ -112,8 +112,6 @@ static void Paint_meter(int xoff, int y, const char *title, int val, int max,
 	rd.drawRectangle(dpy, drawPixmap, gameGC,
 		       WINSCALE(x), WINSCALE(y),
 		       WINSCALE(meterWidth), WINSCALE(meterHeight));
-	Erase_4point(WINSCALE(x), WINSCALE(y),
-		     WINSCALE(meterWidth), WINSCALE(meterHeight));
 
 	/* Paint scale levels(?) */
 	Segment_add(color, x,       y-4,	x,       y+meterHeight+4);
@@ -129,11 +127,6 @@ static void Paint_meter(int xoff, int y, const char *title, int val, int max,
     rd.drawString(dpy, drawPixmap, gameGC,
 		  (xstr), WINSCALE(y)+(gameFont->ascent+meterHeight)/2,
 		  title, strlen(title));
-    Erase_rectangle(xstr,
-		    WINSCALE(y)+(gameFont->ascent+meterHeight)/2
-		    - gameFont->ascent - 1,
-		    XTextWidth(gameFont, title, (int)strlen(title)) + 2,
-		    gameFont->ascent + gameFont->descent + 1);
 
     /* texturedObjects - TODO */
     /*int width = WINSCALE((int)(((meterWidth-3)*val)/(max?max:1)));*/
@@ -186,9 +179,6 @@ void Paint_score_objects(void)
 				x, y,
 				sobj->msg,
 				sobj->msg_len);
-		    Erase_rectangle(x - 1, y - gameFont->ascent,
-				    sobj->msg_width + 2,
-				    gameFont->ascent + gameFont->descent);
 		}
 	    }
 	    sobj->life_time -= timePerFrame;
@@ -316,11 +306,6 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
 		      WINSCALE(hud_pos_y - hudSize + HUD_OFFSET - BORDER )
 		      - gameFont->descent ,
 		      target->id_string, target->name_len);
-	Erase_rectangle(WINSCALE(hud_pos_x) - target->name_width / 2 - 1,
-			WINSCALE(hud_pos_y - hudSize + HUD_OFFSET - BORDER )
-			- gameFont->descent - gameFont->ascent ,
-			target->name_width + 2,
-			gameFont->ascent + gameFont->descent);
 
 	/* lives left is a better info than distance in team games MM */
 	if (BIT(Setup->mode, LIMITED_LIVES))
@@ -339,13 +324,6 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
 			  WINSCALE(hud_pos_y - hudSize + HUD_OFFSET - BORDER)
 			  - gameFont->descent,
 			  str, 3);
-	    Erase_rectangle(WINSCALE(hud_pos_x + hudSize - HUD_OFFSET
-				     + BORDER) - 1,
-			    WINSCALE(hud_pos_y - hudSize + HUD_OFFSET
-				     - BORDER )
-			    - gameFont->descent - gameFont->ascent ,
-			    XTextWidth(gameFont, str, 3) + 2,
-			    gameFont->ascent + gameFont->descent);
 	}
     }
 
@@ -376,8 +354,6 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
 		rd.fillArc(dpy, drawPixmap, gameGC,
 			 WINSCALE(x), WINSCALE(y),
 			 WINSCALE(size), WINSCALE(size), 0, 64*360);
-		Erase_rectangle(WINSCALE(x), WINSCALE(y),
-				 WINSCALE(size), WINSCALE(size));
 	    }
 	}
     }
@@ -548,8 +524,6 @@ static void Paint_HUD_items(int hud_pos_x, int hud_pos_y)
 	if (rect_height == 0)
 	    rect_height = vert_pos - rect_y;
 	rect_x -= rect_width;
-	Erase_rectangle(rect_x - 1, rect_y - 4,
-			rect_width + 2, rect_height + 8);
     }
 
 }
@@ -628,21 +602,11 @@ void Paint_HUD(void)
 		    WINSCALE(hud_pos_y - hudSize + HUD_OFFSET),
 		    WINSCALE(hud_pos_x + hudSize),
 		    WINSCALE(hud_pos_y - hudSize + HUD_OFFSET));
-	Erase_segment(0,
-		      WINSCALE(hud_pos_x - hudSize),
-		      WINSCALE(hud_pos_y - hudSize + HUD_OFFSET),
-		      WINSCALE(hud_pos_x + hudSize),
-		      WINSCALE(hud_pos_y - hudSize + HUD_OFFSET));
 	rd.drawLine(dpy, drawPixmap, gameGC,
 		    WINSCALE(hud_pos_x - hudSize),
 		    WINSCALE(hud_pos_y + hudSize - HUD_OFFSET),
 		    WINSCALE(hud_pos_x + hudSize),
 		    WINSCALE(hud_pos_y + hudSize - HUD_OFFSET));
-	Erase_segment(0,
-		      WINSCALE(hud_pos_x - hudSize),
-		      WINSCALE(hud_pos_y + hudSize - HUD_OFFSET),
-		      WINSCALE(hud_pos_x + hudSize),
-		      WINSCALE(hud_pos_y + hudSize - HUD_OFFSET));
     }
     if (hudVLineColor) {
 	SET_FG(colors[hudVLineColor].pixel);
@@ -651,21 +615,11 @@ void Paint_HUD(void)
 		    WINSCALE(hud_pos_y -hudSize),
 		    WINSCALE(hud_pos_x -hudSize + HUD_OFFSET),
 		    WINSCALE(hud_pos_y +hudSize));
-	Erase_segment(0,
-		      WINSCALE(hud_pos_x - hudSize + HUD_OFFSET),
-		      WINSCALE(hud_pos_y - hudSize),
-		      WINSCALE(hud_pos_x - hudSize + HUD_OFFSET),
-		      WINSCALE(hud_pos_y + hudSize));
 	rd.drawLine(dpy, drawPixmap, gameGC,
 		    WINSCALE(hud_pos_x + hudSize - HUD_OFFSET),
 		    WINSCALE(hud_pos_y - hudSize),
 		    WINSCALE(hud_pos_x + hudSize - HUD_OFFSET),
 		    WINSCALE(hud_pos_y + hudSize));
-	Erase_segment(0,
-		      WINSCALE(hud_pos_x + hudSize - HUD_OFFSET),
-		      WINSCALE(hud_pos_y - hudSize),
-		      WINSCALE(hud_pos_x + hudSize - HUD_OFFSET),
-		      WINSCALE(hud_pos_y + hudSize));
     }
     gcv.line_style = LineSolid;
     XChangeGC(dpy, gameGC, GCLineStyle, &gcv);
@@ -683,10 +637,6 @@ void Paint_HUD(void)
 		    WINSCALE(hud_pos_y + hudSize-HUD_OFFSET+BORDER)
 				+ gameFont->ascent,
 		    str, strlen(str));
-	Erase_rectangle(WINSCALE(hud_pos_x + hudSize-HUD_OFFSET+BORDER) - 1,
-			WINSCALE(hud_pos_y + hudSize-HUD_OFFSET+BORDER) ,
-			XTextWidth(gameFont, str, (int)strlen(str)) + 2,
-			gameFont->ascent + gameFont->descent);
 	if (numItems[ITEM_TANK]) {
 	    if (fuelCurrent == 0)
 		strcpy(str,"M ");
@@ -697,12 +647,6 @@ void Paint_HUD(void)
 			  WINSCALE(hud_pos_y + hudSize-HUD_OFFSET + BORDER)
 			  + gameFont->descent + 2*gameFont->ascent,
 			  str, strlen(str));
-	    Erase_rectangle(WINSCALE(hud_pos_x + hudSize-HUD_OFFSET + BORDER)
-				 - 1,
-			    WINSCALE(hud_pos_y + hudSize-HUD_OFFSET + BORDER)
-				+ gameFont->descent + gameFont->ascent,
-			    XTextWidth(gameFont, str, (int)strlen(str)) + 2,
-			    gameFont->ascent + gameFont->descent);
 	}
     }
 
@@ -727,13 +671,6 @@ void Paint_HUD(void)
 			      + gameFont->ascent
 			      + j * (gameFont->ascent + gameFont->descent),
 			      sobj->hud_msg, sobj->hud_msg_len);
-		Erase_rectangle(WINSCALE(hud_pos_x)
-				- sobj->hud_msg_width/2 - 1,
-				WINSCALE(hud_pos_y + hudSize-HUD_OFFSET
-					 + BORDER)
-				+ j * (gameFont->ascent + gameFont->descent),
-				sobj->hud_msg_width + 2,
-				gameFont->ascent + gameFont->descent);
 		j++;
 	    }
 	}
@@ -748,12 +685,6 @@ void Paint_HUD(void)
 			  WINSCALE(hud_pos_y - hudSize+HUD_OFFSET - BORDER)
 			  - gameFont->descent,
 			  str, strlen(str));
-	    Erase_rectangle(WINSCALE(hud_pos_x - hudSize+HUD_OFFSET - BORDER)
-			    - size - 1,
-			    WINSCALE(hud_pos_y - hudSize+HUD_OFFSET - BORDER)
-			    - gameFont->ascent - gameFont->descent,
-			    size + 2,
-			    gameFont->ascent + gameFont->descent);
 	}
 
 	/* Update the modifiers */
@@ -765,12 +696,6 @@ void Paint_HUD(void)
 		      + gameFont->ascent,
 		      mods, strlen(mods));
 
-	Erase_rectangle(WINSCALE(hud_pos_x - hudSize + HUD_OFFSET - BORDER)
-			- XTextWidth(gameFont, mods, modlen) - 1,
-			WINSCALE(hud_pos_y + hudSize - HUD_OFFSET + BORDER) ,
-			XTextWidth(gameFont, mods, modlen) + 1,
-			gameFont->ascent + gameFont->descent);
-
 	if (autopilotLight) {
 	    int text_width = XTextWidth(gameFont, autopilot,
 					sizeof(autopilot)-1);
@@ -779,12 +704,6 @@ void Paint_HUD(void)
 			  WINSCALE(hud_pos_y - hudSize+HUD_OFFSET - BORDER)
 			  - gameFont->descent * 2 - gameFont->ascent,
 			  autopilot, sizeof(autopilot)-1);
-
-	    Erase_rectangle(WINSCALE(hud_pos_x) - text_width/2,
-			    WINSCALE(hud_pos_y - hudSize+HUD_OFFSET - BORDER)
-			    - gameFont->descent * 2 - gameFont->ascent * 2,
-			    text_width + 2,
-			    gameFont->ascent + gameFont->descent);
 	}
     }
 
@@ -812,12 +731,6 @@ void Paint_HUD(void)
 				  + FUEL_GAUGE_OFFSET) - 1,
 			 WINSCALE(HUD_OFFSET - (2*FUEL_GAUGE_OFFSET)) + 3,
 			 WINSCALE(HUD_FUEL_GAUGE_SIZE) + 3);
-	Erase_4point(WINSCALE(hud_pos_x + hudSize - HUD_OFFSET
-			      + FUEL_GAUGE_OFFSET) - 1,
-		     WINSCALE(hud_pos_y - hudSize + HUD_OFFSET
-			      + FUEL_GAUGE_OFFSET) - 1,
-		     WINSCALE(HUD_OFFSET - (2*FUEL_GAUGE_OFFSET)) + 3,
-		     WINSCALE(HUD_FUEL_GAUGE_SIZE) + 3);
 
 	size = (HUD_FUEL_GAUGE_SIZE * fuelSum) / fuelMax;
 	rd.fillRectangle(dpy, drawPixmap, gameGC,
@@ -828,12 +741,6 @@ void Paint_HUD(void)
 				  - size) + 1,
 			 WINSCALE(HUD_OFFSET - (2*FUEL_GAUGE_OFFSET)),
 			 WINSCALE(size));
-	Erase_rectangle(WINSCALE(hud_pos_x + hudSize - HUD_OFFSET
-				 + FUEL_GAUGE_OFFSET),
-			WINSCALE(hud_pos_y - hudSize + HUD_OFFSET
-				 + FUEL_GAUGE_OFFSET + HUD_FUEL_GAUGE_SIZE
-				 - size),
-			HUD_OFFSET - (2*FUEL_GAUGE_OFFSET) + 1, size + 1);
     }
 }
 
@@ -1047,10 +954,6 @@ void Paint_messages(void)
 	    width = XTextWidth(messageFont, msg->txt, len);
 	else
 	    width = msg->pixelLen;
-	Erase_rectangle((x) - 1,
-			(y) - messageFont->ascent ,
-			width + 2,
-			messageFont->ascent + messageFont->descent);
     }
 }
 
@@ -1074,8 +977,6 @@ void Paint_recording(void)
     x = WINSCALE(ext_view_width) - 10 - w;
     y = 10 + gameFont->ascent;
     XDrawString(dpy, drawPixmap, gameGC, x, y, buf, len);
-    Erase_rectangle(x - 1, WINSCALE(10),
-		    w+2, gameFont->ascent + gameFont->descent);
 }
 
 
@@ -1096,6 +997,4 @@ void Paint_client_fps(void)
     x = WINSCALE(ext_view_width) - 10 - w;
     y = 200 + gameFont->ascent;
     rd.drawString(dpy, drawPixmap, gameGC, x, y, buf, len);
-    Erase_rectangle(x - 1,  WINSCALE(200),
-		    w + 2, gameFont->ascent + gameFont->descent);
 }
