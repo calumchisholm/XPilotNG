@@ -552,10 +552,10 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
     glPushMatrix();
     glLoadIdentity();
 
-    glTranslatef((int)((xoff * Setup->width + polygon.points[0].x) * scale) -
-		 (int)(world.x * scale),
-		 (int)((yoff * Setup->height + polygon.points[0].y) * scale) -
-		 (int)(world.y * scale), 0);
+    glTranslatef(polygon.points[0].x * scale +
+		 rint((xoff * Setup->width - world.x) * scale),
+		 polygon.points[0].y * scale +
+		 rint((yoff * Setup->height - world.y) * scale), 0);
     glScalef(scale, scale, 0);
 
     if ((instruments.showTexturedWalls || instruments.showFilledWorld) &&
