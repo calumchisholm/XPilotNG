@@ -199,6 +199,7 @@ void Object_hits_target(object *obj, target_t *targ, long player_cost)
 			targets_remaining = 0,
 			targets_total = 0;
     DFLOAT 		drainfactor;
+    vector 		zero_vel = {0.0, 0.0};
 
     /* a normal shot or a direct mine hit work, cannons don't */
     /* KK: should shots/mines by cannons of opposing teams work? */
@@ -261,8 +262,8 @@ void Object_hits_target(object *obj, target_t *targ, long player_cost)
     Target_remove_from_map(targ);
 
     Make_debris(
-	/* pos.cx, pos.cy   */ targ->pos.cx, targ->pos.cy,
-	/* vel.x, vel.y   */ 0.0, 0.0,
+	/* pos.cx, pos.cy   */ targ->pos,
+	/* vel.x, vel.y   */ zero_vel,
 	/* owner id       */ NO_ID,
 	/* owner team	  */ targ->team,
 	/* kind           */ OBJ_DEBRIS,
@@ -868,8 +869,8 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
 #if 0
 	    int intensity = (int)(cost * wallBounceExplosionMult);
 	    Make_debris(
-		/* pos.cx, pos.cy */ pl->pos.cx, pl->pos.cy,
-		/* vel.x, vel.y   */ pl->vel.x, pl->vel.y,
+		/* pos            */ pl->pos,
+		/* vel.x, vel.y   */ pl->vel,
 		/* owner id       */ pl->id,
 		/* owner team	  */ pl->team,
 		/* kind           */ OBJ_SPARK,

@@ -38,11 +38,13 @@ void Thrust(player *pl)
     const DFLOAT	max_speed = 1 + (pl->power * 0.14);
     const DFLOAT	max_life = 3 + pl->power * 0.35;
     clpos		engine = Ship_get_engine_clpos(pl->ship, pl->dir);
-    int			cx = pl->pos.cx + engine.cx;
-    int			cy = pl->pos.cy + engine.cy;
+    clpos		pos;
     int			afterburners;
     DFLOAT		tot_sparks = (pl->power * 0.15 + 2.5) * timeStep;
     DFLOAT		alt_sparks;
+
+    pos.cx = pl->pos.cx + engine.cx;
+    pos.cy = pl->pos.cy + engine.cy;
 
     sound_play_sensors(pl->pos, THRUST_SOUND);
 
@@ -54,8 +56,8 @@ void Thrust(player *pl)
     /* floor(tot_sparks + rfrac()) randomly rounds up or down to an integer,
      * so that the expectation value of the result is tot_sparks */
     Make_debris(
-	/* pos.x, pos.y   */ cx, cy,
-	/* vel.x, vel.y   */ pl->vel.x, pl->vel.y,
+	/* pos.x, pos.y   */ pos,
+	/* vel.x, vel.y   */ pl->vel,
 	/* owner id       */ pl->id,
 	/* owner team	  */ pl->team,
 	/* kind           */ OBJ_SPARK,
@@ -70,8 +72,8 @@ void Thrust(player *pl)
 	);
 
     Make_debris(
-	/* pos.x, pos.y   */ cx, cy,
-	/* vel.x, vel.y   */ pl->vel.x, pl->vel.y,
+	/* pos.x, pos.y   */ pos,
+	/* vel.x, vel.y   */ pl->vel,
 	/* owner id       */ pl->id,
 	/* owner team	  */ pl->team,
 	/* kind           */ OBJ_SPARK,
@@ -445,8 +447,8 @@ void Tank_handle_detach(player *pl)
 
 
 void Make_wreckage(
-    /* pos.x, pos.y     */ int    cx,           int    cy,
-    /* vel.x, vel.y     */ DFLOAT velx,         DFLOAT vely,
+    /* pos              */ clpos  pos,
+    /* vel              */ vector vel,
     /* owner id         */ int    id,
     /* owner team	*/ int    team,
     /* min,max mass     */ DFLOAT min_mass,     DFLOAT max_mass,
@@ -468,9 +470,9 @@ void Make_wreckage(
     if (!useWreckage)
 	return;
 
-    cx = WRAP_XCLICK(cx);
-    cy = WRAP_YCLICK(cy);
-    if (!INSIDE_MAP(cx, cy))
+    pos.cx = WRAP_XCLICK(pos.cx);
+    pos.cy = WRAP_YCLICK(pos.cy);
+    if (!INSIDE_MAP(pos.cx, pos.cy))
 	return;
 
     if (max_life < min_life)
@@ -508,7 +510,7 @@ void Make_wreckage(
 	wreckage->type = OBJ_WRECKAGE;
 
 	/* Position */
-	Object_position_init_clicks(OBJ_PTR(wreckage), cx, cy);
+	Object_position_init_clicks(OBJ_PTR(wreckage), pos.cx, pos.cy);
 
 	/* Direction */
 	dir = MOD2(min_dir + (int)(rfrac() * MOD2(max_dir - min_dir, RES)),
@@ -516,8 +518,8 @@ void Make_wreckage(
 
 	/* Velocity and acceleration */
 	speed = min_speed + rfrac() * (max_speed - min_speed);
-	wreckage->vel.x = velx + tcos(dir) * speed;
-	wreckage->vel.y = vely + tsin(dir) * speed;
+	wreckage->vel.x = vel.x + tcos(dir) * speed;
+	wreckage->vel.y = vel.y + tsin(dir) * speed;
 	wreckage->acc.x = 0;
 	wreckage->acc.y = 0;
 
@@ -566,8 +568,8 @@ void Explode_fighter(player *pl)
     min_debris >>= 1; /* Removed *2.0 from range */
 
     Make_debris(
-	/* pos.x, pos.y   */ pl->pos.cx, pl->pos.cy,
-	/* vel.x, vel.y   */ pl->vel.x, pl->vel.y,
+	/* pos            */ pl->pos,
+	/* vel            */ pl->vel,
 	/* owner id       */ pl->id,
 	/* owner team	  */ pl->team,
 	/* kind           */ OBJ_DEBRIS,
@@ -584,8 +586,8 @@ void Explode_fighter(player *pl)
     if ( !BIT(pl->status, KILLED) )
 	return;
     Make_wreckage(
-	/* pos.x, pos.y     */ pl->pos.cx, pl->pos.cy,
-	/* vel.x, vel.y     */ pl->vel.x, pl->vel.y,
+	/* pos.x, pos.y     */ pl->pos,
+	/* vel.x, vel.y     */ pl->vel,
 	/* owner id         */ pl->id,
 	/* owner team	    */ pl->team,
 	/* min,max mass     */ MAX(pl->mass/8.0, 0.33), pl->mass,

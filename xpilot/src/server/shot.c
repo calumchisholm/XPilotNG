@@ -1134,8 +1134,8 @@ void Delete_shot(int ind)
 		break;
 
 	    Make_debris(
-		/* pos.x, pos.y   */ ball->prevpos.cx, ball->prevpos.cy,
-		/* vel.x, vel.y   */ ball->vel.x, ball->vel.y,
+		/* pos            */ ball->prevpos,
+		/* vel            */ ball->vel,
 		/* owner id       */ ball->id,
 		/* owner team     */ ball->team,
 		/* kind           */ OBJ_DEBRIS,
@@ -1234,8 +1234,8 @@ void Delete_shot(int ind)
 	    intensity /= (1 + shot->mods.power);
 
 	Make_debris(
-	    /* pos.x, pos.y   */ shot->prevpos.cx, shot->prevpos.cy,
-	    /* vel.x, vel.y   */ shot->vel.x, shot->vel.y,
+	    /* pos            */ shot->prevpos,
+	    /* vel            */ shot->vel,
 	    /* owner id       */ shot->id,
 	    /* owner team     */ shot->team,
 	    /* kind           */ type,

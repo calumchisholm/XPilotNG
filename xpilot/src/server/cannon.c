@@ -461,6 +461,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player *pl, int dir)
     bool	played = false;
     int		i;
     int		speed = ShotsSpeed;
+    vector	zero_vel = { 0.0, 0.0 };
 
     CLEAR_MODS(mods);
     switch (weapon) {
@@ -578,8 +579,8 @@ static void Cannon_fire(cannon_t *c, int weapon, player *pl, int dir)
 	/* use emergency thrusts to make extra big jets */
 	if ((rfrac() * (c->item[ITEM_EMERGENCY_THRUST] + 1)) >= 1) {
 	    Make_debris(
-		/* pos */	c->pos.cx, c->pos.cy,
-		/* vel */	0, 0,
+		/* pos */	c->pos,
+		/* vel */	zero_vel,
 		/* id */	NO_ID,
 		/* team */	c->team,
 		/* type */	OBJ_SPARK,
@@ -595,8 +596,8 @@ static void Cannon_fire(cannon_t *c, int weapon, player *pl, int dir)
 	    c->item[ITEM_EMERGENCY_THRUST]--;
 	} else {
 	    Make_debris(
-		/* pos */	c->pos.cx, c->pos.cy,
-		/* vel */	0, 0,
+		/* pos */	c->pos,
+		/* vel */	zero_vel,
 		/* id */	NO_ID,
 		/* team */	c->team,
 		/* type */	OBJ_SPARK,
@@ -649,13 +650,15 @@ static void Cannon_fire(cannon_t *c, int weapon, player *pl, int dir)
 
 void Cannon_dies(cannon_t *c, player *pl)
 {
+    vector	zero_vel = { 0.0, 0.0 };
+
     Cannon_remove_from_map(c);
     Cannon_throw_items(c);
     Cannon_init(c);
     sound_play_sensors(c->pos, CANNON_EXPLOSION_SOUND);
     Make_debris(
-	/* pos.cx, pos.cy   */ c->pos.cx, c->pos.cy,
-	/* vel.x, vel.y   */ 0.0, 0.0,
+	/* pos            */ c->pos,
+	/* vel            */ zero_vel,
 	/* owner id       */ NO_ID,
 	/* owner team	  */ c->team,
 	/* kind           */ OBJ_DEBRIS,
@@ -669,8 +672,8 @@ void Cannon_dies(cannon_t *c, player *pl)
 	/* min,max life   */ 8, 68
 	);
     Make_wreckage(
-	/* pos.cx, pos.cy   */ c->pos.cx, c->pos.cy,
-	/* vel.x, vel.y   */ 0.0, 0.0,
+	/* pos            */ c->pos,
+	/* vel            */ zero_vel,
 	/* owner id       */ NO_ID,
 	/* owner team	  */ c->team,
 	/* min,max mass   */ 3.5, 23,

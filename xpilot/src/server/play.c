@@ -123,8 +123,8 @@ int Punish_team(player *pl, treasure_t *td, int cx, int cy)
 
 /* Create debris particles */
 void Make_debris(
-    /* pos.x, pos.y   */ int    cx,          int   cy,
-    /* vel.x, vel.y   */ DFLOAT velx,        DFLOAT vely,
+    /* pos            */ clpos  pos,
+    /* vel            */ vector vel,
     /* owner id       */ int    id,
     /* owner team     */ int    team,
     /* type           */ int    type,
@@ -143,9 +143,9 @@ void Make_debris(
     DFLOAT		life;
     modifiers		mods;
 
-    cx = WRAP_XCLICK(cx);
-    cy = WRAP_YCLICK(cy);
-    if (!INSIDE_MAP(cx, cy))
+    pos.cx = WRAP_XCLICK(pos.cx);
+    pos.cy = WRAP_YCLICK(pos.cy);
+    if (!INSIDE_MAP(pos.cx, pos.cy))
 	return;
 
     if (max_life < min_life)
@@ -175,15 +175,15 @@ void Make_debris(
 	debris->color = color;
 	debris->id = id;
 	debris->team = team;
-	Object_position_init_clicks(debris, cx, cy);
+	Object_position_init_clicks(debris, pos.cx, pos.cy);
 	dir = MOD2(min_dir + (int)(rfrac() * (max_dir - min_dir)), RES);
 	dirplus = MOD2(dir + 1, RES);
 	diroff = rfrac();
 	dx = tcos(dir) + (tcos(dirplus) - tcos(dir)) * diroff;
 	dy = tsin(dir) + (tsin(dirplus) - tsin(dir)) * diroff;
 	speed = min_speed + rfrac() * (max_speed - min_speed);
-	debris->vel.x = velx + dx * speed;
-	debris->vel.y = vely + dy * speed;
+	debris->vel.x = vel.x + dx * speed;
+	debris->vel.y = vel.y + dy * speed;
 	debris->acc.x = 0;
 	debris->acc.y = 0;
 	if (shotHitFuelDrainUsesKineticEnergy

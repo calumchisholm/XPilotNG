@@ -236,34 +236,34 @@ void Update_torpedo(torpobject *torp);
 void Update_missile(missileobject *shot);
 void Update_mine(mineobject *mine);
 void Make_debris(
-	    /* pos.x, pos.y   */ int    cx,          int   cy,
-	    /* vel.x, vel.y   */ DFLOAT velx,        DFLOAT vely,
-	    /* owner id       */ int    id,
-	    /* owner team     */ int    team,
-	    /* type           */ int    type,
-	    /* mass           */ DFLOAT mass,
-	    /* status         */ long   status,
-	    /* color          */ int    color,
-	    /* radius         */ int    radius,
-	    /* num debris     */ int    num_debris,
-	    /* min,max dir    */ int    min_dir,    int    max_dir,
-	    /* min,max speed  */ DFLOAT min_speed,  DFLOAT max_speed,
-	    /* min,max life   */ DFLOAT min_life,   DFLOAT max_life
-	    );
+    /* pos            */ clpos  pos,
+    /* vel            */ vector vel,
+    /* owner id       */ int    id,
+    /* owner team     */ int    team,
+    /* type           */ int    type,
+    /* mass           */ DFLOAT mass,
+    /* status         */ long   status,
+    /* color          */ int    color,
+    /* radius         */ int    radius,
+    /* num debris     */ int    num_debris,
+    /* min,max dir    */ int    min_dir,    int    max_dir,
+    /* min,max speed  */ DFLOAT min_speed,  DFLOAT max_speed,
+    /* min,max life   */ DFLOAT min_life,   DFLOAT max_life
+    );
 void Make_wreckage(
-	    /* pos.x, pos.y   */ int    cx,         int    cy,
-	    /* vel.x, vel.y   */ DFLOAT velx,       DFLOAT vely,
-	    /* owner id       */ int    id,
-	    /* owner team     */ int    team,
-	    /* min,max mass   */ DFLOAT min_mass,   DFLOAT max_mass,
-	    /* total mass     */ DFLOAT total_mass,
-	    /* status         */ long   status,
-	    /* color          */ int    color,
-	    /* max wreckage   */ int    max_wreckage,
-	    /* min,max dir    */ int    min_dir,    int    max_dir,
-	    /* min,max speed  */ DFLOAT min_speed,  DFLOAT max_speed,
-	    /* min,max life   */ DFLOAT min_life,   DFLOAT max_life
-	    );
+    /* pos            */ clpos  pos,
+    /* vel            */ vector vel,
+    /* owner id       */ int    id,
+    /* owner team     */ int    team,
+    /* min,max mass   */ DFLOAT min_mass,   DFLOAT max_mass,
+    /* total mass     */ DFLOAT total_mass,
+    /* status         */ long   status,
+    /* color          */ int    color,
+    /* max wreckage   */ int    max_wreckage,
+    /* min,max dir    */ int    min_dir,    int    max_dir,
+    /* min,max speed  */ DFLOAT min_speed,  DFLOAT max_speed,
+    /* min,max life   */ DFLOAT min_life,   DFLOAT max_life
+    );
 void Make_item(clpos pos,
 	       int vx, int vy,
 	       int item, int num_per_pack,

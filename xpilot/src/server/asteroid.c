@@ -96,14 +96,14 @@ void Break_asteroid(wireobject *asteroid)
 {
     DFLOAT	mass, mass3;
     DFLOAT	speed, speed1, speed2, radius;
-    DFLOAT	velx1, vely1, velx2, vely2, velx3, vely3;
+    DFLOAT	velx1, vely1, velx2, vely2;
     int		dir, dir1, dir2, split_dir;
     int		cx1, cy1, cx2, cy2;
 
     if (asteroid->size == 1) {
 	mass = asteroid->mass / 2;
-	Make_wreckage(asteroid->pos.cx, asteroid->pos.cy,
-		      asteroid->vel.x, asteroid->vel.y,
+	Make_wreckage(asteroid->pos,
+		      asteroid->vel,
 		      NO_ID,
 		      TEAM_NOT_SET,
 		      mass / 20, mass / 3,
@@ -114,8 +114,8 @@ void Break_asteroid(wireobject *asteroid)
 		      0, RES-1,
 		      5, 10,
 		      3, 10);
-	Make_debris(asteroid->pos.cx, asteroid->pos.cy,
-		    asteroid->vel.x, asteroid->vel.y,
+	Make_debris(asteroid->pos,
+		    asteroid->vel,
 		    NO_ID,
 		    TEAM_NOT_SET,
 		    OBJ_DEBRIS,
@@ -154,12 +154,10 @@ void Break_asteroid(wireobject *asteroid)
 	cy1 = WRAP_YCLICK(asteroid->pos.cy + tsin(split_dir) * radius);
 	cx2 = WRAP_XCLICK(asteroid->pos.cx - tcos(split_dir) * radius);
 	cy2 = WRAP_YCLICK(asteroid->pos.cy - tsin(split_dir) * radius);
-	velx3 = asteroid->vel.x;
-	vely3 = asteroid->vel.y;
 	Make_asteroid(cx1, cy1, asteroid->size - 1, dir1, speed1);
 	Make_asteroid(cx2, cy2, asteroid->size - 1, dir2, speed2);
-	Make_wreckage(asteroid->pos.cx, asteroid->pos.cy,
-		      velx3, vely3,
+	Make_wreckage(asteroid->pos,
+		      asteroid->vel,
 		      NO_ID,
 		      TEAM_NOT_SET,
 		      mass3 / 20, mass3 / 3,
@@ -170,8 +168,8 @@ void Break_asteroid(wireobject *asteroid)
 		      0, RES-1,
 		      5, 10,
 		      3, 10);
-	Make_debris(asteroid->pos.cx, asteroid->pos.cy,
-		    velx3, vely3,
+	Make_debris(asteroid->pos,
+		    asteroid->vel,
 		    NO_ID,
 		    TEAM_NOT_SET,
 		    OBJ_DEBRIS,
