@@ -1671,7 +1671,6 @@ static void AsteroidCollision(void)
 		continue;
 
 	    radius = (ast->pl_radius + obj->pl_radius) * CLICK;
-
 #if 1
 	    if (!in_range(OBJ_PTR(ast), obj, radius))
 		continue;
@@ -2016,7 +2015,7 @@ static void MineCollision(void)
 			 &obj_list, &obj_count);
 
 	for (j = 0; j < obj_count; j++) {
-	    int r;
+	    int radius;
 	    bool hit;
 
 	    obj = obj_list[j];
@@ -2024,10 +2023,9 @@ static void MineCollision(void)
 	    if (!BIT(obj->type, collide_object_types))
 		continue;
 
-	    r = PIXEL_TO_CLICK(mineShotDetonateDistance + obj->pl_radius);
-
+	    radius = (mineShotDetonateDistance + obj->pl_radius) * CLICK;
 #if 1
-	    if (!in_range(OBJ_PTR(mine), obj, r))
+	    if (!in_range(OBJ_PTR(mine), obj, radius))
 		continue;
 #else
 	    if (is_polygon_map || !useOldCode) {
@@ -2035,21 +2033,21 @@ static void MineCollision(void)
 		case 0:
 		    hit = in_range_simple(mine->pos.cx, mine->pos.cy,
 					  obj->pos.cx, obj->pos.cy,
-					  r);
+					  radius);
 		    break;
 		case 1:
 		    hit = in_range_acd(mine->prevpos.cx - obj->prevpos.cx,
 				       mine->prevpos.cy - obj->prevpos.cy,
 				       mine->extmove.cx - obj->extmove.cx,
 				       mine->extmove.cy - obj->extmove.cy,
-				       r);
+				       radius);
 		    break;
 		case 2:
 		    hit = in_range_partial(mine->prevpos.cx - obj->prevpos.cx,
 					   mine->prevpos.cy - obj->prevpos.cy,
 					   mine->extmove.cx - obj->extmove.cx,
 					   mine->extmove.cy - obj->extmove.cy,
-					   r, obj->wall_time);
+					   radius, obj->wall_time);
 		    break;
 		case 3:
 		default:
@@ -2067,7 +2065,7 @@ static void MineCollision(void)
 		if (!in_range_acd_old(mine->prevpos.cx, mine->prevpos.cy,
 				      mine->pos.cx, mine->pos.cy,
 				      obj->prevpos.cx, obj->prevpos.cy,
-				      obj->pos.cx, obj->pos.cy, r)) {
+				      obj->pos.cx, obj->pos.cy, radius)) {
 		    continue;
 		}
 	    }
