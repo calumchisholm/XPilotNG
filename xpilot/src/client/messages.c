@@ -564,6 +564,13 @@ static bool Msg_is_in_angle_brackets(char *message)
     return true;
 }
 
+static bool Msg_is_game_msg(char *message)
+{
+    if (message[strlen(message) - 1] == ']' || strncmp(message, " <", 2) == 0)
+	return false;
+    return true;
+}
+
 
 /*
  * add an incoming talk/game message.
@@ -585,34 +592,31 @@ void Add_message(char *message)
     bool		scrolling		= false; /* really moving */
 
     show_reverse_scroll = BIT(instruments, SHOW_REVERSE_SCROLL);
-#endif
 
     len = strlen(message);
-    if (message[len - 1] == ']' || strncmp(message, " <", 2) == 0) {
-	is_game_msg = false;
-#ifndef _WINDOWS
+    is_game_msg = Msg_is_game_msg(message);
+    if (!is_game_msg) {
 	if (selectionAndHistory && selection.draw.state == SEL_PENDING) {
 	    /* the buffer for the pending messages */
 	    msg_set = TalkMsg_pending;
-	} else
-#endif
-	{
+	} else {
 	    msg_set = TalkMsg;
-#ifndef _WINDOWS
 	    is_drawn_talk_message = true;
-#endif
 	}
     } else {
-	is_game_msg = true;
-#ifndef _WINDOWS
-	if (selectionAndHistory && selection.draw.state == SEL_PENDING) {
+	if (selectionAndHistory && selection.draw.state == SEL_PENDING)
 	    msg_set = GameMsg_pending;
-	} else
-#endif
-	{
+	else
 	    msg_set = GameMsg;
-	}
     }
+#else
+    len = strlen(message);
+    is_game_msg = Msg_is_game_msg(message);
+    if (!is_game_msg)
+	msg_set = TalkMsg;
+    else
+	msg_set = GameMsg;
+#endif
 
     if (is_game_msg /* && oldServer)*/)
 	Msg_parse(message, len);
@@ -703,7 +707,8 @@ void Add_message(char *message)
 	  && selection.draw.state == SEL_EMPHASIZED ) {
 
 	if ((scrolling && selection.draw.y2 == 0)
-	      || (!show_reverse_scroll && selection.draw.y1 == maxMessages - 1)) {
+	      || (!show_reverse_scroll && selection.draw.y1
+		  == maxMessages - 1)) {
 	    /*
 	     * the emphasizing vanishes, as it's `last' line
 	     * is `scrolled away'
@@ -729,7 +734,8 @@ void Add_message(char *message)
     }
 #endif
 
-    msg_set[0]->pixelLen = XTextWidth(messageFont, msg_set[0]->txt, msg_set[0]->len);
+    msg_set[0]->pixelLen = XTextWidth(messageFont, msg_set[0]->txt,
+				      msg_set[0]->len);
 
     /* Print messages to standard output.
      */
