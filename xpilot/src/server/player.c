@@ -864,7 +864,7 @@ static void Give_best_player_bonus(DFLOAT average_score,
 
 
     if (best_ratio == 0)
-	sprintf(msg, "There is no Deadly Player");
+	sprintf(msg, "There is no Deadly Player.");
     else if (num_best_players == 1) {
 	player *bp = Players(best_players[0]);
 
