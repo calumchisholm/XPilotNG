@@ -390,9 +390,21 @@ void Paint_score_entry(int entry_num, other_t *other, bool is_team)
 	raceStr[2] = ' ';
 
 	lineSpacing = TTF_FontLineSkip(scoreListFont) + 1;
-	/* kps - workaround for broken TTF_FontLineSkip */
-	if (lineSpacing == 1)
+	/*
+	 * SDL_ttf 1.2 seems to have a broken TTF_FontLineSkip.
+	 * Enable workaround and print a warning.
+	 */
+	if (lineSpacing == 1) {
+	    static bool warned = false;
+	    if (!warned) {
+		warn("Enabling workaround for bug in SDL_ttf 1.2.");
+		warn("SDL_ttf 2.0 or newer should not have this problem.");
+		warned = true;
+	    }
 	    lineSpacing = 15;
+	}
+	/* End of SDL_ttf 1.2 bug workaround. */
+
 	firstLine = 2*SCORE_BORDER + lineSpacing;
     }
     scoreEntryRect.y = firstLine + lineSpacing * entry_num;
