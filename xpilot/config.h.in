@@ -311,6 +311,9 @@
 /* enable sdl client */
 #undef SDL_CLIENT
 
+/* enable sdl gameloop in sdl client */
+#undef SDL_GAMELOOP
+
 /* Define to the type of arg 1 for `select'. */
 #undef SELECT_TYPE_ARG1
 

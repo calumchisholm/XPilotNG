@@ -38,6 +38,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_triplet = @host@
 bin_PROGRAMS = xpilot-ng-sdl$(EXEEXT)
+@COND_SDL_GAMELOOP_TRUE@am__append_1 = gameloop.c
+@COND_SDL_GAMELOOP_FALSE@am__append_2 = gameloop_x.c
 subdir = src/client/sdl
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in TODO
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -50,13 +52,23 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
+am__xpilot_ng_sdl_SOURCES_DIST = DT_drawtext.c DT_drawtext.h \
+	SDL_console.c SDL_console.h SDL_gfxPrimitives.c \
+	SDL_gfxPrimitives.h SDL_gfxPrimitives_font.h console.c \
+	console.h glwidgets.c glwidgets.h images.c images.h main.c \
+	radar.c radar.h sdlevent.c sdlgui.c sdlinit.c sdlkeys.c \
+	sdlkeys.h sdlpaint.c sdlpaint.h sdlwindow.c sdlwindow.h text.c \
+	text.h todo.c sdlmeta.h sdlmeta.c sdlinit.h xpclient_sdl.h \
+	gameloop.c gameloop_x.c
+@COND_SDL_GAMELOOP_TRUE@am__objects_1 = gameloop.$(OBJEXT)
+@COND_SDL_GAMELOOP_FALSE@am__objects_2 = gameloop_x.$(OBJEXT)
 am_xpilot_ng_sdl_OBJECTS = DT_drawtext.$(OBJEXT) SDL_console.$(OBJEXT) \
 	SDL_gfxPrimitives.$(OBJEXT) console.$(OBJEXT) \
-	gameloop_x.$(OBJEXT) glwidgets.$(OBJEXT) images.$(OBJEXT) \
-	main.$(OBJEXT) radar.$(OBJEXT) sdlevent.$(OBJEXT) \
-	sdlgui.$(OBJEXT) sdlinit.$(OBJEXT) sdlkeys.$(OBJEXT) \
-	sdlpaint.$(OBJEXT) sdlwindow.$(OBJEXT) text.$(OBJEXT) \
-	todo.$(OBJEXT) sdlmeta.$(OBJEXT)
+	glwidgets.$(OBJEXT) images.$(OBJEXT) main.$(OBJEXT) \
+	radar.$(OBJEXT) sdlevent.$(OBJEXT) sdlgui.$(OBJEXT) \
+	sdlinit.$(OBJEXT) sdlkeys.$(OBJEXT) sdlpaint.$(OBJEXT) \
+	sdlwindow.$(OBJEXT) text.$(OBJEXT) todo.$(OBJEXT) \
+	sdlmeta.$(OBJEXT) $(am__objects_1) $(am__objects_2)
 xpilot_ng_sdl_OBJECTS = $(am_xpilot_ng_sdl_OBJECTS)
 xpilot_ng_sdl_DEPENDENCIES = $(top_builddir)/src/client/libxpclient.a \
 	$(top_builddir)/src/common/libxpcommon.a
@@ -66,20 +78,20 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/DT_drawtext.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/SDL_console.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/SDL_gfxPrimitives.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/console.Po ./$(DEPDIR)/gameloop_x.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/glwidgets.Po ./$(DEPDIR)/images.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/main.Po ./$(DEPDIR)/radar.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/sdlevent.Po ./$(DEPDIR)/sdlgui.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/sdlinit.Po ./$(DEPDIR)/sdlkeys.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/sdlmeta.Po ./$(DEPDIR)/sdlpaint.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/sdlwindow.Po ./$(DEPDIR)/text.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/todo.Po
+@AMDEP_TRUE@	./$(DEPDIR)/console.Po ./$(DEPDIR)/gameloop.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/gameloop_x.Po ./$(DEPDIR)/glwidgets.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/images.Po ./$(DEPDIR)/main.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/radar.Po ./$(DEPDIR)/sdlevent.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/sdlgui.Po ./$(DEPDIR)/sdlinit.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/sdlkeys.Po ./$(DEPDIR)/sdlmeta.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/sdlpaint.Po ./$(DEPDIR)/sdlwindow.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/text.Po ./$(DEPDIR)/todo.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(xpilot_ng_sdl_SOURCES)
-DIST_SOURCES = $(xpilot_ng_sdl_SOURCES)
+DIST_SOURCES = $(am__xpilot_ng_sdl_SOURCES_DIST)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -96,6 +108,8 @@ CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 COND_SDL_CLIENT_FALSE = @COND_SDL_CLIENT_FALSE@
 COND_SDL_CLIENT_TRUE = @COND_SDL_CLIENT_TRUE@
+COND_SDL_GAMELOOP_FALSE = @COND_SDL_GAMELOOP_FALSE@
+COND_SDL_GAMELOOP_TRUE = @COND_SDL_GAMELOOP_TRUE@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CYGPATH_W = @CYGPATH_W@
@@ -193,12 +207,12 @@ AM_CPPFLAGS = -DCONF_DATADIR=\"$(pkgdatadir)/\" \
 xpilot_ng_sdl_SOURCES = \
 	DT_drawtext.c DT_drawtext.h \
 	SDL_console.c SDL_console.h SDL_gfxPrimitives.c SDL_gfxPrimitives.h \
-	SDL_gfxPrimitives_font.h console.c console.h gameloop_x.c \
+	SDL_gfxPrimitives_font.h console.c console.h \
 	glwidgets.c glwidgets.h images.c images.h main.c radar.c radar.h \
 	sdlevent.c sdlgui.c sdlinit.c sdlkeys.c sdlkeys.h sdlpaint.c \
 	sdlpaint.h sdlwindow.c sdlwindow.h text.c text.h todo.c \
-	sdlmeta.h sdlmeta.c sdlinit.h xpclient_sdl.h
-
+	sdlmeta.h sdlmeta.c sdlinit.h xpclient_sdl.h\
+$(am__append_1) $(am__append_2)
 xpilot_ng_sdl_LDADD = $(top_builddir)/src/client/libxpclient.a  $(top_builddir)/src/common/libxpcommon.a @GL_LIBS@ @SDL_EXTRA_LIBS@ @X_LIBS@ @X_PRE_LIBS@ @X_EXTRA_LIBS@ -lX11
 all: all-am
 
@@ -270,6 +284,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SDL_console.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SDL_gfxPrimitives.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/console.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gameloop.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gameloop_x.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/glwidgets.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/images.Po@am__quote@

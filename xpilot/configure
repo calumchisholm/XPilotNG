@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT XP_AUTHORS XP_COPYRIGHTDATE XP_COPYRIGHT XP_RELEASEDATE XP_DATADIR CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE RANLIB ac_ct_RANLIB CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS X_EXTENSIONS_LIB SDL_CONFIG SDL_CFLAGS SDL_LIBS SDL_EXTRA_LIBS GL_LIBS COND_SDL_CLIENT_TRUE COND_SDL_CLIENT_FALSE EGREP LIBOBJS POW_LIB LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT XP_AUTHORS XP_COPYRIGHTDATE XP_COPYRIGHT XP_RELEASEDATE XP_DATADIR CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE RANLIB ac_ct_RANLIB CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS X_EXTENSIONS_LIB SDL_CONFIG SDL_CFLAGS SDL_LIBS SDL_EXTRA_LIBS GL_LIBS COND_SDL_CLIENT_TRUE COND_SDL_CLIENT_FALSE COND_SDL_GAMELOOP_TRUE COND_SDL_GAMELOOP_FALSE EGREP LIBOBJS POW_LIB LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -865,6 +865,7 @@ Optional Features:
   --enable-plockserver    lock the xpilot server (xpilots) into memory
   --enable-development    enable development code
   --enable-sdl-client     enable sdl client
+  --enable-sdl-gameloop   enable sdl gameloop in sdl client
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
   --disable-sdltest       Do not try to compile and run a test SDL program
@@ -1941,6 +1942,18 @@ if test "${enable_sdl_client+set}" = set; then
 
 cat >>confdefs.h <<\_ACEOF
 #define SDL_CLIENT 1
+_ACEOF
+
+fi
+fi;
+
+# Check whether --enable-sdl_gameloop or --disable-sdl_gameloop was given.
+if test "${enable_sdl_gameloop+set}" = set; then
+  enableval="$enable_sdl_gameloop"
+  if test x$enable_sdl_gameloop = xyes; then
+
+cat >>confdefs.h <<\_ACEOF
+#define SDL_GAMELOOP 1
 _ACEOF
 
 fi
@@ -5840,6 +5853,15 @@ fi
 
 
 
+if test x$enable_sdl_gameloop = xyes; then
+  COND_SDL_GAMELOOP_TRUE=
+  COND_SDL_GAMELOOP_FALSE='#'
+else
+  COND_SDL_GAMELOOP_TRUE='#'
+  COND_SDL_GAMELOOP_FALSE=
+fi
+
+
 echo "$as_me:$LINENO: checking whether time.h and sys/time.h may both be included" >&5
 echo $ECHO_N "checking whether time.h and sys/time.h may both be included... $ECHO_C" >&6
 if test "${ac_cv_header_time+set}" = set; then
@@ -8551,6 +8573,13 @@ echo "$as_me: error: conditional \"COND_SDL_CLIENT\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
+if test -z "${COND_SDL_GAMELOOP_TRUE}" && test -z "${COND_SDL_GAMELOOP_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"COND_SDL_GAMELOOP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"COND_SDL_GAMELOOP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
 
 : ${CONFIG_STATUS=./config.status}
 ac_clean_files_save=$ac_clean_files
@@ -9170,6 +9199,8 @@ s,@SDL_EXTRA_LIBS@,$SDL_EXTRA_LIBS,;t t
 s,@GL_LIBS@,$GL_LIBS,;t t
 s,@COND_SDL_CLIENT_TRUE@,$COND_SDL_CLIENT_TRUE,;t t
 s,@COND_SDL_CLIENT_FALSE@,$COND_SDL_CLIENT_FALSE,;t t
+s,@COND_SDL_GAMELOOP_TRUE@,$COND_SDL_GAMELOOP_TRUE,;t t
+s,@COND_SDL_GAMELOOP_FALSE@,$COND_SDL_GAMELOOP_FALSE,;t t
 s,@EGREP@,$EGREP,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@POW_LIB@,$POW_LIB,;t t

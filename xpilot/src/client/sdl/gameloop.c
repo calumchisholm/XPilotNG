@@ -37,7 +37,7 @@ void Game_loop(void)
         FD_ZERO(&rfds);
         FD_SET(netfd, &rfds);
         tv.tv_sec = 0;
-        tv.tv_usec = 5000; // wait max 5 ms
+        tv.tv_usec = 5000; /* wait max 5 ms */
         n = select(netfd + 1, &rfds, NULL, NULL, &tv);
 		if (n == -1) {
             error("Select failed");

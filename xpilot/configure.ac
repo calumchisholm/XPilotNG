@@ -64,6 +64,14 @@ AC_ARG_ENABLE(sdl_client,
 	AC_DEFINE([SDL_CLIENT], 1, [enable sdl client])
 fi])
 
+dnl  Do this if you want to use the gameloop without the X11 hack.
+AC_ARG_ENABLE(sdl_gameloop,
+	AC_HELP_STRING([--enable-sdl-gameloop],
+			[enable sdl gameloop in sdl client]),
+[if test x$enable_sdl_gameloop = xyes; then
+	AC_DEFINE([SDL_GAMELOOP], 1, [enable sdl gameloop in sdl client])
+fi])
+
 
 dnl  Checks for programs.
 AC_PROG_CC
@@ -186,7 +194,7 @@ if test x$enable_sdl_client = xyes; then
 fi
 
 AM_CONDITIONAL([COND_SDL_CLIENT], [test x$enable_sdl_client = xyes])
-
+AM_CONDITIONAL([COND_SDL_GAMELOOP], [test x$enable_sdl_gameloop = xyes])
 
 dnl  Checks for header files.
 dnl AC_HEADER_STDC
