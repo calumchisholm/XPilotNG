@@ -311,8 +311,8 @@ void Update_tanks(pl_fuel_t *ft)
  */
 void Tank_handle_detach(player_t *pl)
 {
-    player_t		*dummy;
-    int			i, ct;
+    player_t *tank;
+    int i, ct;
 
     if (BIT(pl->used, HAS_PHASING_DEVICE))
 	return;
@@ -328,11 +328,13 @@ void Tank_handle_detach(player_t *pl)
 	ct = pl->fuel.num_tanks;
 
     Update_tanks(&(pl->fuel));
+
     /* Fork the current player */
-    dummy               = Players(NumPlayers);
+    tank = Players(NumPlayers);
+
     /*
      * MWAAH: this was ... naieve at least:
-     * *dummy              = *pl;
+     * *tank = *pl;
      * Player structures contain pointers to dynamic memory...
      */
 
@@ -340,57 +342,56 @@ void Tank_handle_detach(player_t *pl)
 			    ? Parse_shape_str(options.tankShipShape)
 			    : NULL);
     /* Released tanks don't have tanks... */
-    while (dummy->fuel.num_tanks > 0)
-	Player_remove_tank(dummy, dummy->fuel.num_tanks);
+    while (tank->fuel.num_tanks > 0)
+	Player_remove_tank(tank, tank->fuel.num_tanks);
 
-    SET_BIT(dummy->type_ext, OBJ_EXT_TANK);
-    Player_position_init_clpos(dummy, pl->pos);
-    dummy->vel		= pl->vel;
-    dummy->acc		= pl->acc;
-    dummy->dir		= pl->dir;
-    dummy->turnspeed	= pl->turnspeed;
-    dummy->velocity	= pl->velocity;
-    dummy->float_dir	= pl->float_dir;
-    dummy->turnresistance = pl->turnresistance;
-    dummy->turnvel	= pl->turnvel;
-    dummy->oldturnvel	= pl->oldturnvel;
-    dummy->turnacc	= pl->turnacc;
-    dummy->power	= pl->power;
+    SET_BIT(tank->type_ext, OBJ_EXT_TANK);
+    Player_position_init_clpos(tank, pl->pos);
+    tank->vel = pl->vel;
+    tank->acc = pl->acc;
+    tank->dir = pl->dir;
+    tank->turnspeed = pl->turnspeed;
+    tank->velocity = pl->velocity;
+    Player_set_float_dir(tank, pl->float_dir);
+    tank->turnresistance = pl->turnresistance;
+    tank->turnvel = pl->turnvel;
+    tank->oldturnvel = pl->oldturnvel;
+    tank->turnacc = pl->turnacc;
+    tank->power = pl->power;
 
-    strlcpy(dummy->name, pl->name, MAX_CHARS);
-    strlcat(dummy->name, "'s tank", MAX_CHARS);
-    strlcpy(dummy->username, options.tankUserName, MAX_CHARS);
-    strlcpy(dummy->hostname, options.tankHostName, MAX_CHARS);
-    dummy->home_base	= pl->home_base;
-    dummy->team		= pl->team;
-    dummy->pseudo_team	= pl->pseudo_team;
-    dummy->alliance	= ALLIANCE_NOT_SET;
-    dummy->invite	= NO_ID;
-    dummy->mychar       = 'T';
-    dummy->score	= pl->score - options.tankScoreDecrement;
-    updateScores	= true;
+    strlcpy(tank->name, pl->name, MAX_CHARS);
+    strlcat(tank->name, "'s tank", MAX_CHARS);
+    strlcpy(tank->username, options.tankUserName, MAX_CHARS);
+    strlcpy(tank->hostname, options.tankHostName, MAX_CHARS);
+    tank->home_base = pl->home_base;
+    tank->team = pl->team;
+    tank->pseudo_team = pl->pseudo_team;
+    tank->alliance = ALLIANCE_NOT_SET;
+    tank->invite = NO_ID;
+    tank->mychar = 'T';
+    tank->score = pl->score - options.tankScoreDecrement;
 
     /* Fuel is the one from chosen tank */
-    dummy->fuel.sum     =
-    dummy->fuel.tank[0] = pl->fuel.tank[ct];
-    dummy->fuel.max     = TANK_CAP(ct);
-    dummy->fuel.current = 0;
-    dummy->fuel.num_tanks = 0;
+    tank->fuel.sum =
+    tank->fuel.tank[0] = pl->fuel.tank[ct];
+    tank->fuel.max = TANK_CAP(ct);
+    tank->fuel.current = 0;
+    tank->fuel.num_tanks = 0;
 
     /* Mass is only tank + fuel */
-    dummy->mass = (dummy->emptymass = options.shipMass)
-	+ FUEL_MASS(dummy->fuel.sum);
-    dummy->power *= TANK_THRUST_FACT;
+    tank->emptymass = options.shipMass;
+    tank->mass = tank->emptymass + FUEL_MASS(tank->fuel.sum);
+    tank->power *= TANK_THRUST_FACT;
 
     /* Reset visibility. */
-    dummy->updateVisibility = 1;
+    tank->updateVisibility = 1;
     for (i = 0; i <= NumPlayers; i++) {
-	dummy->visibility[i].lastChange = 0;
+	tank->visibility[i].lastChange = 0;
 	Players(i)->visibility[NumPlayers].lastChange = 0;
     }
 
     /* Remember whose tank this is */
-    dummy->lock.pl_id = pl->id;
+    tank->lock.pl_id = pl->id;
 
     request_ID();
     NumPlayers++;
@@ -399,26 +400,28 @@ void Tank_handle_detach(player_t *pl)
 
     /* Possibly join alliance. */
     if (pl->alliance != ALLIANCE_NOT_SET)
-	Player_join_alliance(dummy, pl);
+	Player_join_alliance(tank, pl);
 
     sound_play_sensors(pl->pos, TANK_DETACH_SOUND);
 
     /* The tank uses shield and thrust */
-    dummy->status = (DEF_BITS & ~KILL_BITS) | PLAYING | GRAVITY | THRUSTING;
-    dummy->have = DEF_HAVE;
-    dummy->used = (DEF_USED & ~USED_KILL & pl->have) | HAS_SHIELD;
-    if (options.playerShielding == 0) {
-	dummy->shield_time = 30 * 12;
-	dummy->have |= HAS_SHIELD;
+    tank->status = (DEF_BITS & ~KILL_BITS) | PLAYING | GRAVITY | THRUSTING;
+    tank->have = DEF_HAVE;
+    tank->used = (DEF_USED & ~USED_KILL & pl->have) | HAS_SHIELD;
+
+    if (!options.playerShielding) {
+	tank->shield_time = 30 * 12;
+	tank->have |= HAS_SHIELD;
     }
 
     /* Maybe heat-seekers to retarget? */
     for (i = 0; i < NumObjs; i++) {
-	if (Obj[i]->type == OBJ_HEAT_SHOT
-	    && Obj[i]->info > 0
-	    && Player_by_id(Obj[i]->info) == pl) {
-	    Obj[i]->info = NumPlayers - 1;
-	}
+	object_t *obj = Obj[i];
+
+	if (obj->type == OBJ_HEAT_SHOT
+	    && obj->info > 0
+	    && Player_by_id(obj->info) == pl)
+	    obj->info = NumPlayers - 1; 	/* kps - is this right ? */
     }
 
     /* Remove tank, fuel and mass from myself */
@@ -428,17 +431,19 @@ void Tank_handle_detach(player_t *pl)
 	player_t *pl_i = Players(i);
 
 	if (pl_i->conn != NULL) {
-	    Send_player(pl_i->conn, dummy->id);
-	    Send_score(pl_i->conn, dummy->id,
-		       dummy->score, (int)dummy->life,
-		       dummy->mychar, dummy->alliance);
+	    Send_player(pl_i->conn, tank->id);
+	    Send_score(pl_i->conn, tank->id,
+		       tank->score, (int)tank->life,
+		       tank->mychar, tank->alliance);
 	}
     }
 
     for (i = 0; i < NumSpectators - 1; i++) {
-	Send_player(Players(i + spectatorStart)->conn, dummy->id);
-	Send_score(Players(i + spectatorStart)->conn, dummy->id, dummy->score,
-		   (int)dummy->life, dummy->mychar, dummy->alliance);
+	player_t *pl_i = Players(i + spectatorStart);
+
+	Send_player(pl_i->conn, tank->id);
+	Send_score(pl_i->conn, tank->id, tank->score,
+		   (int)tank->life, tank->mychar, tank->alliance);
     }
 }
 

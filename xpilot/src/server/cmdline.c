@@ -454,9 +454,9 @@ static option_desc opts[] = {
     {
 	"defaultShipShape",
 	"defaultShipShape",
-	"(NM:Default)(AU:Unknown)(SH: 15,0 -9,8 -9,-8)(MG: 15,0)(LG: 15,0)"
-	"(RG: 15,0)(EN: -9,0)(LR: -9,8)(RR: -9,-8)(LL: -9,8)(RL: -9,-8)"
-	"(MR: 15,0)",
+	"(NM:Default)(AU:Unknown)(SH: 14,0 -8,8 -8,-8)(MG: 14,0)(LG: 14,0)"
+	"(RG: 14,0)(EN: -8,0)(LR: -8,8)(RR: -8,-8)(LL: -8,8)(RL: -8,-8)"
+	"(MR: 14,0)",
 	&options.defaultShipShape,
 	valString,
 	tuner_none,
@@ -467,9 +467,14 @@ static option_desc opts[] = {
     {
 	"tankShipShape",
 	"tankShipShape",
-	"(NM:fueltank)"
-	"(SH: 15,0 14,5 9,8 -9,8 -14,5 -15,0 -14,-5 -9,-8 9,-8 14,-5)"
-	"(EN: -15,0)(MG: 15,0)",
+	"(NM:fueltank)(AU:John E. Norlin)"
+	"(SH: 15,0 14,-5 9,-8 -5,-8 -3,-8 -3,0 "
+	"2,0 2,2 -3,2 -3,6 5,6 5,8 -5,8 -5,-8 "
+	"-9,-8 -14,-5 -15,0 -14,5 -9,8 9,8 14,5)"
+	"(EN: -15,0)(MG: 15,0)"
+	/*"(NM:fueltank)"
+	  "(SH: 15,0 14,5 9,8 -9,8 -14,5 -15,0 -14,-5 -9,-8 9,-8 14,-5)"
+	  "(EN: -15,0)(MG: 15,0)"*/,
 	&options.tankShipShape,
 	valString,
 	tuner_none,
