@@ -42,9 +42,9 @@ public class EdgeStyleEditor extends EditorPanel implements ActionListener {
 
         add(new JLabel("Width:"));
         cmbWidth = new JComboBox();
-        for (int i = 1; i < 6; i++)
+        for (int i = 0; i < 6; i++)
             cmbWidth.addItem(String.valueOf(i));
-        cmbWidth.setSelectedIndex(style.getWidth() - 1);
+        cmbWidth.setSelectedIndex(style.getWidth());
         add(cmbWidth);
         
         add(new JLabel("Color:"));
@@ -67,7 +67,7 @@ public class EdgeStyleEditor extends EditorPanel implements ActionListener {
         }
         style.setId(tfName.getText());
         style.setStyle(cmbStyle.getSelectedIndex());
-        style.setWidth(cmbWidth.getSelectedIndex() + 1);
+        style.setWidth(cmbWidth.getSelectedIndex());
         style.setColor(bColor.getBackground());
         return true;
     }

@@ -254,12 +254,16 @@ public class MapModel {
                     if (cstr != null) {
                         col = new Color(Integer.parseInt(cstr, 16));
                     }
+
+                    int flags = 1;
+                    String flagstr = atts.getValue("flags");
+                    if (flagstr != null) flags = Integer.parseInt(flagstr);
                     
                     pstyles.put(id, new PolyStyle
                         (id, col,
                          atts.getValue("texture"),
                          atts.getValue("defedge"),
-                         Integer.parseInt(atts.getValue("flags"))));
+                         flags));
                     
                 } else if (name.equalsIgnoreCase("bmpstyle")) {
                     
