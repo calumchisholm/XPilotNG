@@ -262,7 +262,7 @@ static void Frame_radar_buffer_send(connection_t *conn)
     for (i = 0; i < num_radar; i++)
 	radar_shuffle[i] = i;
 
-    if (conn->ind < World.NumBases) {
+    if (conn->rectype != 2) {
 	/* permute. */
 	for (i = 0; i < num_radar; i++) {
 #if 1
@@ -726,7 +726,7 @@ static void Frame_shots(connection_t *conn, player *pl)
 	case OBJ_SPARK:
 	case OBJ_DEBRIS:
 	    if ((fuzz >>= 7) < 0x40) {
-		if (conn->ind < World.NumBases)
+		if (conn->rectype != 2)
 		    fuzz = randomMT();
 		else
 		    fuzz = 0;
