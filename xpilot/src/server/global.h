@@ -99,6 +99,7 @@ extern double		laserRepeatRate;
 extern long		DEF_BITS, KILL_BITS, DEF_HAVE, DEF_USED, USED_KILL;
 extern int		GetIndArray[];
 extern int		ShutdownServer, ShutdownDelay;
+extern bool		Log;
 extern bool		silent;
 extern bool		RawMode;
 extern bool		NoQuit;

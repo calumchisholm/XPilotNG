@@ -854,7 +854,6 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-dbe            support for X Doublebuffer Extension in client
   --enable-mbx            support for X Multibuffer Extension in client
-  --enable-log            Try to log every server start to log file
   --enable-serversound    Turns on sound support in the server (not client)
   --enable-plockserver    lock the xpilot server (xpilots) into memory
   --enable-development    enable development code
@@ -1733,18 +1732,6 @@ if test "${enable_mbx+set}" = set; then
 
 cat >>confdefs.h <<\_ACEOF
 #define MBX 1
-_ACEOF
-
-fi
-fi;
-
-# Check whether --enable-log or --disable-log was given.
-if test "${enable_log+set}" = set; then
-  enableval="$enable_log"
-  if test $enable_log = yes; then
-
-cat >>confdefs.h <<\_ACEOF
-#define LOG 1
 _ACEOF
 
 fi

@@ -36,13 +36,6 @@ AC_ARG_ENABLE(mbx,
 	AC_DEFINE([MBX], 1, [support for X Multibuffer Extension in client])
 fi])
 
-AC_ARG_ENABLE(log,
-	AC_HELP_STRING([--enable-log],
-			[Try to log every server start to log file]),
-[if test $enable_log = yes; then
-	AC_DEFINE([LOG], 1, [Try to log every server start to log file])
-fi])
-
 AC_ARG_ENABLE(serversound,
 	AC_HELP_STRING([--enable-serversound],
 			[Turns on sound support in the server (not client)]),

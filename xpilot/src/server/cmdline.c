@@ -57,6 +57,7 @@ int		ShotsMax;		/* Max shots pr. player */
 bool		ShotsGravity;		/* Shots affected by gravity */
 double		fireRepeatRate;		/* Ticks per autorepeat fire (0=off) */
 double		laserRepeatRate = 2;	/* Ticks per laser fire (0=off) */
+bool		Log;			/* Log server start to log file */
 bool		silent;			/* Make server really silent ? */
 bool		RawMode;		/* Let robots live and calculate
 					   frames even if there are n
@@ -713,6 +714,16 @@ static option_desc options[] = {
 	valBool,
 	tuner_dummy,
 	"Are bullets afflicted by gravity.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"Log",
+	"Log",
+	"false",
+	&Log,
+	valBool,
+	tuner_dummy,
+	"Log major server events to log file?\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -1819,9 +1830,9 @@ static option_desc options[] = {
 	Timing_setup,
 	"Rate at which game events happen. Allows using higher\n"
 	"FPS without making the game too fast.\n"
-	"A game speed of X means the game proceeds as fast as on a\n"
-	"version 4.5.4 server running at X FPS.\n"
-	"A value of 0 means the game speed is the same as FPS.\n",
+	"A game speed of X means the game proceeds as fast as on an old\n"
+	"server running at X FPS. A value of 0 means the value of game\n"
+	"speed is the same as that of FPS.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
