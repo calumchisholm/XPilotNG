@@ -195,19 +195,16 @@ static int Compress_map(unsigned char *map, int size)
 	if (i + 1 < size
 	    && map[i] == map[i + 1]) {
 	    for (k = 2; i + k < size; k++) {
-		if (map[i] != map[i + k]) {
+		if (map[i] != map[i + k])
 		    break;
-		}
-		if (k == 255) {
+		if (k == 255)
 		    break;
-		}
 	    }
 	    map[j] = (map[i] | SETUP_COMPRESSED);
 	    map[++j] = k;
 	    i += k - 1;
-	} else {
+	} else
 	    map[j] = map[i];
-	}
     }
     return j;
 }
@@ -435,7 +432,8 @@ static int Init_setup_old(void)
     memset(Oldsetup, 0, sizeof(setup_t) + size);
     memcpy(Oldsetup->map_data, mapdata, size);
     free(mapdata);
-    Oldsetup->setup_size = ((char *) &Oldsetup->map_data[0] - (char *) Oldsetup) + size;
+    Oldsetup->setup_size = ((char *) &Oldsetup->map_data[0]
+			    - (char *) Oldsetup) + size;
     Oldsetup->map_data_len = size;
     Oldsetup->map_order = type;
     Oldsetup->lives = World.rules->lives;
@@ -563,9 +561,8 @@ int Setup_net_server(void)
 
     Init_receive();
 
-    if (Init_setup() == -1) {
+    if (Init_setup() == -1)
 	return -1;
-    }
     /*
      * The number of connections is limited by the number of bases
      * and the max number of possible file descriptors to use in
@@ -589,12 +586,10 @@ static void Conn_set_state(connection_t *connp, int state, int drain_state)
     static int num_conn_busy;
     static int num_conn_playing;
 
-    if ((connp->state & (CONN_PLAYING | CONN_READY)) != 0) {
+    if ((connp->state & (CONN_PLAYING | CONN_READY)) != 0)
 	num_conn_playing--;
-    }
-    else if (connp->state == CONN_FREE) {
+    else if (connp->state == CONN_FREE)
 	num_conn_busy++;
-    }
 
     connp->state = state;
     connp->drain_state = drain_state;
@@ -608,15 +603,12 @@ static void Conn_set_state(connection_t *connp, int state, int drain_state)
 	num_conn_playing++;
 	connp->timeout = READY_TIMEOUT;
     }
-    else if (connp->state == CONN_LOGIN) {
+    else if (connp->state == CONN_LOGIN)
 	connp->timeout = LOGIN_TIMEOUT;
-    }
-    else if (connp->state == CONN_SETUP) {
+    else if (connp->state == CONN_SETUP)
 	connp->timeout = SETUP_TIMEOUT;
-    }
-    else if (connp->state == CONN_LISTENING) {
+    else if (connp->state == CONN_LISTENING)
 	connp->timeout = LISTEN_TIMEOUT;
-    }
     else if (connp->state == CONN_FREE) {
 	num_conn_busy--;
 	connp->timeout = IDLE_TIMEOUT;
@@ -701,21 +693,17 @@ void Destroy_connection(connection_t *connp, const char *reason)
 		Send_leave(Players(i + observerStart)->conn, id);
 	}
     }
-    if (connp->real != NULL) {
+    if (connp->real != NULL)
 	free(connp->real);
-    }
-    if (connp->nick != NULL) {
+    if (connp->nick != NULL)
 	free(connp->nick);
-    }
-    if (connp->dpy != NULL) {
+    if (connp->dpy != NULL)
 	free(connp->dpy);
-    }
-    if (connp->addr != NULL) {
+    if (connp->addr != NULL)
 	free(connp->addr);
-    }
-    if (connp->host != NULL) {
+    if (connp->host != NULL)
 	free(connp->host);
-    }
+
     Sockbuf_cleanup(&connp->w);
     Sockbuf_cleanup(&connp->r);
     Sockbuf_cleanup(&connp->c);
@@ -756,12 +744,11 @@ void Create_client_socket(sock_t *socket, int *port)
 {
     int i;
 
-    if (clientPortStart && (!clientPortEnd || clientPortEnd > 65535)) {
+    if (clientPortStart && (!clientPortEnd || clientPortEnd > 65535))
 	clientPortEnd = 65535;
-    }
-    if (clientPortEnd && (!clientPortStart || clientPortStart < 1024)) {
+
+    if (clientPortEnd && (!clientPortStart || clientPortStart < 1024))
 	clientPortStart = 1024;
-    }
 
     if (!clientPortStart || !clientPortEnd ||
 	(clientPortStart > clientPortEnd)) {
@@ -1104,7 +1091,8 @@ static int Handle_listening(connection_t *connp)
 	    return -1;
 	}
 	errno = 0;
-	if (sock_connectRec(&connp->w.sock, connp->addr, connp->his_port) == -1) {
+	if (sock_connectRec(&connp->w.sock, connp->addr, connp->his_port)
+	    == -1) {
 	    error("Still cannot connect datagram socket (%s,%d,%d,%d,%d)",
 		  connp->addr, connp->his_port,
 		  connp->w.sock.error.error,
@@ -1209,26 +1197,23 @@ static int Handle_setup(connection_t *connp)
     }
     if (connp->setup < S->setup_size) {
 	len = MIN(connp->c.size, 4096) - connp->c.len;
-	if (len <= 0) {
+	if (len <= 0)
 	    /* Wait for acknowledgement of previously transmitted data. */
 	    return 0;
-	}
-	if (len > S->setup_size - connp->setup) {
+
+	if (len > S->setup_size - connp->setup)
 	    len = S->setup_size - connp->setup;
-	}
 	buf = (char *) S;
 	if (Sockbuf_writeRec(&connp->c, &buf[connp->setup], len) != len) {
 	    Destroy_connection(connp, "sockbuf write setup error");
 	    return -1;
 	}
 	connp->setup += len;
-	if (len >= 512) {
+	if (len >= 512)
 	    connp->start += (len * FPS) / (8 * 512) + 1;
-	}
     }
-    if (connp->setup >= S->setup_size) {
+    if (connp->setup >= S->setup_size)
 	Conn_set_state(connp, CONN_DRAIN, CONN_LOGIN);
-    }
 #if 0
     if (CheckBanned(connp->real, connp->nick, connp->addr, connp->host)) {
 	Destroy_connection(connp, "Banned from server, contact " LOCALGURU);
@@ -1340,7 +1325,6 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
 	}
     }
 #endif
-    /* kps - fix */
     if (connp->rectype < 2) {
 	if (!Init_player(NumPlayers, connp->ship)) {
 	    strlcpy(errmsg, "Init_player failed: no free ID", errsize);
@@ -1565,21 +1549,19 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
 	/*
 	 * The client assumes at startup that all cannons are active.
 	 */
-	if (World.cannon[i].dead_time == 0) {
+	if (World.cannon[i].dead_time == 0)
 	    SET_BIT(World.cannon[i].conn_mask, conn_bit);
-	} else {
+	else
 	    CLR_BIT(World.cannon[i].conn_mask, conn_bit);
-	}
     }
     for (i = 0; i < World.NumFuels; i++) {
 	/*
 	 * The client assumes at startup that all fuelstations are filled.
 	 */
-	if (World.fuel[i].fuel == MAX_STATION_FUEL) {
+	if (World.fuel[i].fuel == MAX_STATION_FUEL)
 	    SET_BIT(World.fuel[i].conn_mask, conn_bit);
-	} else {
+	else
 	    CLR_BIT(World.fuel[i].conn_mask, conn_bit);
-	}
     }
     for (i = 0; i < World.NumTargets; i++) {
 	/*
@@ -1604,23 +1586,21 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
     if (resetOnHuman > 0
 	&& (NumPlayers - NumPseudoPlayers - NumRobots) <= resetOnHuman
 	&& !round_delay) {
-	if (BIT(World.rules->mode, TIMING)) {
+	if (BIT(World.rules->mode, TIMING))
 	    Race_game_over();
-	} else if (BIT(World.rules->mode, TEAM_PLAY)) {
+	else if (BIT(World.rules->mode, TEAM_PLAY))
 	    Team_game_over(-1, "");
-	} else if (BIT(World.rules->mode, LIMITED_LIVES)) {
+	else if (BIT(World.rules->mode, LIMITED_LIVES))
 	    Individual_game_over(-1);
-	}
     }
 
     /* if the next round is delayed, delay it again */
     if (round_delay > 0 || NumPlayers == 1) {
 	round_delay = roundDelaySeconds * FPS;
-	if (maxRoundTime > 0 && roundDelaySeconds == 0) {
+	if (maxRoundTime > 0 && roundDelaySeconds == 0)
 	    roundtime = maxRoundTime * FPS;
-	} else {
+	else
 	    roundtime = -1;
-	}
 	sprintf(msg, "Player entered. Delaying %d seconds until next %s.",
 		roundDelaySeconds, (BIT(World.rules->mode, TIMING) ?
 			     "race" : "round"));
@@ -1657,22 +1637,18 @@ static void Handle_input(int fd, void *arg)
     short		*pbscheck = NULL;
     char		*pbdcheck = NULL;
 
-    if (connp->state & (CONN_PLAYING | CONN_READY)) {
+    if (connp->state & (CONN_PLAYING | CONN_READY))
 	receive_tbl = &playing_receive[0];
-    }
-    else if (connp->state == CONN_LOGIN) {
+    else if (connp->state == CONN_LOGIN)
 	receive_tbl = &login_receive[0];
-    }
-    else if (connp->state & (CONN_DRAIN | CONN_SETUP)) {
+    else if (connp->state & (CONN_DRAIN | CONN_SETUP))
 	receive_tbl = &drain_receive[0];
-    }
     else if (connp->state == CONN_LISTENING) {
 	Handle_listening(connp);
 	return;
     } else {
-	if (connp->state != CONN_FREE) {
+	if (connp->state != CONN_FREE)
 	    Destroy_connection(connp, "not input");
-	}
 	return;
     }
     connp->num_keyboard_updates = 0;
@@ -1717,18 +1693,19 @@ static void Handle_input(int fd, void *arg)
 	type = (connp->r.ptr[0] & 0xFF);
 	recSpecial = 0;
 	result = (*receive_tbl[type])(connp);
-	if (result == -1) {
+	if (result == -1)
 	    /*
 	     * Unrecoverable error.
 	     * Connection has been destroyed.
 	     */
 	    return;
-	}
+
 	if (record && recOpt && recSpecial && playback_data == pbdcheck &&
 	    playback_shorts == pbscheck) {
 	    int len = connp->r.ptr - pkt;
 	    memmove(playback_data - (connp->r.buf + connp->r.len - pkt),
-		    playback_data - (connp->r.buf + connp->r.len - connp->r.ptr),
+		    playback_data
+		    - (connp->r.buf + connp->r.len - connp->r.ptr),
 		    connp->r.buf + connp->r.len - connp->r.ptr);
 	    playback_data -= len;
 	    pbdcheck = playback_data;
@@ -1752,9 +1729,8 @@ static void Handle_input(int fd, void *arg)
 	    xpprintf("Incomplete packet\n");
 	    break;
 	}
-	if (connp->state == CONN_PLAYING) {
+	if (connp->state == CONN_PLAYING)
 	    connp->start = main_loops;
-	}
     }
 }
 
@@ -1769,9 +1745,8 @@ int Input(void)
     for (i = 0; i < max_connections; i++) {
 	connp = &Conn[i];
 	playback = (connp->rectype == 1);
-	if (connp->state == CONN_FREE) {
+	if (connp->state == CONN_FREE)
 	    continue;
-	}
 	if ((!(playback && recOpt)
 	     && connp->start + connp->timeout * FPS < main_loops)
 	    || (playback && recOpt && *playback_opttout == main_loops
@@ -1873,23 +1848,22 @@ static int Send_self_items(connection_t *connp, player *pl)
 	}
     }
     /* don't send anything if there are no items. */
-    if (item_count == 0) {
+    if (item_count == 0)
 	return 1;
-    }
+
     /* check if enough buffer space is available for the complete packet. */
-    if (connp->w.size - connp->w.len <= 5 + item_count) {
+    if (connp->w.size - connp->w.len <= 5 + item_count)
 	return 0;
-    }
+
     /* build the header. */
     n = Packet_printf(&connp->w, "%c%u", PKT_SELF_ITEMS, item_mask);
-    if (n <= 0) {
+    if (n <= 0)
 	return n;
-    }
+
     /* build rest of packet containing the per item counts. */
     for (i = 0; i < NUM_ITEMS; i++) {
-	if (item_mask & (1 << i)) {
+	if (item_mask & (1 << i))
 	    connp->w.buf[connp->w.len++] = pl->item[i];
-	}
     }
     /* return the number of bytes added to the packet. */
     return 5 + item_count;
@@ -1940,13 +1914,13 @@ int Send_self(connection_t *connp,
 		      stat,
 		      autopilotlight
 	);
-    if (n <= 0) {
+    if (n <= 0)
 	return n;
-    }
+
     n = Send_self_items(connp, pl);
-    if (n <= 0) {
+    if (n <= 0)
 	return n;
-    }
+
     return Send_modifiers(connp, mods);
 }
 
@@ -1970,7 +1944,7 @@ int Send_war(connection_t *connp, int robot_id, int killer_id)
 {
     if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
 	warn("Connection not ready for war declaration (%d,%d)",
-	      connp->state, connp->id);
+	     connp->state, connp->id);
 	return 0;
     }
     return Packet_printf(&connp->c, "%c%hd%hd", PKT_WAR,
@@ -1984,7 +1958,7 @@ int Send_seek(connection_t *connp, int programmer_id, int robot_id, int sought_i
 {
     if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
 	warn("Connection not ready for seek declaration (%d,%d)",
-	      connp->state, connp->id);
+	     connp->state, connp->id);
 	return 0;
     }
     return Packet_printf(&connp->c, "%c%hd%hd%hd", PKT_SEEK,
@@ -2004,7 +1978,7 @@ int Send_player(connection_t *connp, int id)
 
     if (!BIT(connp->state, CONN_PLAYING|CONN_READY)) {
 	warn("Connection not ready for player info (%d,%d)",
-	      connp->state, connp->id);
+	     connp->state, connp->id);
 	return 0;
     }
     Convert_ship_2_string(pl->ship, buf, ext, 0x3200);
@@ -2047,11 +2021,6 @@ int Send_team(connection_t *connp, int id, int team)
 int Send_score(connection_t *connp, int id, DFLOAT score,
 	       int life, int mychar, int alliance)
 {
-    /* for those poor fools using standard client or haven't
-       got 'treatZeroSpecial' on... =) */
-    /* if (teamZeroPausing && (Player_by_id(connp->id)->team == 0))
-       score = (DFLOAT)(-5000.0); */
-
     if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
 	warn("Connection not ready for score(%d,%d)",
 	    connp->state, connp->id);
@@ -2065,9 +2034,9 @@ int Send_score(connection_t *connp, int id, DFLOAT score,
     else {
 	int allchar = ' ';
 	if (alliance != ALLIANCE_NOT_SET) {
-	    if (announceAlliances) {
+	    if (announceAlliances)
 		allchar = alliance + '0';
-	    } else {
+	    else {
 		if (Player_by_id(connp->id)->alliance == alliance)
 		    allchar = '+';
 	    }
@@ -2161,7 +2130,7 @@ int Send_score_object(connection_t *connp, DFLOAT score, int cx, int cy,
 int Send_cannon(connection_t *connp, int num, int dead_time)
 {
     return Packet_printf(&connp->w, "%c%hu%hu", PKT_CANNON,
-	num, dead_time);
+			 num, dead_time);
 }
 
 int Send_destruct(connection_t *connp, int count)
@@ -2172,7 +2141,7 @@ int Send_destruct(connection_t *connp, int count)
 int Send_shutdown(connection_t *connp, int count, int delay)
 {
     return Packet_printf(&connp->w, "%c%hd%hd", PKT_SHUTDOWN,
-	count, delay);
+			 count, delay);
 }
 
 int Send_thrusttime(connection_t *connp, int count, int max)
@@ -2192,7 +2161,7 @@ int Send_phasingtime(connection_t *connp, int count, int max)
 
 int Send_rounddelay(connection_t *connp, int count, int max)
 {
-    return(Packet_printf(&connp->w, "%c%hd%hd", PKT_ROUNDDELAY, count, max));
+    return Packet_printf(&connp->w, "%c%hd%hd", PKT_ROUNDDELAY, count, max);
 }
 
 int Send_debris(connection_t *connp, int type, unsigned char *p, int n)
@@ -2206,11 +2175,10 @@ int Send_debris(connection_t *connp, int type, unsigned char *p, int n)
     }
     avail = w->size - w->len - SOCKBUF_WRITE_SPARE - 2;
     if (n * 2 >= avail) {
-	if (avail > 2) {
+	if (avail > 2)
 	    n = (avail - 1) / 2;
-	} else {
+	else
 	    return 0;
-	}
     }
     w->buf[w->len++] = PKT_DEBRIS + type;
     w->buf[w->len++] = n;
@@ -2220,7 +2188,8 @@ int Send_debris(connection_t *connp, int type, unsigned char *p, int n)
     return n;
 }
 
-int Send_wreckage(connection_t *connp, int cx, int cy, u_byte wrtype, u_byte size, u_byte rot)
+int Send_wreckage(connection_t *connp, int cx, int cy,
+		  u_byte wrtype, u_byte size, u_byte rot)
 {
     if (wreckageCollisionMayKill)
 	/* Set the highest bit when wreckage is deadly. */
@@ -2233,7 +2202,8 @@ int Send_wreckage(connection_t *connp, int cx, int cy, u_byte wrtype, u_byte siz
 			 wrtype, size, rot);
 }
 
-int Send_asteroid(connection_t *connp, int cx, int cy, u_byte type, u_byte size, u_byte rot)
+int Send_asteroid(connection_t *connp, int cx, int cy,
+		  u_byte type, u_byte size, u_byte rot)
 {
     u_byte	type_size;
     int		x = CLICK_TO_PIXEL(cx),
@@ -2259,11 +2229,10 @@ int Send_fastshot(connection_t *connp, int type, unsigned char *p, int n)
     }
     avail = w->size - w->len - SOCKBUF_WRITE_SPARE - 3;
     if (n * 2 >= avail) {
-	if (avail > 2) {
+	if (avail > 2)
 	    n = (avail - 1) / 2;
-	} else {
+	else
 	    return 0;
-	}
     }
     w->buf[w->len++] = PKT_FASTSHOT;
     w->buf[w->len++] = type;
@@ -2359,7 +2328,8 @@ int Send_trans(connection_t *connp, int cx1, int cy1, int cx2, int cy2)
 }
 
 int Send_ship(connection_t *connp, int cx, int cy, int id, int dir,
-	      int shield, int cloak, int emergency_shield, int phased, int deflector)
+	      int shield, int cloak, int emergency_shield, int phased,
+	      int deflector)
 {
     if (!FEATURE(connp, F_SEPARATEPHASING))
 	cloak |= phased;
@@ -2384,7 +2354,8 @@ int Send_refuel(connection_t *connp, int cx0, int cy0, int cx1, int cy1)
 			 CLICK_TO_PIXEL(cx1), CLICK_TO_PIXEL(cy1));
 }
 
-int Send_connector(connection_t *connp, int cx0, int cy0, int cx1, int cy1, int tractor)
+int Send_connector(connection_t *connp, int cx0, int cy0, int cx1, int cy1,
+		   int tractor)
 {
     return Packet_printf(&connp->w,
 			 "%c%hd%hd%hd%hd%c",
@@ -2439,9 +2410,8 @@ int Send_damaged(connection_t *connp, int damaged)
 
 int Send_audio(connection_t *connp, int type, int vol)
 {
-    if (connp->w.size - connp->w.len <= 32) {
+    if (connp->w.size - connp->w.len <= 32)
 	return 0;
-    }
     return Packet_printf(&connp->w, "%c%c%c", PKT_AUDIO, type, vol);
 }
 
@@ -2539,20 +2509,19 @@ static int Receive_keyboard(connection_t *connp)
     u_byte		ch;
     int			size = KEYBOARD_SIZE;
 
-    if (connp->r.ptr - connp->r.buf + size + 1 + 4 > connp->r.len) {
+    if (connp->r.ptr - connp->r.buf + size + 1 + 4 > connp->r.len)
 	/*
 	 * Incomplete client packet.
 	 */
 	return 0;
-    }
+
     Packet_scanf(&connp->r, "%c%ld", &ch, &change);
-    if (change <= connp->last_key_change) {
+    if (change <= connp->last_key_change)
 	/*
 	 * We already have this key.
 	 * Nothing to do.
 	 */
 	connp->r.ptr += size;
-    }
     else {
 	connp->last_key_change = change;
 	pl = Player_by_id(connp->id);
@@ -2626,9 +2595,8 @@ static int Receive_power(connection_t *connp)
     int			autopilot;
 
     if ((n = Packet_scanf(&connp->r, "%c%hd", &ch, &tmp)) <= 0) {
-	if (n == -1) {
+	if (n == -1)
 	    Destroy_connection(connp, "read error");
-	}
 	return n;
     }
     power = (DFLOAT) tmp / 256.0F;
@@ -2711,14 +2679,13 @@ int Send_reliable(connection_t *connp)
     rel_off = connp->reliable_offset;
     if (connp->w.len > 0) {
 	/* We are piggybacking on a frame update. */
-	if (connp->w.len >= max_packet_size - min_send_size) {
+	if (connp->w.len >= max_packet_size - min_send_size)
 	    /* Frame already too big */
 	    return 0;
-	}
-	if (max_todo > max_packet_size - connp->w.len) {
+
+	if (max_todo > max_packet_size - connp->w.len)
 	    /* Do not exceed minimum fragment size. */
 	    max_todo = max_packet_size - connp->w.len;
-	}
     }
     if (connp->retransmit_at_loop > main_loops) {
 	/*
@@ -2734,14 +2701,13 @@ int Send_reliable(connection_t *connp)
 	    return 0;
 	}
     }
-    else if (connp->retransmit_at_loop != 0) {
+    else if (connp->retransmit_at_loop != 0)
 	/*
 	 * Timeout.
 	 * Either our packet or the acknowledgement got lost,
 	 * so retransmit.
 	 */
 	connp->acks >>= 1;
-    }
 
     todo = max_todo;
     for (i = 0; i <= connp->acks && todo > 0; i++) {
@@ -2777,30 +2743,26 @@ int Send_reliable(connection_t *connp)
 
     connp->last_send_loops = main_loops;
 
-    if (max_todo - todo <= 0) {
+    if (max_todo - todo <= 0)
 	/*
 	 * We have not transmitted anything at all.
 	 */
 	return 0;
-    }
 
     /*
      * Retransmission timer with exponential backoff.
      */
-    if (connp->rtt_retransmit > MAX_RETRANSMIT) {
+    if (connp->rtt_retransmit > MAX_RETRANSMIT)
 	connp->rtt_retransmit = MAX_RETRANSMIT;
-    }
     if (connp->retransmit_at_loop <= main_loops) {
 	connp->retransmit_at_loop = main_loops + connp->rtt_retransmit;
 	connp->rtt_retransmit <<= 1;
 	connp->rtt_timeouts++;
-    } else {
+    } else
 	connp->retransmit_at_loop = main_loops + connp->rtt_retransmit;
-    }
 
-    if (rel_off > connp->reliable_unsent) {
+    if (rel_off > connp->reliable_unsent)
 	connp->reliable_unsent = rel_off;
-    }
 
     return (max_todo - todo);
 }
@@ -2832,13 +2794,12 @@ static int Receive_ack(connection_t *connp)
 	 * These roundtrip estimation calculations are derived from Comer's
 	 * books "Internetworking with TCP/IP" parts I & II.
 	 */
-	if (connp->rtt_smoothed == 0) {
+	if (connp->rtt_smoothed == 0)
 	    /*
 	     * Initialize the rtt estimator by this first measurement.
 	     * The estimator is scaled by 3 bits.
 	     */
 	    connp->rtt_smoothed = rtt << 3;
-	}
 	/*
 	 * Scale the estimator back by 3 bits before calculating the error.
 	 */
@@ -2850,9 +2811,8 @@ static int Receive_ack(connection_t *connp)
 	/*
 	 * Now we need the absolute value of the error.
 	 */
-	if (delta < 0) {
+	if (delta < 0)
 	    delta = -delta;
-	}
 	/*
 	 * The rtt deviation is scaled by 2 bits.
 	 * Now we add one fourth of the difference between the
@@ -2870,9 +2830,8 @@ static int Receive_ack(connection_t *connp)
 	/*
 	 * Now keep it within reasonable bounds.
 	 */
-	if (connp->rtt_retransmit < MIN_RETRANSMIT) {
+	if (connp->rtt_retransmit < MIN_RETRANSMIT)
 	    connp->rtt_retransmit = MIN_RETRANSMIT;
-	}
     }
     diff = rel - connp->reliable_offset;
     if (diff > connp->c.len) {
@@ -2882,35 +2841,32 @@ static int Receive_ack(connection_t *connp)
 	Destroy_connection(connp, "bad ack");
 	return -1;
     }
-    else if (diff <= 0) {
+    else if (diff <= 0)
 	/* Late or duplicate ack of old data.  Discard. */
 	return 1;
-    }
     Sockbuf_advance(&connp->c, (int) diff);
     connp->reliable_offset += diff;
-    if ((n = ((diff + 512 - 1) / 512)) > connp->acks) {
+    if ((n = ((diff + 512 - 1) / 512)) > connp->acks)
 	connp->acks = n;
-    }
-    else {
+    else
 	connp->acks++;
-    }
+
     if (connp->reliable_offset >= connp->reliable_unsent) {
 	/*
 	 * All reliable data has been sent and acked.
 	 */
 	connp->retransmit_at_loop = 0;
-	if (connp->state == CONN_DRAIN) {
+	if (connp->state == CONN_DRAIN)
 	    Conn_set_state(connp, connp->drain_state, connp->drain_state);
-	}
     }
     if (connp->state == CONN_READY
 	&& (connp->c.len <= 0
 	    || (connp->c.buf[0] != PKT_REPLY
 		&& connp->c.buf[0] != PKT_PLAY
 		&& connp->c.buf[0] != PKT_SUCCESS
-		&& connp->c.buf[0] != PKT_FAILURE))) {
+		&& connp->c.buf[0] != PKT_FAILURE)))
 	Conn_set_state(connp, connp->drain_state, connp->drain_state);
-    }
+
     connp->rtt_timeouts = 0;
 
     return 1;
@@ -2941,18 +2897,17 @@ static int Receive_ack_cannon(connection_t *connp)
 
     if ((n = Packet_scanf(&connp->r, "%c%ld%hu",
 			  &ch, &loops_ack, &num)) <= 0) {
-	if (n == -1) {
+	if (n == -1)
 	    Destroy_connection(connp, "read error");
-	}
 	return n;
     }
     if (num >= World.NumCannons) {
 	Destroy_connection(connp, "bad cannon ack");
 	return -1;
     }
-    if (loops_ack > World.cannon[num].last_change) {
+    if (loops_ack > World.cannon[num].last_change)
 	SET_BIT(World.cannon[num].conn_mask, 1 << connp->ind);
-    }
+
     return 1;
 }
 
@@ -2965,18 +2920,16 @@ static int Receive_ack_fuel(connection_t *connp)
 
     if ((n = Packet_scanf(&connp->r, "%c%ld%hu",
 			  &ch, &loops_ack, &num)) <= 0) {
-	if (n == -1) {
+	if (n == -1)
 	    Destroy_connection(connp, "read error");
-	}
 	return n;
     }
     if (num >= World.NumFuels) {
 	Destroy_connection(connp, "bad fuel ack");
 	return -1;
     }
-    if (loops_ack > World.fuel[num].last_change) {
+    if (loops_ack > World.fuel[num].last_change)
 	SET_BIT(World.fuel[num].conn_mask, 1 << connp->ind);
-    }
     return 1;
 }
 
@@ -2989,9 +2942,8 @@ static int Receive_ack_target(connection_t *connp)
 
     if ((n = Packet_scanf(&connp->r, "%c%ld%hu",
 			  &ch, &loops_ack, &num)) <= 0) {
-	if (n == -1) {
+	if (n == -1)
 	    Destroy_connection(connp, "read error");
-	}
 	return n;
     }
     if (num >= World.NumTargets) {
@@ -3111,25 +3063,21 @@ static int Receive_talk(connection_t *connp)
     char		str[MAX_CHARS];
 
     if ((n = Packet_scanf(&connp->r, "%c%ld%s", &ch, &seq, str)) <= 0) {
-	if (n == -1) {
+	if (n == -1)
 	    Destroy_connection(connp, "read error");
-	}
 	return n;
     }
     if (seq > connp->talk_sequence_num) {
 	if ((n = Packet_printf(&connp->c, "%c%ld", PKT_TALK_ACK, seq)) <= 0) {
-	    if (n == -1) {
+	    if (n == -1)
 		Destroy_connection(connp, "write error");
-	    }
 	    return n;
 	}
 	connp->talk_sequence_num = seq;
-	if (*str == '/') {
+	if (*str == '/')
 	    Handle_player_command(Player_by_id(connp->id), str + 1);
-	}
-	else {
+	else
 	    Handle_talk(connp, str);
-	}
     }
     return 1;
 }
@@ -3142,9 +3090,8 @@ static int Receive_display(connection_t *connp)
 
     if ((n = Packet_scanf(&connp->r, "%c%hd%hd%c%c", &ch, &width, &height,
 			  &debris_colors, &spark_rand)) <= 0) {
-	if (n == -1) {
+	if (n == -1)
 	    Destroy_connection(connp, "read error");
-	}
 	return n;
     }
     LIMIT(width, MIN_VIEW_SIZE, MAX_VIEW_SIZE);
@@ -3193,9 +3140,8 @@ static int Receive_modifier_bank(connection_t *connp)
     int			n;
 
     if ((n = Packet_scanf(&connp->r, "%c%c%s", &ch, &bank, str)) <= 0) {
-	if (n == -1) {
+	if (n == -1)
 	    Destroy_connection(connp, "read modbank");
-	}
 	return n;
     }
     pl = Player_by_id(connp->id);
@@ -3291,20 +3237,17 @@ static int Receive_shape(connection_t *connp)
     char		str[2*MSG_LEN];
 
     if ((n = Packet_scanf(&connp->r, "%c%S", &ch, str)) <= 0) {
-	if (n == -1) {
+	if (n == -1)
 	    Destroy_connection(connp, "read shape");
-	}
 	return n;
     }
     if ((n = Packet_scanf(&connp->r, "%S", &str[strlen(str)])) <= 0) {
-	if (n == -1) {
+	if (n == -1)
 	    Destroy_connection(connp, "read shape ext");
-	}
 	return n;
     }
-    if (connp->state == CONN_LOGIN && connp->ship == NULL) {
+    if (connp->state == CONN_LOGIN && connp->ship == NULL)
 	connp->ship = Parse_shape_str(str);
-    }
     return 1;
 }
 
@@ -3318,9 +3261,8 @@ static int Receive_motd(connection_t *connp)
     if ((n = Packet_scanf(&connp->r,
 			  "%c%ld%ld",
 			  &ch, &offset, &bytes)) <= 0) {
-	if (n == -1) {
+	if (n == -1)
 	    Destroy_connection(connp, "read error");
-	}
 	return n;
     }
     connp->motd_offset = offset;
@@ -3350,12 +3292,11 @@ int Get_motd(char *buf, int offset, int maxlen, int *size_ptr)
     static long		motd_loops;
     static time_t	motd_mtime;
 
-    if (size_ptr) {
+    if (size_ptr)
 	*size_ptr = 0;
-    }
-    if (offset < 0 || maxlen < 0) {
+
+    if (offset < 0 || maxlen < 0)
 	return -1;
-    }
 
     if (!motd_loops
 	|| (motd_loops + MAX_MOTD_LOOPS < main_loops
@@ -3376,9 +3317,9 @@ int Get_motd(char *buf, int offset, int maxlen, int *size_ptr)
 	    return -1;
 	}
 	size = st.st_size;
-	if (size > MAX_MOTD_SIZE) {
+	if (size > MAX_MOTD_SIZE)
 	    size = MAX_MOTD_SIZE;
-	}
+
 	if (size != motd_size) {
 	    motd_mtime = 0;
 	    motd_size = size;
@@ -3386,9 +3327,8 @@ int Get_motd(char *buf, int offset, int maxlen, int *size_ptr)
 		close(fd);
 		return 0;
 	    }
-	    if (motd_buf) {
+	    if (motd_buf)
 		free(motd_buf);
-	    }
 	    if ((motd_buf = (char *) malloc(size)) == NULL) {
 		close(fd);
 		return -1;
@@ -3410,15 +3350,15 @@ int Get_motd(char *buf, int offset, int maxlen, int *size_ptr)
 
     motd_loops = main_loops;
 
-    if (size_ptr) {
+    if (size_ptr)
 	*size_ptr = motd_size;
-    }
-    if (offset + maxlen > motd_size) {
+
+    if (offset + maxlen > motd_size)
 	maxlen = motd_size - offset;
-    }
-    if (maxlen <= 0) {
+
+    if (maxlen <= 0)
 	return 0;
-    }
+
     memcpy(buf, motd_buf + offset, maxlen);
     return maxlen;
 }
@@ -3435,7 +3375,8 @@ static int Send_motd(connection_t *connp)
 			size = 0;
     char		buf[MAX_MOTD_CHUNK];
 
-    len = MIN(MAX_MOTD_CHUNK, MAX_RELIABLE_DATA_PACKET_SIZE - connp->c.len - 10);
+    len = MIN(MAX_MOTD_CHUNK, MAX_RELIABLE_DATA_PACKET_SIZE
+	      - connp->c.len - 10);
     if (len >= 10) {
 	len = Get_motd(buf, off, len, &size);
 	if (len <= 0) {
@@ -3470,9 +3411,8 @@ static int Receive_pointer_move(connection_t *connp)
     DFLOAT		turnspeed, turndir;
 
     if ((n = Packet_scanf(&connp->r, "%c%hd", &ch, &movement)) <= 0) {
-	if (n == -1) {
+	if (n == -1)
 	    Destroy_connection(connp, "read error");
-	}
 	return n;
     }
     pl = Player_by_id(connp->id);
@@ -3486,9 +3426,9 @@ static int Receive_pointer_move(connection_t *connp)
 	turndir = -1.0;
 	turnspeed = -turnspeed;
     }
-    else {
+    else
 	turndir = 1.0;
-    }
+
     if (pl->turnresistance)
 	LIMIT(turnspeed, MIN_PLAYER_TURNSPEED, MAX_PLAYER_TURNSPEED);
       /* Minimum amount of turning if you want to turn at all?
@@ -3517,16 +3457,15 @@ static int Receive_fps_request(connection_t *connp)
     unsigned char	fps;
 
     if ((n = Packet_scanf(&connp->r, "%c%c", &ch, &fps)) <= 0) {
-	if (n == -1) {
+	if (n == -1)
 	    Destroy_connection(connp, "read error");
-	}
 	return n;
     }
     if (connp->id != NO_ID) {
 	pl = Player_by_id(connp->id);
 	if (fps == 0)
 	    fps = 1;
-	if ((fps == 20) && ignore20MaxFPS)
+	if (!FEATURE(connp, F_POLY) && (fps == 20) && ignore20MaxFPS)
 	    fps = 100;
  	pl->player_fps = fps;
     }
@@ -3542,9 +3481,8 @@ static int Receive_audio_request(connection_t *connp)
     unsigned char	on;
 
     if ((n = Packet_scanf(&connp->r, "%c%c", &ch, &on)) <= 0) {
-	if (n == -1) {
+	if (n == -1)
 	    Destroy_connection(connp, "read error");
-	}
 	return n;
     }
     if (connp->id != NO_ID) {
