@@ -120,8 +120,12 @@ void Handle_Scoring(scoretype_t st, player_t *killer, player_t *victim, void *ex
     
     if (killer)
     	world = killer->world;
-    else
+    else if (victim)
     	world = victim->world;
+    else {
+    	warn("Attempted to score with neither victim nor killer");
+	return;
+    }
     
     switch(st) {
     	case SCORE_CANNON_KILL:
