@@ -3532,6 +3532,8 @@ void Move_object(int ind)
     while (move.delta.x || move.delta.y) {
 	if (!trycount--) {
 	    sprintf(msg, "COULDN'T MOVE OBJECT!!!! Type = %d, x = %d, y = %d. Object was DELETED. [*DEBUG*]", obj->type, move.start.x, move.start.y);
+	    errno = 0;
+	    error(msg);
 	    Set_message(msg);
 	    obj->life = 0;
 	    return;
