@@ -38,41 +38,53 @@ char command_version[] = VERSION;
 player *Get_player_by_name(char *str, int *error, char **errorstr_p)
 {
     int i;
-    player *pl = NULL;
+    player *found_pl = NULL, *pl;
+    size_t len = strlen(str);
 
-    if (str == NULL || strlen(str) == 0)
+    if (str == NULL || (len = strlen(str)) == 0)
 	goto match_none;
 
     /* kps - do we want to match on id ? */
 
     /* Look for an exact match on player nickname. */
     for (i = 0; i < NumPlayers; i++) {
-	player *pl_i = Players(i);
-	if (strcasecmp(pl_i->name, str) == 0)
-	    return pl_i;
+	pl = Players(i);
+	if (strcasecmp(pl->name, str) == 0)
+	    return pl;
     }
+
+    /* Look if 'str' matches beginning of only one nick. */
+    for (i = 0; i < NumPlayers; i++) {
+	pl = Players(i);
+
+	if (!strncasecmp(pl->name, str, len)) {
+	    if (found_pl)
+		goto match_several;
+	    found_pl = pl;
+	    break;
+	}
+    }
+    if (found_pl)
+	return found_pl;
 
     /*
      * Check what players' name 'str' is a substring of (case insensitively).
      */
     for (i = 0; i < NumPlayers; i++) {
-	player *pl_i = Players(i);
-	char *name_i = pl_i->name;
+	pl = Players(i);
 	int j;
 
-	for (j = 0; j < 1 + (int)strlen(name_i) - (int)strlen(str); j++) {
-	    if (!strncasecmp(name_i + j, str, strlen(str))) {
-		if (pl)
+	for (j = 0; j < 1 + (int)strlen(pl->name) - (int)len; j++) {
+	    if (!strncasecmp(pl->name + j, str, len)) {
+		if (found_pl)
 		    goto match_several;
-		pl = pl_i;
+		found_pl = pl;
 		break;
 	    }
 	}
     }
-    if (!pl)
-	goto match_none;
-
-    return pl;
+    if (found_pl)
+	return found_pl;
 
  match_none:
     if (error != NULL)
