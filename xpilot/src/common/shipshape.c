@@ -54,6 +54,16 @@ int	shapeLimits;
 
 extern void	Make_table(void);
 
+void Rotate_position(position pt[RES])
+{
+    int			i;
+
+    for (i = 1; i < RES; i++) {
+	pt[i].x = (tcos(i) * pt[0].x - tsin(i) * pt[0].y) + .5;
+	pt[i].y = (tsin(i) * pt[0].x + tcos(i) * pt[0].y) + .5;
+    }
+}
+
 void Rotate_ship(shipobj *w)
 {
     int			i;

@@ -48,13 +48,6 @@
 
 char shipshape_s_version[] = VERSION;
 
-
-
-extern int	debugShapeParsing;
-extern int	verboseShapeParsing;
-extern int	shapeLimits;
-
-extern int	Get_shape_keyword(char *keyw);
 extern void	Make_table(void);
 
 void Rotate_point(shapepos pt[RES])

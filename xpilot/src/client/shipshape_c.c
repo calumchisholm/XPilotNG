@@ -46,12 +46,6 @@
 
 char shipshape_c_version[] = VERSION;
 
-
-
-extern int	debugShapeParsing;
-extern int	verboseShapeParsing;
-extern int	shapeLimits;
-
 extern int	Get_shape_keyword(char *keyw);
 extern void	Make_table(void);
 
@@ -62,16 +56,6 @@ void Rotate_point(shapepos pt[RES])
     for (i = 1; i < RES; i++) {
 	pt[i].pxl.x = (tcos(i) * pt[0].pxl.x - tsin(i) * pt[0].pxl.y) + .5;
 	pt[i].pxl.y = (tsin(i) * pt[0].pxl.x + tcos(i) * pt[0].pxl.y) + .5;
-    }
-}
-
-void Rotate_position(position pt[RES])
-{
-    int			i;
-
-    for (i = 1; i < RES; i++) {
-	pt[i].x = (tcos(i) * pt[0].x - tsin(i) * pt[0].y) + .5;
-	pt[i].y = (tsin(i) * pt[0].x + tcos(i) * pt[0].y) + .5;
     }
 }
 
