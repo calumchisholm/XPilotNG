@@ -50,8 +50,12 @@ option options[] = {
 };
 
 typedef struct {
-    const char *name;
-    const char *value;
+    const char		*name;		/* option name */
+    const char		*noArg;		/* value for non-argument options */
+    const char		*fallback;	/* default value */
+    keys_t		key;		/* key if not KEY_DUMMY */
+    const char		*help;		/* user help (multiline) */
+    unsigned		hash;		/* option name hashed. */
 } cl_option_t;
 
 
@@ -59,7 +63,14 @@ static int num_options = 0;
 static int max_options = 0;
 static cl_option_t *option_array = NULL;
 
-static cl_option_t *Find_option(const char *name)
+static inline cl_option_t *Option_by_index(int ind)
+{
+    if (ind < 0 || ind >= num_options)
+	return NULL;
+    return &option_array[ind];
+}
+
+static inline cl_option_t *Find_option(const char *name)
 {
     int i;
 
@@ -78,7 +89,7 @@ static void Insert_option(const char *name, const char *value)
     assert(Find_option(name) == NULL);
 
     option.name = xp_safe_strdup(name);
-    option.value = xp_safe_strdup(value);
+    option.noArg = xp_safe_strdup(value);
 
     STORE(cl_option_t, option_array, num_options, max_options, option);
 }
@@ -98,7 +109,7 @@ void Set_option(const char *name, const char *value)
 	opt = Find_option(name);
     }
 
-    printf("setting option '%s' to '%s'\n", opt->name, opt->value);
+    printf("setting option '%s' to '%s'\n", opt->name, opt->noArg);
 }
 
 
@@ -156,6 +167,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
      * Read options from xpilotrc.
      */
     Get_xpilotrc_file(path, sizeof(path));
+    warn("Using xpilotrc file %s\n", path);
     if (strlen(path) > 0
 	&& ((fp = fopen(path, "r")) != NULL)) {
 	while (fgets(buf, sizeof buf, fp)) {
@@ -177,15 +189,43 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     
 }
 
+
+
 char *Get_keyHelpString(keys_t key)
 {
-    return "foobar";
+    int			i;
+    char		*nl;
+    static char		buf[MAX_CHARS];
+
+    for (i = 0; i < num_options; i++) {
+	cl_option_t *opt = Option_by_index(i);
+	if (opt->key == key) {
+	    strlcpy(buf, opt->help, sizeof buf);
+	    if ((nl = strchr(buf, '\n')) != NULL)
+		*nl = '\0';
+	    return buf;
+	}
+    }
+
+    return NULL;
 }
+
 
 const char *Get_keyResourceString(keys_t key)
 {
-    return "raboof";
+    int			i;
+
+    for (i = 0; i < num_options; i++) {
+	cl_option_t *opt = Option_by_index(i);
+	if (opt->key == key)
+	    return opt->name;
+    }
+
+    return NULL;
 }
+
+
+
 
 void defaultCleanup(void)
 {
