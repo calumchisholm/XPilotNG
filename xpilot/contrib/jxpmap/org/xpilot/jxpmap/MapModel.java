@@ -455,7 +455,9 @@ public class MapModel extends ModelObject {
             Node n = (Node)i.next();
             Pixmap pm = new Pixmap();
             pm.setFileName(atts(n, "filename"));
-            pm.setScalable(atti(n, "flags", 1) != 0);
+            String s = atts(n, "scalable");
+            if (s != null && !"yes".equals(s))
+                pm.setScalable(false);
             bstyles.put(atts(n, "id"), pm);
             pixmaps.add(pm);
         }

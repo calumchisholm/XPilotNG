@@ -37,6 +37,7 @@ public class MapCanvas extends JComponent {
     private MapEdit currentEdit;
     private boolean fastRendering;
     private List selected;
+    private int grid;
 
     public MapCanvas() {
 
@@ -49,6 +50,7 @@ public class MapCanvas extends JComponent {
         dragHandler = new DragHandler();
         selectHandler = new SelectHandler();
         selected = new ArrayList();
+        grid = -8;
     }
 
     public void setCanvasEventHandler(CanvasEventHandler h) {
@@ -133,6 +135,14 @@ public class MapCanvas extends JComponent {
 
     public void setCopy(boolean copy) {
         this.copy = copy;
+    }
+    
+    public void setGrid(int grid) {
+        this.grid = grid;
+    }
+    
+    public int getGrid() {
+        return grid;
     }
             
     public void paint(Graphics _g) {
@@ -268,7 +278,7 @@ public class MapCanvas extends JComponent {
                 return true;
         return false;
     }
-
+    
     public AffineTransform getTransform() {
         if (at == null) {
             at = new AffineTransform();
@@ -940,10 +950,20 @@ public class MapCanvas extends JComponent {
         }
 
         private void transformEvent(MouseEvent evt) {
-            Point mapp = new Point();
-            Point evtp = evt.getPoint();
-            getInverse().transform(evtp, mapp);
-            evt.translatePoint(mapp.x - evtp.x, mapp.y - evtp.y);
+            int x = evt.getX();
+            int y = evt.getY();
+            if (grid > 1) {
+                /*
+                double gs = grid * scale * 64;
+                x = (int)(gs * Math.round(x / gs));
+                y = (int)(gs * Math.round(y / gs));
+                */
+                x = (x / grid) * grid;
+                y = (y / grid) * grid;
+            }
+            Point mapp = new Point(x, y);
+            getInverse().transform(mapp, mapp);
+            evt.translatePoint(mapp.x - evt.getX(), mapp.y - evt.getY());
         }        
     }
     

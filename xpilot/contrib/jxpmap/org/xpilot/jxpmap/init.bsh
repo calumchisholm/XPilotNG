@@ -12,6 +12,7 @@ addScript(name, tooltip, method) {
 addScript("Randomize", "Randomize the selected wall polygons", "randomize");
 addScript("Shadow", "Adds a shadow to the selected wall polygons", "shadow");
 addScript("Round", "Rounds the corners of the selected wall polygons", "round");
+addScript("Image to polygon", "Creates a polygon from an image", "imageToPoly");
 
 import org.xpilot.jxpmap.*;
 
@@ -50,6 +51,13 @@ prompt(msg) {
     return JOptionPane.showInputDialog(null, msg);
 }
 
+/**
+ * Gets the center point of the visible area on the map.
+ */
+center() {
+    center = new Point(editor.width / 2, editor.height / 2);
+    return editor.getInverse().transform(center, new Point());
+}
 
 /************************ Randomize script ******************************/
 
@@ -206,6 +214,55 @@ round() {
         for (i = 0; i < times; i++)
             doRound(o, max);
     editor.repaint();
+}
+
+/*********************** Image to polygon ***************************/
+
+imageToPoly(pixmap) {
+    model = editor.model;
+    poly = FindPolygon.findPolygon(pixmap.image);
+    if (poly == null) {
+        alert("Couldn't find a polygon in the image");
+        return;
+    }
+    es = findStyle("hidden", model.edgeStyles);
+    if (es == null) {
+        es = new LineStyle("hidden", 1, Color.darkGray, LineStyle.STYLE_HIDDEN);
+        model.edgeStyles.add(es);
+    }   
+    ps = findStyle(pixmap.fileName, model.polyStyles);
+    if (ps == null) {
+        ps = new PolygonStyle();
+        ps.setId(pixmap.fileName);        
+        ps.setColor(new Color(0,0,128));
+        ps.setFillStyle(PolygonStyle.FILL_TEXTURED);
+        ps.setTexture(pixmap);
+        ps.setVisibleInRadar(true);
+        ps.setDefaultEdgeStyle(es);
+        model.getPolyStyles().add(ps);        
+    }
+    p = center();
+    poly.translate(p.x, p.y);
+    editor.addMapObject(new MapPolygon(poly, ps));    
+}
+
+imageToPoly() {
+    model = editor.model;
+    if (model.pixmaps.isEmpty()) {
+        alert("First add an image using the Image Manager");
+        return;
+    }
+    map = new HashMap();
+    for(p:editor.model.pixmaps)
+        map.put(p.fileName, p);
+    images = map.keySet().toArray();
+    name = JOptionPane.showInputDialog(null,
+        "Select an image", "Question",
+        JOptionPane.INFORMATION_MESSAGE, null,
+        images, images[0]);
+    pixmap = map.get(name);
+    if (pixmap == null) return;
+    imageToPoly(pixmap);
 }
 
 /************************ User scripts ******************************/

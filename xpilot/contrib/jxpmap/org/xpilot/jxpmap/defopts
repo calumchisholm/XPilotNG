@@ -1,22 +1,22 @@
-# /opt2/projects/xpilot/src/server/xpilots option dump
+# /opt2/projects/xpilot/src/server/xpilot-ng-server option dump
 # 
-# CONF_LIBDIR = /usr/local/lib/xpilot/
-# CONF_DEFAULTS_FILE_NAME = /usr/local/lib/xpilot/defaults
-# CONF_PASSWORD_FILE_NAME = /usr/local/lib/xpilot/password
-# CONF_MAPDIR = /usr/local/lib/xpilot/maps/
+# CONF_DATADIR = /usr/local/share/xpilot-ng/
+# CONF_DEFAULTS_FILE_NAME = /usr/local/share/xpilot-ng/defaults.txt
+# CONF_PASSWORD_FILE_NAME = /usr/local/share/xpilot-ng/password.txt
+# CONF_MAPDIR = /usr/local/share/xpilot-ng/maps/
 # CONF_DEFAULT_MAP = polybloods.xp2
-# CONF_SERVERMOTDFILE = /usr/local/lib/xpilot/servermotd
-# CONF_ROBOTFILE = /usr/local/lib/xpilot/robots
+# CONF_SERVERMOTDFILE = /usr/local/share/xpilot-ng/servermotd.txt
+# CONF_ROBOTFILE = /usr/local/share/xpilot-ng/robots.txt
 # 
 expand:                                  
-gravity:                                 -0.14
-shipMass:                                18.0
+gravity:                                 0.0
+shipMass:                                20.0
 ballMass:                                50.0
 minItemMass:                             0.0
 shotMass:                                0.1
 shotSpeed:                               21.0
 shotLife:                                60.0
-shotHitFuelDrainUsesKineticEnergy:       yes
+shotHitFuelDrainUsesKineticEnergy:       true
 fireRepeatRate:                          2.0
 pulseSpeed:                              90.0
 pulseLife:                               6.0
@@ -24,28 +24,24 @@ pulseLength:                             85.0
 laserRepeatRate:                         2.0
 maxRobots:                               4
 minRobots:                               -1
-robotFile:                               /usr/local/lib/xpilot/robots
+robotFile:                               /usr/local/share/xpilot-ng/robots.txt
 robotsTalk:                              false
 robotsLeave:                             true
 robotLeaveLife:                          50
-robotLeaveScore:                         -90.0
-robotLeaveRatio:                         -5.0
 robotTeam:                               0
 restrictRobots:                          true
 reserveRobotTeam:                        true
-robotTicksPerSecond:                     0
 robotUserName:                           robot
-robotHostName:                           xpilot.org
+robotHostName:                           xpilot.sourceforge.net
 tankUserName:                            tank
-tankHostName:                            tanks.org
+tankHostName:                            xpilot.sourceforge.net
 tankScoreDecrement:                      500.0
 selfImmunity:                            false
-defaultShipShape:                        (NM:Default)(AU:Unknown)(SH: 15,0 -9,8 -9,-8)(MG: 15,0)(LG: 15,0)(RG: 15,0)(EN: -9,0)(LR: -9,8)(RR: -9,-8)(LL: -9,8)(RL: -9,-8)(MR: 15,0)
-tankShipShape:                           (NM:fueltank)(SH: 15,0 14,5 9,8 -9,8 -14,5 -15,0 -14,-5 -9,-8 9,-8 14,-5)(EN: -15,0)(MG: 15,0)
+defaultShipShape:                        (NM:Default)(AU:Unknown)(SH: 14,0 -8,8 -8,-8)(MG: 14,0)(LG: 14,0)(RG: 14,0)(EN: -8,0)(LR: -8,8)(RR: -8,-8)(LL: -8,8)(RL: -8,-8)(MR: 14,0)
+tankShipShape:                           (NM:fueltank)(AU:John E. Norlin)(SH: 15,0 14,-5 9,-8 -5,-8 -3,-8 -3,0 2,0 2,2 -3,2 -3,6 5,6 5,8 -5,8 -5,-8 -9,-8 -14,-5 -15,0 -14,5 -9,8 9,8 14,5)(EN: -15,0)(MG: 15,0)
 maxPlayerShots:                          256
 shotsGravity:                            true
 Log:                                     false
-silent:                                  false
 idleRun:                                 false
 noQuit:                                  false
 logRobots:                               true
@@ -58,83 +54,111 @@ mapData:
 contactPort:                             15345
 serverHost:                              
 greeting:                                
-allowPlayerCrashes:                      yes
-allowPlayerBounces:                      yes
-allowPlayerKilling:                      yes
-allowShields:                            yes
-playerStartsShielded:                    yes
-shotsWallBounce:                         no
-ballsWallBounce:                         yes
-ballCollisions:                          no
-ballSparkCollisions:                     yes
-minesWallBounce:                         no
-itemsWallBounce:                         yes
-missilesWallBounce:                      no
-sparksWallBounce:                        no
-debrisWallBounce:                        no
-asteroidsWallBounce:                     yes
-pulsesWallBounce:                        no
-cloakedExhaust:                          yes
+allowPlayerCrashes:                      true
+allowPlayerBounces:                      true
+allowPlayerKilling:                      true
+allowShields:                            true
+playerStartsShielded:                    true
+shotsWallBounce:                         false
+ballsWallBounce:                         true
+ballCollisions:                          false
+ballSparkCollisions:                     true
+minesWallBounce:                         false
+itemsWallBounce:                         true
+missilesWallBounce:                      false
+sparksWallBounce:                        true
+debrisWallBounce:                        false
+asteroidsWallBounce:                     true
+pulsesWallBounce:                        false
+cloakedExhaust:                          true
 maxObjectWallBounceSpeed:                40.0
+maxSparkWallBounceSpeed:                 80.0
 maxShieldedWallBounceSpeed:              50.0
 maxUnshieldedWallBounceSpeed:            20.0
+playerWallBounceType:                    2
 playerWallBounceBrakeFactor:             0.89
+playerWallFriction:                      0.5
 objectWallBounceBrakeFactor:             0.95
 objectWallBounceLifeFactor:              0.80
 wallBounceFuelDrainMult:                 1.0
+afterburnerPowerMult:                    1.0
 wallBounceDestroyItemProb:               0.0
-reportToMetaServer:                      yes
-searchDomainForXPilot:                   no
+reportToMetaServer:                      true
+metaUpdateMaxSize:                       4096
+searchDomainForXPilot:                   false
 denyHosts:                               
-limitedVisibility:                       no
+limitedVisibility:                       false
 minVisibilityDistance:                   0.0
 maxVisibilityDistance:                   0.0
-limitedLives:                            no
+limitedLives:                            false
 worldLives:                              0
-reset:                                   yes
+reset:                                   true
 resetOnHuman:                            0
-allowAlliances:                          yes
-announceAlliances:                       no
-teamPlay:                                no
+allowAlliances:                          true
+announceAlliances:                       false
+teamPlay:                                false
 lockOtherTeam:                           true
-teamFuel:                                no
-teamCannons:                             no
+teamFuel:                                false
+teamCannons:                             false
 cannonSmartness:                         1
-cannonsUseItems:                         no
-cannonsDefend:                           yes
-cannonFlak:                              yes
+cannonsPickupItems:                      false
+cannonFlak:                              true
 cannonDeadTicks:                         864.0
-keepShots:                               no
-teamImmunity:                            yes
-teamShareScore:                          no
-ecmsReprogramMines:                      yes
-ecmsReprogramRobots:                     yes
-targetKillTeam:                          no
-targetTeamCollision:                     yes
-targetSync:                              no
+cannonShotSpeed:                         21.0
+minCannonShotLife:                       8.0
+maxCannonShotLife:                       32.0
+cannonInitialFuel:                       0
+cannonInitialTanks:                      0
+cannonInitialECMs:                       0
+cannonInitialArmor:                      0
+cannonInitialMines:                      0
+cannonInitialMissiles:                   0
+cannonInitialCloaks:                     0
+cannonInitialSensors:                    0
+cannonInitialWideangles:                 0
+cannonInitialRearshots:                  0
+cannonInitialAfterburners:               0
+cannonInitialTransporters:               0
+cannonInitialMirrors:                    0
+cannonInitialDeflectors:                 0
+cannonInitialHyperJumps:                 0
+cannonInitialPhasings:                   0
+cannonInitialLasers:                     0
+cannonInitialEmergencyThrusts:           0
+cannonInitialTractorBeams:               0
+cannonInitialAutopilots:                 0
+cannonInitialEmergencyShields:           0
+keepShots:                               false
+teamImmunity:                            true
+ecmsReprogramMines:                      true
+ecmsReprogramRobots:                     true
+targetKillTeam:                          false
+targetTeamCollision:                     true
+targetSync:                              false
 targetDeadTicks:                         720.0
-treasureKillTeam:                        no
-captureTheFlag:                          no
-treasureCollisionDestroys:               yes
+treasureKillTeam:                        false
+captureTheFlag:                          false
+specialBallTeam:                         -1
+treasureCollisionDestroys:               true
 ballConnectorSpringConstant:             1500.0
 ballConnectorDamping:                    2.0
 maxBallConnectorRatio:                   0.30
 ballConnectorLength:                     120.0
-connectorIsString:                       no
+connectorIsString:                       false
 ballRadius:                              10.0
-treasureCollisionMayKill:                no
-wreckageCollisionMayKill:                no
-asteroidCollisionMayKill:                yes
+treasureCollisionMayKill:                false
+wreckageCollisionMayKill:                false
+asteroidCollisionMayKill:                true
 ignore20MaxFPS:                          true
-tagGame:                                 no
+tagGame:                                 false
 tagKillItScoreMult:                      10.0
 tagItKillScoreMult:                      2.0
-timing:                                  no
+timing:                                  false
 ballrace:                                false
 ballraceConnected:                       false
-edgeWrap:                                no
-edgeBounce:                              yes
-extraBorder:                             no
+edgeWrap:                                false
+edgeBounce:                              true
+extraBorder:                             false
 gravityPoint:                            0,0
 gravityAngle:                            90.0
 gravityPointSource:                      false
@@ -145,35 +169,37 @@ wormholeVisible:                         true
 itemConcentratorVisible:                 true
 asteroidConcentratorVisible:             true
 wormholeStableTicks:                     64.0
-defaultsFileName:                        /usr/local/lib/xpilot/defaults
-passwordFileName:                        /usr/local/lib/xpilot/password
-motdFileName:                            /usr/local/lib/xpilot/servermotd
+defaultsFileName:                        /usr/local/share/xpilot-ng/defaults.txt
+passwordFileName:                        /usr/local/share/xpilot-ng/password.txt
+motdFileName:                            /usr/local/share/xpilot-ng/servermotd.txt
 scoreTableFileName:                      
-adminMessageFileName:                    /usr/local/lib/xpilot/log
+adminMessageFileName:                    /usr/local/share/xpilot-ng/log.txt
 adminMessageFileSizeLimit:               20202
+rankFileName:                            
+rankWebpageFileName:                     
 framesPerSecond:                         50
 gameSpeed:                               12.5
-allowSmartMissiles:                      True
-allowHeatSeekers:                        True
-allowTorpedoes:                          True
-allowNukes:                              False
-allowClusters:                           False
-allowModifiers:                          False
-allowLaserModifiers:                     False
-allowShipShapes:                         True
-playersOnRadar:                          True
-missilesOnRadar:                         True
-minesOnRadar:                            False
-nukesOnRadar:                            True
-treasuresOnRadar:                        False
-asteroidsOnRadar:                        False
-distinguishMissiles:                     True
+allowSmartMissiles:                      true
+allowHeatSeekers:                        true
+allowTorpedoes:                          true
+allowNukes:                              false
+allowClusters:                           false
+allowModifiers:                          false
+allowLaserModifiers:                     false
+allowShipShapes:                         true
+playersOnRadar:                          true
+missilesOnRadar:                         true
+minesOnRadar:                            false
+nukesOnRadar:                            true
+treasuresOnRadar:                        false
+asteroidsOnRadar:                        false
+distinguishMissiles:                     true
 maxMissilesPerPack:                      4
 maxMinesPerPack:                         2
-identifyMines:                           True
-shieldedItemPickup:                      False
-shieldedMining:                          False
-laserIsStunGun:                          False
+identifyMines:                           true
+shieldedItemPickup:                      false
+shieldedMining:                          false
+laserIsStunGun:                          false
 nukeMinSmarts:                           7
 nukeMinMines:                            4
 nukeClusterDamage:                       1.0
@@ -200,10 +226,7 @@ mineScoreMult:                           0.17
 selfKillScoreMult:                       0.5
 selfDestructScoreMult:                   0.0
 unownedKillScoreMult:                    0.5
-asteroidPoints:                          1.0
-cannonPoints:                            1.0
-asteroidMaxScore:                        100.0
-cannonMaxScore:                          100.0
+cannonKillScoreMult:                     0.25
 movingItemProb:                          0.2
 randomItemProb:                          0.0
 dropItemOnKillProb:                      0.5
@@ -212,7 +235,6 @@ destroyItemInCollisionProb:              0.0
 asteroidItemProb:                        0.0
 asteroidMaxItems:                        0
 itemProbMult:                            1.0
-cannonItemProbMult:                      1.0
 maxItemDensity:                          0.00012
 asteroidProb:                            5e-7
 maxAsteroidDensity:                      0.0
@@ -287,6 +309,7 @@ maxAutopilots:                           10
 maxEmergencyShields:                     10
 gameDuration:                            0.0
 baselessPausing:                         false
+survivalScore:                           0.0
 pauseTax:                                0.0
 friction:                                0.0
 blockFriction:                           0.0
@@ -295,13 +318,12 @@ coriolis:                                0.0
 checkpointRadius:                        6.0
 raceLaps:                                3
 loseItemDestroys:                        false
+useDebris:                               true
 useWreckage:                             true
 maxOffensiveItems:                       100
 maxDefensiveItems:                       100
-roundDelay:                              0
 maxRoundTime:                            0
 roundsToPlay:                            0
-numberOfRounds:                          0
 maxVisibleObject:                        1000
 pLockServer:                             false
 sound:                                   true
@@ -309,24 +331,35 @@ timerResolution:                         0
 password:                                
 clientPortStart:                         0
 clientPortEnd:                           0
-maxPauseTime:                            3600
+maxPauseTime:                            14400
+maxIdleTime:                             60
 maxClientsPerIP:                         4
 playerLimit:                             0
 recordMode:                              0
 recordFileName:                          
 recordFlushInterval:                     0
-constantScoring:                         no
-elimination:                             no
+constantScoring:                         false
+zeroSumScoring:                          false
+elimination:                             false
 dataURL:                                 
 polygonMode:                             false
-maraTurnqueue:                           false
-ngControls:                              true
+fastAim:                                 false
+ngControls:                              false
+legacyMode:                              false
+constantSpeed:                           1.0
+thrustWidth:                             0.25
+thrustMass:                              0.0435
+sparkSpeed:                              30.0
 ballStyles:                              true
 ignoreMaxFPS:                            false
 pausedFramesPerSecond:                   0
 waitingFramesPerSecond:                  0
+deadFramesPerSecond:                     0
 teamcup:                                 false
-teamcupStatServer:                       shell.e.kth.se
-teamcupStatPort:                         3749
+teamcupName:                             
+teamcupMailAddress:                      
+teamcupScoreFileNamePrefix:              
 teamcupMatchNumber:                      0
+mainLoopTime:                            0
+cellGetObjectsThreshold:                 500
 

@@ -53,11 +53,12 @@ public class Pixmap extends ModelObject {
     
 
     public void printXml (PrintWriter out) throws IOException {
-        
         out.print("<BmpStyle id=\"");
         out.print(getFileName());
         out.print("\" filename=\"");
         out.print(getFileName());
-        out.println("\" flags=\"1\"/>");
+        out.println(isScalable() 
+            ? "\" scalable=\"yes\"/>" 
+            : "\" scalable=\"no\"/>");
     }
 }

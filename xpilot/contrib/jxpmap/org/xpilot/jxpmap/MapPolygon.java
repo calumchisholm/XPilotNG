@@ -297,7 +297,8 @@ public class MapPolygon extends MapObject {
                 if (img != null) {
                     Rectangle b = polygon.getBounds();
                     g.setPaint(new TexturePaint(img, new Rectangle(
-                        b.x, b.y, img.getWidth() * 64, -img.getHeight() * 64)));
+                        b.x, b.y + b.height, 
+                        img.getWidth() * 64, -img.getHeight() * 64)));
                     g.fill(p);
                 }
             }
@@ -345,15 +346,21 @@ public class MapPolygon extends MapObject {
         }
         
         if (!fastRendering && isSelected()) {
-            g.setStroke(SELECTED_STROKE);
+            //g.setStroke(SELECTED_STROKE);
             g.setColor(Color.white);
-            int sz = (int)(20 / scale);
+            int sz = (int)(5 / scale);
             int off = sz / 2;
             for (int i = 0; i < p.npoints; i++) {
+                /*
                 g.drawArc(
                     p.xpoints[i] - off,
                     p.ypoints[i] - off,
                     sz, sz, 0, 360);
+                */
+                g.fillRect(
+                    p.xpoints[i] - off,
+                    p.ypoints[i] - off,
+                    sz, sz);
             }
         }
     }

@@ -8,6 +8,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.MouseAdapter;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -43,6 +46,7 @@ public class MainFrame extends JFrame implements ActionListener {
     
     private ButtonGroup toggleGroup;
     private JLabel lblZoom;
+    private JLabel lblGrid;
     private File mapFile;
     private BshConsole bshConsole;
     private JMenu scriptMenu;
@@ -169,34 +173,17 @@ public class MainFrame extends JFrame implements ActionListener {
     
     private void buildToolBar () {
         
-        JToolBar tb1 = new JToolBar(SwingConstants.HORIZONTAL);
+        JToolBar tb1 = new JToolBar(SwingConstants.VERTICAL);
+        JToolBar tb2 = new JToolBar(SwingConstants.HORIZONTAL);        
         lblZoom = new JLabel("x1");
         lblZoom.setHorizontalAlignment(SwingConstants.CENTER);
         Font f = lblZoom.getFont();
-        lblZoom.setFont(f.deriveFont((float)(f.getSize() - 2)));        
+        lblZoom.setFont(f.deriveFont((float)(f.getSize() - 2)));
+        lblGrid = new JLabel("off");
+        lblGrid.setHorizontalAlignment(SwingConstants.CENTER);
+        lblGrid.setFont(lblZoom.getFont());                
         toggleGroup = new ButtonGroup();
-        
-        tb1.add(newToggle("newWall", "/images/polyicon.gif", "New wall"));        
-        tb1.add(newToggle("newFuel", "/images/fuelicon.gif", "New fuel station"));
-        tb1.add(newToggle("newBase", "/images/baseicon.gif", "New base"));
-        tb1.add(newToggle("newBall", "/images/ballicon.gif", "New ball"));
-        tb1.add(newToggle("newCheckPoint", "/images/checkicon.gif", "New checkpoint"));
-        tb1.add(newToggle("newGrav", "/images/gravicon.gif", "New gravitation field"));
-        tb1.add(newToggle("newItemConcentrator", "/images/itemconicon.gif", "New item concentrator"));
-        tb1.add(newToggle("newAsteroidConcentrator", "/images/asteroidconicon.gif", "New asteroid concentrator"));
-        tb1.addSeparator();
-        tb1.add(newButton("group", "/images/groupicon.gif", "Group"));
-        tb1.add(newButton("ungroup", "/images/ungroupicon.gif", "Ungroup"));
-        tb1.add(newButton("regroup", "/images/regroupicon.gif", "Regroup"));
-        tb1.addSeparator();
-        tb1.add(newButton("makeBallArea", "/images/ballareaicon.gif", "Make ball area"));        
-        tb1.add(newButton("makeBallTarget", "/images/balltargeticon.gif", "Make ball target"));
-        tb1.add(newButton("makeDecor", "/images/decoricon.gif", "Make decoration"));
-        tb1.add(newButton("makeFriction", "/images/fricticon.gif", "Make friction area"));
-        tb1.add(newButton("makeTarget", "/images/targeticon.gif", "Make target"));
-        tb1.add(newButton("makeCannon", "/images/cannonicon.gif", "Make cannon"));
-        tb1.add(newToggle("makeWormhole", "/images/wormicon.gif", "Make wormhole"));        
-        tb1.addSeparator();
+       
         tb1.add(newToggle("select", "/images/arrow.gif", "Select"));       
         tb1.add(newToggle("eraseMode", "/images/eraseicon.gif", "Erasing mode"));
         tb1.add(newToggle("copyMode", "/images/copyicon.gif", "Copy mode"));                
@@ -206,9 +193,34 @@ public class MainFrame extends JFrame implements ActionListener {
         tb1.add(lblZoom);
         tb1.addSeparator();
         tb1.add(newButton("undo", "/images/undo.gif", "Undo"));
-        tb1.add(newButton("redo", "/images/redo.gif", "Redo"));
+        tb1.add(newButton("redo", "/images/redo.gif", "Redo"));  
+        tb1.addSeparator();
+        tb1.add(gridButton());
+        tb1.add(lblGrid);
         
-        getContentPane().add(tb1, BorderLayout.NORTH);
+        tb2.add(newToggle("newWall", "/images/polyicon.gif", "New wall"));        
+        tb2.add(newToggle("newFuel", "/images/fuelicon.gif", "New fuel station"));
+        tb2.add(newToggle("newBase", "/images/baseicon.gif", "New base"));
+        tb2.add(newToggle("newBall", "/images/ballicon.gif", "New ball"));
+        tb2.add(newToggle("newCheckPoint", "/images/checkicon.gif", "New checkpoint"));
+        tb2.add(newToggle("newGrav", "/images/gravicon.gif", "New gravitation field"));
+        tb2.add(newToggle("newItemConcentrator", "/images/itemconicon.gif", "New item concentrator"));
+        tb2.add(newToggle("newAsteroidConcentrator", "/images/asteroidconicon.gif", "New asteroid concentrator"));
+        tb2.addSeparator();
+        tb2.add(newButton("group", "/images/groupicon.gif", "Group"));
+        tb2.add(newButton("ungroup", "/images/ungroupicon.gif", "Ungroup"));
+        tb2.add(newButton("regroup", "/images/regroupicon.gif", "Regroup"));
+        tb2.addSeparator();
+        tb2.add(newButton("makeBallArea", "/images/ballareaicon.gif", "Make ball area"));        
+        tb2.add(newButton("makeBallTarget", "/images/balltargeticon.gif", "Make ball target"));
+        tb2.add(newButton("makeDecor", "/images/decoricon.gif", "Make decoration"));
+        tb2.add(newButton("makeFriction", "/images/fricticon.gif", "Make friction area"));
+        tb2.add(newButton("makeTarget", "/images/targeticon.gif", "Make target"));
+        tb2.add(newButton("makeCannon", "/images/cannonicon.gif", "Make cannon"));
+        tb2.add(newToggle("makeWormhole", "/images/wormicon.gif", "Make wormhole"));
+                
+        getContentPane().add(tb1, BorderLayout.EAST);
+        getContentPane().add(tb2, BorderLayout.NORTH);        
     }
     
     
@@ -270,6 +282,56 @@ public class MainFrame extends JFrame implements ActionListener {
         b.setPreferredSize(new Dimension(26, 26));
         b.addActionListener(this);
         return b;
+    }
+    
+    private JToggleButton gridButton() {
+        JToggleButton b = new JToggleButton(new ImageIcon(
+            getClass().getResource("/images/polyicon.gif")));
+        b.setToolTipText("Toggle grid");
+        b.setActionCommand("grid");
+        b.setPreferredSize(new Dimension(26, 26));
+        b.addActionListener(this);
+        b.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent me) {
+                if ((me.getModifiers() 
+                & InputEvent.BUTTON1_MASK) == 0) {
+                    int grid = promptGrid();
+                    if (grid == 0) return;
+                    if (canvas.getGrid() > 0) {
+                        canvas.setGrid(grid);
+                        lblGrid.setText(String.valueOf(grid));
+                    } else {
+                        canvas.setGrid(-grid);
+                    }
+                }
+            }
+        });
+        return b;       
+    }
+    
+    private int promptGrid() {
+        String sz = JOptionPane.showInputDialog(this, "Enter grid size");
+        if (sz == null) return 0;
+        try {
+            int value = Integer.parseInt(sz);
+            if (value <= 0) throw new NumberFormatException();
+            return value;
+        } catch (NumberFormatException nfe) {
+            JOptionPane.showMessageDialog(
+                this, "Invalid grid size", "Error",
+                JOptionPane.ERROR_MESSAGE);
+        }
+        return 0;
+    }
+    
+    private void grid() {
+        int grid = -canvas.getGrid();
+        canvas.setGrid(grid);
+        if (grid > 0) {
+            lblGrid.setText(String.valueOf(grid));
+        } else {
+            lblGrid.setText("off");
+        }
     }
     
     private void setZoom (int zoom) {
@@ -608,7 +670,7 @@ public class MainFrame extends JFrame implements ActionListener {
             try {
                 Map vars = new HashMap();
                 vars.put("editor", canvas);
-                bshConsole = new BshConsole(vars);
+                bshConsole = new BshConsole(vars, interpreter.getNameSpace());
             } catch (Throwable t) {
                 t.printStackTrace();
                 JOptionPane.showMessageDialog
@@ -714,10 +776,10 @@ public class MainFrame extends JFrame implements ActionListener {
 }
 
 class BshConsole extends JFrame {
-    public BshConsole(Map variables) throws Exception {
+    public BshConsole(Map variables, bsh.NameSpace ns) throws Exception {
         super("BeanShell");
         bsh.util.JConsole jc = new bsh.util.JConsole();
-        bsh.Interpreter interpreter = new bsh.Interpreter(jc);
+        bsh.Interpreter interpreter = new bsh.Interpreter(jc, ns);
         for (Iterator i = variables.keySet().iterator(); i.hasNext();) {
             String key = (String)i.next();
             interpreter.set(key, variables.get(key));
