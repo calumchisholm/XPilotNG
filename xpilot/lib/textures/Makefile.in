@@ -162,6 +162,7 @@ xpilottextures_DATA = \
 	allitems.ppm \
 	asteroidconcentrator.ppm \
 	ball.ppm \
+	ball_gray.ppm \
 	base_down.ppm \
 	base_left.ppm \
 	base_right.ppm \
