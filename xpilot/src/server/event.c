@@ -118,13 +118,10 @@ bool team_dead(int team)
 /*
  * Return true if a lock is allowed.
  */
-static bool Player_lock_allowed(int ind, int lock)
+static bool Player_lock_allowed(player *pl, player *lock_pl)
 {
-    player		*pl = Players(ind);
-    player		*lock_pl;
-
-    /* we can never lock on ourselves, nor on -1. */
-    if (ind == lock || lock == -1) {
+    /* we can never lock on ourselves, nor on NULL. */
+    if (lock_pl == NULL || pl->id == lock_pl->id) {
 	return false;
     }
 
@@ -137,7 +134,6 @@ static bool Player_lock_allowed(int ind, int lock)
 	return true;
 
     /* we can always lock on players from our own team. */
-    lock_pl = Players(lock);
     if (TEAM(pl, lock_pl))
 	return true;
 
@@ -193,7 +189,7 @@ int Player_lock_closest(int ind, int next)
 	player *pl_i = Players(i);
 	if (i == lock
 	    || !Player_is_active(pl_i)
-	    || !Player_lock_allowed(ind, i)
+	    || !Player_lock_allowed(pl, pl_i)
 	    || OWNS_TANK(pl, pl_i)
 	    || TEAM(pl, pl_i)
 	    || ALLIANCE(pl, pl_i)) {
@@ -471,7 +467,7 @@ int Handle_keyboard(player *pl)
 			break;
 		} while (i == ind
 			 || BIT(Players(i)->status, GAME_OVER|PAUSE)
-			 || !Player_lock_allowed(ind, i));
+			 || !Player_lock_allowed(pl, Players(i)));
 		if (i == ind) {
 		    CLR_BIT(pl->lock.tagged, LOCK_PLAYER);
 		}
@@ -719,7 +715,7 @@ int Handle_keyboard(player *pl)
 		    }
 		} else {
 		    if (*l != NOT_CONNECTED
-			    && Player_lock_allowed(ind, GetInd(*l))) {
+			    && Player_lock_allowed(pl, Player_by_id(*l))) {
 			pl->lock.pl_id = *l;
 			SET_BIT(pl->lock.tagged, LOCK_PLAYER);
 		    }
