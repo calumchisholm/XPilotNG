@@ -606,10 +606,8 @@ static char *RReadString(FILE *fp)
 static int RReadHeader(struct xprc *rc)
 {
     char		magic[5];
-    unsigned char	minor;
-    unsigned char	major;
-    char		dot;
-    char		nl;
+    unsigned char	minor, major, fps;
+    char		dot, nl;
     int			i;
 
     magic[0] = getc(rc->fp);
@@ -642,7 +640,9 @@ static int RReadHeader(struct xprc *rc)
     rc->realname = RReadString(rc->fp);
     rc->hostname = RReadString(rc->fp);
     rc->servername = RReadString(rc->fp);
-    rc->fps = RReadByte(rc->fp);
+    fps = RReadByte(rc->fp);
+    if (rc->fps == 0)
+	rc->fps = fps;
     rc->recorddate = RReadString(rc->fp);
     rc->maxColors = (unsigned char) getc(rc->fp);
     rc->colors = (XColor *) MyMalloc(rc->maxColors * sizeof(XColor), MEM_MISC);
@@ -3272,10 +3272,13 @@ static void usage(void)
 "               Valid gamma correction factors are in the range [0.1 - 10].\n"
 "        -compress\n"
 "               Save frames compressed using the \"compress\" program.\n"
+"        -fps \"value\"\n"
+"               Set the number of frames per second used for replay and\n"
+"               recording.\n"
 "        -loop\n"
-"               Loop after playing\n"
+"               Loop after playing.\n"
 "        -play\n"
-"               Start playing immediately\n"
+"               Start playing immediately.\n"
 "        -debug\n"
 "        -verbose\n"
 "        -help\n"
@@ -3300,6 +3303,7 @@ int main(int argc, char **argv)
     char		*filename;
     struct xprc		*rc;
     struct xui		*ui;
+    int			fps = 0;
     double		scale = 0;
     double		gamma = 0;
 
@@ -3317,6 +3321,12 @@ int main(int argc, char **argv)
 	    verbose = 1;
 	else if (!strcmp(argv[argi], "-compress"))
 	    compress = 1;
+	else if (!strcmp(argv[argi], "-fps")) {
+	    if (++argi == argc || sscanf(argv[argi], "%d", &fps) != 1)
+		usage();
+	    if (fps < 0)
+		usage();
+	}
 	else if (!strcmp(argv[argi], "-scale")) {
 	    if (++argi == argc || sscanf(argv[argi], "%lf", &scale) != 1)
 		usage();
@@ -3379,6 +3389,7 @@ int main(int argc, char **argv)
     memset(rc, 0, sizeof(*rc));
     rc->filename = filename;
     rc->fp = fp;
+    rc->fps = fps;
     rc->scale = scale;
     rc->gamma = gamma;
     TestInput(rc);
@@ -3531,5 +3542,3 @@ static void saveStartToEndXPR(void *data)
 
     SaveFramesXPR(rc);
 }
-
-
