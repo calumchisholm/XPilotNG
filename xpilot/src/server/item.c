@@ -312,7 +312,7 @@ void Make_item(world_t *world, clpos_t pos, vector_t vel,
     obj->status = status;
     obj->id = NO_ID;
     obj->team = TEAM_NOT_SET;
-    Object_position_init_clpos(obj, pos);
+    Object_position_init_clpos(world, obj, pos);
     obj->vel = vel;
     obj->acc.x =
     obj->acc.y = 0.0;

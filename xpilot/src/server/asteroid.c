@@ -265,7 +265,7 @@ static void Make_asteroid(world_t *world, clpos_t pos,
     asteroid->type = OBJ_ASTEROID;
 
     /* Position */
-    Object_position_init_clpos(OBJ_PTR(asteroid), pos);
+    Object_position_init_clpos(world, OBJ_PTR(asteroid), pos);
 
     asteroid->vel.x = tcos(dir) * speed;
     asteroid->vel.y = tsin(dir) * speed;

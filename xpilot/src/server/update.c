@@ -818,7 +818,7 @@ static void Warp_balls(player_t *pl, clpos_t dest)
 		    b->life = 0.0;
 		    continue;
 		}
-		Object_position_set_clpos(b, ballpos);
+		Object_position_set_clpos(world, b, ballpos);
 		Object_position_remember(b);
 		b->vel.x *= WORM_BRAKE_FACTOR;
 		b->vel.y *= WORM_BRAKE_FACTOR;

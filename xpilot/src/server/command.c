@@ -133,7 +133,7 @@ static void Send_info_about_player(player_t * pl)
 
 static void Set_swapper_state(player_t * pl)
 {
-    world_t *world = &World;
+    world_t *world = pl->world;
 
     if (BIT(pl->have, HAS_BALL))
 	Detach_ball(pl, NULL);
@@ -518,12 +518,12 @@ static int Cmd_advance(char *arg, player_t *pl, int oper, char *msg)
 
 static int Cmd_ally(char *arg, player_t *pl, int oper, char *msg)
 {
-    world_t *world = &World;
-    char		*command;
-    int			result = CMD_RESULT_SUCCESS;
-    static const char	usage[] = "Usage: "
-			"/ally {invite|cancel|refuse|accept|leave|list} "
-			"[<player name>]";
+    world_t *world = pl->world;
+    char *command;
+    int result = CMD_RESULT_SUCCESS;
+    static const char usage[] =
+	"Usage: /ally {invite|cancel|refuse|accept|leave|list} "
+	"[<player name>]";
     static const char *cmds[] = {
 	"invite",
 	"cancel",
@@ -1048,8 +1048,8 @@ static int Cmd_queue(char *arg, player_t *pl, int oper, char *msg)
 
 static int Cmd_reset(char *arg, player_t *pl, int oper, char *msg)
 {
-    int			i;
-    world_t *world = &World;
+    int i;
+    world_t *world = pl->world;
 
     if (!oper)
 	return CMD_RESULT_NOT_OPERATOR;
@@ -1115,11 +1115,9 @@ static int Cmd_stats(char *arg, player_t *pl, int oper, char *msg)
 
 static int Cmd_team(char *arg, player_t *pl, int oper, char *msg)
 {
-    int			i;
-    int			team;
-    int			swap_allowed;
-    char		*arg2;
-    world_t *world = &World;
+    int i, team, swap_allowed;
+    char *arg2;
+    world_t *world = pl->world;
 
     UNUSED_PARAM(oper);
 

@@ -260,7 +260,7 @@ void Make_debris(world_t  *world,
 	debris->color = color;
 	debris->id = owner_id;
 	debris->team = owner_team;
-	Object_position_init_clpos(debris, pos);
+	Object_position_init_clpos(world, debris, pos);
 	dir = MOD2(min_dir + (int)(rfrac() * (max_dir - min_dir)), RES);
 	dirplus = MOD2(dir + 1, RES);
 	diroff = rfrac();

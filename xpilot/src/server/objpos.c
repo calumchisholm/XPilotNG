@@ -28,10 +28,8 @@
 char objpos_version[] = VERSION;
 
 
-void Object_position_set_clpos(object_t *obj, clpos_t pos)
+void Object_position_set_clpos(world_t *world, object_t *obj, clpos_t pos)
 {
-    world_t *world = &World;
-
     if (!World_contains_clpos(world, pos)) {
 	if (0) {
 	    printf("BUG!  Illegal object position %d,%d\n", pos.cx, pos.cy);
@@ -47,9 +45,9 @@ void Object_position_set_clpos(object_t *obj, clpos_t pos)
     obj->pos = pos;
 }
 
-void Object_position_init_clpos(object_t *obj, clpos_t pos)
+void Object_position_init_clpos(world_t *world, object_t *obj, clpos_t pos)
 {
-    Object_position_set_clpos(obj, pos);
+    Object_position_set_clpos(world, obj, pos);
     Object_position_remember(obj);
     obj->collmode = 0;
 }
@@ -61,7 +59,7 @@ void Player_position_restore(player_t *pl)
 
 void Player_position_set_clpos(player_t *pl, clpos_t pos)
 {
-    world_t *world = &World;
+    world_t *world = pl->world;
 
     if (!World_contains_clpos(world, pos)) {
 	if (0) {
@@ -87,7 +85,7 @@ void Player_position_init_clpos(player_t *pl, clpos_t pos)
 void Player_position_limit(player_t *pl)
 {
     clpos_t pos = pl->pos, oldpos = pos;
-    world_t *world = &World;
+    world_t *world = pl->world;
 
     LIMIT(pos.cx, 0, world->cwidth - 1);
     LIMIT(pos.cy, 0, world->cheight - 1);

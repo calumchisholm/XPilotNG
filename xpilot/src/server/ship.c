@@ -513,7 +513,7 @@ void Make_wreckage(world_t *world,
 	wreckage->type = OBJ_WRECKAGE;
 
 	/* Position */
-	Object_position_init_clpos(OBJ_PTR(wreckage), pos);
+	Object_position_init_clpos(world, OBJ_PTR(wreckage), pos);
 
 	/* Direction */
 	dir = MOD2(min_dir + (int)(rfrac() * MOD2(max_dir - min_dir, RES)),

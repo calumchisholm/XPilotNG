@@ -258,7 +258,7 @@ void Main_loop(void)
     }
 
     playback = record = 0;
-    Queue_loop();
+    Queue_loop(world);
     playback = rplayback;
     record = rrecord;
 

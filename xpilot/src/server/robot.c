@@ -682,7 +682,7 @@ static void Robot_create(world_t *world)
 {
     player_t *robot;
     robot_t *rob;
-    team_t *teamp;
+    team_t *teamp = NULL;
     int i, num, most_used, least_used;
     robot_data_t *data, *new_data;
     robot_type_t *rob_type;

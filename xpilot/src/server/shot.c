@@ -199,7 +199,7 @@ void Place_general_mine(world_t *world, player_t *pl, int team, long status,
 	mine->id = (pl ? pl->id : NO_ID);
 	mine->team = team;
 	mine->owner = mine->id;
-	Object_position_init_clpos(OBJ_PTR(mine), pos);
+	Object_position_init_clpos(world, OBJ_PTR(mine), pos);
 	if (minis > 1) {
 	    int		space = RES/minis;
 	    int		dir;
@@ -309,7 +309,7 @@ void Make_treasure_ball(world_t *world, treasure_t *t)
     ball->vel.y = 0;		/* longer to the ground */
     ball->acc.x = 0;
     ball->acc.y = 0;
-    Object_position_init_clpos(OBJ_PTR(ball), pos);
+    Object_position_init_clpos(world, OBJ_PTR(ball), pos);
     ball->id = NO_ID;
     ball->owner = NO_ID;
     ball->team = t->team;
@@ -927,7 +927,7 @@ void Fire_general_shot(world_t *world, player_t *pl, int team, bool cannon,
 		Ship_get_m_rack_clpos(pl->ship, rack_no, 0).cy);
 	}
 	shotpos = World_wrap_clpos(world, shotpos);
-	Object_position_init_clpos(shot, shotpos);
+	Object_position_init_clpos(world, shot, shotpos);
 
 	if (type == OBJ_SHOT || !pl)
 	    angle = 0.0;
@@ -1390,7 +1390,8 @@ void Fire_laser(player_t *pl)
 	    if (is_inside(pos.cx, pos.cy, NONBALL_BIT | NOTEAM_BIT, NULL)
 		!= NO_GROUP)
 		return;
-	    Fire_general_laser(pl->world, pl, pl->team, pos, pl->dir, pl->mods);
+	    Fire_general_laser(pl->world, pl, pl->team, pos,
+			       pl->dir, pl->mods);
 	}
     }
 }
@@ -1422,7 +1423,7 @@ void Fire_general_laser(world_t *world, player_t *pl, int team, clpos_t pos,
 
     pulse->id		= (pl ? pl->id : NO_ID);
     pulse->team 	= team;
-    Object_position_init_clpos(OBJ_PTR(pulse), pos);
+    Object_position_init_clpos(world, OBJ_PTR(pulse), pos);
     pulse->vel.x 	= options.pulseSpeed * tcos(dir);
     pulse->vel.y 	= options.pulseSpeed * tsin(dir);
     pulse->acc.x 	= 0;

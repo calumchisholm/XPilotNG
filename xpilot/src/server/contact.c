@@ -85,10 +85,8 @@ int Contact_init(void)
  * Return the number of kicked robots.
  * Don't kick more than one robot.
  */
-static int Kick_robot_players(int team)
+static int Kick_robot_players(world_t *world, int team)
 {
-    world_t *world = &World;
-
     if (NumRobots == 0)		/* no robots available for kicking */
 	return 0;
 
@@ -746,13 +744,11 @@ static void Queue_ack(struct queued_player *qp, int qpos)
     qp->last_ack_sent = main_loops;
 }
 
-void Queue_loop(void)
+void Queue_loop(world_t *world)
 {
-    struct queued_player	*qp, *prev = 0, *next = 0;
-    int				qpos = 0;
-    int				login_port;
-    static long			last_unqueued_loops;
-    world_t *world = &World;
+    struct queued_player *qp, *prev = 0, *next = 0;
+    int qpos = 0, login_port;
+    static long last_unqueued_loops;
 
     for (qp = qp_list; qp && qp->login_port > 0; ) {
 	next = qp->next;
@@ -795,7 +791,7 @@ void Queue_loop(void)
 	    int lim = MIN(options.playerLimit, options.baselessPausing ? 1e6 : world->NumBases);
 	    /* is there a homebase available? */
 	    if (NumPlayers - NumPseudoPlayers + login_in_progress < lim
-		|| !game_lock && ((Kick_robot_players(TEAM_NOT_SET)
+		|| !game_lock && ((Kick_robot_players(world, TEAM_NOT_SET)
 		    && NumPlayers - NumPseudoPlayers + login_in_progress < lim)
 		|| (Kick_paused_players(TEAM_NOT_SET) &&
 		    NumPlayers - NumPseudoPlayers + login_in_progress < lim))){
@@ -808,7 +804,7 @@ void Queue_loop(void)
 			        (qp->team == options.robotTeam && options.reserveRobotTeam) ||
 			        (world->teams[qp->team].NumMembers
 				 >= world->teams[qp->team].NumBases &&
-				 !Kick_robot_players(qp->team) &&
+				 !Kick_robot_players(world, qp->team) &&
 				 !Kick_paused_players(qp->team)))
 			    qp->team = TEAM_NOT_SET;
 		    }
@@ -816,7 +812,7 @@ void Queue_loop(void)
 			qp->team = Pick_team(PickForHuman);
 			if (qp->team == TEAM_NOT_SET && !game_lock) {
 			    if (NumRobots > world->teams[options.robotTeam].NumRobots) {
-				Kick_robot_players(TEAM_NOT_SET);
+				Kick_robot_players(world, TEAM_NOT_SET);
 				qp->team = Pick_team(PickForHuman);
 			    }
 			}

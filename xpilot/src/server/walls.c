@@ -2606,7 +2606,7 @@ static void Move_ball(object_t *obj)
 	    pos.cy -= world->cheight;
 	while (pos.cy < 0)
 	    pos.cy += world->cheight;
-	Object_position_set_clpos(obj, pos);
+	Object_position_set_clpos(world, obj, pos);
 	Cell_add_object(world, obj);
 	return;
     }
@@ -2645,7 +2645,7 @@ static void Move_ball(object_t *obj)
 	    }
 	}
     }
-    Object_position_set_clvec(obj, mv.start);
+    Object_position_set_clvec(world, obj, mv.start);
     Cell_add_object(world, obj);
     return;
 }
@@ -2717,7 +2717,7 @@ void Move_object(object_t *obj)
 	    }
 	}
     }
-    Object_position_set_clvec(obj, mv.start);
+    Object_position_set_clvec(world, obj, mv.start);
     Cell_add_object(world, obj);
     return;
 }
