@@ -5,6 +5,7 @@
 
 int draw_width;
 int draw_height;
+int num_spark_colors;
 
 int Init_playing_windows(void)
 {
@@ -52,4 +53,9 @@ int Init_playing_windows(void)
     Init_spark_colors();
     Radar_init();
     */
+}
+
+void Quit(void) 
+{
+    SDL_Quit();
 }

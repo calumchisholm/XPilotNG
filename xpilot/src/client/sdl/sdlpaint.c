@@ -21,31 +21,35 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include "SDL.h"
 #include "xpclient.h"
+#include "sdlpaint.h"
 
 char sdlpaint_version[] = VERSION;
 
 /*
  * Globals.
  */
-ipos	world;
-ipos	realWorld;
-
-short	ext_view_width;		/* Width of extended visible area */
-short	ext_view_height;	/* Height of extended visible area */
-int	active_view_width;	/* Width of active map area displayed. */
-int	active_view_height;	/* Height of active map area displayed. */
-int	ext_view_x_offset;	/* Offset ext_view_width */
-int	ext_view_y_offset;	/* Offset ext_view_height */
-
+ipos	        world;
+ipos	        realWorld;
+short	        ext_view_width;		/* Width of extended visible area */
+short	        ext_view_height;	/* Height of extended visible area */
+int	        active_view_width;	/* Width of active map area displayed. */
+int	        active_view_height;	/* Height of active map area displayed. */
+int	        ext_view_x_offset;	/* Offset ext_view_width */
+int	        ext_view_y_offset;	/* Offset ext_view_height */
 long		loops = 0;
 unsigned long	loopsSlow = 0;	/* Proceeds slower than loops */
 static double   time_counter = 0.0;
 double          timePerFrame = 0.0;
+double	        hudRadarLimit;		/* Limit for hudradar drawing */
 
 
 int Paint_init(void)
 {
+    /* TODO
     if (Init_wreckage() == -1)
 	return -1;
 
@@ -54,13 +58,15 @@ int Paint_init(void)
 
     if (Bitmaps_init() == -1)
 	return -1;
-    
+    */
     return 0;
 }
 
 void Paint_cleanup(void)
 {
+    /* TODO
     Bitmaps_cleanup();
+    */
 }
 
 int Check_view_dimensions(void)
@@ -168,6 +174,7 @@ void Paint_frame(void)
 	} else
 	    Paint_objects();
 
+	/* TODO
 	Paint_shots();
 	Paint_ships();
 	Paint_meters();
@@ -177,6 +184,7 @@ void Paint_frame(void)
 	Paint_messages();
 	Paint_radar();
 	Paint_score_objects();
+	*/
     }
 }
 
