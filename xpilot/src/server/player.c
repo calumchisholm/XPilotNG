@@ -469,7 +469,6 @@ int Init_player(int ind, shipshape_t *ship)
 
     pl->idleCount = 0;
     pl->flooding = -1;
-    pl->grabbedBallFrame = -1;
 
     /*
      * If limited lives you will have to wait 'til everyone gets GAME OVER.

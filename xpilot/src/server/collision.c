@@ -410,7 +410,6 @@ static void PlayerCollision(void)
 		    SET_BIT(pl->have, HAS_BALL);
 		    pl->ball = NULL;
 		    sound_play_sensors(pl->pos, CONNECT_BALL_SOUND);
-		    pl->grabbedBallFrame = main_loops;
 		    {
 			/* The ball might already be inside the team's ball
 			 * target. */

@@ -624,7 +624,6 @@ struct player {
 
     int		idleCount;		/* idle */
     int	 	flooding;
-    int	 	grabbedBallFrame;
 
     int		privs;			/* Player privileges */
 #define PRIV_NOAUTOKICK		1

@@ -98,14 +98,8 @@ void Rank_show_ranks(void);
  * Converted from C++,
  * moved here from object.h and renamed to have Rank_ prefix
  */
-#define Rank_StartBallRun(pl) \
-	{ (pl)->grabbedBallFrame = main_loops; }
-#define Rank_AbortBallRun(pl) \
-	{ (pl)->grabbedBallFrame = -1; }
 #define Rank_ClearKills(pl)	{ (pl)->kills = 0; }
 #define Rank_ClearDeaths(pl)	{ (pl)->deaths = 0; }
-/*#define Rank_IgnoreLastDeath(pl) \
-  { if ((pl)->rank) (pl)->rank->entry.deaths--;}*/
 
 #define Rank_AddRound(pl) \
 	{ if ((pl)->rank) (pl)->rank->entry.rounds++; }
