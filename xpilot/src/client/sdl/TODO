@@ -6,30 +6,29 @@ and just do it. If your favourite feature is missing, go ahead and add a task
 for it.
 
 Task:
-  Implement the Gui_* methods in sdlgui.c. Most of those are probably easy
-  to implement by just painting the appropriate image.
+Implement the missing Gui_* methods in sdlgui.c. Still left:
+Gui_paint_decor_dot, Gui_paint_setup_target, Gui_paint_wreck, Gui_paint_asteroid, Gui_paint_ecm, Gui_paint_transporter
 Developer:
   
 Task:
-  Implement the Gui_paint_polygon properly. According to OpenGL specs the
-  polygons should be simple and convex. In xpilot polygons are simple but
-  often non-convex, so this may require polygon tessellation. The GLU
-  library provides the necessary functionality.
+Implement the missing functions in radar.c. Still left:
+Radar_paint_self, Radar_paint_checkpoints
 Developer:
 
-
 Task:
-  Scalefactor. This could be done with OpenGL's glScale but the rounding
-  errors make the map change from frame to frame. If possible this effect
-  should be minimized.
-Developer:
-
-
-
-Task:
-  Meta interface in SDL, make it so that you can change to another server whilst in game (saves doing quit and restart).
+Meta interface in SDL, make it so that you can change to another server whilst in game (saves doing quit and restart).
 Developer: colonel
 
+Task:
+Make the client playable on windows. Currently it is laggier than the standard
+windows client.
+Developer: Tarzan (i hope)
 
+Task:
+Improve font loading. Add options for font names and sizes and font path.
+Developer:
 
-  
+Task:
+Add the missing options:
+ball color, shot size, radar window geometry, score window location
+Developer:
