@@ -135,7 +135,7 @@ typedef struct {
     /* plus more mapdata here (HACK) */
 } setup_t;
 
-#ifndef NETSERVER_C
+#ifndef SERVER
 # ifdef FPS
 #  error "FPS needs a different definition in the client"
 #  undef FPS

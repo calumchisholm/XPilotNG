@@ -22,23 +22,7 @@
  */
 /* This piece of code was provided by Greg Renda (greg@ncd.com). */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
-
-#ifdef _WINDOWS
-# include <windows.h>
-#endif
-
-#define SERVER
-#include "version.h"
-#include "xpconfig.h"
-#include "serverconst.h"
-#include "global.h"
-#include "proto.h"
-#include "netserver.h"
-#include "saudio.h"
-#include "click.h"
+#include "xpserver.h"
 
 char saudio_version[] = VERSION;
 

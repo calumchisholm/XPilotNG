@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -22,22 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
-
-#ifndef _WINDOWS
-# ifndef __hpux
-#  include <sys/time.h>
-# endif
-#endif
-
-#ifdef _WINDOWS
-#endif
-
-#define SERVER
-#include "proto.h"
-
+#include "xpserver.h"
 
 char *showtime(void)
 {

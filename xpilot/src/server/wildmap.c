@@ -1,5 +1,4 @@
 /* 
- *
  * Wildmap, a random map generator for XPilot.  Copyright (C) 1993-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -21,21 +20,11 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <errno.h>
-#include <limits.h>
-#include <time.h>
-#include <string.h>
-#include <math.h>
+#include "xpserver.h"
 
-#ifndef _WINDOWS
-# include <unistd.h>
-#endif
+char wildmap_version[] = VERSION;
 
-#include "portability.h"
 
-#define NELEM(a)	(sizeof(a) / sizeof(a[0]))
 
 #define FUZZ_MASK	0xFFFFFFFFU
 #define MAX_FUZZ	FUZZ_MASK
@@ -1333,17 +1322,6 @@ static int wildmain(int argc, char **argv)
 
     return 0;
 }
-
-
-#define SERVER
-#undef NELEM
-#include "version.h"
-#include "serverconst.h"
-#include "object.h"
-#include "proto.h"
-
-
-char wildmap_version[] = VERSION;
 
 
 int Wildmap(

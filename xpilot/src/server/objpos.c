@@ -21,24 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
-
-#ifdef _WINDOWS
-# include <windows.h>
-#endif
-
-#define SERVER
-#include "version.h"
-#include "xpconfig.h"
-#include "serverconst.h"
-#include "global.h"
-#include "proto.h"
-#include "map.h"
-#include "object.h"
-#include "objpos.h"
-#include "walls.h"
+#include "xpserver.h"
 
 char objpos_version[] = VERSION;
 

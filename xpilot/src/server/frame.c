@@ -21,38 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <math.h>
-#include <errno.h>
-#include <time.h>
-#include <limits.h>
-#include <sys/types.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-# include <sys/param.h>
-#endif
-
-#ifdef _WINDOWS
-# include "NT/winServer.h"
-#endif
-
-#define SERVER
-#include "version.h"
-#include "xpconfig.h"
-#include "serverconst.h"
-#include "global.h"
-#include "proto.h"
-#include "bit.h"
-#include "netserver.h"
-#include "saudio.h"
-#include "error.h"
-#include "click.h"
-#include "commonproto.h"
-#include "srecord.h"
-
+#include "xpserver.h"
 
 char frame_version[] = VERSION;
 

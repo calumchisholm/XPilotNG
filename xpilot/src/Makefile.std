@@ -1,5 +1,4 @@
 # 
-#
 # XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
 #
 #      Bjørn Stabell        <bjoern@xpilot.org>
@@ -734,33 +733,41 @@ xpmread.o: xpmread.c ../common/version.h ../common/xpconfig.h \
   ../common/const.h ../common/types.h paint.h client.h ../common/draw.h \
   ../server/click.h ../common/item.h xinit.h ../common/error.h \
   ../common/commonproto.h xpmread.h gfx2d.h
-alliance.o: alliance.c ../common/version.h ../common/xpconfig.h \
-  serverconst.h ../common/const.h ../common/types.h global.h object.h \
+alliance.o: alliance.c xpserver.h ../common/version.h \
+  ../common/xpconfig.h ../common/commonproto.h ../common/types.h \
+  ../common/error.h global.h object.h serverconst.h ../common/const.h \
   ../common/keys.h ../common/bit.h ../common/draw.h ../server/click.h \
   ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  proto.h defaults.h netserver.h ../common/error.h \
-  ../common/commonproto.h
-asteroid.o: asteroid.c ../common/version.h ../common/xpconfig.h \
-  serverconst.h ../common/const.h ../common/types.h ../common/list.h \
-  global.h object.h ../common/keys.h ../common/bit.h ../common/draw.h \
-  ../server/click.h ../common/item.h rank.h map.h ../common/rules.h \
-  proto.h defaults.h saudio.h objpos.h asteroid.h
-auth.o: auth.c ../common/version.h ../common/error.h auth.h \
-  ../common/pack.h ../common/commonproto.h ../common/types.h \
-  ../common/xpconfig.h proto.h object.h serverconst.h ../common/const.h \
+  ../common/pack.h proto.h defaults.h asteroid.h auth.h cannon.h score.h \
+  saudio.h objpos.h netserver.h click.h
+asteroid.o: asteroid.c xpserver.h ../common/version.h \
+  ../common/xpconfig.h ../common/commonproto.h ../common/types.h \
+  ../common/error.h global.h object.h serverconst.h ../common/const.h \
   ../common/keys.h ../common/bit.h ../common/draw.h ../server/click.h \
-  ../common/item.h rank.h ../common/list.h map.h ../common/rules.h \
-  defaults.h global.h
-cannon.o: cannon.c ../common/version.h ../common/xpconfig.h serverconst.h \
-  ../common/const.h ../common/types.h global.h object.h ../common/keys.h \
+  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
+  ../common/pack.h proto.h defaults.h asteroid.h auth.h cannon.h score.h \
+  saudio.h objpos.h netserver.h click.h
+auth.o: auth.c xpserver.h ../common/version.h ../common/xpconfig.h \
+  ../common/commonproto.h ../common/types.h ../common/error.h global.h \
+  object.h serverconst.h ../common/const.h ../common/keys.h \
   ../common/bit.h ../common/draw.h ../server/click.h ../common/item.h \
-  rank.h map.h ../common/rules.h ../common/list.h proto.h defaults.h \
-  objpos.h cannon.h saudio.h score.h ../common/commonproto.h
-cell.o: cell.c ../common/version.h ../common/xpconfig.h serverconst.h \
-  ../common/const.h ../common/types.h global.h object.h ../common/keys.h \
+  rank.h map.h ../common/rules.h ../common/list.h ../common/pack.h \
+  proto.h defaults.h asteroid.h auth.h cannon.h score.h saudio.h objpos.h \
+  netserver.h click.h
+cannon.o: cannon.c xpserver.h ../common/version.h ../common/xpconfig.h \
+  ../common/commonproto.h ../common/types.h ../common/error.h global.h \
+  object.h serverconst.h ../common/const.h ../common/keys.h \
   ../common/bit.h ../common/draw.h ../server/click.h ../common/item.h \
-  rank.h map.h ../common/rules.h ../common/list.h proto.h defaults.h \
-  ../common/error.h
+  rank.h map.h ../common/rules.h ../common/list.h ../common/pack.h \
+  proto.h defaults.h asteroid.h auth.h cannon.h score.h saudio.h objpos.h \
+  netserver.h click.h
+cell.o: cell.c xpserver.h ../common/version.h ../common/xpconfig.h \
+  ../common/commonproto.h ../common/types.h ../common/error.h global.h \
+  object.h serverconst.h ../common/const.h ../common/keys.h \
+  ../common/bit.h ../common/draw.h ../server/click.h ../common/item.h \
+  rank.h map.h ../common/rules.h ../common/list.h ../common/pack.h \
+  proto.h defaults.h asteroid.h auth.h cannon.h score.h saudio.h objpos.h \
+  netserver.h click.h
 cmdline.o: cmdline.c ../common/version.h ../common/xpconfig.h \
   serverconst.h ../common/const.h ../common/types.h global.h object.h \
   ../common/keys.h ../common/bit.h ../common/draw.h ../server/click.h \
@@ -932,12 +939,13 @@ ship.o: ship.c ../common/version.h ../common/xpconfig.h serverconst.h \
 shipshape_s.o: shipshape_s.c ../common/version.h ../common/xpconfig.h \
   ../common/const.h ../common/types.h ../common/draw.h ../server/click.h \
   ../common/error.h click.h
-shot.o: shot.c ../common/version.h ../common/xpconfig.h serverconst.h \
-  ../common/const.h ../common/types.h global.h object.h ../common/keys.h \
+shot.o: shot.c xpserver.h ../common/version.h ../common/xpconfig.h \
+  ../common/commonproto.h ../common/types.h ../common/error.h global.h \
+  object.h serverconst.h ../common/const.h ../common/keys.h \
   ../common/bit.h ../common/draw.h ../server/click.h ../common/item.h \
-  rank.h map.h ../common/rules.h ../common/list.h proto.h defaults.h \
-  score.h saudio.h cannon.h objpos.h netserver.h ../common/error.h \
-  ../common/commonproto.h click.h
+  rank.h map.h ../common/rules.h ../common/list.h ../common/pack.h \
+  proto.h defaults.h asteroid.h auth.h cannon.h score.h saudio.h objpos.h \
+  netserver.h click.h
 showtime.o: showtime.c proto.h object.h serverconst.h ../common/const.h \
   ../common/types.h ../common/keys.h ../common/bit.h ../common/draw.h \
   ../server/click.h ../common/item.h rank.h ../common/list.h map.h \

@@ -26,27 +26,7 @@
  * This file deals with low-level object structure manipulations.
  */
 
-
-#include <stdlib.h>
-#include <time.h>
-
-#ifndef _WINDOWS
-#endif
-
-#ifdef _WINDOWS
-#endif
-
-#define	SERVER
-#include "version.h"
-#include "xpconfig.h"
-#include "types.h"
-#include "serverconst.h"
-#include "global.h"
-#include "proto.h"
-#include "error.h"
-#include "portability.h"
-#include "commonproto.h"
-
+#include "xpserver.h"
 
 char object_version[] = VERSION;
 
@@ -59,9 +39,6 @@ int			NumPulses = 0;
 int			NumEcms = 0;
 int			NumTransporters = 0;
 object			*Obj[MAX_TOTAL_SHOTS];
-#if 0
-pulse_t			*Pulses[MAX_TOTAL_PULSES];
-#endif
 ecm_t			*Ecms[MAX_TOTAL_ECMS];
 trans_t			*Transporters[MAX_TOTAL_TRANSPORTERS];
 

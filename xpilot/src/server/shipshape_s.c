@@ -21,30 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#include <ctype.h>
-#include <math.h>
-
-#if defined(_WINDOWS)
-	/* need this for printf wrappers. */
-#	ifdef	_XPILOTNTSERVER_
-#		include "../server/NT/winServer.h"
-#	elif !defined(_XPMONNT_)
-#		include "NT/winX.h"
-#		include "../client/NT/winClient.h"
-#	endif
-#endif
-
-#define SERVER
-#include "version.h"
-#include "xpconfig.h"
-#include "const.h"
-#include "draw.h"
-#include "error.h"
-#include "click.h"
+#include "xpserver.h"
 
 char shipshape_s_version[] = VERSION;
 

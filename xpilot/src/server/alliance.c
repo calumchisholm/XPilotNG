@@ -22,23 +22,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <time.h>
-
-#define SERVER
-#include "version.h"
-#include "xpconfig.h"
-#include "serverconst.h"
-#include "global.h"
-#include "proto.h"
-#include "map.h"
-#include "bit.h"
-#include "netserver.h"
-#include "error.h"
-#include "commonproto.h"
-
+#include "xpserver.h"
 
 char alliance_version[] = VERSION;
 

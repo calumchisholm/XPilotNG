@@ -21,30 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <limits.h>
-#include <math.h>
-#include <time.h>
-
-#ifdef _WINDOWS
-# include "NT/winServer.h"
-#endif
-
-#define SERVER
-#include "version.h"
-#include "xpconfig.h"
-#include "serverconst.h"
-#include "global.h"
-#include "proto.h"
-#include "saudio.h"
-#include "score.h"
-#include "objpos.h"
-#include "click.h"
-#include "object.h"
-#include "error.h"
-#include "walls.h" /* for move_parameters */
+#include "xpserver.h"
 
 char play_version[] = VERSION;
 

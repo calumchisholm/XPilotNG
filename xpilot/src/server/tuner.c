@@ -21,17 +21,10 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#define	SERVER
-#include <stdlib.h>
-#include <time.h>
-#include "serverconst.h"
-#include "global.h"
-#include "proto.h"
-#include "error.h"
-#include "commonproto.h"
+#include "xpserver.h"
 
+char tuner_version[] = VERSION;
 
-extern time_t gameOverTime;
 
 
 void tuner_plock(void)

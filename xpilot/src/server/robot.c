@@ -22,37 +22,7 @@
  */
 /* Robot code originally submitted by Maurice Abraham. */
 
-#include <stdlib.h>
-#include <errno.h>
-#include <ctype.h>
-#include <string.h>
-#include <stdio.h>
-#include <limits.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-#endif
-
-#ifdef _WINDOWS
-# include "NT/winServer.h"
-#endif
-
-#define SERVER
-#include "version.h"
-#include "xpconfig.h"
-#include "serverconst.h"
-#include "global.h"
-#include "proto.h"
-#include "map.h"
-#include "score.h"
-#include "bit.h"
-#include "saudio.h"
-#include "netserver.h"
-#include "pack.h"
-#include "robot.h"
-#include "error.h"
-#include "server.h"
-#include "commonproto.h"
+#include "xpserver.h"
 
 #define DEFAULT_ROBOT_TYPE	"default"
 

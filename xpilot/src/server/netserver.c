@@ -88,71 +88,37 @@
  * if the acknowledgement timer expires.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#include <ctype.h>
-#include <fcntl.h>
-#include <time.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-# include <sys/param.h>
-# ifdef _AIX
-#  ifndef _BSD_INCLUDES
-#   define _BSD_INCLUDES
-#  endif
-# endif
-# ifndef __hpux
-#  include <sys/time.h>
-# endif
-# include <sys/socket.h>
-# include <netinet/in.h>
-# include <netdb.h>
-#endif
-
-#ifdef _WINDOWS
-# include "NT/winServer.h"
-# include <io.h>
-#endif
-
-#define SERVER
-#include "version.h"
-#include "xpconfig.h"
-#include "serverconst.h"
-#include "global.h"
-#include "proto.h"
-#include "map.h"
-#include "pack.h"
-#include "bit.h"
-#include "types.h"
-#include "socklib.h"
-#include "sched.h"
-#include "net.h"
-#include "error.h"
-#define NETSERVER_C
-#include "netserver.h"
-#include "packet.h"
-#include "setup.h"
-#include "connection.h"
-#undef NETSERVER_C
-#include "saudio.h"
-#include "checknames.h"
-#include "server.h"
-#include "commonproto.h"
-#include "asteroid.h"
-#include "score.h"
-#include "srecord.h"
-#include "recwrap.h"
-#include "click.h"
-#include "auth.h"
-#include "rank.h"
-
+#include "xpserver.h"
 
 char netserver_version[] = VERSION;
+
+static int Compress_map(unsigned char *map, int size);
+static int Init_setup(void);
+static int Handle_listening(int ind);
+static int Handle_setup(int ind);
+static int Handle_login(int ind, char *errmsg, int errsize);
+static void Handle_input(int fd, void *arg);
+
+static int Receive_keyboard(int ind);
+static int Receive_quit(int ind);
+static int Receive_play(int ind);
+static int Receive_power(int ind);
+static int Receive_ack(int ind);
+static int Receive_ack_cannon(int ind);
+static int Receive_ack_fuel(int ind);
+static int Receive_ack_target(int ind);
+static int Receive_discard(int ind);
+static int Receive_undefined(int ind);
+static int Receive_talk(int ind);
+static int Receive_display(int ind);
+static int Receive_modifier_bank(int ind);
+static int Receive_motd(int ind);
+static int Receive_shape(int ind);
+static int Receive_pointer_move(int ind);
+static int Receive_audio_request(int ind);
+static int Receive_fps_request(int ind);
+
+static int Send_motd(int ind);
 
 #define MAX_SELECT_FD			(sizeof(int) * 8 - 1)
 #define MAX_RELIABLE_DATA_PACKET_SIZE	1024

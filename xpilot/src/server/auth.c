@@ -21,26 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#include <sys/stat.h>
-/*#include <crypt.h>*/
-#include <stdlib.h>
-#include <ctype.h>
-#include <time.h>
-#include <sys/file.h>
-#include <unistd.h>
-
-#define SERVER
-#include "version.h"
-#include "error.h"
-#include "auth.h"
-#include "pack.h"
-#include "commonproto.h"
-#include "xpconfig.h"
-#include "proto.h"
-#include "global.h"
+#include "xpserver.h"
 
 char auth_version[] = VERSION;
 

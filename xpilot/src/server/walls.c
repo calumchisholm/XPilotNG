@@ -21,44 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <errno.h>
-#include <math.h>
-#include <limits.h>
-#include <time.h>
-
-#ifndef _WINDOWS
-# include <sys/types.h>  /* freebsd for in.h to work */
-# include <sys/socket.h> /* freebsd for in.h to work */
-# include <netinet/in.h>
-#endif
-
-#ifdef _WINDOWS
-# include "NT/winServer.h"
-# include "../common/NT/winNet.h"
-#endif
-
-#define SERVER
-#include "version.h"
-#include "xpconfig.h"
-#include "serverconst.h"
-#include "global.h"
-#include "proto.h"
-#include "score.h"
-#include "saudio.h"
-#include "item.h"
-#include "error.h"
-#include "walls.h"
-#include "click.h"
-#include "objpos.h"
-
-#include "const.h"
-#include "map.h"
-#include "netserver.h"
-#include "pack.h"
-#include "srecord.h"
+#include "xpserver.h"
 
 char walls_version[] = VERSION;
 

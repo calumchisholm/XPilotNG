@@ -21,32 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <errno.h>
-#include <math.h>
-#include <limits.h>
-#include <time.h>
-
-#ifdef _WINDOWS
-# include "NT/winServer.h"
-#endif
-
-#define SERVER
-#include "version.h"
-#include "xpconfig.h"
-#include "serverconst.h"
-#include "list.h"
-#include "global.h"
-#include "proto.h"
-#include "map.h"
-#include "score.h"
-#include "saudio.h"
-#include "error.h"
-#include "portability.h"
-#include "objpos.h"
-#include "asteroid.h"
+#include "xpserver.h"
 
 
 char laser_version[] = VERSION;

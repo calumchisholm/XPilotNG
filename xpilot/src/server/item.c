@@ -21,39 +21,9 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <math.h>
-#include <errno.h>
-#include <limits.h>
-#include <time.h>
-
-#ifdef _WINDOWS
-# include "NT/winServer.h"
-#endif
-
-#define SERVER
-#include "version.h"
-#include "xpconfig.h"
-#include "serverconst.h"
-#include "global.h"
-#include "proto.h"
-#include "saudio.h"
-#include "score.h"
-#if 0
-#include "bit.h"
-#include "cannon.h"
-#endif
-#include "netserver.h"
-#include "error.h"
-#include "objpos.h"
-#include "click.h"
-/*#include "commonproto.h"*/
+#include "xpserver.h"
 
 char item_version[] = VERSION;
-
-
 
 
 static void Item_update_flags(player *pl)

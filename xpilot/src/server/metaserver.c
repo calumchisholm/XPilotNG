@@ -21,40 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <errno.h>
-#include <stdio.h>
-#include <time.h>
-#include <sys/types.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-# ifndef __hpux
-#  include <sys/time.h>
-# endif
-#endif
-
-#ifdef _WINDOWS
-# include "NT/winServer.h"
-#endif
-
-#define SERVER
-#include "xpconfig.h"
-#include "version.h"
-#include "serverconst.h"
-#include "types.h"
-#include "global.h"
-#include "proto.h"
-#include "socklib.h"
-#include "map.h"
-#include "pack.h"
-#include "metaserver.h"
-#include "saudio.h"
-#include "error.h"
-#include "netserver.h"
-#include "commonproto.h"
+#include "xpserver.h"
 
 #if defined(_WINDOWS)
 #define	META_VERSION	TITLE

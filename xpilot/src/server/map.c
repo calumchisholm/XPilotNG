@@ -21,32 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-
-#ifndef _WINDOWS
-# include <sys/file.h>
-#endif
-
-#ifdef _WINDOWS
-# include "NT/winServer.h"
-#endif
-
-#define SERVER
-#include "version.h"
-#include "xpconfig.h"
-#include "serverconst.h"
-#include "global.h"
-#include "proto.h"
-#include "map.h"
-#include "bit.h"
-#include "error.h"
-#include "commonproto.h"
+#include "xpserver.h"
 
 char map_version[] = VERSION;
 
@@ -111,9 +86,6 @@ static void Realloc_map_objects(void)
 	   World.NumAsteroidConcs, max_asteroidconcs);
 }
 
-
-
-#include <ctype.h>
 void asciidump(void *p, size_t size)
 {
     int i;

@@ -21,34 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <string.h>
-#include <errno.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-#endif
-
-#ifdef _WINDOWS
-# include "NT/winServer.h"
-#endif
-
-#define SERVER
-#include "version.h"
-#include "serverconst.h"
-#include "global.h"
-#include "proto.h"
-#include "error.h"
-#include "netserver.h"
-#include "commonproto.h"
-#include "score.h"
-#include "srecord.h"
-#include "auth.h"
-#include "checknames.h"
-#include "rank.h"
-
+#include "xpserver.h"
 
 char command_version[] = VERSION;
 

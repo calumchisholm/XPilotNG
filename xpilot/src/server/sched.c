@@ -21,40 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <signal.h>
-#include <errno.h>
-#include <time.h>
-#include <sys/types.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-# ifndef __hpux
-#  include <sys/time.h>
-# endif
-# ifdef _AIX
-#  include <sys/select.h> /* _BSD not defined in <sys/types.h>, so done by hand */
-# endif
-#endif
-
-#ifdef _WINDOWS
-# include "NT/winServer.h"
-# include "NT/winSvrThread.h"
-#endif
-
-#define	SERVER
-#include "version.h"
-#include "xpconfig.h"
-#include "serverconst.h"
-#include "error.h"
-#include "types.h"
-#include "sched.h"
-#include "global.h"
-#include "srecord.h"
-
-#include "portability.h"
+#include "xpserver.h"
 
 char sched_version[] = VERSION;
 

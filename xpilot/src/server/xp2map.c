@@ -21,37 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-#endif
-
-#ifdef _WINDOWS
-# include <windows.h>
-# include <io.h>
-# define read(__a, __b, __c)	_read(__a, __b, __c)
-#endif
-
-#define SERVER
-#include "version.h"
-#include "xpconfig.h"
-#include "serverconst.h"
-#include "global.h"
-#include "proto.h"
-#include "defaults.h"
-#include "map.h"
-#include "bit.h"
-#include "error.h"
-#include "commonproto.h"
-
-#include <expat.h>
+#include "xpserver.h"
 
 char xp2map_version[] = VERSION;
 

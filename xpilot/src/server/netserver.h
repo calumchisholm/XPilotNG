@@ -24,40 +24,6 @@
 #ifndef	NETSERVER_H
 #define	NETSERVER_H
 
-#ifdef NETSERVER_C
-
-
-static int Compress_map(unsigned char *map, int size);
-static int Init_setup(void);
-static int Handle_listening(int ind);
-static int Handle_setup(int ind);
-static int Handle_login(int ind, char *errmsg, int errsize);
-static void Handle_input(int fd, void *arg);
-
-
-static int Receive_keyboard(int ind);
-static int Receive_quit(int ind);
-static int Receive_play(int ind);
-static int Receive_power(int ind);
-static int Receive_ack(int ind);
-static int Receive_ack_cannon(int ind);
-static int Receive_ack_fuel(int ind);
-static int Receive_ack_target(int ind);
-static int Receive_discard(int ind);
-static int Receive_undefined(int ind);
-static int Receive_talk(int ind);
-static int Receive_display(int ind);
-static int Receive_modifier_bank(int ind);
-static int Receive_motd(int ind);
-static int Receive_shape(int ind);
-static int Receive_pointer_move(int ind);
-static int Receive_audio_request(int ind);
-static int Receive_fps_request(int ind);
-
-static int Send_motd(int ind);
-
-#endif	/* NETSERVER_C */
-
 int Get_motd(char *buf, int offset, int maxlen, int *size_ptr);
 int Setup_net_server(void);
 void Conn_change_nick(int ind, const char *nick);

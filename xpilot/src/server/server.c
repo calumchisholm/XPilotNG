@@ -21,58 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <signal.h>
-#include <errno.h>
-#include <time.h>
-#include <limits.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-# ifndef __hpux
-#  include <sys/time.h>
-# endif
-# include <pwd.h>
-# include <sys/param.h>
-#endif
-
-#ifdef PLOCKSERVER
-# if defined(__linux__)
-#  include <sys/mman.h>
-# else
-#  include <sys/lock.h>
-# endif
-#endif
-
-#ifdef _WINDOWS
-# include <io.h>
-# include "NT/winServer.h"
-# include "NT/winSvrThread.h"
-#endif
-
-#define	SERVER
-#include "version.h"
-#include "xpconfig.h"
-#include "types.h"
-#include "serverconst.h"
-#include "global.h"
-#include "proto.h"
-#include "socklib.h"
-#include "map.h"
-#include "bit.h"
-#include "sched.h"
-#include "netserver.h"
-#include "error.h"
-#include "portability.h"
-#include "server.h"
-#include "commonproto.h"
-#include "srecord.h"
-#include "rank.h"
+#include "xpserver.h"
 
 char server_version[] = VERSION;
 
@@ -882,6 +831,8 @@ extern char play_version[];
 extern char player_version[];
 extern char polygon_version[];
 extern char portability_version[];
+extern char rank_version[];
+extern char recwrap_version[];
 extern char robot_version[];
 extern char robotdef_version[];
 extern char rules_version[];
@@ -894,6 +845,8 @@ extern char shipshape_version[];
 extern char shipshape_s_version[];
 extern char shot_version[];
 extern char socklib_version[];
+extern char srecord_version[];
+extern char tuner_version[];
 extern char update_version[];
 extern char walls_version[];
 extern char wildmap_version[];
@@ -935,6 +888,8 @@ static void Check_server_versions(void)
 	{ "player", player_version },
 	{ "polygon", polygon_version },
 	{ "portability", portability_version },
+	{ "rank", rank_version },
+	{ "recwrap", recwrap_version },
 	{ "robot", robot_version },
 	{ "robotdef", robotdef_version },
 	{ "rules", rules_version },
@@ -947,6 +902,8 @@ static void Check_server_versions(void)
 	{ "shipshape_s", shipshape_s_version },
 	{ "shot", shot_version },
 	{ "socklib", socklib_version },
+	{ "srecord", srecord_version },
+	{ "tuner", tuner_version },
 	{ "update", update_version },
 	{ "walls", walls_version },
 	{ "wildmap", wildmap_version },

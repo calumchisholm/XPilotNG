@@ -22,29 +22,7 @@
  */
 /* Options parsing code contributed by Ted Lemon <mellon@ncd.com> */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#include <time.h>
-
-#ifdef _WINDOWS
-# include "NT/winServer.h"
-#endif
-
-#define SERVER
-#include "version.h"
-#include "xpconfig.h"
-#include "serverconst.h"
-#include "global.h"
-#include "proto.h"
-#include "defaults.h"
-#include "error.h"
-#include "portability.h"
-#include "checknames.h"
-#include "commonproto.h"
-#include "tuner.h"
-#include "sched.h"
+#include "xpserver.h"
 
 char cmdline_version[] = VERSION;
 

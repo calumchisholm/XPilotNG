@@ -21,47 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <time.h>
-#include <errno.h>
-#include <limits.h>
-#include <sys/types.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-# ifndef __hpux
-#  include <sys/time.h>
-# endif
-#endif
-
-#ifdef _WINDOWS
-# include "NT/winServer.h"
-# include <process.h>
-#endif
-
-#define SERVER
-#include "version.h"
-#include "xpconfig.h"
-#include "types.h"
-#include "serverconst.h"
-#include "global.h"
-#include "proto.h"
-#include "socklib.h"
-#include "map.h"
-#include "pack.h"
-#include "bit.h"
-#include "net.h"
-#include "netserver.h"
-#include "sched.h"
-#include "error.h"
-#include "checknames.h"
-#include "server.h" /* kps - ng does not want this */
-#include "commonproto.h"
-#include "portability.h"
-#include "srecord.h"
+#include "xpserver.h"
 
 char contact_version[] = VERSION;
 

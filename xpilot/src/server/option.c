@@ -21,27 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <limits.h>
-#include <errno.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-#endif
-
-#define SERVER
-#include "version.h"
-#include "xpconfig.h"
-#include "serverconst.h"
-#include "global.h"
-#include "proto.h"
-#include "defaults.h"
-#include "error.h"
-#include "types.h"
-#include "commonproto.h"
+#include "xpserver.h"
 
 
 char option_version[] = VERSION;
