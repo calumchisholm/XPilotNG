@@ -1817,7 +1817,7 @@ void Delete_player(player *pl)
 			id = pl->id;
 
     /* call before important player structures are destroyed */
-    Leave_alliance(ind);
+    Leave_alliance(pl);
 
     if (IS_ROBOT_PTR(pl)) {
 	Robot_destroy(ind);

@@ -465,17 +465,17 @@ void Laser_pulse_hits_player(player *pl, pulseobject *pulse);
 /*
  * Prototypes for alliance.c
  */
-int Invite_player(int ind, int ally_ind);
-int Cancel_invitation(int ind);
-int Refuse_alliance(int ind, int ally_ind);
-int Refuse_all_alliances(int ind);
-int Accept_alliance(int ind, int ally_ind);
-int Accept_all_alliances(int ind);
+int Invite_player(player *pl, player *ally);
+int Cancel_invitation(player *pl);
+int Refuse_alliance(player *pl, player *ally);
+int Refuse_all_alliances(player *pl);
+int Accept_alliance(player *pl, player *ally);
+int Accept_all_alliances(player *pl);
 int Get_alliance_member_count(int id);
-void Player_join_alliance(int ind, int ally_ind);
+void Player_join_alliance(player *pl, player *ally);
 void Dissolve_all_alliances(void);
-int Leave_alliance(int ind);
-void Alliance_player_list(int ind);
+int Leave_alliance(player *pl);
+void Alliance_player_list(player *pl);
 
 /*
  * Prototypes for object.c

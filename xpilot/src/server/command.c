@@ -53,7 +53,7 @@
 char command_version[] = VERSION;
 
 
-
+/* kps - add player *Get_player_by_name(char *name) */
 
 int Get_player_index_by_name(char *name)
 {
@@ -581,14 +581,16 @@ static int Cmd_ally(char *arg, player *pl, int oper, char *msg)
 	    /* a name is specified */
 	    int i = Get_player_index_by_name(arg);
 	    if (i >= 0) {
+		player *pl2 = Players(i);
+
 		if (cmd == AllyInvite) {
-		    Invite_player(GetInd(pl->id), i);
+		    Invite_player(pl, pl2);
 		}
 		else if (cmd == AllyRefuse) {
-		    Refuse_alliance(GetInd(pl->id), i);
+		    Refuse_alliance(pl, pl2);
 		}
 		else if (cmd == AllyAccept) {
-		    Accept_alliance(GetInd(pl->id), i);
+		    Accept_alliance(pl, pl2);
 		}
 		else {
 		    strlcpy(msg, usage, MSG_LEN);
@@ -609,19 +611,19 @@ static int Cmd_ally(char *arg, player *pl, int oper, char *msg)
 	} else {
 	    /* no player name is specified */
 	    if (cmd == AllyCancel) {
-		Cancel_invitation(GetInd(pl->id));
+		Cancel_invitation(pl);
 	    }
 	    else if (cmd == AllyRefuse) {
-		Refuse_all_alliances(GetInd(pl->id));
+		Refuse_all_alliances(pl);
 	    }
 	    else if (cmd == AllyAccept) {
-		Accept_all_alliances(GetInd(pl->id));
+		Accept_all_alliances(pl);
 	    }
 	    else if (cmd == AllyLeave) {
-		Leave_alliance(GetInd(pl->id));
+		Leave_alliance(pl);
 	    }
 	    else if (cmd == AllyList) {
-		Alliance_player_list(GetInd(pl->id));
+		Alliance_player_list(pl);
 	    }
 	    else {
 		strlcpy(msg, usage, MSG_LEN);

@@ -429,7 +429,7 @@ void Tank_handle_detach(player *pl)
 
     /* Possibly join alliance. */
     if (pl->alliance != ALLIANCE_NOT_SET) {
-	Player_join_alliance(GetInd(dummy->id), GetInd(pl->id));
+	Player_join_alliance(dummy, pl);
     }
 
     sound_play_sensors(pl->pos.cx, pl->pos.cy, TANK_DETACH_SOUND);

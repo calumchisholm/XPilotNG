@@ -59,21 +59,18 @@ static int New_alliance_ID(void);
 static void Alliance_add_player(alliance_t *alliance, player *pl);
 static int Alliance_remove_player(alliance_t *alliance, player *pl);
 static void Set_alliance_message(alliance_t *alliance, const char *msg);
-static int Create_alliance(int ind1, int ind2);
+static int Create_alliance(player *pl1, player *pl2);
 static void Dissolve_alliance(int id);
-static void Merge_alliances(int id1, int id2);
+static void Merge_alliances(player *pl, int id2);
 
 
-int Invite_player(int ind, int ally_ind)
+int Invite_player(player *pl, player *ally)
 {
-    player	*pl = Players(ind),
-		*ally = Players(ally_ind);
-
-    if (ind == ally_ind) {
+    if (pl->id == ally->id) {
 	/* we can never form an alliance with ourselves */
 	return 0;
     }
-    if (IS_TANK_IND(ally_ind)) {
+    if (IS_TANK_PTR(ally)) {
 	/* tanks can't handle invitations */
 	return 0;
     }
@@ -87,17 +84,17 @@ int Invite_player(int ind, int ally_ind)
     }
     if (ally->invite == pl->id) {
 	/* player has already invited us. accept invitation */
-	Accept_alliance(ind, ally_ind);
+	Accept_alliance(pl, ally);
 	return 1;
     }
     if (pl->invite != NO_ID) {
 	/* we have already invited another player. cancel that invitation */
-	Cancel_invitation(ind);
+	Cancel_invitation(pl);
     }
     /* set & send invitation */
     pl->invite = ally->id;
     if (IS_ROBOT_PTR(ally)) {
-	Robot_invite(ally_ind, ind);
+	Robot_invite(GetInd(ally->id), GetInd(pl->id));
     }
     else if (IS_HUMAN_PTR(ally)) {
 	char msg[MSG_LEN];
@@ -107,10 +104,9 @@ int Invite_player(int ind, int ally_ind)
     return 1;
 }
 
-int Cancel_invitation(int ind)
+int Cancel_invitation(player *pl)
 {
-    player	*pl = Players(ind),
-		*ally;
+    player	*ally;
 
     if (pl->invite == NO_ID) {
 	/* we have not invited anyone */
@@ -128,11 +124,8 @@ int Cancel_invitation(int ind)
 }
 
 /* refuses invitation from a specific player */
-int Refuse_alliance(int ind, int ally_ind)
+int Refuse_alliance(player *pl, player *ally)
 {
-    player	*pl = Players(ind),
-		*ally = Players(ally_ind);
-
     if (ally->invite != pl->id) {
 	/* we were not invited anyway */
 	return 0;
@@ -148,14 +141,14 @@ int Refuse_alliance(int ind, int ally_ind)
 }
 
 /* refuses invitations from any player */
-int Refuse_all_alliances(int ind)
+int Refuse_all_alliances(player *pl)
 {
-    player	*pl = Players(ind);
     int		i, j = 0;
 
     for (i = 0; i < NumPlayers; i++) {
-	if (Players(i)->invite == pl->id) {
-	    Refuse_alliance(ind, i);
+	player *pl2 = Players(i);
+	if (pl2->invite == pl->id) {
+	    Refuse_alliance(pl, pl2);
 	    j++;
 	}
     }
@@ -173,10 +166,8 @@ int Refuse_all_alliances(int ind)
 }
 
 /* accepts an invitation from a specific player */
-int Accept_alliance(int ind, int ally_ind)
+int Accept_alliance(player *pl, player *ally)
 {
-    player	*pl = Players(ind),
-		*ally = Players(ally_ind);
     int		success = 1;
 
     if (ally->invite != pl->id) {
@@ -187,32 +178,32 @@ int Accept_alliance(int ind, int ally_ind)
     if (ally->alliance != ALLIANCE_NOT_SET) {
 	if (pl->alliance != ALLIANCE_NOT_SET) {
 	    /* both players are in alliances */
-	    Merge_alliances(ally_ind, pl->alliance);
+	    Merge_alliances(ally, pl->alliance);
 	} else {
 	    /* inviting player is in an alliance */
-	    Player_join_alliance(ind, ally_ind);
+	    Player_join_alliance(pl, ally);
 	}
     } else {
 	if (pl->alliance != ALLIANCE_NOT_SET) {
 	    /* accepting player is in an alliance */
-	    Player_join_alliance(ally_ind, ind);
+	    Player_join_alliance(ally, pl);
 	} else {
 	    /* neither player is in an alliance */
-	    success = Create_alliance(ind, ally_ind);
+	    success = Create_alliance(pl, ally);
 	}
     }
     return success;
 }
 
 /* accepts invitations from any player */
-int Accept_all_alliances(int ind)
+int Accept_all_alliances(player *pl)
 {
-    player	*pl = Players(ind);
     int		i, j = 0;
 
     for (i = 0; i < NumPlayers; i++) {
-	if (Players(i)->invite == pl->id) {
-	    Accept_alliance(ind, i);
+	player *pl2 = Players(i);
+	if (pl2->invite == pl->id) {
+	    Accept_alliance(pl, pl2);
 	    j++;
 	}
     }
@@ -265,9 +256,10 @@ static void Set_alliance_message(alliance_t *alliance, const char *msg)
     int	i;
 
     for (i = 0; i < NumPlayers; i++) {
-	if (IS_HUMAN_IND(i)) {
-	    if (Players(i)->alliance == alliance->id) {
-		Set_player_message(Players(i), msg);
+	player *pl2 = Players(i);
+	if (IS_HUMAN_PTR(pl2)) {
+	    if (pl2->alliance == alliance->id) {
+		Set_player_message(pl2, msg);
 	    }
 	}
     }
@@ -295,10 +287,8 @@ static int New_alliance_ID(void)
 }
 
 /* creates an alliance between two players */
-static int Create_alliance(int ind1, int ind2)
+static int Create_alliance(player *pl1, player *pl2)
 {
-    player	*pl1 = Players(ind1),
-		*pl2 = Players(ind2);
     alliance_t	*alliance = (alliance_t *)malloc(sizeof(alliance_t));
     char	msg[MSG_LEN];
 
@@ -333,14 +323,12 @@ static int Create_alliance(int ind1, int ind2)
 }
 
 /* adds a player to an existing alliance */
-void Player_join_alliance(int ind, int ally_ind)
+void Player_join_alliance(player *pl, player *ally)
 {
-    player	*pl = Players(ind),
-		*ally = Players(ally_ind);
     alliance_t	*alliance = Find_alliance(ally->alliance);
     char	msg[MSG_LEN];
 
-    if (!IS_TANK_IND(ind)) {
+    if (!IS_TANK_PTR(pl)) {
 	/* announce first to avoid sending the player two messages */
 	if (announceAlliances) {
 	    sprintf(msg, " < %s has joined alliance %d >",
@@ -367,8 +355,9 @@ static void Alliance_add_player(alliance_t *alliance, player *pl)
 
     /* drop invitations for this player from other members */
     for (i = 0; i < NumPlayers; i++) {
-	if (Players(i)->invite == pl->id) {
-	    Cancel_invitation(i);
+	player *pl2 = Players(i);
+	if (pl2->invite == pl->id) {
+	    Cancel_invitation(pl2);
 	}
     }
     pl->alliance = alliance->id;
@@ -377,9 +366,8 @@ static void Alliance_add_player(alliance_t *alliance, player *pl)
 }
 
 /* removes a player from an alliance and dissolves the alliance if necessary */
-int Leave_alliance(int ind)
+int Leave_alliance(player *pl)
 {
-    player	*pl = Players(ind);
     alliance_t	*alliance;
     char	msg[MSG_LEN];
 
@@ -390,7 +378,7 @@ int Leave_alliance(int ind)
     alliance = Find_alliance(pl->alliance);
     Alliance_remove_player(alliance, pl);
     /* announcement */
-    if (!IS_TANK_IND(ind)) {
+    if (!IS_TANK_PTR(pl)) {
 	if (announceAlliances) {
 	    sprintf(msg, " < %s has left alliance %d >", pl->name,
 		    alliance->id);
@@ -428,10 +416,11 @@ static void Dissolve_alliance(int id)
 
     /* remove all remaining members from the alliance */
     for (i = 0; i < NumPlayers; i++) {
-	if (Players(i)->alliance == id) {
-	    Alliance_remove_player(alliance, Players(i));
-	    if (!announceAlliances && IS_HUMAN_IND(i)) {
-		Set_player_message(Players(i),
+	player *pl2 = Players(i);
+	if (pl2->alliance == id) {
+	    Alliance_remove_player(alliance, pl2);
+	    if (!announceAlliances && IS_HUMAN_PTR(pl2)) {
+		Set_player_message(pl2,
 				   " < Your alliance has been dissolved >");
 	    }
 	}
@@ -474,24 +463,24 @@ void Dissolve_all_alliances(void)
 }
 
 /* merges two alliances by moving the members of the second to the first */
-static void Merge_alliances(int ind, int id2)
+static void Merge_alliances(player *pl, int id2)
 {
     alliance_t	*alliance2 = Find_alliance(id2);
     int		i;
 
     /* move each member of alliance2 to alliance1 */
     for (i = 0; i < NumPlayers; i++) {
-	if (Players(i)->alliance == id2) {
-	    Alliance_remove_player(alliance2, Players(i));
-	    Player_join_alliance(i, ind);
+	player *pl2 = Players(i);
+	if (pl2->alliance == id2) {
+	    Alliance_remove_player(alliance2, pl2);
+	    Player_join_alliance(pl2, pl);
 	}
     }
     Dissolve_alliance(id2);
 }
 
-void Alliance_player_list(int ind)
+void Alliance_player_list(player *pl)
 {
-    player	*pl = Players(ind);
     int		i;
     char	msg[MSG_LEN];
 
@@ -499,33 +488,36 @@ void Alliance_player_list(int ind)
 	Set_player_message(pl, " < You are not a member of any alliance >");
     }
     else {
+	/* note: 80 is assumed to be much less than MSG_LEN */
 	if (announceAlliances) {
 	    sprintf(msg, " < Alliance %d:", pl->alliance);
 	} else {
 	    sprintf(msg, " < Your alliance: ");
 	}
 	for (i = 0; i < NumPlayers; i++) {
-	    if (Players(i)->alliance == pl->alliance) {
-		if (IS_HUMAN_IND(i)) {
+	    player *pl2 = Players(i);
+	    if (pl2->alliance == pl->alliance) {
+		if (IS_HUMAN_PTR(pl2)) {
 		    if (strlen(msg) > 80) {
 			strlcat(msg, ">", sizeof(msg));
 			Set_player_message(pl, msg);
 			strlcpy(msg, " <            ", sizeof(msg));
 		    }
-		    strlcat(msg, Players(i)->name, sizeof(msg));
+		    strlcat(msg, pl2->name, sizeof(msg));
 		    strlcat(msg, ", ", sizeof(msg));
 		}
 	    }
 	}
 	for (i = 0; i < NumPlayers; i++) {
-	    if (Players(i)->alliance == pl->alliance) {
-		if (IS_ROBOT_IND(i)) {
+	    player *pl2 = Players(i);
+	    if (pl2->alliance == pl->alliance) {
+		if (IS_ROBOT_PTR(pl2)) {
 		    if (strlen(msg) > 80) {
 			strlcat(msg, ">", sizeof(msg));
 			Set_player_message(pl, msg);
 			strlcpy(msg, " <            ", sizeof(msg));
 		    }
-		    strlcat(msg, Players(i)->name, sizeof(msg));
+		    strlcat(msg, pl2->name, sizeof(msg));
 		    strlcat(msg, ", ", sizeof(msg));
 		}
 	    }

@@ -334,7 +334,7 @@ static void Robot_default_invite(int ind, int inv_ind)
 	    }
 	}
 	if (!accept) {
-	    Refuse_alliance(ind, inv_ind);
+	    Refuse_alliance(pl, inviter);
 	    return;
 	}
     }
@@ -373,10 +373,10 @@ static void Robot_default_invite(int ind, int inv_ind)
 	}
     }
     if (accept) {
-	Accept_alliance(ind, inv_ind);
+	Accept_alliance(pl, inviter);
     }
     else {
-	Refuse_alliance(ind, inv_ind);
+	Refuse_alliance(pl, inviter);
     }
 }
 
