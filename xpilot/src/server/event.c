@@ -740,7 +740,7 @@ int Handle_keyboard(player *pl)
 	    case KEY_SELF_DESTRUCT:
 		TOGGLE_BIT(pl->status, SELF_DESTRUCT);
 		if (BIT(pl->status, SELF_DESTRUCT))
-		    pl->count = 150;
+		    pl->count = SELF_DESTRUCT_DELAY;
 		break;
 
 	    case KEY_PAUSE:

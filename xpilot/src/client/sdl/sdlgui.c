@@ -1349,7 +1349,7 @@ void Paint_meters(void)
 
 	if (destruct > 0)
 	    Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 3*spacing,
-			&meter_texs[10], destruct, 150,
+			&meter_texs[10], destruct, (int)SELF_DESTRUCT_DELAY,
 			temporaryMeterColorRGBA);
 
 	if (shutdown_count >= 0)

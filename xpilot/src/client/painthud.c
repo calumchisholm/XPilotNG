@@ -250,7 +250,7 @@ void Paint_meters(void)
 
 	if (destruct > 0)
 	    Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 60,
-			"Self destructing", destruct, 150,
+			"Self destructing", destruct, (int)SELF_DESTRUCT_DELAY,
 			temporaryMeterColor);
 
 	if (shutdown_count >= 0)

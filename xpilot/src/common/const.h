@@ -135,6 +135,8 @@ do { \
 #define MAX_STATION_FUEL	500.0
 #define TARGET_DAMAGE		250.0
 
+#define SELF_DESTRUCT_DELAY	150.0
+
 /*
  * Size (pixels) of radius for legal HIT!
  * Was 14 until 4.2. Increased due to `analytical collision detection'
