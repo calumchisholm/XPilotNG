@@ -1410,6 +1410,7 @@ int Handle_player(int id, int player_team, int mychar,
     strlcpy(other->nick_name, nick_name, sizeof(other->nick_name));
     strlcpy(other->user_name, user_name, sizeof(other->user_name));
     strlcpy(other->host_name, host_name, sizeof(other->host_name));
+    strlcpy(other->id_string, nick_name, sizeof(other->id_string));
     other->max_chars_in_names = -1;
     scoresChanged = 1;
     other->ship = Convert_shape_str(shape);
