@@ -893,10 +893,10 @@ void Options_parse(void)
 {
     int		i;
     hash_node	*np;
-    option_desc	*options;
+    option_desc	*option_descs;
     int		option_count;
 
-    options = Get_option_descs(&option_count);
+    option_descs = Get_option_descs(&option_count);
 
     /*
      * Expand a possible "-expand" option.
@@ -910,10 +910,10 @@ void Options_parse(void)
     Options_parse_FPS();
 
     for (i = 0; i < option_count; i++) {
-	np = Get_hash_node_by_name(options[i].name);
+	np = Get_hash_node_by_name(option_descs[i].name);
 	if (np == NULL)
 	    dumpcore("Could not find option hash node for option '%s'.",
-		     options[i].name);
+		     option_descs[i].name);
 	else
 	    Option_parse_node(np);
     }
