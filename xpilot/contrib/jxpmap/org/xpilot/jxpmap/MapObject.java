@@ -174,7 +174,8 @@ public abstract class MapObject extends ModelObject {
                     return true;
 
                 } else {
-                    if (evt.getID() == MouseEvent.MOUSE_PRESSED) {
+                    if (evt.getID() == MouseEvent.MOUSE_PRESSED
+                    && (me.getModifiers() & MouseEvent.BUTTON1_MASK) != 0) {
                         if (canvas.isErase()) {
                             canvas.removeMapObject(this);
                         } else if (canvas.isCopy()) {
