@@ -30,7 +30,7 @@
 <Option name="treasuresonradar" value="no"/>
 <Option name="allowshipshapes" value="yes"/>
 <Option name="itemprobmult" value="0.0000"/>
-<Option name="mapauthor" value="&quot;Blood, Samaseon and Throat&quot;"/>
+<Option name="mapauthor" value="Blood, Samaseon and Throat"/>
 <Option name="roundstoplay" value="0"/>
 <Option name="initialautopilots" value="1"/>
 <Option name="robots" value="0"/>
