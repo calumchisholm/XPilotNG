@@ -227,13 +227,17 @@ void Ball_hits_goal(ballobject *ball, int group);
 void Ball_is_replaced(ballobject *ball);
 void Ball_is_destroyed(ballobject *ball);
 bool Balltarget_hit_func(struct group *group, struct move *move);
+int Cannon_hitmask(cannon_t *cannon);
 void Cannon_restore_on_map(int ind);
 void Cannon_remove_from_map(int ind);
 bool Cannon_hit_func(struct group *group, struct move *move);
+int Target_hitmask(target_t *targ);
 void Target_init(void);
 void Target_restore_on_map(int ind);
 void Target_remove_from_map(int ind);
 bool Target_hit_func(struct group *group, struct move *move);
+void Team_immunity_init(void);
+void Groups_init(void);
 void Delete_shot(int ind);
 void Fire_laser(int ind);
 void Fire_general_laser(int ind, unsigned short team, int cx, int cy, int dir,

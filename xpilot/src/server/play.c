@@ -356,8 +356,18 @@ int Cannon_hitmask(cannon_t *cannon)
 {
     if (cannon->dead_time)
 	return ALL_BITS;
+    if (teamImmunity)
+	return HITMASK(cannon->team);
     return 0;
 }
+
+void Cannon_set_hitmask(int ind)
+{
+    cannon_t *cannon = &World.cannon[ind];
+
+    P_set_hitmask(cannon->group, Cannon_hitmask(cannon));
+}
+
 
 void Cannon_restore_on_map(int ind)
 {
@@ -526,3 +536,16 @@ bool Target_hit_func(struct group *group, struct move *move)
     return true;
 }
 #endif
+
+void Team_immunity_init(void)
+{
+    P_grouphack(CANNON, Cannon_set_hitmask);
+}
+
+
+/* kps - called at server startup to initialize hit masks */
+void Groups_init(void)
+{
+    Target_init();
+    Team_immunity_init();
+}

@@ -1377,7 +1377,7 @@ static option_desc options[] = {
 	"yes",
 	&teamImmunity,
 	valBool,
-	tuner_dummy,
+	Team_immunity_init,
 	"Should other team members be immune to various shots thrust etc.?\n"
 	"This works for alliances too.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE

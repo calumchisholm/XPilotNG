@@ -240,13 +240,15 @@ void P_end_balltarget(void)
 
 int P_start_target(int team, int ind)
 {
+    target_t *targ = &World.targets[ind];
+
     current_group = ++num_groups;
     groups[current_group].type = TARGET;
     groups[current_group].team = team;
-    groups[current_group].hit_mask = HITMASK(team);
+    groups[current_group].hit_mask = Target_hitmask(targ);
     groups[current_group].hit_func = NULL /*Target_hit_func*/;
     groups[current_group].item_id = ind;
-    World.targets[ind].group = current_group;
+    targ->group = current_group;
     return current_group;
 }
 
@@ -257,13 +259,15 @@ void P_end_target(void)
 
 int P_start_cannon(int team, int ind)
 {
+    cannon_t *cannon = &World.cannon[ind];
+
     current_group = ++num_groups;
     groups[current_group].type = CANNON;
     groups[current_group].team = team;
-    groups[current_group].hit_mask = 0 /*HITMASK(team)*/;
+    groups[current_group].hit_mask = Cannon_hitmask(cannon);
     groups[current_group].hit_func = Cannon_hit_func;
     groups[current_group].item_id = ind;
-    World.cannon[ind].group = current_group;
+    cannon->group = current_group;
     return current_group;
 }
 
@@ -349,7 +353,11 @@ int P_get_poly_id(const char *s)
     return -1;
 }
 
-/* kps - which group numbers are ok ???
+/*
+ * Call given function f with group item id as argument for
+ * all groups of grouptype type.
+ *
+ * kps - which group numbers are ok ???
  * Is it 1 to num_groups ???
  */
 void P_grouphack(int type, void (*f)(int))
