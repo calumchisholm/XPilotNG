@@ -246,7 +246,7 @@ int Process_event(SDL_Event *evt)
     }
     
     if (mouseMovement) {
-	Send_pointer_move(mouseMovement);
+	Client_pointer_move(mouseMovement);
 	Net_flush();
     }
     return 1;

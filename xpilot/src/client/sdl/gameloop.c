@@ -39,18 +39,28 @@ void Game_loop(void)
         FD_SET(netfd, &rfds);
         tv.tv_sec = 0;
         tv.tv_usec = 5000; /* wait max 5 ms */
+
+	/*
+	 * don't bother about return value, since we wait only 5 ms anyway
+	 */
+	if (maxMouseTurnsPS > 0)
+	    Client_check_pointer_move_interval();
+
         n = select(netfd + 1, &rfds, NULL, NULL, &tv);
 	if (n == -1) {
-            error("Select failed");
-            break;
+	    if (errno == EINTR)
+		continue;
+	    error("Select failed");
+	    return;
         }
 	if (n > 0) {
 	    if (Net_input() == -1) {
-		error("Bad net input");
-		break;
+		warn("Bad net input.  Have a nice day!");
+		return;
 	    }
 	}
-	while(SDL_PollEvent(&evt)) 
+	while (SDL_PollEvent(&evt)) 
 	    Process_event(&evt);
     }
 }
+

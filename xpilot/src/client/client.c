@@ -2371,20 +2371,25 @@ int Client_pointer_move(int movement)
     return 0;
 }
 
+/*
+ * Check if there is any pointer move we need to send to server.
+ * Returns how many microseconds to wait in select().
+ */
 int Client_check_pointer_move_interval(void)
 {
     struct timeval now;
     static int last_send_interval_num = -1;
     int interval_num; /* 0 ... maxMouseTurnsPS - 1 */
     int next_interval_start;
+
+    assert(maxMouseTurnsPS > 0);
+
     /*
      * Let's see if we've sent any pointer move this interval,
      * if not and there is something to send, do that now.
      */
     gettimeofday(&now, NULL);
     interval_num = ((int)now.tv_usec) / mouseMovementInterval;
-
-    /* if we didn't send mouse movement yet, send now */
     if (interval_num != last_send_interval_num
 	&& cumulativeMouseMovement != 0) {
 	Send_pointer_move(cumulativeMouseMovement);
