@@ -494,7 +494,7 @@ static option_desc opts[] = {
     {
 	"noQuit",
 	"noQuit",
-	"true",
+	"false",
 	&options.NoQuit,
 	valBool,
 	tuner_dummy,
