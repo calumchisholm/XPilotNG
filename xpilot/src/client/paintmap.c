@@ -107,7 +107,7 @@ void Paint_vbase(void)
 	    Base_info_by_pos(vbase_ptr[i].xi, vbase_ptr[i].yi, &id, &team);
 	    Gui_paint_base(vbase_ptr[i].x, vbase_ptr[i].y, id, team,
 			   vbase_ptr[i].type);
-	    if (baseWarningType & 1) {
+	    if ((baseWarningType & 1) && id != -1) {
 		for (j = 0; j < num_bases; j++) {
 		    if (bases[j].id == id &&
 			bases[j].deathtime > loops - baseWarningFrames)
@@ -230,6 +230,7 @@ void Paint_objects(void)
                      bases[i].type);
 
 		if ((baseWarningType & 1)
+		    && bases[i].id != -1
 		    && bases[i].deathtime > loops - baseWarningFrames) {
 		    Gui_paint_appearing(
 			bases[i].bounds.x + xoff * Setup->width + BLOCK_SZ / 2,
