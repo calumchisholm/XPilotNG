@@ -94,13 +94,12 @@ keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
 	memset(str, 0, sizeof str);
 	count = XLookupString(&event->xkey, str, 1, &ks, &compose);
 	if (count == NoSymbol)
-	    printf("Unknown keysym: 0x%03lx", ks);
+	    warn("Unknown keysym: 0x%03lx.", ks);
 	else {
-	    printf("No action bound to keysym 0x%03lx", ks);
+	    warn("No action bound to keysym 0x%03lx.", ks);
 	    if (*str)
-		printf(", which is key \"%s\"", str);
+		warn("(which is key \"%s\")", str);
 	}
-	printf("\n");
     }
 #endif
 
