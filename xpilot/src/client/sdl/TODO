@@ -27,7 +27,7 @@ Task:
   Text/font handling. OpenGL does not provide any easy way to draw text.
   My propose is to use bitmaps for each character and implement a function
   that uses those bitmaps to draw text.
-Developer:
+Developer: Colonel & Mara (whoever gets around to it first)
 
 Task:
   Talk window. This task depends on the text/font handling task.
