@@ -739,6 +739,7 @@ static void Frame_shots(int conn, int ind)
 {
     player			*pl = Players[ind];
     int				cx, cy;
+    int				lcx, lcy, ldir;
     int				i, k, color;
     int				fuzz = 0, teamshot, len;
     int				obj_count;
@@ -760,8 +761,26 @@ static void Frame_shots(int conn, int ind)
 	shot = obj_list[i];
 	cx = shot->pos.cx;
 	cy = shot->pos.cy;
-	if (!click_inview(&cv, cx, cy)) {
-	    continue;
+
+	/* laserhack */
+	if (shot->type != OBJ_PULSE) {
+	    if (!click_inview(&cv, cx, cy))
+		continue;
+	} else {
+	    pulseobject *pulse = PULSE_PTR(shot);
+
+	    /* this is ugly, but seems to work */
+	    if (click_inview(&cv, cx, cy)) {
+		lcx = cx;
+		lcy = cy;
+		ldir = MOD2(pulse->dir + RES/2, RES);
+	    } else {
+		lcx = WRAP_XCLICK(cx - tcos(pulse->dir) * pulse->len);
+		lcy = WRAP_YCLICK(cy - tsin(pulse->dir) * pulse->len);
+		ldir = pulse->dir;
+		if (!click_inview(&cv, lcx, lcy))
+		    continue;
+	    }
 	}
 	if ((color = shot->color) == BLACK) {
 	    xpprintf("black %d,%d\n", shot->type, shot->id);
@@ -934,7 +953,7 @@ static void Frame_shots(int conn, int ind)
 		} else {
 		    color = RED;
 		}
-		Send_laser(conn, color, cx, cy, pulse->len, pulse->dir);
+		Send_laser(conn, color, lcx, lcy, pulse->len, ldir);
 	    }
 	break;
 	default:
@@ -948,46 +967,8 @@ static void Frame_ships(int conn, int ind)
 {
     player			*pl = Players[ind],
 				*pl_i;
-#if 0
-    pulse_t			*pulse;
-#endif
     int				i, j, k, color, dir, cx = -1, cy = -1;
 
-#if 0 /* laserhack */
-    for (j = 0; j < NumPulses; j++) {
-	pulse = Pulses[j];
-	if (pulse->len <= 0) {
-	    continue;
-	}
-	cx = WRAP_XCLICK(pulse->pos.cx);
-	cy = WRAP_YCLICK(pulse->pos.cy);
-
-	if (click_inview(&cv, cx, cy)) {
-	    dir = pulse->dir;
-	} else {
-	    cx += tcos(pulse->dir) * pulse->len;
-	    cy += tsin(pulse->dir) * pulse->len;
-	    cx = WRAP_XCLICK(cx);
-	    cy = WRAP_YCLICK(cy);
-
-	    if (click_inview(&cv, cx, cy)) {
-		dir = MOD2(pulse->dir + RES/2, RES);
-	    }
-	    else {
-		continue;
-	    }
-	}
-	if (Team_immune(pulse->id, pl->id)) {
-	    color = BLUE;
-	} else if (pulse->id == pl->id
-	    && selfImmunity) {
-	    color = BLUE;
-	} else {
-	    color = RED;
-	}
-	Send_laser(conn, color, cx, cy, pulse->len, dir);
-    }
-#endif
     for (i = 0; i < NumEcms; i++) {
 	ecm_t *ecm = Ecms[i];
 	Send_ecm(conn, ecm->pos.cx, ecm->pos.cy, (int)ecm->size);
