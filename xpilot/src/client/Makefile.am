@@ -18,7 +18,7 @@ xpilot_SOURCES = \
 	paintmacros.h paintmap.c paintobjects.c paintradar.c protoclient.h \
 	query.c \
 	record.c record.h recordfmt.h \
-	shipshape_c.c sim.c simbloods.h syslimit.c \
+	sim.c simbloods.h syslimit.c \
 	talk.c talk.h talkmacros.c textinterface.c texture.c texture.h \
 	usleep.c \
 	welcome.c widget.c widget.h \

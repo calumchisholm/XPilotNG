@@ -48,7 +48,7 @@ SRCS = \
 	parser.c play.c player.c polygon.c \
 	rank.c recwrap.c robot.c robotdef.c rules.c \
 	saudio.c sched.c score.c server.c \
-	ship.c shipshape_s.c shot.c showtime.c srecord.c \
+	ship.c shot.c showtime.c srecord.c \
 	tuner.c update.c walls.c walls_old.c wildmap.c xpmap.c xp2map.c
 
 # keep this variable consistent with its counterpart in ../Makefile.std
@@ -62,7 +62,7 @@ OBJS = \
 	parser.o play.o player.o polygon.o \
 	rank.o recwrap.o robot.o robotdef.o rules.o \
 	saudio.o sched.o score.o server.o \
-	ship.o shipshape_s.o shot.o showtime.o srecord.o  \
+	ship.o shot.o showtime.o srecord.o  \
 	tuner.o update.o walls.o walls_old.o wildmap.o xpmap.o xp2map.o
 
 DEPLIBS = $(COMMON)libxpcommon.a 

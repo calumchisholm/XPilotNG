@@ -18,7 +18,7 @@ xpilots_SOURCES = \
 	rank.c rank.h recwrap.c recwrap.h \
 	robot.c robot.h robotdef.c rules.c \
 	saudio.c saudio.h sched.c sched.h score.c score.h \
-	server.c server.h serverconst.h ship.c shipshape_s.c shot.c \
+	server.c server.h serverconst.h ship.c shot.c \
 	showtime.c srecord.c srecord.h \
 	tuner.c tuner.h \
 	update.c \

@@ -130,7 +130,7 @@ xpilots_SOURCES = \
 	rank.c rank.h recwrap.c recwrap.h \
 	robot.c robot.h robotdef.c rules.c \
 	saudio.c saudio.h sched.c sched.h score.c score.h \
-	server.c server.h serverconst.h ship.c shipshape_s.c shot.c \
+	server.c server.h serverconst.h ship.c shot.c \
 	showtime.c srecord.c srecord.h \
 	tuner.c tuner.h \
 	update.c \
@@ -158,11 +158,10 @@ am_xpilots_OBJECTS = alliance.$(OBJEXT) asteroid.$(OBJEXT) \
 	polygon.$(OBJEXT) rank.$(OBJEXT) recwrap.$(OBJEXT) \
 	robot.$(OBJEXT) robotdef.$(OBJEXT) rules.$(OBJEXT) \
 	saudio.$(OBJEXT) sched.$(OBJEXT) score.$(OBJEXT) \
-	server.$(OBJEXT) ship.$(OBJEXT) shipshape_s.$(OBJEXT) \
-	shot.$(OBJEXT) showtime.$(OBJEXT) srecord.$(OBJEXT) \
-	tuner.$(OBJEXT) update.$(OBJEXT) walls.$(OBJEXT) \
-	walls_old.$(OBJEXT) wildmap.$(OBJEXT) xp2map.$(OBJEXT) \
-	xpmap.$(OBJEXT)
+	server.$(OBJEXT) ship.$(OBJEXT) shot.$(OBJEXT) \
+	showtime.$(OBJEXT) srecord.$(OBJEXT) tuner.$(OBJEXT) \
+	update.$(OBJEXT) walls.$(OBJEXT) walls_old.$(OBJEXT) \
+	wildmap.$(OBJEXT) xp2map.$(OBJEXT) xpmap.$(OBJEXT)
 xpilots_OBJECTS = $(am_xpilots_OBJECTS)
 xpilots_DEPENDENCIES = $(top_builddir)/src/common/libxpcommon.a
 xpilots_LDFLAGS =
@@ -187,12 +186,12 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/robotdef.Po ./$(DEPDIR)/rules.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/saudio.Po ./$(DEPDIR)/sched.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/score.Po ./$(DEPDIR)/server.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/ship.Po ./$(DEPDIR)/shipshape_s.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/shot.Po ./$(DEPDIR)/showtime.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/srecord.Po ./$(DEPDIR)/tuner.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/update.Po ./$(DEPDIR)/walls.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/walls_old.Po ./$(DEPDIR)/wildmap.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/xp2map.Po ./$(DEPDIR)/xpmap.Po
+@AMDEP_TRUE@	./$(DEPDIR)/ship.Po ./$(DEPDIR)/shot.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/showtime.Po ./$(DEPDIR)/srecord.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/tuner.Po ./$(DEPDIR)/update.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/walls.Po ./$(DEPDIR)/walls_old.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/wildmap.Po ./$(DEPDIR)/xp2map.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/xpmap.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
@@ -279,7 +278,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/score.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ship.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shipshape_s.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shot.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/showtime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/srecord.Po@am__quote@

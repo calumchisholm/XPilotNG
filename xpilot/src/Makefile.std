@@ -221,7 +221,7 @@ OBJS1 = about.o bitmaps.o \
 	gfx2d.o gfx3d.o guimap.o guiobjects.o \
 	ignore.o join.o mapdata.o messages.o netclient.o \
 	paint.o paintdata.o painthud.o paintmap.o \
-	paintobjects.o paintradar.o query.o record.o shipshape_c.o sim.o \
+	paintobjects.o paintradar.o query.o record.o sim.o \
 	syslimit.o talk.o talkmacros.o textinterface.o texture.o \
 	usleep.o welcome.o widget.o xeventhandlers.o \
 	xevent.o xinit.o xpilot.o xpmread.o \
@@ -232,7 +232,7 @@ SRCS1 = about.c bitmaps.c \
 	gfx2d.c gfx3d.c guimap.c guiobjects.c \
 	ignore.c join.c mapdata.c messages.c netclient.c \
 	paint.c paintdata.c painthud.c paintmap.c \
-	paintobjects.c paintradar.c query.c record.c shipshape_c.c sim.c \
+	paintobjects.c paintradar.c query.c record.c sim.c \
 	syslimit.c talk.c talkmacros.c textinterface.c texture.c \
 	usleep.c welcome.c widget.c xeventhandlers.c \
 	xevent.c xinit.c xpilot.c xpmread.c \
@@ -250,7 +250,7 @@ OBJS2 = alliance.o asteroid.o auth.o cannon.o cell.o cmdline.o \
 	parser.o play.o player.o polygon.o \
 	rank.o recwrap.o robot.o  robotdef.o rules.o \
 	saudio.o sched.o score.o server.o \
-	ship.o shipshape_s.o shot.o showtime.o srecord.o \
+	ship.o shot.o showtime.o srecord.o \
 	tuner.o \
 	update.o walls.o walls_old.o wildmap.o xpmap.o xp2map.o
 SRCS2 = alliance.c asteroid.c auth.c cannon.c cell.c cmdline.c \
@@ -262,7 +262,7 @@ SRCS2 = alliance.c asteroid.c auth.c cannon.c cell.c cmdline.c \
 	parser.c play.c player.c polygon.c \
 	rank.c recwrap.c robot.c  robotdef.c rules.c \
 	saudio.c sched.c score.c server.c \
-	ship.c shipshape_s.c shot.c showtime.c srecord.c \
+	ship.c shot.c showtime.c srecord.c \
 	tuner.c \
 	update.c walls.c walls_old.c wildmap.c xpmap.c xp2map.c
 
@@ -535,7 +535,10 @@ strlcpy.o: strlcpy.c xpcommon.h version.h xpconfig.h astershape.h types.h \
   bit.h checknames.h commonproto.h const.h draw.h ../server/click.h \
   error.h item.h list.h net.h socklib.h pack.h packet.h portability.h \
   rules.h setup.h wreckshape.h
-xpmemory.o: xpmemory.c error.h commonproto.h types.h
+xpmemory.o: xpmemory.c xpcommon.h version.h xpconfig.h astershape.h \
+  types.h bit.h checknames.h commonproto.h const.h draw.h \
+  ../server/click.h error.h item.h list.h net.h socklib.h pack.h packet.h \
+  portability.h rules.h setup.h wreckshape.h
 about.o: about.c xpclient.h ../common/xpcommon.h ../common/version.h \
   ../common/xpconfig.h ../common/astershape.h ../common/types.h \
   ../common/bit.h ../common/checknames.h ../common/commonproto.h \
@@ -860,18 +863,6 @@ record.o: record.c xpclient.h ../common/xpcommon.h ../common/version.h \
   guiobjects.h ignore.h netclient.h paint.h paintdata.h paintmacros.h \
   protoclient.h record.h recordfmt.h talk.h texture.h widget.h xevent.h \
   xeventhandlers.h xinit.h xpmread.h
-shipshape_c.o: shipshape_c.c xpclient.h ../common/xpcommon.h \
-  ../common/version.h ../common/xpconfig.h ../common/astershape.h \
-  ../common/types.h ../common/bit.h ../common/checknames.h \
-  ../common/commonproto.h ../common/const.h ../common/draw.h \
-  ../server/click.h ../common/error.h ../common/item.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h ../common/packet.h \
-  ../common/portability.h ../common/rules.h ../common/setup.h \
-  ../common/wreckshape.h ../common/keys.h bitmaps.h gfx2d.h client.h \
-  clientrank.h configure.h connectparam.h datagram.h dbuff.h default.h \
-  gfx3d.h guimap.h guiobjects.h ignore.h netclient.h paint.h paintdata.h \
-  paintmacros.h protoclient.h record.h recordfmt.h talk.h texture.h \
-  widget.h xevent.h xeventhandlers.h xinit.h xpmread.h
 sim.o: sim.c
 syslimit.o: syslimit.c xpclient.h ../common/xpcommon.h \
   ../common/version.h ../common/xpconfig.h ../common/astershape.h \
@@ -1423,17 +1414,6 @@ ship.o: ship.c xpserver.h ../common/xpcommon.h ../common/version.h \
   serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
   objpos.h proto.h recwrap.h robot.h saudio.h sched.h score.h server.h \
   srecord.h tuner.h walls.h
-shipshape_s.o: shipshape_s.c xpserver.h ../common/xpcommon.h \
-  ../common/version.h ../common/xpconfig.h ../common/astershape.h \
-  ../common/types.h ../common/bit.h ../common/checknames.h \
-  ../common/commonproto.h ../common/const.h ../common/draw.h \
-  ../server/click.h ../common/error.h ../common/item.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h ../common/packet.h \
-  ../common/portability.h ../common/rules.h ../common/setup.h \
-  ../common/wreckshape.h asteroid.h auth.h cannon.h click.h connection.h \
-  defaults.h global.h object.h serverconst.h ../common/keys.h rank.h \
-  map.h metaserver.h netserver.h objpos.h proto.h recwrap.h robot.h \
-  saudio.h sched.h score.h server.h srecord.h tuner.h walls.h
 shot.o: shot.c xpserver.h ../common/xpcommon.h ../common/version.h \
   ../common/xpconfig.h ../common/astershape.h ../common/types.h \
   ../common/bit.h ../common/checknames.h ../common/commonproto.h \
