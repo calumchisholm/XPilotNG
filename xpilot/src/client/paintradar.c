@@ -66,7 +66,7 @@ static void Copy_static_radar(void)
 
 
 #ifdef _WINDOWS
-static void Windows_copy_sliding_radar(float xf, float yf)
+static void Windows_copy_sliding_radar(double xf, double yf)
 {
     slidingradar_x = (int)((pos.x * xf + 0.5) + 128) % 256;
     slidingradar_y = (RadarHeight - (int)(pos.y * yf + 0.5)
@@ -97,7 +97,7 @@ static void Windows_copy_sliding_radar(float xf, float yf)
 #endif
 
 
-static void Paint_checkpoint_radar(float xf, float yf)
+static void Paint_checkpoint_radar(double xf, double yf)
 {
     int			x, y;
     XPoint		points[5];
@@ -139,7 +139,7 @@ static void Paint_checkpoint_radar(float xf, float yf)
     }
 }
 
-static void Paint_self_radar(float xf, float yf)
+static void Paint_self_radar(double xf, double yf)
 {
     int		x, y, x_1, y_1, xw, yw;
 
@@ -221,8 +221,8 @@ static void Paint_objects_radar(void)
 
 void Paint_radar(void)
 {
-    const float		xf = 256.0f / (float)Setup->width,
-			yf = (float)RadarHeight / (float)Setup->height;
+    const double	xf = 256.0 / (double)Setup->width,
+			yf = (double)RadarHeight / (double)Setup->height;
 
     if (radar_exposures == 0)
 	return;
@@ -286,7 +286,7 @@ void Paint_sliding_radar(void)
  */
 static void Paint_radar_block(int xi, int yi, int color)
 {
-    float	xs, ys;
+    double	xs, ys;
     int		xp, yp, xw, yw;
 
     if (radarPixmap2 == radarPixmap) {
@@ -295,14 +295,14 @@ static void Paint_radar_block(int xi, int yi, int color)
     XSetForeground(dpy, radarGC, colors[color].pixel);
 
     if (Setup->x >= 256) {
-	xs = (float)(256 - 1) / (Setup->x - 1);
-	ys = (float)(RadarHeight - 1) / (Setup->y - 1);
+	xs = (double)(256 - 1) / (Setup->x - 1);
+	ys = (double)(RadarHeight - 1) / (Setup->y - 1);
 	xp = (int)(xi * xs + 0.5);
 	yp = RadarHeight - 1 - (int)(yi * ys + 0.5);
 	XDrawPoint(dpy, radarPixmap2, radarGC, xp, yp);
     } else {
-	xs = (float)(Setup->x - 1) / (256 - 1);
-	ys = (float)(Setup->y - 1) / (RadarHeight - 1);
+	xs = (double)(Setup->x - 1) / (256 - 1);
+	ys = (double)(Setup->y - 1) / (RadarHeight - 1);
 	/*
 	 * Calculate the min and max points on the radar that would show
 	 * block position `xi' and `yi'.  Note `xp' is the minimum x coord
@@ -332,7 +332,7 @@ static void Paint_world_radar_old(void)
     int			xmoff, xioff;
     int			type, vis;
     double		damage;
-    float		xs, ys;
+    double		xs, ys;
     int			npoint = 0, nsegment = 0;
     int			start, end;
     int			currColor, visibleColorChange;
@@ -419,8 +419,8 @@ static void Paint_world_radar_old(void)
      * different segments and points arrays for each visible color.
      */
     if (Setup->x >= 256) {
-	xs = (float)(256 - 1) / (Setup->x - 1);
-	ys = (float)(RadarHeight - 1) / (Setup->y - 1);
+	xs = (double)(256 - 1) / (Setup->x - 1);
+	ys = (double)(RadarHeight - 1) / (Setup->y - 1);
 	currColor = -1;
 	for (xi = 0; xi < Setup->x; xi++) {
 	    start = end = -1;
@@ -503,8 +503,8 @@ static void Paint_world_radar_old(void)
 	    }
 	}
     } else {
-	xs = (float)(Setup->x - 1) / (256 - 1);
-	ys = (float)(Setup->y - 1) / (RadarHeight - 1);
+	xs = (double)(Setup->x - 1) / (256 - 1);
+	ys = (double)(Setup->y - 1) / (RadarHeight - 1);
 	currColor = -1;
 	for (xi = 0; xi < 256; xi++) {
 	    xm = (int)(xi * xs + 0.5);
