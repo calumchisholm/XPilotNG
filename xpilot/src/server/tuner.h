@@ -37,7 +37,7 @@ void tuner_worldlives(void);
 void tuner_cannonsmartness(void);
 void tuner_teamcannons(void);
 void tuner_cannonsuseitems(void);
-void tuner_wormtime(void);
+void tuner_wormhole_stable_ticks(void);
 void tuner_modifiers(void);
 void tuner_gameduration(void);
 void tuner_racelaps(void);

@@ -435,7 +435,7 @@ static void Verify_wormhole_consistency(world_t *world)
 	world->NumWormholes = 0;
     }
 
-    if (!options.wormTime) {
+    if (!options.wormholeStableTicks) {
 	for (i = 0; i < world->NumWormholes; i++) {
 	    int j = (int)(rfrac() * world->NumWormholes);
 
@@ -886,7 +886,7 @@ void add_temp_wormholes(world_t *world, int xin, int yin, int xout, int yout)
 
     inhole.pos.cx = BLOCK_CENTER(xin);
     inhole.pos.cy = BLOCK_CENTER(yin);
-    inhole.countdown = options.wormTime;
+    inhole.countdown = options.wormholeStableTicks;
     inhole.lastdest = world->NumWormholes + 1;
     inhole.temporary = true;
     inhole.type = WORM_IN;
@@ -898,7 +898,7 @@ void add_temp_wormholes(world_t *world, int xin, int yin, int xout, int yout)
 
     outhole.pos.cx = BLOCK_CENTER(xout);
     outhole.pos.cy = BLOCK_CENTER(yout);
-    outhole.countdown = options.wormTime;
+    outhole.countdown = options.wormholeStableTicks;
     outhole.temporary = true;
     outhole.type = WORM_OUT;
     outhole.lastblock = world->block[xout][yout];

@@ -928,8 +928,7 @@ static void Traverse_wormhole(player_t *pl)
     if (wh_dest != pl->wormHoleHit) {
 	wh_hit->lastdest = wh_dest;
 	if (!world->wormholes[wh_dest].temporary)
-	    wh_hit->countdown
-		= options.wormTime > 0 ? options.wormTime : WORMCOUNT;
+	    wh_hit->countdown = options.wormholeStableTicks;
     }
 
     CLR_BIT(pl->status, WARPING);
@@ -967,8 +966,11 @@ static void Hyperjump(player_t *pl)
 	return;
     }
 
-    if (options.wormTime)
+#if 0
+    /* kps - we need a option warpingCreatesWormhole or such */
+    if (options.wormholeStableTicks > 0)
 	World_add_temporary_wormholes(world, pl->pos, dest);
+#endif
 
     sound_play_sensors(pl->pos, HYPERJUMP_SOUND);
 

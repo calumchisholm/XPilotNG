@@ -1572,13 +1572,14 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-	"wormTime",
-	"wormTime",
-	"0",
-	&options.wormTime,
-	valSec,
-	tuner_wormtime,
-	"Number of seconds wormholes will remain stable.\n",
+	"wormholeStableTicks",
+	"wormholeStableTicks",
+	"64.0",
+	&options.wormholeStableTicks,
+	valReal,
+	tuner_wormhole_stable_ticks,
+	"Number of ticks wormholes will remain stable.\n"
+	"Replaces option wormTime.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {

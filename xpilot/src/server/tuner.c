@@ -141,6 +141,7 @@ void tuner_teamcannons(void)
     if (options.teamCannons) {
 	for (i = 0; i < world->NumCannons; i++) {
 	    cannon_t *cannon = Cannons(world, i);
+
 	    team = Find_closest_team(world, cannon->pos);
 	    if (team == TEAM_NOT_SET)
 		warn("Couldn't find a matching team for the cannon.");
@@ -173,26 +174,16 @@ void tuner_cannonsuseitems(void)
     }
 }
 
-void tuner_wormtime(void)
+void tuner_wormhole_stable_ticks(void)
 {
     int i;
     world_t *world = &World;
 
-    if (options.wormTime < 0)
-	options.wormTime = 0;
+    if (options.wormholeStableTicks < 0.0)
+	options.wormholeStableTicks = 0.0;
 
-    if (options.wormTime) {
-	for (i = 0; i < world->NumWormholes; i++)
-	    Wormholes(world, i)->countdown = options.wormTime;
-    }
-    else {
-	for (i = 0; i < world->NumWormholes; i++) {
-	    if (Wormholes(world, i)->temporary)
-		remove_temp_wormhole(world, i);
-	    else
-		Wormholes(world, i)->countdown = WORMCOUNT;
-	}
-    }
+    for (i = 0; i < world->NumWormholes; i++)
+	Wormholes(world, i)->countdown = options.wormholeStableTicks;
 }
 
 void tuner_modifiers(void)
@@ -208,9 +199,9 @@ void tuner_modifiers(void)
 void tuner_gameduration(void)
 {
     if (options.gameDuration <= 0.0)
-	gameOverTime = time((time_t *) NULL);
+	gameOverTime = time(NULL);
     else
-	gameOverTime = (time_t) (options.gameDuration * 60) + time((time_t *) NULL);
+	gameOverTime = (time_t) (options.gameDuration * 60) + time(NULL);
 }
 
 void tuner_racelaps(void)

@@ -223,7 +223,7 @@ extern struct options {
     bool	wormholeVisible;
     bool	itemConcentratorVisible;
     bool	asteroidConcentratorVisible;
-    int		wormTime;
+    double	wormholeStableTicks;
     char	*defaultsFileName;
     char	*passwordFileName;
     int		nukeMinSmarts;
