@@ -1284,7 +1284,7 @@ xp_option_t guimap_options[] = {
 
     COLOR_INDEX_OPTION(
 	"fuelColor",
-	5,
+	3,
 	&fuelColor,
 	"Which color number to use for drawing fuel stations.\n"),
 

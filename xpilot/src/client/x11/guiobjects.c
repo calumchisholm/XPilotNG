@@ -549,7 +549,7 @@ void Gui_paint_appearing(int x, int y, int id, int count)
     int color = other ? Life_color(other) : 0;
 
     if (!color)
-	color = RED;
+	color = WHITE;
 
     /* Make a note we are doing the base warning */
     if (version >= 0x4F12) {
@@ -1116,7 +1116,7 @@ static xp_option_t guiobject_options[] = {
 
     COLOR_INDEX_OPTION(
 	"zeroLivesColor",
-	3,
+	5,
 	&zeroLivesColor,
 	"Which color to associate with ships with zero lives left.\n"
 	"This can be used to paint for example ship and base names.\n"),
