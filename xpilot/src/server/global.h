@@ -235,6 +235,7 @@ extern char             *password;
 extern int              numberOfRounds;
 extern int              playerLimit;
 extern int              recordMode;
+extern int              constantScoring;
 
 #endif
 

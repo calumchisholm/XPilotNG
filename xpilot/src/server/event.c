@@ -205,12 +205,14 @@ int Player_lock_closest(int ind, int next)
     for (i = 0; i < NumPlayers; i++) {
 	if (i == lock
 	    || (BIT(Players[i]->status, PLAYING|PAUSE|GAME_OVER) != PLAYING)
-	    || !Player_lock_allowed(ind, i)
-	    || TEAM(ind,i)) {
+	    || !Player_lock_allowed(ind, i)) {
 	    continue;
 	}
-	l = Wrap_length(Players[i]->pos.cx - pl->pos.cx,
-			 Players[i]->pos.cy - pl->pos.cy);
+	if (TEAM(ind,i))
+	    l = FLT_MAX / 2;
+	else	    
+	    l = Wrap_length(Players[i]->pos.cx - pl->pos.cx,
+			    Players[i]->pos.cy - pl->pos.cy);
 	if (l >= dist && l < best) {
 	    best = l;
 	    newpl = i;
@@ -243,6 +245,7 @@ void Pause_player(int ind, int onoff)
 	updateScores = true;
 	if (BIT(pl->have, OBJ_BALL))
 	    Detach_ball(ind, -1);
+	Player_lock_closest(ind, 0);
     }
     else if (onoff == 0 && BIT(pl->status, PAUSE)) { /* Turn pause mode off */
 	if (pl->count <= 0) {
@@ -257,7 +260,7 @@ void Pause_player(int ind, int onoff)
 		    if (i == ind) {
 			continue;
 		    }
-		    if (Players[i]->life < World.rules->lives && !TEAM(ind, i)) {
+		    if (Players[i]->life < World.rules->lives && !TEAM(ind, i) && !BIT(Players[i]->status, PAUSE)) {
 			toolate = true;
 			break;
 		    }

@@ -203,11 +203,6 @@ extern DFLOAT		tbl_cos[];
 /*
  * Used where we wish to know if a player is simply on the same team.
  */
-/* #define TEAM(i, j)							\
-	(BIT(Players[i]->status|Players[j]->status, PAUSE)		\
-	|| (BIT(World.rules->mode, TEAM_PLAY)				\
-	   && (Players[i]->team == Players[j]->team)			\
-	   && (Players[i]->team != TEAM_NOT_SET))) */
 #define TEAM(i, j) \
 	(BIT(World.rules->mode, TEAM_PLAY) \
 	&& (Players[i]->team == Players[j]->team) \

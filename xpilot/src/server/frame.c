@@ -1010,26 +1010,16 @@ void Frame_update(void)
 	}
 	/*
 	 * If status is GAME_OVER or PAUSE'd, the user may look through the
-	 * other players 'eyes'.  If PAUSE'd this only works on team members.
-	 * We can't use TEAM() macro as PAUSE'd players are always on
-	 * equivalent teams.
+	 * other players 'eyes'. lockOtherTeam determines whether you can
+	 * watch opponents while your own team is still alive (potentially
+	 * giving information to your team).
 	 *
 	 * This is done by using two indexes, one
 	 * determining which data should be used (ind, set below) and
 	 * one determining which connection to send it to (conn).
 	 */
-	if (BIT(pl->lock.tagged, LOCK_PLAYER)) {
-	    if ((BIT(pl->status, (GAME_OVER|PLAYING)) == (GAME_OVER|PLAYING))
-		|| (BIT(pl->status, PAUSE) &&
-		    ((BIT(World.rules->mode, TEAM_PLAY)
-		      && pl->team != TEAM_NOT_SET
-		      && pl->team == Players[GetInd[pl->lock.pl_id]]->team)
-		    || pl->isowner
-		    || allowViewing))) {
-		ind = GetInd[pl->lock.pl_id];
-	    } else {
-		ind = i;
-	    }
+	if (BIT(pl->lock.tagged, LOCK_PLAYER) && (BIT(pl->status, (GAME_OVER|PLAYING)) == (GAME_OVER|PLAYING) || BIT(pl->status, PAUSE))) {
+	    ind = GetInd[pl->lock.pl_id];
 	} else {
 	    ind = i;
 	}

@@ -419,6 +419,8 @@ int Rate(int winner, int loser)
 {
     int t;
 
+    if (constantScoring)
+	return RATE_SIZE / 2;
     t = ((RATE_SIZE / 2) * RATE_RANGE) / (ABS(loser - winner) + RATE_RANGE);
     if (loser > winner)
 	t = RATE_SIZE - t;

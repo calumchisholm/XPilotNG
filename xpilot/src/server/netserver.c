@@ -206,11 +206,11 @@ char *showtime(void)
  * We only setup this structure once to save time when new
  * players log in during play.
  */
-int Polys_to_client(int *);
+int Polys_to_client(char *);
 static int Init_setup(void)
 {
-    int			size;
-    unsigned char	*mapdata;
+    int		size;
+    char	*mapdata;
 # if 0
     int                 i, x, y, team, type,
 			wormhole = 0,
@@ -2586,6 +2586,33 @@ static void Send_all_info(player *pl)
   }
 }
 
+static void Set_swapper_state(int ind)
+{
+    player *pl = Players[ind];
+    int i;
+
+    if (BIT(pl->have, OBJ_BALL))
+	Detach_ball(ind, -1);
+
+    if(BIT(pl->status, PAUSE)) {
+	Go_home(ind);
+    }
+    else if (BIT(pl->mode, LIMITED_LIVES))
+	for (i = 0; i < NumPlayers; i++)
+	    if (!TEAM(ind, i) && !BIT(Players[i]->status,PAUSE)) {
+		if (pl->mychar == ' ')
+		    pl->mychar	= 'W';
+		pl->prev_life = pl->life = 0;
+		SET_BIT(pl->status, GAME_OVER);
+		CLR_BIT(pl->status, SELF_DESTRUCT);
+		pl->count=-1;
+		Go_home(ind);
+		break;
+	    }
+    Player_lock_closest(ind, 0);
+}
+    
+
 static void Swap_team(int ind, char *args)
 {
     int      i, team;
@@ -2609,23 +2636,11 @@ static void Swap_team(int ind, char *args)
 	else if (World.teams[team].NumBases - World.teams[team].NumMembers > 0) {
 	    sprintf(msg,"%s has swapped to team %d.",pl->name,team);
 	    Set_message(msg);
-	    if (BIT(pl->have, OBJ_BALL))
-		Detach_ball(ind, -1);
 	    World.teams[pl->team].NumMembers--;
 	    pl->team = team;
 	    World.teams[pl->team].NumMembers++;
-	    if (BIT(pl->mode, LIMITED_LIVES))
-		for (i = 0; i < NumPlayers; i++)
-		    if (!TEAM(ind, i) && !BIT(Players[i]->status,PAUSE)) {
-			if (pl->mychar == ' ')
-			    pl->mychar	= 'W';
-			pl->prev_life = pl->life = 0;
-			SET_BIT(pl->status, GAME_OVER|PLAYING);
-			CLR_BIT(pl->status, SELF_DESTRUCT);
-			pl->count=-1;
-			break;
-		    }
-	    Pick_startpos(GetInd[pl->id]);
+	    Set_swapper_state(ind);
+	    Pick_startpos(ind);
 	    Send_all_info(pl);
 	    return;
 	} else {  /* Team full. Can we permute the teams of several players? */
@@ -2642,17 +2657,9 @@ static void Swap_team(int ind, char *args)
 			World.teams[xteam].SwapperId = -1;
 			xbase2 = pl2->home_base;
 			xteam2 = pl2->team;
-			if (BIT(pl2->have, OBJ_BALL))
-			    Detach_ball(GetInd[pl2->id], -1);
 			pl2->team = xteam;
 			pl2->home_base = xbase;
-			if (pl2->mychar == ' ')
-			    pl2->mychar	= 'W';
-			pl2->prev_life = pl2->life = 0;
-			SET_BIT(pl2->status, GAME_OVER|PLAYING);
-			CLR_BIT(pl2->status, SELF_DESTRUCT);
-			pl2->count = -1;
-			Go_home(GetInd[pl2->id]);
+			Set_swapper_state(GetInd[pl2->id]);
 			Send_all_info(pl2);
 			/* This can send a huge amount of data if several players swap.
 			   Unfortunately all player data, even shipshape, has to be
@@ -2661,17 +2668,9 @@ static void Swap_team(int ind, char *args)
 			xbase = xbase2;
 			xteam = xteam2;
 		    } while (xteam != team);
-		    if (BIT(pl->have, OBJ_BALL))
-			Detach_ball(ind, -1);
 		    pl->team = team;
 		    pl->home_base = xbase;
-		    if (pl->mychar == ' ')
-			pl->mychar = 'W';
-		    pl->prev_life = pl->life = 0;
-		    SET_BIT(pl->status, GAME_OVER|PLAYING);
-		    CLR_BIT(pl->status, SELF_DESTRUCT);
-		    pl->count = -1;
-		    Go_home(ind);
+		    Set_swapper_state(ind);
 		    Send_all_info(pl);
 		    sprintf(msg,"Some players swapped teams.");
 		    Set_message(msg);
@@ -2686,27 +2685,14 @@ static void Swap_team(int ind, char *args)
 		    sprintf(msg,"%s has swapped with paused %s.", pl->name,
 			    Players[i]->name);
 		    Set_message(msg);
-		    if (BIT(pl->have, OBJ_BALL))
-			Detach_ball(GetInd[pl->id], -1);
 		    Players[i]->team = pl->team;
 		    pl->team = team;
 		    team = Players[i]->home_base;
 		    Players[i]->home_base = pl->home_base;
-		    Go_home(i);
 		    pl->home_base = team;
+		    Set_swapper_state(i);
+		    Set_swapper_state(ind);
 		    Send_all_info(Players[i]);
-		    if (BIT(pl->mode, LIMITED_LIVES))
-			for (i = 0; i < NumPlayers; i++)
-			    if (!TEAM(ind, i) && !BIT(Players[i]->status, PAUSE)) {
-				if (pl->mychar == ' ')
-				    pl->mychar = 'W';
-				pl->prev_life = pl->life = 0;
-				SET_BIT(pl->status, GAME_OVER|PLAYING);
-				CLR_BIT(pl->status, SELF_DESTRUCT);
-				pl->count = -1;
-				Go_home(ind);
-				break;
-			    }
 		    Send_all_info(pl);
 		    return;
 		}

@@ -183,7 +183,7 @@ bool		reportToMetaServer;	/* Send status to meta-server? */
 bool            searchDomainForXPilot;  /* Do a DNS lookup for XPilot.domain?*/
 char		*denyHosts;		/* Computers which are denied service */
 DFLOAT		gameDuration;		/* total duration of game in minutes */
-bool		allowViewing;		/* Are players allowed to watch others? */
+bool		allowViewing;		/* Full framerate paused/waiting? */
 
 bool		teamAssign;		/* Assign player to team if not set? */
 bool		teamImmunity;		/* Is team immune from player action */
@@ -213,6 +213,7 @@ char            *password;              /* password for operator status */
 int             numberOfRounds;         /* how many rounds to play */
 int             playerLimit;            /* allow less players than bases */
 int             recordMode;             /* 0=off, 1=record, 2=playback */
+int             constantScoring;        /* Fixed points for kills etc? */
 
 extern char	conf_default_map_string[];	/* from common/config.c */
 
@@ -2208,7 +2209,7 @@ static optionDesc options[] = {
 	&allowViewing,
 	valBool,
 	tuner_dummy,
-	"Are players allowed to watch any other player while paused, waiting or dead?\n",
+	"Do players get a full framerate while they're paused or waiting?\n",
 	MAP(NULL)
     },
     {
@@ -2244,11 +2245,11 @@ static optionDesc options[] = {
     {
 	"lockOtherTeam",
 	"lockOtherTeam",
-	"true",
+	"false",
 	&lockOtherTeam,
 	valBool,
-	tuner_none,
-	"Can you lock on players from other teams when you're dead.\n",
+	tuner_dummy,
+	"Can you watch opposing players when rest of your team is still alive?\n",
 	MAP(NULL)
     },
     {
@@ -2356,6 +2357,16 @@ static optionDesc options[] = {
 	valInt,
 	Init_recording,
 	"If some makes this work reliably, change this description.\n",
+	MAP(NULL)
+    },
+    {
+	"constantScoring",
+	"constantScoring",
+	"no",
+	&constantScoring,
+	valBool,
+	tuner_dummy,
+	"Whether the scores given from various things are fixed.\n",
 	MAP(NULL)
     }
 };
