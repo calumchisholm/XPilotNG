@@ -403,8 +403,8 @@ static void PlayerCollision(void)
 		    continue;
 		if (!in_range_acd(pl->prevpos.x - Players[j]->prevpos.x,
 				  pl->prevpos.y - Players[j]->prevpos.y,
-				  pl->pos.cx - pl->prevpos.x + Players[j]->prevpos.x - Players[j]->pos.cx,
-				  pl->pos.cy - pl->prevpos.y + Players[j]->prevpos.y - Players[j]->pos.cy,
+				  pl->extmove.x - Players[j]->extmove.x,
+				  pl->extmove.y - Players[j]->extmove.y,
 				  (2*SHIP_SZ-6) * CLICK)) {
 			continue;
 		}
@@ -705,17 +705,15 @@ static void PlayerObjectCollision(int ind)
 	case 1:
 	    hit = in_range_acd(pl->prevpos.x - obj->prevpos.x,
 			       pl->prevpos.y - obj->prevpos.y,
-			       pl->pos.cx - pl->prevpos.x -
-			       (obj->pos.cx - obj->prevpos.x),
-			       pl->pos.cy - pl->prevpos.y-
-			       (obj->pos.cy - obj->prevpos.y),
+			       pl->extmove.x - obj->extmove.x,
+			       pl->extmove.y - obj->extmove.y,
 			       range * CLICK);
 	    break;
 	case 2:
 	    hit = in_range_partial(pl->prevpos.x - obj->prevpos.x,
 				   pl->prevpos.y - obj->prevpos.y,
-				   pl->pos.cx - pl->prevpos.x - obj->extmove.x,
-				   pl->pos.cy - pl->prevpos.y - obj->extmove.y,
+				   pl->extmove.x - obj->extmove.x,
+				   pl->extmove.y - obj->extmove.y,
 				   range * CLICK, obj->wall_time);
 	    break;
 	default:
@@ -775,18 +773,16 @@ static void PlayerObjectCollision(int ind)
 	    case 1:
 		hit = in_range_acd(pl->prevpos.x - obj->prevpos.x,
 				   pl->prevpos.y - obj->prevpos.y,
-				   pl->pos.cx - pl->prevpos.x -
-				   (obj->pos.cx - obj->prevpos.x),
-				   pl->pos.cy - pl->prevpos.y-
-				   (obj->pos.cy - obj->prevpos.y),
+				   pl->extmove.x - obj->extmove.x,
+				   pl->extmove.y - obj->extmove.y,
 				   radius * CLICK);
 		break;
 	    case 2:
 		hit = in_range_partial(pl->prevpos.x - obj->prevpos.x,
-				   pl->prevpos.y - obj->prevpos.y,
-				   pl->pos.cx - pl->prevpos.x - obj->extmove.x,
-				   pl->pos.cy - pl->prevpos.y - obj->extmove.y,
-				   radius * CLICK, obj->wall_time);
+				       pl->prevpos.y - obj->prevpos.y,
+				       pl->extmove.x - obj->extmove.x,
+				       pl->extmove.y - obj->extmove.y,
+				       radius * CLICK, obj->wall_time);
 		break;
 	    default:
 		error("Unimplemented collision mode %d", obj->collmode);
@@ -1376,19 +1372,17 @@ static void LaserCollision(void)
 		if (obj->life) {
 		    if (!in_range_acd(vic->prevpos.x - obj->prevpos.x,
 				      vic->prevpos.y - obj->prevpos.y,
-				      vic->pos.cx - vic->prevpos.x -
-				      (obj->pos.cx - obj->prevpos.x),
-				      vic->pos.cy - vic->prevpos.y-
-				      (obj->pos.cy - obj->prevpos.y),
+				      vic->extmove.x - obj->extmove.x,
+				      vic->extmove.y - obj->extmove.y,
 				      SHIP_SZ * CLICK))
 			continue;
 		}
 		else
 		    if (!in_range_partial(vic->prevpos.x - obj->prevpos.x,
-				vic->prevpos.y - obj->prevpos.y,
-				vic->pos.cx - vic->prevpos.x - obj->extmove.x,
-				vic->pos.cy - vic->prevpos.y - obj->extmove.y,
-				SHIP_SZ * CLICK, obj->wall_time))
+					  vic->prevpos.y - obj->prevpos.y,
+					  vic->extmove.x - obj->extmove.x,
+					  vic->extmove.y - obj->extmove.y,
+					  SHIP_SZ * CLICK, obj->wall_time))
 			continue;
 		vic->forceVisible++;
 		pulse->len = PULSE_LENGTH - 1;

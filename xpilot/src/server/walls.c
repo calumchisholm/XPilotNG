@@ -3572,8 +3572,10 @@ void Move_player(int ind)
 
     move.delta.x = FLOAT_TO_CLICK(pl->vel.x) * framespeed2;
     move.delta.y = FLOAT_TO_CLICK(pl->vel.y) * framespeed2;
+#if 0
     pl->extmove.x = move.delta.x;
     pl->extmove.y = move.delta.y;
+#endif
 
     if (BIT(pl->used, OBJ_PHASING_DEVICE)) {
 	int x = pl->pos.cx + move.delta.x;
@@ -3624,6 +3626,10 @@ void Move_player(int ind)
 	Player_position_set_clicks(pl, move.start.x, move.start.y);
     }
     pl->velocity = VECTOR_LENGTH(pl->vel);
+    /* !@# Better than ignoring collisions after wall touch for players,
+     * but might cause some erroneous hits */
+    pl->extmove.x = CENTER_XCLICK(pl->pos.cx - pl->prevpos.x);
+    pl->extmove.y = CENTER_YCLICK(pl->pos.cy - pl->prevpos.y);
     return;
 }
 
