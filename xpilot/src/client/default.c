@@ -580,18 +580,8 @@ option options[] = {
 	NULL,
 	"Yes",
 	KEY_DUMMY,
-	"Allows drawing polygon bitmaps specified by the (new-style) map\n"
-	"See also the wallTextureFile option.\n"
+	"Allows drawing polygon bitmaps specified by the (new-style) map.\n"
 	"Be warned that this needs a reasonably fast graphics system.\n",
-	0
-    },
-    {
-	"wallTextureFile",
-	NULL,
-	"",
-	KEY_DUMMY,
-	"Specify a XPM format pixmap file to load wall texture from.\n"
-	"(this only affects old-style maps, generally useless)\n",
 	0
     },
     {
@@ -1725,16 +1715,7 @@ option options[] = {
 	NULL,
 	"No",
 	KEY_DUMMY,
-	"Draws the map decoration filled with a texture pattern.\n"
-	"See also the decorTextureFile and texturedWalls options.\n",
-	0
-    },
-    {
-	"decorTextureFile",
-	NULL,
-	"",
-	KEY_DUMMY,
-	"Specify a XPM format pixmap file to load the decor texture from.\n",
+	"Draws the map decoration filled with a texture pattern.\n",
 	0
     },
     {
@@ -3680,10 +3661,6 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     clientRankHTMLNOJSFile = xp_strdup(resValue);
     Get_resource(rDB, "texturePath", resValue, sizeof resValue);
     texturePath = xp_strdup(resValue);
-    Get_resource(rDB, "wallTextureFile", resValue, sizeof resValue);
-    wallTextureFile = xp_strdup(resValue);
-    Get_resource(rDB, "decorTextureFile", resValue, sizeof resValue);
-    decorTextureFile = xp_strdup(resValue);
 
     Get_int_resource(rDB, "maxFPS", &maxFPS);
     oldMaxFPS = maxFPS;
@@ -3828,26 +3805,6 @@ void	defaultCleanup(void)
     if (texturePath) {
 	free(texturePath);
 	texturePath = NULL;
-    }
-/*    if (clientRankFile) {
-+	free(clientRankFile);
-+	clientRankFile = NULL;
-+    }
-+    if (clientRankHTMLFile) {
-+	free(clientRankHTMLFile);
-+	clientRankHTMLFile = NULL;
-+    }
-+    if (clientRankHTMLNOJSFile) {
-+	free(clientRankHTMLNOJSFile);
-+	clientRankHTMLNOJSFile = NULL;
-+    }*/
-    if (wallTextureFile) {
-	free(wallTextureFile);
-	wallTextureFile = NULL;
-    }
-    if (decorTextureFile) {
-	free(decorTextureFile);
-	decorTextureFile = NULL;
     }
     if (shipShape) {
 	free(shipShape);

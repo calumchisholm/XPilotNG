@@ -128,8 +128,6 @@ int	fuelColor;		/* Color index for fuel station drawing */
 int	decorColor;		/* Color index for decoration drawing */
 int	backgroundPointColor;	/* Color index for background point drawing */
 int	visibilityBorderColor;	/* Color index for visibility border drawing */
-char	*wallTextureFile;	/* Filename of wall texture */
-char	*decorTextureFile;	/* Filename of decor texture */
 
 
 static void Paint_clock(bool redraw);

@@ -141,9 +141,6 @@ extern double	charsPerTick;		/* Output speed of messages */
 extern bool	markingLights;		/* Marking lights on ships */
 extern bool	titleFlip;		/* Do special titlebar flipping? */
 extern int	shieldDrawMode;		/* How to draw players shield */
-extern char	*wallTextureFile;	/* Filename of wall texture */
-extern char	*decorTextureFile;	/* Filename of decor texture */
-extern char	*ballTextureFile;	/* Filename of ball texture */
 
 extern int	maxKeyDefs;
 extern long	loops;

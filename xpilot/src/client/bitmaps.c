@@ -95,6 +95,7 @@ int Bitmaps_init(void)
 {
     int i;
     xp_pixmap_t pixmap;
+
     for (i = 0; i < NUM_OBJECT_BITMAPS; i++) {
 	pixmap = object_pixmaps[i];
 	pixmap.scalable = (i == BM_LOGO
@@ -103,26 +104,13 @@ int Bitmaps_init(void)
 	STORE(xp_pixmap_t, pixmaps, num_pixmaps, max_pixmaps, pixmap);
     }
 
-    pixmap.filename = wallTextureFile != NULL ? wallTextureFile : "rock4.ppm";
-    pixmap.count = 1;
-    pixmap.scalable = false;
-    pixmap.state = BMS_UNINITIALIZED;
-    STORE(xp_pixmap_t, pixmaps, num_pixmaps, max_pixmaps, pixmap);
-    /* this is for decor */
-    STORE(xp_pixmap_t, pixmaps, num_pixmaps, max_pixmaps, pixmap);
-    /* this is not used anymore */
-    pixmap.filename = "ball.ppm";
-    pixmap.count = 1;
-    pixmap.scalable = false;
-    pixmap.state = BMS_UNINITIALIZED;
-    STORE(xp_pixmap_t, pixmaps, num_pixmaps, max_pixmaps, pixmap);
-
     return 0;
 }
 
 void Bitmaps_cleanup(void)
 {
-    if (pixmaps) free(pixmaps);
+    if (pixmaps)
+	free(pixmaps);
     pixmaps = 0;
 }
 
@@ -134,6 +122,7 @@ void Bitmaps_cleanup(void)
 int Bitmap_add(char *filename, int count, bool scalable)
 {
     xp_pixmap_t pixmap;
+
     pixmap.filename = xp_strdup(filename);
     pixmap.count = count;
     pixmap.scalable = scalable;
