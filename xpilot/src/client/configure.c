@@ -151,6 +151,7 @@ static int Config_create_hudRadarScale(int widget_desc, int *height);
 static int Config_create_hudRadarLimit(int widget_desc, int *height);
 static int Config_create_hudSize(int widget_desc, int *height);
 static int Config_create_hudLockColor(int widget_desc, int *height);
+static int Config_create_visibilityBorderColor(int widget_desc, int *height);
 static int Config_create_fuelGaugeColor(int widget_desc, int *height);
 static int Config_create_dirPtrColor(int widget_desc, int *height);
 static int Config_create_shipShapesHackColor(int widget_desc, int *height);
@@ -353,6 +354,7 @@ static int	(*config_creator_colors[])(int widget_desc, int *height) = {
     Config_create_hudRadarEnemyColor,
     Config_create_hudRadarOtherColor,
     Config_create_hudLockColor,
+    Config_create_visibilityBorderColor,
     Config_create_fuelGaugeColor,
     Config_create_dirPtrColor,
     Config_create_shipShapesHackColor,
@@ -1128,6 +1130,11 @@ static int Config_create_hudSize(int widget_desc, int *height)
 static int Config_create_hudLockColor(int widget_desc, int *height)
 {
     return CONFIG_CREATE_COLOR(hudLockColor);
+}
+
+static int Config_create_visibilityBorderColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(visibilityBorderColor);
 }
 
 static int Config_create_fuelGaugeColor(int widget_desc, int *height)
@@ -1997,6 +2004,7 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_int(fp, "hudRadarEnemyColor", hudRadarEnemyColor);
     Config_save_int(fp, "hudRadarOtherColor", hudRadarOtherColor);
     Config_save_int(fp, "hudLockColor", hudLockColor);
+    Config_save_int(fp, "visibilityBorderColor", visibilityBorderColor);
     Config_save_int(fp, "fuelGaugeColor", fuelGaugeColor);
     Config_save_int(fp, "dirPtrColor", dirPtrColor);
     Config_save_int(fp, "shipShapesHackColor", shipShapesHackColor);

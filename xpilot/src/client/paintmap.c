@@ -63,6 +63,7 @@ char paintmap_version[] = VERSION;
 int	wallColor;		/* Color index for wall drawing */
 int	fuelColor;		/* Color index for fuel station drawing */
 int	decorColor;		/* Color index for decoration drawing */
+int	visibilityBorderColor;	/* Color index for visibility border drawing */
 char	*wallTextureFile;	/* Filename of wall texture */
 char	*decorTextureFile;	/* Filename of decor texture */
 
@@ -328,11 +329,13 @@ void Paint_world(void)
 	}
     }
 
-    if (ext_view_width > MAX_VIEW_SIZE || ext_view_height > MAX_VIEW_SIZE) {
+    if (visibilityBorderColor &&
+	(ext_view_width > MAX_VIEW_SIZE || ext_view_height > MAX_VIEW_SIZE)) {
 	Gui_paint_visible_border(world.x + ext_view_width/2 - MAX_VIEW_SIZE/2,
 				 world.y + ext_view_height/2 - MAX_VIEW_SIZE/2,
 				 world.x + ext_view_width/2 + MAX_VIEW_SIZE/2,
-				 world.y + ext_view_height/2 + MAX_VIEW_SIZE/2);
+				 world.y + ext_view_height/2 + MAX_VIEW_SIZE/2,
+				 visibilityBorderColor);
     }
 
     /* kps - this should be drawn more than one frame if fps is high */
@@ -345,7 +348,8 @@ void Paint_world(void)
 	    (int)(world.x + ext_view_width/2
 		  + hudRadarLimit * MAX_VIEW_SIZE/2),
 	    (int)(world.y + ext_view_height/2
-		  + hudRadarLimit * MAX_VIEW_SIZE/2));
+		  + hudRadarLimit * MAX_VIEW_SIZE/2),
+	    WHITE);
 	oldHRLimit = hudRadarLimit;
     }
 

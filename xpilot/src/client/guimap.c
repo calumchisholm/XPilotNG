@@ -772,21 +772,21 @@ void Gui_paint_border(int x, int y, int xi, int yi)
 }
 
 
-void Gui_paint_visible_border(int x, int y, int xi, int yi)
+void Gui_paint_visible_border(int x, int y, int xi, int yi, int color)
 {
-    Segment_add(hudColor,
+    Segment_add(color,
 		X(x), Y(y),
 		X(x), Y(yi));
 
-    Segment_add(hudColor,
+    Segment_add(color,
 		X(xi), Y(y),
 		X(xi), Y(yi));
 
-    Segment_add(hudColor,
+    Segment_add(color,
 		X(x), Y(y),
 		X(xi), Y(y));
 
-    Segment_add(hudColor,
+    Segment_add(color,
 		X(x), Y(yi),
 		X(xi), Y(yi));
 }

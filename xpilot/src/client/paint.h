@@ -192,6 +192,7 @@ extern int	wallRadarColor;		/* Color index for walls on radar */
 extern int	targetRadarColor;	/* Color index for targets on radar */
 extern int	decorColor;		/* Color index for decoration drawing */
 extern int	decorRadarColor;	/* Color index for decorations on radar */
+extern int	visibilityBorderColor;	/* Color index for visibility border drawing */
 extern int	messagesColor;		/* Color index for message strings */
 extern int	oldMessagesColor;	/* Color index for old message strings */
 extern int	clockColor;		/* Clock color index */

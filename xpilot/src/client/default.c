@@ -1114,6 +1114,13 @@ option options[] = {
 	"Which color number to use for drawing the lock on the HUD.\n"
     },
     {
+	"visibilityBorderColor",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Which color number to use for drawing the visible border.\n"
+    },
+    {
 	"fuelGaugeColor",
 	NULL,
 	"2",
@@ -3083,6 +3090,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_int_resource(rDB, "dirPtrColor", &dirPtrColor);
     Get_int_resource(rDB, "shipShapesHackColor", &shipShapesHackColor);
     Get_int_resource(rDB, "hudLockColor", &hudLockColor);
+    Get_int_resource(rDB, "visibilityBorderColor", &visibilityBorderColor);
     Get_int_resource(rDB, "fuelGaugeColor", &fuelGaugeColor);
     Get_int_resource(rDB, "msgScanBallColor", &msgScanBallColor);
     Get_int_resource(rDB, "msgScanCoverColor", &msgScanCoverColor);
