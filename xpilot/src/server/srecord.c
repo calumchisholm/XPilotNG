@@ -3,6 +3,10 @@
 #include <stdio.h>
 #include <errno.h>
 
+/* Hopefully htons etc are in one of these. */
+#include <arpa/inet.h>
+#include <netinet/in.h>
+
 #define SERVER
 #include "const.h"
 #include "global.h"
@@ -11,93 +15,194 @@
 int   playback = 0;
 int   record = 0;
 int   *playback_ints;
-int   *playback_ints_start;
 int   *playback_errnos;
-int   *playback_errnos_start;
 short *playback_shorts;
-short *playback_shorts_start;
 char  *playback_data;
-char  *playback_data_start;
 char  *playback_sched;
-char  *playback_sched_start;
 int   *playback_ei;
-int   *playback_ei_start;
 char  *playback_es;
-char  *playback_es_start;
 int   *playback_opttout;
-int   *playback_opttout_start;
 
 int   rrecord;
 int   rplayback;
 int   recOpt;
 
-enum bufs {INTS, ERRNOS, SHORTS, DATA, SCHED, EI, ES, OPTTOUT, NOMORE};
-static char *threshold[NOMORE];
-static char *readto[NOMORE];
-static char **startb[NOMORE] = {&playback_ints_start, &playback_errnos_start,
-        &playback_shorts_start, &playback_data_start, &playback_sched_start,
-        &playback_ei_start, &playback_es_start, &playback_opttout_start};
-static char **curb[NOMORE] = {&playback_ints, &playback_errnos,
-        &playback_shorts, &playback_data, &playback_sched, &playback_ei,
-        &playback_es, &playback_opttout};
+enum types {CHAR, INT, SHORT, ERRNO };
+struct buf {
+    void ** const curp;
+    const enum types type;
+    const int size;
+    const int threshold;
+    void *start;
+    int num_read;
+} bufs[] =
+{
+    {&playback_ints, INT, 5000, 4000},
+    {&playback_errnos, ERRNO, 5000, 4000},
+    {&playback_shorts, SHORT, 25000, 23000},
+    {&playback_data, CHAR, 200000, 100000},
+    {&playback_sched, CHAR, 50000, 40000},
+    {&playback_ei, INT, 2000, 1000},
+    {&playback_es, CHAR, 5000, 4000},
+    {&playback_opttout, INT, 2000, 1000}
+};
+
+const int num_types = sizeof(bufs) / sizeof(struct buf);
 
 static FILE *recf1;
 
-static void Write_data(int type)
+
+static void Convert_from_host(void *start, int len, int type)
 {
-    int len;
-    char *startc = *startb[type], *curc = *curb[type];
+    int *iptr, *iend, err;
+    short *sptr, *send;
 
-    len = curc - startc;
-    fwrite(&len, sizeof(int), 1, recf1);
-    fwrite(startc, 1, len, recf1);
-    *curb[type] = *startb[type];
-}
-
-static void Read_data(int type, int len)
-{
-    int num;
-    char *startc, *curc;
-
-    startc = *startb[type];
-    curc = *curb[type];
-    num = readto[type] - curc;
-    if (num != 0) {
-	errno = 0;
-	error("Recording out of sync");
+    switch (type) {
+    case CHAR:
+	return;
+    case INT:
+	iptr = start;
+	iend = iptr + len / 4;
+	while (iptr < iend) {
+	    *iptr = htonl(*iptr);
+	    iptr++;
+	}
+	return;
+    case SHORT:
+	sptr = start;
+	send = sptr + len / 2;
+	while (sptr < send) {
+	    *sptr = htons(*sptr);
+	    sptr++;
+	}
+	return;
+    case ERRNO:
+	iptr = start;
+	iend = start + len / 4;
+	while (iptr < iend) {
+	    err = htonl(*iptr);
+	    switch (err) {
+	    case EAGAIN:
+		err = 1;
+	    case EINTR:
+		err = 2;
+	    default:
+		err = 0;
+	    }
+	    *iptr++ = err;
+	}
+	return;
+    default:
+	error("BUG");
 	exit(1);
     }
-    *curb[type] = *startb[type];
-    fread(*startb[type], 1, len, recf1);
-    readto[type] = startc + len;
 }
+static void Convert_to_host(void *start, int len, int type)
+{
+    int *iptr, *iend, err;
+    short *sptr, *send;
+
+    switch (type) {
+    case CHAR:
+	return;
+    case INT:
+	iptr = start;
+	iend = iptr + len / 4;
+	while (iptr < iend) {
+	    *iptr = ntohl(*iptr);
+	    iptr++;
+	}
+	return;
+    case SHORT:
+	sptr = start;
+	send = sptr + len / 2;
+	while (sptr < send) {
+	    *sptr = ntohs(*sptr);
+	    sptr++;
+	}
+	return;
+    case ERRNO:
+	iptr = start;
+	iend = start + len / 4;
+	while (iptr < iend) {
+	    err = ntohl(*iptr);
+	    switch (err) {
+	    case 0:
+		/* Just some number that isn't tested against anywhere
+		 * in the server code. */
+		err = ERANGE;
+	    case 1:
+		err = EAGAIN;
+	    case 2:
+		err = EINTR;
+	    default:
+		errno = 0;
+		error("Unrecognized errno code in recording");
+		exit(1);
+	    }
+	    *iptr++ = err;
+	}
+	return;
+    default:
+	error("BUG");
+	exit(1);
+    }
+}
+
+#define RECSTAT
 
 static void Dump_data(void)
 {
-    int i;
+    int i, len, len2;
 
     *playback_sched++ = 127;
-    for (i = 0; i < NOMORE; i++)
-	Write_data(i);
-    errno = 0;
-    error("dumping");
+#ifdef RECSTAT
+    printf("Recording sizes: ");
+#endif
+    for (i = 0; i < num_types; i++) {
+	len = (char *)*bufs[i].curp - (char *)bufs[i].start;
+#ifdef RECSTAT
+	printf("%d ", len);
+#endif
+	Convert_from_host(bufs[i].start, len, bufs[i].type);
+	len2 = htonl(len);
+	fwrite(&len2, 4, 1, recf1);
+	fwrite(bufs[i].start, 1, len, recf1);
+	*bufs[i].curp = bufs[i].start;
+    }
+#ifdef RECSTAT
+    printf("\n");
+#endif
 }
 
 void Get_recording_data(void)
 {
     int i, len;
 
-    for (i = 0; i < NOMORE; i++) {
-	fread(&len, sizeof(int), 1, recf1);
-	if (len > 149000) {
+    for (i = 0; i < num_types; i++) {
+	if (fread(&len, 4, 1, recf1) < 1) {
+	    error("Couldn't read more data (end of file?)");
+	    exit(1);
+	}
+	len = ntohl(len);
+	if (len > bufs[i].size - 4) {
 	    errno = 0;
 	    error("Incorrect chunk length reading recording");
 	    exit(1);
 	}
-	Read_data(i, len);
+	if ((char*)*bufs[i].curp - (char*)bufs[i].start != bufs[i].num_read) {
+	    errno = 0;
+	    error("Recording out of sync");
+	    exit(1);
+	}
+	fread(bufs[i].start, 1, len, recf1);
+	bufs[i].num_read = len;
+	*bufs[i].curp = bufs[i].start;
+	Convert_to_host(bufs[i].start, len, bufs[i].type);
+	/* Some of the int buffers must be terminated with INT_MAX */
+	if (bufs[i].type == INT)
+	    *(int *)((char *)bufs[i].start + len) = INT_MAX;
     }
-    *(int*)readto[EI] = INT_MAX;
-    *(int*)readto[OPTTOUT] = INT_MAX;
 }
 
 void Init_recording(void)
@@ -105,30 +210,45 @@ void Init_recording(void)
     static int oldMode = 0;
     int i;
 
+    if (sizeof(int) != 4 || sizeof(short) != 2) {
+	errno = 0;
+	error("Recordings won't work on this machine.");
+	error("This code assumes sizeof(int) == 4 && sizeof(short) == 2");
+	return;
+    }
+    if (EWOULDBLOCK != EAGAIN) {
+	errno = 0;
+	error("This system has weird error codes");
+	return;
+    }
+
     recOpt = 1; /* Less robust but produces smaller files. */
     if (oldMode == 0) {
 	oldMode = recordMode + 10;
 	if (recordMode == 1) {
 	    record = rrecord = 1;
 	    recf1 = fopen("/tmp/serverrec", "wb");
-	    for (i = 0; i < NOMORE; i++) {
-		/* These sizes are not sensible,
-		   different buffers should have
-		   different sizes */
-		*startb[i] = malloc(150000);
-		*curb[i] = *startb[i];
-		threshold[i] = *startb[i] + 50000;
+	    if (!recf1) {
+		error("Opening record file failed");
+		exit(1);
+	    }
+	    for (i = 0; i < num_types; i++) {
+		bufs[i].start = malloc(bufs[i].size);
+		*bufs[i].curp = bufs[i].start;
 	    }
 	    return;
 	} else if (recordMode == 2) {
 	    rplayback = 1;
-	    for (i = 0; i < NOMORE; i++) {
-		*startb[i] = malloc(150000);
-		*curb[i] = *startb[i];
-		readto[i] = *startb[i];
-		threshold[i] = *startb[i] + 100000;
+	    for (i = 0; i < num_types; i++) {
+		bufs[i].start = malloc(bufs[i].size);
+		*bufs[i].curp = bufs[i].start;
+		bufs[i].num_read = 0;
 	    }
 	    recf1 = fopen("/tmp/serverrec", "rb");
+	    if (!recf1) {
+		error("Opening record file failed");
+		exit(1);
+	    }
 	    Get_recording_data();
 	    return;
 	} else if (recordMode == 0)
@@ -165,8 +285,9 @@ void Handle_recording_buffers(void)
 	return;
 
     if (recordMode == 1) {
-	for (i = 0; i < NOMORE; i++)
-	    if (*curb[i] >= threshold[i])
+	for (i = 0; i < num_types; i++)
+	    if ((char *)*bufs[i].curp - (char *)bufs[i].start
+		> bufs[i].threshold)
 		Dump_data();
 	return;
     }
