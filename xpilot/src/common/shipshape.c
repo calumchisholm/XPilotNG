@@ -205,19 +205,7 @@ static int shape2wire(char *ship_shape_str, shipshape_t *ship)
     char		*str, *teststr;
     char 		keyw[20], buf[MSG_LEN];
 
-    ship->num_points = 0;
-    ship->num_orig_points = 0;
-    ship->num_l_gun = 0;
-    ship->num_r_gun = 0;
-    ship->num_l_rgun = 0;
-    ship->num_r_rgun = 0;
-    ship->num_l_light = 0;
-    ship->num_r_light = 0;
-    ship->num_m_rack  = 0;
-#ifdef	_NAMEDSHIPS
-    ship->name = NULL;
-    ship->author = NULL;
-#endif
+    memset(ship, 0, sizeof(shipshape_t));
 
     if (debugShapeParsing)
 	warn("parsing shape: %s", ship_shape_str);
@@ -839,7 +827,7 @@ static int shape2wire(char *ship_shape_str, shipshape_t *ship)
     if (is_server) {
 	pt[ship->num_points] = pt[0];
 	for (i = 1; i < ship->num_points; i++)
-	    pt[i+ship->num_points] = pt[ship->num_points-i];
+	    pt[i + ship->num_points] = pt[ship->num_points - i];
 	ship->num_points = ship->num_points * 2;
     }
     /*MARA evil hack*/
@@ -857,10 +845,9 @@ static int shape2wire(char *ship_shape_str, shipshape_t *ship)
 	|| (ship->num_l_light
 	    && !(ship->l_light[0] = malloc((size_t)ship->num_l_light * i)))
 	|| (ship->num_r_light
-	    && !(ship->r_light[0] =malloc((size_t)ship->num_r_light * i)))
+	    && !(ship->r_light[0] = malloc((size_t)ship->num_r_light * i)))
 	|| (ship->num_m_rack
-	    && !(ship->m_rack[0] = malloc((size_t)ship->num_m_rack * i)))
-	) {
+	    && !(ship->m_rack[0] = malloc((size_t)ship->num_m_rack * i)))) {
 	error("Not enough memory for ship shape");
 	XFREE(ship->pts[0]);
 	XFREE(ship->l_gun[0]);
