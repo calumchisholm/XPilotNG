@@ -394,7 +394,7 @@ static int Localnet_cb(int widget, void *user_data, const char **text)
     int button_x;
     int button_y;
     
-    int button2;
+    /*    int button2; */
     int button2_width;
     int button2_height;
     int button2_x;
@@ -481,16 +481,16 @@ static int Localnet_cb(int widget, void *user_data, const char **text)
 	    
 
 	    /* button2_x = button_x + button_width + button_x;
-	    /* button2_y = button_y;
-	    /* button2_width = XTextWidth(buttonFont, "Status", 6) + 40;
-	    /* button2_height = buttonFont->ascent + buttonFont->descent + 10;
-	    /* button2 =
-	    /*  Widget_create_activate(subform_widget,
-	    /*			     button2_x, button2_y,
-	    /*			     button2_width, button2_height,
-	    /*	 		     1, "Status",
-	    /*			     Local_status_cb,
-	    /* 			     (void *) &localnet_conpars[i]);  */
+	     button2_y = button_y;
+	     button2_width = XTextWidth(buttonFont, "Status", 6) + 40;
+	     button2_height = buttonFont->ascent + buttonFont->descent + 10;
+	     button2 =
+	      Widget_create_activate(subform_widget,
+	    			     button2_x, button2_y,
+	    			     button2_width, button2_height,
+	    	 		     1, "Status",
+	    			     Local_status_cb,
+	     			     (void *) &localnet_conpars[i]);  */
 
 	    button3_x = button_x + button_width + button_x;
 	    button3_y = button_y;
