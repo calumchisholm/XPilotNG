@@ -20,7 +20,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "SDL.h"
@@ -32,6 +31,7 @@
 #include "console.h"
 #include "radar.h"
 #include "sdlwindow.h"
+#include "text.h"
 
 #define SCORE_BORDER 5
 
@@ -90,8 +90,8 @@ guiarea_t *find_guiarea(Uint16 x,Uint16 y)
 {
     guiarea_t *tmp = guiarea_list;
     while(tmp) {
-    	if( 	(x > tmp->bounds.x) && (x < (tmp->bounds.x + tmp->bounds.w))
-	    &&	(y > tmp->bounds.y) && (y < (tmp->bounds.y + tmp->bounds.h))
+    	if( 	(x >= tmp->bounds.x) && (x <= (tmp->bounds.x + tmp->bounds.w))
+	    &&	(y >= tmp->bounds.y) && (y <= (tmp->bounds.y + tmp->bounds.h))
 	    ) break;
 	tmp = tmp->next;
     }
@@ -264,6 +264,7 @@ static void Scorelist_paint(void)
 int Paint_init(void)
 {
     extern bool players_exposed; /* paint.c */
+    int i;
  
     if (TTF_Init()) {
 	error("SDL_ttf initialization failed: %s", SDL_GetError());
@@ -283,6 +284,15 @@ int Paint_init(void)
     SDL_Rect bounds = {0,0,draw_width,draw_height};
     window_guiarea = register_guiarea(bounds,select_button,select_move);
 
+    for (i=0;i<MAX_SCORE_OBJECTS;++i)
+    	score_object_texs[i].texture = 0;
+    for (i=0;i<MAX_METERS;++i)
+    	meter_texs[i].texture = 0;
+    for (i=0;i<maxMessages;++i)
+    	message_texs[i].texture = 0;
+    
+    
+    
     if (Scorelist_init() == -1)
 	return -1;
 
@@ -298,10 +308,15 @@ int Paint_init(void)
 
 void Paint_cleanup(void)
 {
+    int i;
     Scorelist_cleanup();
     Images_cleanup();
     TTF_Quit();
     clean_guiarea_list();
+    for (i=0;i<MAX_SCORE_OBJECTS;++i)
+    	if (score_object_texs[i].texture) free_string_texture(&score_object_texs[i]);
+    for (i=0;i<MAX_METERS;++i)
+    	if (meter_texs[i].texture) free_string_texture(&meter_texs[i]);
 }
 
 /* kps - can we rather use Check_view_dimensions in paint.c ? */
@@ -396,8 +411,8 @@ void setupPaint_HUD(void)
 
 void Paint_frame(void)
 {
-    /*Uint32 now = SDL_GetTicks();*/
     Check_view_dimensions();
+    int i;
 
     world.x = selfPos.x - (ext_view_width / 2);
     world.y = selfPos.y - (ext_view_height / 2);
@@ -463,24 +478,23 @@ void Paint_frame(void)
 	    Paint_objects();
 
     	Paint_score_objects();
-	
+		
 	Paint_shots();
 	setupPaint_moving();
 	Paint_ships();
 
-    	glDisable(GL_BLEND);
-	
 	setupPaint_HUD();
 
     	Paint_meters();
     	Paint_HUD();
     	Paint_client_fps();
 
-    	Paint_messages();       
+	Paint_messages();       
 	Radar_paint();
 	Console_paint();
 	Scorelist_paint();
 	Paint_select();
+		
 	glPopMatrix();
     }
 

@@ -358,21 +358,19 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 	}
     }
 
-    /* TODO : figure out how to make the text stop wobbling */
-
     color |= 0x000000ff;
     switch (type) {
     case SETUP_BASE_UP:
-	mapprint(&mapfont,color,CENTER,DOWN	  ,(x)  	      ,(y - BLOCK_SZ / 2),other->name);
+	mapprint(&mapfont,color,CENTER,DOWN ,(x)    	    	,(y - BLOCK_SZ / 2),other->name);
         break;
     case SETUP_BASE_DOWN:
-	mapprint(&mapfont,color,CENTER,UP	  ,(x)  	      ,(y + BLOCK_SZ / 1.5),other->name);
+	mapprint(&mapfont,color,CENTER,UP   ,(x)    	    	,(y + BLOCK_SZ / 1.5),other->name);
         break;
     case SETUP_BASE_LEFT:
 	mapprint(&mapfont,color,RIGHT,UP    ,(x + BLOCK_SZ / 2) ,(y),other->name);
         break;
     case SETUP_BASE_RIGHT:
-	mapprint(&mapfont,color,LEFT,UP   ,(x - BLOCK_SZ / 2) ,(y),other->name);
+	mapprint(&mapfont,color,LEFT,UP     ,(x - BLOCK_SZ / 2) ,(y),other->name);
         break;
     default:
         errno = 0;
@@ -1014,7 +1012,12 @@ void Paint_score_objects(void)
 		x = sobj->x * BLOCK_SZ + BLOCK_SZ/2;
 		y = sobj->y * BLOCK_SZ + BLOCK_SZ/2;
   		if (wrap(&x, &y)) {
-		    mapprint(&mapfont,scoreObjectColorRGBA,CENTER,CENTER,x,y,sobj->msg);
+		    /*mapprint(&mapfont,scoreObjectColorRGBA,CENTER,CENTER,x,y,sobj->msg);*/
+		    if (!score_object_texs[i].texture)
+		    	draw_text(&mapfont, scoreObjectColorRGBA
+			    	    ,CENTER,CENTER, x, y, sobj->msg, true
+				    , &score_object_texs[i],false);
+		    else disp_text(&score_object_texs[i],scoreObjectColorRGBA,CENTER,CENTER,x,y,false);
 		}
 	    }
 	    sobj->life_time -= timePerFrame;
@@ -1022,6 +1025,8 @@ void Paint_score_objects(void)
 		sobj->life_time = 0.0;
 		sobj->hud_msg_len = 0;
 	    }
+	} else {
+	    if (score_object_texs[i].texture) free_string_texture(&score_object_texs[i]);
 	}
     }
 }
@@ -1052,7 +1057,7 @@ void Paint_client_fps(void)
     HUDprint(&gamefont,hudColorRGBA,RIGHT,DOWN,x,y,"FPS: %d",clientFPS);
 }
 
-static void Paint_meter(int xoff, int y, const char *title, int val, int max,
+static void Paint_meter(int xoff, int y, string_tex_t *tex, int val, int max,
 			int meter_color)
 {
     const int	mw1_4 = meterWidth/4,
@@ -1108,18 +1113,37 @@ static void Paint_meter(int xoff, int y, const char *title, int val, int max,
     if (!meterBorderColorRGBA)
 	color = meter_color;
 
-    HUDprint(&gamefont,color,x_alignment,UP,xstr,draw_height - y - meterHeight,title);
+    /*HUDprint(&gamefont,color,x_alignment,UP,xstr,draw_height - y - meterHeight,title);*/
+    disp_text(tex,color,x_alignment,DOWN,xstr,draw_height - y - meterHeight,true);
 }
 
 void Paint_meters(void)
 {
     int spacing = (20>gamefont.h)?20:gamefont.h;
     int y = spacing, color;
-
+    static bool setup_texs = true;
+    
+    if (setup_texs) {
+    	render_text(&gamefont,"Fuel"	    	, &meter_texs[0]);
+    	render_text(&gamefont,"Power"	    	, &meter_texs[1]);
+     	render_text(&gamefont,"Turnspeed"   	, &meter_texs[2]);
+   	render_text(&gamefont,"Packet"	   	, &meter_texs[3]);
+    	render_text(&gamefont,"Loss"	    	, &meter_texs[4]);
+    	render_text(&gamefont,"Drop"	    	, &meter_texs[5]);
+    	render_text(&gamefont,"Lag" 	    	, &meter_texs[6]);
+    	render_text(&gamefont,"Thrust Left" 	, &meter_texs[7]);
+    	render_text(&gamefont,"Shields Left"	, &meter_texs[8]);
+    	render_text(&gamefont,"Phasing left"	, &meter_texs[9]);
+    	render_text(&gamefont,"Self destructing", &meter_texs[10]);
+    	render_text(&gamefont,"SHUTDOWN"    	, &meter_texs[11]);
+	setup_texs = false;
+    }
+    
+    
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     if (fuelMeterColorRGBA)
-	Paint_meter(-10, y += spacing, "Fuel",
+	Paint_meter(-10, y += spacing, &meter_texs[0],
 		    (int)fuelSum, (int)fuelMax, fuelMeterColorRGBA);
 
     if (powerMeterColorRGBA)
@@ -1130,7 +1154,7 @@ void Paint_meters(void)
 	color = 0;
 
     if (color)
-	Paint_meter(-10, y += spacing, "Power",
+	Paint_meter(-10, y += spacing, &meter_texs[1],
 		    (int)displayedPower, (int)MAX_PLAYER_POWER, color);
 
     if (turnSpeedMeterColorRGBA)
@@ -1141,7 +1165,7 @@ void Paint_meters(void)
 	color = 0;
 
     if (color)
-	Paint_meter(-10, y += spacing, "Turnspeed",
+	Paint_meter(-10, y += spacing, &meter_texs[2],
 		    (int)displayedTurnspeed, (int)MAX_PLAYER_TURNSPEED, color);
 
     if (controlTime > 0.0) {
@@ -1151,49 +1175,49 @@ void Paint_meters(void)
     }
 
     if (packetSizeMeterColorRGBA)
-	Paint_meter(-10, y += spacing, "Packet",
+	Paint_meter(-10, y += spacing, &meter_texs[3],
 		   (packet_size >= 4096) ? 4096 : packet_size, 4096,
 		    packetSizeMeterColorRGBA);
     if (packetLossMeterColorRGBA)
-	Paint_meter(-10, y += spacing, "Loss", packet_loss, FPS,
+	Paint_meter(-10, y += spacing, &meter_texs[4], packet_loss, FPS,
 		    packetLossMeterColorRGBA);
     if (packetDropMeterColorRGBA)
-	Paint_meter(-10, y += spacing, "Drop", packet_drop, FPS,
+	Paint_meter(-10, y += spacing, &meter_texs[5], packet_drop, FPS,
 		    packetDropMeterColorRGBA);
     if (packetLagMeterColorRGBA)
-	Paint_meter(-10, y += spacing, "Lag", MIN(packet_lag, 1 * FPS), 1 * FPS,
+	Paint_meter(-10, y += spacing, &meter_texs[6], MIN(packet_lag, 1 * FPS), 1 * FPS,
 		    packetLagMeterColorRGBA);
 
     if (temporaryMeterColorRGBA) {
 	if (thrusttime >= 0 && thrusttimemax > 0)
 	    Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3,
-			"Thrust Left",
+			&meter_texs[7],
 			(thrusttime >= thrusttimemax
 			 ? thrusttimemax : thrusttime),
 			thrusttimemax, temporaryMeterColorRGBA);
 
 	if (shieldtime >= 0 && shieldtimemax > 0)
 	    Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + spacing,
-			"Shields Left",
+			&meter_texs[8],
 			(shieldtime >= shieldtimemax
 			 ? shieldtimemax : shieldtime),
 			shieldtimemax, temporaryMeterColorRGBA);
 
 	if (phasingtime >= 0 && phasingtimemax > 0)
 	    Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 2*spacing,
-			"Phasing left",
+			&meter_texs[9],
 			(phasingtime >= phasingtimemax
 			 ? phasingtimemax : phasingtime),
 			phasingtimemax, temporaryMeterColorRGBA);
 
 	if (destruct > 0)
 	    Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 3*spacing,
-			"Self destructing", destruct, 150,
+			&meter_texs[10], destruct, 150,
 			temporaryMeterColorRGBA);
 
 	if (shutdown_count >= 0)
 	    Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 4*spacing,
-			"SHUTDOWN", shutdown_count, shutdown_delay,
+			&meter_texs[11], shutdown_count, shutdown_delay,
 			temporaryMeterColorRGBA);
     }
     glDisable(GL_BLEND);
@@ -1545,6 +1569,12 @@ void Paint_messages(void)
 	    bot_y += SPACING;
 	}
 	len = (int)(charsPerSecond * (MSG_LIFE_TIME - msg->lifeTime));
+	
+	/* TODO: make sure this works! */
+	/* new message? */
+	if (!len) {
+	    if (message_texs[i].texture) free_string_texture(&(message_texs[i].texture));
+	}
 	len = MIN(msg->len, len);
 	/*
 	 * it's an emphasized talk message
@@ -1643,21 +1673,51 @@ void Paint_messages(void)
 		}
 	    } /* last line */
 
-
+    	    /* TODO: make it possible to actually divide this per character
+	     * meanwhile just ballpark guess to a fraction of the width... ;)
+	     */
+	    
+	    if (!message_texs[i].texture) render_text(&gamefont,msg->txt,&message_texs[i]);
 	    if (ptr) {
-		HUDnprint(&gamefont,msg_color,LEFT,CENTER,x,y,l,ptr);
+		/*HUDnprint(&gamefont,msg_color,LEFT,CENTER,x,y,l,ptr);*/
+	    	if (!message_texs[i].texture) render_text(&gamefont,ptr,&message_texs[i]);
+	    	disp_text_fraq(&message_texs[i],msg_color,LEFT,CENTER,x,y
+	    	    	    	,(float)( (int)&ptr-(int)&msg->txt  	)/msg->len
+	    	    	    	,(float)( (int)&ptr-(int)&msg->txt + l	)/msg->len
+	    	    	    	,0.0f
+	    	    	    	,1.0f
+		    	    	,true);
 	    }
 	    if (ptr2) {
-		HUDnprint(&gamefont,whiteRGBA,LEFT,CENTER,x,y,l2,ptr2);
+		/*HUDnprint(&gamefont,whiteRGBA,LEFT,CENTER,x,y,l2,ptr2);*/
+	    	if (!message_texs[i].texture) render_text(&gamefont,ptr,&message_texs[i]);
+	    	disp_text_fraq(&message_texs[i],msg_color,LEFT,CENTER,x,y
+	    	    	    	,(float)( (int)&ptr2-(int)&msg->txt 	    )/msg->len
+	    	    	    	,(float)( (int)&ptr2-(int)&msg->txt + l2    )/msg->len
+	    	    	    	,0.0f
+	    	    	    	,1.0f
+		    	    	,true);
 	    }
 	    if (ptr3) {
-		HUDnprint(&gamefont,msg_color,LEFT,CENTER,x,y,l3,ptr2);
+		/*HUDnprint(&gamefont,msg_color,LEFT,CENTER,x,y,l3,ptr2);*/
+	    	if (!message_texs[i].texture) render_text(&gamefont,ptr,&message_texs[i]);
+	    	disp_text_fraq(&message_texs[i],msg_color,LEFT,CENTER,x,y
+	    	    	    	,(float)( (int)&ptr3-(int)&msg->txt 	    )/msg->len
+	    	    	    	,(float)( (int)&ptr3-(int)&msg->txt + l3    )/msg->len
+	    	    	    	,0.0f
+	    	    	    	,1.0f
+		    	    	,true);
 	    }
 
-	} else /* not emphasized */
-
-	{
-	    HUDnprint(&gamefont,msg_color,LEFT,CENTER,x,y,len,msg->txt);
+	} else {
+	    /*	HUDnprint(&gamefont,msg_color,LEFT,CENTER,x,y,len,msg->txt);*/
+	    if (!message_texs[i].texture) render_text(&gamefont,msg->txt,&message_texs[i]);
+	    disp_text_fraq(&message_texs[i],msg_color,LEFT,CENTER,x,y
+	    	    	    ,0.0f
+	    	    	    ,(float)len/msg->len
+	    	    	    ,0.0f
+	    	    	    ,1.0f
+			    ,true);
 	}
 
 	width = nprintsize(&messagefont,MIN(len, msg->len),msg->txt).width; /*this is not accurate*/

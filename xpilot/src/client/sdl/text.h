@@ -28,7 +28,15 @@ typedef struct {
     GLuint list_base; /* start of the texture list for this font */
     GLuint h; /* char height */
     GLuint linespacing; /* proper line spacing according to FT */
+    void *ttffont;
 } font_data;
+
+typedef struct {
+    GLuint texture;
+    texcoord_t texcoords;
+    int width;
+    int height;
+} string_tex_t;
 
 int renderstyle;
 enum {
@@ -49,6 +57,8 @@ typedef struct {
     	float width;
 	float height;
 } fontbounds;
+/* loads a SDL surface onto a GL texture */
+GLuint SDL_GL_LoadTexture(SDL_Surface *surface, texcoord_t *texcoord);
 
 /* Calcs the bounding width,height for the text if it were printed
  * to screen with given font
@@ -66,9 +76,40 @@ void mapnprint(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int
 void HUDprint(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, const char *fmt, ...);
 void mapprint(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, const char *fmt,...);
 
+bool draw_text(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, const char *text, bool savetex, string_tex_t *string_tex, bool onHUD);
+bool draw_text_fraq(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, const char *text
+    	    	    , float xstart
+    	    	    , float xstop
+    	    	    , float ystart
+    	    	    , float ystop
+		    , bool savetex, string_tex_t *string_tex, bool onHUD);
+bool render_text(font_data *ft_font, const char *text, string_tex_t *string_tex);
+void disp_text(string_tex_t *string_tex, int color, int XALIGN, int YALIGN, int x, int y, bool onHUD);
+void disp_text_fraq(string_tex_t *string_tex, int color, int XALIGN, int YALIGN, int x, int y
+    	    	    , float xstart
+    	    	    , float xstop
+    	    	    , float ystart
+    	    	    , float ystop
+		    , bool onHUD);
+void free_string_texture(string_tex_t *string_tex);
+
 font_data gamefont;
 font_data messagefont;
 font_data mapfont;
 
+string_tex_t score_object_texs[MAX_SCORE_OBJECTS];
+
+/*typedef struct {
+    int id;
+    string_tex_t string_tex;
+    void *next;
+} name_tex_t;
+
+name_tex_t *others_name_texs;*/
+
+#define MAX_METERS 12
+string_tex_t meter_texs[MAX_METERS];
+
+string_tex_t message_texs[24];
 
 #endif
