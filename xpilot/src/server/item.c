@@ -477,8 +477,7 @@ void General_tractor_beam(player *pl, clpos pos,
     if (pl)
 	Player_add_fuel(pl, cost);
 
-    theta = (int)Wrap_cfindDir(pos.cx - victim->pos.cx,
-			       pos.cy - victim->pos.cy);
+    theta = Wrap_cfindDir(pos.cx - victim->pos.cx, pos.cy - victim->pos.cy);
 
     if (pl) {
 	pl->vel.x += tcos(theta) * (force / pl->mass);
@@ -497,8 +496,7 @@ void Do_deflector(player *pl)
     double	maxforce = pl->item[ITEM_DEFLECTOR] * 0.2;
     object	*obj, **obj_list;
     int		i, obj_count;
-    int		dx, dy;
-    double	dist;
+    double	dx, dy, dist;
 
     if (pl->fuel.sum < -ED_DEFLECTOR) {
 	if (BIT(pl->used, HAS_DEFLECTOR))
@@ -539,7 +537,7 @@ void Do_deflector(player *pl)
 	dist = (double)(LENGTH(dx, dy) - PIXEL_TO_CLICK(SHIP_SZ));
 	if (dist < range
 	    && dist > 0) {
-	    int dir = (int)findDir(dx, dy);
+	    int dir = findDir(dx, dy);
 	    int idir = MOD2((int)(dir - findDir(obj->vel.x, obj->vel.y)), RES);
 
 	    if (idir > RES * 0.25
@@ -1050,7 +1048,7 @@ void Fire_general_ecm(player *pl, int team, clpos pos)
 	    if (c->item[ITEM_LASER])
 		c->item[ITEM_LASER]
 		    -= (int)(damage * c->item[ITEM_LASER] + 0.5);
-	    c->damaged += 24 * range * pow(0.75, c->item[ITEM_SENSOR]);
+	    c->damaged += 24 * range * pow(0.75, (double)c->item[ITEM_SENSOR]);
 	}
     }
 
@@ -1098,7 +1096,8 @@ void Fire_general_ecm(player *pl, int team, clpos pos)
 	    if (p->item[ITEM_CLOAK] <= 1)
 		p->forceVisible += damage;
 	    else
-		p->forceVisible += damage * pow(0.75, (p->item[ITEM_CLOAK]-1));
+		p->forceVisible
+		    += damage * pow(0.75, (double)(p->item[ITEM_CLOAK]-1));
 
 	    /* ECM may cause balls to detach. */
 	    if (BIT(p->have, HAS_BALL)) {
@@ -1123,7 +1122,7 @@ void Fire_general_ecm(player *pl, int team, clpos pos)
 	    if (!IS_ROBOT_PTR(p) || !ecmsReprogramRobots || !pl) {
 		/* player is blinded by light flashes. */
 		long duration
-		    = (long)(damage * pow(0.75, p->item[ITEM_SENSOR]));
+		    = (long)(damage * pow(0.75, (double)p->item[ITEM_SENSOR]));
 		p->damaged += duration;
 		if (pl)
 		    Record_shove(p, pl, frame_loops + duration);
