@@ -247,13 +247,9 @@ struct world {
     char	dataURL[MAX_CHARS];
 
     u_byte	**block;	/* type of item in each block */
-
     vector_t	**gravity;
-
     item_t	items[NUM_ITEMS];
-
     asteroid_t	asteroids;
-
     team_t	teams[MAX_TEAMS];
 
     int		NumTeamBases;	/* How many 'different' teams are allowed */
@@ -279,6 +275,8 @@ struct world {
     asteroid_concentrator_t	*asteroidConcs;
     int		NumFrictionAreas, MaxFrictionAreas;
     friction_area_t		*frictionAreas;
+
+    bool	have_options;
 };
 
 extern world_t		World;

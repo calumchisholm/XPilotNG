@@ -521,6 +521,9 @@ static bool Grok_map_size(world_t *world)
 
 bool Grok_map_options(world_t *world)
 {
+    if (world->have_options)
+	return true;
+
     Check_map_object_counters(world);
 
     if (!Grok_map_size(world))
@@ -542,15 +545,17 @@ bool Grok_map_options(world_t *world)
 	CLR_BIT(world->rules->mode, TEAM_PLAY);
     }
 
+    world->have_options = true;
+
     return true;
 }
 
 bool Grok_map(world_t *world)
 {
-    if (!is_polygon_map) {
-	if (!Grok_map_options(world))
-	    exit(1);
+    if (!Grok_map_options(world))
+	return false;
 
+    if (!is_polygon_map) {
 	Xpmap_grok_map_data(world, options.mapData);
 	Xpmap_tags_to_internal_data(world, true);
 	Xpmap_find_map_object_teams(world);
