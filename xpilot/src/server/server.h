@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -36,4 +35,27 @@ enum TeamPickType {
 #define	APPNAME	"XPilotServer"
 #endif
 
+/* server types, could be put into servertypes.h */
+
+/* map related types */
+typedef struct fuel fuel_t;
+typedef struct grav grav_t;
+typedef struct base base_t;
+typedef struct baseorder baseorder_t;
+typedef struct cannon cannon_t;
+typedef struct item item_t;
+typedef struct asteroid asteroid_t;
+typedef enum { WORM_NORMAL, WORM_IN, WORM_OUT } wormType;
+typedef struct wormhole wormhole_t;
+typedef struct treasure treasure_t;
+typedef struct target target_t;
+typedef struct team team_t;
+typedef struct item_concentrator item_concentrator_t;
+typedef struct asteroid_concentrator asteroid_concentrator_t;
+
+/* object related types */
+typedef struct player player;
+
 #endif
+
+

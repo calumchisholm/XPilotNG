@@ -28,6 +28,10 @@
 /* need MAX_TANKS */
 #include "serverconst.h"
 #endif
+#ifndef SERVER_H
+/* need wormhole_t */
+#include "server.h"
+#endif
 #ifndef KEYS_H
 /* need NUM_KEYS */
 #include "keys.h"
@@ -43,10 +47,6 @@
 #ifndef ITEM_H
 /* need NUM_ITEMS */
 #include "item.h"
-#endif
-#ifndef MAP_H
-/* need wormhole_t */
-#include "map.h"
 #endif
 #ifndef CLICK_H
 /* need CLICK */
@@ -478,27 +478,6 @@ struct robot_data;
  * this makes it possible to use the same basic operations on both of them
  * (mainly used in update.c).
  */
-typedef struct player player;
-
-typedef struct ScoreNode {
-    char nick[MAX_CHARS];
-    char real[MAX_CHARS];
-    char host[MAX_CHARS];
-    char logout[MAX_CHARS];
-    int timestamp;
-    double score;
-    unsigned int kills;
-    unsigned int deaths;
-    unsigned int rounds;
-    unsigned int firedShots;
-    unsigned int ballsSaved;
-    unsigned int ballsLost;
-    unsigned int ballsWon;
-    unsigned int ballsCashed;
-
-    player *pl;
-} ScoreNode;
-
 struct player {
 
     OBJECT_BASE
@@ -569,7 +548,7 @@ struct player {
     int		last_check_dir;		/* player dir at last checkpoint */
     long	last_wall_touch;	/* last time player touched a wall */
 
-    struct base_t *home_base;
+    base_t	*home_base;
     struct {
 	int	    tagged;		/* Flag, what is tagged? */
 	int	    pl_id;		/* Tagging player id */

@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -36,6 +35,9 @@
 #ifndef ITEM_H
 /* need NUM_ITEMS */
 #include "item.h"
+#endif
+#ifndef SERVER_H
+#include "server.h"
 #endif
 
 #define SPACE			0
@@ -104,34 +106,33 @@
 #define DIR_LEFT		(RES/2)
 #define DIR_DOWN		(3*RES/4)
 
-typedef struct {
+struct fuel {
     clpos	pos;
     long	fuel;
     unsigned	conn_mask;
     long	last_change;
     int		team;
-} fuel_t;
+};
 
-typedef struct {
+struct grav {
     clpos	pos;
     DFLOAT	force;
     int		type;
-} grav_t;
+};
 
-typedef struct base_t {
+struct base {
     clpos		pos;
     int			dir;
     int			ind;
     unsigned short	team;
-} base_t;
+};
 
-/* kps - ng does not want this */
-typedef struct {
+struct baseorder {
     int		base_idx;	/* Index in World.base[] */
     DFLOAT	dist;		/* Distance to first checkpoint */
-} baseorder_t;
+};
 
-typedef struct {
+struct cannon {
     clpos		pos;
     int			dir;
     unsigned		conn_mask;
@@ -147,9 +148,9 @@ typedef struct {
     DFLOAT		emergency_shield_left;
     DFLOAT		phasing_left;
     int			group;
-} cannon_t;
+};
 
-typedef struct {
+struct item {
     DFLOAT	prob;		/* Probability [0..1] for item to appear */
     int		max;		/* Max on world at a given time */
     int		num;		/* Number active right now */
@@ -159,18 +160,16 @@ typedef struct {
     int		max_per_pack;	/* maximum number of elements per item. */
     int		initial;	/* initial number of elements per player. */
     int		limit;		/* max number of elements per player/cannon. */
-} item_t;
+};
 
-typedef struct {
+struct asteroid {
     DFLOAT	prob;		/* Probability [0..1] for asteroid to appear */
     int		max;		/* Max on world at a given time */
     int		num;		/* Number active right now */
     int		chance;		/* Chance [0..127] for asteroid to appear */
-} asteroid_t;
+};
 
-typedef enum { WORM_NORMAL, WORM_IN, WORM_OUT } wormType;
-
-typedef struct {
+struct wormhole {
     clpos		pos;
     int			lastdest;	/* last destination wormhole */
     DFLOAT		countdown;	/* >0 warp to lastdest else random */
@@ -178,17 +177,17 @@ typedef struct {
     wormType		type;
     u_byte		lastblock;	/* block it occluded */
     unsigned short	lastID;
-} wormhole_t;
+};
 
-typedef struct {
+struct treasure {
     clpos		pos;
     bool		have;	/* true if this treasure has ball in it */
     unsigned short	team;	/* team of this treasure */
     int 		destroyed;	/* how often this treasure destroyed */
     bool		empty;	/* true if this treasure never had a ball */
-} treasure_t;
+};
 
-typedef struct {
+struct target {
     clpos		pos;
     unsigned short	team;
     DFLOAT		dead_time;
@@ -197,9 +196,9 @@ typedef struct {
     unsigned 		update_mask;
     long		last_change;
     int			group;
-} target_t;
+};
 
-typedef struct {
+struct team {
     int		NumMembers;		/* Number of current members */
     int		NumRobots;		/* Number of robot players */
     int		NumBases;		/* Number of bases owned */
@@ -210,11 +209,15 @@ typedef struct {
     int		SwapperId;		/* Player swapping to this full team */
     DFLOAT	score;
     DFLOAT	prev_score;
-} team_t;
+};
 
-typedef struct {
+struct item_concentrator {
     clpos	pos;
-} item_concentrator_t, asteroid_concentrator_t;
+};
+
+struct asteroid_concentrator {
+    clpos	pos;
+};
 
 extern bool is_polygon_map;
 
