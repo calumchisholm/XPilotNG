@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -283,7 +282,7 @@ void Gui_paint_asteroid(int x, int y, int type, int rot, int size)
 
 static void Gui_paint_nastyshot(int color, int x, int y, int size)
 {
-	int z = size;
+    int z = size;
 
     if (rfrac() < 0.5f) {
 	Segment_add(color, 
@@ -528,7 +527,7 @@ void Gui_paint_transporter(int x0, int y0, int x1, int y1)
 }
 
 
-void Gui_paint_all_connectors_begin()
+void Gui_paint_all_connectors_begin(void)
 {
     unsigned long	mask;
 
@@ -545,13 +544,13 @@ void Gui_paint_all_connectors_begin()
 }
 
 
-void Gui_paint_ships_begin()
+void Gui_paint_ships_begin(void)
 {
     gcv.dash_offset = WINSCALE(DASHES_LENGTH - (loops % DASHES_LENGTH));
 }
 
 
-void Gui_paint_ships_end()
+void Gui_paint_ships_end(void)
 {
    unsigned long	mask;
    if (gcv.line_style != LineSolid) {
@@ -583,8 +582,8 @@ static void Gui_paint_rounddelay(int x, int y)
 static void Gui_paint_ship_name(int x , int y, other_t *other)
 {
     FIND_NAME_WIDTH(other);
-    SET_FG(colors[shipNameColor].pixel);
     if (shipNameColor) {
+	SET_FG(colors[shipNameColor].pixel);
 	rd.drawString(dpy, p_draw, gc,
 		      WINSCALE(X(x)) - other->name_width / 2,
 		      WINSCALE(Y(y) + 16) + gameFont->ascent,
@@ -593,7 +592,10 @@ static void Gui_paint_ship_name(int x , int y, other_t *other)
 			WINSCALE(Y(y) + 16) + gameFont->ascent
 			- gameFont->ascent, other->name_width + 4,
 			gameFont->ascent + gameFont->descent + 5);
+    } else {
+	SET_FG(colors[BLUE].pixel);
     }
+
     if (BIT(hackedInstruments, SHOW_LIVES_BY_SHIP)
 	&& BIT(Setup->mode, LIMITED_LIVES)) {
 	char keff[4] = "";
@@ -921,8 +923,7 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
      * Determine if the name of the player should be drawn below
      * his/her ship.
      */
-    if (shipNameColor
-	&& self != NULL
+    if (self != NULL
 	&& self->id != id
 	&& other != NULL) {
 
