@@ -30,11 +30,11 @@ Client:
 
 	* Improved meta interface on the X11 client.
 
-	* Players can now spectate without taking up a base whilst 
-	  pausing. 
-
 	* Improved Colour handling and a full colour configuration menu
 	  in the client.
+
+	* Server downloadable textures, enabling maps to export their
+	  own textures directly to a client.
 	
 	* Several client improvements, basewarning, toggle off radar
 	  and score windows, improved hud, direction pointer.
@@ -51,19 +51,19 @@ Server :
 	  and the game will still proceed at a reasonable rate, giving 
 	  a smooth game update.
 
-	* Server downloadable textures, enabling maps to export their
-	  own textures directly to a client.
-
 	* New collision code, collisions are handled properly and ships 
 	  cannot get stuck on acute walls anymore.
 
 	* Many new server commands, more server variables can be altered
  	  online such as gamespeed and fps.
 
+	* Players can now spectate without taking up a base whilst 
+	  pausing. 
+
 	* Improved precision in thrusting and shooting..
 
 	* Server side recordings - more accurate, and you can review 
-	  the recording for any player, much small and compact than 
+	  the recording for any player, much smaller and compact than 
 	  the xp-replay recordings.
 
         * Full integration of teamcup code, run your own xpilot cup.
