@@ -1346,14 +1346,14 @@ XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, NULL, help)
 
     COLOR_INDEX_OPTION(
 	"hudRadarEnemyColor",
-	4,
+	11,
 	&hudRadarEnemyColor,
 	"Which color number to use for drawing hudradar dots\n"
 	"that represent enemy ships.\n"),
 
     COLOR_INDEX_OPTION(
 	"hudRadarOtherColor",
-	2,
+	4,
 	&hudRadarOtherColor,
 	"Which color number to use for drawing hudradar dots\n"
 	"that represent friendly ships or other objects.\n"),
