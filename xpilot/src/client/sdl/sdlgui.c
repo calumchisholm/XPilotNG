@@ -36,55 +36,55 @@ int blueRGBA    = 0x0000ffff;
 int redRGBA     = 0xff0000ff;
 int greenRGBA   = 0x00ff00ff;
 
-int wallColor		    = 0x0000ffff;
-int hudColor		    = 0xff000088;
-int connColor	    	    = 0x00ff0088;
-int scoreObjectColor 	    = 0x00ff0088;
-int fuelColor 	    	    = 0xff000044;
-int messagesColor   	    = 0x00aaaa88;
-int oldMessagesColor   	    = 0x00888888;
-int msgScanBallColor   	    = 0xff000088;
-int msgScanSafeColor   	    = 0x00ff0088;
-int msgScanCoverColor  	    = 0x4e7cff88; /* xpblue */
-int msgScanPopColor   	    = 0xffbb1188; /* xpyellow */
+int wallColorRGBA		    = 0x0000ffff;
+int hudColorRGBA		    = 0xff000088;
+int connColorRGBA	    	    = 0x00ff0088;
+int scoreObjectColorRGBA 	    = 0x00ff0088;
+int fuelColorRGBA 	    	    = 0xff000044;
+int messagesColorRGBA   	    = 0x00aaaa88;
+int oldmessagesColorRGBA   	    = 0x00888888;
+int msgScanBallColorRGBA   	    = 0xff000088;
+int msgScanSafeColorRGBA   	    = 0x00ff0088;
+int msgScanCoverColorRGBA  	    = 0x4e7cff88;
+int msgScanPopColorRGBA   	    = 0xffbb1188;
 
-int meterBorderColor   	    = 0x0000ff55;
-int fuelMeterColor   	    = 0xff000055;
-int powerMeterColor   	    = 0xff000055;
-int turnSpeedMeterColor     = 0xff000055;
-int packetSizeMeterColor    = 0xff000055;
-int packetLossMeterColor    = 0xff000055;
-int packetDropMeterColor    = 0xff000055;
-int packetLagMeterColor     = 0xff000055;
-int temporaryMeterColor     = 0xff000055;
+int meterBorderColorRGBA   	    = 0x0000ff55;
+int fuelMeterColorRGBA   	    = 0xff000055;
+int powerMeterColorRGBA   	    = 0xff000055;
+int turnSpeedMeterColorRGBA     = 0xff000055;
+int packetSizeMeterColorRGBA    = 0xff000055;
+int packetLossMeterColorRGBA    = 0xff000055;
+int packetDropMeterColorRGBA    = 0xff000055;
+int packetLagMeterColorRGBA     = 0xff000055;
+int temporaryMeterColorRGBA     = 0xff000055;
 
-int dirPtrColor   	    = 0x0000ff22;
-int hudHLineColor   	    = 0x0000ff44;
-int hudVLineColor   	    = 0x0000ff44;
-int hudItemsColor   	    = 0x0000ff44;
-int fuelGaugeColor   	    = 0x0000ff44;
-int selfLWColor   	    = 0xff0000ff;
-int teamLWColor   	    = 0xff00ffff;
-int enemyLWColor   	    = 0xffff00ff;
-int team0Color   	    = 0x00000000;
-int team1Color   	    = 0x00000000;
-int team2Color   	    = 0x00000000;
-int team3Color   	    = 0x00000000;
-int team4Color   	    = 0x00000000;
-int team5Color   	    = 0x00000000;
-int team6Color   	    = 0x00000000;
-int team7Color   	    = 0x00000000;
-int team8Color   	    = 0x00000000;
-int team9Color   	    = 0x00000000;
-int shipNameColor  	    = 0x0000ff88;
-int baseNameColor  	    = 0x0000ff88;
-int manyLivesColor  	    = 0x666666aa;
-int twoLivesColor  	    = 0x008800aa;
-int oneLifeColor  	    = 0xaaaa00aa;
-int zeroLivesColor  	    = 0xff0000aa;
+int dirPtrColorRGBA   	    = 0x0000ff22;
+int hudHLineColorRGBA   	    = 0x0000ff44;
+int hudVLineColorRGBA   	    = 0x0000ff44;
+int hudItemsColorRGBA   	    = 0x0000ff44;
+int fuelGaugeColorRGBA   	    = 0x0000ff44;
+int selfLWColorRGBA   	    = 0xff0000ff;
+int teamLWColorRGBA   	    = 0xff00ffff;
+int enemyLWColorRGBA   	    = 0xffff00ff;
+int team0ColorRGBA   	    = 0x00000000;
+int team1ColorRGBA   	    = 0x00000000;
+int team2ColorRGBA   	    = 0x00000000;
+int team3ColorRGBA   	    = 0x00000000;
+int team4ColorRGBA   	    = 0x00000000;
+int team5ColorRGBA   	    = 0x00000000;
+int team6ColorRGBA   	    = 0x00000000;
+int team7ColorRGBA   	    = 0x00000000;
+int team8ColorRGBA   	    = 0x00000000;
+int team9ColorRGBA   	    = 0x00000000;
+int shipNameColorRGBA  	    = 0x0000ff88;
+int baseNameColorRGBA  	    = 0x0000ff88;
+int manyLivesColorRGBA  	    = 0x666666aa;
+int twoLivesColorRGBA  	    = 0x008800aa;
+int oneLifeColorRGBA  	    = 0xaaaa00aa;
+int zeroLivesColorRGBA  	    = 0xff0000aa;
 
-int hudRadarEnemyColor	    = 0xff000088;
-int hudRadarOtherColor	    = 0x00ff0088;
+int hudRadarEnemyColorRGBA	    = 0xff000088;
+int hudRadarOtherColorRGBA	    = 0x00ff0088;
 
 int scoreInactiveSelfColorRGBA	= 0x88008888;
 int scoreInactiveColorRGBA	= 0x0000aa88;
@@ -274,7 +274,7 @@ void Gui_paint_fuel(int x, int y, double fuel)
 
     size = (BLOCK_SZ - 2 * FUEL_BORDER) * fuel / MAX_STATION_FUEL;
 
-    Image_paint(IMG_FUELCELL, x, y, 0, get_alpha(fuelColor));
+    Image_paint(IMG_FUELCELL, x, y, 0, get_alpha(fuelColorRGBA));
 
     area.x = 0;
     area.y = (BLOCK_SZ - 2 * FUEL_BORDER) * (1 - fuel / MAX_STATION_FUEL);
@@ -285,7 +285,7 @@ void Gui_paint_fuel(int x, int y, double fuel)
 		     y + FUEL_BORDER, 
 		     frame, 
 		     &area,
-		     get_alpha(fuelColor));
+		     get_alpha(fuelColorRGBA));
 }
 
 void Gui_paint_base(int x, int y, int id, int team, int type)
@@ -316,9 +316,9 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 
     if (!(other = Other_by_id(id))) return;
 
-    if (baseNameColor) {
+    if (baseNameColorRGBA) {
 	if (!(color = Life_color(other)))
-	    color = baseNameColor;
+	    color = baseNameColorRGBA;
     } else
 	color = whiteRGBA;
 
@@ -385,7 +385,7 @@ void Gui_paint_decor(int x, int y, int xi, int yi, int type,
 
 void Gui_paint_border(int x, int y, int xi, int yi)
 {
-    set_alphacolor(wallColor);
+    set_alphacolor(wallColorRGBA);
     glBegin(GL_LINE);
     	glVertex2i(x, y);
     	glVertex2i(xi, yi);
@@ -395,7 +395,7 @@ void Gui_paint_border(int x, int y, int xi, int yi)
 void Gui_paint_visible_border(int x, int y, int xi, int yi)
 {
     setupPaint_moving();
-    set_alphacolor(hudColor);
+    set_alphacolor(hudColorRGBA);
     glBegin(GL_LINE_LOOP);
     	glVertex2i(x, y);
     	glVertex2i(x, yi);
@@ -479,7 +479,7 @@ void Gui_paint_setup_treasure(int x, int y, int team, bool own)
 
 void Gui_paint_walls(int x, int y, int type)
 {
-    set_alphacolor(wallColor);
+    set_alphacolor(wallColorRGBA);
     glBegin(GL_LINES);
 
 
@@ -512,7 +512,7 @@ void Gui_paint_walls(int x, int y, int type)
 
 void Gui_paint_filled_slice(int bl, int tl, int tr, int br, int y)
 {
-    set_alphacolor(wallColor);
+    set_alphacolor(wallColorRGBA);
     glBegin(GL_QUADS);
     glVertex2i(bl, y);
     glVertex2i(tl, y + BLOCK_SZ);
@@ -610,7 +610,7 @@ void Gui_paint_ball_connector(int x_1, int y_1, int x_2, int y_2)
 {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-    set_alphacolor(connColor);
+    set_alphacolor(connColorRGBA);
     glBegin(GL_LINES);
     glVertex2i(x_1, y_1);
     glVertex2i(x_2, y_2);
@@ -750,7 +750,7 @@ void Gui_paint_refuel(int x_0, int y_0, int x_1, int y_1)
     tmpx = (off -1-loops % (off))*tmpx/len;
     tmpy = (off -1-loops % (off))*tmpy/len;*/
 
-    set_alphacolor(fuelColor);
+    set_alphacolor(fuelColorRGBA);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     glLineStipple(stipple, 0xAAAA);
@@ -768,7 +768,7 @@ void Gui_paint_connector(int x_0, int y_0, int x_1, int y_1, int tractor)
 {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-    set_alphacolor(connColor);
+    set_alphacolor(connColorRGBA);
     glLineStipple(tractor ? 2 : 4, 0xAAAA);
     glEnable(GL_LINE_STIPPLE);
     glBegin(GL_LINES);
@@ -801,16 +801,16 @@ void Gui_paint_ships_end(void)
 int Team_color(int team)
 {
     switch (team) {
-    case 0:	return team0Color;
-    case 1:	return team1Color;
-    case 2:	return team2Color;
-    case 3:	return team3Color;
-    case 4:	return team4Color;
-    case 5:	return team5Color;
-    case 6:	return team6Color;
-    case 7:	return team7Color;
-    case 8:	return team8Color;
-    case 9:	return team9Color;
+    case 0:	return team0ColorRGBA;
+    case 1:	return team1ColorRGBA;
+    case 2:	return team2ColorRGBA;
+    case 3:	return team3ColorRGBA;
+    case 4:	return team4ColorRGBA;
+    case 5:	return team5ColorRGBA;
+    case 6:	return team6ColorRGBA;
+    case 7:	return team7ColorRGBA;
+    case 8:	return team8ColorRGBA;
+    case 9:	return team9ColorRGBA;
     default:    break;
     }
     return 0;
@@ -821,13 +821,13 @@ int Life_color_by_life(int life)
     int color;
 	
     if (life > 2)
-	color = manyLivesColor;
+	color = manyLivesColorRGBA;
     else if (life == 2)
-	color = twoLivesColor;
+	color = twoLivesColorRGBA;
     else if (life == 1)
-	color = oneLifeColor;
+	color = oneLifeColorRGBA;
     else /* we catch all */
-	color = zeroLivesColor;
+	color = zeroLivesColorRGBA;
     return color;
 }
 
@@ -872,10 +872,10 @@ static int Gui_calculate_ship_color(int id, other_t *other)
 	&& eyesId != id
 	&& other != NULL
 	&& eyeTeam == other->team) {
-	/* Paint teammates and allies ships with last life in teamLWColor */
+	/* Paint teammates and allies ships with last life in teamLWColorRGBA */
 	if (BIT(Setup->mode, LIMITED_LIVES)
 	    && (other->life == 0))
-	    ship_color = teamLWColor;
+	    ship_color = teamLWColorRGBA;
 	else
 	    ship_color = blueRGBA;
     }
@@ -885,10 +885,10 @@ static int Gui_calculate_ship_color(int id, other_t *other)
 	&& other != NULL
 	&& eyes->alliance != ' '
 	&& eyes->alliance == other->alliance) {
-	/* Paint teammates and allies ships with last life in teamLWColor */
+	/* Paint teammates and allies ships with last life in teamLWColorRGBA */
 	if (BIT(Setup->mode, LIMITED_LIVES)
 	    && (other->life == 0))
-	    ship_color = teamLWColor;
+	    ship_color = teamLWColorRGBA;
 	else
 	    ship_color = blueRGBA;
     }
@@ -908,20 +908,20 @@ static int Gui_calculate_ship_color(int id, other_t *other)
 
     /* Vato color hack start, edited by mara & kps */
     if (BIT(Setup->mode, LIMITED_LIVES)) {
-	/* Paint your ship in selfLWColor when on last life */
+	/* Paint your ship in selfLWColorRGBA when on last life */
 	if (eyes != NULL
 	    && eyes->id == id
 	    && eyes->life == 0) {
-	    ship_color = selfLWColor;
+	    ship_color = selfLWColorRGBA;
 	}
 
-	/* Paint enemy ships with last life in enemyLWColor */
+	/* Paint enemy ships with last life in enemyLWColorRGBA */
 	if (eyes != NULL
 	    && eyes->id != id
 	    && other != NULL
 	    && eyeTeam != other->team
 	    && other->life == 0) {
-	    ship_color = enemyLWColor;
+	    ship_color = enemyLWColorRGBA;
 	}
     }
     /* Vato color hack end */
@@ -936,9 +936,9 @@ static void Gui_paint_ship_name(int x, int y, other_t *other)
     /* TODO : do all name painting together, so we don't need
      * all theese setupPaint<foo> calls
      */
-    if (shipNameColor) {
+    if (shipNameColorRGBA) {
 	if (!color)
-	    color = shipNameColor;
+	    color = shipNameColorRGBA;
 
 	mapprint(&mapfont, color, CENTER, DOWN,x,y - SHIP_SZ,"%s",other->id_string);
     } else
@@ -1007,7 +1007,7 @@ void Paint_score_objects(void)
 {
     int		i, x, y;
 
-    if (!get_alpha(scoreObjectColor))
+    if (!get_alpha(scoreObjectColorRGBA))
 	return;
 
     for (i = 0; i < MAX_SCORE_OBJECTS; i++) {
@@ -1018,7 +1018,7 @@ void Paint_score_objects(void)
 		x = sobj->x * BLOCK_SZ + BLOCK_SZ/2;
 		y = sobj->y * BLOCK_SZ + BLOCK_SZ/2;
   		if (wrap(&x, &y)) {
-		    mapprint(&mapfont,scoreObjectColor,CENTER,CENTER,x,y,sobj->msg);
+		    mapprint(&mapfont,scoreObjectColorRGBA,CENTER,CENTER,x,y,sobj->msg);
 		}
 	    }
 	    sobj->life_time -= timePerFrame;
@@ -1034,14 +1034,14 @@ void Paint_client_fps(void)
 {
     int			x, y;
 
-    if (!hudColor)
+    if (!hudColorRGBA)
 	return;
 
     x = draw_width - 20;
     /* Better make sure it's below the meters */
     y = draw_height - 9*((20>gamefont.h)?20:gamefont.h);
 ;
-    HUDprint(&gamefont,hudColor,RIGHT,DOWN,x,y,"FPS: %d",clientFPS);
+    HUDprint(&gamefont,hudColorRGBA,RIGHT,DOWN,x,y,"FPS: %d",clientFPS);
 }
 
 static void Paint_meter(int xoff, int y, const char *title, int val, int max,
@@ -1076,9 +1076,9 @@ static void Paint_meter(int xoff, int y, const char *title, int val, int max,
     
     
 
-    /* meterBorderColor = 0 obviously means no meter borders are drawn */
-    if (meterBorderColor) {
-    	color = meterBorderColor;
+    /* meterBorderColorRGBA = 0 obviously means no meter borders are drawn */
+    if (meterBorderColorRGBA) {
+    	color = meterBorderColorRGBA;
 
 	set_alphacolor(color);
 	glBegin( GL_LINE_LOOP );
@@ -1097,7 +1097,7 @@ static void Paint_meter(int xoff, int y, const char *title, int val, int max,
 	glEnd();
     }
 
-    if (!meterBorderColor)
+    if (!meterBorderColorRGBA)
 	color = meter_color;
 
     HUDprint(&gamefont,color,x_alignment,UP,xstr,draw_height - y - meterHeight,title);
@@ -1110,14 +1110,14 @@ void Paint_meters(void)
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    if (fuelMeterColor)
+    if (fuelMeterColorRGBA)
 	Paint_meter(-10, y += spacing, "Fuel",
-		    (int)fuelSum, (int)fuelMax, fuelMeterColor);
+		    (int)fuelSum, (int)fuelMax, fuelMeterColorRGBA);
 
-    if (powerMeterColor)
-	color = powerMeterColor;
+    if (powerMeterColorRGBA)
+	color = powerMeterColorRGBA;
     else if (controlTime > 0.0)
-	color = temporaryMeterColor;
+	color = temporaryMeterColorRGBA;
     else
 	color = 0;
 
@@ -1125,10 +1125,10 @@ void Paint_meters(void)
 	Paint_meter(-10, y += spacing, "Power",
 		    (int)displayedPower, (int)MAX_PLAYER_POWER, color);
 
-    if (turnSpeedMeterColor)
-	color = turnSpeedMeterColor;
+    if (turnSpeedMeterColorRGBA)
+	color = turnSpeedMeterColorRGBA;
     else if (controlTime > 0.0)
-	color = temporaryMeterColor;
+	color = temporaryMeterColorRGBA;
     else
 	color = 0;
 
@@ -1142,51 +1142,51 @@ void Paint_meters(void)
 	    controlTime = 0.0;
     }
 
-    if (packetSizeMeterColor)
+    if (packetSizeMeterColorRGBA)
 	Paint_meter(-10, y += spacing, "Packet",
 		   (packet_size >= 4096) ? 4096 : packet_size, 4096,
-		    packetSizeMeterColor);
-    if (packetLossMeterColor)
+		    packetSizeMeterColorRGBA);
+    if (packetLossMeterColorRGBA)
 	Paint_meter(-10, y += spacing, "Loss", packet_loss, FPS,
-		    packetLossMeterColor);
-    if (packetDropMeterColor)
+		    packetLossMeterColorRGBA);
+    if (packetDropMeterColorRGBA)
 	Paint_meter(-10, y += spacing, "Drop", packet_drop, FPS,
-		    packetDropMeterColor);
-    if (packetLagMeterColor)
+		    packetDropMeterColorRGBA);
+    if (packetLagMeterColorRGBA)
 	Paint_meter(-10, y += spacing, "Lag", MIN(packet_lag, 1 * FPS), 1 * FPS,
-		    packetLagMeterColor);
+		    packetLagMeterColorRGBA);
 
-    if (temporaryMeterColor) {
+    if (temporaryMeterColorRGBA) {
 	if (thrusttime >= 0 && thrusttimemax > 0)
 	    Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3,
 			"Thrust Left",
 			(thrusttime >= thrusttimemax
 			 ? thrusttimemax : thrusttime),
-			thrusttimemax, temporaryMeterColor);
+			thrusttimemax, temporaryMeterColorRGBA);
 
 	if (shieldtime >= 0 && shieldtimemax > 0)
 	    Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + spacing,
 			"Shields Left",
 			(shieldtime >= shieldtimemax
 			 ? shieldtimemax : shieldtime),
-			shieldtimemax, temporaryMeterColor);
+			shieldtimemax, temporaryMeterColorRGBA);
 
 	if (phasingtime >= 0 && phasingtimemax > 0)
 	    Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 2*spacing,
 			"Phasing left",
 			(phasingtime >= phasingtimemax
 			 ? phasingtimemax : phasingtime),
-			phasingtimemax, temporaryMeterColor);
+			phasingtimemax, temporaryMeterColorRGBA);
 
 	if (destruct > 0)
 	    Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 3*spacing,
 			"Self destructing", destruct, 150,
-			temporaryMeterColor);
+			temporaryMeterColorRGBA);
 
 	if (shutdown_count >= 0)
 	    Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 4*spacing,
 			"SHUTDOWN", shutdown_count, shutdown_delay,
-			temporaryMeterColor);
+			temporaryMeterColorRGBA);
     }
     glDisable(GL_BLEND);
 }
@@ -1226,11 +1226,11 @@ static void Paint_hudradar(double hrscale, double xlimit, double ylimit, int sz)
  	    y = -y + draw_height / 2;
 	    
 	    if (radar_ptr[i].type == normal) {
-		if (hudRadarEnemyColor)
-		    Circle(hudRadarEnemyColor, x, y, sz, 1);
+		if (hudRadarEnemyColorRGBA)
+		    Circle(hudRadarEnemyColorRGBA, x, y, sz, 1);
 	    } else {
-		if (hudRadarOtherColor)
-		    Circle(hudRadarOtherColor, x, y, sz, 1);
+		if (hudRadarOtherColorRGBA)
+		    Circle(hudRadarOtherColorRGBA, x, y, sz, 1);
 	    }
 	}
     }
@@ -1260,14 +1260,14 @@ void Paint_HUD(void)
     if (ptr_move_fact != 0.0
 	&& selfVisible
 	&& (selfVel.x != 0 || selfVel.y != 0))
-	Segment_add(hudColor,
+	Segment_add(hudColorRGBA,
 		    draw_width / 2,
 		    draw_height / 2,
 		    (int)(draw_width / 2 - ptr_move_fact * selfVel.x),
 		    (int)(draw_height / 2 + ptr_move_fact * selfVel.y));
 
-    if (selfVisible && dirPtrColor) {
-	Segment_add(dirPtrColor,
+    if (selfVisible && dirPtrColorRGBA) {
+	Segment_add(dirPtrColorRGBA,
 		    (int) (draw_width / 2 +
 			   (100 - 15) * tcos(heading)),
 		    (int) (draw_height / 2 -
@@ -1280,7 +1280,7 @@ void Paint_HUD(void)
     /* This should be done in a nicer way now (using radar.c maybe) */
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
-    if (hudRadarEnemyColor || hudRadarOtherColor) {
+    if (hudRadarEnemyColorRGBA || hudRadarOtherColorRGBA) {
 	hudRadarMapScale = (double) Setup->width / (double) 256;
 	Paint_hudradar(
 	    hudRadarScale,
@@ -1301,11 +1301,11 @@ void Paint_HUD(void)
     glDisable(GL_BLEND);
     /* message scan hack by mara*/
     if (instruments.useBallMessageScan) {
-	if (ball_shout && msgScanBallColor)
-	    Circle(msgScanBallColor, draw_width / 2,
+	if (ball_shout && msgScanBallColorRGBA)
+	    Circle(msgScanBallColorRGBA, draw_width / 2,
 		    draw_height / 2, 8*scale,0);
-	if (need_cover && msgScanCoverColor)
-	    Circle(msgScanCoverColor, draw_width / 2,
+	if (need_cover && msgScanCoverColorRGBA)
+	    Circle(msgScanCoverColorRGBA, draw_width / 2,
 		    draw_height / 2, 6*scale,0);
     }
     glEnable(GL_BLEND);
@@ -1320,8 +1320,8 @@ void Paint_HUD(void)
     /* HUD frame */
     glLineStipple(4, 0xAAAA);
     glEnable(GL_LINE_STIPPLE);
-    if (hudHLineColor) {
-    	set_alphacolor(hudHLineColor);
+    if (hudHLineColorRGBA) {
+    	set_alphacolor(hudHLineColorRGBA);
     	glBegin(GL_LINES);
     	    glVertex2i(hud_pos_x - hudSize,hud_pos_y - hudSize + HUD_OFFSET);
 	    glVertex2i(hud_pos_x + hudSize,hud_pos_y - hudSize + HUD_OFFSET);
@@ -1330,8 +1330,8 @@ void Paint_HUD(void)
 	    glVertex2i(hud_pos_x + hudSize,hud_pos_y + hudSize - HUD_OFFSET);
     	glEnd();
     }
-    if (hudVLineColor) {
-    	set_alphacolor(hudVLineColor);
+    if (hudVLineColorRGBA) {
+    	set_alphacolor(hudVLineColorRGBA);
     	glBegin(GL_LINES);
     	    glVertex2i(hud_pos_x - hudSize + HUD_OFFSET,hud_pos_y - hudSize);
 	    glVertex2i(hud_pos_x - hudSize + HUD_OFFSET,hud_pos_y + hudSize);
@@ -1342,14 +1342,14 @@ void Paint_HUD(void)
     }
     glDisable(GL_LINE_STIPPLE);
 
-    if (hudItemsColor)
+    if (hudItemsColorRGBA)
 	Paint_HUD_items(hud_pos_x, hud_pos_y);
 
     /* Fuel notify, HUD meter on */
-    if (hudColor && (fuelTime > 0.0 || fuelSum < fuelLevel3)) {
+    if (hudColorRGBA && (fuelTime > 0.0 || fuelSum < fuelLevel3)) {
 	did_fuel = 1;
 	/* TODO fix this */
-	HUDprint(&gamefont,hudColor,LEFT,DOWN,
+	HUDprint(&gamefont,hudColorRGBA,LEFT,DOWN,
 	    	hud_pos_x + hudSize-HUD_OFFSET+BORDER,
 		hud_pos_y - (hudSize-HUD_OFFSET+BORDER),
 		"%04d", (int)fuelSum);
@@ -1359,7 +1359,7 @@ void Paint_HUD(void)
 	    else
 		sprintf(str, "T%d", fuelCurrent);
 	    /* TODO fix this */
-	    HUDprint(&gamefont,hudColor,LEFT,DOWN,
+	    HUDprint(&gamefont,hudColorRGBA,LEFT,DOWN,
 	    	    hud_pos_x + hudSize-HUD_OFFSET + BORDER,
 		    hud_pos_y - hudSize-HUD_OFFSET + BORDER,
 		    str);
@@ -1370,7 +1370,7 @@ void Paint_HUD(void)
     Paint_lock(hud_pos_x, hud_pos_y);
 
     /* Draw last score on hud if it is an message attached to it */
-    if (hudColor) {
+    if (hudColorRGBA) {
     	/* TODO: rewrite this to exploit the fact HUDprint handles newlines */
 	for (i = 0, j = 0; i < MAX_SCORE_OBJECTS; i++) {
 	    score_object_t*	sobj = &score_objects[(i+score_object)%MAX_SCORE_OBJECTS];
@@ -1380,9 +1380,9 @@ void Paint_HUD(void)
 		    sobj->hud_msg_width = dummy.width;
 		if (j == 0 &&
 		    sobj->hud_msg_width > 2*hudSize-HUD_OFFSET*2 &&
-		    (did_fuel || hudVLineColor))
+		    (did_fuel || hudVLineColorRGBA))
 		    ++j;
-		HUDprint(&gamefont,hudColor,CENTER,DOWN,
+		HUDprint(&gamefont,hudColorRGBA,CENTER,DOWN,
 		    	hud_pos_x,
 			hud_pos_y - (hudSize-HUD_OFFSET + BORDER + j * dummy.height),
 			sobj->hud_msg);
@@ -1391,7 +1391,7 @@ void Paint_HUD(void)
 	}
 
 	if (time_left > 0) {
-	    HUDprint(&gamefont,hudColor,RIGHT,DOWN,
+	    HUDprint(&gamefont,hudColorRGBA,RIGHT,DOWN,
 		    hud_pos_x - hudSize+HUD_OFFSET - BORDER,
 		    hud_pos_y + hudSize+HUD_OFFSET + BORDER,
 		    "%3d:%02d",
@@ -1400,14 +1400,14 @@ void Paint_HUD(void)
 
 	/* Update the modifiers */
 	modlen = strlen(mods);
-	HUDprint(&gamefont,hudColor,RIGHT,UP,
+	HUDprint(&gamefont,hudColorRGBA,RIGHT,UP,
 		hud_pos_x - hudSize+HUD_OFFSET-BORDER,
 		hud_pos_y - hudSize+HUD_OFFSET-BORDER,
 		mods);
 
 	if (autopilotLight) {
 	    dummy = printsize(&gamefont,autopilot);
-	    HUDprint(&gamefont,hudColor,CENTER,DOWN,
+	    HUDprint(&gamefont,hudColorRGBA,CENTER,DOWN,
 			  hud_pos_x,
 			  hud_pos_y + hudSize+HUD_OFFSET + BORDER
 			  + dummy.height*2,
@@ -1422,7 +1422,7 @@ void Paint_HUD(void)
     }
 
     /* draw fuel gauge */
-    if (fuelGaugeColor &&
+    if (fuelGaugeColorRGBA &&
 	((fuelTime > 0.0)
 	 || (fuelSum < fuelLevel3
 	     && ((fuelSum < fuelLevel1 && (loopsSlow % 4) < 2)
@@ -1431,7 +1431,7 @@ void Paint_HUD(void)
 		     && (loopsSlow % 8) < 4)
 		 || (fuelSum > fuelLevel2))))) {
 
-	set_alphacolor(fuelGaugeColor);
+	set_alphacolor(fuelGaugeColorRGBA);
 	tempx = hud_pos_x + hudSize - HUD_OFFSET + FUEL_GAUGE_OFFSET - 1;
 	tempy = hud_pos_y - hudSize + HUD_OFFSET + FUEL_GAUGE_OFFSET - 1;
 	tempw = HUD_OFFSET - (2*FUEL_GAUGE_OFFSET) + 3;
@@ -1490,7 +1490,7 @@ void Paint_messages(void)
 
 	/*
 	 * While there is something emphasized, freeze the life time counter
-	 * of a message if it is not drawn "flashed" (not in oldMessagesColor)
+	 * of a message if it is not drawn "flashed" (not in oldmessagesColorRGBA)
 	 * anymore.
 	 */
 	if (msg->lifeTime > MSG_FLASH_TIME
@@ -1506,18 +1506,18 @@ void Paint_messages(void)
 	}
 
 	if (msg->lifeTime <= MSG_FLASH_TIME)
-	    msg_color = oldMessagesColor;
+	    msg_color = oldmessagesColorRGBA;
 	else {
 	    /* If paused, don't bother to paint messages in mscScan* colors. */
 	    if (self && strchr("P", self->mychar))
-		msg_color = messagesColor;
+		msg_color = messagesColorRGBA;
 	    else {
 		switch (msg->bmsinfo) {
-		case BmsBall:	msg_color = msgScanBallColor;	break;
-		case BmsSafe:	msg_color = msgScanSafeColor;	break;
-		case BmsCover:	msg_color = msgScanCoverColor;	break;
-		case BmsPop:	msg_color = msgScanPopColor;	break;
-		default:	msg_color = messagesColor;	break;
+		case BmsBall:	msg_color = msgScanBallColorRGBA;	break;
+		case BmsSafe:	msg_color = msgScanSafeColorRGBA;	break;
+		case BmsCover:	msg_color = msgScanCoverColorRGBA;	break;
+		case BmsPop:	msg_color = msgScanPopColorRGBA;	break;
+		default:	msg_color = messagesColorRGBA;	break;
 		}
 	    }
 	}
