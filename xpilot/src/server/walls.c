@@ -2656,10 +2656,10 @@ static void Move_ball(object *obj)
 	return;
     }
     owner = BALL_PTR(obj)->owner;
-    if (owner == NO_ID || Players[GetInd[owner]]->team == TEAM_NOT_SET)
+    if (owner == NO_ID)
 	mv.hitmask = BALL_BIT | NOTEAM_BIT;
     else
-	mv.hitmask = BALL_BIT | 1 << Players[GetInd[owner]]->team;
+	mv.hitmask = BALL_BIT | HITMASK(Players[GetInd[owner]]->team);
     mv.start.cx = obj->pos.cx;
     mv.start.cy = obj->pos.cy;
     while (mv.delta.cx || mv.delta.cy) {
@@ -2731,11 +2731,7 @@ static void Move_object_new(object *obj)
 	    mv.hitmask = NONBALL_BIT;
 	    team = obj->team;
 	}
-    if (team == TEAM_NOT_SET)
-	mv.hitmask |= NOTEAM_BIT;
-    else
-	mv.hitmask |= 1 << team;
-
+    mv.hitmask |= HITMASK(team);
     mv.start.cx = obj->pos.cx;
     mv.start.cy = obj->pos.cy;
     mv.delta.cx = FLOAT_TO_CLICK(obj->vel.x * timeStep);
@@ -2839,10 +2835,7 @@ static void Move_player_new(int ind)
 	Player_position_set_clicks(pl, cx, cy);
     }
     else {
-	if (pl->team != TEAM_NOT_SET)
-	    mv.hitmask = NONBALL_BIT | 1 << pl->team;
-	else
-	    mv.hitmask = NONBALL_BIT | NOTEAM_BIT;
+	mv.hitmask = NONBALL_BIT | HITMASK(pl->team);
 	mv.start.cx = pl->pos.cx;
 	mv.start.cy = pl->pos.cy;
 	while (mv.delta.cx || mv.delta.cy) {
