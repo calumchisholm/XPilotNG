@@ -37,9 +37,7 @@ keys_t          buttonMap[5];        /* maps mouse buttons to keys_t */
 
 static int	movement;	/* horizontal mouse movement. */
 
-
-
-
+int Process_event(SDL_Event *evt);
 
 bool Key_press_swap_scalefactor(void)
 {

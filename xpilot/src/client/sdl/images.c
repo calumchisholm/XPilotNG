@@ -125,13 +125,13 @@ void Image_no_texture()
     glDisable(GL_TEXTURE_2D);
 }
 
-void Image_paint(int ind, int x, int y, int frame)
+void Image_paint(int ind, int x, int y, int frame, GLubyte alpha)
 {
-    Image_paint_area(ind, x, y, frame, NULL);
+    Image_paint_area(ind, x, y, frame, NULL, alpha);
 }
 
 
-void Image_paint_area(int ind, int x, int y, int frame, irec *r)
+void Image_paint_area(int ind, int x, int y, int frame, irec *r, GLubyte alpha)
 {
     image_t *img;
     irec    whole;
@@ -158,7 +158,7 @@ void Image_paint_area(int ind, int x, int y, int frame, irec *r)
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glColor4ub(255, 255, 255, 255);
+    glColor4ub(255, 255, 255, alpha);
 
     glBegin(GL_QUADS);
     glTexCoord2f(tx1, ty1); glVertex2i(x    	, y 	    );

@@ -175,7 +175,7 @@ BitFont *DT_FontPointer(int FontNumber) {
 }
 
 /* removes all the fonts currently loaded */
-void DT_DestroyDrawText() {
+void DT_DestroyDrawText(void) {
 	BitFont *CurrentFont = BitFonts;
 	BitFont *temp;
 

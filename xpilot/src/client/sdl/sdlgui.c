@@ -101,6 +101,10 @@ static void set_alphacolor(int color)
 	       (color >> 8) & 255,
 	       color & 255);
 }
+static GLubyte get_alpha(int color)
+{
+    return (color & 255);
+}
 
 int GL_X(int x) {
     return (x - world.x)*scale;
@@ -141,16 +145,16 @@ void Gui_paint_cannon(int x, int y, int type)
 {
     switch (type) {
     case SETUP_CANNON_UP:
-        Image_paint(IMG_CANNON_DOWN, x, y, 0);
+        Image_paint(IMG_CANNON_DOWN, x, y, 0,255);
         break;
     case SETUP_CANNON_DOWN:
-        Image_paint(IMG_CANNON_UP, x, y + 1, 0);
+        Image_paint(IMG_CANNON_UP, x, y + 1, 0,255);
         break;
     case SETUP_CANNON_LEFT:
-        Image_paint(IMG_CANNON_RIGHT, x, y, 0);
+        Image_paint(IMG_CANNON_RIGHT, x, y, 0,255);
         break;
     case SETUP_CANNON_RIGHT:
-        Image_paint(IMG_CANNON_LEFT, x - 1, y, 0);
+        Image_paint(IMG_CANNON_LEFT, x - 1, y, 0,255);
         break;
     default:
         errno = 0;
@@ -182,33 +186,34 @@ void Gui_paint_fuel(int x, int y, double fuel)
 
     size = (BLOCK_SZ - 2 * FUEL_BORDER) * fuel / MAX_STATION_FUEL;
 
-    Image_paint(IMG_FUELCELL, x, y, 0);
+    Image_paint(IMG_FUELCELL, x, y, 0, get_alpha(fuelColor));
 
     area.x = 0;
-    area.y = 0;
+    area.y = (BLOCK_SZ - 2 * FUEL_BORDER) * (1 - fuel / MAX_STATION_FUEL);
     area.w = BLOCK_SZ - 2 * FUEL_BORDER;
     area.h = size;
     Image_paint_area(IMG_FUEL, 
 		     x + FUEL_BORDER, 
 		     y + FUEL_BORDER, 
 		     frame, 
-		     &area);
+		     &area,
+		     get_alpha(fuelColor));
 }
 
 void Gui_paint_base(int x, int y, int id, int team, int type)
 {
     switch (type) {
     case SETUP_BASE_UP:
-        Image_paint(IMG_BASE_DOWN, x, y, 0);
+        Image_paint(IMG_BASE_DOWN, x, y, 0,255);
         break;
     case SETUP_BASE_DOWN:
-        Image_paint(IMG_BASE_UP, x, y + 1, 0);
+        Image_paint(IMG_BASE_UP, x, y + 1, 0,255);
         break;
     case SETUP_BASE_LEFT:
-        Image_paint(IMG_BASE_RIGHT, x, y, 0);
+        Image_paint(IMG_BASE_RIGHT, x, y, 0,255);
         break;
     case SETUP_BASE_RIGHT:
-        Image_paint(IMG_BASE_LEFT, x - 1, y, 0);
+        Image_paint(IMG_BASE_LEFT, x - 1, y, 0,255);
         break;
     default:
         errno = 0;
@@ -313,7 +318,7 @@ void Gui_paint_setup_target(int x, int y, int team, double damage, bool own)
 
 void Gui_paint_setup_treasure(int x, int y, int team, bool own)
 {
-    Image_paint(own ? IMG_HOLDER_FRIEND : IMG_HOLDER_ENEMY, x, y, 0);
+    Image_paint(own ? IMG_HOLDER_FRIEND : IMG_HOLDER_ENEMY, x, y, 0,255);
 }
 
 void Gui_paint_walls(int x, int y, int type)
@@ -403,7 +408,7 @@ void Gui_paint_item_object(int type, int x, int y)
 
 void Gui_paint_ball(int x, int y)
 {
-    Image_paint(IMG_BALL, x - BALL_RADIUS, y - BALL_RADIUS, 0);
+    Image_paint(IMG_BALL, x - BALL_RADIUS, y - BALL_RADIUS, 0,255);
 }
 
 void Gui_paint_ball_connector(int x_1, int y_1, int x_2, int y_2)
@@ -459,7 +464,7 @@ void Gui_paint_fastshot(int color, int x, int y)
     Image_paint(IMG_BULLET, 
 		x + world.x - 2, 
 		world.y - 7 + ext_view_height - y, 
-		3);
+		3,255);
 }
 
 void Gui_paint_teamshot(int x, int y)
@@ -467,7 +472,7 @@ void Gui_paint_teamshot(int x, int y)
     Image_paint(IMG_BULLET_OWN, 
 		x + world.x - 2, 
 		world.y - 7 + ext_view_height - y, 
-		3);
+		3,255);
 }
 
 void Gui_paint_missiles_begin(void)
@@ -499,7 +504,7 @@ void Gui_paint_paused(int x, int y, int count)
     Image_paint(IMG_PAUSED, 
 		x - BLOCK_SZ / 2,
 		y - BLOCK_SZ / 2,
-		(count <= 0 || loopsSlow % 10 >= 5) ? 1 : 0);
+		(count <= 0 || loopsSlow % 10 >= 5) ? 1 : 0,128);
 }
 
 void Gui_paint_appearing(int x, int y, int id, int count)

@@ -50,7 +50,7 @@ extern "C" {
 	int	DT_FontHeight( int FontNumber );
 	int	DT_FontWidth( int FontNumber );
 	BitFont*	DT_FontPointer(int FontNumber );
-	void	DT_DestroyDrawText();
+	void	DT_DestroyDrawText(void);
 
 
 #ifdef __cplusplus

@@ -54,7 +54,10 @@ int LoadBMP(font_data *ft_font, const char * fname);
 void pushScreenCoordinateMatrix(void);
 void pop_projection_matrix(void);
 int next_p2 ( int a );
-
+#ifdef HAVE_SDL_TTF
+GLuint SDL_GL_LoadTexture(SDL_Surface *surface, texcoord_t *texcoord);
+int FTinit(font_data *font, const char * fontname, int ptsize);
+#endif
 int next_p2 ( int a )
 {
 	int rval=1;

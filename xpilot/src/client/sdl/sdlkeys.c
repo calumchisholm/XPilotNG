@@ -1,6 +1,6 @@
 #include <string.h>
 #include "SDL.h"
-#include "keys.h"
+#include "sdlkeys.h"
 
 typedef struct {
 	char*	name;

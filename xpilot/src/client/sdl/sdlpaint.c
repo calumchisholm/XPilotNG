@@ -140,6 +140,9 @@ int Check_view_dimensions(void)
 }
 #endif
 
+/* This one works best for things that are fixed in position
+ * since they won't appear to move relative to eachother
+ */
 void setupPaint_stationary(void)
 {
     if (paintSetupMode & STATIONARY_MODE) return;
@@ -150,6 +153,9 @@ void setupPaint_stationary(void)
     glScalef(scale, scale, scale);
 }
 
+/* This one works best for things that move, since they don't get
+ * painted differently depending on map position
+ */
 void setupPaint_moving(void)
 {
     if (paintSetupMode & MOVING_MODE) return;
@@ -240,9 +246,6 @@ void Paint_frame(void)
 	} else
 	    Paint_objects();
 
-	/* This one works best for things that move, since they don't get
-	 * painted differently depending on map position
-	 */
 	
 	Paint_shots();
 	setupPaint_moving();

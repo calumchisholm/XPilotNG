@@ -67,6 +67,6 @@ typedef struct {
 int Images_init(void);
 void Images_cleanup(void);
 int Bitmap_add(char *filename, int count, bool scalable);
-void Image_paint(int ind, int x, int y, int frame);
-void Image_paint_area(int ind, int x, int y, int frame, irec *r);
+void Image_paint(int ind, int x, int y, int frame, GLubyte alpha);
+void Image_paint_area(int ind, int x, int y, int frame, irec *r, GLubyte alpha);
 image_t *Image_get(int ind);
