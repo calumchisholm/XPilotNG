@@ -121,7 +121,6 @@ extern xp_pixmap_t xp_pixmaps[];
 
 int Bitmaps_init(void);
 void Bitmaps_cleanup(void);
-int Bitmap_add (const char *filename, int count, bool scalable);
 int Bitmap_create (Drawable d, int img);
 void Bitmap_update_scale (void);
 

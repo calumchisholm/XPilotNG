@@ -135,14 +135,14 @@ int Mapdata_setup(const char *urlstr)
     }
 
     if (access(path, F_OK) == 0) {
-	printf("Required bitmaps have already been downloaded.\n");
+	warn("Required bitmaps have already been downloaded.");
 	rv = true;
 	goto end;
     }
     /* reset path so that it points to the package file name */
     *ptr = '.';
 
-    printf("Downloading map data from %s to %s.\n", urlstr, path);
+    warn("Downloading map data from %s to %s.", urlstr, path);
 
     if (!Mapdata_download(&url, path)) {
 	warn("downloading map data failed");
@@ -226,7 +226,7 @@ static int Mapdata_extract(const char *name)
 	    return 0;
 	}
 
-	printf("Extracting %s (%ld)\n", fname, size);
+	warn("Extracting %s (%ld)", fname, size);
 
 	if ((out = fopen(fname, "wb")) == NULL) {
 	    error("failed to open %s for writing", buf);

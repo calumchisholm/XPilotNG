@@ -654,6 +654,7 @@ extern bool played_this_round;
  * somewhere
  */
 const char *Program_name(void);
+extern int Bitmap_add(const char *filename, int count, bool scalable);
 
 /*
  * event.c

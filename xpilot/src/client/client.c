@@ -25,9 +25,6 @@
 
 #include "xpclient.h"
 
-/* kps - move to some header */
-extern int Bitmap_add(const char *filename, int count, bool scalable);
-
 char client_version[] = VERSION;
 
 char	*geometry;

@@ -93,11 +93,11 @@ typedef struct {
 
 int Images_init(void);
 void Images_cleanup(void);
-int Bitmap_add(const char *filename, int count, bool scalable);
 void Image_paint(int ind, int x, int y, int frame, int c);
 void Image_paint_area(int ind, int x, int y, int frame, irec_t *r, int c);
 image_t *Image_get(int ind);
 image_t *Image_get_texture(int ind);
 void Image_use_texture(int ind);
 void Image_no_texture(void);
+
 #endif
