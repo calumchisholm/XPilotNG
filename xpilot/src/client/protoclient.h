@@ -72,8 +72,8 @@ extern void Store_key_options(void);
  * join.c
  */
 extern int Join(char *server_addr, char *server_name, int port,
-		char *real, char *nick, int my_team,
-		char *display, unsigned server_version);
+		char *real, char *nick,	char *display,
+		unsigned server_version);
 
 /*
  * mapdata.c

@@ -2401,7 +2401,6 @@ int Welcome_screen(Connect_param_t * conpar)
 		      conpar->login_port,
 		      conpar->real_name,
 		      conpar->nick_name,
-		      conpar->team,
 		      conpar->disp_name, conpar->server_version);
     } else
 	Quit();

@@ -173,7 +173,7 @@ static void sigcatch(int signum)
 }
 
 int Join(char *server_addr, char *server_name, int port, char *real,
-	 char *nick, int my_team, char *display, unsigned server_version)
+	 char *nick, char *display, unsigned server_version)
 {
     signal(SIGINT, sigcatch);
     signal(SIGTERM, sigcatch);

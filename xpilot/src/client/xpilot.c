@@ -181,7 +181,7 @@ extern void Handle_x_options(void);
 	retval =
 	  Join(conpar->server_addr, conpar->server_name,
 	       conpar->login_port, conpar->real_name, conpar->nick_name,
-	       conpar->team, conpar->disp_name, conpar->server_version);
+	       conpar->disp_name, conpar->server_version);
     
     if (instruments.useClientRanker)
 	Print_saved_scores();
