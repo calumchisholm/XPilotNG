@@ -69,10 +69,10 @@ void Pick_startpos(player_t *pl)
 	return;
     }
 
-    if (prev_num_bases != world->NumBases) {
-	prev_num_bases = world->NumBases;
+    if (prev_num_bases != Num_bases(world)) {
+	prev_num_bases = Num_bases(world);
 	XFREE(free_bases);
-	free_bases = XMALLOC(char, world->NumBases);
+	free_bases = XMALLOC(char, Num_bases(world));
 	if (free_bases == NULL) {
 	    error("Can't allocate memory for free_bases");
 	    End_game();
@@ -80,8 +80,8 @@ void Pick_startpos(player_t *pl)
     }
 
     num_free = 0;
-    for (i = 0; i < world->NumBases; i++) {
-	if (world->bases[i].team == pl->team) {
+    for (i = 0; i < Num_bases(world); i++) {
+	if (Base_by_index(world, i)->team == pl->team) {
 	    num_free++;
 	    free_bases[i] = 1;
 	} else
@@ -101,14 +101,14 @@ void Pick_startpos(player_t *pl)
     }
 
     if (BIT(world->rules->mode, TIMING)) {	/* pick first free base */
-	for (i = 0; i < world->NumBases; i++) {
+	for (i = 0; i < Num_bases(world); i++) {
 	    if (free_bases[i])
 		break;
 	}
     } else {
 	pick = (int)(rfrac() * num_free);
 	seen = 0;
-	for (i = 0; i < world->NumBases; i++) {
+	for (i = 0; i < Num_bases(world); i++) {
 	    if (free_bases[i] != 0) {
 		if (seen < pick)
 		    seen++;
@@ -118,9 +118,9 @@ void Pick_startpos(player_t *pl)
 	}
     }
 
-    if (i == world->NumBases) {
+    if (i == Num_bases(world)) {
 	error("Can't pick startpos (ind=%d,num=%d,free=%d,pick=%d,seen=%d)",
-	      ind, world->NumBases, num_free, pick, seen);
+	      ind, Num_bases(world), num_free, pick, seen);
 	End_game();
     } else {
 	pl->home_base = Base_by_index(world, i);

@@ -721,7 +721,7 @@ void Queue_loop(world_t *world)
 	if (last_unqueued_loops + 2 + (FPS >> 2) < main_loops) {
 	    int lim = (int)MIN(options.playerLimit,
 			       options.baselessPausing
-			       ? 1e6 : world->NumBases);
+			       ? 1e6 : Num_bases(world));
 
 	    /* is there a homebase available? */
 	    if (NumPlayers - NumPseudoPlayers + login_in_progress < lim

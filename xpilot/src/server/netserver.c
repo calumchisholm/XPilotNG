@@ -1193,7 +1193,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	else
 	    CLR_BIT(cannon->conn_mask, conn_bit);
     }
-    for (i = 0; i < world->NumFuels; i++) {
+    for (i = 0; i < Num_fuels(world); i++) {
 	fuel_t *fs = Fuel_by_index(world, i);
 	/*
 	 * The client assumes at startup that all fuelstations are filled.
@@ -2498,6 +2498,7 @@ static int Receive_ack_fuel(connection_t *connp)
     int n;
     unsigned short num;
     world_t *world = &World;
+    fuel_t *fs;
 
     if ((n = Packet_scanf(&connp->r, "%c%ld%hu",
 			  &ch, &loops_ack, &num)) <= 0) {
@@ -2505,12 +2506,13 @@ static int Receive_ack_fuel(connection_t *connp)
 	    Destroy_connection(connp, "read error");
 	return n;
     }
-    if (num >= world->NumFuels) {
+    if (num >= Num_fuels(world)) {
 	Destroy_connection(connp, "bad fuel ack");
 	return -1;
     }
-    if (loops_ack > world->fuels[num].last_change)
-	SET_BIT(world->fuels[num].conn_mask, 1 << connp->ind);
+    fs = Fuel_by_index(world, num);
+    if (loops_ack > fs->last_change)
+	SET_BIT(fs->conn_mask, 1 << connp->ind);
     return 1;
 }
 

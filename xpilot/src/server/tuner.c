@@ -60,7 +60,7 @@ void tuner_maxrobots(world_t *world)
     UNUSED_PARAM(world);
 
     if (options.maxRobots < 0)
-	options.maxRobots = world->NumBases;
+	options.maxRobots = Num_bases(world);
 
     if (options.maxRobots < options.minRobots)
 	options.minRobots = options.maxRobots;

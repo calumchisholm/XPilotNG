@@ -456,10 +456,10 @@ static void Frame_map(connection_t *conn, player_t *pl)
     packet_count = 0;
     max_packet = MAX(5, bytes_left / fuel_packet_size);
     i = MAX(0, pl->last_fuel_update);
-    for (k = 0; k < world->NumFuels; k++) {
+    for (k = 0; k < Num_fuels(world); k++) {
 	fuel_t *fs;
 
-	if (++i >= world->NumFuels)
+	if (++i >= Num_fuels(world))
 	    i = 0;
 
 	fs = Fuel_by_index(world, i);

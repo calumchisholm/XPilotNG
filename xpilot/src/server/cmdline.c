@@ -3963,11 +3963,11 @@ option_desc* Find_option_by_name(const char* name)
 void Check_playerlimit(world_t *world)
 {
     if (options.playerLimit == 0)
-	options.playerLimit = world->NumBases + 10;
+	options.playerLimit = Num_bases(world) + 10;
 
     if (options.playerLimit_orig == 0)
 	options.playerLimit_orig = MAX(options.playerLimit,
-				       world->NumBases + 10);
+				       Num_bases(world) + 10);
 
     if (options.playerLimit > options.playerLimit_orig)
 	options.playerLimit = options.playerLimit_orig;

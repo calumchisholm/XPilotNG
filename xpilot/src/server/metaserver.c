@@ -210,7 +210,7 @@ void Meta_update(bool change)
     }
     else
 	snprintf(freebases, sizeof(freebases), "=%d",
-		 world->NumBases - num_active_players - login_in_progress);
+		 Num_bases(world) - num_active_players - login_in_progress);
 
     snprintf(string, max_size,
 	     "add server %s\n"
@@ -231,7 +231,7 @@ void Meta_update(bool change)
 	     "add sound %s\n",
 	     Server.host, num_active_players,
 	     META_VERSION, world->name, world->x, world->y, world->author,
-	     world->NumBases, FPS, options.contactPort,
+	     Num_bases(world), FPS, options.contactPort,
 	     game_mode, world->NumTeamBases, freebases,
 	     BIT(world->rules->mode, TIMING) ? 1:0,
 	     (long)(time(NULL) - serverStartTime),

@@ -179,7 +179,7 @@ static void Player_change_home(player_t *pl)
     double l, dist = 1e19;
     int i;
 
-    for (i = 0; i < world->NumBases; i++) {
+    for (i = 0; i < Num_bases(world); i++) {
 	base_t *base = Base_by_index(world, i);
 
 	l = Wrap_length(pl->pos.cx - base->pos.cx,
@@ -200,11 +200,11 @@ static void Player_change_home(player_t *pl)
 	if (enemybase)
 	    Set_player_message_f(pl, "Base belongs to team %d. "
 				 "Enemy home bases can't be occupied. "
-				 "[*Server reply*]", enemybase->team);
+				 "[*Server notice*]", enemybase->team);
 	else
 	    Set_player_message(pl, "You are too far away from "
 			       "a suitable base to change home. "
-			       "[*Server reply*]");
+			       "[*Server notice*]");
 	return;
     }
 	
@@ -270,7 +270,7 @@ static void Player_refuel(player_t *pl)
 	return;
 
     CLR_BIT(pl->used, USES_REFUEL);
-    for (i = 0; i < world->NumFuels; i++) {
+    for (i = 0; i < Num_fuels(world); i++) {
 	fuel_t *fs = Fuel_by_index(world, i);
 
 	l = Wrap_length(pl->pos.cx - fs->pos.cx,

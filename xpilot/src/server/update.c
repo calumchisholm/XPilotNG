@@ -439,7 +439,7 @@ static void Fuel_update(world_t *world)
     fuel = (NumPlayers * STATION_REGENERATION * timeStep);
     frames_per_update = (int)(MAX_STATION_FUEL / (fuel * BLOCK_SZ));
 
-    for (i = 0; i < world->NumFuels; i++) {
+    for (i = 0; i < Num_fuels(world); i++) {
 	fuel_t *fs = Fuel_by_index(world, i);
 
 	if (fs->fuel == MAX_STATION_FUEL)

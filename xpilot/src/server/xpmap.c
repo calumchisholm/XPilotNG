@@ -238,7 +238,7 @@ void Create_blockmap_from_polygons(world_t *world)
      * Create blocks out of map objects. Note that some of these
      * may be in the same block, which might cause a client error.
      */
-    for (i = 0; i < world->NumFuels; i++) {
+    for (i = 0; i < Num_fuels(world); i++) {
 	fuel_t *fs = Fuel_by_index(world, i);
 
 	blk = Clpos_to_blkpos(fs->pos);
@@ -296,7 +296,7 @@ void Create_blockmap_from_polygons(world_t *world)
      * First mark all blocks having a base.
      * We use a base attractor for this.
      */
-    for (i = 0; i < world->NumBases; i++) {
+    for (i = 0; i < Num_bases(world); i++) {
 	base_t *base = Base_by_index(world, i);
 
 	blk = Clpos_to_blkpos(base->pos);
@@ -312,7 +312,7 @@ void Create_blockmap_from_polygons(world_t *world)
      * Put bases where there are base attractors or somewhere else
      * if the block already has some other important type.
      */
-    for (i = 0; i < world->NumBases; i++) {
+    for (i = 0; i < Num_bases(world); i++) {
 	base_t *base = Base_by_index(world, i);
 	bool done;
 
@@ -362,7 +362,7 @@ void Create_blockmap_from_polygons(world_t *world)
 setup_t *Xpmap_init_setup(world_t *world)
 {
     int i, x, y, team, type = -1, dir, wtype;
-    int wormhole = 0, treasure = 0, target = 0, base = 0, cannon = 0;
+    int wormhole_i = 0, treasure_i = 0, target_i = 0, base_i = 0, cannon_i = 0;
     unsigned char *mapdata, *mapptr;
     size_t size, numblocks;
     setup_t *setup;
@@ -440,7 +440,7 @@ setup_t *Xpmap_init_setup(world_t *world)
 	    case DECOR_LD:	*mapptr = SETUP_DECOR_LD; break;
 
 	    case WORMHOLE:
-		if (wormhole >= world->NumWormholes) {
+		if (wormhole_i >= world->NumWormholes) {
 		    /*
 		     * This can happen on an xp2 map if the block mapdata
 		     * contains more wormholes than is specified in the
@@ -450,7 +450,7 @@ setup_t *Xpmap_init_setup(world_t *world)
 		    *mapptr = SETUP_SPACE;
 		    break;
 		}
-		wtype = world->wormholes[wormhole++].type;
+		wtype = world->wormholes[wormhole_i++].type;
 		switch (wtype) {
 		case WORM_NORMAL:
 		case WORM_FIXED:
@@ -470,39 +470,40 @@ setup_t *Xpmap_init_setup(world_t *world)
 		break;
 
 	    case TREASURE:
-		if (treasure >= world->NumTreasures) {
+		if (treasure_i >= world->NumTreasures) {
 		    warn("Too many treasures in block mapdata.");
 		    *mapptr = SETUP_SPACE;
 		    break;
 		}
-		team = world->treasures[treasure++].team;
+		team = world->treasures[treasure_i++].team;
 		if (team == TEAM_NOT_SET)
 		    team = 0;
 		*mapptr = SETUP_TREASURE + team;
 		break;
 
 	    case TARGET:
-		if (target >= world->NumTargets) {
+		if (target_i >= world->NumTargets) {
 		    warn("Too many targets in block mapdata.");
 		    *mapptr = SETUP_SPACE;
 		    break;
 		}
-		team = world->targets[target++].team;
+		team = world->targets[target_i++].team;
 		if (team == TEAM_NOT_SET)
 		    team = 0;
 		*mapptr = SETUP_TARGET + team;
 		break;
 
 	    case BASE:
-		if (base >= world->NumBases) {
+		if (base_i >= Num_bases(world)) {
 		    warn("Too many bases in block mapdata.");
 		    *mapptr = SETUP_SPACE;
 		    break;
 		}
-		team = world->bases[base].team;
+		team = Base_by_index(world, base_i)->team;
 		if (team == TEAM_NOT_SET)
 		    team = 0;
-		dir = world->bases[base++].dir;
+		dir = Base_by_index(world, base_i)->dir;
+		base_i++;
 		/* other code should take care of this */
 		assert(dir >= 0);
 		assert(dir < RES);
@@ -524,12 +525,12 @@ setup_t *Xpmap_init_setup(world_t *world)
 		break;
 
 	    case CANNON:
-		if (cannon >= world->NumCannons) {
+		if (cannon_i >= world->NumCannons) {
 		    warn("Too many cannons in block mapdata.");
 		    *mapptr = SETUP_SPACE;
 		    break;
 		}
-		dir = world->cannons[cannon++].dir;
+		dir = world->cannons[cannon_i++].dir;
 		switch (dir) {
 		case DIR_UP:	*mapptr = SETUP_CANNON_UP; break;
 		case DIR_RIGHT:	*mapptr = SETUP_CANNON_RIGHT; break;
@@ -1010,7 +1011,7 @@ void Xpmap_find_map_object_teams(world_t *world)
 	}
     }
 
-    for (i = 0; i < world->NumFuels; i++) {
+    for (i = 0; i < Num_fuels(world); i++) {
 	fuel_t *fs = Fuel_by_index(world, i);
 
 	fs->team = Find_closest_team(world, fs->pos);
@@ -1030,7 +1031,7 @@ void Xpmap_find_base_direction(world_t *world)
     int	i;
     blkpos_t blk;
 
-    for (i = 0; i < world->NumBases; i++) {
+    for (i = 0; i < Num_bases(world); i++) {
 	base_t *base = Base_by_index(world, i);
 	int x, y, dir, att;
 	vector_t gravity = World_gravity(world, base->pos);

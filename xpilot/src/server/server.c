@@ -62,11 +62,14 @@ int main(int argc, char **argv)
     world_t *world = &World;
 
     if (sock_startup() < 0) {
-    	xpprintf("Error initializing sockets\n");
+    	warn("Error initializing sockets\n");
 	return 1;
     }
 
-    World_init(world);
+    if (World_init(world) < 0) {
+	warn("Error initializing world\n");
+	return 1;
+    }
 
     /*
      * Make output always linebuffered.  By default pipes
@@ -106,8 +109,8 @@ int main(int argc, char **argv)
     Walls_init(world);
 
     /* Allocate memory for players, shots and messages */
-    Alloc_players(world->NumBases + MAX_PSEUDO_PLAYERS + MAX_SPECTATORS);
-    spectatorStart = world->NumBases + MAX_PSEUDO_PLAYERS;
+    Alloc_players(Num_bases(world) + MAX_PSEUDO_PLAYERS + MAX_SPECTATORS);
+    spectatorStart = Num_bases(world) + MAX_PSEUDO_PLAYERS;
     Alloc_shots(world, MAX_TOTAL_SHOTS);
     Alloc_cells(world);
 
@@ -504,7 +507,7 @@ void Server_info(char *str, size_t max_size)
 	     Describe_game_status(),
 	     FPS,
 	     world->name, world->author, world->width, world->height,
-	     NumPlayers, world->NumBases);
+	     NumPlayers, Num_bases(world));
 
     assert(strlen(str) < max_size);
 

@@ -46,12 +46,12 @@ static void Check_map_object_counters(world_t *world)
     int i;
 
     assert(world->NumCannons == 0);
-    assert(world->NumFuels == 0);
+
     assert(world->NumGravs == 0);
     assert(world->NumWormholes == 0);
     assert(world->NumTreasures == 0);
     assert(world->NumTargets == 0);
-    assert(world->NumBases == 0);
+    /*assert(world->NumBases == 0);*/
     assert(world->NumItemConcs == 0);
     assert(world->NumAsteroidConcs == 0);
     assert(world->NumFrictionAreas == 0);
@@ -92,14 +92,14 @@ if ((M) > (N)) { \
 static void Realloc_map_objects(world_t *world)
 {
     SHRINK(cannon_t, world->cannons, world->NumCannons, world->MaxCannons);
-    SHRINK(fuel_t, world->fuels, world->NumFuels, world->MaxFuels);
+    /*SHRINK(fuel_t, world->fuels, world->NumFuels, world->MaxFuels);*/
     SHRINK(grav_t, world->gravs, world->NumGravs, world->MaxGravs);
     SHRINK(wormhole_t, world->wormholes,
 	   world->NumWormholes, world->MaxWormholes);
     SHRINK(treasure_t, world->treasures,
 	   world->NumTreasures, world->MaxTreasures);
     SHRINK(target_t, world->targets, world->NumTargets, world->MaxTargets);
-    SHRINK(base_t, world->bases, world->NumBases, world->MaxBases);
+    /*SHRINK(base_t, world->bases, world->NumBases, world->MaxBases);*/
     SHRINK(item_concentrator_t, world->itemConcs,
 	   world->NumItemConcs, world->MaxItemConcs);
     SHRINK(asteroid_concentrator_t, world->asteroidConcs,
@@ -140,21 +140,22 @@ int World_place_cannon(world_t *world, clpos_t pos, int dir, int team)
 int World_place_fuel(world_t *world, clpos_t pos, int team)
 {
     fuel_t t;
-    int ind = world->NumFuels;
+    int ind = Num_fuels(world);
 
     t.pos = pos;
     t.fuel = START_STATION_FUEL;
     t.conn_mask = (unsigned)-1;
     t.last_change = frame_loops;
     t.team = team;
-    STORE(fuel_t, world->fuels, world->NumFuels, world->MaxFuels, t);
+    /*STORE(fuel_t, world->fuels, world->NumFuels, world->MaxFuels, t);*/
+    Arraylist_add(world->fuels, &t);
     return ind;
 }
 
 int World_place_base(world_t *world, clpos_t pos, int dir, int team)
 {
     base_t t;
-    int ind = world->NumBases, i;
+    int ind = Num_bases(world), i;
 
     t.pos = pos;
     /*
@@ -183,12 +184,13 @@ int World_place_base(world_t *world, clpos_t pos, int dir, int team)
 	    world->NumTeamBases++;
     } else
 	t.team = TEAM_NOT_SET;
-    t.ind = world->NumBases;
+    t.ind = Num_bases(world);
 
     for (i = 0; i < NUM_ITEMS; i++)
 	t.initial_items[i] = -1;
 
-    STORE(base_t, world->bases, world->NumBases, world->MaxBases, t);
+    /*STORE(base_t, world->bases, world->NumBases, world->MaxBases, t);*/
+    Arraylist_add(world->bases, &t);
     return ind;
 }
 
@@ -387,16 +389,25 @@ static void Filled_wire_init(void)
     filled_coords[3].cy = h - 1;
 }
 
-void World_init(world_t *world)
+int World_init(world_t *world)
 {
     int i;
 
     memset(world, 0, sizeof(world_t));
 
+    world->fuels = Arraylist_create(sizeof(fuel_t));
+    if (world->fuels == NULL)
+	return -1;
+    world->bases = Arraylist_create(sizeof(base_t));
+    if (world->bases == NULL)
+	return -1;
+
     for (i = 0; i < MAX_TEAMS; i++)
 	Team_by_index(world, i)->SwapperId = NO_ID;
 
     Filled_wire_init();
+
+    return 0;
 }
 
 void World_free(world_t *world)
@@ -407,7 +418,7 @@ void World_free(world_t *world)
     XFREE(world->bases);
     XFREE(world->cannons);
     XFREE(world->checks);
-    XFREE(world->fuels);
+    /*XFREE(world->fuels);*/
     XFREE(world->wormholes);
     XFREE(world->itemConcs);
     XFREE(world->asteroidConcs);
@@ -433,8 +444,8 @@ static bool World_alloc(world_t *world)
 	       + world->x * sizeof(vector_t) * world->y);
 
     assert(world->gravs == NULL);
-    assert(world->bases == NULL);
-    assert(world->fuels == NULL);
+    /*assert(world->bases == NULL);*/
+    /*assert(world->fuels == NULL);*/
     assert(world->cannons == NULL);
     assert(world->checks == NULL);
     assert(world->wormholes == NULL);
@@ -575,19 +586,19 @@ bool Grok_map(world_t *world)
 
     /* kps - what are these doing here ? */
     if (options.maxRobots == -1)
-	options.maxRobots = world->NumBases;
+	options.maxRobots = Num_bases(world);
 
     if (options.minRobots == -1)
 	options.minRobots = options.maxRobots;
 
     Realloc_map_objects(world);
 
-    if (world->NumBases <= 0)
+    if (Num_bases(world) <= 0)
 	fatal("Map has no bases!");
 
     xpprintf("World....: %s\nBases....: %d\nMapsize..: %dx%d pixels\n"
 	     "Team play: %s\n",
-	     world->name, world->NumBases, world->width, world->height,
+	     world->name, Num_bases(world), world->width, world->height,
 	     BIT(world->rules->mode, TEAM_PLAY) ? "on" : "off");
 
     if (!is_polygon_map)
@@ -607,7 +618,7 @@ int Find_closest_team(world_t *world, clpos_t pos)
     int team = TEAM_NOT_SET, i;
     double closest = FLT_MAX, l;
 
-    for (i = 0; i < world->NumBases; i++) {
+    for (i = 0; i < Num_bases(world); i++) {
 	base_t *base = Base_by_index(world, i);
 
 	if (base->team == TEAM_NOT_SET)

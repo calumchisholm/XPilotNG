@@ -182,7 +182,7 @@ bool team_dead(int team);
 /*
  * Prototypes for map.c
  */
-void World_init(world_t *world);
+int World_init(world_t *world);
 void World_free(world_t *world);
 bool Grok_map(world_t *world);
 bool Grok_map_options(world_t *world);

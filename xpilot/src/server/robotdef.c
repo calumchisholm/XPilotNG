@@ -1476,7 +1476,7 @@ static int Robot_default_play_check_map(player_t *pl)
     robot_default_data_t *my_data = Robot_default_get_data(pl);
     world_t *world = pl->world;
 
-    for (j = 0; j < world->NumFuels; j++) {
+    for (j = 0; j < Num_fuels(world); j++) {
 	fuel_t *fs = Fuel_by_index(world, j);
 
 	if (fs->fuel < 100.0)
@@ -1878,7 +1878,7 @@ static void Robot_default_play(player_t *pl)
     }
 
     if (pl->fuel.sum < pl->fuel.max * 0.80) {
-	for (j = 0; j < world->NumFuels; j++) {
+	for (j = 0; j < Num_fuels(world); j++) {
 	    fuel_t *fs = Fuel_by_index(world, j);
 
 	    if (BIT(world->rules->mode, TEAM_PLAY)

@@ -1115,9 +1115,11 @@ static int Cmd_team(char *arg, player_t *pl, bool oper, char *msg, size_t size)
 	}
 
 	for (i = 0; i < MAX_TEAMS ; i++) {
+	    team_t *t = Team_by_index(world, i);
+
 	    /* Can't queue to two teams at once. */
-	    if (world->teams[i].SwapperId == pl->id)
-		world->teams[i].SwapperId = -1;
+	    if (t->SwapperId == pl->id)
+		t->SwapperId = NO_ID;
 	}
 
 	if (game_lock && pl->home_base == NULL)

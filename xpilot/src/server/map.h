@@ -249,10 +249,21 @@ struct world {
     team_t	teams[MAX_TEAMS];
 
     int		NumTeamBases;	/* How many 'different' teams are allowed */
+
+#if 0
     int		NumBases, MaxBases;
     base_t	*bases;
+#else
+    arraylist_t	*bases;
+#endif
+
+#if 0
     int		NumFuels, MaxFuels;
     fuel_t	*fuels;
+#else
+    arraylist_t	*fuels;
+#endif
+
     int		NumGravs, MaxGravs;
     grav_t	*gravs;
     int		NumCannons, MaxCannons;
@@ -345,19 +356,12 @@ static inline clpos_t World_wrap_clpos(world_t *world, clpos_t pos)
 }
 
 
-static inline base_t *Base_by_index(world_t *world, int ind)
-{
-    if (ind >= 0 && ind < world->NumBases)
-	return &world->bases[ind];
-    return NULL;
-}
+#define Num_bases(w)		Arraylist_get_num_elements((w)->bases)
+#define Base_by_index(w, i)	((base_t *)Arraylist_get((w)->bases, (i)))
+#define Num_fuels(w)		Arraylist_get_num_elements((w)->fuels)
+#define Fuel_by_index(w, i)	((fuel_t *)Arraylist_get((w)->fuels, (i)))
 
-static inline fuel_t *Fuel_by_index(world_t *world, int ind)
-{
-    if (ind >= 0 && ind < world->NumFuels)
-	return &world->fuels[ind];
-    return NULL;
-}
+
 
 static inline cannon_t *Cannon_by_index(world_t *world, int ind)
 {

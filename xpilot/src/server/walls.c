@@ -1623,20 +1623,23 @@ int Polys_to_client(unsigned char **start)
 	    starty = dy;
 	}
     }
-    STORE1(world->NumBases);
-    for (i = 0; i < world->NumBases; i++) {
-	if (world->bases[i].team == TEAM_NOT_SET)
+    STORE1(Num_bases(world));
+    for (i = 0; i < Num_bases(world); i++) {
+	base_t *base = Base_by_index(world, i);
+	if (base->team == TEAM_NOT_SET)
 	    STORE1(0);
 	else
-	    STORE1(world->bases[i].team);
-	STORE2(world->bases[i].pos.cx >> CLICK_SHIFT);
-	STORE2(world->bases[i].pos.cy >> CLICK_SHIFT);
-	STORE1(world->bases[i].dir);
+	    STORE1(base->team);
+	STORE2(base->pos.cx >> CLICK_SHIFT);
+	STORE2(base->pos.cy >> CLICK_SHIFT);
+	STORE1(base->dir);
     }
-    STORE2(world->NumFuels);
-    for (i = 0; i < world->NumFuels; i++) {
-	STORE2(world->fuels[i].pos.cx >> CLICK_SHIFT);
-	STORE2(world->fuels[i].pos.cy >> CLICK_SHIFT);
+    STORE2(Num_fuels(world));
+    for (i = 0; i < Num_fuels(world); i++) {
+	fuel_t *fs = Fuel_by_index(world, i);
+
+	STORE2(fs->pos.cx >> CLICK_SHIFT);
+	STORE2(fs->pos.cy >> CLICK_SHIFT);
     }
     STORE1(world->NumChecks);
     for (i = 0; i < world->NumChecks; i++) {
