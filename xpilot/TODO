@@ -77,9 +77,6 @@ Developer: kps / virus
 Task: Rewrite INSTALL.txt for ng. Especially describe SDL client compiling.
 Developer: kps
 
-Task: Cleanup teamcup.c of obsolete code (teamcup fork etc).
-Developer: kps
-
 Task: Add a way to be able to specify for each cannon/base what start items
 (or more generally options) will be used for that cannon/base. Values of these
 will override general map options where appropriate. Not all options
