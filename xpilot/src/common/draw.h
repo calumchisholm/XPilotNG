@@ -101,25 +101,31 @@
 #define MAX_LIGHT_PTS	    3
 #define MAX_RACK_PTS	    4
 
+#ifdef SERVER
+#define SHIPCOORD ipos
+#else
+#define SHIPCOORD position
+#endif
+
 typedef struct {			/* Defines wire-obj, i.e. ship */
-    position	*pts[MAX_SHIP_PTS];	/* the shape rotated many ways */
+    SHIPCOORD	*pts[MAX_SHIP_PTS];	/* the shape rotated many ways */
     int		num_points;		/* total points in object */
-    position	engine[RES];		/* Engine position */
-    position	m_gun[RES];		/* Main gun position */
+    SHIPCOORD	engine[RES];		/* Engine position */
+    SHIPCOORD	m_gun[RES];		/* Main gun position */
     int		num_l_gun,
 		num_r_gun,
 		num_l_rgun,
 		num_r_rgun;		/* number of additional cannons */
-    position	*l_gun[MAX_GUN_PTS],	/* Additional cannon positions, left*/
+    SHIPCOORD	*l_gun[MAX_GUN_PTS],	/* Additional cannon positions, left*/
 		*r_gun[MAX_GUN_PTS],	/* Additional cannon positions, right*/
 		*l_rgun[MAX_GUN_PTS],	/* Additional rear cannon positions, left*/
 		*r_rgun[MAX_GUN_PTS];	/* Additional rear cannon positions, right*/
     int		num_l_light,		/* Number of lights */
 		num_r_light;
-    position	*l_light[MAX_LIGHT_PTS], /* Left and right light positions */
+    SHIPCOORD	*l_light[MAX_LIGHT_PTS], /* Left and right light positions */
 		*r_light[MAX_LIGHT_PTS];
     int		num_m_rack;		/* Number of missile racks */
-    position	*m_rack[MAX_RACK_PTS];
+    SHIPCOORD	*m_rack[MAX_RACK_PTS];
     int		shield_radius;		/* Radius of shield used by client. */
 #ifdef	_NAMEDSHIPS
 	char*	name;

@@ -38,6 +38,7 @@
 
 #include <math.h>
 
+#define SERVER
 #include "version.h"
 #include "config.h"
 #include "const.h"
@@ -1450,4 +1451,3 @@ void Calculate_shield_radius(wireobj *w)
 			? 34
 			: (max_radius + 2 - (max_radius & 1));
 }
-
