@@ -1206,9 +1206,20 @@ void Update_objects(world_t *world)
 	Cannon_update(world, tick);
     if (Num_targets(world) > 0)
 	Target_update(world);
+
     if (!options.fastAim)
 	Players_turn();
+
+    for (i = 0; i < NumPlayers; i++) {
+	pl = Player_by_index(i);
+	if (pl->wanted_float_dir != pl->float_dir) {
+	    Player_set_float_dir(pl,pl->wanted_float_dir);
+	    Turn_player(pl,false);
+	}
+    }
+
     Update_players(world);
+
     for (i = 0; i < NumPlayers; i++) {
 	pl = Player_by_index(i);
 	if (pl->wanted_float_dir != pl->float_dir) {

@@ -1609,6 +1609,16 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
+	"treasureCollisionCostsFuel",
+	"treasureUnshieldedCollisionCostsFuel",
+	"false",
+	&options.treasureCollisionCostsFuel,
+	valBool,
+	tuner_dummy,
+	"Does a ball drain a player's fuel when the player touches it unshielded?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
 	"wreckageCollisionMayKill",
 	"wreckageUnshieldedCollisionKills",
 	"false",
@@ -3702,6 +3712,27 @@ static option_desc opts[] = {
 	"increasing speeds otherwise. This can improve gameplay for example\n"
 	"on the Blood's Music map. Higher values make the ship behaviour\n"
 	"visibly weird.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"turnPushPersistance",
+	"pushPersist",
+	"0.0",
+	&options.turnPushPersistance,
+	valReal,
+	tuner_dummy,
+	"How much of the turnpush to remain as player velocity. (0.0-1.0)\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"turnGrip",
+	"turnPushGrip",
+	"0.0",
+	&options.turnGrip,
+	valReal,
+	tuner_dummy,
+	"How much of of the turnPush should pull the ship sideways by gripping\n"
+	"to the friction of the wall?. (0.0-1.0)\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {

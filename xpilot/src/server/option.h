@@ -210,6 +210,7 @@ extern struct options {
     int		specialBallTeam;
     bool	treasureCollisionDestroys;
     bool	treasureCollisionMayKill;
+    bool	treasureCollisionCostsFuel;
     bool	wreckageCollisionMayKill;
     bool	asteroidCollisionMayKill;
 
@@ -302,6 +303,8 @@ extern struct options {
     char	*recordFileName;
     double	gameSpeed;
     bool	ngControls;
+    double  	turnPushPersistance;
+    double  	turnGrip;
     double	thrustWidth;
     double	thrustMass;
     double	sparkSpeed;

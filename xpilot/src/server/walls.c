@@ -312,7 +312,6 @@ void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
 	int		total_pusher_count = 0;
 	double		total_pusher_score = 0;
 	int		i, j;
-	double		sc;
 
 	Player_set_state(pl, PL_STATE_KILLED);
 	sprintf(msg, howfmt, pl->name, (!pt) ? " head first" : "");
@@ -592,7 +591,7 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
     int group, type, mapobj_ind;
     world_t *world = pl->world;
     bool constant_speed_subtracted
-	= (pl->last_wall_touch == frame_loops ? true : false);
+    	    = (pl->last_wall_touch == frame_loops ? true : false);
 	
     x = linet[line].delta.cx;
     y = linet[line].delta.cy;
@@ -688,8 +687,7 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 	fy = pl->vel.x * s - pl->vel.y * c;
 	pl->vel.x = fx * options.playerWallBounceBrakeFactor;
 	pl->vel.y = fy * options.playerWallBounceBrakeFactor;
-    }
-    else {
+    } else {
 	/*
 	 * Determine new velocity vector and move->delta after bounce.
 	 * The vector move->delta is the remaining amount left to move
@@ -727,8 +725,7 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 		factor = 0.0;
 	    vel.x *= factor;
 	    mvd.x *= factor;
-	}
-	else if (options.playerWallBounceType == 2) {
+	} else if (options.playerWallBounceType == 2) {
 	    double vtotal1 = VECTOR_LENGTH(vel1);
 	    double vnormal1 = ABS(vel1.y);
 	    double wallfriction = options.playerWallFriction;
@@ -736,7 +733,7 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 
 	    /* Avoid division by 0 */
 	    if (vtotal1 < 0.001)
-		factor = 1.0;
+		factor = 1.0 - wallfriction;
 	    else
 		factor = 1.0 - vnormal1 / vtotal1 * wallfriction;
 	    /*
@@ -747,8 +744,7 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 		factor = 0.0;
 	    vel.x *= factor;
 	    mvd.x *= factor;
-	}
-	else if (options.playerWallBounceType == 3) {
+	} else if (options.playerWallBounceType == 3) {
 	    double change;
 	    double C1 = options.playerWallFriction;
 	    double C2 = 1.0 - options.playerWallBounceBrakeFactor;
@@ -775,7 +771,6 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 	    else
 		mvd.x += change;
 	}
-
 	/* iv. Rotate the whole thing anti-clockwise. */
 	pl->vel.x = vel.x * cl + vel.y * (-sl);
 	pl->vel.y = vel.x * sl + vel.y *   cl;
@@ -2716,7 +2711,7 @@ bool in_move_player = false;
 void Move_player(player_t *pl)
 {
     clpos_t  pos;
-    move_t mv;
+    move_t mv,oldmv;
     struct collans ans;
     double fric = friction;
     vector_t oldv;
@@ -2791,8 +2786,8 @@ void Move_player(player_t *pl)
 	pos.cy = pl->pos.cy + mv.delta.cy;
 	pos = World_wrap_clpos(world, pos);
 	Player_position_set_clpos(pl, pos);
-    }
-    else {
+    } else {
+    	bool run_once = false;
 	mv.hitmask = NONBALL_BIT | HITMASK(pl->team);
 	mv.start.cx = pl->pos.cx;
 	mv.start.cy = pl->pos.cy;
@@ -2802,20 +2797,25 @@ void Move_player(player_t *pl)
 	    mv.start.cy = WRAP_YCLICK(mv.start.cy + ans.moved.cy);
 	    mv.delta.cx -= ans.moved.cx;
 	    mv.delta.cy -= ans.moved.cy;
+	    if (run_once && (oldmv.delta.cx == mv.delta.cx)
+	    	&& (oldmv.delta.cy == mv.delta.cy)) {
+	    	error("endless loop in Move_Player prevented");/*TODO fix this!*/
+		break;
+	    }
+	    oldmv.delta.cx = mv.delta.cx;
+	    oldmv.delta.cy = mv.delta.cy;
 	    if (ans.line != -1) {
 		if (SIDE(pl->vel.x, pl->vel.y, ans.line) < 0) {
 		    Bounce_player(pl, &mv, ans.line, ans.point);
 		    if (Player_is_killed(pl))
 			break;
-		}
-		else if (!Shape_away(&mv, (shape_t *)pl->ship, pl->dir,
+		} else if (!Shape_away(&mv, (shape_t *)pl->ship, pl->dir,
 				     ans.line, &ans)) {
 		    if (SIDE(pl->vel.x, pl->vel.y, ans.line) < 0) {
 			Bounce_player(pl, &mv, ans.line, ans.point);
 			if (Player_is_killed(pl))
 			    break;
-		    }
-		    else {
+		    } else {
 			/* This case could be handled better,
 			 * I'll write the code for that if this
 			 * happens too often. */
@@ -2831,6 +2831,7 @@ void Move_player(player_t *pl)
 		    }
 		}
 	    }
+	    run_once = true;
 	}
 	Player_position_set_clvec(pl, mv.start);
     }
@@ -2896,12 +2897,12 @@ void Turn_player(player_t *pl, bool push)
 			    next_dir, hitmask, OBJ_PTR(pl),
 			    pl->pos.cx, pl->pos.cy, &ans);
 	if (group != NO_GROUP) {
-    	    double fact, velon, velot;
+    	    double /*fact, */velon, velot;
     	    double cl, sl;  	/* cosine and sine of line angle    	    */
     	    double cln, sln;	/* cosine and sine of line normal   	    */
     	    double pc, ps;	/* cosine and sine of the points    	    */
     	    double pdc, pds;	/* cosine and sine of the points direction  */
-    	    double x, y, l, v;
+    	    double x, y, l/*, v*/;
 	    double power = pl->power;
 	    int a = (BIT(pl->used, USES_EMERGENCY_THRUST)
 		     ? MAX_AFTERBURNER
@@ -2909,14 +2910,16 @@ void Turn_player(player_t *pl, bool push)
 	    double inert = pl->mass;
 	    double cx,cy;
 	    move_t move;
-
+    	    
+	    /*xpprintf("ans=(%i,%i,%i,%i)\n",ans.line,ans.point,ans.moved.cx,ans.moved.cy);*/
+	    
 	    Player_set_float_dir(pl, (double)pl->dir);
 
 	    if (!push)
 		break;
 
-    	    p = Ship_get_point_clpos((shipshape_t *)pl->ship ,ans.point ,pl->dir);
-    	    p2 = Ship_get_point_clpos((shipshape_t *)pl->ship ,(ans.point + 1)%(((shape_t *)pl->ship)->num_points) ,pl->dir);
+    	    p = Ship_get_point_clpos((shipshape_t *)pl->ship, ans.point, pl->dir);
+    	    p2 = Ship_get_point_clpos((shipshape_t *)pl->ship, (ans.point + 1)%(((shape_t *)pl->ship)->num_points), pl->dir);
 
 	    length = 0;
 
@@ -2960,6 +2963,11 @@ void Turn_player(player_t *pl, bool push)
     	    	pdc = ps;
     	    	pds = -pc;
     	    }
+	    
+	    if ((ans.line == -1) && ((pdc * cln + pds * sln) > 0)) {
+	    	cln = -cln;
+		sln = -sln;
+	    } 
     	    
 	    if (a) {
 		power = AFTER_BURN_POWER(power, a);
@@ -2973,26 +2981,26 @@ void Turn_player(player_t *pl, bool push)
 	    fact = tanh((power / inert) / (velon) );
 	    velon *= fact;*/
 	    
-     	    velon = 2 * (power / inert) * timeStep;
+     	    velon = (power / inert)*(1 + options.constantSpeed);
     	    	    
-    	    if ((pl->vel.x*cln + pl->vel.y*sln) <= 0) {
+    	    if ((pl->vel.x*cln + pl->vel.y*sln) < 0) {
     	    	if (ans.line != -1)
     	    	    Bounce_player(pl, &move, ans.line, 0);
 		else
     	    	    Bounce_player(pl, &move, ans.point, 0);
 	    }
-
-    	    if ((pl->vel.x * cln + pl->vel.y * sln) <= 0) {
-    	    	pl->vel.x -= velon * cln;
-    	    	pl->vel.y -= velon * sln;
-	    } else {
-    	    	pl->vel.x += velon * cln;
-    	    	pl->vel.y += velon * sln;
-	    }
-    	    
-	    /*velot = velon * options.playerWallFriction * ((-pdc) * cl + (-pds) * sl);
-    	    pl->vel.x += velot * cl;
-    	    pl->vel.y += velot * sl;*/
+	    
+	    velot = velon * options.playerWallFriction * ((-pdc) * cl + (-pds) * sl);
+	    
+	    x = pl->vel.x;
+	    y = pl->vel.y;
+     	    pl->vel.x = velon * cln + options.turnGrip * velot * cl;
+    	    pl->vel.y = velon * sln + options.turnGrip * velot * sl;	    
+	    Move_player(pl);
+ 	    pl->vel.x = x + options.turnPushPersistance
+	    	    	* (velon * cln + options.turnGrip * velot * cl);
+	    pl->vel.y = y + options.turnPushPersistance
+	    	    	* (velon * sln + options.turnGrip * velot * sl);
 	    
 	    break;
 	}
