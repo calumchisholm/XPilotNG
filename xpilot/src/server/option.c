@@ -469,22 +469,22 @@ static void Option_change_node(
  * to set option to the new value if permissions allow us to do so.
  */
 void Option_set_value(
-	const char	*name,
-	const char	*value,
-	int		override,
-	optOrigin	opt_origin)
+	const char *name,
+	const char *value,
+	int override,
+	optOrigin opt_origin)
 {
-    hash_node	*np;
-    hash_value	*vp;
-    int		ix = Option_hash_string(name);
+    hash_node *np;
+    hash_value *vp;
+    int ix = Option_hash_string(name);
 
-    /* Warn about deprecated behaviour. */
+    /* Warn about obsolete behaviour. */
     if (opt_origin == OPT_MAP && value) {
 	if ((!strcasecmp(name, "mineLife")
 	     || (!strcasecmp(name, "missileLife")))
 	    && atoi(value) == 0) {
 	    warn("WARNING: '%s: %s' in map.", name, value);
-	    warn("This is a deprecated way to set the default value.");
+	    warn("This is an obsolete way to set the default value.");
 	    warn("To fix, remove the option from the map file.");
 	}
     }
