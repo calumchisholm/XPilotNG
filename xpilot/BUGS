@@ -53,6 +53,17 @@ Files
 affected:
 
 -----------------------------------------------------------------
+Problem : If someone in your team died and is recovering, you can
+	  take his base and then he will be swapped to have some other
+	  base, but with full recovery delay. This way you can keep
+	  a team member from recovering if you take his base all the time.
+Found by: Throat
+Solution:
+Fixed by:
+Files 
+affected:
+
+-----------------------------------------------------------------
 Problem :
 Found by:
 Solution:
