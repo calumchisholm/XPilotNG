@@ -1047,14 +1047,8 @@ void add_temp_wormholes(int xin, int yin, int xout, int yout)
 
 void remove_temp_wormhole(int ind)
 {
-    wormhole_t hole;
-    int bx, by;
+    Wormhole_remove_from_map(ind);
 
-    hole = World.wormHoles[ind];
-    bx = CLICK_TO_BLOCK(hole.pos.cx);
-    by = CLICK_TO_BLOCK(hole.pos.cy);
-    World.block[bx][by] = hole.lastblock;
-    Map_set_itemid(bx, by, hole.lastID);
     World.NumWormholes--;
     if (ind != World.NumWormholes) {
 	World.wormHoles[ind] = World.wormHoles[World.NumWormholes];
