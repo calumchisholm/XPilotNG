@@ -1,4 +1,12 @@
-
+-------------------------------------------------------------------
+Problem : I Converted active volcano to a polygon map with mapconvert,
+	  all the gravity and asteroid concentrators disappeared, and i couldnt
+	  seem to redit them in with jxpmap.
+Found by: Colonel Blood
+Solution:
+Fixed by:
+Files 
+affected:
 -------------------------------------------------------------------
 Problem : If you build the sdl client you HAVE to make install from root
           otherwise it will not find the fonts file and Seg Fault!!
