@@ -1459,6 +1459,7 @@ static int Handle_login(int ind, char *errmsg, int errsize)
      * And tell him about all the others.
      */
     for (i = 0; i < observerStart + NumObservers - 1; i++) {
+	player *pl_i;
 	if (i == NumPlayers - 1 && pl->rectype != 2)
 	    break;
 	if (i == NumPlayers) {
@@ -1467,11 +1468,12 @@ static int Handle_login(int ind, char *errmsg, int errsize)
 	    else
 		i = observerStart;
 	}
-	Send_player(pl->conn, Players(i)->id);
-	Send_score(pl->conn, Players(i)->id, Players(i)->score,
-		   Players(i)->life, Players(i)->mychar, Players(i)->alliance);
-	if (!IS_TANK_IND(i)) {
-	    Send_base(pl->conn, Players(i)->id, Players(i)->home_base);
+	pl_i = Players(i);
+	Send_player(pl->conn, pl_i->id);
+	Send_score(pl->conn, pl_i->id, pl_i->score,
+		   pl_i->life, pl_i->mychar, pl_i->alliance);
+	if (!IS_TANK_PTR(pl_i)) {
+	    Send_base(pl->conn, pl_i->id, pl_i->home_base);
 	}
     }
     /*

@@ -184,7 +184,7 @@ void Place_general_mine(player *pl, unsigned short team, long status,
 		player *pl_i = Players(i);
 		if (pl_i->id != pl->id
 		    && !Team_immune(pl_i->id, pl->id)
-		    && !IS_TANK_IND(i)) {
+		    && !IS_TANK_PTR(pl_i)) {
 		    int dx = cx - World.base[pl_i->home_base].pos.cx;
 		    int dy = cy - World.base[pl_i->home_base].pos.cy;
 		    if (Wrap_length(dx, dy) <= baseMineRange * BLOCK_CLICKS) {

@@ -540,8 +540,8 @@ int Handle_keyboard(player *pl)
 		}
 		for (i = 0; i < NumPlayers; i++) {
 		    player *pl_i = Players(i);
-		    if (i != ind
-			&& !IS_TANK_IND(i)
+		    if (pl_i->id != pl->id
+			&& !IS_TANK_PTR(pl_i)
 			&& pl->home_base == pl_i->home_base) {
 			Pick_startpos(pl_i);
 			sprintf(msg, "%s has taken over %s's home base.",

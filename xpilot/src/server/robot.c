@@ -735,8 +735,9 @@ static void Robot_create(void)
 	}
     }
     for (i = 0; i < NumPlayers; i++) {
-	if (IS_ROBOT_IND(i)) {
-	    data = (robot_data_t *)Players(i)->robot_data_ptr;
+	player *pl_i = Players(i);
+	if (IS_ROBOT_PTR(pl_i)) {
+	    data = (robot_data_t *)pl_i->robot_data_ptr;
 	    if (Robots[data->robots_ind].used < Robots[most_used].used) {
 		Robots[data->robots_ind].used = Robots[most_used].used;
 	    }

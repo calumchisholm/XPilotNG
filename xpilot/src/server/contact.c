@@ -148,7 +148,7 @@ static int Kick_robot_players(int team)
 	    for (i = 0; i < NumPlayers; i++) {
 		player *pl_i = Players(i);
 
-		if (!IS_ROBOT_IND(i) || pl_i->team == robotTeam)
+		if (!IS_ROBOT_PTR(pl_i) || pl_i->team == robotTeam)
 		    continue;
 		if (pl_i->score < low_score) {
 		    low_pl = pl_i;
@@ -174,7 +174,7 @@ static int Kick_robot_players(int team)
 	    for (i = 0; i < NumPlayers; i++) {
 		player *pl_i = Players(i);
 
-		if (!IS_ROBOT_IND(i) || pl_i->team != team)
+		if (!IS_ROBOT_PTR(pl_i) || pl_i->team != team)
 		    continue;
 		if (pl_i->score < low_score) {
 		    low_pl = pl_i;

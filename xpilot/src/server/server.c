@@ -736,17 +736,18 @@ void Game_Over(void)
 	minsc = 32767;
 	win = lose = -1;
 
-	for (i=0; i < MAX_TEAMS; i++) {
+	for (i = 0; i < MAX_TEAMS; i++) {
 	    teamscore[i] = 1234567; /* These teams are not used... */
 	}
-	for (i=0; i < NumPlayers; i++) {
+	for (i = 0; i < NumPlayers; i++) {
+	    player *pl = Players(i);
 	    int team;
-	    if (IS_HUMAN_IND(i)) {
-		team = Players(i)->team;
+	    if (IS_HUMAN_PTR(pl)) {
+		team = pl->team;
 		if (teamscore[team] == 1234567) {
 		    teamscore[team] = 0;
 		}
-		teamscore[team] += Players(i)->score;
+		teamscore[team] += pl->score;
 	    }
 	}
 
@@ -784,7 +785,7 @@ void Game_Over(void)
 	player *pl_i = Players(i);
 
 	SET_BIT(pl_i->status, GAME_OVER);
-	if (IS_HUMAN_IND(i)) {
+	if (IS_HUMAN_PTR(pl_i)) {
 	    if (pl_i->score > maxsc) {
 		maxsc = pl_i->score;
 		win = i;

@@ -387,7 +387,7 @@ void Object_hits_target(int ind, object *obj, long player_cost)
 	for (j = 0; j < NumPlayers; j++) {
 	    player *pl_j = Players(j);
 
-	    if (IS_TANK_IND(j)
+	    if (IS_TANK_PTR(pl_j)
 		|| (BIT(pl_j->status, PAUSE)
 		    && pl_j->count <= 0)
 		|| (BIT(pl_j->status, GAME_OVER)
@@ -456,7 +456,7 @@ void Object_hits_target(int ind, object *obj, long player_cost)
     for (j = 0; j < NumPlayers; j++) {
 	player *pl = Players(j);
 
-	if (IS_TANK_IND(j)
+	if (IS_TANK_PTR(pl)
 	    || (BIT(pl->status, PAUSE)
 		&& pl->count <= 0)
 	    || (BIT(pl->status, GAME_OVER)

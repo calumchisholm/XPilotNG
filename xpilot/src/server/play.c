@@ -68,7 +68,7 @@ int Punish_team(int ind, int t_destroyed, int cx, int cy)
 	for (i = 0; i < NumPlayers; i++) {
 	    player *pl_i = Players(i);
 
-	    if (IS_TANK_IND(i)
+	    if (IS_TANK_PTR(pl_i)
 		|| (BIT(pl_i->status, PAUSE) && pl_i->count <= 0)
 		|| (BIT(pl_i->status, GAME_OVER)
 		    && pl_i->mychar == 'W'))
@@ -108,7 +108,7 @@ int Punish_team(int ind, int t_destroyed, int cx, int cy)
     for (i = 0; i < NumPlayers; i++) {
 	player *pl_i = Players(i);
 
-	if (IS_TANK_IND(i)
+	if (IS_TANK_PTR(pl_i)
 	    || (BIT(pl_i->status, PAUSE)
 		&& pl_i->count <= 0)
 	    || (BIT(pl_i->status, GAME_OVER)

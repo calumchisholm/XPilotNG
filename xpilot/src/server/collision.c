@@ -404,21 +404,21 @@ static void PlayerCollision(void)
 			sprintf(msg, "%s and %s crashed.",
 				pl->name, pl_j->name);
 			Set_message(msg);
-			if (!IS_TANK_IND(i) && !IS_TANK_IND(j)) {
+			if (!IS_TANK_PTR(pl) && !IS_TANK_PTR(pl_j)) {
 			    sc = Rate(pl_j->score, pl->score)
 				* crashScoreMult;
 			    sc2 = Rate(pl->score, pl_j->score)
 				* crashScoreMult;
 			    Score_players(pl, -sc, pl_j->name,
 					  pl_j, -sc2, pl->name);
-			} else if (IS_TANK_IND(i)) {
+			} else if (IS_TANK_PTR(pl)) {
 			    player *i_tank_owner_pl
 				= Player_by_id(pl->lock.pl_id);
 			    sc = Rate(i_tank_owner_pl->score, pl_j->score)
 				* tankKillScoreMult;
 			    Score_players(i_tank_owner_pl, sc, pl_j->name,
 					  pl_j, -sc, pl->name);
-			} else if (IS_TANK_IND(j)) {
+			} else if (IS_TANK_PTR(pl_j)) {
 			    player *j_tank_owner_pl
 				= Player_by_id(pl_j->lock.pl_id);
 			    sc = Rate(j_tank_owner_pl->score, pl->score)
@@ -429,7 +429,7 @@ static void PlayerCollision(void)
 		    } else {
 			int i_tank_owner = i;
 			player *i_tank_owner_pl;
-			if (IS_TANK_IND(i)) {
+			if (IS_TANK_PTR(pl)) {
 			    i_tank_owner = GetInd(pl->lock.pl_id);
 			    if (i_tank_owner == j) {
 				i_tank_owner = i;
@@ -442,7 +442,7 @@ static void PlayerCollision(void)
 			sound_play_sensors(pl_j->pos.cx, pl_j->pos.cy,
 					   PLAYER_RAN_OVER_PLAYER_SOUND);
 			Rank_AddKill(pl);
-			if (IS_TANK_IND(i)) {
+			if (IS_TANK_PTR(pl)) {
 			    sc = Rate(i_tank_owner_pl->score, pl_j->score)
 				* tankKillScoreMult;
 			} else {
@@ -457,7 +457,7 @@ static void PlayerCollision(void)
 		    if (BIT(pl->status, KILLED)) {
 			int j_tank_owner = j;
 			player *j_tank_owner_pl;
-			if (IS_TANK_IND(j)) {
+			if (IS_TANK_PTR(pl_j)) {
 			    j_tank_owner = GetInd(pl_j->lock.pl_id);
 			    if (j_tank_owner == i) {
 				j_tank_owner = j;
@@ -470,7 +470,7 @@ static void PlayerCollision(void)
 			sound_play_sensors(pl->pos.cx, pl->pos.cy,
 					   PLAYER_RAN_OVER_PLAYER_SOUND);
 			Rank_AddKill(pl_j);
-			if (IS_TANK_IND(j)) {
+			if (IS_TANK_PTR(pl_j)) {
 			    sc = Rate(j_tank_owner_pl->score, pl->score)
 				* tankKillScoreMult;
 			} else {

@@ -123,8 +123,8 @@ void Pick_startpos(player *pl)
     for (i = 0; i < NumPlayers; i++) {
 	player *pl_i = Players(i);
 
-	if (i != ind
-	    && !IS_TANK_IND(i)
+	if (pl_i->id != pl->id
+	    && !IS_TANK_PTR(pl_i)
 	    && free_bases[pl_i->home_base]) {
 	    free_bases[pl_i->home_base] = 0;	/* occupado */
 	    num_free--;
@@ -866,7 +866,7 @@ static void Compute_end_of_round_values(DFLOAT *average_score,
     for (i = 0; i < NumPlayers; i++) {
 	player *pl_i = Players(i);
 
-	if (IS_TANK_IND(i)
+	if (IS_TANK_PTR(pl_i)
 	    || (BIT(pl_i->status, PAUSE)
 	       && pl_i->count <= 0)) {
 	    continue;
@@ -1022,7 +1022,7 @@ void Team_game_over(int winning_team, const char *reason)
 	    if (pl_i->team != winning_team) {
 		continue;
 	    }
-	    if (IS_TANK_IND(i)
+	    if (IS_TANK_PTR(pl_i)
 		|| (BIT(pl_i->status, PAUSE)
 		    && pl_i->count <= 0)
 		|| (BIT(pl_i->status, GAME_OVER)
@@ -1106,7 +1106,8 @@ void Individual_game_over(int winner)
     }
     else if (winner == -2) {
 	for (j = 0; j < NumPlayers; j++) {
-	    if (IS_ROBOT_IND(j)) {
+	    player *pl_j = Players(j);
+	    if (IS_ROBOT_PTR(pl_j)) {
 		for (i = 0; i < num_best_players; i++) {
 		    if (j == best_players[i]) {
 			break;
@@ -1560,7 +1561,7 @@ void Compute_game_status(void)
 	for (i = 0; i < NumPlayers; i++) {
 	    player *pl_i = Players(i);
 
-	    if (IS_TANK_IND(i)) {
+	    if (IS_TANK_PTR(pl_i)) {
 		/* Ignore tanks. */
 		continue;
 	    }
@@ -1677,7 +1678,7 @@ void Compute_game_status(void)
 	    for (i = 0; i < NumPlayers; i++) {
 		player *pl_i = Players(i);
 		if (BIT(pl_i->status, PAUSE)
-		    || IS_TANK_IND(i)) {
+		    || IS_TANK_PTR(pl_i)) {
 		    continue;
 		}
 		team_score[pl_i->team] += pl_i->score;
@@ -1773,17 +1774,17 @@ void Compute_game_status(void)
 	for (i = 0; i < NumPlayers; i++)  {
 	    player *pl_i = Players(i);
 	    if (BIT(pl_i->status, PAUSE)
-		|| IS_TANK_IND(i)) {
+		|| IS_TANK_PTR(pl_i)) {
 		continue;
 	    }
 	    if (!BIT(pl_i->status, GAME_OVER)) {
 		num_alive_players++;
-		if (IS_ROBOT_IND(i)) {
+		if (IS_ROBOT_PTR(pl_i)) {
 		    num_alive_robots++;
 		}
 		winner = i; 	/* Tag player that's alive */
 	    }
-	    else if (IS_HUMAN_IND(i)) {
+	    else if (IS_HUMAN_PTR(pl_i)) {
 		num_active_humans++;
 	    }
 	    num_active_players++;
@@ -1942,7 +1943,7 @@ void Delete_player(player *pl)
 
     for (i = NumPlayers - 1; i >= 0; i--) {
 	player *pl_i = Players(i);
-	if (IS_TANK_IND(i)
+	if (IS_TANK_PTR(pl_i)
 	    && pl_i->lock.pl_id == id) {
 	    /* remove tanks which were released by this player. */
 	    if (keepShots) {
@@ -1977,7 +1978,7 @@ void Delete_player(player *pl)
 	if (pl_i->conn != NOT_CONNECTED) {
 	    Send_leave(pl_i->conn, id);
 	}
-	else if (IS_TANK_IND(i)) {
+	else if (IS_TANK_PTR(pl_i)) {
 	    if (pl_i->lock.pl_id == id) {
 		Delete_player(pl_i);
 	    }

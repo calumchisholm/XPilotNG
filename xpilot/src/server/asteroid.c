@@ -401,9 +401,10 @@ static void Place_asteroid(void)
 	    okay = true;
 
 	    for (i = 0; i < NumPlayers; i++) {
-		if (IS_HUMAN_IND(i)) {
-		    ox = Players(i)->pos.cx;
-		    oy = Players(i)->pos.cy;
+		player *pl = Players(i);
+		if (IS_HUMAN_PTR(pl)) {
+		    ox = pl->pos.cx;
+		    oy = pl->pos.cy;
 		    dpx = WRAP_DCX(cx - ox);
 		    dpy = WRAP_DCY(cy - oy);
 		    if (QUICK_LENGTH(dpx, dpy) < 2 * ASTEROID_MIN_DIST

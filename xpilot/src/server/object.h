@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -88,13 +87,14 @@
 #define OBJ_EXT_TANK		(1U<<1)
 #define OBJ_EXT_ROBOT		(1U<<2)
 
-/* macro's to query the type of player. */
-#define IS_TANK_IND(ind)	IS_TANK_PTR(Players(ind))
-#define IS_ROBOT_IND(ind)	IS_ROBOT_PTR(Players(ind))
-#define IS_HUMAN_IND(ind)	IS_HUMAN_PTR(Players(ind))
-#define IS_TANK_PTR(pl)		(BIT((pl)->type_ext,OBJ_EXT_TANK)==OBJ_EXT_TANK)
-#define IS_ROBOT_PTR(pl)	(BIT((pl)->type_ext,OBJ_EXT_ROBOT)==OBJ_EXT_ROBOT)
-#define IS_HUMAN_PTR(pl)	(!BIT((pl)->type_ext,OBJ_EXT_TANK|OBJ_EXT_ROBOT))
+/* macros to query the type of player. */
+/*#define IS_TANK_IND(ind)	IS_TANK_PTR(Players(ind))
+  #define IS_ROBOT_IND(ind)	IS_ROBOT_PTR(Players(ind))
+  #define IS_HUMAN_IND(ind)	IS_HUMAN_PTR(Players(ind))*/
+/* rather use these for type safety (easy to confuse player id and ind) */
+#define IS_TANK_PTR(pl)	 (BIT((pl)->type_ext, OBJ_EXT_TANK) == OBJ_EXT_TANK)
+#define IS_ROBOT_PTR(pl) (BIT((pl)->type_ext, OBJ_EXT_ROBOT) == OBJ_EXT_ROBOT)
+#define IS_HUMAN_PTR(pl) (!BIT((pl)->type_ext, OBJ_EXT_TANK|OBJ_EXT_ROBOT))
 
 
 /*
