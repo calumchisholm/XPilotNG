@@ -88,37 +88,54 @@ shipobj *Default_ship(void)
     static shapepos	pts[6][RES];
 
     if (!sh.num_points) {
+	ipos pos;
 	sh.num_points = 3;
 	sh.pts[0] = &pts[0][0];
 	/*sh.pts[0][0].x = 15;  sh.pts[0][0].y = 0;*/
-	Ship_set_point(&sh, 0, 15, 0);
+	pos.x = 15;
+	pos.y = 0;
+	Ship_set_point(&sh, 0, pos);
 	sh.pts[1] = &pts[1][0];
 	/*sh.pts[1][0].x = -9;  sh.pts[1][0].y = 8;*/
-	Ship_set_point(&sh, 1, -9, 8);
+	pos.x = -9;
+	pos.y = 8;
+	Ship_set_point(&sh, 1, pos);
 	sh.pts[2] = &pts[2][0];
 	/*sh.pts[2][0].x = -9;  sh.pts[2][0].y = -8;*/
-	Ship_set_point(&sh, 2, -9, -8);
+	pos.x = -9;
+	pos.y = -8;
+	Ship_set_point(&sh, 2, pos);
 
 	/*sh.engine[0].x = -9;  sh.engine[0].y = 0;*/
-	Ship_set_engine(&sh, -9, 0);
+	pos.x = -9;
+	pos.y = 0;
+	Ship_set_engine(&sh, pos);
 
 	/*sh.m_gun[0].x = 15;  sh.m_gun[0].y = 0;*/
-	Ship_set_m_gun(&sh, 15, 0);
+	pos.x = 15;
+	pos.y = 0;
+	Ship_set_m_gun(&sh, pos);
 
 	sh.num_l_light = 1;
 	sh.l_light[0] = &pts[3][0];
+	pos.x = -9;
+	pos.y = 8;
 	/*sh.l_light[0][0].x = -9;  sh.l_light[0][0].y = 8;*/
-	Ship_set_l_light(&sh, -9, 8);
+	Ship_set_l_light(&sh, pos);
 
 	sh.num_r_light = 1;
 	sh.r_light[0] = &pts[4][0];
 	/*sh.r_light[0][0].x = -9;  sh.r_light[0][0].y = -8;*/
-	Ship_set_r_light(&sh, -9, -8);
+	pos.x = -9;
+	pos.y = -8;
+	Ship_set_r_light(&sh, pos);
 
 	sh.num_m_rack = 1;
 	sh.m_rack[0] = &pts[5][0];
 	/*sh.m_rack[0][0].x = 15;  sh.m_rack[0][0].y = 0;*/
-	Ship_set_m_rack(&sh, 15, 0);
+	pos.x = 15;
+	pos.y = 0;
+	Ship_set_m_rack(&sh, pos);
 
 	sh.num_l_gun = sh.num_r_gun = sh.num_l_rgun = sh.num_r_rgun = 0;
 
@@ -1485,70 +1502,34 @@ shapepos Ship_get_m_rack(shipobj *ship, int rack, int dir)
 }
 
 
-void Ship_set_point(shipobj *ship, int i, DFLOAT x, DFLOAT y)
+void Ship_set_point(shipobj *ship, int i, ipos pos)
 {
-    if (is_server) {
-	ship->pts[i][0].clk.cx = FLOAT_TO_CLICK(x);
-	ship->pts[i][0].clk.cy = FLOAT_TO_CLICK(y);
-    } else {
-	ship->pts[i][0].pxl.x = x;
-	ship->pts[i][0].pxl.y = y;
-    }
+    ship->pts[i][0] = ipos2shapepos(pos);
 }
 
-void Ship_set_engine(shipobj *ship, DFLOAT x, DFLOAT y)
+void Ship_set_engine(shipobj *ship, ipos pos)
 {
-    if (is_server) {
-	ship->engine[0].clk.cx = FLOAT_TO_CLICK(x);
-	ship->engine[0].clk.cy = FLOAT_TO_CLICK(y);
-    } else {
-	ship->engine[0].pxl.x = x;
-	ship->engine[0].pxl.y = y;
-    }
+    ship->engine[0] = ipos2shapepos(pos);
 }
 
-void Ship_set_m_gun(shipobj *ship, DFLOAT x, DFLOAT y)
+void Ship_set_m_gun(shipobj *ship, ipos pos)
 {
-    if (is_server) {
-	ship->m_gun[0].clk.cx = FLOAT_TO_CLICK(x);
-	ship->m_gun[0].clk.cy = FLOAT_TO_CLICK(y);
-    } else {
-	ship->m_gun[0].pxl.x = x;
-	ship->m_gun[0].pxl.y = y;
-    }
+    ship->m_gun[0] = ipos2shapepos(pos);
 }
 
-void Ship_set_l_light(shipobj *ship, DFLOAT x, DFLOAT y)
+void Ship_set_l_light(shipobj *ship, ipos pos)
 {
-    if (is_server) {
-	ship->l_light[0][0].clk.cx = FLOAT_TO_CLICK(x);
-	ship->l_light[0][0].clk.cy = FLOAT_TO_CLICK(y);
-    } else {
-	ship->l_light[0][0].pxl.x = x;
-	ship->l_light[0][0].pxl.y = y;
-    }
+    ship->l_light[0][0] = ipos2shapepos(pos);
 }
 
-void Ship_set_r_light(shipobj *ship, DFLOAT x, DFLOAT y)
+void Ship_set_r_light(shipobj *ship, ipos pos)
 {
-    if (is_server) {
-	ship->r_light[0][0].clk.cx = FLOAT_TO_CLICK(x);
-	ship->r_light[0][0].clk.cy = FLOAT_TO_CLICK(y);
-    } else {
-	ship->r_light[0][0].pxl.x = x;
-	ship->r_light[0][0].pxl.y = y;
-    }
+    ship->r_light[0][0] = ipos2shapepos(pos);
 }
 
-void Ship_set_m_rack(shipobj *ship, DFLOAT x, DFLOAT y)
+void Ship_set_m_rack(shipobj *ship, ipos pos)
 {
-    if (is_server) {
-	ship->m_rack[0][0].clk.cx = FLOAT_TO_CLICK(x);
-	ship->m_rack[0][0].clk.cy = FLOAT_TO_CLICK(y);
-    } else {
-	ship->m_rack[0][0].pxl.x = x;
-	ship->m_rack[0][0].pxl.y = y;
-    }
+    ship->m_rack[0][0] = ipos2shapepos(pos);
 }
 
 shapepos ipos2shapepos(ipos pos)
