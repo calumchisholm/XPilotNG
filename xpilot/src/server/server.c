@@ -86,7 +86,7 @@ int main(int argc, char **argv)
 	      "for details see the\n"
 	   "  provided COPYING file.\n\n");
 
-    Conf_print();
+    /*Conf_print();*/
 
     init_error(argv[0]);
     Check_server_versions();
@@ -774,9 +774,8 @@ void Server_log_admin_message(player *pl, const char *str)
 	sprintf(msg, "%s [%s]:[%s]", str, pl->name, "GOD");
 	Set_player_message(pl, msg);
     }
-    else {
+    else
 	Set_player_message(pl, " < GOD doesn't seem to be listening>");
-    }
 }
 
 

@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
 	       Conf_localguru());
     }
 
-    Conf_print();
+    /*Conf_print();*/
 
     Argc = argc;
     Argv = argv;
@@ -108,20 +108,16 @@ int main(int argc, char *argv[])
 
     *hostname = 0;
     cp = getenv("XPILOTHOST");
-    if (cp) {
+    if (cp)
 	strlcpy(hostname, cp, sizeof(hostname));
-    }
-    else {
+    else
         sock_get_local_hostname(hostname, sizeof hostname, 0);
-    }
 
     cp = getenv("XPILOTUSER");
-    if (cp) {
+    if (cp)
 	strlcpy(conpar->real_name, cp, sizeof(conpar->real_name));
-    }
-    else {
+    else
 	Get_login_name(conpar->real_name, sizeof(conpar->real_name) - 1);
-    }
 
     IFWINDOWS( conpar->disp_name[0] = '\0' );
 
@@ -140,12 +136,9 @@ int main(int argc, char *argv[])
     /* CLIENTRANK */
     Init_saved_scores();
 
-    /* BASEWARNING, BMS */
-    xpprintf("Multiple evil hacks ON\n");
-    
-    if (list_servers) {
+    if (list_servers)
 	auto_connect = true;
-    }
+
     if (shutdown_reason[0] != '\0') {
 	auto_shutdown = true;
 	auto_connect = true;
