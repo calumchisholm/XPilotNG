@@ -13,6 +13,7 @@ xpilotmap_DATA = \
 	sadistic_bastard_v2.xp2 \
 	spaceball-0.1.xp2 \
 	spaceball-0.2.xp2 \
-	teamcup.xp
+	teamcup.xp \
+	tourmination.xp2
 
 EXTRA_DIST = $(xpilotmap_DATA)
