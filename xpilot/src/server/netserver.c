@@ -1230,11 +1230,11 @@ static int Handle_setup(connection_t *connp)
 
 static void LegalizeName(char *string)
 {
-    while ( *string != '\0' ) {
+    while (*string != '\0') {
 	char ch = *string;
-	if ( ch == '\"' )
+	if (ch == '\"')
 	    ch = '\'';
-	else if ( !isprint(ch) || strchr("[]:", ch))
+	else if (!isprint(ch) || strchr("{[]}:,", ch))
 	    ch = 'x';
 	*string++ = ch;
     }
