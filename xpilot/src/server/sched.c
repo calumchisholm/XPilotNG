@@ -633,7 +633,7 @@ void sched(void)
 		    ioh = &record_handlers[*playback_sched++ - 1];
 		    (*(ioh->func))(ioh->fd, ioh->arg);
 		}
-	    playback_sched++;
+		playback_sched++;
 	    }
 	    else if (record)
 		*playback_sched++ = 0;
@@ -654,6 +654,7 @@ void sched(void)
 	else {
 	    fd_set readmask;
 	    readmask = input_mask;
+	    Handle_recording_buffers();
 	    n = select(max_fd + 1, &readmask, 0, 0, tvp);
 	    if (n <= 0) {
 		if (n == -1 && errno != EINTR) {

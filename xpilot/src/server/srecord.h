@@ -21,5 +21,6 @@ extern int   *playback_ei;
 extern char  *playback_es;
 extern int   *playback_ei_start;
 extern char  *playback_es_start;
+extern int   *playback_opttout;
 extern int   recOpt;
 #endif  /* SRECORD_H */

@@ -307,7 +307,6 @@ void Main_loop(void)
 	j = *playback_ei++;
 	Setup_connection(a, b, c, i, d, e, j);
     }
-    Handle_recording_buffers();
 }
 
 

@@ -709,7 +709,6 @@ int Setup_connection(char *real, char *nick, char *dpy, int team,
 	strcpy(playback_es, host);
 	while (*playback_es++);
 	*playback_ei++ = version;
-	*playback_ei = INT_MAX;
     }
 
     for (i = 0; i < max_connections; i++) {
@@ -782,7 +781,6 @@ int Setup_connection(char *real, char *nick, char *dpy, int team,
     if (rrecord) {
 	*playback_ei++ = sock - min_fd;
 	*playback_ei++ = my_port;
-	*playback_ei = INT_MAX;
     }
 
     Sockbuf_init(&connp->w, sock, SERVER_SEND_SIZE,
@@ -1253,7 +1251,8 @@ static void Handle_input(int fd, void *arg)
     int			type,
 			result,
 			(**receive_tbl)(int ind);
-    int                 recDataLen;
+    short               *pbscheck;
+    char                *pbdcheck;
 
     if (connp->state & (CONN_PLAYING | CONN_READY)) {
 	receive_tbl = &playing_receive[0];
@@ -1292,7 +1291,8 @@ static void Handle_input(int fd, void *arg)
 	*playback_shorts++ = connp->r.len;
 	memcpy(playback_data, connp->r.buf, connp->r.len);
 	playback_data += connp->r.len;
-	recDataLen = 0;
+	pbdcheck = playback_data;
+	pbscheck = playback_shorts;
     }
     else if (playback) {
 	if ( (connp->r.len = *playback_shorts++) == 0xffff) {
@@ -1318,15 +1318,19 @@ static void Handle_input(int fd, void *arg)
 	    /*
 	     * Unrecoverable error.
 	     * Connection has been destroyed.
-	     * OPTIMIZED RECORDING WILL NOT WORK CORRECTLY, EXCEPT QUIT
 	     */
 	    return;
 	}
-	if (record && recOpt && recSpecial) {
+	if (record && recOpt && recSpecial && playback_data == pbdcheck &&
+	    playback_shorts == pbscheck) {
 	    int len = connp->r.ptr - pkt;
 	    memmove(playback_data - (connp->r.buf + connp->r.len - pkt), playback_data - (connp->r.buf + connp->r.len - connp->r.ptr), connp->r.buf + connp->r.len - connp->r.ptr);
 	    playback_data -= len;
-	    *(playback_shorts - 1) -= len;
+	    pbdcheck = playback_data;
+	    if ( !(*(playback_shorts - 1) -= len) ) {
+		playback_sched--;
+		playback_shorts--;
+	    }
 	}
 
 	if (playback == rplayback) {
@@ -1364,7 +1368,13 @@ int Input(void)
 	if (connp->state == CONN_FREE) {
 	    continue;
 	}
-	if (connp->start + connp->timeout * FPS < main_loops) {
+	if (!(playback && recOpt) && connp->start + connp->timeout * FPS < main_loops || (playback && recOpt && *playback_opttout == main_loops && *(playback_opttout + 1) == i)) {
+	    if (playback && recOpt)
+		playback_opttout += 2;
+	    else if (record & recOpt) {
+		*playback_opttout++ = main_loops;
+		*playback_opttout++ = i;
+	    }
 	    /*
 	     * Timeout this fellow if we have not heard a single thing
 	     * from him for a long time.

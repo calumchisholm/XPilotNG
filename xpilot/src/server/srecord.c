@@ -22,11 +22,14 @@ int   *playback_ei;
 int   *playback_ei_start;
 char  *playback_es;
 char  *playback_es_start;
+int   *playback_opttout;
+int   *playback_opttout_start;
+
 int   rrecord;
 int   rplayback;
 int   recOpt;
 
-static enum bufs {INTS, ERRNOS, SHORTS, DATA, SCHED, EI, ES, NOMORE};
+static enum bufs {INTS, ERRNOS, SHORTS, DATA, SCHED, EI, ES, OPTTOUT, NOMORE};
 static void *threshold[NOMORE];
 static int notfirst[NOMORE];
 static void *readto[NOMORE];
@@ -34,10 +37,10 @@ static void *readto[NOMORE];
    the similarity of (void *)a = (char *)b; and (void **a) = &(char *)b; */
 static void **startb[NOMORE] = {&playback_ints_start, &playback_errnos_start,
         &playback_shorts_start, &playback_data_start, &playback_sched_start,
-        &playback_ei_start, &playback_es_start};
+        &playback_ei_start, &playback_es_start, &playback_opttout_start};
 static void **curb[NOMORE] = {&playback_ints, &playback_errnos,
         &playback_shorts, &playback_data, &playback_sched, &playback_ei,
-        &playback_es};
+        &playback_es, &playback_opttout};
 
 static int next_type;
 static int next_len;
@@ -92,6 +95,9 @@ void Init_recording(void)
 	    recf1 = fopen("/tmp/serverrec", "wb");
 	    recf2 = fopen("/tmp/serverrec2", "wb");
 	    for (i = 0; i < NOMORE; i++) {
+		/* These sizes are not sensible,
+		   different buffers should have
+		   different sizes */
 		*startb[i] = malloc(150000);
 		*curb[i] = *startb[i];
 		threshold[i] = *startb[i] + 50000;
@@ -133,6 +139,8 @@ void Init_recording(void)
 	exit(1);
     }
     if (oldMode == 11) {
+	*playback_opttout++ = INT_MAX;
+	*playback_ei++ = INT_MAX;
 	for (i = 0; i < NOMORE; i++)
 	    Write_data(i);
 	putc(NOMORE, recf1);
