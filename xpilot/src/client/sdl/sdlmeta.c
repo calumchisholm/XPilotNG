@@ -347,6 +347,7 @@ static GLWidget *Init_MetaTableWidget(list_t servers)
     }
     info->server_list   = servers;
     info->scrollbar     = NULL;
+    info->header        = NULL;
     info->selected      = NULL;
 
     tmp->wid_info       = info;
