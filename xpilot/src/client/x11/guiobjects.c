@@ -44,6 +44,7 @@ static int enemyLWColor;	/* Color index for enemyLifeWarning */
 static int teamLWColor;		/* Color index for teamLifeWarning */
 static int shipNameColor;	/* Color index for ship name drawing */
 static int mineNameColor;	/* Color index for mine name drawing */
+static int teamShipColor;   	/* Color index to associate with team 0 */
 static int team0Color;		/* Color index to associate with team 0 */
 static int team1Color;		/* Color index to associate with team 1 */
 static int team2Color;		/* Color index to associate with team 2 */
@@ -739,7 +740,7 @@ static int Gui_calculate_ship_color(int id, other_t *other)
 	    && (other->life == 0))
 	    ship_color = teamLWColor;
 	else
-	    ship_color = BLUE;
+	    ship_color = teamShipColor;
     }
 
     if (eyes != NULL
@@ -752,7 +753,7 @@ static int Gui_calculate_ship_color(int id, other_t *other)
 	    && (other->life == 0))
 	    ship_color = teamLWColor;
 	else
-	    ship_color = BLUE;
+	    ship_color = teamShipColor;
     }
 
     if (Gui_is_my_tank(other))
@@ -1179,6 +1180,12 @@ static xp_option_t guiobject_options[] = {
 	2,
 	&mineNameColor,
 	"Which color number to use for drawing names of mines.\n"),
+
+    COLOR_INDEX_OPTION(
+	"teamShipColor",
+	2,
+	&teamShipColor,
+	"Which color number to use for drawing your teammates.\n"),
 
     COLOR_INDEX_OPTION(
 	"team0Color",
