@@ -100,6 +100,11 @@ static void Input_loop(void)
 	    }
 	}
 	if (FD_ISSET(netfd, &rfds) || result > 1) {
+	    struct timeval tv1, tv2;
+	    double t1, t2;
+
+	    gettimeofday(&tv1, NULL);
+
 	    if ((result = Net_input()) == -1) {
 		warn("Bad net input.  Have a nice day!");
 		return;
@@ -127,27 +132,19 @@ static void Input_loop(void)
 		    return;
 		}
 
-		{
-		    struct timeval tv1, tv2;
-		    double t1, t2;
-
-		    if (newSecond)
-			gettimeofday(&tv1, NULL);
-
-		    XSync(dpy, False);
-
-		    if (newSecond) {
-			gettimeofday(&tv2, NULL);
-
-			t1 = timeval_to_seconds(tv1);
-			t2 = timeval_to_seconds(tv2);
-
-			clData.clientLag = (t2 - t1) * 1e3;
-		    }
-		}
+		XSync(dpy, False);
 
 		if (Handle_input(1) == -1)
 		    return;
+	    }
+
+	    if (newSecond) {
+		gettimeofday(&tv2, NULL);
+
+		t1 = timeval_to_seconds(tv1);
+		t2 = timeval_to_seconds(tv2);
+
+		clData.clientLag = (t2 - t1) * 1e3;
 	    }
 	}
     }
