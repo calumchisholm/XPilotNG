@@ -1253,14 +1253,15 @@ static int Rank_item_value(player_t *pl, long itemtype)
 	    return ROBOT_MUST_HAVE_ITEM;
 	case ITEM_WIDEANGLE:	/* not important in racemode */
 	case ITEM_CLOAK:	/* not important in racemode */
-	case ITEM_LASER:	/* cost too much fuel */
-	case ITEM_MISSILE:	/* likely to hit self */
 	case ITEM_SENSOR:	/* who cares about seeing others? */
 	case ITEM_TANK:		/* makes you heavier */
+	case ITEM_MISSILE:	/* likely to hit self */
+	case ITEM_LASER:	/* cost too much fuel */
 	case ITEM_TRACTOR_BEAM:	/* pushes/pulls owner off the track too */
+	case ITEM_DEFLECTOR:	/* cost too much fuel */
 	case ITEM_HYPERJUMP:	/* likely to end up in wrong place */
 	case ITEM_PHASING:	/* robots don't know how to use them yet */
-	case ITEM_DEFLECTOR:	/* cost too much fuel */
+	case ITEM_MIRROR:	/* not important in racemode */
 	case ITEM_ARMOR:	/* makes you heavier */
 	    return ROBOT_IGNORE_ITEM;
 	default:		/* unknown */
