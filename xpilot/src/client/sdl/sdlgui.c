@@ -1676,7 +1676,7 @@ void Paint_messages(void)
     	    /* TODO: make it possible to actually divide this per character
 	     * meanwhile just ballpark guess to a fraction of the width... ;)
 	     */
-	    if (!message_texs[i].texture) render_text(&gamefont,msg->txt,&message_texs[i]);
+	    /*if (!message_texs[i].texture) render_text(&gamefont,msg->txt,&message_texs[i]);*/
 	    if (ptr) {
 		HUDnprint(&gamefont,msg_color,LEFT,CENTER,x,y,l,ptr);
 	    	/*if (!message_texs[i].texture) render_text(&gamefont,ptr,&message_texs[i]);
@@ -1709,7 +1709,7 @@ void Paint_messages(void)
 	    }
 
 	} else {
-	    	HUDnprint(&gamefont,msg_color,LEFT,CENTER,x,y,len,msg->txt);
+    	    HUDnprint(&gamefont,msg_color,LEFT,CENTER,x,y,len,msg->txt);
 	    /*if (!message_texs[i].texture) render_text(&gamefont,msg->txt,&message_texs[i]);
 	    disp_text_fraq(&message_texs[i],msg_color,LEFT,CENTER,x,y
 	    	    	    ,0.0f
