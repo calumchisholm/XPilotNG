@@ -2173,6 +2173,7 @@ GLWidget *Init_ScrollPaneWidget( GLWidget *content )
 /* Begin: MainWidget  */
 /**********************/
 void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );
+void SetBounds_MainWidget( GLWidget *widget, SDL_Rect *b );
 
 void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
 {
@@ -2198,6 +2199,62 @@ void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *d
     }
 }
 
+void SetBounds_MainWidget( GLWidget *widget, SDL_Rect *b )
+{
+    WrapperWidget *wid_info;
+    SDL_Rect bounds = {0,0,0,0};
+    GLWidget *subs[4];
+    int i;
+    bool change;
+    
+    if (!widget) return;
+    if (!b) return;
+    if (widget->WIDGET != MAINWIDGET) {
+    	error("Wrong widget type for SetBounds_MainWidget [%i]",widget->WIDGET);
+	return;
+    }
+
+    if (!(wid_info = (WrapperWidget *)(widget->wid_info))) {
+    	error("SetBounds_MainWidget: wid_info missing!");
+	return;
+    }
+    
+    subs[0] = wid_info->radar;
+    subs[1] = wid_info->scorelist;
+    subs[2] = wid_info->chat_msgs;
+    subs[3] = wid_info->game_msgs;
+    
+    widget->bounds.x = b->x;
+    widget->bounds.w = b->w;
+    widget->bounds.y = b->y;
+    widget->bounds.h = b->h;
+    
+    for ( i=0; i < 4 ; ++i) {
+    	if (subs[i]) {
+	    change = false;
+	    
+    	    bounds.x = subs[i]->bounds.x;
+    	    bounds.w = subs[i]->bounds.w;
+    	    bounds.y = subs[i]->bounds.y;
+    	    bounds.h = subs[i]->bounds.h;
+
+	    if ( bounds.x + bounds.w + wid_info->BORDER > widget->bounds.x + widget->bounds.w ) {
+	    	bounds.x = widget->bounds.x + widget->bounds.w - (bounds.w + wid_info->BORDER);
+		change = true;
+	    }
+
+	    if ( bounds.y + bounds.h + wid_info->BORDER  > widget->bounds.y + widget->bounds.h ) {
+	    	bounds.y = widget->bounds.y + widget->bounds.h - (bounds.h + wid_info->BORDER);
+		change = true;
+	    }
+	
+	    if ( change )    
+    	    	SetBounds_GLWidget(subs[i],&bounds);
+	    
+    	}
+    }
+}
+
 GLWidget *Init_MainWidget( font_data *font )
 {
     GLWidget *tmp;
@@ -2217,22 +2274,39 @@ GLWidget *Init_MainWidget( font_data *font )
     wid_info = ((WrapperWidget *)tmp->wid_info);
     wid_info->confmenu	= NULL;
     wid_info->font	= font;
+    wid_info->BORDER	= 10;
     
     tmp->WIDGET     	= MAINWIDGET;
     tmp->bounds.w   	= draw_width;
     tmp->bounds.h   	= draw_height;
     tmp->button     	= button_MainWidget;
     tmp->buttondata 	= tmp;
-
-    if ( !AppendGLWidgetList(&(tmp->children),Init_RadarWidget()) ) {
+    tmp->SetBounds 	= SetBounds_MainWidget;
+    
+    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->radar = Init_RadarWidget())) ) {
 	error("radar initialization failed");
-	free(tmp);
+	Close_Widget(&tmp);
 	return NULL;
     }
-    if ( !AppendGLWidgetList(&(tmp->children),Init_ScorelistWidget()) ) {
+    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->scorelist = Init_ScorelistWidget())) ) {
 	error("scorelist initialization failed");
-	Close_Widget(&(tmp->children));
-	free(tmp);
+	Close_Widget(&tmp);
+	return NULL;
+    }
+    if ( !AppendGLWidgetList(&(tmp->children),
+    	    	(wid_info->chat_msgs = Init_ListWidget(200 + wid_info->BORDER,wid_info->BORDER,
+		&nullRGBA,&greenRGBA,LW_DOWN,LW_RIGHT,instruments.showReverseScroll)))
+    	) {
+	error("Failed to initialize chat msg list");
+	Close_Widget(&tmp);
+	return NULL;
+    }
+    if ( !AppendGLWidgetList(&(tmp->children),
+    	    (wid_info->game_msgs = Init_ListWidget(wid_info->BORDER,tmp->bounds.h-wid_info->BORDER,
+	    &nullRGBA,&greenRGBA,LW_UP,LW_RIGHT,!instruments.showReverseScroll)))
+	) {
+	error("Failed to initialize game msg list");
+	Close_Widget(&tmp);
 	return NULL;
     }
 

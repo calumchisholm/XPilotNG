@@ -338,6 +338,11 @@ extern GLWidget *Init_ScorelistWidget( void );
 #define MAINWIDGET 11
 typedef struct {
     GLWidget	*confmenu;
+    GLWidget	*radar;
+    GLWidget	*scorelist;
+    GLWidget	*chat_msgs;
+    GLWidget	*game_msgs;
+    int	    	BORDER;
     font_data	*font;
 } WrapperWidget;
 

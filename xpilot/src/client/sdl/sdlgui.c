@@ -1782,22 +1782,8 @@ void Paint_messages(void)
     msgs[0] = TalkMsg;
     msgs[1] = GameMsg;
     
-    if (!msg_list[0]) {
-    	if (!(msg_list[0] = Init_ListWidget(200+BORDER,BORDER,&nullRGBA,&greenRGBA
-	    	    	    	,LW_DOWN,LW_RIGHT,instruments.showReverseScroll) )) {
-	    error("Paint_messages: Can't make a listwidget for chat messages!");
-	    return;
-	}
-	AppendGLWidgetList(&(MainWidget->children),msg_list[0]);
-    }
-    if (!msg_list[1]) {
-    	if (!(msg_list[1] = Init_ListWidget(BORDER,draw_height-BORDER,&nullRGBA,&greenRGBA
-	    	    	    	,LW_UP,LW_RIGHT,!instruments.showReverseScroll) )) {
-	    error("Paint_messages: Can't make a listwidget for game messages!");
-	    return;
-	} 
-	AppendGLWidgetList(&(MainWidget->children),msg_list[1]);
-    }
+    msg_list[0] = ((WrapperWidget *)(MainWidget->wid_info))->chat_msgs;
+    msg_list[1] = ((WrapperWidget *)(MainWidget->wid_info))->game_msgs;
     
     if ( revscroll != instruments.showReverseScroll ) {
     	ListWidget_SetScrollorder(msg_list[0],instruments.showReverseScroll);

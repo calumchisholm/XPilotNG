@@ -61,37 +61,6 @@ static bool         scoreListMoving;
 
 GLWidget *MainWidget = NULL;
 
-/*void select_button(Uint8 button,Uint8 state,Uint16 x,Uint16 y, void *data)
-{
-    if (state == SDL_PRESSED) {
-
-	if (button == 1) {
-	    select_bounds = malloc(sizeof(irec));
-	    if ( !select_bounds )
-	    	error("Can't malloc select_bounds!");
-	    select_bounds->x = x;
-	    select_bounds->y = y;
-	    select_bounds->w = 0;
-	    select_bounds->h = 0;
-	}
-    }
-    
-    if (state == SDL_RELEASED) {
-	if ((button == 1) && select_bounds) {
-	    free(select_bounds);
-	    select_bounds = NULL;
-	}
-    }
-}
-
-void select_move(Sint16 xrel,Sint16 yrel,Uint16 x,Uint16 y, void *data)
-{
-    if(select_bounds) {
-    	select_bounds->w += xrel;
-    	select_bounds->h += yrel;
-    }
-}*/
-
 /* function to reset our viewport after a window resize */
 int Resize_Window( int width, int height )
 {
@@ -164,6 +133,12 @@ void Scorelist_cleanup( GLWidget *widget )
     sdl_window_destroy(&scoreListWin);
 }
 
+void SetBounds_ScoreList(GLWidget *widget, SDL_Rect *b )
+{
+    widget->bounds.x = scoreListWin.x = b->x;
+    widget->bounds.y = scoreListWin.y = b->y;
+}
+
 void Scorelist_paint(GLWidget *widget)
 {
     if (scoresChanged) {
@@ -233,6 +208,7 @@ GLWidget *Init_ScorelistWidget(void)
     tmp->Draw	    	= Scorelist_paint;
     tmp->Close	    	= Scorelist_cleanup;
     tmp->button     	= Scorelist_button;
+    tmp->SetBounds     	= SetBounds_ScoreList;
     tmp->buttondata 	= tmp;
     tmp->motion     	= Scorelist_move;
     tmp->motiondata 	= tmp;
