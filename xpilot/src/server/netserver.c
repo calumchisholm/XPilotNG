@@ -3182,6 +3182,7 @@ static int Receive_pointer_move(connection_t *connp)
 	LIMIT(turnspeed, 0, 5*RES);
 
     pl->turnvel -= turndir * turnspeed;
+    pl->idleTime = 0;
 
     recSpecial = 1;
 
