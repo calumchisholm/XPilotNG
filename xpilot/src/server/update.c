@@ -66,7 +66,7 @@ char update_version[] = VERSION;
 int	round_delay = 0;	/* delay until start of next round */
 int	round_delay_send = 0;	/* number of frames to send round_delay */
 int	roundtime = -1;		/* time left this round */
-static int time_to_update = TIME_FACT;	/* time before less frequent updates */
+static DFLOAT time_to_update = 1;	/* time before less frequent updates */
 static bool do_update_this_frame = false; /* less frequent update this frame */
 
 static char msg[MSG_LEN];
@@ -789,9 +789,9 @@ void Update_objects(void)
      * Can also be used to do some updates less frequently.
      */
     do_update_this_frame = false;
-    if ((time_to_update -= timeStep) <= 0) {
+    if ((time_to_update -= timeStep2) <= 0) {
 	do_update_this_frame = true;
-	time_to_update += TIME_FACT;
+	time_to_update += 1;
     }
 
 #if 0

@@ -257,7 +257,7 @@ struct _mineobject {
 
     int 		owner;		/* Who's object is this ? */
     DFLOAT		ecm_range;	/* Range from last ecm center */
-    int			spread_left;	/* how much spread time left */
+    DFLOAT		spread_left;	/* how much spread time left */
 
 #ifdef __cplusplus
 			_mineobject() {}
@@ -330,7 +330,7 @@ struct _torpobject {
 
     MISSILE_EXTEND
 
-    int			spread_left;	/* how much spread time left */
+    DFLOAT		spread_left;	/* how much spread time left */
 
 #ifdef __cplusplus
 			_torpobject() {}

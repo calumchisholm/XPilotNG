@@ -54,10 +54,10 @@ char shot_version[] = VERSION;
 
 #define MISSILE_POWER_SPEED_FACT	0.25
 #define MISSILE_POWER_TURNSPEED_FACT	0.75
-#define MINI_TORPEDO_SPREAD_TIME	(6 * TIME_FACT)
+#define MINI_TORPEDO_SPREAD_TIME	6
 #define MINI_TORPEDO_SPREAD_SPEED	20
 #define MINI_TORPEDO_SPREAD_ANGLE	90
-#define MINI_MINE_SPREAD_TIME		(18 * TIME_FACT)
+#define MINI_MINE_SPREAD_TIME		18
 #define MINI_MINE_SPREAD_SPEED		8
 #define MINI_MISSILE_SPREAD_ANGLE	45
 
@@ -133,8 +133,6 @@ void Place_general_mine(int ind, unsigned short team, long status,
 
     cx = WRAP_XCLICK(cx);
     cy = WRAP_YCLICK(cy);
-    if (!INSIDE_MAP(cx, cy))
-	return;
 
     if (pl && BIT(pl->status, KILLED)) {
 	life = (int)(rfrac() * 12 * TIME_FACT);
@@ -258,8 +256,8 @@ void Place_general_mine(int ind, unsigned short team, long status,
 	     * zero over the MINI_MINE_SPREAD_TIME.
 	     */
 	    mine->spread_left = MINI_MINE_SPREAD_TIME;
-	    mine->acc.x = -mv.x * TIME_FACT / MINI_MINE_SPREAD_TIME;
-	    mine->acc.y = -mv.y * TIME_FACT / MINI_MINE_SPREAD_TIME;
+	    mine->acc.x = -mv.x / MINI_MINE_SPREAD_TIME;
+	    mine->acc.y = -mv.y / MINI_MINE_SPREAD_TIME;
 	} else {
 	    mv.x = mv.y = mine->acc.x = mine->acc.y = 0.0;
 	    mine->spread_left = 0;
@@ -986,8 +984,6 @@ void Fire_general_shot(int ind, unsigned short team, bool cannon,
 	}
 	shotpos.cx = WRAP_XCLICK(shotpos.cx);
 	shotpos.cy = WRAP_YCLICK(shotpos.cy);
-	if (!INSIDE_MAP(shotpos.cx, shotpos.cy))
-	    continue;
 	Object_position_init_clicks(shot, shotpos.cx, shotpos.cy);
 
 	if (type == OBJ_SHOT || !pl) {
@@ -1028,8 +1024,8 @@ void Fire_general_shot(int ind, unsigned short team, bool cannon,
 	     *      regardless of minification.
 	     */
 	    TORP_PTR(shot)->spread_left = MINI_TORPEDO_SPREAD_TIME;
-	    shot->acc.x = -mv.x * TIME_FACT / MINI_TORPEDO_SPREAD_TIME;
-	    shot->acc.y = -mv.y * TIME_FACT / MINI_TORPEDO_SPREAD_TIME;
+	    shot->acc.x = -mv.x / MINI_TORPEDO_SPREAD_TIME;
+	    shot->acc.y = -mv.y / MINI_TORPEDO_SPREAD_TIME;
 	    ldir = dir;
 	    break;
 
@@ -1058,9 +1054,8 @@ void Fire_general_shot(int ind, unsigned short team, bool cannon,
      * firing each mini missile.
      */
     if (pl) {
-	for (i = 0; i < fired; i++) {
+	for (i = 0; i < fired; i++)
 	    Recoil((object *)pl, mini_objs[i]);
-	}
     }
 }
 
@@ -1650,7 +1645,7 @@ void Move_smart_shot(int ind)
 	}
 	torp->info += timeStep;
 	acc *= (1 + (torp->mods.power * MISSILE_POWER_SPEED_FACT));
-	if ((torp->spread_left -= timeStep) <= 0) {
+	if ((torp->spread_left -= timeStep2) <= 0) {
 	    torp->acc.x = 0;
 	    torp->acc.y = 0;
 	    torp->spread_left = 0;
@@ -1950,7 +1945,7 @@ void Move_mine(int ind)
     }
 
     if (mine->mods.mini) {
-	if ((mine->spread_left -= timeStep) <= 0) {
+	if ((mine->spread_left -= timeStep2) <= 0) {
 	    mine->acc.x = 0;
 	    mine->acc.y = 0;
 	    mine->spread_left = 0;
