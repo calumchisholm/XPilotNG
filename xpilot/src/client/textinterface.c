@@ -835,7 +835,10 @@ int Contact_servers(int count, char **servers,
 	    retries = 0;
 	    contacted = 0;
 	    do {
-	      IFWINDOWS( Progress("Contacting server %s", servers[i]) );
+		/* kps hack */
+		if (strlen(servers[i]) == 0)
+		    continue;
+		IFWINDOWS( Progress("Contacting server %s", servers[i]) );
 		Sockbuf_clear(&sbuf);
 		Packet_printf(&sbuf, "%u%s%hu%c",
 			      compat_mode ? COMPATIBILITY_MAGIC : MAGIC,

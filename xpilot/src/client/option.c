@@ -139,21 +139,23 @@ void Usage(void)
 }
 
 
-static void Set_noarg_option(xp_option_t *opt, bool value)
+static bool Set_noarg_option(xp_option_t *opt, bool value)
 {
     assert(opt);
     assert(opt->type == xp_noarg_option);
     assert(opt->noarg_ptr);
 
-    *opt->noarg_ptr = value;	
-
-    /*printf("Value of option %s is now %s.\n", opt->name,
-     *opt->noarg_ptr ? "true" : "false");*/
+    *opt->noarg_ptr = value;
+    printf("Value of option %s is now %s.\n", opt->name,
+	   *opt->noarg_ptr ? "true" : "false");
+    return true;
 }
 
 
-static void Set_bool_option(xp_option_t *opt, bool value)
+static bool Set_bool_option(xp_option_t *opt, bool value)
 {
+    bool retval = true;
+
     assert(opt);
     assert(opt->type == xp_bool_option);
     assert(opt->bool_ptr);
@@ -169,14 +171,17 @@ static void Set_bool_option(xp_option_t *opt, bool value)
     *opt->bool_ptr = value;	
 
     if (opt->bool_setfunc)
-	opt->bool_setfunc(opt, value);
+	retval = opt->bool_setfunc(opt, value);
 
-    /*printf("Value of option %s is now %s.\n", opt->name,
-     *opt->bool_ptr ? "true" : "false");*/
+    printf("Value of option %s is now %s.\n", opt->name,
+	   *opt->bool_ptr ? "true" : "false");
+    return retval;
 }
 
-static void Set_int_option(xp_option_t *opt, int value)
+static bool Set_int_option(xp_option_t *opt, int value)
 {
+    bool retval = true;
+
     assert(opt);
     assert(opt->type == xp_int_option);
     assert(opt->int_ptr);
@@ -192,13 +197,16 @@ static void Set_int_option(xp_option_t *opt, int value)
     *opt->int_ptr = value;
 
     if (opt->int_setfunc)
-	opt->int_setfunc(opt, value);
+	retval = opt->int_setfunc(opt, value);
 
-    /*printf("Value of option %s is now %d.\n", opt->name, *opt->int_ptr);*/
+    printf("Value of option %s is now %d.\n", opt->name, *opt->int_ptr);
+    return retval;
 }
 
-static void Set_double_option(xp_option_t *opt, double value)
+static bool Set_double_option(xp_option_t *opt, double value)
 {
+    bool retval = true;
+
     assert(opt);
     assert(opt->type == xp_double_option);
     assert(opt->dbl_ptr);
@@ -214,13 +222,16 @@ static void Set_double_option(xp_option_t *opt, double value)
     *opt->dbl_ptr = value;
 
     if (opt->dbl_setfunc)
-	opt->dbl_setfunc(opt, value);
+	retval = opt->dbl_setfunc(opt, value);
 
-    /*printf("Value of option %s is now %.3f.\n", opt->name, *opt->dbl_ptr);*/
+    printf("Value of option %s is now %.3f.\n", opt->name, *opt->dbl_ptr);
+    return retval;
 }
 
-static void Set_string_option(xp_option_t *opt, const char *value)
+static bool Set_string_option(xp_option_t *opt, const char *value)
 {
+    bool retval = true;
+
     assert(opt);
     assert(opt->type == xp_string_option);
     assert(opt->str_ptr || opt->str_setfunc);
@@ -234,14 +245,14 @@ static void Set_string_option(xp_option_t *opt, const char *value)
 	strlcpy(opt->str_ptr, value, opt->str_size);
 
     if (opt->str_setfunc)
-	opt->str_setfunc(opt, value);
+	retval = opt->str_setfunc(opt, value);
 
-    /*if (opt->str_ptr)
-      printf("Value of option %s is now \"%s\".\n", opt->name, opt->str_ptr);
-      else
-      printf("Value of option %s is now \"%s\".\n",
-      opt->name, opt->str_getfunc(opt));
-    */
+    if (opt->str_ptr)
+	printf("Value of option %s is now \"%s\".\n", opt->name, opt->str_ptr);
+    else
+	printf("Value of option %s is now \"%s\".\n",
+	       opt->name, opt->str_getfunc(opt));
+    return retval;
 }
 
 static xp_key_binding_callback_t key_binding_callback = NULL;
@@ -252,8 +263,9 @@ void Set_key_binding_callback(xp_key_binding_callback_t callback)
 }
 
 
-static void Set_key_option(xp_option_t *opt, const char *value)
+static bool Set_key_option(xp_option_t *opt, const char *value)
 {
+    bool retval = true;
     char *str, *valcpy;
 
     assert(opt);
@@ -285,46 +297,43 @@ static void Set_key_option(xp_option_t *opt, const char *value)
     }
 
     xp_free(valcpy);
+    /* not currently returning false even if keysyms are invalid */
+    return retval;
 }
 
 /*
  * This could also be used from a client '\set' command, e.g.
  * "\set scalefactor 1.5"
  */
-void Set_option(const char *name, const char *value)
+/* returns true if ok */
+bool Set_option(const char *name, const char *value)
 {
     xp_option_t *opt;
 
     opt = Find_option(name);
-
     if (!opt) {
 	warn("Could not find option \"%s\"\n", name);
-	return;
+	return false;
     }
 
     switch (opt->type) {
     case xp_noarg_option:
-	Set_noarg_option(opt, ON(value) ? true : false);
-	break;
+	return Set_noarg_option(opt, ON(value) ? true : false);
     case xp_bool_option:
-	Set_bool_option(opt, ON(value) ? true : false);
-	break;
+	return Set_bool_option(opt, ON(value) ? true : false);
     case xp_int_option:
-	Set_int_option(opt, atoi(value));
-	break;
+	return Set_int_option(opt, atoi(value));
     case xp_double_option:
-	Set_double_option(opt, atof(value));
-	break;
+	return Set_double_option(opt, atof(value));
     case xp_string_option:
-	Set_string_option(opt, value);
-	break;
+	return Set_string_option(opt, value);
     case xp_key_option:
-	Set_key_option(opt, value);
-	break;
+	return Set_key_option(opt, value);
     default:
 	warn("FOO");
 	assert(0);
     }
+    return false;
 }
 
 
@@ -452,17 +461,39 @@ static void Parse_xpilotrc_line(const char *line)
 }
 
 
+static inline bool is_noarg_option(const char *name)
+{
+    xp_option_t *opt = Find_option(name);
+
+    if (!opt || opt->type != xp_noarg_option)
+	return false;
+    return true;
+}
+
 void Parse_options(int *argcp, char **argvp)
 {
     char path[PATH_MAX + 1];
     char buf[BUFSIZ];
     FILE *fp;
+    int i;
 
+
+#if 0
     /*
-     * Create data structure holding all options we know of and their values.
+     * Check for bad arguments.
      */
-    /*warn("numoptions: %d", NELEM(options));*/
+    for (i = 1; i < *argcp; i++) {
+	if (argvp[i][0] == '-' || argvp[i][0] == '+') {
+	    warn("Unknown or incomplete option '%s'", argvp[i]);
+	    warn("Type: %s -help to see a list of options", argvp[0]);
+	    exit(1);
+	}
+	/* The rest of the arguments are hostnames of servers. */
+    }
 
+    /*for (i = 0; i < argc; i++)
+      printf("arg %d: %s\n", i, argvp[i]);*/
+#endif
     /*
      * Read options from xpilotrc.
      */
@@ -484,8 +515,37 @@ void Parse_options(int *argcp, char **argvp)
 	fclose(fp);
     }
 
+    /* evil and ugly argv parsing */
+    for (i = 1; i < *argcp; i++) {
+	if (argvp[i][0] == '-') {
+	    char *arg = &argvp[i][1];
+	    /* allow --foo options */
+	    if (arg[0] == '-')
+		arg++;
+	    if (is_noarg_option(arg)) {
+		Set_option(arg, "true");
+		argvp[i][0] = '\0'; /* remove option */
+		continue;
+	    } else {
+		bool ok = false;
 
-
+		if (i + 1 < *argcp) {
+		    ok = Set_option(arg, argvp[i + 1]);
+		    if (ok) {
+			argvp[i][0] = '\0';
+			argvp[i + 1][0] = '\0';
+			i++; /* evil hack */
+		    }
+		}
+		if (!ok) {
+		    warn("Unknown or incomplete option '%s'", argvp[i]);
+		    warn("Type: %s -help to see a list of options", argvp[0]);
+		    exit(1);
+		}
+	    }
+	}
+	/*printf("arg %d: %s\n", i, argvp[i]);*/
+    }
     
 }
 

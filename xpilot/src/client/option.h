@@ -28,7 +28,7 @@ extern void Parse_options(int *argcp, char **argvp);
 
 extern void Get_xpilotrc_file(char *, unsigned);
 
-extern void Set_option(const char *name, const char *value);
+extern bool Set_option(const char *name, const char *value);
 extern void Set_command(const char *command);
 
 typedef enum {
@@ -43,9 +43,9 @@ typedef enum {
 
 typedef struct xp_option xp_option_t;
 
-typedef void (*xp_bool_option_setfunc_t)   (xp_option_t *opt, bool val);
-typedef void (*xp_int_option_setfunc_t)    (xp_option_t *opt, int val);
-typedef void (*xp_double_option_setfunc_t) (xp_option_t *opt, double val);
+typedef bool (*xp_bool_option_setfunc_t)   (xp_option_t *opt, bool val);
+typedef bool (*xp_int_option_setfunc_t)    (xp_option_t *opt, int val);
+typedef bool (*xp_double_option_setfunc_t) (xp_option_t *opt, double val);
 typedef bool (*xp_string_option_setfunc_t) (xp_option_t *opt, const char *val);
 typedef char *(*xp_string_option_getfunc_t)(xp_option_t *opt);
 typedef bool (*xp_key_binding_callback_t)  (keys_t key, const char *str);
