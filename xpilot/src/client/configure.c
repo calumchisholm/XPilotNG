@@ -101,13 +101,23 @@ static int Nelem_config_creator(void)
 #endif
 }
 
-static int my_callback(int widget_desc, void *height, int *val)
+static int Update_int_option(int widget_desc, void *data, int *val)
 {
+    xp_option_t *opt = (xp_option_t *)data;
+
+    (void)widget_desc;
+    Set_int_option(opt, *val);
+
     return 0;
 }
 
-static int my_callback2(int widget_desc, void *height, double *val)
+static int Update_double_option(int widget_desc, void *data, double *val)
 {
+    xp_option_t *opt = (xp_option_t *)data;
+
+    (void)widget_desc;
+    Set_double_option(opt, *val);
+
     return 0;
 }
 
@@ -534,13 +544,13 @@ static int config_creator_new(xp_option_t *opt, int widget_desc, int *height)
 				 Option_get_name(opt),
 				 opt->int_ptr, opt->int_minval,
 				 opt->int_maxval,
-				 my_callback, opt);
+				 Update_int_option, opt);
     case xp_double_option:
 	return Config_create_double(widget_desc, height,
 				    Option_get_name(opt),
 				    opt->dbl_ptr, opt->dbl_minval,
 				    opt->dbl_maxval,
-				    my_callback2, opt);
+				    Update_double_option, opt);
     default:
 	return Config_create_bool(widget_desc, height,
 				  Option_get_name(opt),
