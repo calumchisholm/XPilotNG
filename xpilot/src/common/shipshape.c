@@ -317,6 +317,7 @@ static int shape2wire(char *ship_shape_str, shipshape_t *ship)
     bool mainGunSet = false, engineSet = false;
     char *str, *teststr;
     char keyw[20], buf[MSG_LEN];
+    bool remove_edge = false;
 
     memset(ship, 0, sizeof(shipshape_t));
 
@@ -378,10 +379,10 @@ static int shape2wire(char *ship_shape_str, shipshape_t *ship)
 		    if (ship->num_points > 0
 			&& old_in.x == in.x
 			&& old_in.y == in.y) {
-			if (verboseShapeParsing) {
-			    warn("Duplicte ship point at %d,%d", in.x, in.y);
-			    warn("Removing edge with length 0 from ship.");
-			}
+			remove_edge = true;
+			if (verboseShapeParsing)
+			    warn("Duplicate ship point at %d,%d, ignoring it.",
+				 in.x, in.y);
 		    }
 		    else {
 			pt[ship->num_points++] = in;
@@ -395,13 +396,15 @@ static int shape2wire(char *ship_shape_str, shipshape_t *ship)
 	    if (ship->num_points > 0
 		&& pt[ship->num_points - 1].x == pt[0].x
 		&& pt[ship->num_points - 1].y == pt[0].y) {
-		if (verboseShapeParsing) {
-		    warn("Ship last point equals first point at %d,%d",
-			 pt[0].x, pt[0].y);
-		    warn("Removing edge with length 0 from ship.");
-		}
+		if (verboseShapeParsing)
+		    warn("Ship last point equals first point at %d,%d, "
+			 "ignoring it.", pt[0].x, pt[0].y);
+		remove_edge = true;
 		ship->num_points--;
 	    }
+
+	    if (remove_edge && verboseShapeParsing)
+		warn("Removing ship edges with length 0.");
 	    
 	    break;
 
@@ -616,7 +619,7 @@ static int shape2wire(char *ship_shape_str, shipshape_t *ship)
     /* Check for some things being set, and give them defaults if not */
     if (ship->num_points < 3) {
 	if (verboseShapeParsing)
-	    warn("not enough ship points defined");
+	    warn("A shipshape must have at least 3 valid points.");
 	return -1;
     }
 
