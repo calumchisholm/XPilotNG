@@ -28,6 +28,7 @@ char event_version[] = VERSION;
 
 static BITV_DECL(keyv, NUM_KEYS);
 
+keys_t buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
 
 
 int Key_init(void)
@@ -52,7 +53,7 @@ int Key_update(void)
 static bool Key_check_talk_macro(keys_t key)
 {
     if (key >= KEY_MSG_1 && key < KEY_MSG_1 + TALK_FAST_NR_OF_MSGS)
-	Talk_macro(key - KEY_MSG_1);
+	Talk_macro((int)(key - KEY_MSG_1));
     return true;
 }
 
@@ -377,6 +378,42 @@ void Set_toggle_shield(bool on)
 }
 
 #ifdef OPTIONHACK
+
+char *pointerButtonBindings[MAX_POINTER_BUTTONS] =
+{ NULL, NULL, NULL, NULL, NULL };
+
+static inline int pointer_button_index_by_option(xp_option_t *opt)
+{
+    return atoi(Get_option_name(opt) + strlen("pointerButton")) - 1;
+}
+
+static bool setPointerButtonBinding(xp_option_t *opt, const char *value)
+{
+    int ind = pointer_button_index_by_option(opt);
+
+    assert(ind >= 0);
+    assert(ind < MAX_POINTER_BUTTONS);
+    if (pointerButtonBindings[ind])
+	xp_free(pointerButtonBindings[ind]);
+
+    pointerButtonBindings[ind] = xp_safe_strdup(value);
+
+    /* kps: TODO */
+    return true;
+}
+
+static char *getPointerButtonBinding(xp_option_t *opt)
+{
+    int ind = pointer_button_index_by_option(opt);
+
+    assert(ind >= 0);
+    assert(ind < MAX_POINTER_BUTTONS);
+
+    return pointerButtonBindings[ind];
+}
+
+
+
 /*
  * Standard key options.
  */
@@ -963,6 +1000,51 @@ xp_option_t key_options[] = {
 	"",
 	KEY_MSG_20,
 	"Sends the talkmessage stored in msg20.\n"),
+
+    /*
+     * These are after the keys so that the key options will be
+     * present when the pointer button options are stored.
+     */
+    XP_STRING_OPTION(
+	"pointerButton1",
+	"keyFireShot",
+	NULL, 0,
+	setPointerButtonBinding,
+	getPointerButtonBinding,
+	"The key to activate when pressing the first mouse button.\n"),
+
+    XP_STRING_OPTION(
+	"pointerButton2",
+	"keyThrust",
+	NULL, 0,
+	setPointerButtonBinding,
+	getPointerButtonBinding,
+	"The key to activate when pressing the second mouse button.\n"),
+
+    XP_STRING_OPTION(
+	"pointerButton3",
+	"keyDropBall",
+	NULL, 0,
+	setPointerButtonBinding,
+	getPointerButtonBinding,
+	"The key to activate when pressing the third mouse button.\n"),
+
+    XP_STRING_OPTION(
+	"pointerButton4",
+	"",
+	NULL, 0,
+	setPointerButtonBinding,
+	getPointerButtonBinding,
+	"The key to activate when pressing the fourth mouse button.\n"),
+
+    XP_STRING_OPTION(
+	"pointerButton5",
+	"",
+	NULL, 0,
+	setPointerButtonBinding,
+	getPointerButtonBinding,
+	"The key to activate when pressing the fifth mouse button.\n"),
+
 
 };
 

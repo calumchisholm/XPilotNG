@@ -111,6 +111,7 @@ typedef struct {
 #define MAX_POINTER_BUTTONS	5
 #define MAX_BUTTON_DEFS		3
 #define NUM_BUTTON_DEFS(i)	(buttonDefs[(i)][MAX_BUTTON_DEFS])
+extern keys_t	buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
 
 /*
  * Macros to manipulate dynamic arrays.

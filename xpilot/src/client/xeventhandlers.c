@@ -29,7 +29,6 @@ char xeventhandlers_version[] = VERSION;
 extern int	talk_key_repeating;  /* xevent.c */
 extern XEvent	talk_key_repeat_event;  /* xevent.c */
 extern struct timeval talk_key_repeat_time;
-extern keys_t	buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
 extern ipos	mouse;		/* position of mouse pointer. */
 extern int	movement;	/* horizontal mouse movement. */
 

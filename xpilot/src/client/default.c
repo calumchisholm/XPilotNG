@@ -32,13 +32,9 @@ char default_version[] = VERSION;
 char myName[] = "xpilot";
 char myClass[] = "XPilot";
 
-keys_t buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
-
 #ifdef OPTIONHACK
 
 char myshipshapefile[PATH_MAX + 1];
-char *pointerButtonBindings[MAX_POINTER_BUTTONS] =
-{ NULL, NULL, NULL, NULL, NULL };
 
 static bool setTexturePath(xp_option_t *opt, const char *value)
 {
@@ -71,43 +67,15 @@ static char *getGeometry(xp_option_t *opt)
     return geometry;
 }
 
-static inline int pointer_button_index_by_option(xp_option_t *opt)
-{
-    return atoi(Get_option_name(opt) + strlen("pointerButton")) - 1;
-}
-
-static bool setPointerButtonBinding(xp_option_t *opt, const char *value)
-{
-    int ind = pointer_button_index_by_option(opt);
-
-    assert(ind >= 0);
-    assert(ind < MAX_POINTER_BUTTONS);
-    if (pointerButtonBindings[ind])
-	xp_free(pointerButtonBindings[ind]);
-
-    pointerButtonBindings[ind] = xp_safe_strdup(value);
-
-    /* kps: TODO */
-    return true;
-}
-
-static char *getPointerButtonBinding(xp_option_t *opt)
-{
-    int ind = pointer_button_index_by_option(opt);
-
-    assert(ind >= 0);
-    assert(ind < MAX_POINTER_BUTTONS);
-
-    return pointerButtonBindings[ind];
-}
-
 static bool setShipShape(xp_option_t *opt, const char *value)
 {
+    (void)opt; (void)value;
     return true;
 }
 
 static char *getShipShape(xp_option_t *opt)
 {
+    (void)opt;
     return "FOOBAR";
 }
 
@@ -623,47 +591,6 @@ xp_option_t default_options[] = {
 	"moving the mouse to the left for an anti-clockwise turn and\n"
 	"moving the mouse to the right for a clockwise turn.\n"
 	"Also see the pointerButton options for use of the mouse buttons.\n"),
-
-    /* kps - fix these */
-    XP_STRING_OPTION(
-	"pointerButton1",
-	"keyFireShot",
-	NULL, 0,
-	setPointerButtonBinding,
-	getPointerButtonBinding,
-	"The key to activate when pressing the first mouse button.\n"),
-
-    XP_STRING_OPTION(
-	"pointerButton2",
-	"keyThrust",
-	NULL, 0,
-	setPointerButtonBinding,
-	getPointerButtonBinding,
-	"The key to activate when pressing the second mouse button.\n"),
-
-    XP_STRING_OPTION(
-	"pointerButton3",
-	"keyDropBall",
-	NULL, 0,
-	setPointerButtonBinding,
-	getPointerButtonBinding,
-	"The key to activate when pressing the third mouse button.\n"),
-
-    XP_STRING_OPTION(
-	"pointerButton4",
-	"",
-	NULL, 0,
-	setPointerButtonBinding,
-	getPointerButtonBinding,
-	"The key to activate when pressing the fourth mouse button.\n"),
-
-    XP_STRING_OPTION(
-	"pointerButton5",
-	"",
-	NULL, 0,
-	setPointerButtonBinding,
-	getPointerButtonBinding,
-	"The key to activate when pressing the fifth mouse button.\n"),
 
     /* message stuff */
 
