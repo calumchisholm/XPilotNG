@@ -358,34 +358,14 @@ static void PlayerCollision(void)
 	    for (j = i + 1; j < NumPlayers; j++) {
 		player *pl_j = Players(j);
 		int range;
-		bool hit1, hit2;
 
 		if (!Player_is_playing(pl_j))
 		    continue;
 		if (BIT(pl_j->used, HAS_PHASING_DEVICE))
 		    continue;
+
 		range = (2*SHIP_SZ-6) * CLICK;
-
-		hit1 = in_range(OBJ_PTR(pl), OBJ_PTR(pl_j), range);
-
-		if (is_polygon_map || !useOldCode) {
-		    hit2 = in_range_acd(pl->prevpos.cx - pl_j->prevpos.cx,
-					pl->prevpos.cy - pl_j->prevpos.cy,
-					pl->extmove.cx - pl_j->extmove.cx,
-					pl->extmove.cy - pl_j->extmove.cy,
-					range);
-		} else {
-		    hit2 = in_range_acd_old(pl->prevpos.cx, pl->prevpos.cy,
-					    pl->pos.cx, pl->pos.cy,
-					    pl_j->prevpos.cx,
-					    pl_j->prevpos.cy,
-					    pl_j->pos.cx,
-					    pl_j->pos.cy,
-					    range);
-		}
-
-		assert(hit1 == hit2);
-		if (!hit1)
+		if (!in_range(OBJ_PTR(pl), OBJ_PTR(pl_j), range))
 		    continue;
 
 		/*
