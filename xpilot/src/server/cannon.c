@@ -50,12 +50,6 @@
 char cannon_version[] = VERSION;
 
 
-#ifdef	SOUND
-#define IFSOUND(__x)	__x
-#else
-#define IFSOUND(__x)
-#endif
-
 static int Cannon_select_weapon(int ind);
 static void Cannon_aim(int ind, int weapon, int *target, int *dir);
 static void Cannon_fire(int ind, int weapon, int target, int dir);
@@ -273,25 +267,22 @@ static int Cannon_in_danger(int ind)
 static void Cannon_defend(int ind, int defense)
 {
     cannon_t	*c = World.cannon + ind;
-    IFSOUND( int sound = -1 );
 
     switch (defense) {
     case CD_EM_SHIELD:
       c->emergency_shield_left += 4 * 12 * TIME_FACT;
 	SET_BIT(c->used, HAS_EMERGENCY_SHIELD);
 	c->item[ITEM_EMERGENCY_SHIELD]--;
-	IFSOUND( sound = EMERGENCY_SHIELD_ON_SOUND );
+	sound_play_sensors(c->pos.cx, c->pos.cy, EMERGENCY_SHIELD_ON_SOUND);
 	break;
     case CD_PHASING:
 	c->phasing_left += 4 * 12 * TIME_FACT;
 	SET_BIT(c->used, HAS_PHASING_DEVICE);
 	c->tractor_count = 0;
 	c->item[ITEM_PHASING]--;
-	IFSOUND( sound = PHASING_ON_SOUND );
+	sound_play_sensors(c->pos.cx, c->pos.cy, PHASING_ON_SOUND);
 	break;
     }
-    IFSOUND( if (sound != -1)
-	     sound_play_sensors(c->pos.cx, c->pos.cy, sound) );
 }
 
 /* selects one of the available weapons. see cannon.h for descriptions. */
@@ -500,9 +491,7 @@ static void Cannon_fire(int ind, int weapon, int target, int dir)
     int		cx = c->pos.cx;
     int		cy = c->pos.cy;
     modifiers	mods;
-#ifdef SOUND
     int		sound = CANNON_FIRE_SOUND;
-#endif
     int		i;
     int		speed = ShotsSpeed;
 
@@ -520,7 +509,7 @@ static void Cannon_fire(int ind, int weapon, int target, int dir)
 	if (rfrac() < 0.5f) {	/* place mine in front of cannon */
 	    Place_general_mine(-1, c->team, FROMCANNON, cx, cy,
 			       0, 0, mods);
-	    IFSOUND (sound = DROP_MINE_SOUND );
+	    sound = DROP_MINE_SOUND;
 	} else {		/* throw mine at player */
 	    if (BIT(World.rules->mode, ALLOW_MODIFIERS)) {
 		mods.mini = (int)(rfrac() * MODS_MINI_MAX) + 1;
@@ -529,7 +518,7 @@ static void Cannon_fire(int ind, int weapon, int target, int dir)
 	    speed = (int)(speed * 0.5 + 0.1 * cannonSmartness);
 	    Place_general_mine(-1, c->team, GRAVITY|FROMCANNON, cx, cy,
 			       tcos(dir) * speed, tsin(dir) * speed, mods);
-	    IFSOUND(sound = DROP_MOVING_MINE_SOUND);
+	    sound = DROP_MOVING_MINE_SOUND;
 	}
 	c->item[ITEM_MINE]--;
 	break;
@@ -556,7 +545,7 @@ static void Cannon_fire(int ind, int weapon, int target, int dir)
 	    if (allowSmartMissiles) {
 		Fire_general_shot(-1, c->team, 1, cx, cy, OBJ_SMART_SHOT,
 				  dir, mods, target);
-		IFSOUND(sound = FIRE_SMART_SHOT_SOUND);
+		sound = FIRE_SMART_SHOT_SOUND;
 		break;
 	    }
 	    /* FALLTHROUGH */
@@ -565,14 +554,14 @@ static void Cannon_fire(int ind, int weapon, int target, int dir)
 		&& BIT(Players[target]->status, THRUSTING)) {
 		Fire_general_shot(-1, c->team, 1, cx, cy, OBJ_HEAT_SHOT,
 				  dir, mods, target);
-		IFSOUND(sound = FIRE_HEAT_SHOT_SOUND);
+		sound = FIRE_HEAT_SHOT_SOUND;
 		break;
 	    }
 	    /* FALLTHROUGH */
 	case 0:
 	    Fire_general_shot(-1, c->team, 1, cx, cy, OBJ_TORPEDO,
 			      dir, mods, -1);
-	    IFSOUND(sound = FIRE_TORPEDO_SOUND);
+	    sound = FIRE_TORPEDO_SOUND;
 	    break;
 	}
 	c->item[ITEM_MISSILE]--;
@@ -585,12 +574,12 @@ static void Cannon_fire(int ind, int weapon, int target, int dir)
 	    mods.laser = (int)(rfrac() * (MODS_LASER_MAX + 1));
 	}
 	Fire_general_laser(-1, c->team, cx, cy, dir, mods);
-	IFSOUND(sound = FIRE_LASER_SOUND);
+	sound = FIRE_LASER_SOUND;
 	break;
     case CW_ECM:
 	Fire_general_ecm(-1, c->team, cx, cy);
 	c->item[ITEM_ECM]--;
-	IFSOUND(sound = ECM_SOUND);
+	sound = ECM_SOUND;
 	break;
     case CW_TRACTORBEAM:
 	/* smarter cannons use tractors more often and also push/pull longer */
@@ -599,7 +588,7 @@ static void Cannon_fire(int ind, int weapon, int target, int dir)
 	c->tractor_count =
 	    (11 * TIME_FACT
 	     + (int)(TIME_FACT * rfrac() * ((3 * cannonSmartness) + 1)));
-	IFSOUND(sound = -1);
+	sound = -1;
 	break;
     case CW_TRANSPORTER:
 	c->item[ITEM_TRANSPORTER]--;
@@ -610,9 +599,9 @@ static void Cannon_fire(int ind, int weapon, int target, int dir)
 	    Do_general_transporter(-1, cx, cy, target, &item, &amount);
 	    if (item != -1)
 		Cannon_add_item(ind, item, amount);
-	    IFSOUND(sound = -1);
+	    sound = -1;
 	} else {
-	    IFSOUND(sound = TRANSPORTER_FAIL_SOUND);
+	    sound = TRANSPORTER_FAIL_SOUND;
 	}
 	break;
     case CW_GASJET:
@@ -652,7 +641,7 @@ static void Cannon_fire(int ind, int weapon, int target, int dir)
 		/* life */	3 * TIME_FACT, 20 * TIME_FACT);
 	}
 	c->item[ITEM_FUEL]--;
-	IFSOUND(sound = THRUST_SOUND);
+	sound = THRUST_SOUND;
 	break;
     case CW_SHOT:
     default:
@@ -682,8 +671,8 @@ static void Cannon_fire(int ind, int weapon, int target, int dir)
     }
 
     /* finally, play sound effect */
-    IFSOUND(if (sound != -1)
-	    sound_play_sensors(cx, cy, sound));
+    if (sound != -1)
+	sound_play_sensors(cx, cy, sound);
 }
 
 
