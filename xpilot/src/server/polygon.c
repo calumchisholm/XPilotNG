@@ -169,7 +169,12 @@ void P_offset(clpos offset, int edgestyle)
     int i, offcx = offset.cx, offcy = offset.cy;
 
     if (offcx == 0 && offcy == 0) {
-	warn("Edge with zero length");
+	/*
+	 * Don't warn about zero length edges for xp maps, since
+	 * the conversion creates such edges.
+	 */
+	if (is_polygon_map)
+	    warn("Edge with zero length");
 	if (edgestyle != -1 && edgestyle != current_estyle) {
 	    warn("Refusing to change edgestyle with zero-length edge");
 	    exit(1);
