@@ -284,7 +284,7 @@ static void Make_asteroid(world_t *world, clpos_t pos,
     asteroid->pl_radius = (int)radius;
     asteroid->fuse = timeStep;
     asteroid->obj_status = GRAVITY;
-    CLEAR_MODS(asteroid->mods);
+    Mods_clear(&asteroid->mods);
 
     if (Asteroid_add_to_list(asteroid) == true) {
 	world->asteroids.num += 1 << (size - 1);

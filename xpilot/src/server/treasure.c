@@ -60,7 +60,7 @@ void Make_treasure_ball(world_t *world, treasure_t *t)
     ball->color = WHITE;
     ball->pl_range = BALL_RADIUS;
     ball->pl_radius = BALL_RADIUS;
-    CLEAR_MODS(ball->mods);
+    Mods_clear(&ball->mods);
     ball->obj_status = RECREATE;
     ball->ball_treasure = t;
     ball->ball_loose_ticks = 0;

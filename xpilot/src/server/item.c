@@ -395,9 +395,9 @@ void Detonate_items(player_t *pl)
 	    vector_t vel;
 
 	    mods = pl->mods;
-	    if (Get_nuclear_modifier(mods)
+	    if (Mods_get(mods, ModsNuclear)
 		&& pl->item[ITEM_MINE] < options.nukeMinMines)
-		Set_nuclear_modifier(&mods, 0);
+		Mods_set(&mods, ModsNuclear, 0, world);
 
 	    vel.x = pl->vel.x + speed * tcos(dir);
 	    vel.y = pl->vel.y + speed * tsin(dir);
@@ -426,9 +426,9 @@ void Detonate_items(player_t *pl)
 	    }
 
 	    mods = pl->mods;
-	    if (Get_nuclear_modifier(mods)
+	    if (Mods_get(mods, ModsNuclear)
 		&& pl->item[ITEM_MISSILE] < options.nukeMinSmarts)
-		Set_nuclear_modifier(&mods, 0);
+		Mods_set(&mods, ModsNuclear, 0, world);
 
 	    Fire_general_shot(world, owner_pl->id, pl->team, pl->pos,
 			      type, (int)(rfrac() * RES), mods, NO_ID);
@@ -1019,7 +1019,7 @@ void Fire_general_ecm(world_t *world, int id, int team, clpos_t pos)
 	     *
 	     * remember the closest unconfused mine -- it gets reprogrammed
 	     */
-	    perim = MINE_RANGE / (Get_mini_modifier(mine->mods) + 1);
+	    perim = MINE_RANGE / (Mods_get(mine->mods, ModsMini) + 1);
 	    range = (range - perim) / (ECM_DISTANCE - perim);
 
 	    /*

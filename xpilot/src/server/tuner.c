@@ -214,7 +214,7 @@ void tuner_modifiers(world_t *world)
     Set_world_rules(world);
 
     for (i = 0; i < NumPlayers; i++)
-	filter_mods(world, &Player_by_index(i)->mods);
+	Mods_filter(&Player_by_index(i)->mods, world);
 }
 
 void tuner_gameduration(world_t *world)

@@ -112,17 +112,17 @@ void Object_hits_target(object_t *obj, target_t *targ, double player_cost)
 	if (!obj->mass)
 	    /* happens at end of round reset. */
 	    return;
-	if (Get_nuclear_modifier(obj->mods))
+	if (Mods_get(obj->mods, ModsNuclear))
 	    targ->damage = 0.0;
 	else
 	    targ->damage += ED_SMART_SHOT_HIT /
-		(Get_mini_modifier(obj->mods) + 1);
+		(Mods_get(obj->mods, ModsMini) + 1);
 	break;
     case OBJ_MINE:
 	if (!obj->mass)
 	    /* happens at end of round reset. */
 	    return;
-	targ->damage -= TARGET_DAMAGE / (Get_mini_modifier(obj->mods) + 1);
+	targ->damage -= TARGET_DAMAGE / (Mods_get(obj->mods, ModsMini) + 1);
 	break;
     case OBJ_PLAYER:
 	if (player_cost <= 0.0 || player_cost > TARGET_DAMAGE / 4.0)

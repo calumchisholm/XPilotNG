@@ -491,7 +491,7 @@ void Make_wreckage(world_t *world,
     if (max_wreckage > MAX_TOTAL_SHOTS - NumObjs)
 	max_wreckage = MAX_TOTAL_SHOTS - NumObjs;
 
-    CLEAR_MODS(mods);
+    Mods_clear(&mods);
 
     for (i = 0; i < max_wreckage && sum_mass < total_mass; i++) {
 

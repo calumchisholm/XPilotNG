@@ -109,7 +109,8 @@ static inline vector_t World_gravity(world_t *world, clpos_t pos)
 
 static inline double SHOT_MULT(object_t *obj)
 {
-    if (Get_nuclear_modifier(obj->mods) && Get_cluster_modifier(obj->mods))
+    if (Mods_get(obj->mods, ModsNuclear)
+	&& Mods_get(obj->mods, ModsCluster))
 	return options.nukeClusterDamage;
     return 1.0;
 }

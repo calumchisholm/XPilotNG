@@ -439,9 +439,9 @@ int Init_player(world_t *world, int ind, shipshape_t *ship, int type)
     if (pl->item[ITEM_CLOAK] > 0)
 	SET_BIT(pl->have, HAS_CLOAKING_DEVICE);
 
-    CLEAR_MODS(pl->mods);
+    Mods_clear(&pl->mods);
     for (i = 0; i < NUM_MODBANKS; i++)
-	CLEAR_MODS(pl->modbank[i]);
+	Mods_clear(&pl->modbank[i]);
 
     for (i = 0; i < LOCKBANK_MAX; i++)
 	pl->lockbank[i] = NO_ID;

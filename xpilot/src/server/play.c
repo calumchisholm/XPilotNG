@@ -159,10 +159,10 @@ void Make_debris(world_t  *world,
     if (max_speed < min_speed)
 	max_speed = min_speed;
 
-    CLEAR_MODS(mods);
+    Mods_clear(&mods);
 
     if (type == OBJ_SHOT) {
-	Set_cluster_modifier(&mods, 1);
+	Mods_set(&mods, ModsCluster, 1, world);
 	if (!options.shotsGravity)
 	    CLR_BIT(status, GRAVITY);
     }
@@ -171,8 +171,8 @@ void Make_debris(world_t  *world,
 	num_debris = MAX_TOTAL_SHOTS - NumObjs;
 
     for (i = 0; i < num_debris; i++) {
-	double		speed, dx, dy, diroff;
-	int		dir, dirplus;
+	double speed, dx, dy, diroff;
+	int dir, dirplus;
 
 	if ((debris = Object_allocate()) == NULL)
 	    break;

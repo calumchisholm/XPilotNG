@@ -671,7 +671,7 @@ static void PlayerObjectCollision(player_t *pl)
 
 	case OBJ_CANNON_SHOT:
 	    /* don't explode cannon flak if it hits directly */
-	    Set_cluster_modifier(&obj->mods, 0);
+	    Mods_set(&obj->mods, ModsCluster, 0, world);
 	    break;
 
 	case OBJ_PULSE:
@@ -1092,8 +1092,8 @@ static void Player_collides_with_asteroid(player_t *pl, wireobject_t *ast)
 static inline double Missile_hit_drain(missileobject_t *missile)
 {
     return (ED_SMART_SHOT_HIT /
-	    ((Get_mini_modifier(missile->mods) + 1)
-	     * (Get_power_modifier(missile->mods) + 1)));
+	    ((Mods_get(missile->mods, ModsMini) + 1)
+	     * (Mods_get(missile->mods, ModsPower) + 1)));
 }
 
 static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
@@ -1117,7 +1117,7 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
     if (BIT(pl->used, HAS_SHIELD)
 	|| BIT(pl->have, HAS_ARMOR)
 	|| (obj->type == OBJ_TORPEDO
-	    && Get_nuclear_modifier(obj->mods)
+	    && Mods_get(obj->mods, ModsNuclear)
 	    && (rfrac() >= 0.25))) {
 	switch (obj->type) {
 	case OBJ_TORPEDO:
@@ -1236,7 +1236,7 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 
 	    switch (obj->type) {
 	    case OBJ_SHOT:
-		if (Get_cluster_modifier(obj->mods))
+		if (Mods_get(obj->mods, ModsCluster))
 		    factor = options.clusterKillScoreMult;
 		else
 		    factor = options.shotKillScoreMult;

@@ -155,7 +155,7 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
     /* kps - do we need some hack so that the laser pulse is
      * not removed in the same frame that its life ends ?? */
     pulse->life = 0;
-    if ((Get_laser_modifier(pulse->mods) & MODS_LASER_STUN)
+    if ((Mods_get(pulse->mods, ModsLaser) & MODS_LASER_STUN)
 	|| (options.laserIsStunGun == true
 	    && options.allowLaserModifiers == false)) {
 	if (BIT(pl->used, HAS_SHIELD|HAS_LASER|HAS_SHOT)
@@ -172,7 +172,7 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 	    Player_thrust(pl, false);
 	    pl->stunned += 5;
 	}
-    } else if (Get_laser_modifier(pulse->mods) & MODS_LASER_BLIND) {
+    } else if (Mods_get(pulse->mods, ModsLaser) & MODS_LASER_BLIND) {
 	pl->damaged += (12 + 6);
 	pl->forceVisible += (12 + 6);
 	if (kp)

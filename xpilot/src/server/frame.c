@@ -320,7 +320,7 @@ static void Frame_radar_buffer_free(void)
 static int Frame_status(connection_t *conn, player_t *pl)
 {
     world_t *world = pl->world;
-    static char mods[MAX_CHARS];
+    static char modsstr[MAX_CHARS];
     int n, lock_ind, lock_id = NO_ID, lock_dist = 0, lock_dir = 0;
     int showautopilot;
 
@@ -371,7 +371,7 @@ static int Frame_status(connection_t *conn, player_t *pl)
     /*
      * Don't forget to modify Receive_modifier_bank() in netserver.c
      */
-    Modifiers_to_string(pl->mods, mods, sizeof(mods));
+    Mods_to_string(pl->mods, modsstr, sizeof(modsstr));
     n = Send_self(conn,
 		  pl,
 		  lock_id,
@@ -379,7 +379,7 @@ static int Frame_status(connection_t *conn, player_t *pl)
 		  lock_dir,
 		  showautopilot,
 		  Player_by_id(Get_player_id(conn))->pl_old_status,
-		  mods);
+		  modsstr);
     if (n <= 0)
 	return 0;
 
@@ -692,7 +692,7 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 		&& options.selfImmunity) {
 		color = BLUE;
 		teamshot = DEBRIS_TYPES;
-	    } else if (Get_nuclear_modifier(shot->mods)
+	    } else if (Mods_get(shot->mods, ModsNuclear)
 		       && (frame_loops_slow & 2)) {
 		color = RED;
 		teamshot = DEBRIS_TYPES;
@@ -949,7 +949,7 @@ static void Frame_radar(connection_t *conn, player_t *pl)
 		continue;
 
 	    shownuke = (options.nukesOnRadar
-			&& Get_nuclear_modifier(shot->mods));
+			&& Mods_get(shot->mods, ModsNuclear));
 	    if (shownuke && (frame_loops_slow & 2))
 		size = 3;
 	    else
