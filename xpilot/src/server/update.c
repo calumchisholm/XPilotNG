@@ -1041,12 +1041,12 @@ static void Update_players(void)
 	if ((pl->damaged -= timeStep) <= 0)
 	    pl->damaged = 0;
 
-	if (pl->flooding > FPS + 1) {
+	if (pl->flooding > FPS + 2) {
 	    sprintf(msg, "%s was kicked out because of flooding.", pl->name);
 	    Destroy_connection(pl->conn, "flooding");
 	    i--;
 	    continue;
-	} else if (pl->flooding >= 0)
+	} else if (pl->flooding > 0)
 	    pl->flooding--;
 
 	/* ugly hack */

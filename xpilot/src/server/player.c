@@ -469,8 +469,6 @@ int Init_player(int ind, shipshape_t *ship)
     Rank_ClearKills(pl);
     Rank_ClearDeaths(pl);
 
-    pl->flooding = -1;
-
     /*
      * If limited lives you will have to wait 'til everyone gets GAME OVER.
      *
