@@ -31,8 +31,9 @@
 #endif
 
 /* need MAX_COLORS */
-#ifndef PAINT_H
-#include "paint.h"
+#ifdef _WINDOWS
+#define MAX_COLORS  16   /* Max. switched colors ever */
+#define MAX_COLOR_LEN 32 /* Max. length of a color name */
 #endif
 
 /*
