@@ -225,9 +225,9 @@ static bool Process_commands(sockbuf_t *ibuf,
     char		c, status, reply_to;
     char		linebuf[MAX_LINE];
     unsigned short	port, qpos;
-    int			has_credentials = 0;
+    bool		has_credentials = false;
     int			cmd_credentials = 0;
-    int			privileged_cmd;
+    bool		privileged_cmd;
     int			max_replies;
     long		key = 0;
     time_t		qsent = 0;
@@ -285,7 +285,7 @@ static bool Process_commands(sockbuf_t *ibuf,
 	    ibuf->sock.fd = SOCK_FD_INVALID;
 	}
 
-	privileged_cmd = (strchr("DKLMOR", c) != NULL);
+	privileged_cmd = (strchr("DKLMOR", c) != NULL) ? true : false;
 	if (privileged_cmd) {
 	    if (!has_credentials) {
 		success = create_dgram_addr_socket(
@@ -329,9 +329,9 @@ static bool Process_commands(sockbuf_t *ibuf,
 	Packet_printf(ibuf, "%u%s%hu", VERSION2MAGIC(conpar->server_version),
 		      conpar->real_name, sock_get_port(&ibuf->sock));
 
-	if (privileged_cmd && !has_credentials) {
+	if (privileged_cmd && !has_credentials)
 	    Packet_printf(ibuf, "%c%ld", CREDENTIALS_pack, 0L);
-	} else {
+	else {
 
 	    switch (c) {
 
@@ -442,9 +442,9 @@ static bool Process_commands(sockbuf_t *ibuf,
 		    conpar->team = TEAM_NOT_SET;
 		    printf("Team set to unspecified\n");
 		}
-		else if (linebuf[1] != '\0') {
+		else if (linebuf[1] != '\0')
 		    conpar->team = TEAM_NOT_SET;
-		}
+
 		Packet_printf(ibuf, "%c%s%s%s%d", ENTER_QUEUE_pack,
 			      conpar->nick_name, conpar->disp_name,
 			      hostname, conpar->team);
@@ -471,19 +471,16 @@ static bool Process_commands(sockbuf_t *ibuf,
 		printf("Enter team: ");
 		fflush(stdout);
 		if (!getline(linebuf, MAX_LINE, stdin)
-		    || (len = strlen(linebuf)) == 0) {
+		    || (len = strlen(linebuf)) == 0)
 		    printf("Nothing changed.\n");
-		}
 		else {
 		    int newteam;
-		    if (sscanf(linebuf, " %d", &newteam) != 1) {
+		    if (sscanf(linebuf, " %d", &newteam) != 1)
 			printf("Invalid team specification: %s.\n", linebuf);
-		    }
 		    else if (newteam >= 0 && newteam <= 9) {
 			conpar->team = newteam;
 			printf("Team set to %d\n", conpar->team);
-		    }
-		    else {
+		    } else {
 			conpar->team = TEAM_NOT_SET;
 			printf("Team set to unspecified\n");
 		    }
@@ -510,9 +507,8 @@ static bool Process_commands(sockbuf_t *ibuf,
 	for (i = 0; i <= retries; i++) {
 	    if (i > 0) {
 		sock_set_timeout(&ibuf->sock, 1, 0);
-		if (sock_readable(&ibuf->sock)) {
+		if (sock_readable(&ibuf->sock))
 		    break;
-		}
 	    }
 	    if (sock_write(&ibuf->sock, ibuf->buf, ibuf->len) != ibuf->len) {
 		error("Couldn't send request to server.");
@@ -550,9 +546,8 @@ static bool Process_commands(sockbuf_t *ibuf,
 		switch (reply_to & 0xFF) {
 
 		case OPTION_LIST_pack:
-		    while (Packet_scanf(ibuf, "%S", linebuf) > 0) {
+		    while (Packet_scanf(ibuf, "%S", linebuf) > 0)
 			printf("%s\n", linebuf);
-		    }
 		    break;
 
 		case REPORT_STATUS_pack:
@@ -629,7 +624,7 @@ static bool Process_commands(sockbuf_t *ibuf,
 		    if (Packet_scanf(ibuf, "%ld", &key) <= 0)
 			warn("Incomplete credentials reply from server");
 		    else {
-			has_credentials++;
+			has_credentials = true;
 			cmd_credentials = c;
 			continue;
 		    }
@@ -679,7 +674,8 @@ static bool Process_commands(sockbuf_t *ibuf,
 		warn("Requested operation is undefined, says the server");
 		break;
 	    default:
-		warn("Server answers with unknown error status '%02x'", status);
+		warn("Server answers with unknown error status '%02x'",
+		     status);
 		break;
 	    }
 
