@@ -1,19 +1,15 @@
 package org.xpilot.jxpmap;
 
-import java.awt.GridLayout;
-import java.util.Iterator;
-
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
+import java.awt.*;
+import java.util.*;
+import javax.swing.*;
 
 public class PolygonPropertyEditor extends EditorPanel {
-
-    private JComboBox cmbStyle;
 
     private MapPolygon polygon;
     private MapModel model;
     private MapCanvas canvas;
-
+    private JComboBox cmbDefStyle, cmbDestStyle;
     
     public PolygonPropertyEditor (MapCanvas canvas, MapPolygon poly) {
 
@@ -22,22 +18,35 @@ public class PolygonPropertyEditor extends EditorPanel {
         this.model = canvas.getModel();
 
         setTitle("Polygon");
+        setLayout(new GridLayout(2,2));
+        
+        cmbDefStyle = new JComboBox();
+        for (Iterator iter = model.polyStyles.iterator(); iter.hasNext();)
+            cmbDefStyle.addItem(((PolygonStyle)iter.next()).getId());
+        cmbDefStyle.setSelectedItem(poly.getDefaultStyle().getId());
 
-        add(new JLabel("Style:"));
-        cmbStyle = new JComboBox();
-        for (Iterator iter = model.polyStyles.iterator(); iter.hasNext();) {
-            PolygonStyle style = (PolygonStyle)iter.next();
-            cmbStyle.addItem(style.getId());
-        }
-        cmbStyle.setSelectedItem(polygon.getStyle().getId());
-        add(cmbStyle);       
+        cmbDestStyle = new JComboBox();
+        cmbDestStyle.addItem("");
+        for (Iterator iter = model.polyStyles.iterator(); iter.hasNext();)
+            cmbDestStyle.addItem(((PolygonStyle)iter.next()).getId());
+        if (poly.getStyle("destroyed") != null)
+            cmbDestStyle.setSelectedItem(poly.getStyle("destroyed").getId());
+        
+        add(new JLabel("Default style:"));
+        add(cmbDefStyle);
+        add(new JLabel("Destroyed style:"));
+        add(cmbDestStyle);
     }
 
 
     public boolean apply () {
-        int styleIndex = cmbStyle.getSelectedIndex();
-        PolygonStyle style = (PolygonStyle)model.polyStyles.get(styleIndex);
-        canvas.setPolygonProperties(polygon, style);
+        Map m = new HashMap();
+        m.put("default", model.polyStyles.get(cmbDefStyle.getSelectedIndex()));
+        if (cmbDestStyle.getSelectedIndex() > 0)
+            m.put("destroyed", 
+                model.polyStyles.get(cmbDestStyle.getSelectedIndex() - 1));
+        polygon.setCurrentStyle(null);
+        canvas.setPolygonStyles(polygon, m);
         return true;
     }
 }

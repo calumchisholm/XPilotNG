@@ -9,10 +9,13 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
+import java.awt.event.InputEvent;
 import java.awt.geom.AffineTransform;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.swing.JComponent;
 import javax.swing.undo.AbstractUndoableEdit;
@@ -26,13 +29,14 @@ public class MapCanvas extends JComponent {
     private float scale;
     private AffineTransform at, it;
     private CanvasEventHandler eventHandler;
+    private CanvasEventHandler dragHandler, selectHandler;
     private boolean erase;
     private boolean copy;
     private Point offset;
     private UndoManager undoManager;
     private MapEdit currentEdit;
     private boolean fastRendering;
-    private MapObject selected;
+    private List selected;
 
     public MapCanvas() {
 
@@ -42,6 +46,9 @@ public class MapCanvas extends JComponent {
         addMouseListener(handler);
         addMouseMotionListener(handler);
         undoManager = new UndoManager();
+        dragHandler = new DragHandler();
+        selectHandler = new SelectHandler();
+        selected = new ArrayList();
     }
 
     public void setCanvasEventHandler(CanvasEventHandler h) {
@@ -68,15 +75,25 @@ public class MapCanvas extends JComponent {
         return this.fastRendering;
     }
     
-    public MapObject getSelectedObject() {
+    public List getSelectedObjects() {
         return selected;
     }
     
     public void setSelectedObject(MapObject object) {
-        if (selected != null) selected.setSelected(false);
-        selected = object;
-        if (selected != null) 
-            selected.setSelected(true);
+        if (!selected.isEmpty()) {
+            for (Iterator i = selected.iterator(); i.hasNext();)
+                ((MapObject)i.next()).setSelected(false);
+        }
+        selected.clear();
+        if (object != null) {
+            object.setSelected(true);
+            selected.add(object);
+        }
+    }
+    
+    public void addSelectedObject(MapObject object) {
+        object.setSelected(true);
+        selected.add(object);
     }
 
     public void setModel(MapModel m) {
@@ -117,7 +134,7 @@ public class MapCanvas extends JComponent {
     public void setCopy(boolean copy) {
         this.copy = copy;
     }
-
+            
     public void paint(Graphics _g) {
 
         if (model == null)
@@ -387,19 +404,19 @@ public class MapCanvas extends JComponent {
         });
     }
 
-    public void setPolygonProperties(
+    public void setPolygonStyles(
         final MapPolygon p,
-        final PolygonStyle newStyle) {
-        final PolygonStyle oldStyle = p.getStyle();
-        final PolygonStyle oldDefaultStyle = model.getDefaultPolygonStyle();
+        final Map newStyles) {
         doEdit(new AbstractMapEdit() {
+            Map oldStyles = p.getStyles();
+            Map oldDefaultStyles = model.getDefaultPolygonStyles();
             public void unedit() {
-                p.setStyle(oldStyle);
-                model.setDefaultPolygonStyle(oldDefaultStyle);
+                p.setStyles(oldStyles);
+                model.setDefaultPolygonStyles(oldDefaultStyles);
             }
             public void edit() {
-                p.setStyle(newStyle);
-                model.setDefaultPolygonStyle(newStyle);
+                p.setStyles(newStyles);
+                model.setDefaultPolygonStyles(newStyles);
             }
         });
     }
@@ -495,8 +512,44 @@ public class MapCanvas extends JComponent {
                 o.setType(newType);
             }            
         });
-    }    
+    }
+    
+    public void setWormholePoint(final Wormhole o, final int x, final int y) {
+        doEdit(new AbstractMapEdit() {
+            private Point oldPoint = o.getPoint();
+            public void unedit() {
+                o.setPoint(oldPoint);
+            }
+            public void edit() {
+                o.setPoint(new Point(x, y));
+            }
+        });
+    }
 
+    public void setCannonDir(final Cannon c, final int newDir) {
+        final int oldDir = c.getDir();
+        doEdit(new AbstractMapEdit() {
+            public void unedit() {
+                c.setDir(oldDir);
+            }
+            public void edit() {
+                c.setDir(newDir);
+            }            
+        });        
+    }
+    
+    public void setCannonPoint(final Cannon c, final int x, final int y) {
+        final Point oldPoint = c.getPoint();
+        doEdit(new AbstractMapEdit() {
+            public void unedit() {
+                c.setPoint(oldPoint);
+            }
+            public void edit() {
+                c.setPoint(new Point(x, y));
+            }            
+        });        
+    }
+    
     public void removeMapObject(final MapObject o) {
         final int i = getModel().indexOf(o);
         if (i == -1)
@@ -532,6 +585,110 @@ public class MapCanvas extends JComponent {
             public void edit() {
                 getModel().removeObject(o);
                 getModel().addObject(o, front);
+            }
+        });
+    }
+        
+    public void makeBallAreaFromSelected() {
+        if (selected.isEmpty()) return;
+        makeGroup(new BallArea(selected));
+    }
+    
+    public void makeBallTargetFromSelected() {
+        if (selected.isEmpty()) return;
+        makeGroup(new BallTarget(selected));
+    }
+    
+    public void makeCannonFromSelected() {
+        if (selected.isEmpty()) return;
+        makeGroup(new Cannon(selected));
+    }    
+
+    public void makeDecorationFromSelected() {
+        if (selected.isEmpty()) return;
+        makeGroup(new Decoration(selected));
+    }
+    
+    public void makeFrictionAreaFromSelected() {
+        if (selected.isEmpty()) return;
+        makeGroup(new FrictionArea(selected));        
+    }
+    
+    public void makeGroupFromSelected() {
+        if (selected.isEmpty()) return;
+        makeGroup(new Group(selected));
+    }    
+    
+    public void makeTargetFromSelected() {
+        if (selected.isEmpty()) return;
+        makeGroup(new Target(selected));        
+    }    
+    
+    public void makeWormholeFromSelected() {
+        if (selected.isEmpty()) return;
+        makeGroup(new Wormhole(selected));        
+    }    
+
+    private void makeGroup(final Group g) {
+        doEdit(new AbstractMapEdit() {
+            public void unedit() {
+                for (Iterator i = g.getMembers().iterator(); i.hasNext();) {
+                    MapObject o = (MapObject)i.next();
+                    o.setParent(null);
+                    getModel().addToFront(o);
+                }
+            }
+            public void edit() {
+                for (Iterator i = selected.iterator(); i.hasNext();) {
+                    MapObject o = (MapObject)i.next();
+                    o.setParent(g);
+                    getModel().removeObject(o);
+                }
+                getModel().addToFront(g);
+                setSelectedObject(g);
+            }            
+        });
+    }
+        
+    public void ungroupSelected() {
+        if (selected.isEmpty() 
+            || !(selected.get(0) instanceof Group))
+            return;
+        doEdit(new AbstractMapEdit() {
+            Group g = (Group)selected.get(0);
+            public void unedit() {
+                getModel().addToFront(g);
+                for (Iterator i = g.getMembers().iterator(); i.hasNext();)
+                    getModel().removeObject((MapObject)i.next());                
+            }
+            public void edit() {
+                getModel().removeObject(g);
+                setSelectedObject(null);
+                for (Iterator i = g.getMembers().iterator(); i.hasNext();) {
+                    MapObject o = (MapObject)i.next();
+                    getModel().addToFront(o);
+                    addSelectedObject(o);
+                }
+            }
+        });
+    }
+    
+    public void regroupSelected() {
+        if (selected.isEmpty() 
+            || ((MapObject)selected.get(0)).getParent() == null)
+            return;
+        doEdit(new AbstractMapEdit() {
+            Group g = ((MapObject)selected.get(0)).getParent();
+            public void unedit() {
+                getModel().removeObject(g);
+                for (Iterator i = g.getMembers().iterator(); i.hasNext();)
+                    getModel().addToFront((MapObject)i.next());                    
+            }
+            public void edit() {
+                getModel().addToFront(g);
+                for (Iterator i = g.getMembers().iterator(); i.hasNext();)
+                    getModel().removeObject((MapObject)i.next());
+                setSelectedObject(g);                
             }
         });
     }
@@ -682,21 +839,15 @@ public class MapCanvas extends JComponent {
     }
 
     private class AwtEventHandler implements CanvasEventHandler {
-
-        private Point dragStart;
-        private Point offsetStart;
-
+        
         public void mouseClicked(MouseEvent evt) {
-
             if (model == null)
                 return;
             transformEvent(evt);
-
             if (eventHandler != null) {
                 eventHandler.mouseClicked(evt);
                 return;
             }
-
             for (Iterator iter = model.objects.iterator(); iter.hasNext();) {
                 MapObject o = (MapObject) iter.next();
                 if (o.checkAwtEvent(MapCanvas.this, evt)) {
@@ -726,36 +877,37 @@ public class MapCanvas extends JComponent {
         }
 
         public void mousePressed(MouseEvent evt) {
-
             if (model == null)
                 return;
-
-            dragStart = evt.getPoint();
-            offsetStart = new Point(offset);
-
             transformEvent(evt);
             if (eventHandler != null) {
                 eventHandler.mousePressed(evt);
                 return;
             }
-
             for (Iterator iter = model.objects.iterator(); iter.hasNext();) {
                 MapObject o = (MapObject) iter.next();
                 if (o.checkAwtEvent(MapCanvas.this, evt)) {
                     return;
                 }
             }
-            
-            setSelectedObject(null);
-            setFastRendering(true);
+            if ((evt.getModifiers() & InputEvent.BUTTON1_MASK) != 0) {
+                if (evt.isControlDown()) {            
+                    setSelectedObject(null);
+                    setCanvasEventHandler(selectHandler);
+                    selectHandler.mousePressed(evt);
+                } else {
+                    dragHandler.mousePressed(evt);
+                    setCanvasEventHandler(dragHandler);
+                    setSelectedObject(null);
+                }
+            }
         }
 
         public void mouseReleased(MouseEvent evt) {           
             if (model == null)
                 return;
-
-	    transformEvent(evt);
-	    if (eventHandler != null) {
+            transformEvent(evt);
+            if (eventHandler != null) {
                 eventHandler.mouseReleased(evt);
                 return;
             }
@@ -765,23 +917,16 @@ public class MapCanvas extends JComponent {
                     return;
                 }
             }
-            setFastRendering(false);
-            repaint();            
         }
 
         public void mouseDragged(MouseEvent evt) {
             if (model == null)
                 return;
+            transformEvent(evt);
             if (eventHandler != null) {
-                transformEvent(evt);
                 eventHandler.mouseDragged(evt);
                 return;
             }
-            at = null;
-            it = null;
-            offset.x = offsetStart.x + (dragStart.x - evt.getX());
-            offset.y = offsetStart.y + (dragStart.y - evt.getY());
-            repaint();
         }
 
         public void mouseMoved(MouseEvent evt) {
@@ -799,6 +944,84 @@ public class MapCanvas extends JComponent {
             Point evtp = evt.getPoint();
             getInverse().transform(evtp, mapp);
             evt.translatePoint(mapp.x - evtp.x, mapp.y - evtp.y);
+        }        
+    }
+    
+    private class DragHandler extends CanvasEventAdapter {
+        
+        private Point dragStart;
+        private Point offsetStart;        
+        
+        public void mousePressed(MouseEvent evt) {
+            toScreen(evt);
+            dragStart = evt.getPoint();
+            offsetStart = new Point(offset);
+            setFastRendering(true);            
+        }
+        
+        public void mouseDragged(MouseEvent evt) {
+            toScreen(evt);
+            at = null;
+            it = null;
+            offset.x = offsetStart.x + (dragStart.x - evt.getX());
+            offset.y = offsetStart.y + (dragStart.y - evt.getY());
+            repaint();           
+        }
+        
+        public void mouseReleased(MouseEvent evt) {
+            setFastRendering(false);
+            setCanvasEventHandler(null);
+            repaint();                        
+        }
+        
+        private void toScreen(MouseEvent evt) {
+            Point mapp = new Point();
+            Point evtp = evt.getPoint();
+            getTransform().transform(evtp, mapp);
+            evt.translatePoint(mapp.x - evtp.x, mapp.y - evtp.y);
+        }                
+    }
+    
+    private class SelectHandler extends CanvasEventAdapter {
+        
+        private Point selectStart;
+        private Rectangle selectShape = new Rectangle();
+        
+        public void mousePressed(MouseEvent evt) {
+            if ((evt.getModifiers() 
+            & InputEvent.BUTTON1_MASK) != 0) {
+                selectStart = evt.getPoint();
+                paintSelectArea(evt, false, true);
+            }
+        }
+        
+        public void mouseDragged(MouseEvent evt) {
+            if ((evt.getModifiers() 
+            & InputEvent.BUTTON1_MASK) != 0)
+                paintSelectArea(evt, true, true);
+        }
+        
+        public void mouseReleased(MouseEvent evt) {
+            if ((evt.getModifiers()
+            & InputEvent.BUTTON1_MASK) != 0) {            
+                paintSelectArea(evt, true, false);
+                setCanvasEventHandler(null);
+                repaint();
+            }
+        }           
+        
+        private void paintSelectArea(
+        MouseEvent evt, boolean erase, boolean paint) {
+            Graphics2D g = (Graphics2D)getGraphics();
+            g.setXORMode(Color.black);
+            g.setColor(Color.white);
+            if (erase) drawShape(g, selectShape);
+            selectShape.setBounds(
+                Math.min(selectStart.x, evt.getX()),
+                Math.min(selectStart.y, evt.getY()),
+                Math.abs(selectStart.x - evt.getX()),
+                Math.abs(selectStart.y - evt.getY()));
+            if (paint) drawShape(g, selectShape);
         }
     }
 }

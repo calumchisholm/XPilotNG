@@ -3,19 +3,18 @@
  */
 package org.xpilot.jxpmap;
 
-import java.awt.Polygon;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.math.BigDecimal;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
+import java.util.Collection;
 
 /**
  * @author jli
  */
-public class FrictionArea extends MapPolygon {
+public class FrictionArea extends Group {
     
     private BigDecimal friction;
     
@@ -24,9 +23,12 @@ public class FrictionArea extends MapPolygon {
         this.friction = new BigDecimal(0.0);
     }
     
-    public FrictionArea(Polygon p, PolygonStyle style, ArrayList edgeStyles,
-    BigDecimal friction) {
-        super(p, style, edgeStyles);
+    public FrictionArea(Collection c) {
+        this(c, new BigDecimal(0.0));
+    }
+    
+    public FrictionArea(Collection c, BigDecimal friction) {
+        super(c);
         setFriction(friction);
     }
     
@@ -40,16 +42,12 @@ public class FrictionArea extends MapPolygon {
 
     public void printXml(PrintWriter out) throws IOException {
         out.println("<FrictionArea friction=\"" + getFriction() + "\">");
-        super.printXml(out);
+        super.printMemberXml(out);
         out.println("</FrictionArea>");
     }
 
     public EditorPanel getPropertyEditor(MapCanvas canvas) {
-        CompoundEditor ce = 
-            new CompoundEditor("FrictionArea", canvas, this);
-        ce.add(new FrictionEditor(canvas));
-        ce.add(super.getPropertyEditor(canvas));
-        return ce;
+        return new FrictionEditor(canvas);
     }
     
     private class FrictionEditor extends EditorPanel {

@@ -5,108 +5,128 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.geom.Point2D;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
+import java.awt.AWTEvent;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
-public class Cannon extends MapPolygon {
+public class Cannon extends Group {
     
-    private static final double[] arrow = {
-        0, 0,
-        27, 0,
-        27, 3,
-        30, 0, 
-        27, -3,
-        27, 0
-    };
+    private static final GeneralPath ARROW = new GeneralPath();
+    static {
+        ARROW.moveTo(0, 0);
+        ARROW.lineTo(27, 0);
+        ARROW.lineTo(27, 3);
+        ARROW.lineTo(30, 0);
+        ARROW.lineTo(27, -3);
+        ARROW.lineTo(27, 0);
+    }
+    private static final Point HEAD = new Point(30, 0);
 
     private int x, y, dir;
-    private int[] arrowx = new int[arrow.length / 2]; 
-    private int[] arrowy = new int[arrow.length / 2];
+    private Shape arrow;
+    private Point2D head;
+    
+    public MapObject copy() {
+        Cannon copy = (Cannon)super.copy();
+        copy.arrow = new GeneralPath(arrow);
+        return copy;
+    }
 
-
-
+    public Object deepClone(Map context) {
+        Cannon clone = (Cannon)super.deepClone(context);
+        clone.arrow = new GeneralPath(arrow);
+        return clone;
+    }
+    
     public Cannon() {
         super();
         setTeam(-1);
-        computeArrow();
+        updateArrow();
+    }
+    
+    public Cannon(Collection c) {
+        super(c);
+        x = (int)getBounds().getCenterX();
+        y = (int)getBounds().getCenterY();
+        updateArrow();
     }
 
-    public Cannon(Polygon p, PolygonStyle style, ArrayList edgeStyles,
-    int team, int x, int y, int dir) {
-        super(p, style, edgeStyles);
-        this.dir = dir;
+    public Cannon(Collection c, int team, int x, int y, int dir) {
+        super(c);
         setTeam(team);
+        this.dir = dir;
         this.x = x;
         this.y = y;
-        computeArrow();
+        updateArrow();
     }
 
 
-    public int getDir () {
+    public int getDir() {
         return dir;
     }
 
 
-    public void setDir (int dir) {
-        
+    public void setDir(int dir) {
         if (dir > 127) dir = 127;
         if (dir < 0) dir = 0;
         this.dir = dir;
-        computeArrow();
+        updateArrow();
+    }
+    
+    
+    public void setPoint(Point p) {
+        setPoint(p.x, p.y);
+    }
+    
+    public void setPoint(int x, int y) {
+        this.x = x;
+        this.y = y;
+        updateArrow();
+    }
+
+    
+    
+    public Point getPoint() {
+        return new Point(x, y);
     }
     
 
-    public void moveTo (int x, int y) {
+    public void moveTo(int x, int y) {
         Rectangle r = getBounds();
         this.x += x - r.x;
         this.y += y - r.y;
-        computeArrow();        
+        updateArrow();        
         super.moveTo(x, y);
     }
     
-    
-    public void rotate (double angle) {
-        super.rotate(angle);
-        double cx = getBounds().getCenterX();
-        double cy = getBounds().getCenterY();
-        AffineTransform at = AffineTransform.getTranslateInstance(cx, cy);
-        at.rotate(angle);
-        at.translate(-cx, -cy);
-        Point p = new Point();
-        p.x = x;
-        p.y = y;
-        at.transform(p, p);
-        x = p.x;
-        y = p.y;
-        int d = getDir();
-        d += (int)(127 * angle / (2 * Math.PI));
-        if (d > 127) d %= 127;
-        while(d < 0) d += 127;
-        setDir(d);
+    protected void updateArrow() {
+        AffineTransform at = 
+            computeTransform(x, y, 2 * Math.PI * getDir() / 128.0);
+        arrow = at.createTransformedShape(ARROW);
+        head = at.transform(HEAD, new Point());
     }
-    
-    public void computeArrow() {
+        
+    protected AffineTransform computeTransform(int x, int y, double a) {
         AffineTransform at = new AffineTransform();
         at.translate(x, y);
-        at.rotate(2 * Math.PI * getDir() / 128.0);
+        at.rotate(a);
         at.scale(64, 64);
-        double[] pts = new double[arrow.length];
-        at.transform(arrow, 0, pts, 0, pts.length / 2);
-        for (int i = 0; i < arrowx.length; i++) {
-            arrowx[i] = (int)pts[2 * i];
-            arrowy[i] = (int)pts[2 * i + 1];
-        }
+        return at;
     }
 
-    public int getTeam () {
+    public int getTeam() {
         return team;
     }
 
 
-    public void setTeam (int team) {
+    public void setTeam(int team) {
         if (team < -1 || team > 10)
             throw new IllegalArgumentException
                 ("illegal team: " + team);
@@ -114,55 +134,101 @@ public class Cannon extends MapPolygon {
     }
 
     
-    public void printXml (PrintWriter out) throws IOException {
+    public void printXml(PrintWriter out) throws IOException {
         out.println("<Cannon x=\"" + x + "\" y=\"" + y 
             + "\" dir=\"" + dir + "\">");
-        super.printXml(out);
+        super.printMemberXml(out);
         out.println("</Cannon>");
     }
 
     
-    public EditorPanel getPropertyEditor (MapCanvas c) {
-        CompoundEditor ce = 
-            new CompoundEditor("Cannon", c, this);
-        ce.add(new TeamEditor("Team", c, this));
-        ce.add(super.getPropertyEditor(c));
-        return ce;
+    public EditorPanel getPropertyEditor(MapCanvas c) {
+        return new TeamEditor("Cannon", c, this);
     }
 
     public void paint(Graphics2D g, float scale) {
         super.paint(g, scale);
         g.setColor(Color.yellow);
-        g.drawPolyline(arrowx, arrowy, arrowx.length);
-    }
-
-    public CanvasEventHandler getCreateHandler(final Runnable r) {
-        Runnable r2 = new Runnable() {
-            public void run() {
-                Rectangle b = getBounds();
-                x = b.x + b.width;
-                y = (int)b.getCenterY();
-                computeArrow();
-                if (r != null) r.run();
-            }
-        };
-        return super.getCreateHandler(r2);
+        g.draw(arrow);
     }
     
-    public MapObject copy() {
-        Cannon copy = (Cannon)super.copy();
-        copy.arrowx = new int[arrowx.length];
-        copy.arrowy = new int[arrowy.length];
-        copy.computeArrow();
-        return copy;
+    public boolean checkAwtEvent(MapCanvas canvas, AWTEvent evt) {
+        if (evt.getID() == MouseEvent.MOUSE_PRESSED) {
+            MouseEvent me = (MouseEvent)evt;
+            if (
+            (me.getModifiers() & MouseEvent.BUTTON1_MASK) != 0) {
+                double thSq = 100 / (canvas.getScale() * canvas.getScale());
+                if (Point2D.distanceSq(x, y, me.getX(), me.getY()) < thSq) {
+                    canvas.setCanvasEventHandler(
+                        new ArrowMoveHandler(me));
+                    return true;
+                } else if (Point2D.distanceSq(head.getX(), head.getY(), 
+                    me.getX(), me.getY()) < thSq) {
+                    canvas.setCanvasEventHandler(
+                        new ArrowRotateHandler(me));
+                    return true;
+                }
+            }
+        }
+        return super.checkAwtEvent(canvas, evt);
     }
-
-    public Object deepClone(Map context) {
-        Cannon clone = (Cannon)super.deepClone(context);
-        clone.arrowx = new int[arrowx.length];
-        clone.arrowy = new int[arrowy.length];
-        clone.computeArrow();
-        return clone;
+    
+    protected class ArrowMoveHandler extends CanvasEventAdapter {
+        
+        private Shape preview;
+        private double angle;
+        private boolean clear;
+        
+        public ArrowMoveHandler(MouseEvent evt) {
+            preview = new GeneralPath(Cannon.this.arrow);
+            angle = 2 * Math.PI * getDir() / 128.0;
+        }
+        public void mouseReleased(MouseEvent evt) {
+            MapCanvas c = (MapCanvas)evt.getSource();
+            c.setCanvasEventHandler(null);
+            c.setCannonPoint(Cannon.this, evt.getX(), evt.getY());
+            c.repaint();            
+        }
+        public void mouseDragged(MouseEvent evt) {
+            MapCanvas c = (MapCanvas)evt.getSource();
+            Graphics2D g = (Graphics2D)c.getGraphics();
+            g.setColor(Color.white);
+            g.setXORMode(Color.black);
+            if (clear) c.drawShape(g, preview);
+            preview = computeTransform(evt.getX(), evt.getY(), angle)
+                .createTransformedShape(ARROW);                     
+            c.drawShape(g, preview);
+            clear = true;            
+        }                
     }
+    
+    protected class ArrowRotateHandler extends CanvasEventAdapter {
+        
+        private Shape preview;
+        private boolean clear;
+        private double angle;
 
+        public ArrowRotateHandler(MouseEvent evt) {
+            preview = new GeneralPath(Cannon.this.arrow);
+        }        
+        public void mouseReleased(MouseEvent evt) {
+            MapCanvas c = (MapCanvas)evt.getSource();
+            c.setCanvasEventHandler(null);
+            if (angle < 0) angle += 2 * Math.PI;
+            c.setCannonDir(Cannon.this, (int)(64 * angle / Math.PI));
+            c.repaint();
+        }
+        public void mouseDragged(MouseEvent evt) {
+            MapCanvas c = (MapCanvas)evt.getSource();
+            Graphics2D g = (Graphics2D)c.getGraphics();
+            g.setColor(Color.white);
+            g.setXORMode(Color.black);
+            if (clear) c.drawShape(g, preview);
+            angle = Math.atan2(evt.getY() - y, evt.getX() - x);
+            preview = computeTransform(x, y, angle)
+                .createTransformedShape(ARROW);            
+            c.drawShape(g, preview);
+            clear = true;
+        }
+    }
 }

@@ -9,12 +9,9 @@ addScript(name, tooltip, method) {
     }
 }
 
-addScript("Randomize", "Randomize the selected wall polygon", "randomize");
-addScript("Randomize all", "Randomize all walls", "randomizeAll");
-addScript("Shadow", "Adds a shadow to the selected wall polygon", "shadow");
-addScript("Shadow all", "Adds a shadow to all wall polygons", "shadowAll");
-addScript("Round", "Rounds the corners of the selected wall polygon", "round");
-addScript("Round all", "Rounds the corners of all wall polygons", "roundAll");
+addScript("Randomize", "Randomize the selected wall polygons", "randomize");
+addScript("Shadow", "Adds a shadow to the selected wall polygons", "shadow");
+addScript("Round", "Rounds the corners of the selected wall polygons", "round");
 
 import org.xpilot.jxpmap.*;
 
@@ -26,12 +23,7 @@ import org.xpilot.jxpmap.*;
  * Utility to check if a map objects is a regular wall polygon
  */
 isWall(p) {
-    return (p instanceof MapPolygon) 
-	&& !(p instanceof BallArea)
-	&& !(p instanceof BallTarget)
-	&& !(p instanceof Decoration)
-	&& !(p instanceof Cannon)
-	&& !(p instanceof Target);
+    return (p instanceof MapPolygon); 
 }
 
 /**
@@ -39,7 +31,7 @@ isWall(p) {
  */
 findStyle(id, list) {
     for (style:list) 
-        if (style.getId().equals(id))
+        if (style.id.equals(id))
             return style;
     return null;
 }
@@ -73,34 +65,22 @@ doRandomize(pixels, o) {
             (int)((Math.random() - 0.5) * pixels * 64));
             o.setPoint(i, p.x, p.y);
         }
+    } else if (o instanceof Group) {
+        for (i:o.members) doRandomize(pixels, i);
+        o.invalidate();
     }
 }
 
-/**
- * Randomizes all wall polygons with the given amount of pixels.
- */
-doRandomizeAll(pixels) {
-    for(o:editor.getModel().getObjects())
-        doRandomize(pixels, o);
-}
-
 randomize() {
-    if (editor.getSelectedObject() == null) {
+    if (editor.getSelectedObjects().isEmpty()) {
         alert("First select a polygon");
         return;
     }
     value = prompt("How many pixels to randomize");
     if (value == null) return;
-    doRandomize(Integer.parseInt(value), 
-        editor.getSelectedObject());
+    for (o:editor.selectedObjects)
+        doRandomize(Integer.parseInt(value), o);
     editor.repaint();        
-}
-
-randomizeAll() {
-    value = prompt("How many pixels to randomize");
-    if (value == null) return;
-    doRandomizeAll(Integer.parseInt(value));
-    editor.repaint();
 }
 
 
@@ -119,7 +99,9 @@ addShadow(polygon, style) {
         sp.ypoints[i] -= 640;
     }
     sp.invalidate();
-    editor.getModel().addToBack(new Decoration(sp, style, null));   
+    decor = new Decoration();
+    decor.addToFront(new MapPolygon(sp, style));
+    editor.model.addToBack(decor);   
 }
 
 /**
@@ -127,13 +109,13 @@ addShadow(polygon, style) {
  * for a drop shadow.
  */
 getShadowStyle() {
-    model = editor.getModel();
-    es = findStyle("hidden", model.getEdgeStyles());
+    model = editor.model;
+    es = findStyle("hidden", model.edgeStyles);
     if (es == null) {
         es = new LineStyle("hidden", 1, Color.darkGray, LineStyle.STYLE_HIDDEN);
-        model.getEdgeStyles().add(es);
+        model.edgeStyles.add(es);
     }
-    ps = findStyle("shadow", model.getPolyStyles());
+    ps = findStyle("shadow", model.polyStyles);
     if (ps == null) {
         ps = new PolygonStyle();
         ps.setColor(new Color(50,50,50));
@@ -146,25 +128,22 @@ getShadowStyle() {
     return ps;    
 }
 
-doShadow(polygon) {
+doShadow(o) {
     style = getShadowStyle();
-    if (isWall(polygon)) 
-        addShadow(polygon, style);
+    if (isWall(o)) addShadow(o, style);
+    else if (o instanceof Group) {
+        for (i:o.members) doShadow(i);
+        o.invalidate();
+    }
 }
 
 shadow() {
-    if (editor.getSelectedObject() == null) {
+    if (editor.selectedObjects.isEmpty()) {
         alert("First select a polygon");
         return;
     }
-    doShadow(editor.getSelectedObject());
+    for (o:editor.selectedObjects) doShadow(o);
     editor.repaint();            
-}
-
-shadowAll() {
-    style = getShadowStyle();
-    for(o:new ArrayList(editor.getModel().getObjects()))
-        if (isWall(o)) addShadow(o, style);
 }
 
 
@@ -184,6 +163,12 @@ movePoint(p, dir, len) {
  * controls the maximum amount of pixels a vertex gets moved.
  */
 doRound(mp, max) {
+    if (!isWall(mp)) return;
+    if (mp instanceof Group) {
+        for (o:mp.members) 
+            doRound(o, max);
+        mp.invalidate();
+    }
     if (mp.getNumPoints() < 3) return;
     minDist = 1 * 64;
     maxMove = max * 64;
@@ -206,13 +191,8 @@ doRound(mp, max) {
     }
 }
 
-doRoundAll(max) {
-    for(o:new ArrayList(editor.getModel().getObjects()))
-        if (isWall(o)) doRound(o, max);
-}
-
 round() {
-    if (editor.getSelectedObject() == null) {
+    if (editor.selectedObjects.isEmpty()) {
         alert("First select a polygon");
         return;
     }
@@ -221,22 +201,12 @@ round() {
     max = Integer.parseInt(value);
     value = prompt("How many times to run");
     if (value == null) return;
-    times = Integer.parseInt(value);
-    for (i = 0; i < times; i++) doRound(editor.getSelectedObject(), max);
+    times = Integer.parseInt(value);   
+    for (o:editor.selectedObjects)
+        for (i = 0; i < times; i++)
+            doRound(o, max);
     editor.repaint();
 }
-
-roundAll() {
-    value = prompt("How many pixels to round");
-    if (value == null) return;
-    max = Integer.parseInt(value);
-    value = prompt("How many times to run");
-    if (value == null) return;
-    times = Integer.parseInt(value);
-    for (i = 0; i < times; i++) doRoundAll(max);
-    editor.repaint();            
-}
-
 
 /************************ User scripts ******************************/
 

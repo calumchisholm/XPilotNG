@@ -21,15 +21,15 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.HashMap;
 
 
 public class MapPolygon extends MapObject {
-
-    private static final Stroke SELECTED_STROKE = new BasicStroke(1);
     
     protected Polygon polygon;
-    protected PolygonStyle style;
+    protected PolygonStyle currentStyle;
     protected ArrayList edgeStyles;
+    protected Map styles;
 
     public Object deepClone (Map context) {
 
@@ -39,7 +39,14 @@ public class MapPolygon extends MapObject {
             polygon.ypoints, 
             polygon.npoints);
 
-        clone.style = (PolygonStyle)style.deepClone(context);
+        if (styles != null) {
+            Map m = new HashMap();
+            for (Iterator i = styles.keySet().iterator(); i.hasNext();) {
+                String key = (String)i.next();
+                m.put(key, ((PolygonStyle)styles.get(key)).deepClone(context));
+            }
+            clone.styles = m;
+        }
 
         if (edgeStyles != null) {
             ArrayList l = new ArrayList();
@@ -56,17 +63,23 @@ public class MapPolygon extends MapObject {
         copy.polygon = new Polygon(polygon.xpoints, 
             polygon.ypoints, 
             polygon.npoints);
+        if (styles != null)
+            copy.styles = new HashMap(styles);
         if (edgeStyles != null) 
             copy.edgeStyles = new ArrayList(edgeStyles);
         return copy;
     }
 
-    public MapPolygon () {}
+    protected MapPolygon () {}
 
-
-    public MapPolygon (Polygon p, PolygonStyle style, ArrayList edgeStyles) {
+    public MapPolygon(Polygon p, PolygonStyle defStyle) {
         this.polygon = p;
-        this.style = style;
+        setDefaultStyle(defStyle);
+    }
+
+    public MapPolygon (Polygon p, Map styles, ArrayList edgeStyles) {
+        this.polygon = p;
+        this.styles = styles;
         this.edgeStyles = edgeStyles;
     }
 
@@ -80,17 +93,42 @@ public class MapPolygon extends MapObject {
     }
 
     public Polygon getPolygon() {
-	return polygon;
-    }
-
-    public PolygonStyle getStyle () {
-        return style;
+        return polygon;
     }
     
-    public void setStyle (PolygonStyle style) {
-        this.style = style;
+    public Map getStyles() {
+        return styles;
     }
-
+    
+    public void setStyles(Map m) {
+        this.styles = m;
+    }
+    
+    public PolygonStyle getDefaultStyle() {
+        return getStyle("default");
+    }
+    
+    public void setDefaultStyle(PolygonStyle style) {
+        if (style == null) throw new NullPointerException();
+        if (styles == null) styles = new HashMap();
+        styles.put("default", style);
+    }
+    
+    public PolygonStyle getStyle(String name) {
+        if (styles == null) return null;
+        return (PolygonStyle)styles.get(name);
+    }
+    
+    public PolygonStyle getCurrentStyle() {
+        if (currentStyle == null)
+            currentStyle = getDefaultStyle();
+        return currentStyle;
+    }
+    
+    public void setCurrentStyle(PolygonStyle style) {
+        currentStyle = style;
+    }
+    
     public Rectangle getBounds () {
         return polygon.getBounds();
     }
@@ -161,7 +199,7 @@ public class MapPolygon extends MapObject {
 
 
     public LineStyle getEdgeStyle (int index) {
-        if (edgeStyles == null) return style.getDefaultEdgeStyle();
+        if (edgeStyles == null) return getDefaultStyle().getDefaultEdgeStyle();
         return (LineStyle)edgeStyles.get(index);
     }
 
@@ -175,8 +213,19 @@ public class MapPolygon extends MapObject {
         out.print("\" y=\"");
         out.print(polygon.ypoints[0]);
         out.print("\" style=\"");
-        out.print(getStyle().getId());
+        out.print(getStyle("default").getId());
         out.println("\">");
+        
+        for (Iterator i = getStyles().entrySet().iterator(); i.hasNext();) {
+            Map.Entry e = (Map.Entry)i.next();
+            if ("default".equals(e.getKey())) continue;
+            if ("".equals(e.getValue())) continue;
+            out.print("<Style state=\"");
+            out.print(e.getKey());
+            out.print("\" id=\"");
+            out.print(((PolygonStyle)e.getValue()).getId());
+            out.println("\"/>");
+        }
 
         LineStyle cls = null;
 
@@ -194,7 +243,7 @@ public class MapPolygon extends MapObject {
                     if (ls != cls) {
                         out.print("\" style=\"");
                         out.print((ls != null) ? ls.getId() : 
-                                  style.getDefaultEdgeStyle().getId());
+                            getDefaultStyle().getDefaultEdgeStyle().getId());
                         cls = ls;
                     }
                 }
@@ -215,7 +264,7 @@ public class MapPolygon extends MapObject {
                     if (ls != cls) {
                         out.print("\" style=\"");
                         out.print((ls != null) ? ls.getId() : 
-                                  style.getDefaultEdgeStyle().getId());
+                            getDefaultStyle().getDefaultEdgeStyle().getId());
                         cls = ls;
                     }
                 }
@@ -230,6 +279,7 @@ public class MapPolygon extends MapObject {
 
     public void paint (Graphics2D g, float scale) {
 
+        PolygonStyle style = getCurrentStyle();
         if (!style.isVisible()) return;
 
         Polygon p = polygon;
@@ -523,8 +573,7 @@ public class MapPolygon extends MapObject {
                         new Polygon(poly.xpoints, 
                                     poly.ypoints, 
                                     poly.npoints - 1);
-                    MapPolygon.this.style = 
-                        c.getModel().getDefaultPolygonStyle();
+                    setStyles(c.getModel().getDefaultPolygonStyles());
                     c.addMapObject(MapPolygon.this);
                     c.setCanvasEventHandler(newInstance().getCreateHandler(cmd));
                     if (cmd != null) cmd.run();

@@ -3,34 +3,32 @@
  */
 package org.xpilot.jxpmap;
 
-import java.awt.Polygon;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
+import java.util.Collection;
 
-public class Target extends MapPolygon {
+public class Target extends Group {
     
     public Target() {
         super();
     }
-
-    public Target(Polygon p, PolygonStyle style, ArrayList edgeStyles, 
-    int team) {
-        super(p, style, edgeStyles);
+    
+    public Target(Collection c) {
+        super(c);
+    }
+    
+    public Target(Collection c, int team) {
+        super(c);
         setTeam(team);
     }
 
     public void printXml(PrintWriter out) throws IOException {
         out.println("<Target team=\"" + getTeam() + "\">");
-        super.printXml(out);
+        super.printMemberXml(out);
         out.println("</Target>");
     }
 
     public EditorPanel getPropertyEditor(MapCanvas canvas) {
-        CompoundEditor ce = 
-            new CompoundEditor("BallArea", canvas, this);
-        ce.add(new TeamEditor("Team", canvas, this));
-        ce.add(super.getPropertyEditor(canvas));
-        return ce;
-    }    
+        return new TeamEditor("Target", canvas, this);
+    }
 }

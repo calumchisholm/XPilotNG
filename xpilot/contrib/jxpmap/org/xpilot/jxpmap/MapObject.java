@@ -14,11 +14,20 @@ import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
+import java.util.Comparator;
 
 import javax.swing.ImageIcon;
 
 
 public abstract class MapObject extends ModelObject {
+    
+    public static final Stroke SELECTED_STROKE = new BasicStroke(1);    
+    
+    public static final Comparator Z_ORDER = new Comparator() {
+        public int compare(Object o1, Object o2) {
+            return ((MapObject)o1).getZOrder() - ((MapObject)o2).getZOrder();
+        }
+    };
     
     protected Rectangle bounds;
     protected Stroke previewStroke;
@@ -26,6 +35,7 @@ public abstract class MapObject extends ModelObject {
     protected MapObjectPopup popup;
     protected int team;
     protected boolean selected;
+    protected Group parent;
     
     public Object deepClone (Map context) {
         MapObject clone = (MapObject)super.deepClone(context);
@@ -84,6 +94,14 @@ public abstract class MapObject extends ModelObject {
     
     public void setTeam (int team) {
         this.team = team;
+    }
+    
+    public Group getParent () {
+        return parent;
+    }
+    
+    public void setParent (Group parent) {
+        this.parent = parent;
     }
 
     public Rectangle getBounds () {
@@ -182,7 +200,12 @@ public abstract class MapObject extends ModelObject {
                             canvas.setCanvasEventHandler(
                                 copy().new CopyHandler(me));
                         } else {
-                            canvas.setSelectedObject(this);
+                            if ((me.getModifiersEx() 
+                            & MouseEvent.CTRL_DOWN_MASK) != 0) {
+                                canvas.addSelectedObject(this);
+                            } else {
+                                canvas.setSelectedObject(this);
+                            }
                             canvas.setCanvasEventHandler(new MoveHandler(me));
                         }
                     }
@@ -207,6 +230,10 @@ public abstract class MapObject extends ModelObject {
                 (r.x, r.y + r.height);
             at.scale(64, -64);
             g.drawImage(img, at, null);
+        }
+        if (isSelected()) {
+            g.setColor(Color.white);
+            g.draw(getBounds());
         }
     }
 

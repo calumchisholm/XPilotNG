@@ -3,27 +3,26 @@
  */
 package org.xpilot.jxpmap;
 
-import java.awt.Polygon;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * @author jli
  */
-public class Decoration extends MapPolygon  {
+public class Decoration extends Group  {
     
     public Decoration() {
         super();
     }
-
-    public Decoration(Polygon p, PolygonStyle style, ArrayList edgeStyles) {
-        super(p, style, edgeStyles);
+    
+    public Decoration(Collection c) {
+        super(c);
     }
 
     public void printXml(PrintWriter out) throws IOException {
         out.println("<Decor>");
-        super.printXml(out);
+        super.printMemberXml(out);
         out.println("</Decor>");
     }
 }

@@ -1,6 +1,7 @@
 package org.xpilot.jxpmap;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.io.BufferedWriter;
@@ -24,16 +25,12 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.math.BigDecimal;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParserFactory;
+import javax.xml.parsers.*;
+import javax.xml.*;
+import org.w3c.dom.*;
+import org.xml.sax.*;
+
 import javax.swing.JOptionPane;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.InputSource;
-import org.xml.sax.helpers.DefaultHandler;
-
 
 public class MapModel extends ModelObject {
 
@@ -44,7 +41,7 @@ public class MapModel extends ModelObject {
     MapOptions options;
     float defaultScale;
     LineStyle defEdgeStyle;
-    PolygonStyle defPolygonStyle;
+    Map defPolygonStyles;
 
     public Object deepClone (Map context) {
 
@@ -98,7 +95,8 @@ public class MapModel extends ModelObject {
         ps.setFillStyle(PolygonStyle.FILL_NONE);
         ps.setDefaultEdgeStyle(defEdgeStyle);
         polyStyles.add(ps);
-        defPolygonStyle = ps;
+        defPolygonStyles = new HashMap();
+        defPolygonStyles.put("default", ps);
     }
 
 
@@ -148,13 +146,13 @@ public class MapModel extends ModelObject {
     }
 
 
-    public PolygonStyle getDefaultPolygonStyle () {
-        return defPolygonStyle;
+    public Map getDefaultPolygonStyles() {
+        return defPolygonStyles;
     }
     
     
-    public void setDefaultPolygonStyle (PolygonStyle style) {
-        this.defPolygonStyle = style;
+    public void setDefaultPolygonStyles (Map styles) {
+        this.defPolygonStyles = styles;
     }
 
 
@@ -232,8 +230,8 @@ public class MapModel extends ModelObject {
 
 
     public void load (String name) 
-    throws IOException, SAXException, ParserConfigurationException, 
-    XPDFile.ParseException {
+    throws IOException, ParserConfigurationException,
+    SAXException, ParseException, XPDFile.ParseException {
             
         edgeStyles.clear();
         LineStyle ls;
@@ -259,10 +257,11 @@ public class MapModel extends ModelObject {
         }
 
         defEdgeStyle = (LineStyle)edgeStyles.get(edgeStyles.size() - 1);
-        defPolygonStyle = (PolygonStyle)polyStyles.get(polyStyles.size() - 1);
+        defPolygonStyles = new HashMap();
+        defPolygonStyles.put("default", polyStyles.get(polyStyles.size() - 1));
     }
     
-    
+    /*
     private void readXml (String xml) 
     throws IOException, SAXException, ParserConfigurationException {
         SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -271,7 +270,7 @@ public class MapModel extends ModelObject {
         reader.setContentHandler(new MapDocumentHandler());
         reader.parse(new InputSource(new StringReader(xml)));
     }
-
+    */
 
     public void save (File file) throws IOException {
         
@@ -346,7 +345,8 @@ public class MapModel extends ModelObject {
     
     
     public void importXml(String xml)
-    throws IOException, SAXException, ParserConfigurationException {
+    throws IOException, ParseException, 
+    SAXException, ParserConfigurationException {
         edgeStyles.clear();
         LineStyle ls;
         ls = new LineStyle("internal", 0, Color.black, LineStyle.STYLE_HIDDEN);
@@ -382,7 +382,7 @@ public class MapModel extends ModelObject {
         }
 
         defEdgeStyle = (LineStyle)edgeStyles.get(edgeStyles.size() - 1);
-        defPolygonStyle = (PolygonStyle)polyStyles.get(polyStyles.size() - 1);        
+        defPolygonStyles.put("default", polyStyles.get(polyStyles.size() - 1));
     }
     
     public String exportXml() throws IOException {
@@ -411,432 +411,312 @@ public class MapModel extends ModelObject {
 
         return w.toString();        
     }
-
-    private interface MapTag {
-        public MapObject toMapObject() throws SAXException;
-    }   
-
-    private class MapDocumentHandler extends DefaultHandler {
-
-        private List tags;
-        private PolyTag poly;
-        private Map pstyles;
-        private Map bstyles;
-        private Map estyles;
-        private Map opMap;
-
-        public MapDocumentHandler () {
-            tags = new ArrayList();
-            estyles = new HashMap();
-            estyles.put("internal", edgeStyles.get(0));
-            pstyles = new HashMap();
-            bstyles = new HashMap();
-            opMap = new HashMap();
-        }
-        
-
-        public void startElement (String ns, 
-                                  String local,
-                                  String name, 
-                                  Attributes atts) 
-            throws SAXException {
-
-            try {
-                if (name.equalsIgnoreCase("polygon")) {
-                    
-                    if (poly == null) poly = new PolyTag();
-                    poly.style = atts.getValue("style");
-                   
-                    poly.points.add(new PolyPoint
-                        (Integer.parseInt(atts.getValue("x")), 
-                         Integer.parseInt(atts.getValue("y")), 
-                         null));
-
-                } else if (name.equalsIgnoreCase("offset")) {
-                    
-                    String es = atts.getValue("style");
-                    if (es != null) poly.hasSpecialEdges = true;
-                    poly.points.add(new PolyPoint
-                        (Integer.parseInt(atts.getValue("x")), 
-                         Integer.parseInt(atts.getValue("y")),
-                         es));
-                    
-                } else if (name.equalsIgnoreCase("edgestyle")) {
-                    
-                    String id = atts.getValue("id");
-                    Color color = 
-                        new Color(Integer.parseInt
-                                  (atts.getValue("color"), 16));
-                    int width = Integer.parseInt(atts.getValue("width"));
-                    int style = Integer.parseInt(atts.getValue("style"));
-                    if (width == -1) {
-                        width = 1;
-                        style = LineStyle.STYLE_HIDDEN;
-                    }
-                    
-                    LineStyle ls = new LineStyle(id, width, color, style);
-                    estyles.put(id, ls);
-                    edgeStyles.add(ls);
-                    
-                } else if (name.equalsIgnoreCase("polystyle")) {
-
-                    String id = atts.getValue("id");                    
-                    Color col = null;
-                    String cstr = atts.getValue("color");
-                    if (cstr != null) {
-                        col = new Color(Integer.parseInt(cstr, 16));
-                    }
-
-                    int flags = 1;
-                    String flagstr = atts.getValue("flags");
-                    if (flagstr != null) flags = Integer.parseInt(flagstr);
-                    
-                    pstyles.put(id, new PolyStyle
-                        (id, col,
-                         atts.getValue("texture"),
-                         atts.getValue("defedge"),
-                         flags));
-                    
-                } else if (name.equalsIgnoreCase("bmpstyle")) {
-                    
-                    String id = atts.getValue("id");
-                    String fileName = atts.getValue("filename");
-                    int flags = Integer.parseInt(atts.getValue("flags"));
-                    
-                    Pixmap pm = new Pixmap();
-                    pm.setFileName(fileName);
-                    pm.setScalable(flags != 0);
-                    
-                    bstyles.put(id, pm);
-                    pixmaps.add(pm);
-
-                } else if (name.equalsIgnoreCase("option")) {
-
-                    opMap.put(atts.getValue("name"), atts.getValue("value"));
-
-                } else if (name.equalsIgnoreCase("fuel")) {
-
-                    int x = Integer.parseInt(atts.getValue("x"));
-                    int y = Integer.parseInt(atts.getValue("y"));
-                    MapObject o = SimpleMapObject.createFuel();
-                    Rectangle r = o.getBounds();
-                    o.moveTo(x - r.width / 2, y - r.height / 2);
-                    tags.add(new ObjectTag(o));
-
-                } else if (name.equalsIgnoreCase("ball")) {
-
-                    int x = Integer.parseInt(atts.getValue("x"));
-                    int y = Integer.parseInt(atts.getValue("y"));
-                    int team = Integer.parseInt(atts.getValue("team"));
-                    String style = atts.getValue("style");
-                    tags.add(new BallTag(x, y, team, style));
-
-                } else if (name.equalsIgnoreCase("base")) {
-
-                    int x = Integer.parseInt(atts.getValue("x"));
-                    int y = Integer.parseInt(atts.getValue("y"));
-                    int dir = Integer.parseInt(atts.getValue("dir"));
-                    int team = Integer.parseInt(atts.getValue("team"));
-                    Base o = new Base(x, y, dir, team);
-                    Rectangle r = o.getBounds();
-                    o.moveTo(r.x - r.width / 2, r.y - r.height / 2);
-                    tags.add(new ObjectTag(o));
-
-                } else if (name.equalsIgnoreCase("check")) {
-
-                    int x = Integer.parseInt(atts.getValue("x"));
-                    int y = Integer.parseInt(atts.getValue("y"));
-                    MapObject o = SimpleMapObject.createCheck();
-                    Rectangle r = o.getBounds();
-                    o.moveTo(x - r.width / 2, y - r.height / 2);
-                    tags.add(new ObjectTag(o));
-                    
-                } else if (name.equalsIgnoreCase("itemconcentrator")) {
-
-                    int x = Integer.parseInt(atts.getValue("x"));
-                    int y = Integer.parseInt(atts.getValue("y"));
-                    MapObject o = SimpleMapObject.createItemConcentrator();
-                    Rectangle r = o.getBounds();
-                    o.moveTo(x - r.width / 2, y - r.height / 2);
-                    tags.add(new ObjectTag(o));
-
-                } else if (name.equalsIgnoreCase("asteroidconcentrator")) {
-
-                    int x = Integer.parseInt(atts.getValue("x"));
-                    int y = Integer.parseInt(atts.getValue("y"));
-                    MapObject o = SimpleMapObject.createAsteroidConcentrator();
-                    Rectangle r = o.getBounds();
-                    o.moveTo(x - r.width / 2, y - r.height / 2);
-                    tags.add(new ObjectTag(o));
-                    
-                } else if (name.equalsIgnoreCase("grav")) {
-
-                    int x = Integer.parseInt(atts.getValue("x"));
-                    int y = Integer.parseInt(atts.getValue("y"));
-                    String type = atts.getValue("type");
-                    String force = atts.getValue("force");
-                    Grav grav = new Grav(x, y, type, force);
-                    Rectangle r = grav.getBounds();
-                    grav.moveTo(r.x - r.width / 2, r.y - r.height / 2);
-                    tags.add(new ObjectTag(grav));
-
-                } else if (name.equalsIgnoreCase("wormhole")) {
-
-                    int x = Integer.parseInt(atts.getValue("x"));
-                    int y = Integer.parseInt(atts.getValue("y"));
-                    String type = atts.getValue("type");
-                    Wormhole hole = new Wormhole(x, y, type);
-                    Rectangle r = hole.getBounds();
-                    hole.moveTo(r.x - r.width / 2, r.y - r.height / 2);
-                    tags.add(new ObjectTag(hole));
-
-                } else if (name.equalsIgnoreCase("ballarea")) {
-
-                    poly = new PolyTag();
-                    poly.type = 1;
-
-                } else if (name.equalsIgnoreCase("balltarget")) {
-
-                    poly = new PolyTag();
-                    poly.type = 2;
-                    poly.team = Integer.parseInt(atts.getValue("team"));
-
-                } else if (name.equalsIgnoreCase("decor")) {
-                    
-                    poly = new PolyTag();
-                    poly.type = 3;
-
-                } else if (name.equalsIgnoreCase("cannon")) {
-                    
-                    poly = new PolyTag();
-                    poly.type = 4;
-                    String tmp = atts.getValue("team");
-                    poly.team = (tmp != null) ? Integer.parseInt(tmp) : -1;
-                    poly.x = Integer.parseInt(atts.getValue("x"));
-                    poly.y = Integer.parseInt(atts.getValue("y"));
-                    poly.dir = Integer.parseInt(atts.getValue("dir")); 
-                    
-                } else if (name.equalsIgnoreCase("target")) {
-                    
-                    poly = new PolyTag();
-                    poly.type = 5;
-                    poly.team = Integer.parseInt(atts.getValue("team"));
-                    
-                } else if (name.equalsIgnoreCase("frictionarea")) {
-                    
-                    poly = new PolyTag();
-                    poly.type = 6;
-                    poly.friction = new BigDecimal(
-                        atts.getValue("friction"));
-                    
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new SAXException(e);
-            }
-        }
-
-
-        public void endElement (String ns, String local, String name) 
-            throws SAXException {
-            try {
-                if (name.equalsIgnoreCase("polygon")) {
-                    tags.add(poly);
-                    poly = null;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new SAXException(e);
-            }                
-        }
-
     
-        public void endDocument () throws SAXException {
-            try {
-                options = new MapOptions(opMap);
-
-                for (Iterator iter = pstyles.values().iterator(); 
-                     iter.hasNext();) {
-
-                    PolyStyle ps = (PolyStyle)iter.next();
-
-                    PolygonStyle style = new PolygonStyle();
-                    style.setId(ps.id);
-                    if (ps.color != null) style.setColor(ps.color);      
-                    if (ps.textureId != null) 
-                        style.setTexture((Pixmap)bstyles.get(ps.textureId));
-                    style.parseFlags(ps.flags);
-                    
-                    LineStyle ls = (LineStyle)estyles.get(ps.defEdgeId);
-                    if (ls == null)
-                        throw new SAXException
-                            ("Undefined edge style: " + ps.defEdgeId);
-                    style.setDefaultEdgeStyle(ls);
-
-                    polyStyles.add(style);
-                    ps.ref = style;
-                }
-
-                for (Iterator i = tags.iterator(); i.hasNext();) {
-                    addToFront(((MapTag)i.next()).toMapObject());
-                }
-                
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new SAXException(e);
-            }                
+    private String atts(Node tag, String name) {
+        Node att = tag.getAttributes().getNamedItem(name);
+        return att != null ? att.getNodeValue() : null;
+    }
+    
+    private int atti(Node tag, String name) {
+        return Integer.parseInt(atts(tag, name));
+    }
+    
+    private int atti(Node tag, String name, int def) {
+        String s = atts(tag, name);
+        if (s == null) return def;
+        return Integer.parseInt(s);
+    }
+    
+    private Iterator tags(Node parent, String name) {
+        ArrayList list = new ArrayList();
+        for (Node n = parent.getFirstChild(); 
+        n != null; 
+        n = n.getNextSibling()) {
+            if (n.getNodeType() != Node.ELEMENT_NODE) continue;
+            if (!name.equalsIgnoreCase(n.getNodeName())) continue;
+            list.add(n);
         }
-
-
-        // Utility classes used during parsing
+        return list.iterator();
+    }
+    
+    private void readXml(String xml)
+    throws IOException, SAXException, 
+    ParseException, ParserConfigurationException {
+        Document doc = 
+            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
+                new InputSource(new StringReader(xml)));
+        Element root = doc.getDocumentElement();
+        if (!"xpilotmap".equalsIgnoreCase(root.getNodeName()))
+            throw new ParseException("expected XPilotMap");
+        if (root.getFirstChild() == null) return;
         
-        private class ObjectTag implements MapTag {
-            
-            private MapObject o;
-            
-            ObjectTag(MapObject o) {
-                this.o = o;
-            }
-            
-            public MapObject toMapObject() {
-                return o;
-            }
+        Map bstyles = new HashMap();
+        for (Iterator i = tags(root, "bmpstyle"); i.hasNext();) {
+            Node n = (Node)i.next();
+            Pixmap pm = new Pixmap();
+            pm.setFileName(atts(n, "filename"));
+            pm.setScalable(atti(n, "flags", 1) != 0);
+            bstyles.put(atts(n, "id"), pm);
+            pixmaps.add(pm);
         }
-
-        private class PolyTag implements MapTag {
-            
-            String style;
-            List points;
-            int type, team, dir, x, y;
-            boolean hasSpecialEdges;
-            BigDecimal friction;
-            
-            PolyTag() {
-                points = new ArrayList();
+        
+        Map estyles = new HashMap();
+        for (Iterator i = tags(root, "edgestyle"); i.hasNext();) {
+            Node n = (Node)i.next();
+            LineStyle ls = new LineStyle();
+            ls.setId(atts(n, "id"));
+            ls.setWidth(atti(n, "width"));
+            ls.setStyle(atti(n, "style"));
+            if (ls.getWidth() == -1) {
+                ls.setWidth(1);
+                ls.setStyle(LineStyle.STYLE_HIDDEN);
             }
+            ls.setColor(new Color(Integer.parseInt(atts(n, "color"), 16)));
+            estyles.put(ls.getId(), ls);
+            edgeStyles.add(ls);
+        }
+        
+        Map pstyles = new HashMap();
+        for (Iterator i = tags(root, "polystyle"); i.hasNext();) {
+            Node n = (Node)i.next();
+            PolygonStyle style = new PolygonStyle();                             
+            style.setId(atts(n, "id"));
+            String cstr = atts(n, "color");
+            if (cstr != null)
+                style.setColor(
+                    new Color(Integer.parseInt(cstr, 16)));      
+            String txid = atts(n, "texture");
+            if (txid != null)
+                style.setTexture((Pixmap)bstyles.get(txid));
+            style.parseFlags(atti(n, "flags", 1));
+            LineStyle ls = null;
+            String lsid = atts(n, "defedge");
+            if (lsid != null) ls = (LineStyle)estyles.get(lsid);
+            if (ls == null)
+                throw new ParseException(
+                    "Undefined edge style: " + lsid);
+            style.setDefaultEdgeStyle(ls);
+            polyStyles.add(style);
+            pstyles.put(style.getId(), style);            
+        }
+        
+        Group temp = new Group();
+        readObjects(temp, root, pstyles, estyles);
+        objects.addAll(temp.getMembers());
+        options.updated();
+    }
+    
+    private void 
+    readObjects(Group parent, Node root, Map pstyles, Map estyles)
+    throws ParseException {
+        
+        for (Node n = root.getFirstChild(); n != null; 
+        n = n.getNextSibling()) {
             
-            public MapObject toMapObject() throws SAXException {
-                PolyStyle ps = (PolyStyle)pstyles.get(style);
-                if (ps == null) 
-                    throw new SAXException
-                        ("Undefined polygon style: " + style);
-                        
-                LineStyle defls = ps.ref.getDefaultEdgeStyle();
-                ArrayList edges = hasSpecialEdges ? new ArrayList() : null;
-                Polygon awtp = new Polygon();
+            if (n.getNodeType() != Node.ELEMENT_NODE) continue;
+            String name = n.getNodeName();
+            
+            if (name.equalsIgnoreCase("generaloptions")) {
                 
-                Iterator i2 = points.iterator();
-                PolyPoint pnt = (PolyPoint)i2.next();
-                int x = pnt.x;
-                int y = pnt.y;
-                awtp.addPoint(x, y);
-                
-                // Current line style. 
-                // Using null to indicate default.
-                LineStyle cls = null;
-
-                while (i2.hasNext()) {
-
-                    pnt = (PolyPoint)i2.next();
-
-                    // last point is not needed
-                    if (i2.hasNext()) {
-                        x += pnt.x;
-                        y += pnt.y;
-                        awtp.addPoint(x, y);
+                for (Node n2 = n.getFirstChild(); n2 != null; 
+                n2 = n2.getNextSibling()) {
+                    if (n2.getNodeType() != Node.ELEMENT_NODE) continue;
+                    if (!"option".equalsIgnoreCase(n2.getNodeName())) {
+                        System.err.println("unknown tag inside options: "
+                            + n2.getNodeName());
+                        continue;
                     }
-
-                    if (edges != null) {
-                        if (pnt.style != null) {
-                            cls = (LineStyle)estyles.get(pnt.style);
-                            if (cls == null)
-                                throw new SAXException
-                                    ("Undefined edge style: " + pnt.style);
-                            if (cls == defls) cls = null;
-                        }
-                        edges.add(cls);
-                    }
+                    options.put(atts(n2, "name"), atts(n2, "value"));
                 }
                 
-                switch(type) {
-                    case 1: 
-                        return new BallArea(awtp, ps.ref, edges); 
-                    case 2: 
-                        return new BallTarget(awtp, ps.ref, edges, team); 
-                    case 3: 
-                        return new Decoration(awtp, ps.ref, edges); 
-                    case 4: 
-                        return new Cannon(awtp, ps.ref, edges, team, x, y, dir); 
-                    case 5: 
-                        return new Target(awtp, ps.ref, edges, team);
-                    case 6:
-                        return new FrictionArea(awtp, ps.ref, edges, friction);                        
-                    default:
-                        return new MapPolygon(awtp, ps.ref, edges); 
-                }                
-            }
-        }
-        
-
-        private class PolyPoint {
-            int x;
-            int y;
-            String style;
-
-            PolyPoint (int x, int y, String style) {
-                this.x = x;
-                this.y = y;
-                this.style = style;
-            }
-        }
-
-
-        private class PolyStyle {
-            String id;
-            Color color;
-            String textureId;
-            String defEdgeId;
-            int flags;
-            PolygonStyle ref;
-
-            PolyStyle (String id, Color color, String textureId, 
-                       String defEdgeId, int flags) {
-                this.id = id;
-                this.color = color;
-                this.textureId = textureId;
-                this.defEdgeId = defEdgeId;
-                this.flags = flags;
-            }
-        }
-        
-        private class BallTag implements MapTag {
-            int x;
-            int y;
-            int team;
-            String style;
-            
-            BallTag(int x, int y, int team, String style) {
-                this.x = x;
-                this.y = y;
-                this.team = team;
-                this.style = style;
-            }
-            
-            public MapObject toMapObject() throws SAXException {
-                PolygonStyle pstyle = null;
-                if (style != null) {
-                    PolyStyle ps = (PolyStyle)pstyles.get(style);
-                    if (ps == null) 
-                        throw new SAXException
-                            ("Undefined polygon style: " + style);
-                    pstyle = ps.ref;
+            } else if (name.equalsIgnoreCase("polygon")) {
+                
+                PolygonStyle s = (PolygonStyle)pstyles.get(atts(n, "style"));
+                if (s == null) throw new ParseException(
+                    "undefined style: " + atts(n, "style")); 
+                ArrayList points = new ArrayList();
+                int x = atti(n, "x");
+                int y = atti(n, "y");
+                points.add(new Point(x, y));
+                ArrayList edges = new ArrayList();
+                HashMap states = new HashMap();
+                states.put("default", s);
+                boolean special = false;
+                for (Node n2 = n.getFirstChild(); n2 != null; 
+                n2 = n2.getNextSibling()) {
+                    if (n2.getNodeType() != Node.ELEMENT_NODE) continue;
+                    String name2 = n2.getNodeName();
+                    if (name2.equalsIgnoreCase("offset")) {
+                        x += atti(n2, "x");
+                        y += atti(n2, "y");
+                        points.add(new Point(x, y));
+                        LineStyle es = null;
+                        String esName = atts(n2, "style");
+                        if (esName != null) 
+                            es = (LineStyle)estyles.get(esName);
+                        if (es != null) special = true;
+                        edges.add(es);
+                    } else if (name2.equalsIgnoreCase("style")) {
+                        LineStyle ls = (LineStyle)estyles.get(atts(n2, "id"));
+                        if (ls != null) states.put(atts(n2, "state"), ls);
+                        else System.err.println(
+                            "undefined state style: " + atts(n2, "id"));
+                    } else {
+                        System.err.println("unknown tag inside polygon: "
+                        + name2);
+                    }
                 }
-                MapObject o = new Ball(x, y, team, pstyle);
+                Polygon p = new Polygon();
+                for (int i = 0; i < points.size() - 1; i++) {
+                    Point pnt = (Point)points.get(i);
+                    p.addPoint(pnt.x, pnt.y);
+                }
+                MapPolygon mp = 
+                    new MapPolygon(p, states, special ? edges : null);
+                parent.addToFront(mp);
+                
+            } else if (name.equalsIgnoreCase("fuel")) {
+
+                MapObject o = SimpleMapObject.createFuel();
+                Rectangle r = o.getBounds();
+                o.moveTo(atti(n, "x") - r.width / 2, 
+                    atti(n, "y") - r.height / 2);
+                parent.addToFront(o);
+
+            } else if (name.equalsIgnoreCase("ball")) {
+
+                PolygonStyle style = null;
+                String styleName = atts(n, "style");
+                if (styleName != null) {
+                    style = (PolygonStyle)pstyles.get(styleName);
+                    if (style == null)
+                        System.err.println("undefined style: " 
+                            + styleName);
+                }
+                Ball o = new Ball(
+                    atti(n, "x"),
+                    atti(n, "y"),
+                    atti(n, "team", 0xffff),
+                    style);
                 Rectangle r = o.getBounds();
                 o.moveTo(r.x - r.width / 2, r.y - r.height / 2);
-                return o;
+                parent.addToFront(o);
+
+            } else if (name.equalsIgnoreCase("base")) {
+
+                Base o = new Base(
+                    atti(n, "x"),
+                    atti(n, "y"),
+                    atti(n, "dir"),
+                    atti(n, "team", -1));
+                Rectangle r = o.getBounds();
+                o.moveTo(r.x - r.width / 2, r.y - r.height / 2);
+                parent.addToFront(o);
+
+            } else if (name.equalsIgnoreCase("check")) {
+
+                MapObject o = SimpleMapObject.createCheck();
+                Rectangle r = o.getBounds();
+                o.moveTo(atti(n, "x") - r.width / 2, 
+                    atti(n, "y") - r.height / 2);
+                parent.addToFront(o);
+                
+            } else if (name.equalsIgnoreCase("itemconcentrator")) {
+
+                MapObject o = SimpleMapObject.createItemConcentrator();
+                Rectangle r = o.getBounds();
+                o.moveTo(atti(n, "x") - r.width / 2, 
+                    atti(n, "y") - r.height / 2);
+                parent.addToFront(o);
+
+            } else if (name.equalsIgnoreCase("asteroidconcentrator")) {
+
+                MapObject o = SimpleMapObject.createAsteroidConcentrator();
+                Rectangle r = o.getBounds();
+                o.moveTo(atti(n, "x") - r.width / 2, 
+                    atti(n, "y") - r.height / 2);
+                parent.addToFront(o);
+                
+            } else if (name.equalsIgnoreCase("grav")) {
+
+                Grav g = new Grav(
+                    atti(n, "x"),
+                    atti(n, "y"),
+                    atts(n, "type"),
+                    atts(n, "force"));
+                Rectangle r = g.getBounds();
+                g.moveTo(r.x - r.width / 2, r.y - r.height / 2);
+                parent.addToFront(g);
+
+            } else if (name.equalsIgnoreCase("wormhole")) {
+
+                Wormhole wh = new Wormhole();
+                wh.setPoint(atti(n, "x"), atti(n, "y"));
+                wh.setType(atts(n, "type"));
+                readObjects(wh, n, pstyles, estyles);
+                parent.addToFront(wh);
+
+            } else if (name.equalsIgnoreCase("ballarea")) {
+                
+                BallArea ba = new BallArea();
+                readObjects(ba, n, pstyles, estyles);
+                parent.addToFront(ba);
+
+            } else if (name.equalsIgnoreCase("balltarget")) {
+
+                BallTarget bt = new BallTarget();
+                bt.setTeam(atti(n, "team"));
+                readObjects(bt, n, pstyles, estyles);
+                parent.addToFront(bt);
+
+            } else if (name.equalsIgnoreCase("decor")) {
+                
+                Decoration d = new Decoration();
+                readObjects(d, n, pstyles, estyles);
+                parent.addToFront(d);
+
+            } else if (name.equalsIgnoreCase("cannon")) {
+                
+                Cannon c = new Cannon();
+                c.setTeam(atti(n, "team", -1));
+                c.setPoint(atti(n, "x"), atti(n, "y"));
+                c.setDir(atti(n, "dir"));
+                readObjects(c, n, pstyles, estyles);
+                parent.addToFront(c);                
+                
+            } else if (name.equalsIgnoreCase("target")) {
+                
+                Target t = new Target();
+                t.setTeam(atti(n, "team", -1));
+                readObjects(t, n, pstyles, estyles);
+                parent.addToFront(t);
+                
+            } else if (name.equalsIgnoreCase("frictionarea")) {
+                
+                FrictionArea fa = new FrictionArea();
+                fa.setFriction(new BigDecimal(atts(n, "friction")));
+                readObjects(fa, n, pstyles, estyles);
+                parent.addToFront(fa);
+                
+            } else if (name.equalsIgnoreCase("group")) {
+                
+                Group g = new Group();
+                readObjects(g, n, pstyles, estyles);
+                parent.addToFront(g);
+                
+            } else if (name.equalsIgnoreCase("bmpstyle") 
+            || name.equalsIgnoreCase("edgestyle") 
+            || name.equalsIgnoreCase("polystyle")) {
+                /* ignore */
+            } else {
+                System.err.println("unknown map element: " + name);
             }
         }
     }
+    
+    public static class ParseException extends Exception {
+        public ParseException(String msg) {
+            super(msg);
+        }
+    }    
 }
