@@ -55,11 +55,10 @@ char event_version[] = VERSION;
 static char		msg[MSG_LEN];
 
 
-static void Refuel(int ind)
+static void Refuel(player *pl)
 {
-    player *pl = Players(ind);
     int i;
-    DFLOAT l, dist = 1e9;
+    DFLOAT l, dist = 1e19;
 
 
     if (!BIT(pl->have, HAS_REFUEL))
@@ -79,9 +78,8 @@ static void Refuel(int ind)
 }
 
 
-static void Repair(int ind)
+static void Repair(player *pl)
 {
-    player *pl = Players(ind);
     int i;
     DFLOAT l, dist = 1e19;
     int cx, cy;
@@ -904,11 +902,11 @@ int Handle_keyboard(player *pl)
 		break;
 
 	    case KEY_REFUEL:
-		Refuel(ind);
+		Refuel(pl);
 		break;
 
 	    case KEY_REPAIR:
-		Repair(ind);
+		Repair(pl);
 		break;
 
 	    case KEY_CONNECTOR:
