@@ -114,7 +114,7 @@ do { \
 } while (0)
 
 /* Use this to remove unused parameter warning. */
-#define UNUSED_PARAM(x) x = x;
+#define UNUSED_PARAM(x) x = x
 
 /* Do NOT change these! */
 #define OLD_MAX_CHECKS		26
@@ -137,7 +137,6 @@ do { \
 
 #define MAX_STATION_FUEL	500.0
 #define TARGET_DAMAGE		250.0
-
 #define SELF_DESTRUCT_DELAY	150.0
 
 /*
