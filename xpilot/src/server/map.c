@@ -79,6 +79,44 @@ static void Find_base_order(void);
 
 static void Reset_map_object_counters(void);
 
+
+static void shrink(void **pp, size_t size)
+{
+    void *p;
+
+    p = realloc(*pp, size);
+    if (!p) {
+	warn("Realloc failed!");
+	exit(1);
+    }
+    *pp = p;
+}
+
+#define SHRINK(T,P,N,M) { \
+if ((M) > (N)) { \
+  xpprintf("Shrinking " #P " from %d to %d.\n", (M), (N)); \
+  shrink((void **)&(P), (N) * sizeof(T)); \
+  M = (N); \
+} } \
+
+
+static void Realloc_map_objects(void)
+{
+    SHRINK(cannon_t, World.cannon, World.NumCannons, max_cannons);
+    SHRINK(fuel_t, World.fuel, World.NumFuels, max_fuels);
+    SHRINK(grav_t, World.grav, World.NumGravs, max_gravs);
+    SHRINK(wormhole_t, World.wormHoles, World.NumWormholes, max_wormholes);
+    SHRINK(treasure_t, World.treasures, World.NumTreasures, max_treasures);
+    SHRINK(target_t, World.targets, World.NumTargets, max_targets);
+    SHRINK(base_t, World.base, World.NumBases, max_bases);
+    SHRINK(item_concentrator_t, World.itemConcentrators,
+	   World.NumItemConcentrators, max_itemconcs);
+    SHRINK(asteroid_concentrator_t, World.asteroidConcs,
+	   World.NumAsteroidConcs, max_asteroidconcs);
+}
+
+
+
 #include <ctype.h>
 void asciidump(void *p, size_t size)
 {
@@ -529,57 +567,6 @@ bool Grok_map_new(void)
     return Grok_map_options();
 }
 
-/*
- * Get space for special objects.
- *
- * Used for block based maps.
- */
-
-void Allocate_map_objects(void)
-{
-    if ((World.check = (clpos *)
-	    malloc(OLD_MAX_CHECKS * sizeof(clpos))) == NULL) {
-	error("Out of memory - checks");
-	exit(-1);
-    }
-}
-
-
-static void shrink(void **pp, size_t size)
-{
-    void *p;
-
-    p = realloc(*pp, size);
-    if (!p) {
-	warn("Realloc failed!");
-	exit(1);
-    }
-    *pp = p;
-}
-
-#define SHRINK(T,P,N,M) { \
-if ((M) > (N)) { \
-  xpprintf("Shrinking " #P " from %d to %d.\n", (M), (N)); \
-  shrink((void **)&(P), (N) * sizeof(T)); \
-  M = (N); \
-} } \
-
-
-static void Realloc_map_objects(void)
-{
-    SHRINK(cannon_t, World.cannon, World.NumCannons, max_cannons);
-    SHRINK(fuel_t, World.fuel, World.NumFuels, max_fuels);
-    SHRINK(grav_t, World.grav, World.NumGravs, max_gravs);
-    SHRINK(wormhole_t, World.wormHoles, World.NumWormholes, max_wormholes);
-    SHRINK(treasure_t, World.treasures, World.NumTreasures, max_treasures);
-    SHRINK(target_t, World.targets, World.NumTargets, max_targets);
-    SHRINK(base_t, World.base, World.NumBases, max_bases);
-    SHRINK(item_concentrator_t, World.itemConcentrators,
-	   World.NumItemConcentrators, max_itemconcs);
-    SHRINK(asteroid_concentrator_t, World.asteroidConcs,
-	   World.NumAsteroidConcs, max_asteroidconcs);
-}
-
 
 void Verify_wormhole_consistency(void)
 {
@@ -690,7 +677,7 @@ static bool Grok_map_old(void)
 
     Xpmap_grok_map_data();
 
-    Allocate_map_objects();
+    Xpmap_allocate_checks();
 
     /*
      * Now reset all counters since we will recount everything

@@ -197,6 +197,17 @@ void Xpmap_grok_map_data(void)
     mapData = NULL;
 }
 
+void Xpmap_allocate_checks(void)
+{
+    if (!BIT(World.rules->mode, TIMING))
+	return;
+
+    if ((World.check = (clpos *)
+	 malloc(OLD_MAX_CHECKS * sizeof(clpos))) == NULL) {
+	error("Out of memory - checks");
+	exit(-1);
+    }
+}
 
 
 /*
