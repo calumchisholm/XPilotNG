@@ -91,7 +91,6 @@ void Object_crash(object *obj, struct move *move, int crashtype, int item_id);
  * Prototypes for event.c
  */
 int Handle_keyboard(player *pl);
-bool Team_zero_pausing_available(void);
 void Pause_player(player *pl, int on);
 int Player_lock_closest(player *pl, int next);
 bool team_dead(int team);
@@ -171,6 +170,7 @@ void tuner_none(void);
 void tuner_dummy(void);
 bool Init_options(void);
 void Free_options(void);
+void Check_playerlimit(void);
 void Timing_setup(void);
 
 /*

@@ -174,15 +174,10 @@ int Player_lock_closest(player *pl, int next)
 }
 
 
-bool Team_zero_pausing_available(void)
-{
-    return (teamZeroPausing && !lock_zero
-	    && World.teams[0].NumBases > 0
-	    && World.teams[0].NumBases > World.teams[0].NumMembers);
-}
-
 void Pause_player(player *pl, int on)
 {
+    int i;
+
     if (on && !BIT(pl->status, PAUSE)) { /* Turn pause mode on */
 	if (pl->team != TEAM_NOT_SET)
 	    World.teams[pl->team].SwapperId = -1;
@@ -190,13 +185,33 @@ void Pause_player(player *pl, int on)
 	pl->updateVisibility = 1;
 	CLR_BIT(pl->status, SELF_DESTRUCT|PLAYING);
 	SET_BIT(pl->status, PAUSE);
+	if (baselessPausing) {
+	    World.teams[pl->team].NumMembers--;
+	    for (i = 0; i < NumPlayers; i++) {
+		player *pl_i = Players(i);
+		if (pl_i->conn != NULL)
+		    Send_base(pl_i->conn, -1, pl->home_base->ind);
+	    }
+	    for (i = observerStart; i < observerStart + NumObservers; i++)
+		Send_base(Players(i)->conn, -1, pl->home_base->ind);
+	    pl->home_base = NULL;
+	}
 	pl->mychar = 'P';
 	updateScores = true;
 	strcpy(pl->rank->entry.logout, "paused");
 	if (BIT(pl->have, HAS_BALL))
 	    Detach_ball(pl, -1);
+	for (i = 0; i < MAX_TEAMS ; i++) {
+	    if (World.teams[i].SwapperId == pl->id)
+		World.teams[i].SwapperId = -1;
+	}
     }
     else if (!on && BIT(pl->status, PAUSE)) { /* Turn pause mode off */
+	if (pl->home_base == NULL) {
+	    Set_player_message(pl, "You don't have a base. "
+			       "Select team to unpause. [*Server notice*]");
+	    return;
+	}
 	if (pl->count <= 0) {
 	    bool toolate = false;
 
@@ -216,9 +231,8 @@ void Pause_player(player *pl, int on)
 		pl->mychar = ' ';
 		Go_home(pl);
 		SET_BIT(pl->status, PLAYING);
-		if (BIT(World.rules->mode, LIMITED_LIVES)) {
+		if (BIT(World.rules->mode, LIMITED_LIVES))
 		    pl->life = World.rules->lives;
-		}
 	    }
 	    if (BIT(World.rules->mode, TIMING)) {
 		pl->round = 0;
@@ -772,20 +786,7 @@ int Handle_keyboard(player *pl)
 		    if (BIT(pl->used, HAS_AUTOPILOT))
 			Autopilot(pl, 0);
 
-		    /* toggle pause mode */
-		    /* team 0 pausing */
-		    if (teamZeroPausing && (pl->team == 0)) {
-			Pause_player(pl, true);
-		    } else {
-			/* allow players who get idlepaused to unpause */
-			if (Team_zero_pausing_available()
-			    && !BIT(pl->status, PAUSE)) {
-			    Handle_player_command(pl, "team 0");
-			} else {
-			    Pause_player(pl, !BIT(pl->status, PAUSE));
-			}
-		    }
-		    /* end team 0 pausing */
+		    Pause_player(pl, !BIT(pl->status, PAUSE));
 
 		    if (BIT(pl->status, PLAYING)) {
 			BITV_SET(pl->last_keyv, key);

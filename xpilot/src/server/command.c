@@ -106,9 +106,8 @@ int Get_player_index_by_name(char *name)
 {
     int			i, j, len;
 
-    if (!name || !*name) {
+    if (!name || !*name)
 	return -1;
-    }
 
     /* Id given directly */
     if (isdigit(*name)) {
@@ -119,9 +118,8 @@ int Get_player_index_by_name(char *name)
 	    && Players(j)->id == i) {
 	    return j;
 	}
-	else {
+	else
 	    return -1;
-	}
     }
 
     /* look for an exact match on player nickname. */
@@ -150,20 +148,17 @@ static void Send_info_about_player(player * pl)
 
     for (i = 0; i < observerStart + NumObservers; i++) {
 	player *pl_i;
-	/* hack */
 	if (i == NumPlayers) {
-	    if (!NumObservers) {
-		break;
-	    } else {
-		i = observerStart;
-	    }
+	    i = observerStart - 1;
+	    continue;
 	}
 	pl_i = Players(i);
 	if (pl_i->conn != NULL) {
-	    Send_player(pl_i->conn, pl->id);
+	    Send_team(pl_i->conn, pl->id, pl->team);
 	    Send_score(pl_i->conn, pl->id, pl->score, pl->life,
 		       pl->mychar, pl->alliance);
-	    Send_base(pl_i->conn, pl->id, pl->home_base->ind);
+	    if (pl->home_base != NULL)
+		Send_base(pl_i->conn, pl->id, pl->home_base->ind);
 	}
     }
 }
@@ -208,7 +203,7 @@ static int Cmd_get(char *arg, player *pl, int oper, char *msg);
 static int Cmd_help(char *arg, player *pl, int oper, char *msg);
 static int Cmd_kick(char *arg, player *pl, int oper, char *msg);
 static int Cmd_lock(char *arg, player *pl, int oper, char *msg);
-static int Cmd_mutezero(char *arg, player *pl, int oper, char *msg);
+static int Cmd_mutepaused(char *arg, player *pl, int oper, char *msg);
 static int Cmd_nuke(char *arg, player *pl, int oper, char *msg);
 static int Cmd_op(char *arg, player *pl, int oper, char *msg);
 static int Cmd_password(char *arg, player *pl, int oper, char *msg);
@@ -220,7 +215,6 @@ static int Cmd_set(char *arg, player *pl, int oper, char *msg);
 static int Cmd_stats(char *arg, player *pl, int oper, char *msg);
 static int Cmd_team(char *arg, player *pl, int oper, char *msg);
 static int Cmd_version(char *arg, player *pl, int oper, char *msg);
-static int Cmd_zerolock(char *arg, player *pl, int oper, char *msg);
 
 
 typedef struct {
@@ -301,11 +295,11 @@ static Command_info commands[] = {
 	Cmd_lock
     },
     {
-	"mutezero",
+	"mutepaused",
 	"m",
-	"Just /mute 1 mutes, /mute 0 unmutes team zero.  (operator)",
+	"Just /mute 1 mutes, /mute 0 unmutes paused players WITHOUT BASE.  (operator)",
 	0,      /* checked in the function */
-	Cmd_mutezero
+	Cmd_mutepaused
     },
     {
 	"nuke",
@@ -391,30 +385,17 @@ static Command_info commands[] = {
 	0,
 	Cmd_version
     },
-    {
-	"zerolock",
-	"z",
-	"Just /zerolock 1 locks, /zerolock 0 unlocks team zero.  (operator)",
-	0,      /* checked in the function */
-	Cmd_zerolock
-    },
 };
 
 
 /*
  * cmd parameter has no leading slash.
  */
-void Handle_player_command(player *pl, char *cmd_orig)
+void Handle_player_command(player *pl, char *cmd)
 {
     int			i, result;
     char		*args;
     char		msg[MSG_LEN];
-    char		cmd[MAX_CHARS];
-
-    /* Make a copy so teamZeroPausing hack can at least use constant strings
-     * when calling this function. Maybe fix it in nicer ways later. */
-    strlcpy(cmd, cmd_orig, sizeof(cmd));
-    cmd[sizeof(cmd) - 1] = 0;
 
     if (!*cmd) {
 	strlcpy(msg,
@@ -733,6 +714,7 @@ static int Cmd_auth(char *arg, player *pl, int oper, char *msg)
     Conn_change_nick(pl->conn, pl->auth_nick);
     strcpy(pl->name, pl->auth_nick);
     /*Rank_get_saved_score(pl);*/
+#error "Send_info doesn't send name now, fix"
     Send_info_about_player(pl);
     pl->auth_nick[0] = 0;
 
@@ -877,45 +859,35 @@ static int Cmd_lock(char *arg, player *pl, int oper, char *msg)
 }
 
 
-static int Cmd_mutezero(char *arg, player *pl, int oper, char *msg)
+static int Cmd_mutepaused(char *arg, player *pl, int oper, char *msg)
 {
     int			new_mute;
 
-    if (!teamZeroPausing) {
-	sprintf(msg, "There is no team zero pausing here (set in mapfile).");
-	return CMD_RESULT_ERROR;
-    }
-
     if (!arg || !*arg) {
-	sprintf(msg, "Team zero is currently %s.",
-		mute_zero ? "muted" : "unmuted");
+	sprintf(msg, "Baseless paused players are currently %s.",
+		mute_baseless ? "muted" : "unmuted");
 	return CMD_RESULT_SUCCESS;
     }
 
-    if (!oper) {
+    if (!oper)
 	return CMD_RESULT_NOT_OPERATOR;
-    }
 
-    if (!strcmp(arg, "1")) {
+    if (!strcmp(arg, "1"))
 	new_mute = 1;
-    }
-    else if (!strcmp(arg, "0")) {
+    else if (!strcmp(arg, "0"))
 	new_mute = 0;
-    }
     else {
 	sprintf(msg, "Invalid argument '%s'.  Specify either 0 or 1.", arg);
 	return CMD_RESULT_ERROR;
     }
 
-    if (new_mute == mute_zero) {
-	sprintf(msg, "Team zero is already %s.",
-		mute_zero ? "muted" : "unmuted");
-    }
+    if (new_mute == mute_baseless)
+	sprintf(msg, "Already %s.",
+		mute_baseless ? "muted" : "unmuted");
     else {
-	mute_zero = new_mute;
-	sprintf(msg, " < Team zero has been %s by %s! >",
-		mute_zero ? "muted" : "unmuted",
-		pl->name);
+	mute_baseless = new_mute;
+	sprintf(msg, " < Baseless paused players have been %s by %s! >",
+		mute_baseless ? "muted" : "unmuted", pl->name);
 	Set_message(msg);
 	strcpy(msg, "");
     }
@@ -1074,13 +1046,9 @@ static int Cmd_pause(char *arg, player *pl, int oper, char *msg)
     if (pl2->conn != NULL) {
 	if (Player_is_playing(pl2))
 	    Kill_player(pl2, false);
-	if (Team_zero_pausing_available()) {
-	    sprintf(msg, "%s was pause-swapped by %s.", pl2->name, pl->name);
-	    Handle_player_command(pl2, "team 0");
-	} else {
-	    Pause_player(pl2, true);
-	    sprintf(msg, "%s was paused by %s.", pl2->name, pl->name);
-	}
+	Pause_player(pl2, true);
+	sprintf(msg, "%s was paused by %s. [*Server notice*]",
+		pl2->name, pl->name);
 	Set_message(msg);
 	strcpy(msg, "");
     } else {
@@ -1218,18 +1186,18 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
 		World.teams[i].SwapperId = -1;
 	}
 
-	if (teamZeroPausing && game_lock && pl->team == 0)
+	if (game_lock && pl->home_base == NULL)
 	    sprintf(msg, "Playing teams are locked.");
-	else if (teamZeroPausing && lock_zero && (team == 0))
-	    sprintf(msg, "Team zero is locked.");
 	else if (team < 0 || team >= MAX_TEAMS)
 	    sprintf(msg, "Team %d is not a valid team.", team);
-	else if (team == pl->team)
+	else if (team == pl->team && pl->home_base != NULL)
 	    sprintf(msg, "You already are on team %d.", team);
 	else if (World.teams[team].NumBases == 0)
 	    sprintf(msg, "There are no bases for team %d on this map.", team);
 	else if (reserveRobotTeam && team == robotTeam)
 	    sprintf(msg, "You cannot join the robot team on this server.");
+	else if (pl->rectype == 2)
+	    sprintf(msg, "Spectators cannot change team.");
 	else
 	    swap_allowed = true;
     }
@@ -1239,24 +1207,28 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
     if (World.teams[team].NumBases > World.teams[team].NumMembers) {
 	sprintf(msg, "%s has swapped to team %d.", pl->name, team);
 	Set_message(msg);
-	World.teams[pl->team].NumMembers--;
-	TEAM_SCORE(pl->team, -(pl->score));
+	if (pl->home_base) {
+	    World.teams[pl->team].NumMembers--;
+	    TEAM_SCORE(pl->team, -(pl->score));
+	}
 	pl->team = team;
 	World.teams[pl->team].NumMembers++;
 	TEAM_SCORE(pl->team, pl->score);
 	Set_swapper_state(pl);
-	Pick_startpos(pl);
+	if (pl->home_base == NULL) {
+	    Pick_startpos(pl);
+	    Pause_player(pl, 0);
+	}
+	else
+	    Pick_startpos(pl);
 	Send_info_about_player(pl);
 	strcpy(msg, "");
-
-	if (teamZeroPausing)
-	    Pause_player(pl, pl->team == 0);
 
 	return CMD_RESULT_SUCCESS;
     }
 
     i = World.teams[pl->team].SwapperId;
-    while (i != -1) {
+    while (i != -1 && pl->home_base != NULL) {
 	if ((i = Player_by_id(i)->team) != team)
 	    i = World.teams[i].SwapperId;
 	else {
@@ -1274,13 +1246,6 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
 		TEAM_SCORE(xteam2, -(pl2->score));
 		TEAM_SCORE(pl2->team, pl2->score);
 		Set_swapper_state(pl2);
-		/*
-		 * kps - previously this was Pause_player(pl2->id, ..)
-		 * which was buggy, since Pause_player took a player
-		 * index as argument. (1)
-		 */
-		if (teamZeroPausing)
-		    Pause_player(pl2, pl2->team == 0);
 		Send_info_about_player(pl2);
 		/* This can send a huge amount of data if several
 		 * players swap. Unfortunately all player data, even
@@ -1296,9 +1261,6 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
 	    TEAM_SCORE(xteam, -(pl->score));
 	    TEAM_SCORE(pl->team, pl->score);
 	    Set_swapper_state(pl);
-	    /* kps - same bug was here as above (1) */
-	    if (teamZeroPausing)
-		Pause_player(pl, pl->team == 0);
 	    Send_info_about_player(pl);
 	    sprintf(msg, "Some players swapped teams.");
 	    Set_message(msg);
@@ -1307,31 +1269,29 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
 	}
     }
     /* Swap a paused player away from the full team */
-    if (!teamZeroPausing || team != 0) {
-	for (i = NumPlayers - 1; i >= 0; i--) {
-	    player *pl2 = Players(i);
-	    if (pl2->conn != NULL && BIT(pl2->status, PAUSE)
-			&& (pl2->team == team)) {
-		base_t *temp;
-		pl2->team = pl->team;
-		pl->team = team;
-		temp = pl2->home_base;
-		pl2->home_base = pl->home_base;
-		pl->home_base = temp;
-		TEAM_SCORE(pl2->team, -(pl->score));
-		TEAM_SCORE(pl->team, -(pl2->score));
-		TEAM_SCORE(pl2->team, pl2->score);
-		TEAM_SCORE(pl->team, pl->score);
-		Set_swapper_state(pl2);
-		Set_swapper_state(pl);
-		Send_info_about_player(pl2);
-		Send_info_about_player(pl);
-		sprintf(msg, "%s has swapped with paused %s.",
-			pl->name, pl2->name);
-		Set_message(msg);
-		strcpy(msg, "");
-		return CMD_RESULT_SUCCESS;
-	    }
+    for (i = NumPlayers - 1; i >= 0; i--) {
+	player *pl2 = Players(i);
+	if (pl2->conn != NULL && BIT(pl2->status, PAUSE)
+	    && (pl2->team == team) && pl2->home_base != NULL) {
+	    base_t *temp;
+	    TEAM_SCORE(pl->team, -(pl->score));
+	    TEAM_SCORE(pl2->team, -(pl2->score));
+	    pl2->team = pl->team;
+	    pl->team = team;
+	    TEAM_SCORE(pl->team, pl->score);
+	    TEAM_SCORE(pl2->team, pl2->score);
+	    temp = pl2->home_base;
+	    pl2->home_base = pl->home_base;
+	    pl->home_base = temp;
+	    Set_swapper_state(pl2);
+	    Set_swapper_state(pl);
+	    Send_info_about_player(pl2);
+	    Send_info_about_player(pl);
+	    sprintf(msg, "%s has swapped with paused %s.",
+		    pl->name, pl2->name);
+	    Set_message(msg);
+	    strcpy(msg, "");
+	    return CMD_RESULT_SUCCESS;
 	}
     }
     sprintf(msg,"You are queued for swap to team %d.", team);
@@ -1476,52 +1436,5 @@ static int Cmd_setpass(char *arg, player *pl, int oper, char *msg)
 static int Cmd_version(char *arg, player *pl, int oper, char *msg)
 {
     sprintf(msg, "XPilot version %s.", VERSION);
-    return CMD_RESULT_SUCCESS;
-}
-
-
-static int Cmd_zerolock(char *arg, player *pl, int oper, char *msg)
-{
-    int			new_lock;
-
-    if (!teamZeroPausing) {
-	sprintf(msg, "There is no team zero pausing here (set in mapfile).");
-	return CMD_RESULT_ERROR;
-	}
-
-	if (!arg || !*arg) {
-	sprintf(msg, "Team zero is currently %s.",
-		lock_zero ? "locked" : "unlocked");
-	return CMD_RESULT_SUCCESS;
-    }
-
-    if (!oper) {
-	return CMD_RESULT_NOT_OPERATOR;
-    }
-
-    if (!strcmp(arg, "1")) {
-	new_lock = 1;
-    }
-    else if (!strcmp(arg, "0")) {
-	new_lock = 0;
-    }
-    else {
-	sprintf(msg, "Invalid argument '%s'.  Specify either 0 or 1.", arg);
-	return CMD_RESULT_ERROR;
-    }
-
-    if (new_lock == lock_zero) {
-	sprintf(msg, "Team zero is already %s.",
-		lock_zero ? "locked" : "unlocked");
-    }
-    else {
-	lock_zero = new_lock;
-	sprintf(msg, " < Team zero has been %s by %s! >",
-		lock_zero ? "locked" : "unlocked",
-		pl->name);
-	Set_message(msg);
-	strcpy(msg, "");
-    }
-
     return CMD_RESULT_SUCCESS;
 }

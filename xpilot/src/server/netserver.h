@@ -44,6 +44,7 @@ int Send_leave(connection_t *connp, int id);
 int Send_war(connection_t *connp, int robot_id, int killer_id);
 int Send_seek(connection_t *connp, int programmer_id, int robot_id, int sought_id);
 int Send_player(connection_t *connp, int id);
+int Send_team(connection_t *connp, int id, int team);
 int Send_score(connection_t *connp, int id, DFLOAT score,
 	       int life, int mychar, int alliance);
 int Send_score_object(connection_t *connp, DFLOAT score, int cx, int cy, const char *string);
@@ -70,6 +71,7 @@ int Send_wormhole(connection_t *connp, int cx, int cy);
 int Send_audio(connection_t *connp, int type, int vol);
 int Send_item(connection_t *connp, int cx, int cy, int type);
 int Send_paused(connection_t *connp, int cx, int cy, int count);
+int Send_appearing(connection_t *connp, int cx, int cy, int id, int count);
 int Send_ecm(connection_t *connp, int cx, int cy, int size);
 int Send_ship(connection_t *connp, int cx, int cy, int id, int dir, int shield, int cloak, int eshield, int phased, int deflector);
 int Send_refuel(connection_t *connp, int cx0, int cy0, int cx1, int cy1);
@@ -93,14 +95,16 @@ const char *Player_get_addr(player *pl);
 const char *Player_get_dpy(player *pl);
 int Send_shape(connection_t *connp, int shape);
 #define FEATURE(connp, feature)	((connp)->features & (feature))
-#define F_POLY		(1 << 0)
-#define F_FLOATSCORE	(1 << 1)
+#define F_POLY			(1 << 0)
+#define F_FLOATSCORE		(1 << 1)
 #define F_TEAMSCORE F_FLOATSCORE
-#define F_EXPLICITSELF	(1 << 2)
-#define F_ASTEROID	(1 << 3)
-#define F_TEMPWORM	(1 << 4)
-#define F_FASTRADAR	(1 << 5)
-#define F_SEPARATEPHASING (1 << 6)
-#define F_TEAMRADAR	(1 << 7)
+#define F_EXPLICITSELF		(1 << 2)
+#define F_ASTEROID		(1 << 3)
+#define F_TEMPWORM		(1 << 4)
+#define F_FASTRADAR		(1 << 5)
+#define F_SEPARATEPHASING	(1 << 6)
+#define F_TEAMRADAR		(1 << 7)
+#define F_SHOW_APPEARING	(1 << 8)
+#define F_SENDTEAM		(1 << 8)
 
 #endif

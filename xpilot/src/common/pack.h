@@ -102,13 +102,14 @@
 
  * Polygon branch
  * 4.F.0.9: 4.3.0.0 + xp2 map format
- * 4.F.1.0: Send_player(): Additional %c (is 1 when we tell a player about himself).
+ * 4.F.1.0: Send_player(): Additional %c (1 when sending player's own info).
  * 4.F.1.1: support for everything in 4.5.0.1
+ * 4.F.1.2: Show ships about to appear on bases, new team change packet.
  */
 #ifdef SERVER
-#define	MAGIC		(is_polygon_map ? 0x4F11F4ED : 0x4501F4ED)
+#define	MAGIC		(is_polygon_map ? 0x4F12F4ED : 0x4501F4ED)
 #else
-#define	MAGIC		0x4F11F4ED
+#define	MAGIC		0x4F12F4ED
 #endif
 
 #define MAGIC2VERSION(M)	(((M) >> 16) & 0xFFFF)

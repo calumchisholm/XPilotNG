@@ -56,7 +56,6 @@ int	messagesColor;		/* Color index for messages */
 int	oldMessagesColor;	/* Color index for old messages */
 DFLOAT	scoreObjectTime;	/* How long to flash score objects */
 int	baseWarningType;	/* Which type of base warning you prefer */
-int	baseWarningFrames;	/* Duration of base warning */
 
 radar_t	*old_radar_ptr;
 int	old_num_radar, old_max_radar;
@@ -154,7 +153,7 @@ static void Paint_meter(int xoff, int y, const char *title, int val, int max,
 
     /* texturedObjects - TODO */
     /*int width = WINSCALE((int)(((meterWidth-3)*val)/(max?max:1)));*/
-    
+
     /*printf("TODO: implement paint meter\n");*/
     /*PaintMeter(p_draw, BM_METER,
       WINSCALE(x), WINSCALE(y),
@@ -245,7 +244,7 @@ void Paint_meters(void)
 	color = temporaryMeterColor;
     else
 	color = 0;
-	
+
     if (color)
 	Paint_meter(-10, y += 20, "Turnspeed",
 		    (int)displayedTurnspeed, (int)MAX_PLAYER_TURNSPEED, color);
@@ -277,26 +276,26 @@ void Paint_meters(void)
 			(thrusttime >= thrusttimemax
 			 ? thrusttimemax : thrusttime),
 			thrusttimemax, temporaryMeterColor);
-	
+
 	if (shieldtime >= 0 && shieldtimemax > 0)
 	    Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 20,
 			"Shields Left",
 			(shieldtime >= shieldtimemax
 			 ? shieldtimemax : shieldtime),
 			shieldtimemax, temporaryMeterColor);
-	
+
 	if (phasingtime >= 0 && phasingtimemax > 0)
 	    Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 40,
 			"Phasing left",
 			(phasingtime >= phasingtimemax
 			 ? phasingtimemax : phasingtime),
 			phasingtimemax, temporaryMeterColor);
-	
+
 	if (destruct > 0)
 	    Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 60,
 			"Self destructing", destruct, 150,
 			temporaryMeterColor);
-	
+
 	if (shutdown_count >= 0)
 	    Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 80,
 			"SHUTDOWN", shutdown_count, shutdown_delay,
@@ -725,7 +724,7 @@ void Paint_HUD(void)
 		j++;
 	    }
 	}
-	
+
 	if (time_left > 0) {
 	    sprintf(str, "%3d:%02d",
 		    (int)(time_left / 60), (int)(time_left % 60));
@@ -743,7 +742,7 @@ void Paint_HUD(void)
 			    size + 2,
 			    gameFont->ascent + gameFont->descent);
 	}
-	
+
 	/* Update the modifiers */
 	modlen = strlen(mods);
 	rd.drawString(dpy, p_draw, gc,
@@ -767,7 +766,7 @@ void Paint_HUD(void)
 			  WINSCALE(hud_pos_y - hudSize+HUD_OFFSET - BORDER)
 			  - gameFont->descent * 2 - gameFont->ascent,
 			  autopilot, sizeof(autopilot)-1);
-	    
+
 	    Erase_rectangle(WINSCALE(hud_pos_x) - text_width/2,
 			    WINSCALE(hud_pos_y - hudSize+HUD_OFFSET - BORDER)
 			    - gameFont->descent * 2 - gameFont->ascent * 2,

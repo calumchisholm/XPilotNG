@@ -53,8 +53,7 @@ static bool		Log = true;
 #endif
 static bool		NoPlayersEnteredYet = true;
 int			game_lock = false;
-int			lock_zero;
-int			mute_zero;
+int			mute_baseless;
 
 time_t			gameOverTime = 0;
 time_t			serverTime = 0;
@@ -154,15 +153,15 @@ int main(int argc, char **argv)
     Log_game("START");
 
     if (!Contact_init())
-		return(false);
+	return(false);
 
     Meta_init();
 
     Timing_setup();
+    Check_playerlimit();
 
-    if (Setup_net_server() == -1) {
+    if (Setup_net_server() == -1)
 	End_game();
-    }
 #ifndef _WINDOWS
     if (NoQuit) {
 	signal(SIGHUP, SIG_IGN);
@@ -385,6 +384,11 @@ int Pick_team(int pick_for_type)
     long		team_score[MAX_TEAMS];
     long		losing_score;
 
+    /* If game_lock is on, can't join playing teams (might be able to join
+     * paused). */
+    if (game_lock && pick_for_type == PickForHuman)
+	return TEAM_NOT_SET;
+
     for (i = 0; i < MAX_TEAMS; i++) {
 	free_bases[i] = World.teams[i].NumBases - World.teams[i].NumMembers;
 	playing[i] = 0;
@@ -393,17 +397,15 @@ int Pick_team(int pick_for_type)
     }
     if (restrictRobots) {
 	if (pick_for_type == PickForRobot) {
-	    if (free_bases[robotTeam] > 0) {
+	    if (free_bases[robotTeam] > 0)
 		return robotTeam;
-	    } else {
+	    else
 		return TEAM_NOT_SET;
-	    }
 	}
     }
     if (reserveRobotTeam) {
-	if (pick_for_type != PickForRobot) {
+	if (pick_for_type != PickForRobot)
 	    free_bases[robotTeam] = 0;
-	}
     }
 
     /*
@@ -413,77 +415,62 @@ int Pick_team(int pick_for_type)
      */
     for (i = 0; i < NumPlayers; i++) {
 	pl = Players(i);
-	if (IS_TANK_PTR(pl)) {
+	if (IS_TANK_PTR(pl))
 	    continue;
-	}
-	if (BIT(pl->status, PAUSE)) {
+	if (BIT(pl->status, PAUSE))
 	    continue;
-	}
-	if (!playing[pl->team]++) {
+	if (!playing[pl->team]++)
 	    playing_teams++;
-	}
-	if (IS_HUMAN_PTR(pl) || IS_ROBOT_PTR(pl)) {
+	if (IS_HUMAN_PTR(pl) || IS_ROBOT_PTR(pl))
 	    team_score[pl->team] += pl->score;
-	}
     }
     if (playing_teams <= 1) {
 	for (i = 0; i < MAX_TEAMS; i++) {
-	    if (!playing[i] && free_bases[i] > 0) {
+	    if (!playing[i] && free_bases[i] > 0)
 		available_teams[num_available_teams++] = i;
-	    }
 	}
     } else {
 	least_players = NumPlayers;
 	for (i = 0; i < MAX_TEAMS; i++) {
 	    /* We fill teams with players first. */
 	    if (playing[i] > 0 && free_bases[i] > 0) {
-		if (playing[i] < least_players) {
+		if (playing[i] < least_players)
 		    least_players = playing[i];
-		}
 	    }
 	}
 
 	for (i = 0; i < MAX_TEAMS; i++) {
 	    if (free_bases[i] > 0) {
 		if (least_players == NumPlayers
-		    || playing[i] == least_players) {
+			    || playing[i] == least_players)
 		    available_teams[num_available_teams++] = i;
-		}
 	    }
 	}
     }
 
     if (!num_available_teams) {
 	for (i = 0; i < MAX_TEAMS; i++) {
-	    if (free_bases[i] > 0) {
+	    if (free_bases[i] > 0)
 		available_teams[num_available_teams++] = i;
-	    }
 	}
     }
 
-    /* kps - why check game lock here ??? */
-    if (!teamZeroPausing || !game_lock) {
-	if (num_available_teams == 1) {
-	    return available_teams[0];
-	}
+    if (num_available_teams == 1)
+	return available_teams[0];
 
-	if (num_available_teams > 1) {
-	    losing_team = -1;
-	    losing_score = LONG_MAX;
-	    for (i = 0; i < num_available_teams; i++) {
-		if (team_score[available_teams[i]] < losing_score
-		    && available_teams[i] != robotTeam) {
-		    losing_team = available_teams[i];
-		    losing_score = team_score[losing_team];
-		}
+    if (num_available_teams > 1) {
+	losing_team = -1;
+	losing_score = LONG_MAX;
+	for (i = 0; i < num_available_teams; i++) {
+	    if (team_score[available_teams[i]] < losing_score
+		&& available_teams[i] != robotTeam) {
+		losing_team = available_teams[i];
+		losing_score = team_score[losing_team];
 	    }
-	    return losing_team;
 	}
-    } else if (Team_zero_pausing_available()) {
-	return 0;
+	return losing_team;
     }
 
-    /*NOTREACHED*/
     return TEAM_NOT_SET;
 }
 

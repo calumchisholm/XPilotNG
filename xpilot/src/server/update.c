@@ -63,6 +63,12 @@ static void Transport_to_home(player *pl)
     DFLOAT		dx, dy, t, m;
     const int		T = RECOVERY_DELAY;
 
+    if (pl->home_base == NULL) {
+	pl->vel.x = 0;
+	pl->vel.y = 0;
+	return;
+    }
+
     if (BIT(World.rules->mode, TIMING) && pl->round) {
 	int check;
 
@@ -908,16 +914,8 @@ void Update_objects(void)
 		     * Are both needed ?
 		     */
 		    if (pl->idleCount >= IDLETHRESHOLD) { /* idle */
-			if (!game_lock && Team_zero_pausing_available()) {
-			    sprintf(msg,
-				    "%s was pause-swapped because of idling.",
-				    pl->name);
-			    Handle_player_command(pl, "team 0");
-			} else {
-			    Pause_player(pl, true);
-			    sprintf(msg, "%s was paused for idling.",
-				    pl->name);
-			}
+			Pause_player(pl, true);
+			sprintf(msg, "%s was paused for idling.", pl->name);
 			Set_message(msg);
 			continue;
 		    }
@@ -1333,15 +1331,8 @@ void Update_objects(void)
 	    if (IS_HUMAN_PTR(pl)) {
 		if (frame_loops - pl->frame_last_busy > 60 * FPS) {
 		    if ((NumPlayers - NumRobots - NumPseudoPlayers) > 1) {
-			if (!game_lock && Team_zero_pausing_available()) {
-			    sprintf(msg, "%s was pause-swapped because of "
-				    "idling.", pl->name);
-			    Handle_player_command(pl, "team 0");
-			} else {
-			    Pause_player(pl, true);
-			    sprintf(msg, "%s was paused for idling.",
-				    pl->name);
-	    		}
+			Pause_player(pl, true);
+			sprintf(msg, "%s was paused for idling.", pl->name);
 			Set_message(msg);
 		    }
 		}
@@ -1351,7 +1342,6 @@ void Update_objects(void)
 	if (maxPauseTime > 0
 	    && IS_HUMAN_PTR(pl)
 	    && BIT(pl->status, PAUSE)
-	    && (!(teamZeroPausing && pl->team == 0))
 	    && frame_loops - pl->frame_last_busy > maxPauseTime) {
 	    sprintf(msg, "%s was auto-kicked for pausing too long "
 		    "[*Server notice*]", pl->name);

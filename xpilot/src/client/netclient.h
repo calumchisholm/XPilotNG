@@ -1,4 +1,4 @@
-/* 
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -76,6 +76,7 @@ int Receive_fastshot(void);
 int Receive_ecm(void);
 int Receive_trans(void);
 int Receive_paused(void);
+int Receive_appearing(void);
 int Receive_radar(void);
 int Receive_fastradar(void);
 int Receive_damaged(void);
@@ -83,6 +84,7 @@ int Receive_leave(void);
 int Receive_war(void);
 int Receive_seek(void);
 int Receive_player(void);
+int Receive_team(void);
 int Receive_score(void);
 int Receive_score_object(void);
 int Receive_team_score(void);

@@ -105,6 +105,7 @@ static void Receive_init(void)
     receive_tbl[PKT_ECM]	= Receive_ecm;
     receive_tbl[PKT_TRANS]	= Receive_trans;
     receive_tbl[PKT_PAUSED]	= Receive_paused;
+    receive_tbl[PKT_APPEARING]	= Receive_appearing;
     receive_tbl[PKT_ITEM]	= Receive_item;
     receive_tbl[PKT_MINE]	= Receive_mine;
     receive_tbl[PKT_BALL]	= Receive_ball;
@@ -137,6 +138,7 @@ static void Receive_init(void)
     reliable_tbl[PKT_MESSAGE]	= Receive_message;
     reliable_tbl[PKT_TEAM_SCORE] = Receive_team_score;
     reliable_tbl[PKT_PLAYER]	= Receive_player;
+    reliable_tbl[PKT_TEAM]	= Receive_team;
     reliable_tbl[PKT_SCORE]	= Receive_score;
     reliable_tbl[PKT_TIMING]	= Receive_timing;
     reliable_tbl[PKT_LEAVE]	= Receive_leave;
@@ -1536,9 +1538,8 @@ int Net_input(void)
     last_frame->loops = 0;
     rbuf = last_frame->sbuf;
 
-    if (n == -1) {
+    if (n == -1)
 	return -1;
-    }
 
     /*
      * If the server hasn't yet acked our last keyboard change
@@ -2321,6 +2322,19 @@ int Receive_paused(void)
     return 1;
 }
 
+int Receive_appearing(void)
+{
+    int			n;
+    short		x, y, id, count;
+    u_byte		ch;
+    if ((n = Packet_scanf(&rbuf, "%c%hd%hd%hd%hd", &ch, &x, &y, &id,
+			  &count)) <= 0)
+	return n;
+    if ((n = Handle_appearing(x, y, id, count)) == -1)
+	return -1;
+    return 1;
+}
+
 int Receive_radar(void)
 {
     int			n;
@@ -2430,9 +2444,8 @@ int Receive_seek(void)
 			  &programmer_id, &robot_id, &sought_id)) <= 0) {
 	return n;
     }
-    if ((n = Handle_seek(programmer_id, robot_id, sought_id)) == -1) {
+    if ((n = Handle_seek(programmer_id, robot_id, sought_id)) == -1)
 	return -1;
-    }
     return 1;
 }
 
@@ -2461,8 +2474,7 @@ int Receive_player(void)
 	if (version < 0x4F10)
 	    n = Packet_scanf(&cbuf, "%S", &shape[strlen(shape)]);
 	else
-	    n = Packet_scanf(&cbuf, "%S%c", &shape[strlen(shape)],
-			     &myself);
+	    n = Packet_scanf(&cbuf, "%S%c", &shape[strlen(shape)], &myself);
 	if (n <= 0) {
 	    cbuf.ptr = cbuf_ptr;
 	    return n;
@@ -2472,6 +2484,19 @@ int Receive_player(void)
 			   shape, myself)) == -1) {
 	return -1;
     }
+    return 1;
+}
+
+int Receive_team(void)
+{
+    int		n;
+    short	id;
+    u_byte	ch, pl_team;
+
+    if ((n = Packet_scanf(&cbuf, "%c%hd%c", &ch, &id, &pl_team)) <= 0)
+	return n;
+    if (Handle_team(id, pl_team) == -1)
+	return -1;
     return 1;
 }
 
@@ -2497,9 +2522,8 @@ int Receive_score_object(void)
     }
     if (n <= 0)
 	return n;
-    if ((n = Handle_score_object(score, x, y, msg)) == -1) {
+    if ((n = Handle_score_object(score, x, y, msg)) == -1)
 	return -1;
-    }
 
     return 1;
 }

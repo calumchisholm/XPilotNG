@@ -232,7 +232,7 @@ static bool Msg_scan_for_ball_destruction(char *message)
 	int destroyer_team = atoi(mn.name[0]);
 	int destroyed_team = atoi(mn.name[1]);
 	char *destroyer = mn.name[2];
-	
+
 	if (destroyer_team == self->team) {
 	    ballstats_teamcashes++;
 	    if (!strcmp(destroyer, self->name))
@@ -254,6 +254,9 @@ static void Msg_scan_death(int id)
     int i;
     other_t *other;
 
+    if (version >= 0x4F12)
+	return;
+
     other = Other_by_id(id);
     if (!other)
 	return;
@@ -263,8 +266,7 @@ static void Msg_scan_death(int id)
      * lost their last life. If deathtime is used for anything else
      * this must be done some other way.
      */
-    if (BIT(Setup->mode, LIMITED_LIVES)
-	&& other->life == 0)
+    if (BIT(Setup->mode, LIMITED_LIVES)	&& other->life == 0)
 	return;
 
     for (i = 0; i < num_bases; i++) {

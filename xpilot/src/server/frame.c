@@ -925,16 +925,24 @@ static void Frame_ships(connection_t *conn, player *pl)
     for (k = 0; k < num_player_shuffle; k++) {
 	i = player_shuffle_ptr[k];
 	pl_i = Players(i);
-	if (!BIT(pl_i->status, PLAYING|PAUSE))
-	    continue;
 	if (BIT(pl_i->status, GAME_OVER))
 	    continue;
-	if (!click_inview(&cv, pl_i->pos.cx, pl_i->pos.cy))
-	    continue;
-	if (BIT(pl_i->status, PAUSE)) {
-	    Send_paused(conn, pl_i->pos.cx, pl_i->pos.cy, (int)pl_i->count);
+	if (!BIT(pl_i->status, PLAYING) || BIT(pl_i->status, PAUSE)) {
+	    if (pl_i->home_base == NULL)
+		continue;
+	    if (!click_inview(&cv, pl_i->home_base->pos.cx,
+			     pl_i->home_base->pos.cy))
+		continue;
+	    if (BIT(pl_i->status, PAUSE))
+		Send_paused(conn, pl_i->home_base->pos.cx,
+			    pl_i->home_base->pos.cy, (int)pl_i->count);
+	    else
+		Send_appearing(conn, pl_i->home_base->pos.cx,
+			pl_i->home_base->pos.cy, pl_i->id, (int)pl_i->count);
 	    continue;
 	}
+	if (!click_inview(&cv, pl_i->pos.cx, pl_i->pos.cy))
+	    continue;
 
 	/* Don't transmit information if fighter is invisible */
 	if (pl->visibility[i].canSee

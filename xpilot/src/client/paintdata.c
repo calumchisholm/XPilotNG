@@ -1,4 +1,4 @@
-/* 
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -47,6 +47,8 @@ trans_t		*trans_ptr;
 int		 num_trans, max_trans;
 paused_t	*paused_ptr;
 int		 num_paused, max_paused;
+appearing_t	*appearing_ptr;
+int		 num_appearing, max_appearing;
 radar_t		*radar_ptr;
 int		 num_radar, max_radar;
 vcannon_t	*vcannon_ptr;
@@ -610,8 +612,8 @@ int Handle_ball(int x, int y, int id)
     return 0;
 }
 
-int Handle_ship(int x, int y, int id, int dir, int shield, int cloak, int eshield, 
-				int phased, int deflector)
+int Handle_ship(int x, int y, int id, int dir, int shield, int cloak,
+		int eshield, int phased, int deflector)
 {
     ship_t	t;
 
@@ -785,6 +787,18 @@ int Handle_paused(int x, int y, int count)
     return 0;
 }
 
+int Handle_appearing(int x, int y, int id, int count)
+{
+    appearing_t	t;
+
+    t.x = x;
+    t.y = y;
+    t.id = id;
+    t.count = count;
+    STORE(appearing_t, appearing_ptr, num_appearing, max_appearing, t);
+    return 0;
+}
+
 int Handle_radar(int x, int y, int size)
 {
     radar_t	t;
@@ -792,7 +806,7 @@ int Handle_radar(int x, int y, int size)
     t.x = x;
     t.y = y;
     t.color = WHITE;
-    
+
     if ((size & 0x80) != 0) {
 	/* friendly target */
 	if (maxColors > 4)
@@ -984,6 +998,11 @@ void paintdataCleanup(void)
 	free(paused_ptr);
 	paused_ptr = 0;
     }
+    if (max_appearing > 0 && appearing_ptr) {
+	max_appearing = 0;
+	free(appearing_ptr);
+	appearing_ptr = 0;
+    }
     if (max_radar > 0 && radar_ptr) {
 	max_radar = 0;
 	free(radar_ptr);
@@ -1092,4 +1111,3 @@ void Init_scale_array(void)
 	exit(1);
     }
 }
-

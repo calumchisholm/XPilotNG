@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -105,8 +105,8 @@
 #define PKT_LOSEITEM		59
 
 /* packet types: 60 - 69 */
-#define PKT_NOT_USED_60		60
-#define PKT_NOT_USED_61		61
+#define PKT_APPEARING		60
+#define PKT_TEAM		61
 #define PKT_NOT_USED_62		62
 #define PKT_NOT_USED_63		63
 #define PKT_NOT_USED_64		64
@@ -154,4 +154,3 @@
 #define PKT_DEBRIS		128		/* + color + x + y */
 
 #endif
-

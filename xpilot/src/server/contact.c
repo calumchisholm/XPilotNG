@@ -166,13 +166,10 @@ static int do_kick(int team, int nonlast)
 
 	if (pl_i->conn != NULL
 	    && BIT(pl_i->status, PAUSE)
-	    && (team == TEAM_NOT_SET || pl_i->team == team)
+	    && (team == TEAM_NOT_SET || (pl_i->team == team &&
+					 pl_i->home_base != NULL))
 	    && !(pl_i->privs & PRIV_NOAUTOKICK)
 	    && (!nonlast || !(pl_i->privs & PRIV_AUTOKICKLAST))) {
-
-	    /* team 0 pausers have special privileges =) */
-	    if (teamZeroPausing && pl_i->team == 0)
-		continue;
 
 	    if (team == TEAM_NOT_SET) {
 		sprintf(msg,
@@ -813,20 +810,16 @@ void Queue_loop(void)
 
 	/* slow down the rate at which players enter the game. */
 	if (last_unqueued_loops + 2 + (FPS >> 2) < main_loops) {
-
+	    int lim = MIN(playerLimit, baselessPausing ? 1e6 : World.NumBases);
 	    /* is there a homebase available? */
-	    if (NumPlayers - NumPseudoPlayers + login_in_progress
-		< World.NumBases - playerLimit
+	    if (NumPlayers - NumPseudoPlayers + login_in_progress < lim
 		|| (Kick_robot_players(TEAM_NOT_SET)
-		    && NumPlayers - NumPseudoPlayers + login_in_progress
-		    < World.NumBases - playerLimit)
-		|| (Kick_paused_players(TEAM_NOT_SET)
-		    && NumPlayers - NumPseudoPlayers + login_in_progress
-		    < World.NumBases - playerLimit)) {
+		    && NumPlayers - NumPseudoPlayers + login_in_progress < lim)
+		|| (Kick_paused_players(TEAM_NOT_SET) &&
+		    NumPlayers - NumPseudoPlayers + login_in_progress < lim)) {
 
 		/* find a team for this fellow. */
 		if (BIT(World.rules->mode, TEAM_PLAY)) {
-
 		    /* see if he has a reasonable suggestion. */
 		    if (qp->team >= 0 && qp->team < MAX_TEAMS) {
 			if ((World.teams[qp->team].NumMembers
@@ -839,8 +832,7 @@ void Queue_loop(void)
 		    }
 		    if (qp->team == TEAM_NOT_SET) {
 			qp->team = Pick_team(PickForHuman);
-			if (qp->team == TEAM_NOT_SET
-			    || (qp->team == robotTeam && reserveRobotTeam)) {
+			if (qp->team == TEAM_NOT_SET) {
 			    if (NumRobots > World.teams[robotTeam].NumRobots) {
 				Kick_robot_players(TEAM_NOT_SET);
 				qp->team = Pick_team(PickForHuman);
@@ -900,16 +892,13 @@ static int Queue_player(char *real, char *nick, char *disp, int team,
     int				num_same_hosts = 0;
 
     *qpos = 0;
-    if ((status = Check_names(nick, real, host)) != SUCCESS) {
+    if ((status = Check_names(nick, real, host)) != SUCCESS)
 	return status;
-    }
 
     for (qp = qp_list; qp; prev = qp, qp = qp->next) {
-
 	num_queued++;
-	if (qp->login_port == -1) {
+	if (qp->login_port == -1)
 	    ++*qpos;
-	}
 
 	/* same nick? */
 	if (!strcasecmp(nick, qp->nick_name)) {
@@ -932,27 +921,20 @@ static int Queue_player(char *real, char *nick, char *disp, int team,
 
 	/* same computer? */
 	if (!strcmp(addr, qp->host_addr)) {
-	    if (++num_same_hosts > 1) {
+	    if (++num_same_hosts > 1)
 		return E_IN_USE;
-	    }
 	}
     }
 
     NumQueuedPlayers = num_queued;
-    if (NumQueuedPlayers >= MaxQueuedPlayers) {
+    if (NumQueuedPlayers >= MaxQueuedPlayers)
 	return E_GAME_FULL;
-    }
-    if (game_lock && !rplayback) {
-	if (!Team_zero_pausing_available())
-	    return E_GAME_LOCKED;
-	else
-	    team = 0;
-    }
+    if (game_lock && !rplayback && !baselessPausing)
+	return E_GAME_LOCKED;
 
     qp = (struct queued_player *)malloc(sizeof(struct queued_player));
-    if (!qp) {
+    if (!qp)
 	return E_SOCKET;
-    }
     ++*qpos;
     strlcpy(qp->real_name, real, MAX_CHARS);
     strlcpy(qp->nick_name, nick, MAX_CHARS);
@@ -967,11 +949,10 @@ static int Queue_player(char *real, char *nick, char *disp, int team,
     qp->last_ack_recv = main_loops;
 
     qp->next = 0;
-    if (!qp_list) {
+    if (!qp_list)
 	qp_list = qp;
-    } else {
+    else
 	prev->next = qp;
-    }
     NumQueuedPlayers++;
 
     return SUCCESS;

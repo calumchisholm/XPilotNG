@@ -170,6 +170,10 @@ static void Feature_init(connection_t *connp)
 	    SET_BIT(features, F_FLOATSCORE);
 	    SET_BIT(features, F_TEMPWORM);
 	}
+	if (v >= 0x4F12) {
+	    SET_BIT(features, F_SHOW_APPEARING);
+	    SET_BIT(features, F_SENDTEAM);
+	}
     }
     connp->features = features;
     return;
@@ -350,11 +354,10 @@ static int Init_setup_old(void)
 		*mapptr = SETUP_TARGET + World.targets[target++].team;
 		break;
 	    case BASE:
-		if (World.base[base].team == TEAM_NOT_SET) {
+		if (World.base[base].team == TEAM_NOT_SET)
 		    team = 0;
-		} else {
+		else
 		    team = World.base[base].team;
-		}
 		switch (World.base[base++].dir) {
 		case DIR_UP:    *mapptr = SETUP_BASE_UP + team; break;
 		case DIR_RIGHT: *mapptr = SETUP_BASE_RIGHT + team; break;
@@ -570,7 +573,7 @@ int Setup_net_server(void)
      * the contact socket, and the socket for the resolver library routines.
      */
     max_connections = MIN(MAX_SELECT_FD - 5,
-			  World.NumBases + MAX_OBSERVERS * !!rplayback);
+			  playerLimit_orig + MAX_OBSERVERS * !!rplayback);
     size = max_connections * sizeof(*Conn);
     if ((Conn = (connection_t *) malloc(size)) == NULL) {
 	error("Cannot allocate memory for connections");
@@ -946,16 +949,15 @@ int Setup_connection(char *real, char *nick, char *dpy, int team,
 
     for (i = 0; i < max_connections; i++) {
 	if (playback) {
-	    if (i >= World.NumBases)
+	    if (i >= playerLimit_orig)
 		break;
 	}
-	else if (rplayback && i < World.NumBases)
+	else if (rplayback && i < playerLimit_orig)
 	    continue;
 	connp = &Conn[i];
 	if (connp->state == CONN_FREE) {
-	    if (free_conn_index == max_connections) {
+	    if (free_conn_index == max_connections)
 		free_conn_index = i;
-	    }
 	    continue;
 	}
 	if (strcasecmp(connp->nick, nick) == 0) {
@@ -1275,24 +1277,17 @@ static void LegalizeHost(char *string)
 static int Handle_login(connection_t *connp, char *errmsg, int errsize)
 {
     player		*pl;
-    int			i, /*r,*/ war_on_id, conn_bit, nick_mod = 0;
+    int			i, war_on_id, conn_bit, nick_mod = 0;
     char		msg[MSG_LEN];
     char		old_nick[MAX_NAME_LEN] /*, *p */;
     const char		sender[] = "[*Server notice*]";
 
-    if (NumPlayers - NumPseudoPlayers >= World.NumBases) {
-	strlcpy(errmsg, "Not enough bases for players", errsize);
-	warn("%s", errmsg);
-	return -1;
-    }
     if (BIT(World.rules->mode, TEAM_PLAY)) {
 	if (connp->team < 0 || connp->team >= MAX_TEAMS
-	    || (reserveRobotTeam && (connp->team == robotTeam))) {
+		    || (reserveRobotTeam && (connp->team == robotTeam)))
 	    connp->team = TEAM_NOT_SET;
-	}
-	else if (World.teams[connp->team].NumBases <= 0) {
+	else if (World.teams[connp->team].NumBases <= 0)
 	    connp->team = TEAM_NOT_SET;
-	}
 	else {
 	    Check_team_members(connp->team);
 	    if (World.teams[connp->team].NumMembers
@@ -1301,18 +1296,10 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
 		connp->team = TEAM_NOT_SET;
 	    }
 	}
-	if (connp->team == TEAM_NOT_SET) {
+	if (connp->team == TEAM_NOT_SET)
 	    connp->team = Pick_team(PickForHuman);
-	    if (connp->team == TEAM_NOT_SET ||
-		(connp->team == robotTeam && reserveRobotTeam)) {
-		strlcpy(errmsg, "Can't pick team", errsize);
-		warn("%s", errmsg);
-		return -1;
-	    }
-	}
-    } else {
+    } else
 	connp->team = TEAM_NOT_SET;
-    }
     for (i = 0; i < NumPlayers; i++) {
 	if (strcasecmp(Players(i)->name, connp->nick) == 0) {
 	    warn("Name already in use %s", connp->nick);
@@ -1380,16 +1367,22 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
     LegalizeHost(pl->hostname);
     pl->isowner = (!strcmp(pl->realname, Server.owner) &&
 		   !strcmp(connp->addr, "127.0.0.1"));
-    if (connp->team != TEAM_NOT_SET) {
-	pl->team = connp->team;
-    }
+    pl->team = connp->team;
     pl->version = connp->version;
 
     if (pl->rectype < 2) {
-	Pick_startpos(pl /*NumPlayers*/);
-	Go_home(pl /*NumPlayers*/);
+	if (BIT(World.rules->mode, TEAM_PLAY) && pl->team == TEAM_NOT_SET) {
+	    SET_BIT(pl->status, PAUSE);
+	    pl->mychar = 'P';
+	    pl->home_base = NULL;
+	    pl->team = 0;
+	}
+	else {
+	    Pick_startpos(pl);
+	    Go_home(pl);
+	}
 	Rank_get_saved_score(pl);
-	if (pl->team != TEAM_NOT_SET) {
+	if (pl->team != TEAM_NOT_SET && pl->home_base != NULL) {
 	    World.teams[pl->team].NumMembers++;
 	    if (teamShareScore) {
 		if (World.teams[pl->team].NumMembers == 1) {
@@ -1402,6 +1395,8 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
 	NumPlayers++;
 	request_ID();
     } else {
+	pl->home_base = NULL;
+	pl->team = 0;
 	pl->id = NUM_IDS + 1 + connp->ind - observerStart;
 	GetIndArray[pl->id] = observerStart + NumObservers;
 	pl->score = -6666;
@@ -1416,12 +1411,6 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
 
     Conn_set_state(connp, CONN_READY, CONN_PLAYING);
 
-    /* kps - this was buggy, Pause_player was given an id,
-     * even though it should be given and ind (now pl)
-     */
-    if (teamZeroPausing && pl->team == 0)
-	Pause_player(pl, true);
-
     if (Send_reply(connp, PKT_PLAY, PKT_SUCCESS) <= 0) {
 	strlcpy(errmsg, "Cannot send play reply", errsize);
 	error("%s", errmsg);
@@ -1433,8 +1422,13 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
 		 showtime(), old_nick, connp->nick);
 
 #ifndef	SILENT
-    xpprintf("%s %s (%d) starts at startpos %d.\n", showtime(),
-	   pl->name, NumPlayers, pl->home_base->ind);
+    if (pl->rectype < 2)
+	xpprintf("%s %s (%d) starts at startpos %d.\n", showtime(),
+		 pl->name, NumPlayers, pl->home_base ? pl->home_base->ind :
+		 -1);
+    else
+	xpprintf("%s spectator %s (%d) starts.\n", showtime(), pl->name,
+		 NumObservers);
 #endif
 
     /*
@@ -1443,7 +1437,8 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
     Send_player(pl->conn, pl->id);
     Send_score(pl->conn, pl->id, pl->score,
 	       pl->life, pl->mychar, pl->alliance);
-    Send_base(pl->conn, pl->id, pl->home_base->ind);
+    if (pl->home_base) /* Spectators don't have bases */
+	Send_base(pl->conn, pl->id, pl->home_base->ind);
     /*
      * And tell him about all the others.
      */
@@ -1452,16 +1447,14 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
 	if (i == NumPlayers - 1 && pl->rectype != 2)
 	    break;
 	if (i == NumPlayers) {
-	    if (NumObservers == 1)
-		break;
-	    else
-		i = observerStart;
+	    i = observerStart - 1;
+	    continue;
 	}
 	pl_i = Players(i);
 	Send_player(pl->conn, pl_i->id);
 	Send_score(pl->conn, pl_i->id, pl_i->score,
 		   pl_i->life, pl_i->mychar, pl_i->alliance);
-	if (!IS_TANK_PTR(pl_i))
+	if (!IS_TANK_PTR(pl_i) && pl_i->home_base != NULL)
 	    Send_base(pl->conn, pl_i->id, pl_i->home_base->ind);
     }
     /*
@@ -1478,12 +1471,10 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
      */
     for (i = 0; i < observerStart + NumObservers - 1; i++) {
 	player *pl_i;
-	/* hack alert */
+
 	if (i == NumPlayers - 1) {
-	    if (!NumObservers)
-		break;
-	    else
-		i = observerStart;
+	    i = observerStart - 1;
+	    continue;
 	}
 	pl_i = Players(i);
 	if (pl_i->rectype == 1 && pl->rectype == 2)
@@ -1492,7 +1483,8 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
 	    Send_player(pl_i->conn, pl->id);
 	    Send_score(pl_i->conn, pl->id, pl->score,
 		       pl->life, pl->mychar, pl->alliance);
-	    Send_base(pl_i->conn, pl->id, pl->home_base->ind);
+	    if (pl->home_base)
+		Send_base(pl_i->conn, pl->id, pl->home_base->ind);
 	}
 	/*
 	 * And tell him about the relationships others have with eachother.
@@ -2035,6 +2027,22 @@ int Send_player(connection_t *connp, int id)
     return n;
 }
 
+int Send_team(connection_t *connp, int id, int team)
+{
+    /* No way to send only team to old clients, all player info has to be
+     * resent. This only works if pl->team really is the same as team. */
+    if (!FEATURE(connp, F_SENDTEAM))
+	return Send_player(connp, id);
+
+    if (!BIT(connp->state, CONN_PLAYING|CONN_READY)) {
+	warn("Connection not ready for team info (%d,%d)",
+	      connp->state, connp->id);
+	return 0;
+    }
+
+    return Packet_printf(&connp->c, "%c%hd%c", PKT_TEAM, id, team);
+}
+
 /*
  * Send the new score for some player to a client.
  */
@@ -2330,6 +2338,15 @@ int Send_paused(connection_t *connp, int cx, int cy, int count)
 			 CLICK_TO_PIXEL(cx), CLICK_TO_PIXEL(cy), count);
 }
 
+int Send_appearing(connection_t *connp, int cx, int cy, int id, int count)
+{
+    if (!FEATURE(connp, F_SHOW_APPEARING))
+	return 0;
+
+    return Packet_printf(&connp->w, "%c%hd%hd%hd%hd", PKT_APPEARING,
+			 CLICK_TO_PIXEL(cx), CLICK_TO_PIXEL(cy), count);
+}
+
 int Send_ecm(connection_t *connp, int cx, int cy, int size)
 {
     return Packet_printf(&connp->w, "%c%hd%hd%hd", PKT_ECM,
@@ -2587,9 +2604,8 @@ static int Receive_play(connection_t *connp)
 	    Destroy_connection(connp, "not login");
 	    return -1;
 	}
-	if (Send_reliable(connp) == -1) {
+	if (Send_reliable(connp) == -1)
 	    return -1;
-	}
 	return 0;
     }
     Sockbuf_clear(&connp->w);
@@ -3024,13 +3040,12 @@ static void Handle_talk(connection_t *connp, char *str)
 	|| strchr("-_~)(/\\}{[]", cp[1])	/* smileys are smileys */
 	) {
 	sprintf(msg, "%s [%s]", str, pl->name);
-	if (!(teamZeroPausing && mute_zero && pl->team == 0)) {
+	if (!(mute_baseless && pl->home_base == NULL))
 	    Set_message(msg);
-	} else {
-	    sprintf(msg + strlen(msg), ":[zero]");
+	else {
 	    for (sent = i = 0; i < NumPlayers; i++) {
 		player *pl_i = Players(i);
-		if (pl_i->team == 0)
+		if (pl_i->home_base == NULL)
 		    Set_player_message (pl_i, msg);
 	    }
 	}
@@ -3044,7 +3059,7 @@ static void Handle_talk(connection_t *connp, char *str)
 	team = atoi (str);
 	sprintf(msg + strlen(msg), ":[%d]", team);
 	sent = 0;
-	if (!(teamZeroPausing && mute_zero && pl->team == 0 && team != 0)) {
+	if (!(mute_baseless && pl->home_base == NULL)) {
 	    for (i = 0; i < NumPlayers; i++) {
 		player *pl_i = Players(i);
 		if (pl_i->team == team) {
@@ -3057,18 +3072,15 @@ static void Handle_talk(connection_t *connp, char *str)
 	    if (pl->team != team)
 		Set_player_message (pl, msg);
 	} else {
-	    if (!(teamZeroPausing && mute_zero
-		  && pl->team == 0 && team != 0)) {
+	    if (!(mute_baseless && pl->home_base == NULL))
 		sprintf(msg, "Message not sent, nobody in team %d!", team);
-	    } else {
+	    else
 		sprintf(msg, "You may not send messages to active teams!");
-	    }
 	    Set_player_message(pl, msg);
 	}
     }
-    else if (strcasecmp(str, "god") == 0) {
+    else if (strcasecmp(str, "god") == 0)
 	Server_log_admin_message(pl, cp);
-    }
     else {						/* Player message */
 	char *errmsg;
 	player *other_pl = Get_player_by_name(str, NULL, &errmsg);
@@ -3082,13 +3094,12 @@ static void Handle_talk(connection_t *connp, char *str)
 	}
 
 	if (other_pl != pl) {
-	    if (!(teamZeroPausing && mute_zero
-		  && pl->team == 0 && other_pl->team != 0)) {
+	    if (!(mute_baseless && pl->home_base == NULL &&
+		  other_pl->home_base != NULL)) {
 		sprintf(msg + strlen(msg), ":[%s]", other_pl->name);
 		Set_player_message(other_pl, msg);
-	    } else {
+	    } else
 		sprintf(msg, "You may not send messages to active players!");
-	    }
 	    Set_player_message(pl, msg);
 	}
     }

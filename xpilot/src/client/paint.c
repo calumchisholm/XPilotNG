@@ -1,4 +1,4 @@
-/* 
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -212,11 +212,6 @@ void Paint_frame(void)
     }
 
     /*
-     * Estimate suitable number of frames to do the base warning.
-     */
-    baseWarningFrames = 3 * clientFPS;
-
-    /*
      * Switch between two different window titles.
      */
     if (titleFlip && (loopsSlow % TITLE_DELAY) == 0) {
@@ -324,7 +319,7 @@ void Paint_frame(void)
 	    XCopyArea(dpy, p_radar, radar, gc,
 		      0, 0, 256, RadarHeight, 0, 0);
 #else
-	    WinXBltPixToWin(p_radar, radar, 
+	    WinXBltPixToWin(p_radar, radar,
 			    0, 0, 256, RadarHeight, 0, 0);
 #endif
 	} else {
@@ -350,7 +345,7 @@ void Paint_frame(void)
 	    w = 256 - x;
 	    h = RadarHeight - y;
 
-#ifndef _WINDOWS	
+#ifndef _WINDOWS
 	    XCopyArea(dpy, p_radar, radar, gc,
 		      0, 0, x, y, w, h);
 	    XCopyArea(dpy, p_radar, radar, gc,
@@ -360,7 +355,7 @@ void Paint_frame(void)
 	    XCopyArea(dpy, p_radar, radar, gc,
 		      x, y, w, h, 0, 0);
 #else
-	    Paint_world_radar();			  
+	    Paint_world_radar();
 #endif
 	}
     }
@@ -438,9 +433,9 @@ static void Paint_score_background(int thisLine)
 	XSetForeground(dpy, scoreListGC, colors[BLACK].pixel);
 
 	bgh = pixmaps[BM_SCORE_BG].height;
-	lh = pixmaps[BM_LOGO].height;	
+	lh = pixmaps[BM_LOGO].height;
 
-	IFWINDOWS( XFillRectangle(dpy, players, scoreListGC, 
+	IFWINDOWS( XFillRectangle(dpy, players, scoreListGC,
 				  0, 0, players_width, players_height) );
 
 	Bitmap_paint(players, BM_SCORE_BG, 0, 0, 0);
@@ -492,7 +487,7 @@ void Paint_score_start(void)
 		     headingStr,
 		     colors[scoreColor].pixel,
 		     colors[BLACK].pixel);
-    
+
     gcv.line_style = LineSolid;
     XChangeGC(dpy, scoreListGC, GCLineStyle, &gcv);
     XDrawLine(dpy, players, scoreListGC,
@@ -715,5 +710,3 @@ void ShadowDrawString(Display* dpy, Window w, GC gc,
     XSetForeground(dpy, gc, fg);
     XDrawString(dpy, w, gc, x, y, str, strlen(str));
 }
-
-

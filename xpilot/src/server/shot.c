@@ -157,6 +157,8 @@ void Place_general_mine(player *pl, unsigned short team, long status,
 	if (baseMineRange) {
 	    for (i = 0; i < NumPlayers; i++) {
 		player *pl_i = Players(i);
+		if (pl_i->home_base == NULL)
+		    continue;
 		if (pl_i->id != pl->id
 		    && !Team_immune(pl_i->id, pl->id)
 		    && !IS_TANK_PTR(pl_i)) {

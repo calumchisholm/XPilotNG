@@ -298,7 +298,8 @@ int		maxPauseTime;		/* Max. time you can stay paused for */
 extern char	conf_logfile_string[];	/* Default name of log file */
 
 int		roundsToPlay;		/* how many rounds to play */
-int		playerLimit;		/* allow less players than bases */
+int		playerLimit;		/* how many connections at once */
+int		playerLimit_orig;	/* how many connections at once */
 
 int		constantScoring;	/* Fixed points for kills etc? */
 int		eliminationRace;	/* Last player drops each lap? */
@@ -315,7 +316,7 @@ bool		polygonMode;		/* Run server in polygon mode even
 					   with block based (.xp) mapfile */
 bool		fastAim;		/* Turn before shooting in frame */
 bool		ignoreMaxFPS;		/* Temporary hack */
-bool		teamZeroPausing;
+bool		baselessPausing;
 bool		maraTurnqueue;		/* Mara's "turnqueue" hack */
 int		pausedFrameRate;	/* Limited FPS for pausers */
 int		waitingFrameRate;	/* Limited FPS for waiters */
@@ -339,7 +340,7 @@ static void Tune_robot_real_name(void) { Fix_real_name(robotRealName); }
 static void Tune_robot_host_name(void) { Fix_host_name(robotHostName); }
 static void Tune_tank_real_name(void)  { Fix_real_name(tankRealName); }
 static void Tune_tank_host_name(void)  { Fix_host_name(tankHostName); }
-
+static void Check_baseless(void);
 
 static option_desc options[] = {
     {
@@ -3167,13 +3168,14 @@ static option_desc options[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-	"teamZeroPausing",
-	"teamZeroPausing",
+	"baselessPausing",
+	"baselessPausing",
 	"false",
-	&teamZeroPausing,
+	&baselessPausing,
 	valBool,
-	tuner_dummy,
-	"Should team zero be considered a pause only team?\n",
+	Check_baseless,
+	"Should paused players keep their bases?\n"
+	"Can only be used on teamplay maps for now.\n",
  	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -3448,9 +3450,11 @@ static option_desc options[] = {
 	"0",
 	&playerLimit,
 	valInt,
-	tuner_dummy,
-	"Allow only (number of bases)-playerLimit players to enter.\n"
-	"This option will probably change in future versions.\n",
+	Check_playerlimit,
+	"Allow playerLimit players to enter at once.\n"
+	"If set to 0, allow 10 more players than there are bases.\n"
+	"(If baselessPausing is off, more than bases cannot enter.)\n"
+	"During game, cannot be set higher than the starting value.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -3718,6 +3722,24 @@ option_desc* Find_option_by_name(const char* name)
     return NULL;
 }
 
+
+void Check_playerlimit(void)
+{
+    if (playerLimit == 0)
+	playerLimit = World.NumBases + 10;
+
+    if (playerLimit_orig == 0)
+	playerLimit_orig = MAX(playerLimit, World.NumBases + 10);
+
+    if (playerLimit > playerLimit_orig)
+	playerLimit = playerLimit_orig;
+}
+
+static void Check_baseless(void)
+{
+    if (!BIT(World.rules->mode, TEAM_PLAY))
+	baselessPausing = false;
+}
 
 void Timing_setup(void)
 {

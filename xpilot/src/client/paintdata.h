@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -103,6 +103,10 @@ typedef struct {
 } paused_t;
 
 typedef struct {
+    short		x, y, id, count;
+} appearing_t;
+
+typedef struct {
     short		x, y, size, color;
 } radar_t;
 
@@ -163,6 +167,8 @@ extern trans_t		*trans_ptr;
 extern int		 num_trans, max_trans;
 extern paused_t		*paused_ptr;
 extern int		 num_paused, max_paused;
+extern appearing_t	*appearing_ptr;
+extern int		 num_appearing, max_appearing;
 extern radar_t		*radar_ptr;
 extern int		 num_radar, max_radar;
 extern vcannon_t	*vcannon_ptr;

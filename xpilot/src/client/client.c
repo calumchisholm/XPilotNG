@@ -1,4 +1,4 @@
-/* 
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -384,9 +384,8 @@ int Handle_base(int id, int ind)
 	return -1;
     }
     for (i = 0; i < num_bases; i++) {
-	if (bases[i].id == id) {
+	if (bases[i].id == id)
 	    bases[i].id = -1;
-	}
     }
     bases[ind].id = id;
 
@@ -966,9 +965,8 @@ other_t *Other_by_id(int id)
 
     if (id != -1) {
 	for (i = 0; i < num_others; i++) {
-	    if (Others[i].id == id) {
+	    if (Others[i].id == id)
 		return &Others[i];
-	    }
 	}
     }
     return NULL;
@@ -993,9 +991,8 @@ shipobj *Ship_by_id(int id)
 {
     other_t		*other;
 
-    if ((other = Other_by_id(id)) == NULL) {
+    if ((other = Other_by_id(id)) == NULL)
 	return Parse_shape_str(NULL);
-    }
     return other->ship;
 }
 
@@ -1007,8 +1004,7 @@ int Handle_leave(int id)
 
     if ((other = Other_by_id(id)) != NULL) {
 	if (other == self) {
-	    errno = 0;
-	    error("Self left?!");
+	    warn("Self left?!");
 	    self = NULL;
 	}
 	Free_ship_shape(other->ship);
@@ -1016,8 +1012,7 @@ int Handle_leave(int id)
 	/*
 	 * Silent about tanks and robots.
 	 */
-	if (other->mychar != 'T'
-	    && other->mychar != 'R') {
+	if (other->mychar != 'T' && other->mychar != 'R') {
 	    sprintf(msg, "%s left this world.", other->name);
 	    Add_message(msg);
 	}
@@ -1044,21 +1039,20 @@ int Handle_player(int id, int player_team, int mychar, char *player_name,
 {
     other_t		*other;
 
+    if ((BIT(Setup->mode, TEAM_PLAY) && player_team < 0)
+		|| player_team >= MAX_TEAMS) {
+	warn("Illegal team %d for received player, setting to 0");
+	player_team = 0;
+    }
     if ((other = Other_by_id(id)) == NULL) {
 	if (num_others >= max_others) {
 	    max_others += 5;
-	    if (num_others == 0) {
-		Others = (other_t *) malloc(max_others * sizeof(other_t));
-	    } else {
-		Others = (other_t *) realloc(Others,
-		    max_others * sizeof(other_t));
-	    }
-	    if (Others == NULL) {
-		error("Not enough memory for player info");
-		num_others = max_others = 0;
-		self = NULL;
-		return -1;
-	    }
+	    if (num_others == 0)
+		Others = malloc(max_others * sizeof(other_t));
+	    else
+		Others = realloc(Others, max_others * sizeof(other_t));
+	    if (Others == NULL)
+		fatal("Not enough memory for player info");
 	    if (self != NULL) {
 		/*
 		 * We've made `self' the first member of Others[].
@@ -1069,8 +1063,7 @@ int Handle_player(int id, int player_team, int mychar, char *player_name,
 	other = &Others[num_others++];
     }
     if (self == NULL
-	&& (myself
-	    || (version < 0x4F10 && strcmp(name, player_name) == 0))) {
+	&& (myself || (version < 0x4F10 && strcmp(name, player_name) == 0))) {
 	if (other != &Others[0]) {
 	    /*
 	     * Make `self' the first member of Others[].
@@ -1103,6 +1096,25 @@ int Handle_player(int id, int player_team, int mychar, char *player_name,
     other->ignorelevel = 0;
     Calculate_shield_radius(other->ship);
 
+    return 0;
+}
+
+int Handle_team(int id, int pl_team)
+{
+    other_t *other;
+
+    other = Other_by_id(id);
+    if (other == NULL) {
+	warn("Received packet to change team for nonexistent id %d", id);
+	return 0;
+    }
+    if ((BIT(Setup->mode, TEAM_PLAY) && pl_team < 0) || pl_team >= MAX_TEAMS) {
+	warn("Illegal team %d received for player id %d", pl_team, id);
+	return 0;
+    }
+    other->team = pl_team;
+    if (other == self)
+	team = pl_team;
     return 0;
 }
 
@@ -1384,35 +1396,29 @@ static void Determine_order(other_t **order, struct team_score team[])
 	     * Sort the score table on position in race.
 	     * Put paused and waiting players last as well as tanks.
 	     */
-	    if (strchr("PTW", other->mychar)) {
+	    if (strchr("PTW", other->mychar))
 		j = i;
-	    }
 	    else {
 		for (j = 0; j < i; j++) {
-		    if (order[j]->timing < other->timing) {
+		    if (order[j]->timing < other->timing)
 			break;
-		    }
-		    if (strchr("PTW", order[j]->mychar)) {
+		    if (strchr("PTW", order[j]->mychar))
 			break;
-		    }
 		    if (order[j]->timing == other->timing) {
-			if (order[j]->timing_loops > other->timing_loops) {
+			if (order[j]->timing_loops > other->timing_loops)
 			    break;
-			}
 		    }
 		}
 	    }
 	}
 	else {
 	    for (j = 0; j < i; j++) {
-		if (order[j]->score < other->score) {
+		if (order[j]->score < other->score)
 		    break;
-		}
 	    }
 	}
-	for (k = i; k > j; k--) {
+	for (k = i; k > j; k--)
 	    order[k] = order[k - 1];
-	}
 	order[j] = other;
 
 	if (BIT(Setup->mode, TEAM_PLAY|TIMING) == TEAM_PLAY) {
@@ -1423,11 +1429,10 @@ static void Determine_order(other_t **order, struct team_score team[])
 		break;
 	    case ' ':
 	    case 'R':
-		if (BIT(Setup->mode, LIMITED_LIVES)) {
+		if (BIT(Setup->mode, LIMITED_LIVES))
 		    team[other->team].life += other->life + 1;
-		} else {
+		else
 		    team[other->team].life += other->life;
-		}
 		/*FALLTHROUGH*/
 	    default:
 		team[other->team].playing++;
@@ -1516,13 +1521,11 @@ void Client_score_table(void)
 			**order;
     int			i, j, entrynum = 0;
 
-    if (scoresChanged == 0) {
+    if (scoresChanged == 0)
 	return;
-    }
 
-    if (players_exposed == false) {
+    if (players_exposed == false)
 	return;
-    }
 
     if (num_others < 1) {
 	Paint_score_start();
@@ -1785,7 +1788,7 @@ int Client_wrap_mode(void)
     return (BIT(Setup->mode, WRAP_PLAY) != 0);
 }
 
-int Check_client_fps(void) 
+int Check_client_fps(void)
 {
     if (oldMaxFPS != maxFPS) {
 	LIMIT(maxFPS, 1, 200);
@@ -1794,4 +1797,3 @@ int Check_client_fps(void)
     }
     return 0;
 }
-

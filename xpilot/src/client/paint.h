@@ -96,7 +96,7 @@ extern bool played_this_round;
 extern int rounds_played;
 extern homebase_t *bases;
 extern int num_bases;
- 
+
 
 extern char	dashes[NUM_DASHES];
 extern char	cdashes[NUM_CDASHES];
@@ -208,7 +208,6 @@ extern int	temporaryMeterColor;	/* Color index for temporary meters */
 extern int	meterBorderColor;	/* Color index for meter borders */
 extern DFLOAT	scoreObjectTime;	/* how long score objects are flashed */
 extern int	baseWarningType;	/* Which type of base warning you prefer */
-extern int	baseWarningFrames;	/* Duration of base warning */
 extern int	wallColor;		/* Color index for wall drawing */
 extern int	fuelColor;		/* Color index for fuel box drawing */
 extern int	backgroundPointColor;	/* Color index for background point drawing */
@@ -315,6 +314,7 @@ int Handle_wormhole(int x, int y);
 int Handle_ecm(int x, int y, int size);
 int Handle_trans(int x1, int y1, int x2, int y2);
 int Handle_paused(int x, int y, int count);
+int Handle_appearing(int x, int y, int id, int count);
 int Handle_radar(int x, int y, int size);
 int Handle_vcannon(int x, int y, int type);
 int Handle_vfuel(int x, int y, long fuel);

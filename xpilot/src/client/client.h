@@ -1,4 +1,4 @@
-/* 
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -397,6 +397,7 @@ int Handle_leave(int id);
 int Handle_player(int id, int team, int mychar, char *player_name,
 		  char *real_name, char *host_name, char *shape,
 		  int myself);
+int Handle_team(int id, int pl_team);
 int Handle_score(int id, DFLOAT score, int life, int mychar, int alliance);
 int Handle_score_object(DFLOAT score, int x, int y, char *msg);
 int Handle_team_score(int team, DFLOAT score);
@@ -442,4 +443,3 @@ extern	void audioEvents();
 #endif
 
 #endif
-
