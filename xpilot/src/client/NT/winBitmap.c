@@ -82,6 +82,9 @@ int Bitmap_create_begin(Drawable d,xp_pixmap_t *pm, int bmp)
 		return -1;
 	}
     pm->bitmaps[bmp].bitmap = (Pixmap)hbm;
+	// The following hack is used to pass the dimension information 
+	// to XFillPolygon
+	SetBitmapDimensionEx(hbm, pm->width, pm->height, NULL);
 	return 0;
 }
 

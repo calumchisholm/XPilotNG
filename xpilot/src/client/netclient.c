@@ -501,10 +501,7 @@ static void parse_new(void)
 	checks[i].bounds.h = BLOCK_SZ;
     }
 
-#ifndef _WINDOWS
-    if (Setup->data_url[0])
-	Mapdata_setup(Setup->data_url);
-#endif
+    if (Setup->data_url[0]) Mapdata_setup(Setup->data_url);
 	Colors_init_style_colors();
 }
 

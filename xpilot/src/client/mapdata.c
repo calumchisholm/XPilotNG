@@ -12,14 +12,12 @@
 #include <io.h>
 #include <direct.h>
 #define snprintf _snprintf
+#define printf Trace
 #define F_OK 0
 #define W_OK 2
 #define R_OK 4
 #define X_OK 0
 #define mkdir(A,B) _mkdir(A)
-#define PATHSEP '\\'
-#else
-#define PATHSEP '/'
 #endif
 
 #include <zlib.h>
@@ -61,9 +59,10 @@ int Mapdata_setup (const char *urlstr) {
         error("malformed URL: %s", urlstr);
         return FALSE;
     }
-
-    for (name = url.path + strlen(url.path) - 1; name > url.path; name--)
-        if (*(name - 1) == PATHSEP) break;
+	
+	for (name = url.path + strlen(url.path) - 1; name > url.path; name--) {
+		if (*(name - 1) == '/') break;
+	}
 
     if (*name == '\0') {
         error("no file name in URL: %s", urlstr);
@@ -91,9 +90,9 @@ int Mapdata_setup (const char *urlstr) {
         }
         
         if (strlen(home) == 0) sprintf(buf, "%s", DATADIR);
-        else if (home[strlen(home) - 1] == PATHSEP) 
+        else if (home[strlen(home) - 1] == '/') 
             sprintf(buf, "%s%s", home, DATADIR);
-        else sprintf(buf, "%s%c%s", home, PATHSEP, DATADIR);
+        else sprintf(buf, "%s%c%s", home, '/', DATADIR);
 
         if (access(buf, F_OK) != 0) {
             if (mkdir(buf, S_IRWXU | S_IRWXG | S_IRWXO) == -1) {
@@ -106,9 +105,9 @@ int Mapdata_setup (const char *urlstr) {
     }
     
     if (strlen(dir) == 0) sprintf(path, "%s", name);
-    else if (dir[strlen(dir) - 1] == PATHSEP) 
+    else if (dir[strlen(dir) - 1] == '/') 
         sprintf(path, "%s%s", dir, name);
-    else sprintf(path, "%s%c%s", dir, PATHSEP, name);
+    else sprintf(path, "%s%c%s", dir, '/', name);
 
     if (strrchr(path, '.') == NULL) {
         error("no extension in file name %s.", name);
@@ -209,7 +208,7 @@ static int Mapdata_extract (const char *name) {
             return 0;
         }
 
-        sprintf(fname, "%s%c", dir, PATHSEP);
+        sprintf(fname, "%s%c", dir, '/');
 
         if (sscanf(buf, "%s\n%ld\n", fname + strlen(dir) + 1, &size) != 2) {
             error("failed to parse file info %s", buf);
@@ -218,7 +217,7 @@ static int Mapdata_extract (const char *name) {
         }
 
         /* security check */
-        if (strchr(fname + strlen(dir) + 1, PATHSEP) != NULL) {
+        if (strchr(fname + strlen(dir) + 1, '/') != NULL) {
             error("file name %s is illegal", fname);
             gzclose(in);
             return 0;
@@ -226,7 +225,7 @@ static int Mapdata_extract (const char *name) {
 
         printf("Extracting %s (%ld)\n", fname, size);
 
-        if ((out = fopen(fname, "w")) == NULL) {
+        if ((out = fopen(fname, "wb")) == NULL) {
             error("failed to open %s for writing", buf);
             gzclose(in);
             return 0;
@@ -280,7 +279,7 @@ static int Mapdata_download (const URL *url, const char *filePath)
         return FALSE;
     }
 
-    if ((f = fopen(filePath, "w")) == NULL) {
+    if ((f = fopen(filePath, "wb")) == NULL) {
         error("failed to open %s", filePath);
         return FALSE;
     }
@@ -330,7 +329,7 @@ static int Mapdata_download (const URL *url, const char *filePath)
     c = 0;
 
     for(;;) {
-        if ((len = read(s.fd, buf, 1024)) == -1) {
+        if ((len = sock_read(&s, buf, 1024)) == -1) {
             error("socket read failed");
             rv = FALSE;
             break;

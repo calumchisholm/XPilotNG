@@ -170,17 +170,70 @@ XDrawPoints(Display* dpy, Drawable d, GC gc,
 XFillPolygon(Display* dpy, Drawable d, GC gc, XPoint* points,
 					int npoints, int shape, int mode)
 {
-
-	HDC hDC = xid[d].hwnd.hBmpDC;
 	int i;
+	int px1, px2, py1, py2; // bounding box for the polygon
+	HDC hdc = xid[d].hwnd.hBmpDC;
 
-	BeginPath(hDC);
-	MoveToEx(hDC, points->x, points->y, NULL);
+	/* 
+	 * As Windows 95/98/ME doesn't support textured brushes with texture size 
+	 * over 8x8, I'll provide my own routine for painting textured polygons. 
+	 * It first creates a clipping region that restricts GDI operations to the
+	 * area of the polygon. Then it blits the texture bitmap over the polygon
+	 * so that it gets fully covered.
+	 */
+
+	if (!BeginPath(hdc)) return -1;
+
+	px1 = px2 = points->x;
+	py1 = py2 = points->y;
+	if (!MoveToEx(hdc, points->x, points->y, NULL)) return -1;
 	points++;
-	for (i=1; i<npoints; i++, points++)
-		LineTo(hDC, points->x, points->y);
-	EndPath(hDC);
-	StrokeAndFillPath(hDC);
+
+	for (i = 1; i < npoints; i++, points++) {
+		if (!LineTo(hdc, points->x, points->y)) return -1;
+		if (points->x < px1) px1 = points->x;
+		else if (points->x > px2) px2 = points->x;
+		if (points->y < py1) py1 = points->y;
+		else if (points->y > py2) py2 = points->y;
+	}
+
+	if (!EndPath(hdc)) return -1;
+
+
+	if (xid[gc].hgc.xgcv.fill_style != FillTiled) {
+		
+		if (!StrokeAndFillPath(hdc)) return -1;
+
+	} else {
+
+		int x, y;
+		int sx, sy; // where to start blitting
+		SIZE bs;    // bitmap dimensions
+		HBITMAP hBmp = (HBITMAP)xid[gc].hgc.xgcv.tile;
+		extern HDC itemsDC; // from winX.c
+
+		if (!GetBitmapDimensionEx(hBmp, &bs)) return -1;
+		if (!SelectObject(itemsDC, hBmp)) return -1;
+		if (!SelectPalette(itemsDC, myPal, FALSE)) return -1;
+		if (RealizePalette(itemsDC) == GDI_ERROR) return -1;
+
+		sx = xid[gc].hgc.xgcv.ts_x_origin - px1;
+		sx = (sx > 0) ? px1 + sx % bs.cx - bs.cx : px1 - sx % bs.cx;
+
+		sy = xid[gc].hgc.xgcv.ts_y_origin - py1;
+		sy = (sy > 0) ? py1 + sy % bs.cy - bs.cy : py1 - sy % bs.cy;
+
+		if (!SelectClipPath(hdc, RGN_AND)) return -1;
+
+		for (x = sx; x < px2; x += bs.cx) {
+			for (y = sy; y < py2; y += bs.cy) {
+				//XDrawRectangle(dpy, d, gc, x, y, bs.cx, bs.cy);
+				BitBlt(hdc, x, y, bs.cx, bs.cy, itemsDC, 0, 0, SRCCOPY);
+			}
+		}
+
+		SelectClipRgn(hdc, NULL);
+	}
 
 	return(0);
 }

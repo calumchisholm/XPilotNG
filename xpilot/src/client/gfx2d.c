@@ -91,12 +91,6 @@ int Picture_init (xp_picture_t *picture, const char *filename, int count)
  */
 static int Picture_find_path(const char *filename, char *path)
 {
-#ifdef _WINDOWS
-#define PATHNAME_SEP	'\\'
-#else
-#define PATHNAME_SEP	'/'
-#endif
-
     char		*dir, *colon;
     int			len;
 
@@ -109,38 +103,37 @@ static int Picture_find_path(const char *filename, char *path)
      * without using the texturePath.
      */
     if (access(filename, 4) == 0) {
-	strcpy(path, filename);
-	return TRUE;
+		strcpy(path, filename);
+		return TRUE;
     }
 
     /*
      * If filename doesn't contain a slash
      * then we also try the texturePath, if it exists.
      */
-    if (!strchr(filename, PATHNAME_SEP) && texturePath != NULL) {
-	for (dir = texturePath; *dir; dir = colon) {
-	    if (is_this_windows() ||
-		!(colon = strchr(dir, ':'))) {
-		len = strlen(dir);
-		colon = &dir[len];
-	    } else {
-		len = colon - dir;
-		colon++;
-	    }
-	    if (len > 0 && len + strlen(filename) + 1 < PATH_MAX) {
-		memcpy(path, dir, len);
-		if (path[len - 1] != PATHNAME_SEP) {
-		    path[len++] = PATHNAME_SEP;
+    if (!strchr(filename, '/') && texturePath != NULL) {
+		for (dir = texturePath; *dir; dir = colon) {
+			if (!(colon = strchr(dir, ':'))) {
+				len = strlen(dir);
+				colon = &dir[len];
+			} else {
+				len = colon - dir;
+				colon++;
+			}
+			if (len > 0 && len + strlen(filename) + 1 < PATH_MAX) {
+				memcpy(path, dir, len);
+				if (path[len - 1] != '/') {
+					path[len++] = '/';
+				}
+				strcpy(&path[len], filename);
+				if (access(path, 4) == 0) {
+					return TRUE;
+				}
+			}
 		}
-		strcpy(&path[len], filename);
-		if (access(path, 4) == 0) {
-		    return TRUE;
-		}
-	    }
-	}
     }
 #ifdef _WINDOWS
-	Trace("Can't find PPM file \"%s\"", filename);
+	Trace("Can't find PPM file \"%s\"\n", filename);
 #else
     error("Can't find PPM file \"%s\"", filename);
 #endif
