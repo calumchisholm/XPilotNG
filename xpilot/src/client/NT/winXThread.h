@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -31,6 +30,9 @@
 *  					*
 \***************************************************************************/
 
+#ifndef WINXTHREAD_H
+#define WINXTHREAD_H
+
 typedef struct {
 	HDC		hDC;
 	HDC		hBmpDC;
@@ -50,3 +52,5 @@ typedef struct {
 extern	_dinfo	dinfo;
 
 extern void winXTDraw(HDC hDC, Window xidno, RECT* rect);
+
+#endif
