@@ -1048,8 +1048,6 @@ static void Player_collides_with_asteroid(player_t *pl, wireobject_t *ast)
 	&& (pl->fuel.sum == 0.0
 	    || (!BIT(pl->used, HAS_SHIELD)
 		&& !BIT(pl->have, HAS_ARMOR)))) {
-	double sc;
-
 	SET_BIT(pl->status, KILLED);
 	if (pl->velocity > v)
 	    /* player moves faster than asteroid */
