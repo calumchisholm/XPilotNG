@@ -270,6 +270,10 @@ void Place_item(int item, int ind)
 	    con = NULL;
 	}
 	/*
+	 * kps - write a generic function that can be used here and
+	 * with asteroids.
+	 */
+	/*
 	 * This will take very long (or forever) with maps
 	 * that hardly have any (or none) spaces.
 	 * So bail out after a few retries.
