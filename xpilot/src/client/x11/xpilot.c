@@ -194,6 +194,7 @@ extern char paintobjects_version[];
 extern char paintradar_version[];
 extern char portability_version[];
 extern char query_version[];
+extern char randommt_version[];
 extern char record_version[];
 extern char shipshape_version[];
 extern char socklib_version[];
@@ -251,6 +252,7 @@ static void Check_client_versions(void)
 	{ "paintradar", paintradar_version },
 	{ "portability", portability_version },
 	{ "query", query_version },
+	{ "randommt", randommt_version },
 	{ "record", record_version },
 	{ "shipshape", shipshape_version },
 	{ "socklib", socklib_version },

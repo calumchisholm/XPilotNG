@@ -805,6 +805,7 @@ extern char player_version[];
 extern char polygon_version[];
 extern char portability_version[];
 extern char race_version[];
+extern char randommt_version[];
 extern char rank_version[];
 extern char recwrap_version[];
 extern char robot_version[];
@@ -863,6 +864,7 @@ static void Check_server_versions(void)
 	{ "polygon", polygon_version },
 	{ "portability", portability_version },
 	{ "race", race_version },
+	{ "randommt", randommt_version },
 	{ "rank", rank_version },
 	{ "recwrap", recwrap_version },
 	{ "robot", robot_version },

@@ -52,12 +52,9 @@
 ** 
 */
 
+#include "xpcommon.h"
 
-/* Our exported interface: */
-void seedMT(unsigned int seed);
-unsigned int reloadMT(void);
-unsigned int randomMT(void);
-
+char randommt_version[] = VERSION;
 
 /*
 ** uint32 must be an unsigned integer type capable of holding at least 32
