@@ -2,6 +2,7 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "SDL.h"
+#include "SDL_ttf.h"
 #include "text.h"
 #include "console.h"
 #include "sdlkeys.h"
