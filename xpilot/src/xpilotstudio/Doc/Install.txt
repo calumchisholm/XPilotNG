@@ -1,4 +1,0 @@
-To Compile and Install XpilotStudio:For Windows 9*/NT/2000:**The following instructions assume you have Microsoft Visual C++ 5.0 or laterinstalled on your system, and configured in the standard manner.1. Change directory to the "windows" subdirectory, of the XpilotStudio Source code.2. Open the XpilotStudio.dsw file in MS V C++. 3. Under the Build Menu, set the active configuration to "Release"
-
-4. Copy the file called "XpilotStudio.exe" from the release directory to the location
-of your Xpilot Installation. If you don't have Xpilotinstalled...see www.xpilot.org for details on obtaining a copy of the source.6. Create any Desktop Icon's or Shortcuts you desire...at some point an installationprogram will probably be developed.7. Double click the file XpilotStudio.exe to start the editor.For *NIX:
