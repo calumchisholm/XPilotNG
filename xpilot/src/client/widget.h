@@ -61,11 +61,11 @@ int Widget_create_color(int parent_desc, int color,
  		        int border, int *val, int min, int max,
  		        int (*callback)(int, void *, int *),
  		        void *user_data);
-int Widget_create_float(int parent_desc,
-			int x, int y, int width, int height,
-			int border, double *val, double min, double max,
-			int (*callback)(int, void *, double *),
-			void *user_data);
+int Widget_create_double(int parent_desc,
+			 int x, int y, int width, int height,
+			 int border, double *val, double min, double max,
+			 int (*callback)(int, void *, double *),
+			 void *user_data);
 int Widget_create_label(int parent_desc,
 			int x, int y,
 			int width, int height, bool centered,

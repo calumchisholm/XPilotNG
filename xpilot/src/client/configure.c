@@ -29,17 +29,6 @@
 
 char configure_version[] = VERSION;
 
-/* int */
-static int Config_create_sparkSize(int widget_desc, int *height);
-/* bool */
-static int Config_create_showNastyShots(int widget_desc, int *height);
-/* color */
-static int Config_create_hudHLineColor(int widget_desc, int *height);
-/* float */
-static int Config_create_hudRadarScale(int widget_desc, int *height);
-
-
-
 static int Config_create_save(int widget_desc, int *height);
 static int Config_update_bool(int widget_desc, void *data, bool *val);
 static int Config_close(int widget_desc, void *data, const char **strptr);
@@ -74,23 +63,17 @@ static int		config_page,
 			config_bool_width,
 			config_bool_height,
 			config_int_width,
-			config_float_width,
+			config_double_width,
 			config_arrow_width,
 			config_arrow_height;
 static int		*config_widget_desc,
 			config_save_confirm_desc = NO_WIDGET;
-static int	(*config_creator_default[])(int widget_desc, int *height) = {
-    Config_create_sparkSize,
-    Config_create_showNastyShots,
-    Config_create_hudRadarScale,
 
+static int	(*config_creator_default[])(int widget_desc, int *height) = {
     Config_create_save			/* must be last */
 };
 
 static int	(*config_creator_colors[])(int widget_desc, int *height) = {
-
-    Config_create_hudHLineColor,
-
     Config_create_save			/* must be last */
 };
 
@@ -118,10 +101,13 @@ static int Nelem_config_creator(void)
 #endif
 }
 
-int my_callback(int i, void *p, int *ip);
-int my_callback(int i, void *p, int *ip)
+static int my_callback(int widget_desc, void *height, int *val)
 {
-    warn("my_callback: i = %d, p = %p, ip = %p", i, p, ip);
+    return 0;
+}
+
+static int my_callback2(int widget_desc, void *height, double *val)
+{
     return 0;
 }
 
@@ -179,8 +165,8 @@ static void Create_config(void)
     config_bool_height = config_button_height;
     config_arrow_height = config_text_height;
     config_arrow_width = config_text_height;
-    config_int_width = 4 + XTextWidth(buttonFont, "1000", 4);
-    config_float_width = 4 + XTextWidth(buttonFont, "0.22", 4);
+    config_int_width = 4 + XTextWidth(buttonFont, "10000", 5);
+    config_double_width = 4 + XTextWidth(buttonFont, "0.222", 5);
 
     config_max = Nelem_config_creator();
     config_widget_desc = malloc(config_max * sizeof(int));
@@ -441,22 +427,22 @@ static int Config_create_color(int widget_desc, int *height, int color,
  
 
 
-static int Config_create_float(int widget_desc, int *height,
-			       const char *str, double *val,
-			       double min, double max,
-			       int (*callback)(int, void *, double *),
-			       void *data)
+static int Config_create_double(int widget_desc, int *height,
+				const char *str, double *val,
+				double min, double max,
+				int (*callback)(int, void *, double *),
+				void *data)
 {
     int			offset,
 			label_width,
-			floatw;
+			doublew;
 
     if (*height + 2*config_entry_height + 2*config_space >= config_height)
 	return 0;
     label_width = XTextWidth(textFont, str, (int)strlen(str))
 		  + 2 * config_text_space;
     offset = config_width - (config_space + 2 * config_arrow_width
-	    + config_float_width);
+	    + config_double_width);
     if (config_space + label_width > offset) {
 	if (*height + 3*config_entry_height + 2*config_space >= config_height)
 	    return 0;
@@ -467,39 +453,30 @@ static int Config_create_float(int widget_desc, int *height,
 			0, str);
     if (config_space + label_width > offset)
 	*height += config_entry_height;
-    floatw = Widget_create_float(widget_desc, offset, *height
-				 + (config_entry_height
-				 - config_text_height) / 2,
-				 config_float_width, config_text_height,
-				 0, val, min, max, callback, data);
-    offset += config_float_width;
+    doublew = Widget_create_double(widget_desc, offset, *height
+				  + (config_entry_height
+				     - config_text_height) / 2,
+				  config_double_width, config_text_height,
+				  0, val, min, max, callback, data);
+    offset += config_double_width;
     Widget_create_arrow_left(widget_desc, offset, *height
 			     + (config_entry_height - config_arrow_height) / 2,
 			     config_arrow_width, config_arrow_height,
-			     0, floatw);
+			     0, doublew);
     offset += config_arrow_width;
     Widget_create_arrow_right(widget_desc, offset, *height
 			      + (config_entry_height-config_arrow_height) / 2,
 			      config_arrow_width, config_arrow_height,
-			      0, floatw);
+			      0, doublew);
     *height += config_entry_height + config_space;
 
-    return floatw;
+    return doublew;
 }
 
 
 #define CONFIG_CREATE_COLOR(c) \
 Config_create_color(widget_desc, height, c, #c, &c, 0, maxColors-1, NULL, NULL)
 
-
-
-static int Config_create_sparkSize(int widget_desc, int *height)
-{
-    return Config_create_int(widget_desc, height,
-			     "sparkSize", &spark_size,
-			     MIN_SPARK_SIZE, MAX_SPARK_SIZE,
-			     NULL, NULL);
-}
 
 
 
@@ -517,18 +494,6 @@ static int Config_create_hudHLineColor(int widget_desc, int *height)
 {
     return CONFIG_CREATE_COLOR(foobarColor);
 }
-
-double foobarDouble;
-
-static int Config_create_hudRadarScale(int widget_desc, int *height)
-{
-    return Config_create_float(widget_desc, height,
-			       "foobarDouble", &foobarDouble, 0.5, 4.0,
-			       NULL, NULL);
-}
-
-
-
 
 
 
@@ -570,6 +535,12 @@ static int config_creator_new(xp_option_t *opt, int widget_desc, int *height)
 				 opt->int_ptr, opt->int_minval,
 				 opt->int_maxval,
 				 my_callback, opt);
+    case xp_double_option:
+	return Config_create_double(widget_desc, height,
+				    Option_get_name(opt),
+				    opt->dbl_ptr, opt->dbl_minval,
+				    opt->dbl_maxval,
+				    my_callback2, opt);
     default:
 	return Config_create_bool(widget_desc, height,
 				  Option_get_name(opt),

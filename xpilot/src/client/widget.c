@@ -37,7 +37,7 @@ typedef enum widget_type {
     WIDGET_BUTTON_ARROW_RIGHT,
     WIDGET_INPUT_INT,
     WIDGET_INPUT_COLOR,
-    WIDGET_INPUT_FLOAT,
+    WIDGET_INPUT_DOUBLE,
     WIDGET_INPUT_STRING,
     WIDGET_VIEWER,
     WIDGET_SLIDER_HORI,
@@ -118,13 +118,13 @@ typedef struct widget_color {
     void			*user_data;
 } widget_color_t;
 
-typedef struct widget_float {
-    double			*val,		/* Float pointer */
+typedef struct widget_double {
+    double			*val,		/* Double pointer */
 				min,		/* Minimum value */
 				max;		/* Maximum value */
     int				(*callback)(int, void *, double *);
     void			*user_data;
-} widget_float_t;
+} widget_double_t;
 
 typedef struct widget_string {
     const char			*str;		/* Current input string */
@@ -681,7 +681,7 @@ static void Widget_draw_expose(int widget_desc, XExposeEvent *expose)
     widget_activate_t		*activw;
     widget_int_t		*intw;
     widget_color_t		*colorw;
-    widget_float_t		*floatw;
+    widget_double_t		*doublew;
     char			buf[16];
 
     if ((widget = Widget_pointer(widget_desc)) == NULL) {
@@ -761,16 +761,16 @@ static void Widget_draw_expose(int widget_desc, XExposeEvent *expose)
  	Widget_draw_color(widget, buf, *colorw->val);
  	break;
 
-    case WIDGET_INPUT_FLOAT:
+    case WIDGET_INPUT_DOUBLE:
 	if (expose && expose->count > 0)
 	    break;
-	floatw = (widget_float_t *) widget->sub;
-	if (floatw->max <= 1.0)
-	    sprintf(buf, "%.2f", *floatw->val);
-	else if (floatw->max <= 10.0)
-	    sprintf(buf, "%.1f", *floatw->val);
+	doublew = (widget_double_t *) widget->sub;
+	if (doublew->max <= 1.0)
+	    sprintf(buf, "%.2f", *doublew->val);
+	else if (doublew->max <= 10.0)
+	    sprintf(buf, "%.1f", *doublew->val);
 	else
-	    sprintf(buf, "%d", (int) *floatw->val);
+	    sprintf(buf, "%d", (int) *doublew->val);
 #ifdef _WINDOWS
 	SET_FG(WHITE);
 #endif
@@ -954,16 +954,16 @@ static void Widget_button(XEvent *event, int widget_desc, bool pressed)
     widget_activate_t		*activw;
     widget_int_t		*intw;
     widget_color_t		*colorw;
-    widget_float_t		*floatw;
+    widget_double_t		*doublew;
     widget_arrow_t		*arroww;
     widget_entry_t		*entryw;
     int				i,
 				ival,
 				sub_widget_desc;
-    double			fval,
+    double			dval,
 				cval,
 				delta,
-				fmin,
+				dmin,
 				offset,
 				newoffset;
 
@@ -1087,7 +1087,7 @@ static void Widget_button(XEvent *event, int widget_desc, bool pressed)
 		    Widget_draw(sub_widget_desc);
 		    if (intw->callback) {
 			if ((*intw->callback)(sub_widget_desc,
-					  intw->user_data, intw->val) == 1)
+					      intw->user_data, intw->val) == 1)
 			    Widget_draw(sub_widget_desc);
 		    }
 #ifdef _WINDOWS
@@ -1131,48 +1131,48 @@ static void Widget_button(XEvent *event, int widget_desc, bool pressed)
 #endif
 		break;
 
-	    case WIDGET_INPUT_FLOAT:
-		floatw = (widget_float_t *) sub_widget->sub;
-		fval = *floatw->val;
-		LIMIT(fval, floatw->min, floatw->max);
-		delta = floatw->max - floatw->min;
-		if (fval >= 0) {
-		    if (floatw->min < 0)
-			fmin = 0;
+	    case WIDGET_INPUT_DOUBLE:
+		doublew = (widget_double_t *) sub_widget->sub;
+		dval = *doublew->val;
+		LIMIT(dval, doublew->min, doublew->max);
+		delta = doublew->max - doublew->min;
+		if (dval >= 0) {
+		    if (doublew->min < 0)
+			dmin = 0;
 		    else
-			fmin = floatw->min;
-		    offset = fval - fmin;
+			dmin = doublew->min;
+		    offset = dval - dmin;
 		} else {
-		    if (floatw->max > 0)
-			fmin = 0;
+		    if (doublew->max > 0)
+			dmin = 0;
 		    else
-			fmin = floatw->max;
-		    offset = -fval + fmin;
+			dmin = doublew->max;
+		    offset = -dval + dmin;
 		}
 		if ((widget->type == WIDGET_BUTTON_ARROW_RIGHT)
-		    == (fval >= 0)) {
-		    newoffset = (float)(offset * 1.05);
+		    == (dval >= 0)) {
+		    newoffset = offset * 1.05;
 		    if (newoffset - offset < delta / 100.0)
 			newoffset = offset + delta / 100.0;
 		} else {
-		    newoffset = (float)(offset * 0.95);
+		    newoffset = offset * 0.95;
 		    if (newoffset - offset > -delta / 100.0)
 			newoffset = offset - delta / 100.0;
 		    if (newoffset < 0 && offset > 0)
 			newoffset = 0;
 		}
-		if (fval >= 0)
-		    fval = fmin + newoffset;
+		if (dval >= 0)
+		    dval = dmin + newoffset;
 		else
-		    fval = fmin - newoffset;
-		LIMIT(fval, floatw->min, floatw->max);
-		if (fval != *floatw->val) {
-		    *floatw->val = fval;
+		    dval = dmin - newoffset;
+		LIMIT(dval, doublew->min, doublew->max);
+		if (dval != *doublew->val) {
+		    *doublew->val = dval;
 		    Widget_draw(sub_widget_desc);
-		    if (floatw->callback) {
-			if ((*floatw->callback)(sub_widget_desc,
-						floatw->user_data,
-						floatw->val) == 1)
+		    if (doublew->callback) {
+			if ((*doublew->callback)(sub_widget_desc,
+						 doublew->user_data,
+						 doublew->val) == 1)
 			    Widget_draw(sub_widget_desc);
 		    }
 #ifdef _WINDOWS
@@ -1752,39 +1752,39 @@ int Widget_create_color(int parent_desc, int color,
     return widget_desc;
 }
 
-int Widget_create_float(int parent_desc,
-			int x, int y, int width, int height,
-			int border, double *val, double min, double max,
-			int (*callback)(int, void *, double *),
-			void *user_data)
+int Widget_create_double(int parent_desc,
+			 int x, int y, int width, int height,
+			 int border, double *val, double min, double max,
+			 int (*callback)(int, void *, double *),
+			 void *user_data)
 {
     int			widget_desc;
     Window		window;
     widget_t		*parent_widget;
-    widget_float_t	*floatw;
+    widget_double_t	*doublew;
 
     if ((parent_widget = Widget_pointer(parent_desc)) == NULL
 	|| parent_widget->type != WIDGET_FORM) {
-	warn("Widget_create_float: Invalid parent widget");
+	warn("Widget_create_double: Invalid parent widget");
 	return NO_WIDGET;
     }
-    if ((floatw = malloc(sizeof(*floatw))) == NULL) {
-	error("No memory for float widget");
+    if ((doublew = malloc(sizeof(*doublew))) == NULL) {
+	error("No memory for double widget");
 	return NO_WIDGET;
     }
-    floatw->val = val;
-    floatw->min = min;
-    floatw->max = max;
-    floatw->callback = callback;
-    floatw->user_data = user_data;
+    doublew->val = val;
+    doublew->min = min;
+    doublew->max = max;
+    doublew->callback = callback;
+    doublew->user_data = user_data;
     window =
 	XCreateSimpleWindow(dpy, parent_widget->window,
 			    x, y, width, height,
 			    border, colors[borderColor].pixel,
 			    colors[BLACK].pixel);
     XSelectInput(dpy, window, ExposureMask);
-    widget_desc = Widget_create(WIDGET_INPUT_FLOAT, "input_float", window,
-				width, height, floatw);
+    widget_desc = Widget_create(WIDGET_INPUT_DOUBLE, "input_double", window,
+				width, height, doublew);
     if (widget_desc == NO_WIDGET)
 	return NO_WIDGET;
     if (Widget_add_child(parent_desc, widget_desc) == NO_WIDGET) {
