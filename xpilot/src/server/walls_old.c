@@ -1564,8 +1564,8 @@ void Move_object_old(object *obj)
     dist = walldist[obj->pos.bx][obj->pos.by];
     if (dist > 2) {
 	int max = ((dist - 2) * BLOCK_SZ) >> 1;
-	DFLOAT dcx = obj->vel.x * timeStep2;
-	DFLOAT dcy = obj->vel.y * timeStep2;
+	DFLOAT dcx = obj->vel.x * timeStep;
+	DFLOAT dcy = obj->vel.y * timeStep;
 	if (sqr(max) >= sqr(dcx) + sqr(dcy)) {
 	    int cx = obj->pos.cx + FLOAT_TO_CLICK(dcx);
 	    int cy = obj->pos.cy + FLOAT_TO_CLICK(dcy);
@@ -1595,8 +1595,8 @@ void Move_object_old(object *obj)
     ms.pos.cx = obj->pos.cx;
     ms.pos.cy = obj->pos.cy;
     ms.vel = obj->vel;
-    ms.todo.cx = FLOAT_TO_CLICK(ms.vel.x * timeStep2);
-    ms.todo.cy = FLOAT_TO_CLICK(ms.vel.y * timeStep2);
+    ms.todo.cx = FLOAT_TO_CLICK(ms.vel.x * timeStep);
+    ms.todo.cy = FLOAT_TO_CLICK(ms.vel.y * timeStep);
     ms.dir = obj->missile_dir;
     ms.mip = &mi;
 
@@ -1730,8 +1730,8 @@ void Move_player_old(int ind)
 
     if (BIT(pl->status, PLAYING|PAUSE|GAME_OVER|KILLED) != PLAYING) {
 	if (!BIT(pl->status, KILLED|PAUSE)) {
-	    pos.cx = pl->pos.cx + FLOAT_TO_CLICK(pl->vel.x * timeStep2);
-	    pos.cy = pl->pos.cy + FLOAT_TO_CLICK(pl->vel.y * timeStep2);
+	    pos.cx = pl->pos.cx + FLOAT_TO_CLICK(pl->vel.x * timeStep);
+	    pos.cy = pl->pos.cy + FLOAT_TO_CLICK(pl->vel.y * timeStep);
 	    pos.cx = WRAP_XCLICK(pos.cx);
 	    pos.cy = WRAP_YCLICK(pos.cy);
 	    if (pos.cx != pl->pos.cx || pos.cy != pl->pos.cy) {
@@ -1770,8 +1770,8 @@ void Move_player_old(int ind)
     if (dist > 3) {
 	int max = ((dist - 3) * BLOCK_SZ) >> 1;
 	if (max >= pl->velocity) {
-	    pos.cx = pl->pos.cx + FLOAT_TO_CLICK(pl->vel.x * timeStep2);
-	    pos.cy = pl->pos.cy + FLOAT_TO_CLICK(pl->vel.y * timeStep2);
+	    pos.cx = pl->pos.cx + FLOAT_TO_CLICK(pl->vel.x * timeStep);
+	    pos.cy = pl->pos.cy + FLOAT_TO_CLICK(pl->vel.y * timeStep);
 	    pos.cx = WRAP_XCLICK(pos.cx);
 	    pos.cy = WRAP_YCLICK(pos.cy);
 	    Player_position_set_clicks(pl, pos.cx, pos.cy);
@@ -1792,8 +1792,8 @@ void Move_player_old(int ind)
     mi.phased = BIT(pl->used, HAS_PHASING_DEVICE);
 
     vel = pl->vel;
-    todo.cx = FLOAT_TO_CLICK(vel.x * timeStep2);
-    todo.cy = FLOAT_TO_CLICK(vel.y * timeStep2);
+    todo.cx = FLOAT_TO_CLICK(vel.x * timeStep);
+    todo.cy = FLOAT_TO_CLICK(vel.y * timeStep);
     for (i = 0; i < pl->ship->num_points; i++) {
 	ms[i].pos.cx = pl->pos.cx + pl->ship->pts[i][pl->dir].cx;
 	ms[i].pos.cy = pl->pos.cy + pl->ship->pts[i][pl->dir].cy;

@@ -2742,8 +2742,8 @@ static void Move_ball(object *obj)
     struct collans ans;
     int owner;
 
-    mv.delta.cx = FLOAT_TO_CLICK(obj->vel.x * timeStep2);
-    mv.delta.cy = FLOAT_TO_CLICK(obj->vel.y * timeStep2);
+    mv.delta.cx = FLOAT_TO_CLICK(obj->vel.x * timeStep);
+    mv.delta.cy = FLOAT_TO_CLICK(obj->vel.y * timeStep);
     mv.obj = obj;
     obj->extmove.cx = mv.delta.cx;
     obj->extmove.cy = mv.delta.cy;
@@ -2851,8 +2851,8 @@ static void Move_object_new(object *obj)
 
     mv.start.cx = obj->pos.cx;
     mv.start.cy = obj->pos.cy;
-    mv.delta.cx = FLOAT_TO_CLICK(obj->vel.x * timeStep2);
-    mv.delta.cy = FLOAT_TO_CLICK(obj->vel.y * timeStep2);
+    mv.delta.cx = FLOAT_TO_CLICK(obj->vel.x * timeStep);
+    mv.delta.cy = FLOAT_TO_CLICK(obj->vel.y * timeStep);
     obj->extmove.cx = mv.delta.cx;
     obj->extmove.cy = mv.delta.cy;
     while (mv.delta.cx || mv.delta.cy) {
@@ -2898,8 +2898,8 @@ static void Move_player_new(int ind)
 
     if (BIT(pl->status, PLAYING|PAUSE|GAME_OVER|KILLED) != PLAYING) {
 	if (!BIT(pl->status, KILLED|PAUSE)) {
-	    pos.cx = pl->pos.cx + FLOAT_TO_CLICK(pl->vel.x * timeStep2);
-	    pos.cy = pl->pos.cy + FLOAT_TO_CLICK(pl->vel.y * timeStep2);
+	    pos.cx = pl->pos.cx + FLOAT_TO_CLICK(pl->vel.x * timeStep);
+	    pos.cy = pl->pos.cy + FLOAT_TO_CLICK(pl->vel.y * timeStep);
 	    pos.cx = WRAP_XCLICK(pos.cx);
 	    pos.cy = WRAP_YCLICK(pos.cy);
 	    if (pos.cx != pl->pos.cx || pos.cy != pl->pos.cy) {
@@ -2920,8 +2920,8 @@ static void Move_player_new(int ind)
     pl->collmode = 1;
 
     mv.obj = (object *)pl;
-    mv.delta.cx = FLOAT_TO_CLICK(pl->vel.x * timeStep2);
-    mv.delta.cy = FLOAT_TO_CLICK(pl->vel.y * timeStep2);
+    mv.delta.cx = FLOAT_TO_CLICK(pl->vel.x * timeStep);
+    mv.delta.cy = FLOAT_TO_CLICK(pl->vel.y * timeStep);
 #if 0
     pl->extmove.cx = mv.delta.cx;
     pl->extmove.cy = mv.delta.cy;

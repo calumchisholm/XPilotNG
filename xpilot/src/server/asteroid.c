@@ -332,7 +332,7 @@ static void Make_asteroid(int cx, int cy,
     radius = ASTEROID_RADIUS(size) / CLICK;
     asteroid->pl_range = radius;
     asteroid->pl_radius = radius;
-    asteroid->fusetime = frame_time + timeStep2;
+    asteroid->fusetime = frame_time + timeStep;
     asteroid->status = GRAVITY;
     CLEAR_MODS(asteroid->mods);
 

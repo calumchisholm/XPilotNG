@@ -330,11 +330,8 @@ int		playerLimit;		/* allow less players than bases */
 int		constantScoring;	/* Fixed points for kills etc? */
 int		eliminationRace;	/* Last player drops each lap? */
 
-DFLOAT		FPSMultiplier;		/* Slow everything by this factor */
-DFLOAT		gameSpeed;		/* FPS/FPSMultiplier */
-int		timeStep;
-DFLOAT		timeStep2;		/* Game time step per frame */
-					/* before: framespeed, framespeed2 */
+DFLOAT		gameSpeed;		/* Speed of game action */
+DFLOAT		timeStep;		/* Game time step per frame */
 DFLOAT		ecmSizeFactor;		/* Factor for ecm size update */
 
 int		recordMode;		/* 0=off, 1=record, 2=playback */
@@ -3568,19 +3565,6 @@ static option_desc options[] = {
 	"URL where the client can get extra data for this map\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
-#if 0
-    {
-	"FPSMultiplier",
-	"FPSMultiplier",
-	"1.0",
-	&FPSMultiplier,
-	valReal,
-	Timing_setup,
-	"Everything is slowed by this factor. Allows using higher\n"
-	"FPS without making the game too fast.\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-#endif
     {
 	"gameSpeed",
 	"gameSpeed",
@@ -3768,42 +3752,27 @@ void Timing_setup(void)
 
     if (gameSpeed == 0.0)
 	gameSpeed = FPS;
-
-    FPSMultiplier = FPS / gameSpeed;
-
-    /* this can't happen */
-    if (FPSMultiplier < 1.0) {
-	printf("BUG - FPSMultiplier < 1.0\n");
-	FPSMultiplier = 1.0;
-    }
-
-    /* we want timeStep >= 1 */
-    if (FPSMultiplier > 64.0)
-	FPSMultiplier = 64.0;
-
-    gameSpeed = FPS / FPSMultiplier;
+    if (gameSpeed < FPS / 50.)
+	gameSpeed = FPS / 50.;
 
     /*
      * Calculate amount of game time that elapses per frame.
      */
-    timeStep = (int)(TIME_FACT / FPSMultiplier);
-    timeStep2 = 1. / FPSMultiplier;
+    timeStep = gameSpeed / FPS;
 
     friction = frictionSetting;
 
     /* If friction > 1, the result is silly - allow such settings but
      * don't bother making it "FPSMultiplier independent" */
     if (friction < 1)
-	friction = 1. - pow(1. - friction, 1. / FPSMultiplier);
+	friction = 1. - pow(1. - friction, timeStep);
 
     /* ecm size used to be halved every update on old servers */
-    ecmSizeFactor = pow(0.5, 1. / FPSMultiplier);
+    ecmSizeFactor = pow(0.5, timeStep);
     install_timer_tick(NULL, timerResolution ? timerResolution : FPS);
 #if 0
     xpprintf(__FILE__ ": gameSpeed         = %f\n", gameSpeed);
-    xpprintf(__FILE__ ": FPSMultiplier     = %f\n", FPSMultiplier);
-    xpprintf(__FILE__ ": timeStep          = %d\n", timeStep);
-    xpprintf(__FILE__ ": timeStep2         = %f\n", timeStep2);
+    xpprintf(__FILE__ ": timeStep          = %f\n", timeStep);
     xpprintf(__FILE__ ": friction          = %f\n", friction);
 #endif
 }

@@ -1241,7 +1241,7 @@ void Frame_update(void)
     static bool		game_over_called = false;
 
     frame_loops++;
-    frame_time += timeStep2;
+    frame_time += timeStep;
 
     Frame_shuffle();
 

@@ -1687,7 +1687,7 @@ static void AsteroidCollision(void)
 		damage = -ABS(2 * obj->mass * VECTOR_LENGTH(obj->vel));
 		Delta_mv_elastic(ast, obj);
 		/* avoid doing collision twice */
-		obj->fusetime = frame_time + timeStep2;
+		obj->fusetime = frame_time + timeStep;
 		sound = true;
 		break;
 	    case OBJ_SPARK:

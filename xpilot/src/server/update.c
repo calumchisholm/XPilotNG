@@ -55,12 +55,12 @@ char update_version[] = VERSION;
 #define update_object_speed(o_)						\
     if (BIT((o_)->status, GRAVITY)) {					\
 	(o_)->vel.x += ((o_)->acc.x					\
-	  + World.gravity[(o_)->pos.bx][(o_)->pos.by].x) * timeStep2;	\
+	  + World.gravity[(o_)->pos.bx][(o_)->pos.by].x) * timeStep;	\
 	(o_)->vel.y += ((o_)->acc.y					\
-	  + World.gravity[(o_)->pos.bx][(o_)->pos.by].y) * timeStep2;	\
+	  + World.gravity[(o_)->pos.bx][(o_)->pos.by].y) * timeStep;	\
     } else {								\
-	(o_)->vel.x += (o_)->acc.x * timeStep2;			\
-	(o_)->vel.y += (o_)->acc.y * timeStep2;			\
+	(o_)->vel.x += (o_)->acc.x * timeStep;			\
+	(o_)->vel.y += (o_)->acc.y * timeStep;			\
     }
 
 int	round_delay = 0;	/* delay until start of next round */
@@ -474,21 +474,18 @@ static void do_Autopilot (player *pl)
 static void Fuel_update(void)
 {
     int i;
-    DFLOAT fuel = (NumPlayers * STATION_REGENERATION);
+    DFLOAT fuel = (NumPlayers * STATION_REGENERATION * timeStep);
     int frames_per_update = MAX_STATION_FUEL / (fuel * BLOCK_SZ);
 
     if (NumPlayers == 0)
 	return;
 
     for (i = 0; i < World.NumFuels; i++) {
-	if (World.fuel[i].fuel == MAX_STATION_FUEL) {
+	if (World.fuel[i].fuel == MAX_STATION_FUEL)
 	    continue;
-	}
-	if ((World.fuel[i].fuel += fuel) >= MAX_STATION_FUEL) {
+	if ((World.fuel[i].fuel += fuel) >= MAX_STATION_FUEL)
 	    World.fuel[i].fuel = MAX_STATION_FUEL;
-	}
-	else if (World.fuel[i].last_change + frames_per_update
-		 > frame_loops) {
+	else if (World.fuel[i].last_change + frames_per_update > frame_loops) {
 	    /*
 	     * We don't send fuelstation info to the clients every frame
 	     * if it wouldn't change their display.
@@ -525,7 +522,7 @@ static void Misc_object_update(void)
 
 	else if (BIT(obj->type, OBJ_PULSE)) {
 	    pulseobject *pulse = PULSE_PTR(obj);
-	    pulse->len += pulseSpeed * timeStep2;
+	    pulse->len += pulseSpeed * timeStep;
 	    if (pulse->len > pulseLength)
 		pulse->len = pulseLength;
 	}
@@ -543,7 +540,7 @@ static void Cannon_update(int do_update_this_frame)
     for (i = 0; i < World.NumCannons; i++) {
 	cannon_t *cannon = World.cannon + i;
 	if (cannon->dead_time > 0) {
-	    if ((cannon->dead_time -= timeStep2) <= 0)
+	    if ((cannon->dead_time -= timeStep) <= 0)
 		Cannon_restore_on_map(i);
 	    continue;
 	} else {
@@ -579,7 +576,7 @@ static void Cannon_update(int do_update_this_frame)
 		}
 	    }
 	}
-	if ((cannon->damaged -= timeStep2) <= 0)
+	if ((cannon->damaged -= timeStep) <= 0)
 	    cannon->damaged = 0;
 	if (cannon->tractor_count > 0) {
 	    int ind = GetInd[cannon->tractor_target];
@@ -591,21 +588,21 @@ static void Cannon_update(int do_update_this_frame)
 		General_tractor_beam(-1, cannon->pos.cx, cannon->pos.cy,
 				     cannon->item[ITEM_TRACTOR_BEAM], ind,
 				     cannon->tractor_is_pressor);
-		if ((cannon->tractor_count -= timeStep2) <= 0)
+		if ((cannon->tractor_count -= timeStep) <= 0)
 		    cannon->tractor_count = 0;
 	    } else {
 		cannon->tractor_count = 0;
 	    }
 	}
 	if (cannon->emergency_shield_left > 0) {
-	    if ((cannon->emergency_shield_left -= timeStep2) <= 0) {
+	    if ((cannon->emergency_shield_left -= timeStep) <= 0) {
 		CLR_BIT(cannon->used, HAS_EMERGENCY_SHIELD);
 		sound_play_sensors(cannon->pos.cx, cannon->pos.cy,
 				   EMERGENCY_SHIELD_OFF_SOUND);
 	    }
 	}
 	if (cannon->phasing_left > 0) {
-	    if ((cannon->phasing_left -= timeStep2) <= 0) {
+	    if ((cannon->phasing_left -= timeStep) <= 0) {
 		CLR_BIT(cannon->used, HAS_PHASING_DEVICE);
 	        sound_play_sensors(cannon->pos.cx, cannon->pos.cy,
 				   PHASING_OFF_SOUND);
@@ -620,7 +617,7 @@ static void Target_update(void)
 
     for (i = 0; i < World.NumTargets; i++) {
 	if (World.targets[i].dead_time > 0) {
-	    if ((World.targets[i].dead_time -= timeStep2) <= 0) {
+	    if ((World.targets[i].dead_time -= timeStep) <= 0) {
 		Target_restore_on_map(i);
 
 		if (targetSync) {
@@ -638,10 +635,9 @@ static void Target_update(void)
 	    continue;
 	}
 
-	World.targets[i].damage += TARGET_REPAIR_PER_FRAME;
-	if (World.targets[i].damage >= TARGET_DAMAGE) {
+	World.targets[i].damage += TARGET_REPAIR_PER_FRAME * timeStep;
+	if (World.targets[i].damage >= TARGET_DAMAGE)
 	    World.targets[i].damage = TARGET_DAMAGE;
-	}
 	else if (World.targets[i].last_change + TARGET_UPDATE_DELAY
 		 < frame_loops) {
 	    /*
@@ -701,7 +697,7 @@ static void Use_items(int i)
     player *pl = Players[i];
 
     if (pl->shield_time > 0) {
-	if ((pl->shield_time -= timeStep2) <= 0) {
+	if ((pl->shield_time -= timeStep) <= 0) {
 	    pl->shield_time = 0;
 	    if (!BIT(pl->used, HAS_EMERGENCY_SHIELD))
 		CLR_BIT(pl->used, HAS_SHIELD);
@@ -714,7 +710,7 @@ static void Use_items(int i)
     }
 
     if (BIT(pl->used, HAS_PHASING_DEVICE)) {
-	if ((pl->phasing_left -= timeStep2) <= 0) {
+	if ((pl->phasing_left -= timeStep) <= 0) {
 	    if (pl->item[ITEM_PHASING])
 		Phasing(i, 1);
 	    else
@@ -725,7 +721,7 @@ static void Use_items(int i)
     if (BIT(pl->used, HAS_EMERGENCY_THRUST)) {
 	if (pl->fuel.sum > 0
 	    && BIT(pl->status, THRUSTING)
-	    && (pl->emergency_thrust_left -= timeStep2) <= 0) {
+	    && (pl->emergency_thrust_left -= timeStep) <= 0) {
 	    if (pl->item[ITEM_EMERGENCY_THRUST])
 		Emergency_thrust(i, true);
 	    else
@@ -736,7 +732,7 @@ static void Use_items(int i)
     if (BIT(pl->used, HAS_EMERGENCY_SHIELD)) {
 	if (pl->fuel.sum > 0
 	    && BIT(pl->used, HAS_SHIELD)
-	    && ((pl->emergency_shield_left -= timeStep2) <= 0)) {
+	    && ((pl->emergency_shield_left -= timeStep) <= 0)) {
 	    if (pl->item[ITEM_EMERGENCY_SHIELD])
 		Emergency_shield(i, true);
 	    else
@@ -783,7 +779,7 @@ void Update_objects(void)
      * Can also be used to do some updates less frequently.
      */
     do_update_this_frame = false;
-    if ((time_to_update -= timeStep2) <= 0) {
+    if ((time_to_update -= timeStep) <= 0) {
 	do_update_this_frame = true;
 	time_to_update += 1;
     }
@@ -805,7 +801,7 @@ void Update_objects(void)
 	pl = Players[i];
 
 	if (pl->stunned > 0) {
-	    pl->stunned -= timeStep2;
+	    pl->stunned -= timeStep;
 	    if (pl->stunned <= 0)
 		pl->stunned = 0;
 	    CLR_BIT(pl->used, HAS_SHIELD|HAS_LASER|HAS_SHOT);
@@ -856,7 +852,7 @@ void Update_objects(void)
      * Update transporters
      */
     for (i = 0; i < NumTransporters; i++) {
-	if ((Transporters[i]->count -= timeStep2) <= 0) {
+	if ((Transporters[i]->count -= timeStep) <= 0) {
 	    free(Transporters[i]);
 	    --NumTransporters;
 	    Transporters[i] = Transporters[NumTransporters];
@@ -878,7 +874,7 @@ void Update_objects(void)
     for (i = 0; i < NumPlayers; i++) {
 	pl = Players[i];
 
-	if ((pl->damaged -= timeStep2) <= 0)
+	if ((pl->damaged -= timeStep) <= 0)
 	    pl->damaged = 0;
 
 	/* kps - fix these */
@@ -909,7 +905,7 @@ void Update_objects(void)
 	}
 
 	if (pl->count >= 0) {
-	    pl->count -= timeStep2;
+	    pl->count -= timeStep;
 	    if (pl->count > 0) {
 		if (!BIT(pl->status, PLAYING)) {
 		    Transport_to_home(i);
@@ -1004,11 +1000,11 @@ void Update_objects(void)
 		int ct = pl->fuel.current;
 
 		do {
-		    if (World.fuel[pl->fs].fuel > REFUEL_RATE) {
-			World.fuel[pl->fs].fuel -= REFUEL_RATE;
+		    if (World.fuel[pl->fs].fuel > REFUEL_RATE * timeStep) {
+			World.fuel[pl->fs].fuel -= REFUEL_RATE * timeStep;
 			World.fuel[pl->fs].conn_mask = 0;
 			World.fuel[pl->fs].last_change = frame_loops;
-			Add_fuel(&(pl->fuel), REFUEL_RATE);
+			Add_fuel(&(pl->fuel), REFUEL_RATE * timeStep);
 		    } else {
 			Add_fuel(&(pl->fuel), World.fuel[pl->fs].fuel);
 			World.fuel[pl->fs].fuel = 0;
@@ -1041,11 +1037,11 @@ void Update_objects(void)
 		int ct = pl->fuel.current;
 
 		do {
-		    if (pl->fuel.tank[pl->fuel.current] > REFUEL_RATE) {
+		    if (pl->fuel.tank[pl->fuel.current] > REFUEL_RATE * timeStep) {
 			targ->damage += TARGET_FUEL_REPAIR_PER_FRAME;
 			targ->conn_mask = 0;
 			targ->last_change = frame_loops;
-			Add_fuel(&(pl->fuel), -REFUEL_RATE);
+			Add_fuel(&(pl->fuel), -REFUEL_RATE * timeStep);
 			if (targ->damage > TARGET_DAMAGE) {
 			    targ->damage = TARGET_DAMAGE;
 			    break;
@@ -1066,7 +1062,7 @@ void Update_objects(void)
 	    CLR_BIT(pl->used, HAS_SHIELD|HAS_CLOAKING_DEVICE|HAS_DEFLECTOR);
 	    CLR_BIT(pl->status, THRUSTING);
 	}
-	if (pl->fuel.sum > (pl->fuel.max - REFUEL_RATE))
+	if (pl->fuel.sum > (pl->fuel.max - REFUEL_RATE * timeStep))
 	    CLR_BIT(pl->used, HAS_REFUEL);
 
 	/*
@@ -1299,7 +1295,7 @@ void Update_objects(void)
 	pl->updateVisibility = 0;
 
 	if (pl->forceVisible > 0) {
-	    if ((pl->forceVisible -= timeStep2) <= 0)
+	    if ((pl->forceVisible -= timeStep) <= 0)
 		pl->forceVisible = 0;
 
 	    if (!pl->forceVisible)
@@ -1375,7 +1371,7 @@ void Update_objects(void)
      * Kill shots that ought to be dead.
      */
     for (i = NumObjs - 1; i >= 0; i--)
-	if ((Obj[i]->life -= timeStep2) <= 0)
+	if ((Obj[i]->life -= timeStep) <= 0)
 	    Delete_shot(i);
 
     /*

@@ -136,9 +136,6 @@
 	&& (GetInd[Players[j]->lock.pl_id] == (i)))
 
 
-#define TIME_BITS		6
-#define TIME_FACT 		(1 << TIME_BITS)
-
 #define RECOVERY_DELAY		(12 * 3)
 #define ROBOT_CREATE_DELAY	(12 * 2)
 
@@ -266,6 +263,15 @@
 #define PHASING_TIME		(4*12)
 #define EMERGENCY_THRUST_TIME	(4*12)
 
+#define FUEL_MASS(f)            ((f)*0.005/FUEL_SCALE_FACT)
+/* changed the default to max to avoid sending lots of fuel ACKs */
+/*#define START_STATION_FUEL	(20<<FUEL_SCALE_BITS)*/
+#define START_STATION_FUEL	MAX_STATION_FUEL
+#define STATION_REGENERATION	(0.06*FUEL_SCALE_FACT)
+#define REFUEL_RATE		(5<<FUEL_SCALE_BITS)
+#define TARGET_FUEL_REPAIR_PER_FRAME (TARGET_DAMAGE / (12 * 10))
+
+#define TARGET_REPAIR_PER_FRAME	(TARGET_DAMAGE / (12 * 600))
 #define ALLIANCE_NOT_SET	(-1)
 
 #define DEBRIS_MASS             4.5

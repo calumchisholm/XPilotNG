@@ -261,12 +261,12 @@ void Ball_is_replaced(ballobject *ball)
 void Ball_is_destroyed(ballobject *ball)
 {
     char msg[MSG_LEN];
-    int frames = (1e6 - ball->life) / timeStep2 + .5;
+    int frames = (1e6 - ball->life) / timeStep + .5;
     int ind = GetInd[ball->owner];
     DFLOAT seconds = ((DFLOAT)frames) / framesPerSecond;
 
-    if (FPSMultiplier != 1.0) {
-	DFLOAT frames12 = ((DFLOAT)frames) / FPSMultiplier;
+    if (timeStep != 1.0) {
+	DFLOAT frames12 = ((DFLOAT)frames) * timeStep;
 
 	sprintf(msg," < The ball was loose for %d frames (best %d) "
 		"/ %.2f frames @ 12fps / %.2fs >",

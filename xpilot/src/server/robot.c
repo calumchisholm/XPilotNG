@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -1120,7 +1120,7 @@ void Robot_update(void)
 	     && World.teams[robotTeam].NumMembers >=
 		World.teams[robotTeam].NumBases)) {
 
-	new_robot_delay += timeStep2;
+	new_robot_delay += timeStep;
 	if (new_robot_delay >= ROBOT_CREATE_DELAY) {
 	    Robot_create();
 	    new_robot_delay = 0;
@@ -1180,4 +1180,3 @@ void Robot_update(void)
 	Robot_play(i);
     }
 }
-

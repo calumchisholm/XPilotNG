@@ -1967,13 +1967,12 @@ static void Robot_default_play(int ind)
 	/* dx = WRAP_DX(dx);
 	   dy = WRAP_DY(dy); */
 	if (sqr(dx) + sqr(dy) <= sqr(90)
-	    && World.fuel[j].fuel > REFUEL_RATE) {
+	    && World.fuel[j].fuel > REFUEL_RATE * timeStep) {
 	    pl->fs = j;
 	    SET_BIT(pl->used, HAS_REFUEL);
 	    break;
-	} else {
+	} else
 	    CLR_BIT(pl->used, HAS_REFUEL);
-	}
     }
 
     /* don't turn NEED_FUEL off until refueling stops */

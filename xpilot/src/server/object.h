@@ -208,7 +208,7 @@ struct _cell_node {
     vector		vel;		/* speed in x,y */		\
     vector		acc;		/* acceleration in x,y */	\
     DFLOAT		mass;		/* mass in unigrams */		\
-    DFLOAT		life;		/* No of ticks left to live */	\
+    double		life;		/* No of ticks left to live */	\
     long		status;		/* gravity, etc. */		\
     int			type;		/* one bit of OBJ_XXX */	\
 /* Item pack count is kept in the 'count' field, DFLOAT now, change !@# */ \
@@ -272,6 +272,7 @@ struct _mineobject {
 #define MISSILE_EXTEND		\
     DFLOAT		max_speed;	/* speed limitation */		\
     DFLOAT		turnspeed;	/* how fast to turn */
+    DFLOAT		fusetime;	/* time until deadly to owner */
 /* up to here all missiles types are the same. */
 
 /*
