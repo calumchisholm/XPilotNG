@@ -781,14 +781,16 @@ void Game_Over(void)
     win = lose = -1;
 
     for (i = 0; i < NumPlayers; i++) {
-	SET_BIT(Players(i)->status, GAME_OVER);
+	player *pl_i = Players(i);
+
+	SET_BIT(pl_i->status, GAME_OVER);
 	if (IS_HUMAN_IND(i)) {
-	    if (Players(i)->score > maxsc) {
-		maxsc = Players(i)->score;
+	    if (pl_i->score > maxsc) {
+		maxsc = pl_i->score;
 		win = i;
 	    }
-	    if (Players(i)->score < minsc) {
-		minsc = Players(i)->score;
+	    if (pl_i->score < minsc) {
+		minsc = pl_i->score;
 		lose = i;
 	    }
 	}
