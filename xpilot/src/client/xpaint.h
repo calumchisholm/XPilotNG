@@ -29,22 +29,6 @@
 /* how to draw a selection */
 #define DRAW_EMPHASIZED		BLUE
 
-#if 0
-#define FIND_NAME_WIDTH(other)                                          \
-    if ((other)->name_width == 0) {                                     \
-        (other)->name_len = strlen((other)->name);                      \
-        (other)->name_width = 2 + XTextWidth(gameFont, (other)->name,   \
-                                         (other)->name_len);            \
-    }
-#endif /* 0 */
- 
-#define FIND_NAME_WIDTH(other)                                          \
-    if ((other)->name_width == 0) {                                     \
-        (other)->name_len = strlen((other)->id_string);                 \
-        (other)->name_width = 2 + XTextWidth(gameFont, (other)->id_string,\
-                                         (other)->name_len);            \
-    }
-
 /* The fonts used in the game */
 extern XFontStruct* gameFont;
 extern XFontStruct* messageFont;
@@ -113,6 +97,25 @@ static inline void SET_FG(unsigned long fg)
 {
     if (fg != current_foreground)
 	XSetForeground(dpy, gameGC, current_foreground = fg);
+}
+
+/*
+ * MS compiler might not grok this, in that case define inline to empty.
+ */
+static inline void FIND_NAME_WIDTH(other_t *other)
+{
+    if (other->max_chars_in_names != maxCharsInNames) {
+	int len;
+
+	strlcpy(other->id_string, other->nick_name, sizeof(other->id_string));
+	len = strlen(other->id_string);
+	if (maxCharsInNames >= 0 && maxCharsInNames < len)
+	    other->id_string[maxCharsInNames] = '\0';
+	other->name_len = strlen(other->id_string);                 
+        other->name_width
+	    = 2 + XTextWidth(gameFont, other->id_string, other->name_len);
+	other->max_chars_in_names = maxCharsInNames;
+    }
 }
 
 extern void Paint_item_symbol(int type, Drawable d, GC mygc,

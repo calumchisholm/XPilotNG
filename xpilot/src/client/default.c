@@ -786,6 +786,16 @@ xp_option_t default_options[] = {
 	"A value of 2 makes the base name flash when a ship is appearing.\n"
 	"A value of 3 combines the effects of values 1 and 2.\n"),
 
+    XP_INT_OPTION(
+	"maxCharsInNames",
+	MAX_NAME_LEN,
+	0,
+	MAX_NAME_LEN,
+	&maxCharsInNames,
+	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
+	"Maximum number of characters to paint in names on game area.\n"),
+
     XP_BOOL_OPTION(
 	"slidingRadar",
 	true,

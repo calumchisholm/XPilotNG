@@ -37,6 +37,7 @@ Connect_param_t connectParam;
 
 bool	newbie;
 int	baseWarningType;	/* Which type of base warning you prefer */
+int	maxCharsInNames;
 int	hudRadarDotSize;	/* Size for hudradar dot drawing */
 double	hudRadarScale;		/* Scale for hudradar drawing */
 double	hudRadarLimit;		/* Hudradar dots are not drawn if closer to
@@ -1400,23 +1401,17 @@ int Handle_player(int id, int player_team, int mychar,
 	}
 	self = other;
     }
+    memset(other, 0, sizeof(other_t));
     other->id = id;
     other->team = player_team;
-    other->score = 0;
-    other->round = 0;
-    other->check = 0;
-    other->timing = 0;
-    other->life = 0;
     other->mychar = mychar;
     other->war_id = -1;
-    other->name_width = 0;
     strlcpy(other->nick_name, nick_name, sizeof(other->nick_name));
-    strlcpy(other->id_string, nick_name, sizeof(other->id_string));
     strlcpy(other->user_name, user_name, sizeof(other->user_name));
     strlcpy(other->host_name, host_name, sizeof(other->host_name));
+    other->max_chars_in_names = -1;
     scoresChanged = 1;
     other->ship = Convert_shape_str(shape);
-    other->ignorelevel = 0;
     Calculate_shield_radius(other->ship);
 
     return 0;

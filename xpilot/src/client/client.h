@@ -185,7 +185,6 @@ do {								\
 
 
 typedef struct {
-    double	ratio;
     double	score;
     short	id;
     uint16_t	team;
@@ -199,6 +198,8 @@ typedef struct {
     short	war_id;
     short	name_width;	/* In pixels */
     short	name_len;	/* In bytes */
+    short	max_chars_in_names;	/* name_width was calculated
+					   for this value of maxCharsInNames */
     short	ignorelevel;
     shipshape_t	*ship;
     char	nick_name[MAX_CHARS];
@@ -563,6 +564,7 @@ extern char	modBankStr[][MAX_CHARS];/* modifier banks strings */
 extern int	clientPortStart;	/* First UDP port for clients */
 extern int	clientPortEnd;		/* Last one (these are for firewalls) */
 extern int	baseWarningType;	/* Which type of base warning you prefer */
+extern int	maxCharsInNames;
 extern byte	lose_item;		/* flag and index to drop item */
 extern int	lose_item_active;	/* one of the lose keys is pressed */
 
