@@ -129,12 +129,10 @@ static int click_inview(click_visibility_t *v, int cx, int cy)
 
 #define DEBRIS_STORE(xd,yd,color,offset) \
     int			i;						  \
-    if (xd < 0) {							  \
+    if (xd < 0)								  \
 	xd += World.width;						  \
-    }									  \
-    if (yd < 0) {							  \
+    if (yd < 0)								  \
 	yd += World.height;						  \
-    }									  \
     if ((unsigned) xd >= (unsigned)view_width || (unsigned) yd >= (unsigned)view_height) {	  \
 	/*								  \
 	 * There's some rounding error or so somewhere.			  \
@@ -147,16 +145,14 @@ static int click_inview(click_visibility_t *v, int cx, int cy)
 	+ (((yd >> 8) % debris_y_areas) * debris_x_areas)		  \
 	+ ((xd >> 8) % debris_x_areas);					  \
 									  \
-    if (num_ >= 255) {							  \
+    if (num_ >= 255)							  \
 	return;								  \
-    }									  \
     if (num_ >= max_) {							  \
-	if (num_ == 0) {						  \
+	if (num_ == 0)							  \
 	    ptr_ = (debris_t *) malloc((max_ = 16) * sizeof(*ptr_));	  \
-	} else {							  \
+	else								  \
 	    ptr_ = (debris_t *) realloc(ptr_, (max_ += max_) * sizeof(*ptr_)); \
-	}								  \
-	if (ptr_ == 0) {						  \
+	if (ptr_ == NULL) {						  \
 	    error("No memory for debris");				  \
 	    num_ = 0;							  \
 	    return;							  \
@@ -265,11 +261,7 @@ static void Frame_radar_buffer_send(connection_t *conn)
     if (conn->rectype != 2) {
 	/* permute. */
 	for (i = 0; i < num_radar; i++) {
-#if 1
-	    dest = (int)(rfrac() * num_radar);
-#else /* ng wants this */
 	    dest = (int)(rfrac() * (num_radar - i)) + i;
-#endif
 	    tmp = radar_shuffle[i];
 	    radar_shuffle[i] = radar_shuffle[dest];
 	    radar_shuffle[dest] = tmp;
@@ -291,9 +283,8 @@ static void Frame_radar_buffer_send(connection_t *conn)
 	int buf_index = 0;
 	int fast_count = 0;
 
-	if (num_radar > 256) {
+	if (num_radar > 256)
 	    num_radar = 256;
-	}
 	for (i = 0; i < num_radar; i++) {
 	    p = &radar_ptr[radar_shuffle[i]];
 	    radar_x = (radar_width * p->x) / World.width;
@@ -451,9 +442,8 @@ static int Frame_status(connection_t *conn, player *pl)
 		  showautopilot,
 		  Player_by_id(Get_player_id(conn))->status,
 		  mods);
-    if (n <= 0) {
+    if (n <= 0)
 	return 0;
-    }
 
     if (BIT(pl->used, HAS_EMERGENCY_THRUST))
 	Send_thrusttime(conn,
@@ -495,9 +485,8 @@ static void Frame_map(connection_t *conn, player *pl)
     i = MAX(0, pl->last_target_update);
     for (k = 0; k < World.NumTargets; k++) {
 	target_t *targ;
-	if (++i >= World.NumTargets) {
+	if (++i >= World.NumTargets)
 	    i = 0;
-	}
 	targ = &World.targets[i];
 	if (BIT(targ->update_mask, conn_bit)
 	    || (BIT(targ->conn_mask, conn_bit) == 0
@@ -505,9 +494,8 @@ static void Frame_map(connection_t *conn, player *pl)
 	    Send_target(conn, i, (int)targ->dead_time, targ->damage);
 	    pl->last_target_update = i;
 	    bytes_left -= target_packet_size;
-	    if (++packet_count >= max_packet) {
+	    if (++packet_count >= max_packet)
 		break;
-	    }
 	}
     }
 
@@ -535,21 +523,6 @@ static void Frame_map(connection_t *conn, player *pl)
 	if (++i >= World.NumFuels)
 	    i = 0;
 	if (BIT(World.fuel[i].conn_mask, conn_bit) == 0) {
-#if 0 /* old block based stuff */
-	    if (World.block[World.fuel[i].blk_pos.x]
-			   [World.fuel[i].blk_pos.y] == FUEL) {
-		if (block_inview(&bv,
-				 World.fuel[i].blk_pos.x,
-				 World.fuel[i].blk_pos.y)) {
-		    Send_fuel(conn, i, (int) World.fuel[i].fuel);
-		    pl->last_fuel_update = i;
-		    bytes_left -= max_packet * fuel_packet_size;
-		    if (++packet_count >= max_packet) {
-			break;
-		    }
-		}
-	    }
-#else
 	    if ((CENTER_XCLICK(World.fuel[i].pos.cx - pl->pos.cx) <
 		 (view_width << CLICK_SHIFT) + BLOCK_CLICKS) &&
 		(CENTER_YCLICK(World.fuel[i].pos.cy - pl->pos.cy) <
@@ -560,7 +533,6 @@ static void Frame_map(connection_t *conn, player *pl)
 		if (++packet_count >= max_packet)
 		    break;
 	    }
-#endif
 	}
     }
 
@@ -577,15 +549,6 @@ static void Frame_map(connection_t *conn, player *pl)
 	    && (worm->type == WORM_IN
 		|| worm->type == WORM_NORMAL)
 	    && click_inview(&cv, worm->pos.cx, worm->pos.cy)) {
-	    /* This is really a stupid bug: he first converts
-	       the perfect blocksizes to pixels which the
-	       client is perfectly capable of doing itself.
-	       Then he sends the pixels in signed shorts.
-	       This will fail on big maps. */
-#if 0
-	    int	x = (worm->pos.x * BLOCK_SZ) + BLOCK_SZ / 2,
-		y = (worm->pos.y * BLOCK_SZ) + BLOCK_SZ / 2;
-#endif
 	    Send_wormhole(conn, worm->pos.cx, worm->pos.cy);
 	    pl->last_wormhole_update = i;
 	    bytes_left -= max_packet * wormhole_packet_size;
@@ -604,15 +567,13 @@ static void Frame_shuffle_objects(void)
     num_object_shuffle = MIN(NumObjs, MAX_VISIBLE_OBJECTS);
 
     if (max_object_shuffle < num_object_shuffle) {
-	if (object_shuffle_ptr != NULL) {
+	if (object_shuffle_ptr != NULL)
 	    free(object_shuffle_ptr);
-	}
 	max_object_shuffle = num_object_shuffle;
 	memsize = max_object_shuffle * sizeof(shuffle_t);
 	object_shuffle_ptr = (shuffle_t *) malloc(memsize);
-	if (object_shuffle_ptr == NULL) {
+	if (object_shuffle_ptr == NULL)
 	    max_object_shuffle = 0;
-	}
     }
 
     if (max_object_shuffle < num_object_shuffle)
@@ -931,14 +892,14 @@ static void Frame_ships(connection_t *conn, player *pl)
 	    if (pl_i->home_base == NULL)
 		continue;
 	    if (!click_inview(&cv, pl_i->home_base->pos.cx,
-			     pl_i->home_base->pos.cy))
+			      pl_i->home_base->pos.cy))
 		continue;
 	    if (BIT(pl_i->status, PAUSE))
 		Send_paused(conn, pl_i->home_base->pos.cx,
 			    pl_i->home_base->pos.cy, (int)pl_i->count);
 	    else
-		Send_appearing(conn, pl_i->home_base->pos.cx,
-		  pl_i->home_base->pos.cy, pl_i->id, (int)(pl_i->count * 10));
+		Send_appearing(conn, pl_i->home_base->pos.cx, pl_i->home_base->pos.cy,
+			       pl_i->id, (int)(pl_i->count * 10));
 	    continue;
 	}
 	if (!click_inview(&cv, pl_i->pos.cx, pl_i->pos.cy))
@@ -978,10 +939,9 @@ static void Frame_ships(connection_t *conn, player *pl)
 	if (BIT(pl_i->used, HAS_REPAIR)) {
 	    int cx = World.targets[pl_i->repair_target].pos.cx,
 		cy = World.targets[pl_i->repair_target].pos.cy;
-	    if (click_inview(&cv, cx, cy)) {
+	    if (click_inview(&cv, cx, cy))
 		/* same packet as refuel */
 		Send_refuel(conn, pl_i->pos.cx, pl_i->pos.cy, cx, cy);
-	    }
 	}
 	if (BIT(pl_i->used, HAS_TRACTOR_BEAM)) {
 	    player *t = Player_by_id(pl_i->lock.pl_id);
@@ -1019,9 +979,9 @@ static void Frame_radar(connection_t *conn, player *pl)
     Frame_radar_buffer_reset();
 
 #ifndef NO_SMART_MIS_RADAR
-    if (nukesOnRadar) {
+    if (nukesOnRadar)
 	mask = OBJ_SMART_SHOT|OBJ_TORPEDO|OBJ_HEAT_SHOT|OBJ_MINE;
-    } else {
+    else {
 	mask = (missilesOnRadar ?
 		(OBJ_SMART_SHOT|OBJ_TORPEDO|OBJ_HEAT_SHOT) : 0);
 	mask |= (minesOnRadar) ? OBJ_MINE : 0;
@@ -1063,9 +1023,8 @@ static void Frame_radar(connection_t *conn, player *pl)
 	    cx = shot->pos.cx;
 	    cy = shot->pos.cy;
 	    if (Wrap_length(pl->pos.cx - cx,
-			    pl->pos.cy - cy) <= pl->sensor_range * CLICK) {
+			    pl->pos.cy - cy) <= pl->sensor_range * CLICK)
 		Frame_radar_buffer_add(cx, cy, size);
-	    }
 	}
     }
 #endif
