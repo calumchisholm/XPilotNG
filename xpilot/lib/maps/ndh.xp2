@@ -15,8 +15,6 @@
 <Option name="allowTorpedoes" value="True"/>
 <Option name="announceAlliances" value="no"/>
 <Option name="asteroidCollisionMayKill" value="yes"/>
-<Option name="asteroidmaxscore" value="100.0"/>
-<Option name="asteroidpoints" value="1.0"/>
 <Option name="asteroidsOnRadar" value="False"/>
 <Option name="asteroidsWallBounce" value="yes"/>
 <Option name="ballCollisions" value="no"/>
@@ -26,10 +24,6 @@
 <Option name="ballsWallBounce" value="yes"/>
 <Option name="cannonFlak" value="no"/>
 <Option name="cannonitemprobmult" value="1.0"/>
-<Option name="cannonmaxscore" value="100.0"/>
-<Option name="cannonpoints" value="1.0"/>
-<Option name="cannonsdefend" value="yes"/>
-<Option name="cannonsuseitems" value="no"/>
 <Option name="captureTheFlag" value="no"/>
 <Option name="cloakedExhaust" value="no"/>
 <Option name="clusterKillScoreMult" value="0.33"/>
@@ -47,11 +41,11 @@
 <Option name="edgeWrap" value="true"/>
 <Option name="elimination" value="no"/>
 <Option name="extraBorder" value="no"/>
-<Option name="friction" value="0.015"/>
+<Option name="friction" value="0"/>
 <Option name="heatKillScoreMult" value="0.4"/>
 <Option name="identifyMines" value="True"/>
-<Option name="initialAfterburners" value="1"/>
-<Option name="initialFuel" value="2000"/>
+<Option name="initialAfterburners" value="3"/>
+<Option name="initialFuel" value="500"/>
 <Option name="itemAfterburnerProb" value="5e-9"/>
 <Option name="itemAutopilotProb" value="0"/>
 <Option name="itemCloakProb" value="0"/>
@@ -93,7 +87,6 @@
 <Option name="nukeMinMines" value="5"/>
 <Option name="nukeMinSmarts" value="2"/>
 <Option name="nukesOnRadar" value="True"/>
-<Option name="numberofrounds" value="0"/>
 <Option name="objectWallBounceBrakeFactor" value="0.9"/>
 <Option name="playersOnRadar" value="True"/>
 <Option name="playerStartsShielded" value="yes"/>
@@ -102,19 +95,14 @@
 <Option name="reset" value="yes"/>
 <Option name="robotHostName" value="xpilot.org"/>
 <Option name="robotLeaveLife" value="7"/>
-<Option name="robotleaveratio" value="-5.0"/>
-<Option name="robotleavescore" value="-90.0"/>
-<Option name="robottickspersecond" value="0"/>
-<Option name="rounddelay" value="0"/>
 <Option name="runoverKillScoreMult" value="1.33"/>
 <Option name="selfKillScoreMult" value="0.3"/>
 <Option name="shieldedItemPickup" value="False"/>
 <Option name="shieldedMining" value="False"/>
-<Option name="shipMass" value="7"/>
+<Option name="shipMass" value="20"/>
 <Option name="shotHitFuelDrainUsesKineticEnergy" value="yes"/>
 <Option name="shotsWallBounce" value="no"/>
 <Option name="shoveKillScoreMult" value="2"/>
-<Option name="silent" value="false"/>
 <Option name="smartKillScoreMult" value="0.33"/>
 <Option name="sparksWallBounce" value="no"/>
 <Option name="tagGame" value="no"/>
@@ -125,19 +113,16 @@
 <Option name="targetSync" value="no"/>
 <Option name="targetTeamCollision" value="yes"/>
 <Option name="teamCannons" value="no"/>
-<Option name="teamcupstatport" value="3749"/>
 <Option name="teamFuel" value="no"/>
 <Option name="teamImmunity" value="yes"/>
 <Option name="teamPlay" value="no"/>
-<Option name="teamsharescore" value="no"/>
 <Option name="timing" value="no"/>
 <Option name="torpedoKillScoreMult" value="1.2"/>
 <Option name="treasureCollisionDestroys" value="no"/>
 <Option name="treasureCollisionMayKill" value="yes"/>
 <Option name="treasureKillTeam" value="no"/>
-<Option name="treasuresOnRadar" value="True"/>
+<Option name="treasuresOnRadar" value="yes"/>
 <Option name="useDebris" value="no"/>
-<Option name="wallBounceFuelDrainMult" value="0.1"/>
 <Option name="wreckageCollisionMayKill" value="no"/>
 </GeneralOptions>
 <BmpStyle id="bakedmud.pnm" filename="bakedmud.pnm" scalable="yes"/>
