@@ -1376,6 +1376,12 @@ int Handle_player(int id, int player_team, int mychar, char *player_name,
 {
     other_t		*other;
 
+#ifdef OPTIONHACK
+    warn("Handle player: id=%d, player_name=%s, real_name=%s, host_name=%s",
+	 id, player_name, real_name, host_name);
+    warn("myself = %d", myself);
+#endif
+
     if (BIT(Setup->mode, TEAM_PLAY)
 	&& (player_team < 0 || player_team >= MAX_TEAMS)) {
 	warn("Illegal team %d for received player, setting to 0", player_team);

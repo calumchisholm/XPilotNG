@@ -540,7 +540,7 @@ void Paint_score_entry(int entry_num, other_t* other, bool is_team)
      * e94_msu eKthHacks
      */
     if (!is_team && strchr("DPW", other->mychar)) {
-	if (other->id == self->id)
+	if (self && other->id == self->id)
 	    color = scoreInactiveSelfColor;
 	else
 	    color = scoreInactiveColor;
@@ -551,14 +551,14 @@ void Paint_score_entry(int entry_num, other_t* other, bool is_team)
 		    label, (int)strlen(label));
     } else {
 	if (!is_team) {
-	    if (other->id == self->id)
+	    if (self && other->id == self->id)
 		color = scoreSelfColor;
 	    else
 		color = scoreColor;
 	} else {
 	    color = Team_color(other->team);
 	    if (!color) {
-		if (other->team == self->team)
+		if (self && other->team == self->team)
 		    color = scoreOwnTeamColor;
 		else
 		    color = scoreEnemyTeamColor;

@@ -362,6 +362,11 @@ static void Msg_scan_game_msg(const char *message)
 	return;
     }
 
+    if (!self) {
+	warn("Variable 'self' is NULL!");
+	return;
+    }
+
     /*
      * Now let's check if someone got killed.
      */
