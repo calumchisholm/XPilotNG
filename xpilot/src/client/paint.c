@@ -649,7 +649,9 @@ void Paint_score_entry(int entry_num,
      * Underline the teams
      */
     if (is_team) {
-	XSetForeground(dpy, scoreListGC, colors[BLUE].pixel);
+	int color = (windowColor != BLUE ? BLUE : BLACK);
+
+	XSetForeground(dpy, scoreListGC, colors[color].pixel);
 	gcv.line_style = LineSolid;
 	XChangeGC(dpy, scoreListGC, GCLineStyle, &gcv);
 	XDrawLine(dpy, players, scoreListGC,
