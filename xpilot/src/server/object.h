@@ -212,7 +212,6 @@ struct _cell_node {
     int			pl_radius;	/* distance for hit */		\
     long		info;		/* Miscellaneous info */	\
     double		fusetime;	/* Frame when considered fused */ \
-    void		(*update)(object *);	/* Called during update */ \
 
 /* up to here all object types are the same. */
 

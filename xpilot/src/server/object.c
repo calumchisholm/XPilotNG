@@ -63,7 +63,6 @@ object *Object_allocate(void)
 
 	obj->type = OBJ_DEBRIS;
 	obj->life = 0;
-	obj->update = NULL;
     }
 
     return obj;
