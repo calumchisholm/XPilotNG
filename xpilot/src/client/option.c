@@ -756,7 +756,7 @@ static void Parse_xpilotrc_line(const char *line)
     colon = strchr(l, ':');
     if (colon == NULL) {
 	/* no colon on line, not ok */
-	warn("WARNING: Xpilotrc line %d:", num_xpilotrc_lines + 1);
+	warn("Xpilotrc line %d:", num_xpilotrc_lines + 1);
 	warn("Line has no colon after option name, ignoring.");
 	goto line_is_comment;
     }
@@ -788,7 +788,7 @@ static void Parse_xpilotrc_line(const char *line)
 	
 	if (x->opt == opt) {
 	    /* same option defined several times in xpilotrc */
-	    warn("WARNING: Xpilotrc line %d:", num_xpilotrc_lines + 1);
+	    warn("Xpilotrc line %d:", num_xpilotrc_lines + 1);
 	    warn("Option %s previously given on line %d, ignoring new value.",
 		 name, i + 1);
 	    goto line_is_comment;
@@ -812,7 +812,7 @@ static void Parse_xpilotrc_line(const char *line)
     }
 
     if (!Set_option(name, value, xp_option_origin_xpilotrc)) {
-	warn("WARNING: Xpilotrc line %d:", num_xpilotrc_lines + 1);
+	warn("Xpilotrc line %d:", num_xpilotrc_lines + 1);
 	warn("Failed to set option %s value \"%s\", ignoring.", name, value);
 	goto line_is_comment;
     }
@@ -866,7 +866,7 @@ int Xpilotrc_read(const char *path)
 	return -2;
     }
 
-    warn("Reading options from xpilotrc file %s.\n", path);
+    xpinfo("Reading options from xpilotrc file %s.", path);
 
     while (fgets(buf, sizeof buf, fp)) {
 	char *cp;

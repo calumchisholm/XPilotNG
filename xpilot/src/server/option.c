@@ -480,7 +480,7 @@ void Option_set_value(
 	if ((!strcasecmp(name, "mineLife")
 	     || (!strcasecmp(name, "missileLife")))
 	    && atoi(value) == 0) {
-	    warn("WARNING: value of %s is %s in map.", name, value);
+	    warn("Value of %s is %s in map.", name, value);
 	    warn("This is an obsolete way to set the default value.");
 	    warn("It will cause the weapon to detonate at once.");
 	    warn("To fix, remove the option from the map file.");
@@ -490,8 +490,8 @@ void Option_set_value(
     for (np = Option_hash_array[ix]; np; np = np->next) {
 	if (!strcasecmp(name, np->name)) {
 	    if (opt_origin == OPT_MAP && np->value->origin == OPT_MAP) {
-		warn("WARNING: the map contains multiple instances of the "
-		     "option %s.", name);
+		warn("The map contains multiple instances of the option %s.",
+		     name);
 		warn("The server will use the first instance.");
 		return;
 	    }

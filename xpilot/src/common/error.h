@@ -34,6 +34,8 @@
 #define	ERROR_H
 
 #include "xpcommon.h"
+
+extern void xpinfo(const char *fmt, ...);
 extern void warn(const char *fmt, ...);
 extern void error(const char *fmt, ...);
 extern void fatal(const char *fmt, ...);

@@ -10,26 +10,22 @@
 
 char error_version[] = VERSION;
 
-
 /*
- * This file defines two entry points:
+ * This file defines several entry points:
  *
  * init_error()		- Initialize the error routine, accepts program name
  *			  as input.
  * error()		- perror() with printf functionality.
+ * warn(), ...
  */
-
-
 
 /*
  * File local static data.
  */
 #define	MAX_PROG_LENGTH	32
-static char		progname[MAX_PROG_LENGTH];
+static char progname[MAX_PROG_LENGTH];
 
-
-
-static const char* prog_basename(const char *prog)
+static const char *prog_basename(const char *prog)
 {
 #ifndef _WINDOWS
     char *p;
@@ -38,7 +34,7 @@ static const char* prog_basename(const char *prog)
 
     return (p != NULL) ? (p + 1) : prog;
 #else
-    return "xpilot";
+    return "XPilot NG";
 #endif
 }
 
@@ -48,71 +44,92 @@ static const char* prog_basename(const char *prog)
  */
 void init_error(const char *prog)
 {
-    const char *p = prog_basename(prog);   /* Beautify arv[0] */
+    const char *p = prog_basename(prog);   /* Beautify argv[0] */
 
     strlcpy(progname, p, MAX_PROG_LENGTH);
 }
 
-
 #ifndef _WINDOWS
+
 /*
  * Ok, let's do it the ANSI C way.
  */
-void error(const char *fmt, ...)
+void xpinfo(const char *fmt, ...)
 {
-    va_list	 ap;
-    int		 e = errno;
+    size_t len;
+    va_list ap;
 
     va_start(ap, fmt);
 
-    if (progname[0] != '\0') {
-	fprintf(stderr, "%s: ", progname);
-    }
+    if (progname[0] != '\0')
+	fprintf(stderr, "%s: INFO: ", progname);
 
     vfprintf(stderr, fmt, ap);
 
-    if (e != 0) {
-	fprintf(stderr, ": (%s)", strerror(e));
-    }
-    fprintf(stderr, "\n");
+    len = strlen(fmt);
+    if (len == 0 || fmt[len - 1] != '\n')
+	fprintf(stderr, "\n");
 
     va_end(ap);
 }
 
 void warn(const char *fmt, ...)
 {
-    int		len;
-    va_list	ap;
+    size_t len;
+    va_list ap;
 
     va_start(ap, fmt);
 
-    if (progname[0] != '\0') {
-	fprintf(stderr, "%s: ", progname);
-    }
+    if (progname[0] != '\0')
+	fprintf(stderr, "%s: WARNING: ", progname);
 
     vfprintf(stderr, fmt, ap);
 
     len = strlen(fmt);
-    if (len == 0 || fmt[len - 1] != '\n') {
+    if (len == 0 || fmt[len - 1] != '\n')
 	fprintf(stderr, "\n");
-    }
+
+    va_end(ap);
+}
+
+void error(const char *fmt, ...)
+{
+    size_t len;
+    va_list ap;
+    int e = errno;
+
+    va_start(ap, fmt);
+
+    if (progname[0] != '\0')
+	fprintf(stderr, "%s: ERROR: ", progname);
+
+    vfprintf(stderr, fmt, ap);
+
+    if (e != 0)
+	fprintf(stderr, ": (%s)", strerror(e));
+
+    len = strlen(fmt);
+    if (len == 0 || fmt[len - 1] != '\n')
+	fprintf(stderr, "\n");
 
     va_end(ap);
 }
 
 void fatal(const char *fmt, ...)
 {
-    va_list	 ap;
+    size_t len;
+    va_list ap;
 
     va_start(ap, fmt);
 
-    if (progname[0] != '\0') {
-	fprintf(stderr, "%s: ", progname);
-    }
+    if (progname[0] != '\0')
+	fprintf(stderr, "%s: FATAL: ", progname);
 
     vfprintf(stderr, fmt, ap);
 
-    fprintf(stderr, "\n");
+    len = strlen(fmt);
+    if (len == 0 || fmt[len - 1] != '\n')
+	fprintf(stderr, "\n");
 
     va_end(ap);
 
@@ -121,17 +138,19 @@ void fatal(const char *fmt, ...)
 
 void dumpcore(const char *fmt, ...)
 {
-    va_list	 ap;
+    size_t len;
+    va_list ap;
 
     va_start(ap, fmt);
 
-    if (progname[0] != '\0') {
-	fprintf(stderr, "%s: ", progname);
-    }
+    if (progname[0] != '\0')
+	fprintf(stderr, "%s: ABORT: ", progname);
 
     vfprintf(stderr, fmt, ap);
 
-    fprintf(stderr, "\n");
+    len = strlen(fmt);
+    if (len == 0 || fmt[len - 1] != '\n')
+	fprintf(stderr, "\n");
 
     va_end(ap);
 
@@ -169,11 +188,24 @@ static void Win_show_error(char *s)
     inerror = FALSE;
 }
 
+void xpinfo(const char *fmt, ...)
+{
+    va_list ap;
+    char s[512];
+
+    va_start(ap, fmt);
+
+    vsprintf(s, fmt, ap);
+
+    Win_show_error(s);
+
+    va_end(ap);
+}
 
 void error(const char *fmt, ...)
 {
-    va_list	ap;
-    char	s[512];
+    va_list ap;
+    char s[512];
 
     va_start(ap, fmt);
 
@@ -186,8 +218,8 @@ void error(const char *fmt, ...)
 
 void warn(const char *fmt, ...)
 {
-    va_list	ap;
-    char	s[512];
+    va_list ap;
+    char s[512];
 
     va_start(ap, fmt);
 
@@ -200,8 +232,8 @@ void warn(const char *fmt, ...)
 
 void fatal(const char *fmt, ...)
 {
-    va_list	ap;
-    char	s[512];
+    va_list ap;
+    char s[512];
 
     va_start(ap, fmt);
 
@@ -216,8 +248,8 @@ void fatal(const char *fmt, ...)
 
 void dumpcore(const char *fmt, ...)
 {
-    va_list	ap;
-    char	s[512];
+    va_list ap;
+    char s[512];
 
     va_start(ap, fmt);
 

@@ -633,10 +633,8 @@ bool Grok_map(world_t *world)
 
     Realloc_map_objects(world);
 
-    if (world->NumBases <= 0) {
-	warn("WARNING: map has no bases!");
-	exit(1);
-    }
+    if (world->NumBases <= 0)
+	fatal("Map has no bases!");
 
     xpprintf("World....: %s\nBases....: %d\nMapsize..: %dx%d pixels\n"
 	     "Team play: %s\n",

@@ -1062,7 +1062,7 @@ static bool Set_maxColors (xp_option_t *opt, int val)
 {
     UNUSED_PARAM(opt);
     if (val == 4 || val == 8) {
-	warn("WARNING: Values 4 or 8 for maxColors are not actively "
+	warn("Values 4 or 8 for maxColors are not actively "
 	     "supported. Use at own risk.");
 	maxColors = val;
     } else
