@@ -428,9 +428,6 @@ void stop_sched(void)
 }
 
 
-extern int End_game(void);
-
-
 static void sched_select_error(void)
 {
 #ifndef _WINDOWS
@@ -454,6 +451,7 @@ static void sched_select_error(void)
 
 unsigned long skip_to = 0;
 
+#ifndef _WINDOWS
 void sched(void)
 {
     int			i, n, io_todo = 3;
@@ -461,7 +459,6 @@ void sched(void)
 
     playback = rplayback;
 
-#ifndef _WINDOWS
     if (sched_running) {
 	error("sched already running");
 	exit(1);
@@ -474,25 +471,6 @@ void sched(void)
 	tv.tv_sec = 0;
 	tv.tv_usec = 0;
 
-#else
-
-	if (NumPlayers > NumRobots + NumPseudoPlayers
-	    || login_in_progress != 0
-	    || NumQueuedPlayers > 0) {
-
-	    /* need fast I/O checks now! (2 or 3 times per frames) */
-	    tv.tv_sec = 0;
-	    /* KOERBER */
-	    /*	tv.tv_usec = 1000000 / (3 * timer_freq + 1); */
-	    tv.tv_usec = 1000000 / (10 * timer_freq + 1);
-	}
-	else {
-	    /* slow I/O checks are possible here... (2 times per second) */
-	    tv.tv_sec = 0;
-	    tv.tv_usec = 500000;
-	}
-
-#endif
 	if (main_loops < skip_to && timers_used >= timer_ticks)
 	    timer_ticks++;
 	if (io_todo == 0 && timers_used < timer_ticks) {
@@ -514,11 +492,9 @@ void sched(void)
 	    }
 	    else if (record)
 		*playback_sched++ = 0;
-#ifndef _WINDOWS
-	    if (timer_handler) {
+
+	    if (timer_handler)
 		(*timer_handler)();
-	    }
-#endif
 
 	    do {
 		++timers_used;
@@ -535,9 +511,8 @@ void sched(void)
 	    Handle_recording_buffers();
 	    n = select(max_fd + 1, &readmask, 0, 0, tvp);
 	    if (n <= 0) {
-		if (n == -1 && errno != EINTR) {
+		if (n == -1 && errno != EINTR)
 		    sched_select_error();
-		}
 		io_todo = 0;
 	    }
 	    else {
@@ -558,20 +533,84 @@ void sched(void)
 			(*(ioh->func))(ioh->fd, ioh->arg);
 			record = rrecord;
 			playback = rplayback;
-			if (--n == 0) {
+			if (--n == 0)
 			    break;
-			}
 		    }
 		}
-		if (io_todo > 0) {
+		if (io_todo > 0)
 		    io_todo--;
+	    }
+	    if (io_todo == 0)
+		tvp = NULL;
+	}
+    }
+}
+
+#else /* _WINDOWS */
+void sched(void)
+{
+    int			i, n, io_todo = 3;
+    struct timeval	tv, *tvp = &tv;
+
+    if (NumPlayers > NumRobots + NumPseudoPlayers
+	|| login_in_progress != 0
+	|| NumQueuedPlayers > 0) {
+
+	/* need fast I/O checks now! (2 or 3 times per frames) */
+	tv.tv_sec = 0;
+	/* KOERBER */
+	/*	tv.tv_usec = 1000000 / (3 * timer_freq + 1); */
+	tv.tv_usec = 1000000 / (10 * timer_freq + 1); 
+    }
+    else {
+	/* slow I/O checks are possible here... (2 times per second) */ ; 
+	tv.tv_sec = 0;
+	tv.tv_usec = 500000;
+    }
+
+
+    if (io_todo == 0 && timers_used < timer_ticks) {
+	io_todo = 1 + (timer_ticks - timers_used);
+	tvp = &tv;
+
+	do {
+	    ++timers_used;
+	    if (--ticks_till_second <= 0) {
+		ticks_till_second += timer_freq;
+		current_time++;
+		timeout_chime();
+	    }
+	} while (timers_used + 1 < timer_ticks);
+    }
+    else {
+	fd_set readmask;
+	readmask = input_mask;
+	n = select(max_fd + 1, &readmask, 0, 0, tvp);
+	if (n <= 0) {
+	    if (n == -1 && errno != EINTR) {
+		sched_select_error();
+	    }
+	    io_todo = 0;
+	}
+	else {
+	    for (i = max_fd; i >= min_fd; i--) {
+		if (FD_ISSET(i, &readmask)) {
+		    struct io_handler *ioh;
+		    ioh = &input_handlers[i - min_fd];
+		    (*(ioh->func))(ioh->fd, ioh->arg);
+		    if (--n == 0) {
+			break;
+		    }
 		}
 	    }
-	    if (io_todo == 0) {
-		tvp = NULL;
+	    if (io_todo > 0) {
+		io_todo--;
 	    }
 	}
-#ifndef _WINDOWS
+	if (io_todo == 0) {
+	    tvp = NULL;
+	}
     }
-#endif
 }
+
+#endif /* _WINDOWS */
