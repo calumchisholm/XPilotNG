@@ -96,24 +96,6 @@ shipobj *Default_ship(void)
     return &sh;
 }
 
-void Calculate_shield_radius(shipobj *w)
-{
-    int			i;
-    int			radius2, max_radius = 0;
-
-    for (i = 0; i < w->num_points; i++) {
-	position pti = Ship_get_point_position(w, i, 0);
-	radius2 = (int)(sqr(pti.x) + sqr(pti.y));
-	if (radius2 > max_radius) {
-	    max_radius = radius2;
-	}
-    }
-    max_radius = (int)(2.0 * sqrt(max_radius));
-    w->shield_radius = CLICK_TO_PIXEL((max_radius + 2 <= 34)
-				      ? 34
-				      : (max_radius + 2 - (max_radius & 1)));
-}
-
 shapepos ipos2shapepos(ipos pos)
 {
     shapepos shpos;
