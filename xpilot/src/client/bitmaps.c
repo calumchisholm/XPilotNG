@@ -86,9 +86,9 @@ static int Bitmap_init(int img);
 static void Bitmap_picture_copy(xp_pixmap_t * xp_pixmap, int image);
 static void Bitmap_picture_scale(xp_pixmap_t * xp_pixmap, int image);
 
-int Bitmap_create_begin(Drawable d, xp_pixmap_t * pm, int bmp);
-int Bitmap_create_end(Drawable d);
-void Bitmap_set_pixel(xp_pixmap_t *, int, int, int, RGB_COLOR);
+static int Bitmap_create_begin(Drawable d, xp_pixmap_t * pm, int bmp);
+static int Bitmap_create_end(Drawable d);
+static void Bitmap_set_pixel(xp_pixmap_t *, int, int, int, RGB_COLOR);
 
 
 /*
@@ -221,7 +221,7 @@ static void Bitmap_blend_with_color(int img, int bmp, int rgb)
     int x, y, r, g, b, r2, g2, b2;
     bool scaled;
     RGB_COLOR color;
-    double x_scaled, y_scaled, dx_scaled, dy_scaled;
+    double x_scaled = 0.0, y_scaled  = 0.0, dx_scaled  = 0.0, dy_scaled = 0.0;
     xp_pixmap_t *pix = &pixmaps[img];
 
     pix->bitmaps[bmp].rgb = rgb;
@@ -239,20 +239,23 @@ static void Bitmap_blend_with_color(int img, int bmp, int rgb)
     b2 = rgb & 0xff;
     
     for (y = 0; y < (int)pix->height; y++) {
-	if (scaled) x_scaled = 0;
+	if (scaled)
+	    x_scaled = 0;
 	for (x = 0; x < (int)pix->width; x++) {
 	    color = scaled ?
-		Picture_get_pixel_area
-		(&(pix->picture), bmp,
-		 x_scaled, y_scaled, dx_scaled, dy_scaled) :
+		Picture_get_pixel_area(&(pix->picture), bmp,
+				       x_scaled, y_scaled,
+				       dx_scaled, dy_scaled) :
 		Picture_get_pixel(&(pix->picture), bmp, x, y);
 	    r = RED_VALUE(color) * r2 / 0xff;
 	    g = GREEN_VALUE(color) * g2 / 0xff;
 	    b = BLUE_VALUE(color) * b2 / 0xff;
 	    Bitmap_set_pixel(pix, bmp, x, y, RGB24(r, g, b));
-	    if (scaled) x_scaled += dx_scaled;
+	    if (scaled)
+		x_scaled += dx_scaled;
 	}
-	if (scaled) y_scaled += dy_scaled;
+	if (scaled)
+	    y_scaled += dy_scaled;
     }    
 }
 
