@@ -309,7 +309,7 @@ typedef struct {
     int style;
     int group;
     int edges;
-    int cx, cy;
+    clpos pos;
     int num_points;
     int estyles_start;
     int num_echanges;

@@ -118,13 +118,12 @@ void hexdump(void *p, size_t size)
     printf("\n\n");
 }
 
-int Map_place_cannon(int cx, int cy, int dir, int team)
+int Map_place_cannon(clpos pos, int dir, int team)
 {
     cannon_t t, *cannon;
     int ind = World.NumCannons;
 
-    t.pos.cx = cx;
-    t.pos.cy = cy;
+    t.pos = pos;
     t.dir = dir;
     t.team = team;
     t.dead_time = 0;
@@ -136,13 +135,12 @@ int Map_place_cannon(int cx, int cy, int dir, int team)
     return ind;
 }
 
-int Map_place_fuel(int cx, int cy, int team)
+int Map_place_fuel(clpos pos, int team)
 {
     fuel_t t;
     int ind = World.NumFuels;
 
-    t.pos.cx = cx;
-    t.pos.cy = cy;
+    t.pos = pos;
     t.fuel = START_STATION_FUEL;
     t.conn_mask = (unsigned)-1;
     t.last_change = frame_loops;
@@ -151,13 +149,12 @@ int Map_place_fuel(int cx, int cy, int team)
     return ind;
 }
 
-int Map_place_base(int cx, int cy, int dir, int team)
+int Map_place_base(clpos pos, int dir, int team)
 {
     base_t t;
     int ind = World.NumBases;
 
-    t.pos.cx = cx;
-    t.pos.cy = cy;
+    t.pos = pos;
     /*
      * The direction of the base should be so that it points
      * up with respect to the gravity in the region.  This
@@ -179,13 +176,12 @@ int Map_place_base(int cx, int cy, int dir, int team)
     return ind;
 }
 
-int Map_place_treasure(int cx, int cy, int team, bool empty)
+int Map_place_treasure(clpos pos, int team, bool empty)
 {
     treasure_t t;
     int ind = World.NumTreasures;
 
-    t.pos.cx = cx;
-    t.pos.cy = cy;
+    t.pos = pos;
     t.have = false;
     t.destroyed = 0;
     t.team = team;
@@ -198,13 +194,12 @@ int Map_place_treasure(int cx, int cy, int team, bool empty)
     return ind;
 }
 
-int Map_place_target(int cx, int cy, int team)
+int Map_place_target(clpos pos, int team)
 {
     target_t t;
     int ind = World.NumTargets;
 
-    t.pos.cx = cx;
-    t.pos.cy = cy;
+    t.pos = pos;
     /*
      * If we have a block based map, the team is determined in
      * in Xpmap_find_map_object_teams().
@@ -220,13 +215,12 @@ int Map_place_target(int cx, int cy, int team)
     return ind;
 }
 
-int Map_place_wormhole(int cx, int cy, wormType type)
+int Map_place_wormhole(clpos pos, wormType type)
 {
     wormhole_t t;
     int ind = World.NumWormholes;
 
-    t.pos.cx = cx;
-    t.pos.cy = cy;
+    t.pos = pos;
     t.countdown = 0;
     t.lastdest = -1;
     t.temporary = false;
@@ -241,54 +235,49 @@ int Map_place_wormhole(int cx, int cy, wormType type)
  * if 0 <= ind < OLD_MAX_CHECKS, the checkpoint is directly inserted
  * into the check array and it is assumed it has been allocated earlier
  */
-int Map_place_check(int cx, int cy, int ind)
+int Map_place_check(clpos pos, int ind)
 {
     check_t t;
 
     if (ind >= 0 && ind < OLD_MAX_CHECKS) {
-	World.checks[ind].pos.cx = cx;
-	World.checks[ind].pos.cy = cy;
+	World.checks[ind].pos = pos;
 	return ind;
     }
 
     ind = World.NumChecks;
-    t.pos.cx = cx;
-    t.pos.cy = cy;
+    t.pos = pos;
     STORE(check_t, World.checks, World.NumChecks, max_checks, t);
     return ind;
 }
 
-int Map_place_item_concentrator(int cx, int cy)
+int Map_place_item_concentrator(clpos pos)
 {
     item_concentrator_t t;
     int ind = World.NumItemConcs;
 
-    t.pos.cx = cx;
-    t.pos.cy = cy;
+    t.pos = pos;
     STORE(item_concentrator_t, World.itemConcs,
 	  World.NumItemConcs, max_itemconcs, t);
     return ind;
 }
 
-int Map_place_asteroid_concentrator(int cx, int cy)
+int Map_place_asteroid_concentrator(clpos pos)
 {
     asteroid_concentrator_t t;
     int ind = World.NumAsteroidConcs;
 
-    t.pos.cx = cx;
-    t.pos.cy = cy;
+    t.pos = pos;
     STORE(asteroid_concentrator_t, World.asteroidConcs,
 	  World.NumAsteroidConcs, max_asteroidconcs, t);
     return ind;
 }
 
-int Map_place_grav(int cx, int cy, DFLOAT force, int type)
+int Map_place_grav(clpos pos, DFLOAT force, int type)
 {
     grav_t t;
     int ind = World.NumGravs;
 
-    t.pos.cx = cx;
-    t.pos.cy = cy;
+    t.pos = pos;
     t.force = force;
     t.type = type;
     STORE(grav_t, World.gravs, World.NumGravs, max_gravs, t);

@@ -62,13 +62,11 @@ static void Xpmap_extra_error(int line_num)
 
     if (line_num > prev_line_num) {
 	prev_line_num = line_num;
-	if (++error_count <= max_error) {
+	if (++error_count <= max_error)
 	    xpprintf("Map file contains extraneous characters on line %d\n",
 		     line_num);
-	}
-	else if (error_count - max_error == 1) {
+	else if (error_count - max_error == 1)
 	    xpprintf("And so on...\n");
-	}
     }
 #endif
 }
@@ -192,30 +190,30 @@ void Xpmap_allocate_checks(void)
  */
 static void Xpmap_place_cannon(int x, int y, int dir, bool create)
 {
-    int cx = -1, cy = -1;
+    clpos pos;
 
     switch (dir) {
     case DIR_UP:
-	cx = (x + 0.5) * BLOCK_CLICKS;
-	cy = (y + 0.333) * BLOCK_CLICKS;
+	pos.cx = (x + 0.5) * BLOCK_CLICKS;
+	pos.cy = (y + 0.333) * BLOCK_CLICKS;
 	break;
     case DIR_LEFT:
-	cx = (x + 0.667) * BLOCK_CLICKS;
-	cy = (y + 0.5) * BLOCK_CLICKS;
+	pos.cx = (x + 0.667) * BLOCK_CLICKS;
+	pos.cy = (y + 0.5) * BLOCK_CLICKS;
 	break;
     case DIR_RIGHT:
-	cx = (x + 0.333) * BLOCK_CLICKS;
-	cy = (y + 0.5) * BLOCK_CLICKS;
+	pos.cx = (x + 0.333) * BLOCK_CLICKS;
+	pos.cy = (y + 0.5) * BLOCK_CLICKS;
 	break;
     case DIR_DOWN:
-	cx = (x + 0.5) * BLOCK_CLICKS;
-	cy = (y + 0.667) * BLOCK_CLICKS;
+	pos.cx = (x + 0.5) * BLOCK_CLICKS;
+	pos.cy = (y + 0.667) * BLOCK_CLICKS;
 	break;
     }
 
     World.block[x][y] = CANNON;
     if (create)
-	Map_place_cannon(cx, cy, dir, TEAM_NOT_SET);
+	Map_place_cannon(pos, dir, TEAM_NOT_SET);
 }
 
 /*
@@ -224,55 +222,53 @@ static void Xpmap_place_cannon(int x, int y, int dir, bool create)
  * is fixed in Find_base_dir() when the gravity has
  * been computed.
  */
+static clpos Xpmap_get_clpos(int x, int y)
+{
+    clpos pos;
+
+    pos.cx = BLOCK_CENTER(x);
+    pos.cy = BLOCK_CENTER(y);
+
+    return pos;
+}
+
 static void Xpmap_place_base(int x, int y, int team, bool create)
 {
-    int cx = BLOCK_CENTER(x), cy = BLOCK_CENTER(y);
-
     World.block[x][y] = BASE;
     if (create)
-	Map_place_base(cx, cy, DIR_UP, team);
+	Map_place_base(Xpmap_get_clpos(x, y), DIR_UP, team);
 }
 
 static void Xpmap_place_fuel(int x, int y, bool create)
 {
-    int cx = BLOCK_CENTER(x), cy = BLOCK_CENTER(y);
-
     World.block[x][y] = FUEL;
     if (create)
-	Map_place_fuel(cx, cy, TEAM_NOT_SET);
+	Map_place_fuel(Xpmap_get_clpos(x, y), TEAM_NOT_SET);
 }
 
 static void Xpmap_place_treasure(int x, int y, bool empty, bool create)
 {
-    int cx = BLOCK_CENTER(x), cy = BLOCK_CENTER(y);
-
     World.block[x][y] = TREASURE;
     if (create)
-	Map_place_treasure(cx, cy, TEAM_NOT_SET, empty);
+	Map_place_treasure(Xpmap_get_clpos(x, y), TEAM_NOT_SET, empty);
 }
 
 static void Xpmap_place_wormhole(int x, int y, wormType type, bool create)
 {
-    int cx = BLOCK_CENTER(x), cy = BLOCK_CENTER(y);
-
     World.block[x][y] = WORMHOLE;
     if (create)
-	Map_place_wormhole(cx, cy, type);
+	Map_place_wormhole(Xpmap_get_clpos(x, y), type);
 }
 
 static void Xpmap_place_target(int x, int y, bool create)
 {
-    int cx = BLOCK_CENTER(x), cy = BLOCK_CENTER(y);
-
     World.block[x][y] = TARGET;
     if (create)
-	Map_place_target(cx, cy, TEAM_NOT_SET);
+	Map_place_target(Xpmap_get_clpos(x, y), TEAM_NOT_SET);
 }
 
 static void Xpmap_place_check(int x, int y, int index, bool create)
 {
-    int cx = BLOCK_CENTER(x), cy = BLOCK_CENTER(y);
-
     if (!BIT(World.rules->mode, TIMING)) {
 	World.block[x][y] = SPACE;
 	return;
@@ -280,34 +276,28 @@ static void Xpmap_place_check(int x, int y, int index, bool create)
 
     World.block[x][y] = CHECK;
     if (create)
-	Map_place_check(cx, cy, index);
+	Map_place_check(Xpmap_get_clpos(x, y), index);
 }
 
 static void Xpmap_place_item_concentrator(int x, int y, bool create)
 {
-    int cx = BLOCK_CENTER(x), cy = BLOCK_CENTER(y);
-
     World.block[x][y] = ITEM_CONCENTRATOR;
     if (create)
-	Map_place_item_concentrator(cx, cy);
+	Map_place_item_concentrator(Xpmap_get_clpos(x, y));
 }
 
 static void Xpmap_place_asteroid_concentrator(int x, int y, bool create)
 {
-    int cx = BLOCK_CENTER(x), cy = BLOCK_CENTER(y);
-
     World.block[x][y] = ASTEROID_CONCENTRATOR;
     if (create)
-	Map_place_asteroid_concentrator(cx, cy);
+	Map_place_asteroid_concentrator(Xpmap_get_clpos(x, y));
 }
 
 static void Xpmap_place_grav(int x, int y, DFLOAT force, int type, bool create)
 {
-    int cx = BLOCK_CENTER(x), cy = BLOCK_CENTER(y);
-
     World.block[x][y] = type;
     if (create)
-	Map_place_grav(cx, cy, force, type);
+	Map_place_grav(Xpmap_get_clpos(x, y), force, type);
 }
 
 static void Xpmap_place_block(int x, int y, int type)
@@ -388,16 +378,8 @@ void Xpmap_tags_to_internal_data(bool create)
 		Xpmap_place_block(x, y, BASE_ATTRACTOR);
 		break;
 	    case '_':
-	    case '0':
-	    case '1':
-	    case '2':
-	    case '3':
-	    case '4':
-	    case '5':
-	    case '6':
-	    case '7':
-	    case '8':
-	    case '9':
+	    case '0': case '1': case '2': case '3': case '4':
+	    case '5': case '6': case '7': case '8': case '9':
 		Xpmap_place_base(x, y, (int) (c - '0'), create);
 		break;
 		
@@ -564,9 +546,8 @@ void Xpmap_find_base_direction(void)
 		att = DIR_UP;
 	}
 	if (y < World.y - 1 && World.block[x][y + 1] == BASE_ATTRACTOR) {
-	    if (att == -1 || dir == DIR_UP) {
+	    if (att == -1 || dir == DIR_UP)
 		att = DIR_UP;
-	    }
 	}
 	/*THEN DOWNWARDS ATTRACTORS*/
         if (y == 0 && World.block[x][World.y-1] == BASE_ATTRACTOR
@@ -653,17 +634,17 @@ static void Xpmap_treasure_to_polygon(int treasure_ind)
 
     /* create balltarget */
     P_start_balltarget(treasure->team, treasure_ind);
-    P_start_polygon(pos[0].cx, pos[0].cy, polystyle);
+    P_start_polygon(pos[0], polystyle);
     for (i = 1; i <= N; i++)
-	P_vertex(pos[i].cx, pos[i].cy, edgestyle); 
+	P_vertex(pos[i], edgestyle); 
     P_end_polygon();
     P_end_balltarget();
 
     /* create ballarea */
     P_start_ballarea();
-    P_start_polygon(pos[0].cx, pos[0].cy, polystyle);
+    P_start_polygon(pos[0], polystyle);
     for (i = 1; i <= N; i++)
-	P_vertex(pos[i].cx, pos[i].cy, edgestyle); 
+	P_vertex(pos[i], edgestyle); 
     P_end_polygon();
     P_end_ballarea();
 }
@@ -688,27 +669,24 @@ static void Xpmap_block_polygon(int cx, int cy, int polystyle, int edgestyle)
     pos[3].cy = cy + (BLOCK_CLICKS - 1);
     pos[4] = pos[0];
 
-    P_start_polygon(pos[0].cx, pos[0].cy, polystyle);
+    P_start_polygon(pos[0], polystyle);
     for (i = 1; i <= 4; i++)
-	P_vertex(pos[i].cx, pos[i].cy, edgestyle); 
+	P_vertex(pos[i], edgestyle); 
     P_end_polygon();
 }
 
 
 static void Xpmap_target_to_polygon(int target_ind)
 {
-    int cx, cy, ps, es;
+    int ps, es;
     target_t *targ = Targets(target_ind);
 
     ps = P_get_poly_id("target_ps");
     es = P_get_edge_id("target_es");
 
-    cx = targ->pos.cx;
-    cy = targ->pos.cy;
-
     /* create target polygon */
     P_start_target(target_ind);
-    Xpmap_block_polygon(cx, cy, ps, es);
+    Xpmap_block_polygon(targ->pos.cx, targ->pos.cy, ps, es);
     P_end_target();
 }
 
@@ -721,8 +699,7 @@ static void Xpmap_cannon_polygon(cannon_t *cannon,
     int cy = cannon->pos.cy;
     int i;
 
-    pos[0].cx = cx;
-    pos[0].cy = cy;
+    pos[0] = cannon->pos;
 
     cx = CLICK_TO_BLOCK(cx) * BLOCK_CLICKS;
     cy = CLICK_TO_BLOCK(cy) * BLOCK_CLICKS;
@@ -755,9 +732,9 @@ static void Xpmap_cannon_polygon(cannon_t *cannon,
     }
     pos[3] = pos[0];
 
-    P_start_polygon(pos[0].cx, pos[0].cy, polystyle);
+    P_start_polygon(pos[0], polystyle);
     for (i = 1; i <= 3; i++)
-	P_vertex(pos[i].cx, pos[i].cy, edgestyle); 
+	P_vertex(pos[i], edgestyle); 
     P_end_polygon();
 }
 
@@ -802,9 +779,9 @@ static void Xpmap_wormhole_to_polygon(int wormhole_ind)
     pos[N] = pos[0];
 
     P_start_wormhole(wormhole_ind);
-    P_start_polygon(pos[0].cx, pos[0].cy, ps);
+    P_start_polygon(pos[0], ps);
     for (i = 1; i <= N; i++)
-	P_vertex(pos[i].cx, pos[i].cy, es); 
+	P_vertex(pos[i], es); 
     P_end_polygon();
     P_end_wormhole();
 }
@@ -899,9 +876,9 @@ static void Xpmap_wall_poly(int bx, int by, char startblock,
      */
     pos[4] = pos[0];
 
-    P_start_polygon(pos[0].cx, pos[0].cy, polystyle);
+    P_start_polygon(pos[0], polystyle);
     for (i = 1; i <= 4; i++)
-	P_vertex(pos[i].cx, pos[i].cy, edgestyle); 
+	P_vertex(pos[i], edgestyle); 
     P_end_polygon();
 }
 

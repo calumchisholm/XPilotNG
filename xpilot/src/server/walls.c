@@ -1694,8 +1694,8 @@ int Polys_to_client(unsigned char **start)
 	edges = estyleptr + pdata[i].estyles_start;
 	while (*edges != INT_MAX)
 	    STORE2(*edges++);
-	startx = pdata[i].cx;
-	starty = pdata[i].cy;
+	startx = pdata[i].pos.cx;
+	starty = pdata[i].pos.cy;
 	edges = edgeptr + pdata[i].edges;
 	STORE2(j);
 	STORE2(startx >> CLICK_SHIFT);
@@ -2105,8 +2105,8 @@ static void Inside_init(void)
 	    num_points = pdata[poly].num_points;
 	    dx = 0;
 	    dy = 0;
-	    startx = pdata[poly].cx;
-	    starty = pdata[poly].cy;
+	    startx = pdata[poly].pos.cx;
+	    starty = pdata[poly].pos.cy;
 	    /* Better wrapping for bx2/by2 could be selected for speed here,
 	     * but this keeping track of min/max at all is probably
 	     * unnoticeable in practice. */
@@ -2462,8 +2462,8 @@ static void Poly_to_lines(void)
 	style = pstyles[pdata[i].style].defedge_id;
 	dx = 0;
 	dy = 0;
-	startx = pdata[i].cx;
-	starty = pdata[i].cy;
+	startx = pdata[i].pos.cx;
+	starty = pdata[i].pos.cy;
 	edges = edgeptr + pdata[i].edges;
 	for (j = 0; j < np; j++) {
 	    if (j == *styleptr) {

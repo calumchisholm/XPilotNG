@@ -136,14 +136,14 @@ void P_bmpstyle(char *id, char *filename, int flags)
 /* current vertex */
 static clpos P_cv;
 
-void P_start_polygon(int cx, int cy, int style)
+void P_start_polygon(clpos pos, int style)
 {
     poly_t t;
 
-    if (!INSIDE_MAP(cx, cy)) {
+    if (!INSIDE_MAP(pos.cx, pos.cy)) {
 	warn("Polygon start point (%d, %d) is not inside the map"
 	     "(0 <= x < %d, 0 <= y < %d)",
-	     cx, cy, World.cwidth, World.cheight);
+	     pos.cx, pos.cy, World.cwidth, World.cheight);
 	exit(1);
     }
     if (style == -1) {
@@ -152,10 +152,8 @@ void P_start_polygon(int cx, int cy, int style)
     }
 
     ptscount = 0;
-    P_cv.cx = cx;
-    P_cv.cy = cy;
-    t.cx = cx;
-    t.cy = cy;
+    P_cv = pos;
+    t.pos = pos;
     t.group = current_group;
     t.edges = num_edges;
     t.style = style;
@@ -166,9 +164,9 @@ void P_start_polygon(int cx, int cy, int style)
 }
 
 
-void P_offset(int offcx, int offcy, int edgestyle)
+void P_offset(clpos offset, int edgestyle)
 {
-    int i;
+    int i, offcx = offset.cx, offcy = offset.cy;
 
     if (offcx == 0 && offcy == 0) {
 	warn("Edge with zero length");
@@ -198,16 +196,21 @@ void P_offset(int offcx, int offcy, int edgestyle)
     }
 }
 
-void P_vertex(int cx, int cy, int edgestyle)
+void P_vertex(clpos pos, int edgestyle)
 {
-    P_offset(cx - P_cv.cx, cy - P_cv.cy, edgestyle);
+    clpos offset;
+
+    offset.cx = pos.cx - P_cv.cx;
+    offset.cy = pos.cy - P_cv.cy;
+
+    P_offset(offset, edgestyle);
 }
 
 void P_end_polygon(void)
 {
     if (ptscount < 3) {
 	warn("Polygon with less than 3 edges?? (start %d, %d)",
-	     pdata[num_polys - 1].cx, pdata[num_polys - 1].cy);
+	     pdata[num_polys - 1].pos.cx, pdata[num_polys - 1].pos.cy);
 	exit(-1);
     }
     pdata[num_polys - 1].num_points = ptscount;
