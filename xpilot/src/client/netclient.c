@@ -762,6 +762,7 @@ int Net_start(void)
 	break;
     }
     packet_measure = NULL;
+    packetMeasurement = true;
     Net_init_measurement();
     Net_init_lag_measurement();
     errno = 0;

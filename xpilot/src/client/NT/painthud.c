@@ -867,49 +867,6 @@ void Paint_client_fps(void)
     rd.drawString(dpy, drawPixmap, gameGC, x, y, buf, len);
 }
 
-static void handle_packet_measurement(void)
-{
-    if (packetDropMeterColor || packetLossMeterColor) {
-	packetMeasurement = true;
-	Net_init_measurement();
-	if (!packetMeasurement)
-	    packetDropMeterColor
-		= packetLossMeterColor = 0;
-    }
-}
-
-static bool Set_packetLossMeterColor(xp_option_t *opt, int value)
-{
-    UNUSED_PARAM(opt);
-
-    packetLossMeterColor = value;
-    handle_packet_measurement();
-
-    return true;
-}
-
-static bool Set_packetDropMeterColor(xp_option_t *opt, int value)
-{
-    UNUSED_PARAM(opt);
-
-    packetDropMeterColor = value;
-    handle_packet_measurement();
-
-    return true;
-}
-
-static bool Set_packetLagMeterColor(xp_option_t *opt, int value)
-{
-    UNUSED_PARAM(opt);
-
-    packetLagMeterColor = value;
-    if (packetLagMeterColor)
-	Net_init_lag_measurement();
-
-    return true;
-}
-
-
 xp_option_t hud_options[] = {
 
     COLOR_INDEX_OPTION(
@@ -1031,28 +988,25 @@ xp_option_t hud_options[] = {
 	"Which color number to use for drawing the packet size meter.\n"
 	"Each bar is equavalent to 1024 bytes, for a maximum of 4096 bytes.\n"),
 
-    COLOR_INDEX_OPTION_WITH_SETFUNC(
+    COLOR_INDEX_OPTION(
 	"packetLossMeterColor",
 	3,
 	&packetLossMeterColor,
-	Set_packetLossMeterColor,
 	"Which color number to use for drawing the packet loss meter.\n"
 	"This gives the percentage of lost frames due to network failure.\n"),
 
-    COLOR_INDEX_OPTION_WITH_SETFUNC(
+    COLOR_INDEX_OPTION(
 	"packetDropMeterColor",
 	0,
 	&packetDropMeterColor,
-	Set_packetDropMeterColor,
 	"Which color number to use for drawing the packet drop meter.\n"
 	"This gives the percentage of dropped frames due to display\n"
 	"slowness.\n"),
 
-    COLOR_INDEX_OPTION_WITH_SETFUNC(
+    COLOR_INDEX_OPTION(
 	"packetLagMeterColor",
 	3,
 	&packetLagMeterColor,
-	Set_packetLagMeterColor,
 	"Which color number to use for drawing the packet lag meter.\n"
 	"This gives the amount of lag in frames over the past one second.\n"),
 
