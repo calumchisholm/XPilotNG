@@ -15,14 +15,6 @@ clients see e.g. the bases in the right order. When this task is done, mapdata
 option support can be removed from xp2 maps. Check file src/server/xpmap.c.
 Developer: kps
 
-Task: Write a select() based frame scheduling in server. Currently an interval
-timer is used, which doesn't give the correct FPS in some cases. If the select
-based frame scheduling works ok, then also the server timerresolution option
-can be removed. Check src/server/sched.c. Note that when there is a server
-freeze it would be good if the players don't get a fast forward after that,
-rather just continue processing frames like nothing happened.
-Developer: kps
-
 Task: After select based server frame scheduling has been implemented,
 implement code that tries to process stuff between frames, so that there is
 a minimum amount of stuff todo when the actual frame update is done.
