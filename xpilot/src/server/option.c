@@ -278,9 +278,9 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    if (!strcasecmp(*attr, "width"))
 		estyles[num_estyles].width = atoi(*(attr + 1));
 	    if (!strcasecmp(*attr, "color"))
-		estyles[num_estyles].width = atoi(*(attr + 1));
+		estyles[num_estyles].color = atoi(*(attr + 1));
 	    if (!strcasecmp(*attr, "style")) /* !@# names later */
-		estyles[num_estyles].width = atoi(*(attr + 1));
+		estyles[num_estyles].style = atoi(*(attr + 1));
 	    attr += 2;
 	}
 	num_estyles++;
