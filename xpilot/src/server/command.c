@@ -27,7 +27,7 @@ char command_version[] = VERSION;
 
 
 
-player *Get_player_by_string(char *str, int *error, char **errorstr_p)
+player *Get_player_by_name(char *str, int *error, char **errorstr_p)
 {
     int i;
     player *pl = NULL;
@@ -47,11 +47,11 @@ player *Get_player_by_string(char *str, int *error, char **errorstr_p)
     /* Check if 'str' is a substring of any player's name. */
     for (i = 0; i < NumPlayers; i++) {
 	player *pl_i = Players(i);
-	char *name = pl_i->name;
+	char *name_i = pl_i->name;
 	int j;
 
-	for (j = 0; j < 1 + (int)strlen(name) - (int)strlen(str); j++) {
-	    if (!strncasecmp(name + j, str, strlen(str))) {
+	for (j = 0; j < 1 + (int)strlen(name_i) - (int)strlen(str); j++) {
+	    if (!strncasecmp(name_i + j, str, strlen(str))) {
 		if (pl)
 		    goto match_several;
 		pl = pl_i;
@@ -484,15 +484,28 @@ void Handle_player_command(player *pl, char *cmd_orig)
 static int Cmd_addr(char *arg, player *pl, int oper, char *msg)
 {
     int ind;
+    player *pl2 = NULL;
+    char *errorstr;
 
-    if (!oper) {
+    if (!oper)
 	return CMD_RESULT_NOT_OPERATOR;
-    }
 
-    if (!arg || !*arg) {
+    if (!arg || !*arg)
 	return CMD_RESULT_NO_NAME;
-    }
 
+#if 1
+    pl2 = Get_player_by_name(arg, NULL, &errorstr);
+    if (pl2) {
+	const char *addr = Player_get_addr(pl2);
+	if (addr == NULL)
+	    sprintf(msg, "Unable to get address for %s.", pl->name);
+	else
+	    sprintf(msg, "%s plays from: %s.", pl->name, addr);
+    } else {
+	strcpy(msg, errorstr);
+	return CMD_RESULT_ERROR;
+    }
+#else
     ind = Get_player_index_by_name(arg);
     if (ind >= 0) {
 	player *pl = Players(ind);
@@ -511,6 +524,7 @@ static int Cmd_addr(char *arg, player *pl, int oper, char *msg)
 	}
 	return CMD_RESULT_ERROR;
     }
+#endif
 
     return CMD_RESULT_SUCCESS;
 }
@@ -817,7 +831,7 @@ static int Cmd_kick(char *arg, player *pl, int oper, char *msg)
 	return CMD_RESULT_NO_NAME;
 
 #if 1
-    kicked_pl = Get_player_by_string(arg, NULL, &errorstr);
+    kicked_pl = Get_player_by_name(arg, NULL, &errorstr);
     if (kicked_pl) {
 	sprintf(msg, "%s kicked %s out! [*Server notice*]",
 		pl->name, kicked_pl->name);
@@ -828,8 +842,8 @@ static int Cmd_kick(char *arg, player *pl, int oper, char *msg)
 	Set_message(msg);
 	strcpy(msg, "");
 	return CMD_RESULT_SUCCESS;
-    } else
-	strcpy(msg, errorstr);
+    }
+    strcpy(msg, errorstr);
 #else
     i = Get_player_index_by_name(arg);
     if (i >= 0) {
