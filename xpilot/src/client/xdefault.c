@@ -63,6 +63,25 @@ static bool testxcolors = false;
 static char displayName[MAX_DISP_LEN];
 static char keyboardName[MAX_DISP_LEN];
 
+
+static bool Set_geometry(xp_option_t *opt, const char *value)
+{
+    (void)opt;
+    if (geometry)
+	xp_free(geometry);
+
+    geometry = xp_safe_strdup(value);
+    return true;
+}
+
+static char *Get_geometry(xp_option_t *opt)
+{
+    (void)opt;
+    return geometry;
+}
+
+
+
 xp_option_t xdefault_options[] = {
     XP_BOOL_OPTION(
 	"fullColor",
@@ -82,6 +101,14 @@ xp_option_t xdefault_options[] = {
 	"Be warned that this requires more graphics speed.\n"
 	"fullColor must be on for this to work.\n"
 	"You may also need to enable multibuffering or double-buffering.\n"),
+
+    XP_STRING_OPTION(
+	"geometry",
+	"1024x768",
+	NULL, 0,
+	Set_geometry, Get_geometry,
+	"Set the window size and position in standard X geometry format.\n"
+	"The maximum allowed window size is 1922x1440.\n"),
 
     XP_STRING_OPTION(
 	"display",

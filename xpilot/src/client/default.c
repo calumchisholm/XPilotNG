@@ -164,22 +164,6 @@ static char *Get_texturePath(xp_option_t *opt)
     return texturePath;
 }
 
-static bool Set_geometry(xp_option_t *opt, const char *value)
-{
-    (void)opt;
-    if (geometry)
-	xp_free(geometry);
-
-    geometry = xp_safe_strdup(value);
-    return true;
-}
-
-static char *Get_geometry(xp_option_t *opt)
-{
-    (void)opt;
-    return geometry;
-}
-
 /*
  * This function trys to set the shipShape variable.
  *
@@ -480,16 +464,6 @@ xp_option_t default_options[] = {
 	&clientPortEnd,
 	NULL,
 	"Use UDP ports clientPortStart - clientPortEnd (for firewalls).\n"),
-
-    XP_STRING_OPTION(
-	"geometry",
-	"1024x768",
-	NULL, 0,
-	Set_geometry, Get_geometry,
-	"Set the window size and position in standard X geometry format.\n"
-	"The maximum allowed window size is 1922x1440.\n"),
-
-
     /*
      * kps - steering stuff, note that set functions might have to be
      * specified here.
