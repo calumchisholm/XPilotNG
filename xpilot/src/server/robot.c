@@ -48,266 +48,334 @@ static robot_t DefaultRobots[] = {
 	"Mad Max",
 	"94 20",
 	0,
-	"(SH: 15,0 7,1 7,2 2,4 -1,11 -3,11 -2,3 -8,6 -8,-6 -2,-3 -3,-11 -1,-11 2,-4 7,-2 7,-1)(EN: -8,0)(MG: 15,0)(LL: -8,-6)(RL: -8,6)(MR: 15,0)"
+	"(SH: 15,0 7,1 7,2 2,4 -1,11 -3,11 -2,3 -8,6 -8,-6 -2,-3 -3,-11 "
+	"-1,-11 2,-4 7,-2 7,-1)"
+	"(EN: -8,0)(MG: 15,0)(LL: -8,-6)(RL: -8,6)(MR: 15,0)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Blackie",
 	"10 90",
 	0,
-	"(SH: 15,0 6,2 -2,3 -1,4 -2,5 -10,8 -13,8 -13,1 -15,0 -13,-1 -13,-8 -10,-8 -2,-5 -1,-4 -2,-3 6,-2)(EN: -13,0)(MG: 15,0)(LL: -13,8)(RL: -13,-8)(MR: 15,0)"
+	"(SH: 15,0 6,2 -2,3 -1,4 -2,5 -10,8 -13,8 -13,1 -15,0 -13,-1 "
+	"-13,-8 -10,-8 -2,-5 -1,-4 -2,-3 6,-2)"
+	"(EN: -13,0)(MG: 15,0)(LL: -13,8)(RL: -13,-8)(MR: 15,0)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Kryten",
 	"70 40",
 	0,
-	"(SH: 15,0 0,8 -8,0 0,-8)(EN: 0,0)(MG: 15,0)(LL: 0,8)(RL: 0,-8)(MR: 15,0)"
+	"(SH: 15,0 0,8 -8,0 0,-8)"
+	"(EN: 0,0)(MG: 15,0)(LL: 0,8)(RL: 0,-8)(MR: 15,0)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Marvin",
 	"30 70",
 	0,
-	"(SH: 10,0 10,7 5,14 -5,14 -10,7 -10,-7 -5,-14 5,-14 10,-7 10,0 5,5 2,7 5,0 2,-7 5,-5)(EN: -10,0)(MG: 10,0)(LL: -10,7)(RL: -10,-7)(MR: 10,0)"
+	"(SH: 10,0 10,7 5,14 -5,14 -10,7 -10,-7 -5,-14 5,-14 10,-7 10,0 "
+	"5,5 2,7 5,0 2,-7 5,-5)"
+	"(EN: -10,0)(MG: 10,0)(LL: -10,7)(RL: -10,-7)(MR: 10,0)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"R2D2",
 	"50 60",
 	0,
-	"(SH: 15,0 14,1 -1,2 -2,9 0,10 -4,10 -7,2 -8,2 -8,-2 -7,-2 -4,-10 0,-10 -2,-9 -1,-2 14,-1)(EN: -7,-2)(MG: 15,0)(LL: -8,-2)(RL: -7,-2)(MR: 15,0)"
+	"(SH: 15,0 14,1 -1,2 -2,9 0,10 -4,10 -7,2 -8,2 -8,-2 -7,-2 -4,-10 "
+	"0,-10 -2,-9 -1,-2 14,-1)"
+	"(EN: -7,-2)(MG: 15,0)(LL: -8,-2)(RL: -7,-2)(MR: 15,0)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"C3PO",
 	"60 50",
 	0,
-	"(SH: 10,0 0,5 0,15 15,10 0,15 -15,10 0,15 0,5 -7,0 0,-5 0,-15 -15,-10 0,-15 15,-10 0,-15 0,-5)(EN: 0,0)(MG: 10,0)(LL: 0,5)(RL: 0,-5)(MR: 10,0)"
+	"(SH: 10,0 0,5 0,15 15,10 0,15 -15,10 0,15 0,5 -7,0 0,-5 0,-15 "
+	"-15,-10 0,-15 15,-10 0,-15 0,-5)"
+	"(EN: 0,0)(MG: 10,0)(LL: 0,5)(RL: 0,-5)(MR: 10,0)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"K9",
 	"50 50",
 	0,
-	"(SH: 15,0 15,5 5,5 5,-5 15,-5 15,0 -15,0 -15,5 5,5 5,-5 -15,-5 -15,-8 -15,8 -15,0)(EN: 15,0)(MG: 15,0)(LL: 15,0)(RL: 15,0)(MR: 15,0)"
+	"(SH: 15,0 15,5 5,5 5,-5 15,-5 15,0 -15,0 -15,5 5,5 5,-5 -15,-5 "
+	"-15,-8 -15,8 -15,0)"
+	"(EN: 15,0)(MG: 15,0)(LL: 15,0)(RL: 15,0)(MR: 15,0)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Robby",
 	"45 55",
 	0,
-	"(SH: 15,0 0,12 -9,8 -9,-8 0,-12)(EN: -9,0)(MG: 15,0)(LL: -9,8)(RL: -9,-8)(MR: 15,0)"
+	"(SH: 15,0 0,12 -9,8 -9,-8 0,-12)"
+	"(EN: -9,0)(MG: 15,0)(LL: -9,8)(RL: -9,-8)(MR: 15,0)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Mickey",
 	"05 95",
 	0,
-	"(SH: 5,-1 8,-5 7,-9 4,-11 -1,-10 -5,-6 -8,-10 -8,10 -5,6 -1,10 4,11 7,9 8,5 5,1 0,0)(EN: -8,0)(MG: 5,-1)(LL: -8,-10)(RL: -8,10)(MR: 5,-1)"
+	"(SH: 5,-1 8,-5 7,-9 4,-11 -1,-10 -5,-6 -8,-10 -8,10 -5,6 -1,10 "
+	"4,11 7,9 8,5 5,1 0,0)"
+	"(EN: -8,0)(MG: 5,-1)(LL: -8,-10)(RL: -8,10)(MR: 5,-1)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Hermes",
 	"15 85",
 	0,
-	"(SH: 10,1 12,8 -11,8 -10,3 -7,0 -5,2 -7,0 -10,-1 -10,-3 -13,-4 -13,-7 -15,-8 -15,-13 -5,-5 -2,-4 5,-2)(EN: -15,-10)(MG: 10,1)(LL: -15,-13)(RL: -15,-8)(MR: 10,1)"
+	"(SH: 10,1 12,8 -11,8 -10,3 -7,0 -5,2 -7,0 -10,-1 -10,-3 -13,-4 "
+	"-13,-7 -15,-8 -15,-13 -5,-5 -2,-4 5,-2)"
+	"(EN: -15,-10)(MG: 10,1)(LL: -15,-13)(RL: -15,-8)(MR: 10,1)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Pan",
 	"60 60",
 	0,
-	"(SH: 15,-1 15,0 5,0 5,-1 5,9 -15,9 -15,-4 -5,-7 -3,-8 -7,-8 -5,-7 5,-4 5,-1 -15,-1)(EN: -15,2)(MG: 15,-1)(LL: -15,-4)(RL: -15,9)(MR: 15,-1)"
+	"(SH: 15,-1 15,0 5,0 5,-1 5,9 -15,9 -15,-4 -5,-7 -3,-8 -7,-8 -5,-7 "
+	"5,-4 5,-1 -15,-1)"
+	"(EN: -15,2)(MG: 15,-1)(LL: -15,-4)(RL: -15,9)(MR: 15,-1)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Azurion",
 	"40 30",
 	0,
-	"(SH: 15,0 0,2 -9,8 -3,0 -9,-8 0,-2)(EN: -3,0)(MG: 15,0)(LL: -9,8)(RL: -9,-8)(MR: 15,0)"
+	"(SH: 15,0 0,2 -9,8 -3,0 -9,-8 0,-2)"
+	"(EN: -3,0)(MG: 15,0)(LL: -9,8)(RL: -9,-8)(MR: 15,0)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Droidion",
 	"60 30",
 	0,
-	"(SH: 10,0 5,9 -6,9 -11,0 -6,-9 5,-9 10,0)(EN: -6,0)(MG: 10,0)(LL: -6,9)(RL: -6,-9)(MR: 10,0)"
+	"(SH: 10,0 5,9 -6,9 -11,0 -6,-9 5,-9 10,0)"
+	"(EN: -6,0)(MG: 10,0)(LL: -6,9)(RL: -6,-9)(MR: 10,0)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Terminator",
 	"80 40",
 	0,
-	"(SH: 15,0 0,2 -9,8 -3,0 -9,-8 0,-2)(EN: -3,0)(MG: 15,0)(LL: -9,8)(RL: -9,-8)(MR: 15,0)"
+	"(SH: 15,0 0,2 -9,8 -3,0 -9,-8 0,-2)"
+	"(EN: -3,0)(MG: 15,0)(LL: -9,8)(RL: -9,-8)(MR: 15,0)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Sniper",
 	"30 90",
 	0,
-	"(SH: 15,0 4,2 -2,8 -4,7 -3,2 -8,5 -8,2 -6,1 -6,-1 -8,-2 -8,-5 -3,-2 -4,-7 -2,-8 4,-2)(EN: -6,0)(MG: 15,0)(LL: -8,2)(RL: -8,-2)(MR: 15,0)"
+	"(SH: 15,0 4,2 -2,8 -4,7 -3,2 -8,5 -8,2 -6,1 -6,-1 -8,-2 -8,-5 "
+	"-3,-2 -4,-7 -2,-8 4,-2)"
+	"(EN: -6,0)(MG: 15,0)(LL: -8,2)(RL: -8,-2)(MR: 15,0)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Slugger",
 	"40 40",
 	0,
-	"(SH: 15,0 13,1 3,2 -1,8 -3,8 -3,2 -5,2 -8,5 -8,-5 -5,-2 -3,-2 -3,-8 -1,-8 3,-2 13,-1 15,0)(EN: -8,0)(MG: 15,0)(LL: -8,-5)(RL: -8,5)(MR: 15,0)"
+	"(SH: 15,0 13,1 3,2 -1,8 -3,8 -3,2 -5,2 -8,5 -8,-5 -5,-2 -3,-2 "
+	"-3,-8 -1,-8 3,-2 13,-1 15,0)"
+	"(EN: -8,0)(MG: 15,0)(LL: -8,-5)(RL: -8,5)(MR: 15,0)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Uzi",
 	"95 5",
 	0,
-	"(SH: 15,3 7,3 7,-8 3,-8 3,1 -2,1 -3,-1 -5,-1 -14,-5 -15,2 -3,4 -1,8 0,6 13,6 14,8 15,6)(EN: -14,-1)(MG: 15,3)(LL: -15,2)(RL: -14,-5)(MR: 15,3)"
+	"(SH: 15,3 7,3 7,-8 3,-8 3,1 -2,1 -3,-1 -5,-1 -14,-5 -15,2 -3,4 "
+	"-1,8 0,6 13,6 14,8 15,6)"
+	"(EN: -14,-1)(MG: 15,3)(LL: -15,2)(RL: -14,-5)(MR: 15,3)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Capone",
 	"80 50",
 	0,
-	"(SH: 14,0 2,2 0,8 1,8 -3,8 -3,2 -8,4 -7,1 -7,-1 -8,-4 -3,-2 -3,-8 1,-8 0,-8 2,-2)(EN: -7,0)(MG: 14,0)(LL: -8,-4)(RL: -8,4)(MR: 14,0)"
+	"(SH: 14,0 2,2 0,8 1,8 -3,8 -3,2 -8,4 -7,1 -7,-1 -8,-4 -3,-2 "
+	"-3,-8 1,-8 0,-8 2,-2)"
+	"(EN: -7,0)(MG: 14,0)(LL: -8,-4)(RL: -8,4)(MR: 14,0)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Tanx",
 	"40 70",
 	0,
-	"(SH: 15,1 2,0 1,-2 6,-3 6,-5 3,-8 -10,-8 -13,-6 -13,-3 -10,-2 -11,2 -7,2 -7,8 -7,2 1,2 2,1)(EN: -13,-4)(MG: 15,1)(LL: -13,-6)(RL: -13,-3)(MR: 15,1)"
+	"(SH: 15,1 2,0 1,-2 6,-3 6,-5 3,-8 -10,-8 -13,-6 -13,-3 -10,-2 "
+	"-11,2 -7,2 -7,8 -7,2 1,2 2,1)"
+	"(EN: -13,-4)(MG: 15,1)(LL: -13,-6)(RL: -13,-3)(MR: 15,1)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Chrome Star",
 	"60 60",
 	0,
-	"(SH: 10,0 -10,6 2,-10 2,10 -10,-6 10,0)(EN: -6,0)(MG: 10,0)(LL: -10,6)(RL: -10,-6)(MR: 10,0)"
+	"(SH: 10,0 -10,6 2,-10 2,10 -10,-6 10,0)"
+	"(EN: -6,0)(MG: 10,0)(LL: -10,6)(RL: -10,-6)(MR: 10,0)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Bully",
 	"80 10",
 	0,
-	"(SH: 11,0 12,-3 9,-3 8,-2 -5,-5 -9,-11 -14,-14 -5,-3 -5,3 -14,14 -9,11 -5,5 8,2 9,3 12,3)(EN: -5,0)(MG: 11,0)(LL: -14,-14)(RL: -14,14)(MR: 11,0)"
+	"(SH: 11,0 12,-3 9,-3 8,-2 -5,-5 -9,-11 -14,-14 -5,-3 -5,3 -14,14 "
+	"-9,11 -5,5 8,2 9,3 12,3)"
+	"(EN: -5,0)(MG: 11,0)(LL: -14,-14)(RL: -14,14)(MR: 11,0)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Metal Hero",
 	"40 45",
 	0,
-	"(SH: 15,5 12,-2 9,-2 10,-1 -8,-1 -4,-1 1,-3 -13,-9 -9,0 -15,8 1,3 -4,1 -8,1 -8,-1 -8,1 11,1)(EN: -9,0)(MG: 15,5)(LL: -13,-9)(RL: -15,8)(MR: 15,5)"
+	"(SH: 15,5 12,-2 9,-2 10,-1 -8,-1 -4,-1 1,-3 -13,-9 -9,0 -15,8 "
+	"1,3 -4,1 -8,1 -8,-1 -8,1 11,1)"
+	"(EN: -9,0)(MG: 15,5)(LL: -13,-9)(RL: -15,8)(MR: 15,5)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Aurora",
 	"60 55",
 	0,
-	"(SH: 15,0 -1,3 -3,5 -3,9 7,10 -12,10 -6,9 -6,4 -8,0 -6,-4 -6,-9 -12,-10 7,-10 -3,-9 -3,-5 -1,-3)(EN: -8,0)(MG: 15,0)(LL: -12,10)(RL: -12,-10)(MR: 15,0)"
+	"(SH: 15,0 -1,3 -3,5 -3,9 7,10 -12,10 -6,9 -6,4 -8,0 -6,-4 -6,-9 "
+	"-12,-10 7,-10 -3,-9 -3,-5 -1,-3)"
+	"(EN: -8,0)(MG: 15,0)(LL: -12,10)(RL: -12,-10)(MR: 15,0)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Dalt Wisney",
 	"30 75",
 	0,
-	"(SH: 14,0 7,-4 0,-1 -5,-4 2,-8 0,-10 -14,-10 -5,-7 -14,0 -5,7 -14,10 0,10 2,8 -5,4 0,1 7,4)(EN: -14,0)(MG: 14,0)(LL: -14,10)(RL: -14,-10)(MR: 14,0)"
+	"(SH: 14,0 7,-4 0,-1 -5,-4 2,-8 0,-10 -14,-10 -5,-7 -14,0 -5,7 "
+	"-14,10 0,10 2,8 -5,4 0,1 7,4)"
+	"(EN: -14,0)(MG: 14,0)(LL: -14,10)(RL: -14,-10)(MR: 14,0)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Psycho",
 	"65 55",
 	0,
-	"(SH: 8,0 5,8 3,12 0,15 0,0 -8,3 -8,-3 0,0 0,-15 3,-12 5,-8)(EN: -8,0)(MG: 8,0)(LL: -8,3)(RL: -8,-3)(MR: 8,0)"
+	"(SH: 8,0 5,8 3,12 0,15 0,0 -8,3 -8,-3 0,0 0,-15 3,-12 5,-8)"
+	"(EN: -8,0)(MG: 8,0)(LL: -8,3)(RL: -8,-3)(MR: 8,0)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Gorgon",
 	"30 40",
 	0,
-	"(SH: 15,0 5,2 3,8 2,2 -9,2 -10,4 -12,2 -14,4 -14,-4 -12,-2 -10,-4 -9,-2 2,-2 3,-8 5,-2)(EN: -14,0)(MG: 15,0)(LL: -14,4)(RL: -14,-4)(MR: 15,0)"
+	"(SH: 15,0 5,2 3,8 2,2 -9,2 -10,4 -12,2 -14,4 -14,-4 -12,-2 -10,-4 "
+	"-9,-2 2,-2 3,-8 5,-2)"
+	"(EN: -14,0)(MG: 15,0)(LL: -14,4)(RL: -14,-4)(MR: 15,0)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Pompel",
 	"50 50",
 	0,
-	"(SH: 15,0 14,4 10,5 5,2 -7,3 -7,6 5,8 -9,8 -9,-8 5,-8 -7,-6 -7,-3 5,-2 10,-5 14,-4)(EN: -9,0)(MG: 15,0)(LL: -9,8)(RL: -9,-8)(MR: 15,0)"
+	"(SH: 15,0 14,4 10,5 5,2 -7,3 -7,6 5,8 -9,8 -9,-8 5,-8 -7,-6 "
+	"-7,-3 5,-2 10,-5 14,-4)"
+	"(EN: -9,0)(MG: 15,0)(LL: -9,8)(RL: -9,-8)(MR: 15,0)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Pilt",
 	"50 50",
 	0,
-	"(SH: 15,0 13,-2 9,-3 3,-3 -3,-3 -5,-2 -13,-2 -15,-3 -15,3 -13,2 -5,2 -3,3 -3,-8 -3,8 -3,3 8,3)(EN: -15,0)(MG: 15,0)(LL: -15,3)(RL: -15,-3)(MR: 15,0)"
+	"(SH: 15,0 13,-2 9,-3 3,-3 -3,-3 -5,-2 -13,-2 -15,-3 -15,3 -13,2 "
+	"-5,2 -3,3 -3,-8 -3,8 -3,3 8,3)"
+	"(EN: -15,0)(MG: 15,0)(LL: -15,3)(RL: -15,-3)(MR: 15,0)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Sparky",
 	"20 40",
 	0,
-	"(SH:)(EN: -8,0)(MG: 14,0)(LL: -8,8)(RL: -8,-8)(MR: 14,0)"
+	"(SH:)"
+	"(EN: -8,0)(MG: 14,0)(LL: -8,8)(RL: -8,-8)(MR: 14,0)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Cobra",
 	"85 60",
 	0,
-	"(SH: 8,0 8,-6 6,-8 0,-7 5,-6 -14,-4 5,-2 0,-1 5,0 0,1 5,2 -14,4 5,6 0,7 6,8 8,6 8,0)(EN: 5,0)(MG: 8,0)(LL: -14,-4)(RL: -14,4)(MR: 8,0)"
+	"(SH: 8,0 8,-6 6,-8 0,-7 5,-6 -14,-4 5,-2 0,-1 5,0 0,1 5,2 "
+	"-14,4 5,6 0,7 6,8 8,6 8,0)"
+	"(EN: 5,0)(MG: 8,0)(LL: -14,-4)(RL: -14,4)(MR: 8,0)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Falcon",
 	"70 20",
 	0,
-	"(SH: 14,2 14,4 2,10 -5,10 -10,8 -12,3 -12,-3 -10,-8 -5,-10 9,-11 10,-8 7,-8 14,-4 14,-2 4,-2 4,2)(EN: -12,0)(MG: 14,2)(LL: -12,3)(RL: -12,-3)(MR: 14,2)"
+	"(SH: 14,2 14,4 2,10 -5,10 -10,8 -12,3 -12,-3 -10,-8 -5,-10 9,-11 "
+	"10,-8 7,-8 14,-4 14,-2 4,-2 4,2)"
+	"(EN: -12,0)(MG: 14,2)(LL: -12,3)(RL: -12,-3)(MR: 14,2)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Boson",
 	"25 35",
 	0,
-	"(SH: 15,0 10,-5 4,-8 7,-2 7,2 4,8 6,0 4,-8 -10,-8 -10,8 -10,-8 -15,-7 -15,7 -10,8 4,8 10,5)(EN: -15,0)(MG: 15,0)(LL: -15,-7)(RL: -15,7)(MR: 15,0)"
+	"(SH: 15,0 10,-5 4,-8 7,-2 7,2 4,8 6,0 4,-8 -10,-8 -10,8 -10,-8 "
+	"-15,-7 -15,7 -10,8 4,8 10,5)"
+	"(EN: -15,0)(MG: 15,0)(LL: -15,-7)(RL: -15,7)(MR: 15,0)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Blazy",
 	"40 40",
 	0,
-	"(SH: 4,0 2,4 -5,11 10,12 -8,12 -4,6 -2,0 -4,-6 -8,-12 10,-12 -5,-11 2,-4)(EN: -2,0)(MG: 4,0)(LL: -8,12)(RL: -8,-12)(MR: 4,0)"
+	"(SH: 4,0 2,4 -5,11 10,12 -8,12 -4,6 -2,0 -4,-6 -8,-12 10,-12 "
+	"-5,-11 2,-4)"
+	"(EN: -2,0)(MG: 4,0)(LL: -8,12)(RL: -8,-12)(MR: 4,0)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Pixie",
 	"15 93",
 	0,
-	"(SH: 15,0 7,4 11,1 -4,3 3,5 -7,10 -9,2 -9,-2 -7,-10 3,-5 -4,-3 11,-1 7,-4)(EN: -9,0)(MG: 15,0)(LL: -9,2)(RL: -9,-2)(MR: 15,0)"
+	"(SH: 15,0 7,4 11,1 -4,3 3,5 -7,10 -9,2 -9,-2 -7,-10 3,-5 -4,-3 "
+	"11,-1 7,-4)"
+	"(EN: -9,0)(MG: 15,0)(LL: -9,2)(RL: -9,-2)(MR: 15,0)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Wimpy",
 	"5 98",
 	0,
-	"(SH: 3,0 6,5 8,10 5,11 1,10 -1,8 -4,9 -8,6 -5,0 -8,-6 -4,-9 -1,-8 1,-10 5,-11 8,-10 6,-5)(EN: -5,0)(MG: 3,0)(LL: -8,-6)(RL: -8,6)(MR: 3,0)"
+	"(SH: 3,0 6,5 8,10 5,11 1,10 -1,8 -4,9 -8,6 -5,0 -8,-6 -4,-9 "
+	"-1,-8 1,-10 5,-11 8,-10 6,-5)"
+	"(EN: -5,0)(MG: 3,0)(LL: -8,-6)(RL: -8,6)(MR: 3,0)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Bonnie",
 	"30 40",
 	0,
-	"(SH: 15,3 5,3 5,1 4,-1 0,-1 -2,-8 -8,-8 -5,3 -6,6 -8,7 -7,8 -4,7 10,7 12,8 14,8 15,7 15,3)(EN: -6,0)(MG: 15,3)(LL: -8,7)(RL: -8,-8)(MR: 15,3)"
+	"(SH: 15,3 5,3 5,1 4,-1 0,-1 -2,-8 -8,-8 -5,3 -6,6 -8,7 -7,8 -4,7 "
+	"10,7 12,8 14,8 15,7 15,3)"
+	"(EN: -6,0)(MG: 15,3)(LL: -8,7)(RL: -8,-8)(MR: 15,3)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Clyde",
 	"40 45",
 	0,
-	"(SH: 14,0 5,5 6,2 0,2 0,8 -13,8 -13,4 -4,4 -6,0 -4,-4 -13,-4 -13,-8 0,-8 0,-2 6,-2 5,-5)(EN: -6,0)(MG: 14,0)(LL: -13,8)(RL: -13,-8)(MR: 14,0)"
+	"(SH: 14,0 5,5 6,2 0,2 0,8 -13,8 -13,4 -4,4 -6,0 -4,-4 -13,-4 "
+	"-13,-8 0,-8 0,-2 6,-2 5,-5)"
+	"(EN: -6,0)(MG: 14,0)(LL: -13,8)(RL: -13,-8)(MR: 14,0)"
     },
     {
 	DEFAULT_ROBOT_TYPE,
 	"Neuro",
 	"70 70",
 	0,
-	"(SH: 12,-7 12,-12 5,-12 2,-10 1,-5 -9,-4 -11,2 -8,8 -3,11 3,11 9,8 11,2 13,0 12,-3 12,-7 7,-7)(EN: -8,2)(MG: 12,-7)(LL: -8,8)(RL: -9,-4)(MR: 12,-7)"
+	"(SH: 12,-7 12,-12 5,-12 2,-10 1,-5 -9,-4 -11,2 -8,8 -3,11 3,11 "
+	"9,8 11,2 13,0 12,-3 12,-7 7,-7)"
+	"(EN: -8,2)(MG: 12,-7)(LL: -8,8)(RL: -9,-4)(MR: 12,-7)"
     },
 };
 
@@ -343,6 +411,7 @@ void Parse_robot_file(void)
 {
     if (options.robotFile && *options.robotFile) {
 	FILE *fp = fopen(options.robotFile, "r");
+
 	if (fp) {
 	    char buf[1024];
 	    char name_buf[MAX_NAME_LEN];
@@ -399,6 +468,7 @@ void Parse_robot_file(void)
 		    }
 		    if (key > 0) {
 			char *ptr = strchr(buf, ':') + 1;
+
 			while (isspace(*ptr))
 			    ptr++;
 			strlcpy(dst, ptr, size);
@@ -625,8 +695,8 @@ static void Robot_create(void)
     if (peek_ID() == 0)
 	return;
 
-    if ((new_data = (robot_data_t *)malloc(sizeof(robot_data_t))) == NULL) {
-	perror("malloc robot_data");
+    if ((new_data = malloc(sizeof(robot_data_t))) == NULL) {
+	error("malloc robot_data");
 	return;
     }
     new_data->private_data = NULL;
@@ -638,6 +708,7 @@ static void Robot_create(void)
     }
     for (i = 0; i < NumPlayers; i++) {
 	player_t *pl_i = Players(i);
+
 	if (Player_is_robot(pl_i)) {
 	    data = (robot_data_t *)pl_i->robot_data_ptr;
 	    if (Robots[data->robots_ind].used < Robots[most_used].used)
@@ -666,7 +737,7 @@ static void Robot_create(void)
 
     Init_player(NumPlayers, (options.allowShipShapes)
 			    ? Parse_shape_str(rob->shape)
-			    : (shipshape_t *)NULL);
+			    : NULL);
     robot = Players(NumPlayers);
     SET_BIT(robot->type_ext, OBJ_EXT_ROBOT);
     robot->robot_data_ptr = new_data;
@@ -714,6 +785,7 @@ static void Robot_create(void)
 
     for (i = 0; i < NumPlayers - 1; i++) {
 	player_t *pl_i = Players(i);
+
 	if (pl_i->conn != NULL) {
 	    Send_player(pl_i->conn, robot->id);
 	    Send_base(pl_i->conn, robot->id, robot->home_base->ind);
@@ -730,7 +802,8 @@ static void Robot_create(void)
     if (round_delay > 0 || NumPlayers == 1) {
 	round_delay = options.roundDelaySeconds * FPS;
 	round_delay_send = round_delay + FPS;  /* delay him an extra second */
-	if (options.maxRoundTime > 0 && options.roundDelaySeconds == 0)
+	if (options.maxRoundTime > 0
+	    && options.roundDelaySeconds == 0)
 	    roundtime = options.maxRoundTime * FPS;
 	else
 	    roundtime = -1;
@@ -753,23 +826,24 @@ void Robot_destroy(player_t *pl)
 
 void Robot_delete(player_t *pl, bool kicked)
 {
-    int			i;
-    player_t		*low_pl = NULL;
-    double		low_score = (double)LONG_MAX;
-    char		msg[MSG_LEN];
+    int i;
+    char msg[MSG_LEN];
 
     if (pl == NULL) {
+	player_t *low_pl = NULL;
+	double low_score = (double)LONG_MAX;
+
 	/*
 	 * Find the robot with the lowest score.
 	 */
 	for (i = 0; i < NumPlayers; i++) {
-	    player_t *pl2 = Players(i);
+	    player_t *pl_i = Players(i);
 
-	    if (!Player_is_robot(pl2))
+	    if (!Player_is_robot(pl_i))
 		continue;
 
-	    if (pl2->score < low_score) {
-		low_pl = pl2;
+	    if (pl_i->score < low_score) {
+		low_pl = pl_i;
 		low_score = low_pl->score;
 	    }
 	}
@@ -811,7 +885,7 @@ static void Robot_set_war(player_t *pl, int victim_id)
  */
 void Robot_reset_war(player_t *pl)
 {
-    Robot_set_war(pl, -1);
+    Robot_set_war(pl, NO_ID);
 }
 
 
@@ -853,17 +927,18 @@ void Robot_war(player_t *pl, player_t *kp)
     if (Player_is_robot(kp)) {
 	Robot_talks(ROBOT_TALK_KILL, kp->name, pl->name);
 
-	if (Robot_war_on_player(kp) == pl->id)
+	if (Robot_war_on_player(kp) == pl->id) {
 	    for (i = 0; i < NumPlayers; i++) {
 		player_t *pl_i = Players(i);
 		if (pl_i->conn != NULL)
 		    Send_war(pl_i->conn, kp->id, NO_ID);
 	    }
-	Robot_set_war(kp, -1);
+	}
+	Robot_set_war(kp, NO_ID);
     }
 
     if (Player_is_robot(pl)
-	&& (int)(rfrac() * 100) < kp->score - pl->score
+	&& rfrac() * 100.0 < kp->score - pl->score
 	&& !Players_are_teammates(pl, kp)
 	&& !Players_are_allies(pl, kp)) {
 
@@ -878,6 +953,7 @@ void Robot_war(player_t *pl, player_t *kp)
 	if (Robot_war_on_player(pl) != kp->id) {
 	    for (i = 0; i < NumPlayers; i++) {
 		player_t *pl_i = Players(i);
+
 		if (pl_i->conn != NULL)
 		    Send_war(pl_i->conn, pl->id, kp->id);
 	    }
@@ -934,9 +1010,11 @@ static int Robot_check_leave(player_t *pl)
 	&& !BIT(world->rules->mode, LIMITED_LIVES)
 	&& (BIT(pl->status, PLAYING) || pl->count <= 0)) {
 	msg[0] = '\0';
-	if (options.robotLeaveLife > 0 && pl->life >= options.robotLeaveLife)
+	if (options.robotLeaveLife > 0
+	    && pl->life >= options.robotLeaveLife)
 	    sprintf(msg, "%s retired.", pl->name);
-	else if (options.robotLeaveScore != 0 && pl->score < options.robotLeaveScore)
+	else if (options.robotLeaveScore != 0
+		 && pl->score < options.robotLeaveScore)
 	    sprintf(msg, "%s left out of disappointment.", pl->name);
 	else if (options.robotLeaveRatio != 0
 		 && pl->score / (pl->life + 1) < options.robotLeaveRatio)
@@ -983,13 +1061,11 @@ static void Tank_play(player_t *pl)
 
 void Robot_update(void)
 {
-    player_t		*pl;
-    int			i;
-    static double	new_robot_delay;
-    int			num_playing_ships;
-    int			num_any_ships;
-    bool		tick_this_update = false;
-    static int		ticks_per_second = 0;
+    int i;
+    static double new_robot_delay;
+    int num_playing_ships, num_any_ships;
+    bool tick_this_update = false;
+    static int ticks_per_second = 0;
     world_t *world = &World;
 
     num_any_ships = NumPlayers + login_in_progress;
@@ -1015,7 +1091,8 @@ void Robot_update(void)
 	if (NumRobots > 0) {
 	    if ((num_playing_ships > world->NumBases)
 		|| (num_any_ships > NUM_IDS)
-		|| (num_playing_ships > options.maxRobots && NumRobots > options.minRobots))
+		|| (num_playing_ships > options.maxRobots
+		    && NumRobots > options.minRobots))
 		Robot_delete(NULL, false);
 	}
     }
@@ -1025,7 +1102,8 @@ void Robot_update(void)
 
     /*
      * Robots play better the more updates they get. They can be made
-     * easier opponents by setting a lower value for options.robotTicksPerSecond.
+     * easier opponents by setting a lower value for option
+     * robotTicksPerSecond.
      */
     {
 	static time_t oldtime = 0;
@@ -1067,7 +1145,7 @@ void Robot_update(void)
     Robot_round_tick();
 
     for (i = 0; i < NumPlayers; i++) {
-	pl = Players(i);
+	player_t *pl = Players(i);
 
 	if (Player_is_tank(pl)) {
 	    Tank_play(pl);
