@@ -357,21 +357,6 @@ void Player_reset_timing(player_t *pl);
 void Player_pass_checkpoint(player_t *pl);
 void PlayerCheckpointCollision(player_t *pl);
 
-/*
- * Prototypes for robot.c
- */
-void Parse_robot_file(void);
-void Robot_init(world_t *world);
-void Robot_delete(player_t *robot, bool kicked);
-void Robot_destroy(player_t *robot);
-void Robot_update(world_t *world);
-void Robot_invite(player_t *robot, player_t *inviter);
-void Robot_war(player_t *robot, player_t *killer);
-void Robot_reset_war(player_t *robot);
-int Robot_war_on_player(player_t *robot);
-void Robot_go_home(player_t *robot);
-void Robot_program(player_t *robot, int victim_id);
-void Robot_message(player_t *robot, const char *message);
 
 /*
  * Prototypes for rules.c

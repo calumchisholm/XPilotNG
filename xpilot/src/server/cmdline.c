@@ -357,18 +357,6 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-	"robotTicksPerSecond",
-	"robotTicks",
-	"0",
-	&options.robotTicksPerSecond,
-	valInt,
-	Timing_setup,
-	"How many times per second to call robot round tick?\n"
-	"The value will be limited into the range 1 to server FPS.\n"
-	"A value of 0 means one tick per frame.\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    {
 	"robotUserName",
 	"robotRealName",
 	"robot",
@@ -3865,9 +3853,6 @@ void Timing_setup(world_t *world)
 	coriolisSine = sin(cor_angle / timeStep);
     }
 
-    if (options.robotTicksPerSecond == 0)
-	options.robotTicksPerSecond = FPS;
-    LIMIT(options.robotTicksPerSecond, 1, FPS);
 #ifdef SELECT_SCHED
     install_timer_tick(NULL, FPS);
 #else

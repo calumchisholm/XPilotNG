@@ -1010,13 +1010,15 @@ static void Tank_play(player_t *pl)
 	Player_thrust(pl, false);
 }
 
-void Robot_update(world_t *world)
+
+/*
+ * Update robots. If 'tick' is true, robot AI routines will be called.
+ */
+void Robot_update(world_t *world, bool tick)
 {
     int i;
     static double new_robot_delay;
     int num_playing_ships, num_any_ships;
-    bool tick_this_update = false;
-    static int ticks_per_second = 0;
 
     num_any_ships = NumPlayers + login_in_progress;
     num_playing_ships = num_any_ships - NumPseudoPlayers;
@@ -1047,51 +1049,12 @@ void Robot_update(world_t *world)
 	}
     }
 
+    if (!tick)
+	return;
+
     if (NumRobots <= 0 && NumPseudoPlayers <= 0)
 	return;
 
-    /*
-     * Robots play better the more updates they get. They can be made
-     * easier opponents by setting a lower value for option
-     * robotTicksPerSecond.
-     */
-    {
-	static time_t oldtime = 0;
-	static int updates_per_second = 0, updates_last_second;
-	static double seconds_per_update = 1.0, seconds_per_tick = 1.0;
-	static double seconds_since_last_update = 0.0;
-	time_t t = time(NULL);
-
-	updates_per_second++;
-
-	seconds_since_last_update += seconds_per_update;
-	if (seconds_since_last_update > seconds_per_tick) {
-	    tick_this_update = true;
-	    seconds_since_last_update -= seconds_per_tick;
-	    /* make sure seconds_since_last_update stays limited */
-	    if (seconds_since_last_update > seconds_per_tick)
-		seconds_since_last_update = seconds_per_tick;
-	}
-
-	/* another second has elapsed */
-	if (t != oldtime) {
-	    oldtime = t;
-	    assert(updates_per_second > 0);
-	    seconds_per_update = 1.0 / (double)updates_per_second;
-	    updates_last_second = updates_per_second;
-	    /*warn("updates_per_second = %d, ticks_per_second = %d",
-	      updates_per_second, ticks_per_second);*/
-	    ticks_per_second = 0;
-	    updates_per_second = 0;
-	    assert(options.robotTicksPerSecond > 0);
-	    seconds_per_tick = 1.0 / (double)options.robotTicksPerSecond;
-	}
-    }
-
-    if (!tick_this_update)
-	return;
-
-    ticks_per_second++;
     Robot_round_tick(world);
 
     for (i = 0; i < NumPlayers; i++) {
