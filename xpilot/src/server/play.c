@@ -70,7 +70,7 @@ void Check_tag(void)
     int num = 0, i, candidate;
     player *tag_pl = Player_by_id(tagItPlayerId);
 
-    if (tag_pl && !BIT(tag_pl->status, PAUSE))
+    if (tag_pl && Player_can_be_tagged(tag_pl))
 	return;
 
     /* Find number of players that might get the tag */
