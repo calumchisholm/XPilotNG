@@ -1366,6 +1366,9 @@ void Fire_laser(player *pl)
 		+ FLOAT_TO_CLICK(pl->vel.y * timeStep);
 	    pos.cx = WRAP_XCLICK(pos.cx);
 	    pos.cy = WRAP_YCLICK(pos.cy);
+	    if (is_inside(pos.cx, pos.cy, NONBALL_BIT | NOTEAM_BIT, NULL)
+		!= NO_GROUP)
+		return;
 	    Fire_general_laser(pl, pl->team, pos, pl->dir, pl->mods);
 	}
     }
