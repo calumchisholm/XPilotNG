@@ -286,46 +286,16 @@ int Map_place_grav(clpos pos, double force, int type)
 
 void Free_map(void)
 {
-    if (World.block) {
-	free(World.block);
-	World.block = NULL;
-    }
-    if (World.gravity) {
-	free(World.gravity);
-	World.gravity = NULL;
-    }
-    if (World.gravs) {
-	free(World.gravs);
-	World.gravs = NULL;
-    }
-    if (World.bases) {
-	free(World.bases);
-	World.bases = NULL;
-    }
-    if (World.cannons) {
-	free(World.cannons);
-	World.cannons = NULL;
-    }
-    if (World.checks) {
-	free(World.checks);
-	World.checks = NULL;
-    }
-    if (World.fuels) {
-	free(World.fuels);
-	World.fuels = NULL;
-    }
-    if (World.wormholes) {
-	free(World.wormholes);
-	World.wormholes = NULL;
-    }
-    if (World.itemConcs) {
-	free(World.itemConcs);
-	World.itemConcs = NULL;
-    }
-    if (World.asteroidConcs) {
-	free(World.asteroidConcs);
-	World.asteroidConcs = NULL;
-    }
+    XFREE(World.block);
+    XFREE(World.gravity);
+    XFREE(World.gravs);
+    XFREE(World.bases);
+    XFREE(World.cannons);
+    XFREE(World.checks);
+    XFREE(World.fuels);
+    XFREE(World.wormholes);
+    XFREE(World.itemConcs);
+    XFREE(World.asteroidConcs);
 }
 
 static void Alloc_map(void)

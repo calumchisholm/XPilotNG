@@ -107,6 +107,12 @@ extern double		tbl_cos[];
 #  define MOD2(x, m)		( (x) & ((m) - 1) )
 #endif	/* MOD2 */
 
+/* borrowed from autobook */
+#define XFREE(ptr) \
+do { \
+    if (ptr) { free(ptr);  ptr = NULL; } \
+} while (0)
+
 /* Do NOT change these! */
 #define OLD_MAX_CHECKS		26
 #define MAX_TEAMS		10
