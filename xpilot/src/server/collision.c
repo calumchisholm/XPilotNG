@@ -516,13 +516,12 @@ static void PlayerCollision(void)
 		if (distance >= ballConnectorLength * CLICK) {
 		    ball->id = pl->id;
 		    /* this is only the team of the owner of the ball,
-		       not the team the ball belongs to. the latter is
-		       found through the ball's treasure */
+		     * not the team the ball belongs to. the latter is
+		     * found through the ball's treasure */
 		    ball->team = pl->team;
 		    if (ball->owner == NO_ID)
-			ball->life = LONG_MAX;  /* for frame counter */
+			ball->life = 1e6;  /* for frame counter */
 		    ball->owner = pl->id;
-		    /*ball->length = distance;*/
 		    SET_BIT(ball->status, GRAVITY);
 		    World.treasures[ball->treasure].have = false;
 		    SET_BIT(pl->have, HAS_BALL);
@@ -735,9 +734,8 @@ static void PlayerObjectCollision(int ind)
 	    if (!hit)
 		continue;
 	} else {
-	    if (obj->life <= 0) {
+	    if (obj->life <= 0)
 		continue;
-	    }
 
 	    range = SHIP_SZ + obj->pl_range;
 	    if (!in_range_acd_old(pl->prevpos.cx, pl->prevpos.cy,
@@ -755,18 +753,16 @@ static void PlayerObjectCollision(int ind)
 		    && BIT(obj->status, OWNERIMMUNE)) {
 		    continue;
 		}
-		else if (selfImmunity) {
+		else if (selfImmunity)
 		    continue;
-		}
 	    } else if (selfImmunity &&
 		       IS_TANK_PTR(pl) &&
 		       (pl->lock.pl_id == obj->id)) {
 		continue;
-	    } else if (Team_immune(obj->id, pl->id)) {
+	    } else if (Team_immune(obj->id, pl->id))
 		continue;
-	    } else if (BIT(Players[GetInd[obj->id]]->status, PAUSE)) {
+	    else if (BIT(Players[GetInd[obj->id]]->status, PAUSE))
 		continue;
-	    }
 	} else if (BIT(World.rules->mode, TEAM_PLAY)
 		   && teamImmunity
 		   && obj->team == pl->team
@@ -784,20 +780,16 @@ static void PlayerObjectCollision(int ind)
 	}
 	else if (BIT(obj->type, OBJ_HEAT_SHOT | OBJ_SMART_SHOT | OBJ_TORPEDO
 				| OBJ_SHOT | OBJ_CANNON_SHOT)) {
-	    /*if (pl->id == obj->id && obj->life > obj->fuselife) {*/
-	    if (pl->id == obj->id && frame_loops < obj->fuseframe) {
+	    if (pl->id == obj->id && frame_time < obj->fusetime)
 		continue;
-	    }
 	}
 	else if (BIT(obj->type, OBJ_MINE)) {
-	    if (BIT(obj->status, CONFUSED)) {
+	    if (BIT(obj->status, CONFUSED))
 		continue;
-	    }
 	}
 	else if (BIT(obj->type, OBJ_BALL) && obj->id != NO_ID) {
-	    if (BIT(Players[GetInd[obj->id]]->used, HAS_PHASING_DEVICE)) {
+	    if (BIT(Players[GetInd[obj->id]]->used, HAS_PHASING_DEVICE))
 		continue;
-	    }
 	}
 	else if (BIT(obj->type, OBJ_PULSE)) {
 	    pulseobject *pulse = PULSE_PTR(obj);
@@ -926,9 +918,8 @@ static void PlayerObjectCollision(int ind)
 	    }
 	}
 
-	if (hit) {
+	if (hit)
 	    Delta_mv((object *)pl, (object *)obj);
-	}
     }
 }
 
@@ -1007,9 +998,8 @@ static void Player_collides_with_item(int ind, object *obj)
 	    return;
 	}
 	else if (obj->count > 1
-		 && off_items + obj->count > maxOffensiveItems) {
+		 && off_items + obj->count > maxOffensiveItems)
 	    obj->count = maxOffensiveItems - off_items;
-	}
     }
     else if (IsDefensiveItem((enum Item) obj->info)) {
 	int def_items = CountDefensiveItems(pl);
@@ -1019,9 +1009,8 @@ static void Player_collides_with_item(int ind, object *obj)
 	    return;
 	}
 	else if (obj->count > 1
-		 && def_items + obj->count > maxDefensiveItems) {
+		 && def_items + obj->count > maxDefensiveItems)
 	    obj->count = maxDefensiveItems - def_items;
-	}
     }
 
     item_index = (enum Item) obj->info;
@@ -1631,8 +1620,7 @@ static void AsteroidCollision(void)
 		&& !BIT(obj->status, FROMCANNON))
 		continue;
 	    /* don't collide while still overlapping  after breaking */
-	    /*if (obj->type == OBJ_ASTEROID && ast->life > ast->fuselife)*/
-	    if (obj->type == OBJ_ASTEROID && frame_loops < ast->fuseframe)
+	    if (obj->type == OBJ_ASTEROID && frame_time < ast->fusetime)
 		continue;
 	    /* don't collide with self */
 	    if (obj == ast)
@@ -1699,8 +1687,7 @@ static void AsteroidCollision(void)
 		damage = -ABS(2 * obj->mass * VECTOR_LENGTH(obj->vel));
 		Delta_mv_elastic(ast, obj);
 		/* avoid doing collision twice */
-		/*obj->fuselife = obj->life - 1;*/
-		obj->fuseframe = frame_loops + 1;
+		obj->fusetime = frame_time + timeStep2;
 		sound = true;
 		break;
 	    case OBJ_SPARK:

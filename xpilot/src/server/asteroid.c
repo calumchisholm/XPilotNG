@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -139,7 +139,7 @@ void Break_asteroid(int ind)
 		      10,
 		      0, RES-1,
 		      5, 10,
-		      3 * TIME_FACT, 10 * TIME_FACT);
+		      3, 10);
 	Make_debris(asteroid->pos.cx, asteroid->pos.cy,
 		    asteroid->vel.x, asteroid->vel.y,
 		    -1,
@@ -152,7 +152,7 @@ void Break_asteroid(int ind)
 		    20 + 30 * rfrac(),
 		    0, RES-1,
 		    5, 10,
-		    3 * TIME_FACT, 10 * TIME_FACT);
+		    3, 10);
     } else {
 	/* foo[12] refer to the mini-asteroids
 	   foo3 refers to the wreckage and debris */
@@ -195,7 +195,7 @@ void Break_asteroid(int ind)
 		      10,
 		      0, RES-1,
 		      5, 10,
-		      3 * TIME_FACT, 10 * TIME_FACT);
+		      3, 10);
 	Make_debris(asteroid->pos.cx, asteroid->pos.cy,
 		    velx3, vely3,
 		    -1,
@@ -208,7 +208,7 @@ void Break_asteroid(int ind)
 		    20 + 30 * rfrac(),
 		    0, RES-1,
 		    5, 10,
-		    3 * TIME_FACT, 10 * TIME_FACT);
+		    3, 10);
     }
 
     if ((asteroidMaxItems > 0) && (rfrac() < asteroidItemProb)) {
@@ -241,8 +241,8 @@ void Break_asteroid(int ind)
 		      item, num_per_pack,
 		      status);
 	}
-    }	
-	
+    }
+
     sound_play_sensors(asteroid->pos.cx, asteroid->pos.cy,
 		       ASTEROID_BREAK_SOUND);
 
@@ -332,8 +332,7 @@ static void Make_asteroid(int cx, int cy,
     radius = ASTEROID_RADIUS(size) / CLICK;
     asteroid->pl_range = radius;
     asteroid->pl_radius = radius;
-    /*asteroid->fuselife = asteroid->life - 1;*/
-    asteroid->fuseframe = frame_loops + 1;
+    asteroid->fusetime = frame_time + timeStep2;
     asteroid->status = GRAVITY;
     CLEAR_MODS(asteroid->mods);
 
@@ -511,4 +510,3 @@ void Asteroid_update(void)
 	}
     }
 }
-

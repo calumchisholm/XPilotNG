@@ -216,55 +216,6 @@ void tuner_modifiers(void)
     }
 }
 
-void tuner_minelife(void)
-{
-    int i;
-    int life;
-
-    if (mineLife < 0)
-	mineLife = 0;
-
-    for (i = 0; i < NumObjs; i++) {
-	if (Obj[i]->type != OBJ_MINE)
-	    continue;
-
-	if (!BIT(Obj[i]->status, FROMCANNON)) {
-	    life = (mineLife ? mineLife * TIME_FACT : MINE_LIFETIME)
-		/ (Obj[i]->mods.mini + 1);
-
-	    Obj[i]->life = (int)(rfrac() * life);
-	    /* We wouldn't want all the mines
-	       to explode simultaneously, now
-	       would we? */
-	}
-    }
-}
-
-void tuner_missilelife(void)
-{
-    int i;
-    int life;
-
-    if (missileLife < 0)
-	missileLife = 0;
-
-    for (i = 0; i < NumObjs; i++) {
-	if (Obj[i]->type != OBJ_SMART_SHOT &&
-	    Obj[i]->type != OBJ_HEAT_SHOT && Obj[i]->type != OBJ_TORPEDO)
-	    continue;
-
-	if (!BIT(Obj[i]->status, FROMCANNON)) {
-	    life = (missileLife ? missileLife * TIME_FACT : MISSILE_LIFETIME)
-		/ (Obj[i]->mods.mini + 1);
-
-	    Obj[i]->life = (int)(rfrac() * life);
-	    /* Maybe all the missiles are full
-	       nukes. Going off together might
-	       not be such a good idea. */
-	}
-    }
-}
-
 void tuner_gameduration(void)
 {
     if (gameDuration <= 0.0) {

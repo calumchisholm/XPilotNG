@@ -122,7 +122,8 @@ void Place_general_mine(int ind, unsigned short team, long status,
 {
     char		msg[MSG_LEN];
     player		*pl = (ind == -1 ? NULL : Players[ind]);
-    int			used, life;
+    int			used;
+    DFLOAT		life;
     long		drain;
     DFLOAT		mass;
     int			i, minis;
@@ -134,22 +135,20 @@ void Place_general_mine(int ind, unsigned short team, long status,
     cx = WRAP_XCLICK(cx);
     cy = WRAP_YCLICK(cy);
 
-    if (pl && BIT(pl->status, KILLED)) {
-	life = (int)(rfrac() * 12 * TIME_FACT);
-    } else if (BIT(status, FROMCANNON)) {
+    if (pl && BIT(pl->status, KILLED))
+	life = rfrac() * 12;
+    else if (BIT(status, FROMCANNON))
 	life = CANNON_SHOT_LIFE;
-    } else {
-	life = (mineLife ? mineLife * TIME_FACT : MINE_LIFETIME);
-    }
+    else
+	life = (mineLife ? mineLife : MINE_LIFETIME);
 
     if (!BIT(mods.warhead, CLUSTER))
 	mods.velocity = 0;
     if (!mods.mini)
 	mods.spread = 0;
 
-    if (nukeMinSmarts <= 0) {
+    if (nukeMinSmarts <= 0)
 	CLR_BIT(mods.nuclear, NUCLEAR);
-    }
     if (BIT(mods.nuclear, NUCLEAR)) {
 	if (pl) {
 	    used = (BIT(mods.nuclear, FULLNUCLEAR)
@@ -311,9 +310,8 @@ void Detonate_mines(int ind)
 	    }
 	}
     }
-    if (closest != -1) {
+    if (closest != -1)
 	Obj[closest]->life = 0;
-    }
 
     return;
 }
@@ -342,8 +340,7 @@ void Make_treasure_ball(int treasure)
 	return;
     }
 
-    /*ball->length = ballConnectorLength;*/ /* kps - ng wants this removed */
-    ball->life = LONG_MAX;
+    ball->life = 1e6;
     ball->mass = ballMass;
     ball->vel.x = 0;	  	/* make the ball stuck a little */
     ball->vel.y = 0;		/* longer to the ground */
@@ -527,7 +524,6 @@ void Fire_general_shot(int ind, unsigned short team, bool cannon,
     char		msg[MSG_LEN];
     player		*pl = (ind == -1 ? NULL : Players[ind]);
     int			used,
-			life = ShotsLife,
 			fuse = 0,
 			lock = 0,
 			status = GRAVITY,
@@ -542,6 +538,7 @@ void Fire_general_shot(int ind, unsigned short team, bool cannon,
 			fired = 0;
     long		drain;
     DFLOAT		mass = ShotsMass,
+			life = ShotsLife,
 			speed = ShotsSpeed,
 			turnspeed = 0,
 			max_speed = SPEED_LIMIT,
@@ -642,11 +639,10 @@ void Fire_general_shot(int ind, unsigned short team, bool cannon,
 		drain += (long)(CLUSTER_MASS_DRAIN(mass));
 	}
 
-	if (pl && BIT(pl->status, KILLED)) {
-	    life = (int)(rfrac() * 12 * TIME_FACT);
-	} else if (!cannon) {
-	    life = (missileLife ? missileLife * TIME_FACT : MISSILE_LIFETIME);
-	}
+	if (pl && BIT(pl->status, KILLED))
+	    life = rfrac() * 12;
+	else if (!cannon)
+	    life = (missileLife ? missileLife : MISSILE_LIFETIME);
 
 	switch (type) {
 	case OBJ_HEAT_SHOT:
@@ -949,8 +945,7 @@ void Fire_general_shot(int ind, unsigned short team, bool cannon,
 	}
 
 	shot->life 	= life / minis;
-	/*shot->fuselife	= shot->life - fuse;*/
-	shot->fuseframe	= frame_loops + fuse;
+	shot->fusetime 	= frame_time + fuse;
 	shot->mass	= mass / minis;
 	shot->count 	= 0;
 	shot->info 	= lock;
@@ -1211,7 +1206,7 @@ void Delete_shot(int ind)
 		/* num debris     */ 10 + 10 * rfrac(),
 		/* min,max dir    */ 0, RES-1,
 		/* min,max speed  */ 10, 50,
-		/* min,max life   */ 10 * TIME_FACT, 54 * TIME_FACT
+		/* min,max life   */ 10, 54
 		);
 
 	}
@@ -1322,8 +1317,7 @@ void Delete_shot(int ind)
 	    /* min,max dir    */ 0, RES-1,
 	    /* min,max speed  */ 20 * speed_modv,
 				 (intensity >> 2) * speed_modv,
-	    /* min,max life   */ (int)(8 * TIME_FACT * life_modv),
-	                         (int)((intensity >> 1) * TIME_FACT * life_modv)
+	    /* min,max life   */ (8 * life_modv), (intensity >> 1) * life_modv
 	    );
 	break;
 
@@ -1359,7 +1353,7 @@ void Delete_shot(int ind)
 	    /* If -timeStep < shot->life <= 0, then it died of old age. */
 	    /* If it was picked up, then life was set to 0 and it is now
 	     * -timeStep after the substract in update.c. */
-	    if (-timeStep < shot->life && shot->life <= 0) {
+	    if (-timeStep2 < shot->life && shot->life <= 0) {
 		if (shot->color != WHITE) {
 		    shot->color = WHITE;
 		    shot->life  = WARN_TIME;
@@ -1372,7 +1366,7 @@ void Delete_shot(int ind)
 
 	case ITEM_MINE:
 	    /* See comment for ITEM_MISSILE above */
-	    if (-timeStep < shot->life && shot->life <= 0) {
+	    if (-timeStep2 < shot->life && shot->life <= 0) {
 		if (shot->color != WHITE) {
 		    shot->color = WHITE;
 		    shot->life  = WARN_TIME;
@@ -1503,7 +1497,7 @@ void Fire_general_laser(int ind, unsigned short team, int cx, int cy,
     pulse->color	= (pl ? pl->color : WHITE);
 
     pulse->info 	= 0;
-    pulse->fuseframe 	= frame_loops;
+    pulse->fusetime	= frame_time;
     pulse->pl_range 	= 0;
     pulse->pl_radius 	= 0;
 
@@ -1569,8 +1563,7 @@ void Connector_force(int ind)
     ballobject		*ball = BALL_IND(ind);
     player		*pl = Players[ GetInd[ball->id] ];
     vector		D;
-    DFLOAT		length, force, ratio, accell, cosine;
-    DFLOAT		pl_damping, ball_damping, damping;
+    DFLOAT		length, force, ratio, accell, damping;
     /* const DFLOAT		k = 1500.0, b = 2.0; */
     /* const DFLOAT		max_spring_ratio = 0.30; */
 
@@ -1602,23 +1595,9 @@ void Connector_force(int ind)
 	Detach_ball(GetInd[ball->id], ind);
 	return;
     }
-    /*ball->length = length;*/
 
-    /* compute damping for player */
-    cosine = (pl->vel.x * D.x) + (pl->vel.y * D.y);
-    pl_damping = -ballConnectorDamping * cosine;
-
-    /* compute damping for ball */
-    cosine = (ball->vel.x * -D.x) + (ball->vel.y * -D.y);
-    ball_damping = -ballConnectorDamping * cosine;
-
-    damping = pl_damping + ball_damping;
-
-    /*
-      damping can be calculated like this too:
-      damping = -ballConnectorDamping * ((pl->vel.x - ball->vel.x) * D.x +
-      (pl->vel.y - ball->vel.y) * D.y);
-    */
+    damping = -ballConnectorDamping * ((pl->vel.x - ball->vel.x) * D.x +
+				       (pl->vel.y - ball->vel.y) * D.y);
 
     /* compute accelleration for player, assume t = 1 */
     accell = (force + damping) / pl->mass;

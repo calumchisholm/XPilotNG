@@ -381,7 +381,7 @@ void Object_hits_target(int ind, object *obj, long player_cost)
 	/* num debris     */ 75 + 75 * rfrac(),
 	/* min,max dir    */ 0, RES-1,
 	/* min,max speed  */ 20, 70,
-	/* min,max life   */ 10 * TIME_FACT, 100 * TIME_FACT
+	/* min,max life   */ 10, 100
 	);
 
     if (BIT(World.rules->mode, TEAM_PLAY)) {

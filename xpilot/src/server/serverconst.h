@@ -200,11 +200,10 @@
 #define MINE_SENSE_BASE_RANGE   (MINE_RANGE*1.3)
 #define MINE_SENSE_RANGE_FACTOR (MINE_RANGE*0.3)
 #define MINE_MASS               30.0
-#define MINE_LIFETIME           (5000*TIME_FACT+(randomMT()&(255*TIME_FACT)))
+#define MINE_LIFETIME           (5000+(randomMT()&255))
 #define MINE_SPEED_FACT         1.3
 
-#define MISSILE_LIFETIME        ((randomMT()%((64*12*TIME_FACT-1))\
-                                +(128*12*TIME_FACT)))
+#define MISSILE_LIFETIME        ((randomMT()%(64 * 12 - 1) + 128 * 12))
 #define MISSILE_MASS            5.0
 #define MISSILE_RANGE           4
 #define SMART_SHOT_ACC		0.6
@@ -248,10 +247,10 @@
 #define PULSE_SPEED		(90 * CLICK)
 #define PULSE_SAMPLE_DISTANCE	(5 * CLICK)
 #define PULSE_LENGTH		(PULSE_SPEED - PULSE_SAMPLE_DISTANCE)
-#define PULSE_MIN_LIFE		(4.5 * TIME_FACT)
-#define PULSE_LIFE(lasers)	(PULSE_MIN_LIFE + ((lasers) / 4) * TIME_FACT)
+#define PULSE_MIN_LIFE		(4.5)
+#define PULSE_LIFE(lasers)	(PULSE_MIN_LIFE + ((lasers) / 4))
 #endif
-#define CANNON_PULSE_LIFE	(4.75 * TIME_FACT)
+#define CANNON_PULSE_LIFE	(4.75)
 
 #define TRACTOR_MAX_RANGE(items)  (200 + (items) * 50)
 #define TRACTOR_MAX_FORCE(items)  (-40 + (items) * -20)
@@ -261,7 +260,7 @@
 #define TRACTOR_FORCE(tr_pr, percent, maxforce) \
 	((percent) * (maxforce) * ((tr_pr) ? -1 : 1))
 
-#define WARN_TIME		(2*12*TIME_FACT)
+#define WARN_TIME		(2 * 12)
 #define EMERGENCY_SHIELD_TIME	(4*12*TIME_FACT)
 #define SHIELD_TIME		(2*12*TIME_FACT)
 #define PHASING_TIME		(4*12)

@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -66,11 +66,11 @@
 	| FUEL_BIT | CANNON_BIT | TREASURE_BIT | TARGET_BIT \
 	| CHECK_BIT | WORMHOLE_BIT)
 
-unsigned SPACE_BLOCKS = ( 
-	SPACE_BIT | BASE_BIT | WORMHOLE_BIT | 
-	POS_GRAV_BIT | NEG_GRAV_BIT | CWISE_GRAV_BIT | ACWISE_GRAV_BIT | 
-	UP_GRAV_BIT | DOWN_GRAV_BIT | RIGHT_GRAV_BIT | LEFT_GRAV_BIT | 
-	DECOR_LU_BIT | DECOR_LD_BIT | DECOR_RU_BIT | DECOR_RD_BIT | 
+unsigned SPACE_BLOCKS = (
+	SPACE_BIT | BASE_BIT | WORMHOLE_BIT |
+	POS_GRAV_BIT | NEG_GRAV_BIT | CWISE_GRAV_BIT | ACWISE_GRAV_BIT |
+	UP_GRAV_BIT | DOWN_GRAV_BIT | RIGHT_GRAV_BIT | LEFT_GRAV_BIT |
+	DECOR_LU_BIT | DECOR_LD_BIT | DECOR_RU_BIT | DECOR_RD_BIT |
 	DECOR_FILLED_BIT | CHECK_BIT | ITEM_CONCENTRATOR_BIT |
 	FRICTION_BIT | ASTEROID_CONCENTRATOR_BIT
     );
@@ -750,7 +750,7 @@ static void Move_segment(move_state_t *ms)
 	if (BIT(World.cannon[i].used, HAS_PHASING_DEVICE)) {
 	    break;
 	}
-	
+
 	if (BIT(World.rules->mode, TEAM_PLAY)
 	    && (teamImmunity
 		|| BIT(mi->obj->status, FROMCANNON))
@@ -1499,7 +1499,7 @@ static void Cannon_dies_old(move_state_t *ms)
     player *pl = NULL;
 
     if (!ms->mip->pl) {
-	/* 
+	/*
 	 * If it was not a player that crashed  into the cannon,
 	 * look if it was something fired by a player.
 	 */
@@ -2024,8 +2024,7 @@ void Move_player_old(int ind)
 			/* num debris     */ (intensity>>1) + ((intensity>>1) * rfrac()),
 			/* min,max dir    */ wall_dir - (RES/4), wall_dir + (RES/4),
 			/* min,max speed  */ 20, 20 + (intensity>>2),
-			/* min,max life   */ 10 * TIME_FACT,
-			(10 + (intensity >> 1)) * TIME_FACT
+			/* min,max life   */ 10, 10 + (intensity >> 1)
 			);
 		    sound_play_sensors(pl->pos.cx, pl->pos.cy,
 				       PLAYER_BOUNCED_SOUND);

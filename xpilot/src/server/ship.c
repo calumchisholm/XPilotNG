@@ -62,8 +62,7 @@ void Thrust(int ind)
     const int		min_dir = (int)(pl->dir + RES/2 - RES*0.2 - 1);
     const int		max_dir = (int)(pl->dir + RES/2 + RES*0.2 + 1);
     const DFLOAT	max_speed = 1 + (pl->power * 0.14);
-    const int		max_life = 3 * TIME_FACT
-	                		+ (int)(pl->power * 0.35 * TIME_FACT);
+    const DFLOAT	max_life = 3 + pl->power * 0.35;
     int			cx = pl->pos.cx + pl->ship->engine[pl->dir].cx;
     int			cy = pl->pos.cy + pl->ship->engine[pl->dir].cy;
     int			afterburners;
@@ -92,7 +91,7 @@ void Thrust(int ind)
 	/* num debris     */ (tot_sparks-alt_sparks) + rfrac(),
 	/* min,max dir    */ min_dir, max_dir,
 	/* min,max speed  */ 1.0, max_speed,
-	/* min,max life   */ 3 * TIME_FACT, max_life
+	/* min,max life   */ 3, max_life
 	);
 
     Make_debris(
@@ -108,7 +107,7 @@ void Thrust(int ind)
 	/* num debris     */ alt_sparks + rfrac(),
 	/* min,max dir    */ min_dir, max_dir,
 	/* min,max speed  */ 1.0, max_speed,
-	/* min,max life   */ 3 * TIME_FACT, max_life
+	/* min,max life   */ 3, max_life
 	);
 }
 
@@ -484,11 +483,12 @@ void Make_wreckage(
     /* max wreckage     */ int    max_wreckage,
     /* min,max dir      */ int    min_dir,      int    max_dir,
     /* min,max speed    */ DFLOAT min_speed,    DFLOAT max_speed,
-    /* min,max life     */ int    min_life,     int    max_life
+    /* min,max life     */ DFLOAT min_life,     DFLOAT max_life
 )
 {
     wireobject		*wreckage;
-    int			i, life, size;
+    int			i, size;
+    DFLOAT		life;
     modifiers		mods;
     DFLOAT		mass, sum_mass = 0.0;
 
@@ -556,23 +556,22 @@ void Make_wreckage(
 	sum_mass += mass;
 
 	/* Lifespan  */
-	life = (int)(min_life + rfrac() * (max_life - min_life) + 1);
+	life = min_life + rfrac() * (max_life - min_life);
 
 	wreckage->life = life;
-	/*wreckage->fuselife = wreckage->life;*/
-	wreckage->fuseframe = 0;
+	wreckage->fusetime = 0;
 
 	/* Wreckage type, rotation, and size */
 	wreckage->turnspeed = 0.02 + rfrac() * 0.35;
 	wreckage->rotation = (int)(rfrac() * RES);
 	size = (int) ( 256.0 * 1.5 * mass / total_mass );
-	if ( size > 255 )
+	if (size > 255)
 	    size = 255;
 	wreckage->size = size;
 	wreckage->info = (int)(rfrac() * 256);
 
 	radius = wreckage->size * 16 / 256;
-	if ( radius < 8 ) radius = 8;
+	if (radius < 8) radius = 8;
 
 	wreckage->pl_range = radius;
 	wreckage->pl_radius = radius;
@@ -609,8 +608,7 @@ void Explode_fighter(int ind)
 	/* num debris     */ min_debris + debris_range * rfrac(),
 	/* min,max dir    */ 0, RES-1,
 	/* min,max speed  */ 20.0, 20 + (((int)(pl->mass))>>1),
-	/* min,max life   */ 5 * TIME_FACT,
-	                     (int)(5 + (pl->mass * 1.5)) * TIME_FACT
+	/* min,max life   */ 5, 5 + (pl->mass * 1.5)
 	);
 
     if ( !BIT(pl->status, KILLED) )
@@ -627,8 +625,7 @@ void Explode_fighter(int ind)
 	/* max wreckage     */ 10,
 	/* min,max dir      */ 0, RES-1,
 	/* min,max speed    */ 10.0, 10 + (((int)(pl->mass))>>1),
-	/* min,max life     */ 5 * TIME_FACT,
-	                       (int)(5 + (pl->mass * 1.5)) * TIME_FACT
+	/* min,max life     */ 5,5 + (pl->mass * 1.5)
 	);
 
 }

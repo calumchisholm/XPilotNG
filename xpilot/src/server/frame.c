@@ -814,21 +814,18 @@ static void Frame_shots(int conn, int ind)
 	     */
 	    if (debris_colors >= 3) {
 		if (debris_colors > 4) {
-		    if (color == BLUE) {
-			color = (shot->life >> (TIME_BITS + 1));
-		    } else {
-			color = (shot->life >> (TIME_BITS + 2));
-		    }
+		    if (color == BLUE)
+			color = (int)shot->life / 2;
+		    else
+			color = (int)shot->life / 4;
 		} else {
-		    if (color == BLUE) {
-			color = (shot->life >> (TIME_BITS + 2));
-		    } else {
-			color = (shot->life >> (TIME_BITS + 3));
-		    }
+		    if (color == BLUE)
+			color = (int)shot->life / 4;
+		    else
+			color = (int)shot->life / 8;
 		}
-		if (color >= debris_colors) {
+		if (color >= debris_colors)
 		    color = debris_colors - 1;
-		}
 	    }
 
 	    debris_store(shot->pos.cx - cv.world.cx,
@@ -965,7 +962,7 @@ static void Frame_ships(int conn, int ind)
 {
     player			*pl = Players[ind],
 				*pl_i;
-    int				i, j, k, color, dir, cx = -1, cy = -1;
+    int				i, k;
 
     for (i = 0; i < NumEcms; i++) {
 	ecm_t *ecm = Ecms[i];

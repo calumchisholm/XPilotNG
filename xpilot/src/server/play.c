@@ -156,12 +156,13 @@ void Make_debris(
     /* radius         */ int    radius,
     /* num debris     */ int    num_debris,
     /* min,max dir    */ int    min_dir,    int    max_dir,
-    /* min,max speed  */ DFLOAT  min_speed,  DFLOAT  max_speed,
-    /* min,max life   */ int    min_life,   int    max_life
+    /* min,max speed  */ DFLOAT min_speed,  DFLOAT max_speed,
+    /* min,max life   */ DFLOAT min_life,   DFLOAT max_life
 )
 {
     object		*debris;
-    int			i, life;
+    int			i;
+    DFLOAT		life;
     modifiers		mods;
 
     cx = WRAP_XCLICK(cx);
@@ -218,10 +219,9 @@ void Make_debris(
 	    debris->mass = mass;
 	}
 	debris->type = type;
-	life = (int)(min_life + rfrac() * (max_life - min_life) + 1);
+	life = min_life + rfrac() * (max_life - min_life);
 	debris->life = life;
-	/*debris->fuselife = life;*/
-	debris->fuseframe = 0;
+	debris->fusetime = 0;
 	debris->pl_range = radius;
 	debris->pl_radius = radius;
 	debris->status = status;
@@ -261,18 +261,18 @@ void Ball_is_replaced(ballobject *ball)
 void Ball_is_destroyed(ballobject *ball)
 {
     char msg[MSG_LEN];
-    long frames = (LONG_MAX - ball->life) / timeStep;
+    int frames = (1e6 - ball->life) / timeStep2 + .5;
     int ind = GetInd[ball->owner];
     DFLOAT seconds = ((DFLOAT)frames) / framesPerSecond;
 
     if (FPSMultiplier != 1.0) {
 	DFLOAT frames12 = ((DFLOAT)frames) / FPSMultiplier;
 
-	sprintf(msg," < The ball was loose for %ld frames (best %d) "
+	sprintf(msg," < The ball was loose for %d frames (best %d) "
 		"/ %.2f frames @ 12fps / %.2fs >",
 		frames, Rank_GetBestBall(Players[ind]), frames12, seconds);
     } else {
-	sprintf(msg," < The ball was loose for %ld frames (best %d) / %.2fs >",
+	sprintf(msg," < The ball was loose for %d frames (best %d) / %.2fs >",
 		frames, Rank_GetBestBall(Players[ind]), seconds);
     }
     Set_message(msg);

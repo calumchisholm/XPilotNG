@@ -38,8 +38,6 @@ void tuner_teamcannons(void);
 void tuner_cannonsuseitems(void);
 void tuner_wormtime(void);
 void tuner_modifiers(void);
-void tuner_minelife(void);
-void tuner_missilelife(void);
 void tuner_gameduration(void);
 void tuner_racelaps(void);
 void tuner_allowalliances(void);

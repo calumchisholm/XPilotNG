@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -377,7 +377,7 @@ void Make_item(int cx, int cy,
     obj->acc.x =
     obj->acc.y = 0.0;
     obj->mass = 10.0;
-    obj->life = 1500 * TIME_FACT + (int)(rfrac() * 512 * TIME_FACT);
+    obj->life = 1500 + rfrac() * 512;
     obj->count = num_per_pack;
     obj->pl_range = ITEM_SIZE/2;
     obj->pl_radius = ITEM_SIZE/2;
@@ -542,7 +542,7 @@ void General_tractor_beam(int ind, int cx, int cy,
     percent = TRACTOR_PERCENT(dist, maxdist);
     cost = (long)TRACTOR_COST(percent);
     force = TRACTOR_FORCE(pressor, percent, maxforce);
-    
+
     sound_play_sensors(cx, cy,
 		       (pressor ? PRESSOR_BEAM_SOUND : TRACTOR_BEAM_SOUND));
 
@@ -583,7 +583,7 @@ void Do_deflector(int ind)
     Cell_get_objects(OBJ_X_IN_BLOCKS(pl), OBJ_Y_IN_BLOCKS(pl),
 		     (int)(range / BLOCK_CLICKS + 1), 200,
 		     &obj_list, &obj_count);
-    
+
     for (i = 0; i < obj_count; i++) {
 	obj = obj_list[i];
 
@@ -592,8 +592,7 @@ void Do_deflector(int ind)
 
 	if (obj->id == pl->id) {
 	    if (BIT(obj->status, OWNERIMMUNE)
-		/*|| obj->fuselife < obj->life*/
-		|| frame_loops < obj->fuseframe
+		|| frame_time < obj->fusetime
 		|| selfImmunity)
 		continue;
 	} else {
@@ -1241,5 +1240,3 @@ void Fire_ecm(int ind)
 
     Fire_general_ecm(ind, pl->team, pl->pos.cx, pl->pos.cy);
 }
-
-

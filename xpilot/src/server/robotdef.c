@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -393,7 +393,7 @@ static bool Really_empty_space(int ind, int x, int y)
 
     if (!is_polygon_map && useOldCode)
 	goto blockbased;
-    
+
     /*
      * kps hack - check a few positions inside the block, if only a few of them
      * are inside, assume it is empty
@@ -410,7 +410,7 @@ static bool Really_empty_space(int ind, int x, int y)
 		outside++;
 	}
     }
-    
+
     if (inside > 0)
 	return false;
     return true;
@@ -1022,10 +1022,7 @@ static bool Check_robot_target(int ind,
 
 		/* kps -
 		   changed PULSE_LIFE(pl->item[ITEM_LASER]) to pulseLife */
-		if (ship_dist
-		    < pulseSpeed
-		    * pulseLife / TIME_FACT
-		    + SHIP_SZ) {
+		if (ship_dist < pulseSpeed * pulseLife + SHIP_SZ) {
 		    dir3 = Wrap_findDir(x3 - x1, y3 - y1);
 		    x4 = x3 + tcos(MOD2((int)(dir3 - RES/4), RES)) * SHIP_SZ;
 		    y4 = y3 + tsin(MOD2((int)(dir3 - RES/4), RES)) * SHIP_SZ;
@@ -2370,4 +2367,3 @@ static void Robot_default_round_tick(void)
 		* (NUM_IDS - NumRobots)) / NUM_IDS);
     }
 }
-

@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -132,7 +132,7 @@ void Cannon_throw_items(int ind)
 		obj->acc.x = 0;
 		obj->acc.y = 0;
 		obj->mass = 10;
-		obj->life = 1500*TIME_FACT + (int)(rfrac() * 512 * TIME_FACT);
+		obj->life = 1500 + rfrac() * 512;
 		obj->count = amount;
 		obj->pl_range = ITEM_SIZE / 2;
 		obj->pl_radius = ITEM_SIZE / 2;
@@ -352,7 +352,7 @@ static void Cannon_aim(int ind, int weapon, int *target, int *dir)
 	break;
     case CW_LASER:
 	speed = pulseSpeed;
-	range = (int)((CANNON_PULSE_LIFE / TIME_FACT) * speed);
+	range = (int)(CANNON_PULSE_LIFE * speed);
 	break;
     case CW_ECM:
 	/* smarter cannons wait a little longer before firing an ECM */
@@ -627,7 +627,7 @@ static void Cannon_fire(int ind, int weapon, int target, int dir)
 		/* dir */	dir - 4 * (4 - cannonSmartness),
 				dir + 4 * (4 - cannonSmartness),
 		/* speed */	0.1, speed * 4,
-		/* life */	3 * TIME_FACT, 20 * TIME_FACT);
+		/* life */	3, 20);
 	    c->item[ITEM_EMERGENCY_THRUST]--;
 	} else {
 	    Make_debris(
@@ -644,7 +644,7 @@ static void Cannon_fire(int ind, int weapon, int target, int dir)
 		/* dir */	dir - 3 * (4 - cannonSmartness),
 				dir + 3 * (4 - cannonSmartness),
 		/* speed */	0.1, speed * 2,
-		/* life */	3 * TIME_FACT, 20 * TIME_FACT);
+		/* life */	3, 20);
 	}
 	c->item[ITEM_FUEL]--;
 	sound_play_sensors(cx, cy, THRUST_SOUND);
@@ -705,7 +705,7 @@ void Cannon_dies(int ind, player *pl)
 	/* num debris     */ 20 + 20 * rfrac(),
 	/* min,max dir    */ (int)(cannon->dir - (RES * 0.2)), (int)(cannon->dir + (RES * 0.2)),
 	/* min,max speed  */ 20, 50,
-	/* min,max life   */ 8 * TIME_FACT, 68 * TIME_FACT
+	/* min,max life   */ 8, 68
 	);
     Make_wreckage(
 	/* pos.cx, pos.cy   */ cannon->pos.cx, cannon->pos.cy,
@@ -719,7 +719,7 @@ void Cannon_dies(int ind, player *pl)
 	/* max wreckage   */ 10,
 	/* min,max dir    */ (int)(cannon->dir - (RES * 0.2)), (int)(cannon->dir + (RES * 0.2)),
 	/* min,max speed  */ 10, 25,
-	/* min,max life   */ 8 * TIME_FACT, 68 * TIME_FACT
+	/* min,max life   */ 8, 68
 	);
 
     if (pl) {

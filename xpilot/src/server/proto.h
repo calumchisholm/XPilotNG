@@ -259,8 +259,8 @@ void Make_debris(
 	    /* radius         */ int    radius,
 	    /* num debris     */ int    num_debris,
 	    /* min,max dir    */ int    min_dir,    int    max_dir,
-	    /* min,max speed  */ DFLOAT  min_speed,  DFLOAT  max_speed,
-	    /* min,max life   */ int    min_life,   int    max_life
+	    /* min,max speed  */ DFLOAT min_speed,  DFLOAT max_speed,
+	    /* min,max life   */ DFLOAT min_life,   DFLOAT max_life
 	    );
 void Make_wreckage(
 	    /* pos.x, pos.y   */ int    cx,         int    cy,
@@ -274,7 +274,7 @@ void Make_wreckage(
 	    /* max wreckage   */ int    max_wreckage,
 	    /* min,max dir    */ int    min_dir,    int    max_dir,
 	    /* min,max speed  */ DFLOAT min_speed,  DFLOAT max_speed,
-	    /* min,max life   */ int    min_life,   int    max_life
+	    /* min,max life   */ DFLOAT min_life,   DFLOAT max_life
 	    );
 void Make_item(int cx, int cy,
 	       int vx, int vy,

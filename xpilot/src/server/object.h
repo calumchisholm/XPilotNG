@@ -208,7 +208,7 @@ struct _cell_node {
     vector		vel;		/* speed in x,y */		\
     vector		acc;		/* acceleration in x,y */	\
     DFLOAT		mass;		/* mass in unigrams */		\
-    long		life;		/* No of ticks left to live */	\
+    DFLOAT		life;		/* No of ticks left to live */	\
     long		status;		/* gravity, etc. */		\
     int			type;		/* one bit of OBJ_XXX */	\
     int			count;		/* Misc timings */		\
@@ -220,7 +220,7 @@ struct _cell_node {
 #define OBJECT_EXTEND	\
     cell_node		cell;		/* node in cell linked list */	\
     long		info;		/* Miscellaneous info */	\
-    long		fuseframe;	/* Frame when considered fused */ \
+    double		fusetime;	/* Frame when considered fused */ \
     int			pl_range;	/* distance for collision */	\
     int			pl_radius;	/* distance for hit */		\
 /* up to here all object types are the same. */

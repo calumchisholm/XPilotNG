@@ -109,10 +109,6 @@ static void Transport_to_home(int ind)
 	t = T - t;
 	m = (4 * t) / (T * T - 2 * t * t);
     }
-    /* kps - this can be optimized by multiplying by timeStep here
-     * and not multiplying by timeStep2 in some places of Move_player
-     * functions, but it can be confusing.
-     */
     m *= TIME_FACT;
     pl->vel.x = dx * m / CLICK;
     pl->vel.y = dy * m / CLICK;
@@ -1381,7 +1377,7 @@ void Update_objects(void)
      * Kill shots that ought to be dead.
      */
     for (i = NumObjs - 1; i >= 0; i--)
-	if ((Obj[i]->life -= timeStep) <= 0)
+	if ((Obj[i]->life -= timeStep2) <= 0)
 	    Delete_shot(i);
 
     /*
