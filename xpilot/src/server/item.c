@@ -1162,13 +1162,6 @@ void Fire_general_ecm(world_t *world, player_t *pl, int team, clpos_t pos)
 		     * Player programs robot to seek target.
 		     */
 		    Robot_program(p, pl->lock.pl_id);
-		    for (j = 0; j < NumPlayers; j++) {
-			player_t *pl_j = Player_by_index(j);
-
-			if (pl_j->conn != NULL)
-			    Send_seek(pl_j->conn, pl->id,
-				      p->id, pl->lock.pl_id);
-		    }
 		}
 	    }
 	}

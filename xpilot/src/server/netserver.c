@@ -1003,7 +1003,7 @@ static void LegalizeHost(char *string)
 static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 {
     player_t *pl;
-    int i, war_on_id, conn_bit;
+    int i, conn_bit;
     char msg[MSG_LEN];
     const char sender[] = "[*Server notice*]";
     world_t *world = &World;
@@ -1151,13 +1151,6 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 		       (int)pl->life, pl->mychar, pl->alliance);
 	    if (pl->home_base)
 		Send_base(pl_i->conn, pl->id, pl->home_base->ind);
-	}
-	/*
-	 * And tell him about the relationships others have with eachother.
-	 */
-	else if (Player_is_robot(pl_i)) {
-	    if ((war_on_id = Robot_war_on_player(pl_i)) != NO_ID)
-		Send_war(pl->conn, pl_i->id, war_on_id);
 	}
     }
 
@@ -1603,35 +1596,6 @@ int Send_leave(connection_t *connp, int id)
 	return 0;
     }
     return Packet_printf(&connp->c, "%c%hd", PKT_LEAVE, id);
-}
-
-/*
- * Somebody is declaring war.
- */
-int Send_war(connection_t *connp, int robot_id, int killer_id)
-{
-    if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
-	warn("Connection not ready for war declaration (%d,%d)",
-	     connp->state, connp->id);
-	return 0;
-    }
-    return Packet_printf(&connp->c, "%c%hd%hd", PKT_WAR,
-			 robot_id, killer_id);
-}
-
-/*
- * Somebody is programming a robot to seek some player.
- */
-int Send_seek(connection_t *connp, int programmer_id, int robot_id,
-	      int sought_id)
-{
-    if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
-	warn("Connection not ready for seek declaration (%d,%d)",
-	     connp->state, connp->id);
-	return 0;
-    }
-    return Packet_printf(&connp->c, "%c%hd%hd%hd", PKT_SEEK,
-			 programmer_id, robot_id, sought_id);
 }
 
 /*

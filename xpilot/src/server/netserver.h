@@ -47,8 +47,6 @@ int Send_self(connection_t *connp, player_t *pl,
 	      long status,
 	      char *mods);
 int Send_leave(connection_t *connp, int id);
-int Send_war(connection_t *connp, int robot_id, int killer_id);
-int Send_seek(connection_t *connp, int programmer_id, int robot_id, int sought_id);
 int Send_player(connection_t *connp, int id);
 int Send_team(connection_t *connp, int id, int team);
 int Send_score(connection_t *connp, int id, double score,

@@ -902,22 +902,11 @@ int Robot_war_on_player(player_t *pl)
  */
 void Robot_war(player_t *pl, player_t *kp)
 {
-    int			i;
-
     if (kp->id == pl->id)
 	return;
 
     if (Player_is_robot(kp)) {
 	Robot_talks(ROBOT_TALK_KILL, kp->name, pl->name);
-
-	if (Robot_war_on_player(kp) == pl->id) {
-	    for (i = 0; i < NumPlayers; i++) {
-		player_t *pl_i = Player_by_index(i);
-
-		if (pl_i->conn != NULL)
-		    Send_war(pl_i->conn, kp->id, NO_ID);
-	    }
-	}
 	Robot_set_war(kp, NO_ID);
     }
 
@@ -935,12 +924,6 @@ void Robot_war(player_t *pl, player_t *kp)
 	/* pl->fuel.sum = MAX_PLAYER_FUEL; */
 
 	if (Robot_war_on_player(pl) != kp->id) {
-	    for (i = 0; i < NumPlayers; i++) {
-		player_t *pl_i = Player_by_index(i);
-
-		if (pl_i->conn != NULL)
-		    Send_war(pl_i->conn, pl->id, kp->id);
-	    }
 	    sound_play_all(DECLARE_WAR_SOUND);
 	    Robot_set_war(pl, kp->id);
 	}
