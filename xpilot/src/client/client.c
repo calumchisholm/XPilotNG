@@ -2396,6 +2396,12 @@ void Disable_emulate3buttons(bool disable, Display *display)
     if (!working) return;
     
     status = XF86MiscGetMouseSettings(display, &m);
+    if (status != 1) {
+	warn("Failed to retrieve mouse settings from X server.");
+	working = false;
+	return;
+    }
+
     #ifdef XF86DEBUG
 	warn("--- 1st get ---");
 	warn("status          : %d", status);
@@ -2422,10 +2428,15 @@ void Disable_emulate3buttons(bool disable, Display *display)
     
     m.emulate3buttons = !disable;
     status = XF86MiscSetMouseSettings(display, &m);
-
+    if (status != 1) {
+	warn("*** Warning: Failed to switch Emulate3Buttons.");
+	working = false;
+	return;
+    }
+    
     #ifdef XF86DEBUG
 	warn("--- set ---");
-	warn("wanted          : %d", wanted_emulate);
+	warn("wanted          : %d", !disable);
 	warn("status          : %d", status);
     #endif
     
