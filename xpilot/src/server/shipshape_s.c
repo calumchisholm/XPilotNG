@@ -271,7 +271,11 @@ static int shape2wire(char *ship_shape_str, shipobj *w)
 		    }
 		    break;
 		}
+#ifdef SSHACK
+		if (w->num_points >= MAX_SHIP_PTS / 2) {
+#else
 		if (w->num_points >= MAX_SHIP_PTS) {
+#endif
 		    if (verboseShapeParsing) {
 			xpprintf("Too many ship shape coordinates\n");
 		    }
@@ -557,7 +561,11 @@ static int shape2wire(char *ship_shape_str, shipobj *w)
 
 	if (sscanf(str, "(%d,%d,%d)", &ofNum, &ofLeft, &ofRight) != 3
 	    || ofNum < MIN_SHIP_PTS
+#ifdef SSHACK
+	    || ofNum > MAX_SHIP_PTS / 2
+#else
 	    || ofNum > MAX_SHIP_PTS
+#endif
 	    || ofLeft < 0
 	    || ofLeft >= ofNum
 	    || ofRight < 0
@@ -605,6 +613,27 @@ static int shape2wire(char *ship_shape_str, shipobj *w)
 	engine.cy = (pt[ofLeft].cy + pt[ofRight].cy) / 2;
 	engineSet = true;
     }
+
+/*MARA evil hack*/
+#ifdef SSHACK
+    /*xpprintf("MARA evil shipshape hack (numpoints = %i)\n", w->num_points);*/
+    
+    pt[w->num_points].cx = pt[0].cx;
+    pt[w->num_points].cy = pt[0].cy;
+    /*xpprintf("first point added\n");*/
+    for (i = 1; i < w->num_points; i++) {
+	/*xpprintf("%i th point added\n",i+1);*/
+	pt[i+w->num_points].cx = pt[w->num_points-i].cx;
+	pt[i+w->num_points].cy = pt[w->num_points-i].cy;
+    }
+    /*xpprintf("SS: ");*/
+    /*for (i = 0; i < w->num_points * 2; i++)
+      xpprintf("(%i,%i)", pt[i].cx, pt[i].cy);
+      xpprintf("\n");*/
+    
+    w->num_points = w->num_points * 2;
+#endif
+/*MARA evil hack*/
 
     /* Check for some things being set, and give them defaults if not */
 
@@ -1177,7 +1206,11 @@ void Convert_ship_2_string(shipobj *w, char *buf, char *ext,
     if (shape_version >= 0x3200) {
 	strcpy(buf, "(SH:");
 	buflen = strlen(&buf[0]);
+#ifdef SSHACK
+	for (i = 0; i < w->num_points / 2 && i < MAX_SHIP_PTS / 2; i++) {
+#else
 	for (i = 0; i < w->num_points && i < MAX_SHIP_PTS; i++) {
+#endif
 	    sprintf(&buf[buflen], " %d,%d",
 		    (int)w->pts[i][0].cx / CLICK,
 		    (int)w->pts[i][0].cy / CLICK);

@@ -139,6 +139,10 @@ int main(int argc, char **argv)
 	      "for details see the\n"
 	   "  provided LICENSE file.\n\n");
 
+#ifdef SSHACK
+    xpprintf("Using Mara's SSHACK.\n");
+#endif
+
     init_error(argv[0]);
     Check_server_versions();
 
