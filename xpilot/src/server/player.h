@@ -354,18 +354,6 @@ extern player_t	**PlayersArray;
 
 int GetInd(int id);
 
-/* player was killed this frame ? */
-static inline bool Player_is_killed(player_t *pl)
-{
-#ifdef USE_PL_STATE
-    return pl->pl_state == PL_STATE_PAUSED ? true : false;
-#else
-    if (BIT(pl->pl_status, KILLED))
-	return true;
-    return false;
-#endif
-}
-
 /*
  * Get player with index 'ind' from Players array.
  */
@@ -387,6 +375,41 @@ static inline bool Player_is_waiting(player_t *pl)
     return pl->pl_state == PL_STATE_WAITING ? true : false;
 #else
     if (BIT(pl->pl_status, GAME_OVER) && pl->mychar == 'W')
+	return true;
+    return false;
+#endif
+}
+
+static inline bool Player_is_appearing(player_t *pl)
+{
+#ifdef USE_PL_STATE
+    return pl->pl_state == PL_STATE_APPEARING ? true : false;
+#else
+    if (BIT(pl->pl_status, PLAYING|PAUSE|GAME_OVER|KILLED) == 0
+	&& pl->recovery_count > 0)
+	return true;
+    return false;
+#endif
+}
+
+static inline bool Player_is_alive(player_t *pl)
+{
+#ifdef USE_PL_STATE
+    return pl->pl_state == PL_STATE_ALIVE ? true : false;
+#else
+    if (BIT(pl->pl_status, PLAYING|PAUSE|GAME_OVER|KILLED) == PLAYING)
+	return true;
+    return false;
+#endif
+}
+
+/* player was killed this frame ? */
+static inline bool Player_is_killed(player_t *pl)
+{
+#ifdef USE_PL_STATE
+    return pl->pl_state == PL_STATE_PAUSED ? true : false;
+#else
+    if (BIT(pl->pl_status, KILLED))
 	return true;
     return false;
 #endif
@@ -539,26 +562,9 @@ static inline bool Player_used_emergency_shield(player_t *pl)
     return false;
 }
 
-static inline bool Player_is_alive(player_t *pl)
-{
-#ifdef USE_PL_STATE
-    return pl->pl_state == PL_STATE_ALIVE ? true : false;
-#else
-    if (Player_is_killed(pl))
-	return false;
-    if (Player_is_paused(pl))
-	return false;
-    if (BIT(pl->pl_status, PLAYING|GAME_OVER) == PLAYING)
-	return true;
-    return false;
-#endif
-}
-
 static inline bool Player_is_active(player_t *pl)
 {
-    if (Player_is_paused(pl))
-	return false;
-    if (BIT(pl->pl_status, PLAYING|GAME_OVER) == PLAYING)
+    if (BIT(pl->pl_status, PLAYING|PAUSE|GAME_OVER) == PLAYING)
 	return true;
     return false;
 }

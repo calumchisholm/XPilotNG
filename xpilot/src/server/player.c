@@ -1656,6 +1656,18 @@ void Player_print_state(player_t *pl, const char *funcname)
 {
     warn("%-20s: %-16s (%c): %-20s %s ", funcname, pl->name, pl->mychar,
 	 state2str(pl->pl_state), status2str(pl->pl_status));
+    if (Player_is_waiting(pl))
+	warn("Player_is_waiting");
+    if (Player_is_appearing(pl))
+	warn("Player_is_appearing");
+    if (Player_is_alive(pl))
+	warn("Player_is_alive");
+    if (Player_is_killed(pl))
+	warn("Player_is_killed");
+    if (Player_is_dead(pl))
+	warn("Player_is_dead");
+    if (Player_is_paused(pl))
+	warn("Player_is_paused");
 }
 
 void Player_set_state(player_t *pl, int state)
