@@ -232,6 +232,7 @@ def convert(options):
 	    check = Struct()
 	    check.x = loc.x * BCLICKS + BCLICKS / 2
 	    check.y = (height - loc.y - 1) % height * BCLICKS + BCLICKS / 2
+	    check.loc = loc.copy()
 	    checks[ord(map[loc]) - ord('A')] = check
 	if done[loc]:
 	    continue
@@ -266,6 +267,10 @@ def convert(options):
     myc = BCLICKS * height
     for ball in balls:
 	ball.team = closestteam(ball.loc, bases)
+    if (options.get('timing') or options.get('race')) in ['yes', 'on', 'true']:
+	bases = [(checks[0].loc.dist2(b.loc), b) for b in bases]
+	bases.sort()
+	bases = [b[1] for b in bases]
     if options.get('teamfuel') in ['yes', 'on', 'true']: #default off
 	for fuel in fuels:
 	    fuel.team = closestteam(fuel.loc, bases)
