@@ -1,6 +1,0 @@
-/*  */
-
-#include "Local.config"
-
-MAPS = *.xp
-InstallMultiple($(MAPS),$(INSTLIBDIR)/maps/)
