@@ -2885,7 +2885,7 @@ void Turn_player(player_t *pl, bool push)
 		     : pl->item[ITEM_AFTERBURNER]);
 	    double inert = pl->mass;
 	    double cx,cy;
-	    move_t move;
+	    static move_t move;
     	    
 	    /*xpprintf("ans=(%i,%i,%i,%i)\n",ans.line,ans.point,ans.moved.cx,ans.moved.cy);*/
 	    
