@@ -1223,9 +1223,9 @@ static void LegalizeName(char *string)
 	    ch = (char)0xA0; /* kps - ??? */
 	else if ( ch == '\"' )
 	    ch = '\'';
-	else if ( !isprint(ch) )
-	    ch = '.';
-	string++;
+	else if ( !isprint(ch) || strchr("[]:", ch))
+	    ch = 'x';
+	*string++ = ch;
     }
 }
 
@@ -1235,7 +1235,7 @@ static void LegalizeHost(char *string)
 	char ch = *string;
 	if ( !isalnum(ch) && ch != '.' )
 	    ch = '.';
-	string++;
+	*string++ = ch;
     }
 }
 
