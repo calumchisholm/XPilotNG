@@ -175,31 +175,46 @@ int Player_lock_closest(player_t *pl, bool next)
 
 static void Player_change_home(player_t *pl)
 {
-    bool change_home = false;
     world_t *world = pl->world;
     player_t *pl2 = NULL;
+    base_t *base2 = NULL;
+    base_t *enemybase = NULL;
+    double l, dist = 1e19;
     int i;
 
     for (i = 0; i < world->NumBases; i++) {
 	base_t *base = Base_by_index(world, i);
-	int dx, dy;
 
-	dx = ABS(CENTER_XCLICK(base->pos.cx - pl->pos.cx));
-	dy = ABS(CENTER_YCLICK(base->pos.cy - pl->pos.cy));
-	if (dx < BLOCK_CLICKS / 2 && dy < BLOCK_CLICKS / 2) {
-	    if (base == pl->home_base)
-		break;
+	l = Wrap_length(pl->pos.cx - base->pos.cx,
+			pl->pos.cy - base->pos.cy);
+	if (l < dist
+	    && l < 1.5 * BLOCK_CLICKS) {
 	    if (base->team != TEAM_NOT_SET
-		&& base->team != pl->team)
-		break;
-	    pl->home_base = base;
-	    change_home = true;
-	    break;
+		&& base->team != pl->team) {
+		enemybase = base;
+		continue;
+	    }
+	    base2 = base;
+	    dist = l;
 	}
     }
 
-    if (!change_home)
+    if (base2 == NULL) {
+	if (enemybase)
+	    Set_player_message_f(pl, "Base belongs to team %d. "
+				 "Enemy home bases can't be occupied. "
+				 "[*Server reply*]", enemybase->team);
+	else
+	    Set_player_message(pl, "You are too far away from "
+			       "a suitable base to change home. "
+			       "[*Server reply*]");
 	return;
+    }
+	
+    if (base2 == pl->home_base)
+	return;
+
+    pl->home_base = base2;
 
     /* Make sure two teammates don't have the same base. */
     for (i = 0; i < NumPlayers; i++) {
