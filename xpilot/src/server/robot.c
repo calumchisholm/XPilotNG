@@ -928,8 +928,8 @@ void Robot_war(player *pl, player *kp)
 
     if (Player_is_robot(pl)
 	&& (int)(rfrac() * 100) < kp->score - pl->score
-	&& !TEAM(pl, kp)
-	&& !ALLIANCE(pl, kp)) {
+	&& !Players_are_teammates(pl, kp)
+	&& !Players_are_allies(pl, kp)) {
 
 	Robot_talks(ROBOT_TALK_WAR, pl->name, kp->name);
 

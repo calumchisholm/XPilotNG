@@ -120,7 +120,7 @@ static bool Player_lock_allowed(player *pl, player *lock_pl)
 	return true;
 
     /* we can always lock on players from our own team. */
-    if (TEAM(pl, lock_pl))
+    if (Players_are_teammates(pl, lock_pl))
 	return true;
 
     /* if lockOtherTeam is true then we can always lock on other teams. */
@@ -156,8 +156,8 @@ int Player_lock_closest(player *pl, bool next)
 	    || !Player_is_active(pl_i)
 	    || !Player_lock_allowed(pl, pl_i)
 	    || Player_owns_tank(pl, pl_i)
-	    || TEAM(pl, pl_i)
-	    || ALLIANCE(pl, pl_i))
+	    || Players_are_teammates(pl, pl_i)
+	    || Players_are_allies(pl, pl_i))
 	    continue;
 
 	l = Wrap_length(pl_i->pos.cx - pl->pos.cx,

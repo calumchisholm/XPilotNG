@@ -380,8 +380,8 @@ static int Frame_status(connection_t *conn, player *pl)
 #ifndef SHOW_CLOAKERS_RANGE
 	    && (pl->visibility[lock_ind].canSee
 		|| Player_owns_tank(pl, lock_pl)
-		|| TEAM(pl, lock_pl)
-		|| ALLIANCE(pl, lock_pl))
+		|| Players_are_teammates(pl, lock_pl)
+		|| Players_are_allies(pl, lock_pl))
 #endif
 	    && BIT(lock_pl->status, PLAYING|GAME_OVER) == PLAYING
 	    && (playersOnRadar
@@ -924,8 +924,8 @@ static void Frame_ships(connection_t *conn, player *pl)
 	/* Don't transmit information if fighter is invisible */
 	if (pl->visibility[i].canSee
 	    || pl_i->id == pl->id
-	    || TEAM(pl_i, pl)
-	    || ALLIANCE(pl_i, pl)) {
+	    || Players_are_teammates(pl_i, pl)
+	    || Players_are_allies(pl_i, pl)) {
 	    /*
 	     * Transmit ship information
 	     */
@@ -1052,8 +1052,8 @@ static void Frame_radar(connection_t *conn, player *pl)
 	     */
 	    if (pl_i->conn == conn
 		|| !Player_is_active(pl_i) /* kps - active / playing ??? */
-		|| (!TEAM(pl_i, pl)
-		    && !ALLIANCE(pl, pl_i)
+		|| (!Players_are_teammates(pl_i, pl)
+		    && !Players_are_allies(pl, pl_i)
 		    && !Player_owns_tank(pl, pl_i)
 		    && (!playersOnRadar || !pl->visibility[i].canSee))) {
 		continue;
@@ -1070,8 +1070,8 @@ static void Frame_radar(connection_t *conn, player *pl)
 		continue;
 	    }
 	    size = 3;
-	    if (TEAM(pl_i, pl)
-		|| ALLIANCE(pl, pl_i)
+	    if (Players_are_teammates(pl_i, pl)
+		|| Players_are_allies(pl, pl_i)
 		|| Player_owns_tank(pl, pl_i))
 		size |= 0x80;
 	    Frame_radar_buffer_add(pos, size);

@@ -112,8 +112,8 @@ double Rate(double winner, double loser)
 void Score_players(player *winner_pl, double winner_score, char *winner_msg,
 		   player *loser_pl, double loser_score, char *loser_msg)
 {
-    if (TEAM(winner_pl, loser_pl)
-	|| ALLIANCE(winner_pl, loser_pl)
+    if (Players_are_teammates(winner_pl, loser_pl)
+	|| Players_are_allies(winner_pl, loser_pl)
 	|| (Player_is_tank(loser_pl)
 	    && loser_pl->lock.pl_id == winner_pl->id)) {
 	if (winner_score > 0)

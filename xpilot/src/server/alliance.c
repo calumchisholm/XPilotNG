@@ -58,7 +58,7 @@ int Invite_player(player *pl, player *ally)
 	/* tanks can't handle invitations */
 	return 0;
     }
-    if (ALLIANCE(pl, ally)) {
+    if (Players_are_allies(pl, ally)) {
 	/* we're already in the same alliance */
 	return 0;
     }

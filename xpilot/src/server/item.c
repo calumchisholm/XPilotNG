@@ -1072,7 +1072,7 @@ void Fire_general_ecm(player *pl, int team, clpos pos)
 	if (BIT(world->rules->mode, TEAM_PLAY) && p->team == team)
 	    continue;
 
-	if (pl && ALLIANCE(pl, p))
+	if (pl && Players_are_allies(pl, p))
 	    continue;
 
 	if (BIT(p->used, HAS_PHASING_DEVICE))

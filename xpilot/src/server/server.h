@@ -770,6 +770,33 @@ static inline bool Player_owns_tank(player *pl, player *tank)
     return false;
 }
 
+/*
+ * Used where we wish to know if a player is simply on the same team.
+ * Replacement for TEAM
+ */
+static inline bool Players_are_teammates(player *pl1, player *pl2)
+{
+    world_t *world = &World;
+
+    if (BIT(world->rules->mode, TEAM_PLAY)
+	&& pl1->team != TEAM_NOT_SET
+	&& pl1->team == pl2->team)
+	return true;
+    return false;
+}
+
+/*
+ * Used where we wish to know if two players are members of the same alliance.
+ * Replacement for ALLIANCE
+ */
+static inline bool Players_are_allies(player *pl1, player *pl2)
+{
+    if (pl1->alliance != ALLIANCE_NOT_SET
+	&& pl1->alliance == pl2->alliance)
+	return true;
+    return false;
+}
+
 void Pick_startpos(player *pl);
 void Go_home(player *pl);
 void Compute_sensor_range(player *pl);
@@ -806,7 +833,7 @@ void Player_death_reset(player *pl, bool add_rank_death);
 void Team_game_over(int winning_team, const char *reason);
 void Individual_game_over(int winner);
 void Race_game_over(void);
-int Team_immune(int id1, int id2);
+bool Team_immune(int id1, int id2);
 
 static inline void Player_set_float_dir(player *pl, double new_float_dir)
 {

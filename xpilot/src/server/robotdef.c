@@ -289,7 +289,7 @@ static void Robot_default_invite(player *pl, player *inviter)
 	   let robots refuse in this case */
 	for (i = 0; i < NumPlayers; i++) {
 	    player *pl_i = Players(i);
-	    if (Player_is_human(pl_i) && ALLIANCE(pl, pl_i)) {
+	    if (Player_is_human(pl_i) && Players_are_allies(pl, pl_i)) {
 		we_accept = false;
 		break;
 	    }

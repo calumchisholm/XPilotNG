@@ -101,15 +101,6 @@
 	((pl1)->pseudo_team == (pl2)->pseudo_team)
 
 /*
- * Used where we wish to know if a player is simply on the same team.
- */
-#define TEAM(pl1, pl2) \
-	(BIT(World.rules->mode, TEAM_PLAY) \
-	&& ((pl1)->team != TEAM_NOT_SET) \
-	 && ((pl1)->team == (pl2)->team))
-
-
-/*
  * Not used where we wish to know if a player is on the same team
  * and has immunity to shots, thrust sparks, lasers, ecms, etc.
  */
@@ -120,13 +111,6 @@
  * Used when we want to pass an index which is not in use.
  */
 #define NO_IND			(-1)
-
-/*
- * Used where we wish to know if two players are members of the same alliance.
- */
-#define ALLIANCE(pl1, pl2) \
-	(((pl1)->alliance != ALLIANCE_NOT_SET) \
-	&& ((pl1)->alliance == (pl2)->alliance))
 
 #define RECOVERY_DELAY		(12 * 3)
 #define ROBOT_CREATE_DELAY	(12 * 2)

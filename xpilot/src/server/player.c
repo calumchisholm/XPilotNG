@@ -2055,29 +2055,29 @@ void Player_death_reset(player *pl, bool add_rank_death)
 }
 
 /* determines if two players are immune to eachother */
-int Team_immune(int id1, int id2)
+bool Team_immune(int id1, int id2)
 {
     player 	*pl1, *pl2;
 
+    /* owned stuff is never team immune */
     if (id1 == id2)
-	/* owned stuff is never team immune */
-	return 0;
+	return false;
+
     if (!teamImmunity)
-	return 0;
+	return false;
+
     if (id1 == NO_ID || id2 == NO_ID)
 	/* can't find owner for cannon stuff */
-	return 0;
+	return false;
 
     pl1 = Player_by_id(id1);
     pl2 = Player_by_id(id2);
 
-    if (TEAM(pl1, pl2))
-	/* players are teammates */
-	return 1;
+    if (Players_are_teammates(pl1, pl2))
+	return true;
 
-    if (ALLIANCE(pl1, pl2))
-	/* players are allies */
-	return 1;
+    if (Players_are_allies(pl1, pl2))
+	return true;
 
-    return 0;
+    return false;
 }
