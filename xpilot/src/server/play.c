@@ -574,15 +574,23 @@ bool Wormhole_hitfunc(struct group *group, struct move *move)
 	return false;
     }
 
-    return false;
-
     if (obj == NULL)
 	return true;
 
     if (obj->type == OBJ_PLAYER) {
 	player *pl = (player *)obj;
+
+	if (BIT(pl->status, WARPING))
+	    return false;
+
+	if (BIT(pl->status, WARPED)) {
+	    ;
+	}
+
     } else {
-	;
+	int last = wormhole->lastdest;
+
+	return false;
     }
 
     return true;
