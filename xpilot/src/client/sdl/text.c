@@ -208,10 +208,10 @@ int FTinit(font_data *font, const char * fontname, int ptsize)
     backcol = &black;
     
     /* Initialize the TTF library */
-    if ( TTF_Init() < 0 ) {
+    /*if ( TTF_Init() < 0 ) {
     	fprintf(stderr, "Couldn't initialize TTF: %s\n",SDL_GetError());
     	return(2);
-    }
+    }*/
     ttffont = TTF_OpenFont(fontname, ptsize);
     if ( ttffont == NULL ) {
     	fprintf(stderr, "Couldn't load %d pt font from %s: %s\n", ptsize, fontname, SDL_GetError());
@@ -266,7 +266,7 @@ int FTinit(font_data *font, const char * fontname, int ptsize)
     }
     
     TTF_CloseFont(ttffont);
-    TTF_Quit();
+    /*TTF_Quit();*/
     return 0;
 }
 #endif

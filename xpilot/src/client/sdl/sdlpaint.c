@@ -348,7 +348,7 @@ void Paint_score_start(void)
     SDL_FillRect(scoreListWin.surface, NULL, 0);
     header = TTF_RenderText_Solid(scoreListFont, headingStr, fg);
     if (header == NULL) {
-	error("scorelist rendering failed: %s", SDL_GetError());
+	error("scorelist header rendering failed: %s", SDL_GetError());
 	return;
     }
     SDL_BlitSurface(header, NULL, scoreListWin.surface, &dst);
@@ -361,8 +361,8 @@ void Paint_score_entry(int entry_num, other_t *other, bool is_team)
     static int		lineSpacing = -1, firstLine;
     char		scoreStr[16];
     SDL_Surface         *line;
-    SDL_Color           fg  = { 0, 255, 0, 255 };
     SDL_Rect            dst = { SCORE_BORDER, 0, 0, 0 };
+    int     	    	color;
 
     /*
      * First time we're here, set up miscellaneous strings for
@@ -433,33 +433,35 @@ void Paint_score_entry(int entry_num, other_t *other, bool is_team)
 	}
     }
 
-#if 0
     /*
      * Draw the line
      * e94_msu eKthHacks
      */
     if (!is_team && strchr("DPW", other->mychar)) {
 	if (other->id == self->id)
-	    color = scoreInactiveSelfColor;
+	    color = scoreInactiveSelfColorRGBA;
 	else
-	    color = scoreInactiveColor;
+	    color = scoreInactiveColorRGBA;
     } else {
 	if (!is_team) {
 	    if (other->id == self->id)
-		color = scoreSelfColor;
+		color = scoreSelfColorRGBA;
 	    else
-		color = scoreColor;
+		color = scoreColorRGBA;
 	} else {
 	    color = Team_color(other->team);
 	    if (!color) {
 		if (other->team == self->team)
-		    color = scoreOwnTeamColor;
+		    color = scoreOwnTeamColorRGBA;
 		else
-		    color = scoreEnemyTeamColor;
+		    color = scoreEnemyTeamColorRGBA;
 	    }
 	}
     }
-#endif
+    SDL_Color fg = {	(color >> 24) & 255 ,
+    	    	    	(color >> 16) & 255 ,
+    	    	    	(color >> 8) & 255  ,
+    	    	    	color & 255 	    };
 
     line = TTF_RenderText_Solid(scoreListFont, label, fg);
     if (line == NULL) {

@@ -86,6 +86,13 @@ int zeroLivesColor  	    = 0xff0000aa;
 int hudRadarEnemyColor	    = 0xff000088;
 int hudRadarOtherColor	    = 0x00ff0088;
 
+int scoreInactiveSelfColorRGBA	= 0x88008888;
+int scoreInactiveColorRGBA	= 0x0000aa88;
+int scoreSelfColorRGBA	    	= 0xffff00ff;
+int scoreColorRGBA	    	= 0x888800ff;
+int scoreOwnTeamColorRGBA	= 0x00ff00ff;
+int scoreEnemyTeamColorRGBA	= 0xff0000ff;
+
 int hudSize 	    	= 250;
 static int meterWidth	= 60;
 static int meterHeight	= 10;
