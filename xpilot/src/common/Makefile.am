@@ -18,6 +18,6 @@ libxpcommon_a_SOURCES = \
 	types.h \
 	version.h \
 	wreckshape.h \
-	xpcommon.h xpconfig.h xpmemory.c
+	xpcommon.h xpconfig.h xpmap.h xpmemory.c
 
 SUBDIRS = NT

@@ -297,6 +297,7 @@ static inline struct timeval seconds_to_timeval(double t)
 #include "socklib.h"
 #include "types.h"
 #include "wreckshape.h"
+#include "xpmap.h"
 
 #ifdef	SOUND
 # include "audio.h"

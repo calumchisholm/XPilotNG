@@ -634,7 +634,7 @@ void Xpmap_grok_map_data(world_t *world)
 		continue;
 	    } else
 		/* make extra border of solid rock */
-		c = 'x';
+		c = XPMAP_FILLED;
 	}
 	else {
 	    c = *s;
@@ -642,14 +642,14 @@ void Xpmap_grok_map_data(world_t *world)
 		if (x < world->x) {
 		    /* not enough map data on this line */
 		    Xpmap_missing_error(world->y - y);
-		    c = ' ';
+		    c = XPMAP_SPACE;
 		} else
 		    c = '\n';
 	    } else {
 		if (c == '\n' && x < world->x) {
 		    /* not enough map data on this line */
 		    Xpmap_missing_error(world->y - y);
-		    c = ' ';
+		    c = XPMAP_SPACE;
 		} else
 		    s++;
 	    }
@@ -809,130 +809,146 @@ void Xpmap_tags_to_internal_data(world_t *world)
 	    c = world->block[x][y];
 
 	    switch (c) {
-	    case ' ':
-	    case '.':
+	    case XPMAP_SPACE:
+	    case XPMAP_SPACE_ALT:
 	    default:
 		Xpmap_place_block(world, blk, SPACE);
 		break;
 
-	    case 'x':
+	    case XPMAP_FILLED:
 		Xpmap_place_block(world, blk, FILLED);
 		break;
-	    case 's':
+	    case XPMAP_REC_LU:
 		Xpmap_place_block(world, blk, REC_LU);
 		break;
-	    case 'a':
+	    case XPMAP_REC_RU:
 		Xpmap_place_block(world, blk, REC_RU);
 		break;
-	    case 'w':
+	    case XPMAP_REC_LD:
 		Xpmap_place_block(world, blk, REC_LD);
 		break;
-	    case 'q':
+	    case XPMAP_REC_RD:
 		Xpmap_place_block(world, blk, REC_RD);
 		break;
 
-	    case 'r':
+	    case XPMAP_CANNON_UP:
 		Xpmap_place_cannon(world, blk, DIR_UP);
 		break;
-	    case 'd':
+	    case XPMAP_CANNON_LEFT:
 		Xpmap_place_cannon(world, blk, DIR_LEFT);
 		break;
-	    case 'f':
+	    case XPMAP_CANNON_RIGHT:
 		Xpmap_place_cannon(world, blk, DIR_RIGHT);
 		break;
-	    case 'c':
+	    case XPMAP_CANNON_DOWN:
 		Xpmap_place_cannon(world, blk, DIR_DOWN);
 		break;
 
-	    case '#':
+	    case XPMAP_FUEL:
 		Xpmap_place_fuel(world, blk);
 		break;
-	    case '*':
+	    case XPMAP_TREASURE:
 		Xpmap_place_treasure(world, blk, false);
 		break;
-	    case '^':
+	    case XPMAP_EMPTY_TREASURE:
 		Xpmap_place_treasure(world, blk, true);
 		break;
-	    case '!':
+	    case XPMAP_TARGET:
 		Xpmap_place_target(world, blk);
 		break;
-	    case '%':
+	    case XPMAP_ITEM_CONCENTRATOR:
 		Xpmap_place_item_concentrator(world, blk);
 		break;
-	    case '&':
+	    case XPMAP_ASTEROID_CONCENTRATOR:
 		Xpmap_place_asteroid_concentrator(world, blk);
 		break;
-	    case '$':
+	    case XPMAP_BASE_ATTRACTOR:
 		Xpmap_place_block(world, blk, BASE_ATTRACTOR);
 		break;
-	    case '_':
+	    case XPMAP_BASE:
 		Xpmap_place_base(world, blk, TEAM_NOT_SET);
 		break;
-	    case '0': case '1': case '2': case '3': case '4':
-	    case '5': case '6': case '7': case '8': case '9':
-		Xpmap_place_base(world, blk, (int) (c - '0'));
+	    case XPMAP_BASE_TEAM_0:
+	    case XPMAP_BASE_TEAM_1:
+	    case XPMAP_BASE_TEAM_2:
+	    case XPMAP_BASE_TEAM_3:
+	    case XPMAP_BASE_TEAM_4:
+	    case XPMAP_BASE_TEAM_5:
+	    case XPMAP_BASE_TEAM_6:
+	    case XPMAP_BASE_TEAM_7:
+	    case XPMAP_BASE_TEAM_8:
+	    case XPMAP_BASE_TEAM_9:
+		Xpmap_place_base(world, blk, (int) (c - XPMAP_BASE_TEAM_0));
 		break;
 
-	    case '+':
+	    case XPMAP_POS_GRAV:
 		Xpmap_place_grav(world, blk, -GRAVS_POWER, POS_GRAV);
 		break;
-	    case '-':
+	    case XPMAP_NEG_GRAV:
 		Xpmap_place_grav(world, blk, GRAVS_POWER, NEG_GRAV);
 		break;
-	    case '>':
+	    case XPMAP_CWISE_GRAV:
 		Xpmap_place_grav(world, blk, GRAVS_POWER, CWISE_GRAV);
 		break;
-	    case '<':
+	    case XPMAP_ACWISE_GRAV:
 		Xpmap_place_grav(world, blk, -GRAVS_POWER, ACWISE_GRAV);
 		break;
-	    case 'i':
+	    case XPMAP_UP_GRAV:
 		Xpmap_place_grav(world, blk, GRAVS_POWER, UP_GRAV);
 		break;
-	    case 'm':
+	    case XPMAP_DOWN_GRAV:
 		Xpmap_place_grav(world, blk, -GRAVS_POWER, DOWN_GRAV);
 		break;
-	    case 'k':
+	    case XPMAP_RIGHT_GRAV:
 		Xpmap_place_grav(world, blk, GRAVS_POWER, RIGHT_GRAV);
 		break;
-	    case 'j':
+	    case XPMAP_LEFT_GRAV:
 		Xpmap_place_grav(world, blk, -GRAVS_POWER, LEFT_GRAV);
 		break;
 
-	    case '@':
+	    case XPMAP_WORMHOLE_NORMAL:
 		Xpmap_place_wormhole(world, blk, WORM_NORMAL);
 		break;
-	    case '(':
+	    case XPMAP_WORMHOLE_IN:
 		Xpmap_place_wormhole(world, blk, WORM_IN);
 		break;
-	    case ')':
+	    case XPMAP_WORMHOLE_OUT:
 		Xpmap_place_wormhole(world, blk, WORM_OUT);
 		break;
 
-	    case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
-	    case 'G': case 'H': case 'I': case 'J': case 'K': case 'L':
-	    case 'M': case 'N': case 'O': case 'P': case 'Q': case 'R':
-	    case 'S': case 'T': case 'U': case 'V': case 'W': case 'X':
-	    case 'Y': case 'Z':
-		Xpmap_place_check(world, blk, (int) (c - 'A'));
+	    case XPMAP_CHECK_0:	    case XPMAP_CHECK_1:
+	    case XPMAP_CHECK_2:	    case XPMAP_CHECK_3:
+	    case XPMAP_CHECK_4:	    case XPMAP_CHECK_5:
+	    case XPMAP_CHECK_6:	    case XPMAP_CHECK_7:
+	    case XPMAP_CHECK_8:	    case XPMAP_CHECK_9:
+	    case XPMAP_CHECK_10:    case XPMAP_CHECK_11:
+	    case XPMAP_CHECK_12:    case XPMAP_CHECK_13:
+	    case XPMAP_CHECK_14:    case XPMAP_CHECK_15:
+	    case XPMAP_CHECK_16:    case XPMAP_CHECK_17:
+	    case XPMAP_CHECK_18:    case XPMAP_CHECK_19:
+	    case XPMAP_CHECK_20:    case XPMAP_CHECK_21:
+	    case XPMAP_CHECK_22:    case XPMAP_CHECK_23:
+	    case XPMAP_CHECK_24:    case XPMAP_CHECK_25:
+		Xpmap_place_check(world, blk, (int) (c - XPMAP_CHECK_0));
 		break;
 
-	    case 'z':
+	    case XPMAP_FRICTION_AREA:
 		Xpmap_place_friction_area(world, blk);
 		break;
 
-	    case 'b':
+	    case XPMAP_DECOR_FILLED:
 		Xpmap_place_block(world, blk, DECOR_FILLED);
 		break;
-	    case 'h':
+	    case XPMAP_DECOR_LU:
 		Xpmap_place_block(world, blk, DECOR_LU);
 		break;
-	    case 'g':
+	    case XPMAP_DECOR_RU:
 		Xpmap_place_block(world, blk, DECOR_RU);
 		break;
-	    case 'y':
+	    case XPMAP_DECOR_LD:
 		Xpmap_place_block(world, blk, DECOR_LD);
 		break;
-	    case 't':
+	    case XPMAP_DECOR_RD:
 		Xpmap_place_block(world, blk, DECOR_RD);
 		break;
 	    }
