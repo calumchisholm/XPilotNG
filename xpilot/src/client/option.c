@@ -1048,7 +1048,6 @@ int Xpilotrc_write(const char *path)
 	xp_option_t *opt = Option_by_index(i);
 	xp_option_origin_t origin;
 	xpilotrc_line_t t;
-	const char *os;
 	int j;
 	bool was_in_xpilotrc = false;
 
@@ -1068,18 +1067,6 @@ int Xpilotrc_write(const char *path)
 
 	origin = Option_get_origin(opt);
 	assert(origin != xp_option_origin_xpilotrc);
-#if 0
-	switch (origin) {
-	case xp_option_origin_default:  os = "default";  break;
-	case xp_option_origin_cmdline:  os = "cmdline";  break;
-	case xp_option_origin_env:      os = "env";      break;
-	case xp_option_origin_xpilotrc: os = "xpilotrc"; break;
-	case xp_option_origin_config:   os = "config";   break;
-	case xp_option_origin_setcmd:   os = "setcmd";   break;
-	default:                        os = "unknown";  break;
-	}
-	warn("option %s origin is %s.", Option_get_name(opt), os);
-#endif
 
 	if (origin == xp_option_origin_default)
 	    t.comment = xp_safe_strdup("; " PACKAGE_STRING " default");
