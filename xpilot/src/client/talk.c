@@ -307,12 +307,12 @@ void Print_messages_to_stdout(void)
     if (!selectionAndHistory)
 	return;
 
-    if (BIT(instruments, SHOW_REVERSE_SCROLL)) {
-	direction	= -1;
-	offset		= maxMessages - 1;
+    if (instruments.showReverseScroll) {
+	direction = -1;
+	offset = maxMessages - 1;
     } else {
-	direction	= 1;
-	offset		= 0;
+	direction = 1;
+	offset = 0;
     }
 
     xpprintf("[talk messages]\n");
@@ -1505,7 +1505,7 @@ void Talk_cut_from_messages(XButtonEvent* xbutton)
 	current_line = TALK_MSG_SCREENPOS(last_msg_index, selection.draw.y1);
 
 	/* how to walk through the messages */
-	if (BIT(instruments, SHOW_REVERSE_SCROLL))
+	if (instruments.showReverseScroll)
 	    next = -1;
 	else
 	    next = +1;

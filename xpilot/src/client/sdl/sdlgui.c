@@ -985,7 +985,7 @@ void Paint_HUD(void)
     
 
     /* message scan hack by mara*/
-    if (BIT(instruments, BALL_MSG_SCAN)) {
+    if (instruments.useBallMessageScan) {
 	if (ball_shout && msgScanBallColor)
 	    Circle(msgScanBallColor, draw_width / 2,
 		    draw_height / 2, 8*scale);
@@ -1165,10 +1165,9 @@ void Paint_messages(void)
 	last_msg_index--; /* make it an index */
     }
 
-    for (i = (BIT(instruments, SHOW_REVERSE_SCROLL) ? 2 * maxMessages - 1 : 0);
-	 (BIT(instruments, SHOW_REVERSE_SCROLL)
-	  ? i >= 0 : i < 2 * maxMessages);
-	 i += (BIT(instruments, SHOW_REVERSE_SCROLL) ? -1 : 1)) {
+    for (i = (instruments.showReverseScroll ? 2 * maxMessages - 1 : 0);
+	 (instruments.showReverseScroll ? i >= 0 : i < 2 * maxMessages);
+	 i += (instruments.showReverseScroll ? -1 : 1)) {
 	if (i < maxMessages)
 	    msg = TalkMsg[i];
 	else
@@ -1218,7 +1217,7 @@ void Paint_messages(void)
 	    y = top_y;
 	    top_y -= SPACING;
 	} else {
-	    if (!BIT(instruments, SHOW_MESSAGES))
+	    if (!instruments.showMessages)
 		continue;
 	    x = BORDERx_bot;
 	    y = bot_y;

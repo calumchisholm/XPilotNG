@@ -231,12 +231,11 @@ void Paint_radar(void)
     slidingradar_y = 0;
 
 #ifdef _WINDOWS
-    if (BIT(instruments, SHOW_SLIDING_RADAR) != 0) {
+    if (instruments.showSlidingRadar)
 	/*
 	 * Hack to fix slidingradar in windows.
 	 */
 	Windows_copy_sliding_radar(xf, yf);
-    }
     else
 	Copy_static_radar();
 #else
@@ -259,7 +258,7 @@ void Paint_sliding_radar(void)
     if (radarPixmap != radarPixmap2)
 	return;
 
-    if (BIT(instruments, SHOW_SLIDING_RADAR) != 0) {
+    if (instruments.showSlidingRadar) {
 	if (radarPixmap2 != radarWindow)
 	    return;
 
@@ -375,7 +374,7 @@ static void Paint_world_radar_old(void)
     for (i = BLUE_BIT; i < (int)sizeof visible; i++)
 	visible[i] = 1;
 
-    if (BIT(instruments, SHOW_DECOR)) {
+    if (instruments.showDecor) {
 	visible[SETUP_DECOR_FILLED] = 1;
 	visible[SETUP_DECOR_LU] = 1;
 	visible[SETUP_DECOR_RU] = 1;
@@ -401,7 +400,7 @@ static void Paint_world_radar_old(void)
     for (i = BLUE_BIT; i < (int)sizeof visible; i++)
 	visibleColor[i] = wallRadarColor;
 
-    if (BIT(instruments, SHOW_DECOR))
+    if (instruments.showDecor)
 	visibleColor[SETUP_DECOR_FILLED] =
 	    visibleColor[SETUP_DECOR_LU] =
 	    visibleColor[SETUP_DECOR_RU] =

@@ -454,7 +454,7 @@ static void Paint_HUD_items(int hud_pos_x, int hud_pos_y)
 	if (i == ITEM_FUEL)
 	    continue;
 
-	if (BIT(instruments, SHOW_ITEMS)) {
+	if (instruments.showItems) {
 	    lastNumItems[i] = num;
 	    if (num <= 0)
 		num = -1;
@@ -561,7 +561,7 @@ void Paint_HUD(void)
 		  * hudRadarScale / hudRadarMapScale),
 	    hudRadarDotSize);
 
-	if (BIT(instruments, MAP_RADAR))
+	if (instruments.showMapRadar)
 	    Paint_hudradar(hudRadarMapScale,
 			   active_view_width / 2,
 			   active_view_height / 2,
@@ -569,7 +569,7 @@ void Paint_HUD(void)
     }
 
     /* message scan hack by mara*/
-    if (BIT(instruments, BALL_MSG_SCAN)) {
+    if (instruments.useBallMessageScan) {
 	if (ball_shout && msgScanBallColor)
 	    Arc_add(msgScanBallColor, ext_view_width / 2 - 5,
 		    ext_view_height / 2 - 5, 10, 10, 0, 64 * 360);
@@ -762,10 +762,9 @@ void Paint_messages(void)
 	last_msg_index--; /* make it an index */
     }
 
-    for (i = (BIT(instruments, SHOW_REVERSE_SCROLL) ? 2 * maxMessages - 1 : 0);
-	 (BIT(instruments, SHOW_REVERSE_SCROLL)
-	  ? i >= 0 : i < 2 * maxMessages);
-	 i += (BIT(instruments, SHOW_REVERSE_SCROLL) ? -1 : 1)) {
+    for (i = (instruments.showReverseScroll ? 2 * maxMessages - 1 : 0);
+	 (instruments.showReverseScroll ? i >= 0 : i < 2 * maxMessages);
+	 i += (instruments.showReverseScroll ? -1 : 1)) {
 	if (i < maxMessages)
 	    msg = TalkMsg[i];
 	else
@@ -824,7 +823,7 @@ void Paint_messages(void)
 	    y = top_y;
 	    top_y += SPACING;
 	} else {
-	    if (!BIT(instruments, SHOW_MESSAGES))
+	    if (!instruments.showMessages)
 		continue;
 	    x = BORDER;
 	    y = bot_y;

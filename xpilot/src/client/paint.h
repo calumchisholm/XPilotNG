@@ -43,9 +43,9 @@
 /* constants end */
 
 
-/* which index a message actually has (consider SHOW_REVERSE_SCROLL) */
-#define TALK_MSG_SCREENPOS(_total,_pos) \
-    (BIT(instruments, SHOW_REVERSE_SCROLL)?(_total)-(_pos):(_pos))
+/* which index a message actually has (consider reverse scroll) */
+#define TALK_MSG_SCREENPOS(total, pos) \
+    (instruments.showReverseScroll ? (total)-(pos) : (pos))
 
 
 /*

@@ -93,7 +93,7 @@ extern int GetMaxColors();
 static void WinXSetupRadarWindow()
 {
     if (radar) {
-	if (instruments & SHOW_SLIDING_RADAR) {
+	if (instruments.showSlidingRadar) {
 	    if (xid[radar].hwnd.hSaveDC != NULL) {
 		ReleaseDC(xid[radar].hwnd.hWnd, xid[radar].hwnd.hBmpDC);
 		xid[radar].hwnd.hBmpDC = xid[radar].hwnd.hSaveDC;
@@ -1068,7 +1068,7 @@ void WinXResize(void)
     draw_width = WinXUnscale(draw_width);
     draw_height = WinXUnscale(draw_height);
 
-    if (radar && (instruments & SHOW_SLIDING_RADAR)) {
+    if (radar && (instruments.showSlidingRadar)) {
 	GetClientRect(xid[radar].hwnd.hWnd, &rect);
 	InvalidateRect(xid[radar].hwnd.hWnd, &rect, FALSE);
     }
@@ -1102,7 +1102,7 @@ void PaintWinClient(void)
     InvalidateRect(xid[draw].hwnd.hWnd, &rect, FALSE);
     drawPending = TRUE;
 
-    if (instruments & SHOW_SLIDING_RADAR) {
+    if (instruments.showSlidingRadar) {
 	GetClientRect(xid[radar].hwnd.hWnd, &rect);
 	InvalidateRect(xid[radar].hwnd.hWnd, &rect, FALSE);
     }

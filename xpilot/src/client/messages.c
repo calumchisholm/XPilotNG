@@ -490,7 +490,7 @@ static void Msg_scan_game_msg(const char *message)
     if (i_am_victim || i_am_victim2)
 	killratio_deaths++;
 
-    if (BIT(instruments, CLIENT_RANKER)) {
+    if (instruments.useClientRanker) {
 	/*static char tauntstr[MAX_CHARS];
 	  int kills, deaths; */
 
@@ -718,7 +718,7 @@ void Add_message(const char *message)
     bool		show_reverse_scroll	= false;
     bool		scrolling		= false; /* really moving */
 
-    show_reverse_scroll = BIT(instruments, SHOW_REVERSE_SCROLL);
+    show_reverse_scroll = instruments.showReverseScroll;
 
     is_game_msg = Msg_is_game_msg(message);
     if (!is_game_msg) {
@@ -743,7 +743,7 @@ void Add_message(const char *message)
     else if (Msg_is_in_angle_brackets(message))
 	Msg_scan_angle_bracketed_msg(message, want_scan);
 
-    else if (BIT(instruments, BALL_MSG_SCAN)
+    else if (instruments.useBallMessageScan
 	     && !is_game_msg
 	     && BIT(Setup->mode, TEAM_PLAY)
 	     && want_scan

@@ -44,26 +44,27 @@
 #include "item.h"
 #endif
 
-#define SHOW_SLIDING_RADAR	(1L << 0)
-#define SHOW_ITEMS		(1L << 1)
-#define SHOW_MESSAGES		(1L << 2)
-#define SHOW_OUTLINE_WORLD	(1L << 3)
-#define SHOW_FILLED_WORLD	(1L << 4)
-#define SHOW_TEXTURED_WALLS	(1L << 5)
-#define SHOW_DECOR		(1L << 6)
-#define SHOW_OUTLINE_DECOR	(1L << 7)
-#define SHOW_FILLED_DECOR	(1L << 8)
-#define SHOW_TEXTURED_DECOR	(1L << 9)
-#define SHOW_CLOCK_AMPM_FORMAT	(1L << 10)
-#define SHOW_REVERSE_SCROLL	(1L << 11)
-#define SHOW_SHIP_ID		(1L << 12)
-#define SHOW_SHIP_SHAPES	(1L << 13)
-#define SHOW_MY_SHIP_SHAPE	(1L << 14)
-#define BALL_MSG_SCAN		(1L << 15)
-#define CLIENT_RANKER		(1L << 16)
-#define MAP_RADAR		(1L << 17)
-#define SHOW_LIVES_BY_SHIP	(1L << 18)
-
+typedef struct {
+    bool showShipShapes;
+    bool showMyShipShape;
+    bool showLivesByShip;
+    bool showItems;
+    bool showDecor;
+    bool showOutlineWorld;
+    bool showFilledWorld;
+    bool showTexturedWalls;
+    bool showOutlineDecor;
+    bool showFilledDecor;
+    bool showTexturedDecor;
+    bool showShipId;
+    bool showMessages;
+    bool showMapRadar;
+    bool showSlidingRadar;
+    bool showReverseScroll;
+    bool useBallMessageScan;
+    bool useClientRanker;
+    bool useAMPMFormatClock;
+} instruments_t;
 
 #define PACKET_LOSS		0
 #define PACKET_DROP		1
@@ -514,8 +515,7 @@ extern int	charsPerSecond;		/* Message output speed (config) */
 extern double	hud_move_fact;		/* scale the hud-movement (speed) */
 extern double	ptr_move_fact;		/* scale the speed pointer length */
 extern char	mods[MAX_CHARS];	/* Current modifiers in effect */
-extern long	instruments;		/* Instruments on screen (bitmask) */
-extern long	hackedInstruments;	/* Hacked instruments on screen (bitmask) */
+extern instruments_t	instruments;	/* Instruments on screen */
 extern int	packet_size;		/* Current frame update packet size */
 extern int	packet_loss;		/* lost packets per second */
 extern int	packet_drop;		/* dropped packets per second */

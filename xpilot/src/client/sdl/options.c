@@ -86,7 +86,7 @@ extern keys_t buttonMap[5];        /* maps mouse buttons to keys_t */
  * Help lines can span multiple lines, but for
  * the key help window only the first line is used.
  */
-option options[] = {
+cl_option_t options[] = {
     {
 	"help",
 	"Yes",
@@ -2901,7 +2901,7 @@ static void Get_bool_resource(XrmDatabase db, const char *resource,
     *result = (ON(resValue) ? true : false);
 }
 
-
+#if 0
 static void Get_bit_resource(XrmDatabase db, const char *resource,
 			     long *mask, int bit)
 {
@@ -2912,6 +2912,7 @@ static void Get_bit_resource(XrmDatabase db, const char *resource,
     if (ON(resValue))
 	SET_BIT(*mask, bit);
 }
+#endif
 
 static void Get_shipshape_resource(XrmDatabase db, char **ship_shape)
 {
@@ -3258,30 +3259,27 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 
     Get_float_resource(rDB, "scoreObjectTime", &scoreObjectTime);
 
-    instruments = 0;
+    memset(&instruments, 0, sizeof instruments);
 
-    Get_bit_resource(rDB, "showMessages", &instruments, SHOW_MESSAGES);
-
-    Get_bit_resource(rDB, "mapRadar", &instruments, MAP_RADAR);
-    Get_bit_resource(rDB, "clientRanker", &instruments, CLIENT_RANKER);
-    Get_bit_resource(rDB, "showShipShapes", &instruments, SHOW_SHIP_SHAPES);
-    Get_bit_resource(rDB, "showMyShipShape", &instruments,
-		     SHOW_MY_SHIP_SHAPE);
-    Get_bit_resource(rDB, "ballMsgScan", &instruments, BALL_MSG_SCAN);
-    Get_bit_resource(rDB, "showLivesByShip", &instruments,
-		     SHOW_LIVES_BY_SHIP);
-    Get_bit_resource(rDB, "slidingRadar", &instruments, SHOW_SLIDING_RADAR);
-    Get_bit_resource(rDB, "showItems", &instruments, SHOW_ITEMS);
-    Get_bit_resource(rDB, "clockAMPM", &instruments, SHOW_CLOCK_AMPM_FORMAT);
-    Get_bit_resource(rDB, "outlineWorld", &instruments, SHOW_OUTLINE_WORLD);
-    Get_bit_resource(rDB, "filledWorld", &instruments, SHOW_FILLED_WORLD);
-    Get_bit_resource(rDB, "texturedWalls", &instruments, SHOW_TEXTURED_WALLS);
-    Get_bit_resource(rDB, "showDecor", &instruments, SHOW_DECOR);
-    Get_bit_resource(rDB, "outlineDecor", &instruments, SHOW_OUTLINE_DECOR);
-    Get_bit_resource(rDB, "filledDecor", &instruments, SHOW_FILLED_DECOR);
-    Get_bit_resource(rDB, "texturedDecor", &instruments, SHOW_TEXTURED_DECOR);
-    Get_bit_resource(rDB, "reverseScroll", &instruments, SHOW_REVERSE_SCROLL);
-    Get_bit_resource(rDB, "showID", &instruments, SHOW_SHIP_ID);
+    Get_bool_resource(rDB, "showMessages", &instruments.showMessages);
+    Get_bool_resource(rDB, "mapRadar", &instruments.showMapRadar);
+    Get_bool_resource(rDB, "clientRanker", &instruments.useClientRanker);
+    Get_bool_resource(rDB, "showShipShapes", &instruments.showShipShapes);
+    Get_bool_resource(rDB, "showMyShipShape", &instruments.showMyShipShape);
+    Get_bool_resource(rDB, "ballMsgScan", &instruments.useBallMessageScan);
+    Get_bool_resource(rDB, "showLivesByShip", &instruments.showLivesByShip);
+    Get_bool_resource(rDB, "slidingRadar", &instruments.showSlidingRadar);
+    Get_bool_resource(rDB, "showItems", &instruments.showItems);
+    Get_bool_resource(rDB, "clockAMPM", &instruments.useAMPMFormatClock);
+    Get_bool_resource(rDB, "outlineWorld", &instruments.showOutlineWorld);
+    Get_bool_resource(rDB, "filledWorld", &instruments.showFilledWorld);
+    Get_bool_resource(rDB, "texturedWalls", &instruments.showTexturedWalls);
+    Get_bool_resource(rDB, "showDecor", &instruments.showDecor);
+    Get_bool_resource(rDB, "outlineDecor", &instruments.showOutlineDecor);
+    Get_bool_resource(rDB, "filledDecor", &instruments.showFilledDecor);
+    Get_bool_resource(rDB, "texturedDecor", &instruments.showTexturedDecor);
+    Get_bool_resource(rDB, "reverseScroll", &instruments.showReverseScroll);
+    Get_bool_resource(rDB, "showID", &instruments.showShipId);
 
     Get_bool_resource(rDB, "pointerControl", &initialPointerControl);
     Get_float_resource(rDB, "showItemsTime", &showItemsTime);

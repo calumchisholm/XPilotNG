@@ -182,7 +182,7 @@ void Winpaint_world_radar(void)
     for (i = BLUE_BIT; i < sizeof visible; i++) {
 	visible[i] = 1;
     }
-    if (BIT(instruments, SHOW_DECOR)) {
+    if (instruments.showDecor) {
 	visible[SETUP_DECOR_FILLED] = 1;
 	visible[SETUP_DECOR_LU] = 1;
 	visible[SETUP_DECOR_RU] = 1;
@@ -204,7 +204,7 @@ void Winpaint_world_radar(void)
     for (i = BLUE_BIT; i < sizeof visible; i++) {
 	visibleColor[i] = wallRadarColor;
     }
-    if (BIT(instruments, SHOW_DECOR)) {
+    if (instruments.showDecor) {
 	visibleColor[SETUP_DECOR_FILLED] =
 	    visibleColor[SETUP_DECOR_LU] =
 	    visibleColor[SETUP_DECOR_RU] =

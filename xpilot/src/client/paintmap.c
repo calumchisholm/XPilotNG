@@ -338,10 +338,10 @@ void Paint_world(void)
 		switch (type) {
 
 		case SETUP_FILLED_NO_DRAW:
-		    if (BIT(instruments, SHOW_FILLED_WORLD|SHOW_TEXTURED_WALLS)
-			&& fill_top_left == -1 && oldServer) {
+		    if ((instruments.showFilledWorld
+			 || instruments.showTexturedWalls)
+			&& fill_top_left == -1 && oldServer)
 			fill_top_left = fill_bottom_left = x;
-		    }
 		    break;
 		case SETUP_CHECK:
 		    Gui_paint_setup_check
@@ -427,7 +427,7 @@ void Paint_world(void)
 		case SETUP_DECOR_RU:
 		case SETUP_DECOR_LD:
 		case SETUP_DECOR_LU:
-		    if (BIT(instruments, SHOW_DECOR))
+		    if (instruments.showDecor)
 			Handle_vdecor(x, y, xi, yi, type);
 		    break;
 
@@ -482,7 +482,8 @@ void Paint_world(void)
 		}
 	    }
 	    else if (oldServer) {
-		if (!BIT(instruments, SHOW_FILLED_WORLD|SHOW_TEXTURED_WALLS)) {
+		if (!(instruments.showFilledWorld
+		      || instruments.showTexturedWalls)) {
 		    Gui_paint_walls(x, y, type);
 
 		    if ((type & BLUE_FUEL) == BLUE_FUEL)

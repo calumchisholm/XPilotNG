@@ -486,7 +486,7 @@ void Gui_paint_decor(int x, int y, int xi, int yi, int type,
 
     mask = decor[type];
 
-    if (!BIT(instruments, SHOW_FILLED_DECOR|SHOW_TEXTURED_DECOR)) {
+    if (!(instruments.showFilledDecor||instruments.showTexturedDecor)) {
 	if (mask & DECOR_LEFT) {
 	    if ((xi == 0)
 		? (!BIT(Setup->mode, WRAP_PLAY) ||
@@ -516,7 +516,7 @@ void Gui_paint_decor(int x, int y, int xi, int yi, int type,
 	    }
 	}
 	if (mask & DECOR_RIGHT) {
-	    if (!BIT(instruments, SHOW_OUTLINE_DECOR)
+	    if (!instruments.showOutlineDecor
 		|| ((xi == Setup->x - 1)
 		    ? (!BIT(Setup->mode, WRAP_PLAY)
 		       || !(decor[Setup->map_data[yi]]
@@ -531,7 +531,7 @@ void Gui_paint_decor(int x, int y, int xi, int yi, int type,
 	    }
 	}
 	if (mask & DECOR_UP) {
-	    if (!BIT(instruments, SHOW_OUTLINE_DECOR)
+	    if (!instruments.showOutlineDecor
 		|| ((yi == Setup->y - 1)
 		    ? (!BIT(Setup->mode, WRAP_PLAY)
 		       || !(decor[Setup->map_data[xi * Setup->y]]
@@ -1164,8 +1164,8 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
 
     if (BIT(style.flags, STYLE_INVISIBLE)) return;
 
-    textured = BIT(instruments, SHOW_TEXTURED_WALLS) && fullColor;
-    filled = BIT(instruments, SHOW_FILLED_WORLD);
+    textured = instruments.showTexturedWalls && fullColor;
+    filled = instruments.showFilledWorld;
 
     x = xoff * Setup->width;
     y = yoff * Setup->height;

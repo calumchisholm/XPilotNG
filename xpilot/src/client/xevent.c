@@ -317,13 +317,13 @@ static bool Key_press_talk(void)
 
 static bool Key_press_show_items(void)
 {
-    TOGGLE_BIT(instruments, SHOW_ITEMS);
+    instruments.showItems = !instruments.showItems;
     return false;	/* server doesn't need to know */
 }
 
 static bool Key_press_show_messages(void)
 {
-    TOGGLE_BIT(instruments, SHOW_MESSAGES);
+    instruments.showMessages = !instruments.showMessages;
     return false;	/* server doesn't need to know */
 }
 

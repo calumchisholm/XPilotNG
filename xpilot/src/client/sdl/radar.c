@@ -87,7 +87,7 @@ static void Radar_paint_world_blocks(SDL_Surface *s)
     for (i = BLUE_BIT; i < 256; i++) {
 	bcolor[i] = wallRadarColorValue;
     }
-    if (BIT(instruments, SHOW_DECOR)) {
+    if (instruments.showDecor) {
 	bcolor[SETUP_DECOR_FILLED] =
 	    bcolor[SETUP_DECOR_LU] =
 	    bcolor[SETUP_DECOR_RU] =
@@ -188,7 +188,7 @@ static void Radar_paint_objects(void)
     float fx, fy, sx, sy;
     SDL_Rect rb = radar_bounds;
 
-    if (BIT(instruments, SHOW_SLIDING_RADAR)) {
+    if (instruments.showSlidingRadar) {
 	sx = FOOpos.x * rb.w / Setup->width;
 	sy = FOOpos.y * rb.h / Setup->height;
     }
@@ -198,7 +198,7 @@ static void Radar_paint_objects(void)
         fy = radar_ptr[i].y * rb.h / RadarHeight;
         s = radar_ptr[i].size;
 
-	if (BIT(instruments, SHOW_SLIDING_RADAR)) {
+	if (instruments.showSlidingRadar) {
             fx = fx - sx;
             fy = fy - sy;
 	    if (fx < -rb.w/2)
@@ -327,7 +327,7 @@ void Radar_paint(void)
     const float	xf = (float)radar_bounds.w / (float)Setup->width;
     const float yf = (float)radar_bounds.h / (float)Setup->height;
 
-    if (BIT(instruments, SHOW_SLIDING_RADAR)) {
+    if (instruments.showSlidingRadar) {
 
         int x, y, w, h;
         float xp, yp, xo, yo;

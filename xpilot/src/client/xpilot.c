@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
 	       conpar->team, conpar->disp_name, conpar->server_version);
     }
     
-    if (BIT(instruments, CLIENT_RANKER))
+    if (instruments.useClientRanker)
 	Print_saved_scores();
 
     return retval;

@@ -116,7 +116,7 @@ int     charsPerSecond;         /* Message output speed (configurable) */
 
 double	hud_move_fact;		/* scale the hud-movement (speed) */
 double	ptr_move_fact;		/* scale the speed pointer length */
-long	instruments;		/* Instruments on screen (bitmask) */
+instruments_t	instruments;		/* Instruments on screen */
 char	mods[MAX_CHARS];	/* Current modifiers in effect */
 int	packet_size;		/* Current frame update packet size */
 int	packet_loss;		/* lost packets per second */
@@ -513,7 +513,7 @@ void Map_dots(void)
      */
     memset(dot, 0, sizeof dot);
     dot[SETUP_SPACE] = 1;
-    if (!BIT(instruments, SHOW_DECOR)) {
+    if (!instruments.showDecor) {
 	dot[SETUP_DECOR_FILLED] = 1;
 	dot[SETUP_DECOR_RU] = 1;
 	dot[SETUP_DECOR_RD] = 1;
@@ -624,10 +624,12 @@ void Map_blue(int startx, int starty, int width, int height)
 			type,
 			newtype;
     unsigned char	blue[256];
-    const long		outline_mask = SHOW_OUTLINE_WORLD
-				     | SHOW_FILLED_WORLD
-				     | SHOW_TEXTURED_WALLS;
+    bool		outline = false;
 
+    if (instruments.showOutlineWorld ||
+	instruments.showFilledWorld ||
+	instruments.showTexturedWalls)
+	outline = true;
     /*
      * Optimize the map for blue.
      */
@@ -705,7 +707,7 @@ void Map_blue(int startx, int starty, int width, int height)
 		    : !(blue[Setup->map_data[x * Setup->y + (y - 1)]]
 			& BLUE_UP))
 		    newtype |= BLUE_DOWN;
-		if (!BIT(instruments, outline_mask)
+		if (!outline
 		    || ((x == Setup->x - 1)
 			? (!BIT(Setup->mode, WRAP_PLAY)
 			   || !(blue[Setup->map_data[y]]
@@ -713,7 +715,7 @@ void Map_blue(int startx, int starty, int width, int height)
 			: !(blue[Setup->map_data[(x + 1) * Setup->y + y]]
 			    & BLUE_LEFT)))
 		    newtype |= BLUE_RIGHT;
-		if (!BIT(instruments, outline_mask)
+		if (!outline
 		    || ((y == Setup->y - 1)
 			? (!BIT(Setup->mode, WRAP_PLAY)
 			   || !(blue[Setup->map_data[x * Setup->y]]
@@ -732,7 +734,7 @@ void Map_blue(int startx, int starty, int width, int height)
 		    : !(blue[Setup->map_data[(x - 1) * Setup->y + y]]
 			& BLUE_RIGHT))
 		    newtype |= BLUE_LEFT;
-		if (!BIT(instruments, outline_mask)
+		if (!outline
 		    || ((y == Setup->y - 1)
 			? (!BIT(Setup->mode, WRAP_PLAY)
 			   || !(blue[Setup->map_data[x * Setup->y]]
@@ -744,7 +746,7 @@ void Map_blue(int startx, int starty, int width, int height)
 
 	    case SETUP_REC_RU:
 		newtype = BLUE_BIT | BLUE_CLOSED;
-		if (!BIT(instruments, outline_mask)
+		if (!outline
 		    || ((x == Setup->x - 1)
 			? (!BIT(Setup->mode, WRAP_PLAY)
 			   || !(blue[Setup->map_data[y]]
@@ -752,7 +754,7 @@ void Map_blue(int startx, int starty, int width, int height)
 			: !(blue[Setup->map_data[(x + 1) * Setup->y + y]]
 			    & BLUE_LEFT)))
 		    newtype |= BLUE_RIGHT;
-		if (!BIT(instruments, outline_mask)
+		if (!outline
 		    || ((y == Setup->y - 1)
 			? (!BIT(Setup->mode, WRAP_PLAY)
 			   || !(blue[Setup->map_data[x * Setup->y]]
@@ -782,7 +784,7 @@ void Map_blue(int startx, int starty, int width, int height)
 
 	    case SETUP_REC_RD:
 		newtype = BLUE_BIT | BLUE_BELOW | BLUE_OPEN;
-		if (!BIT(instruments, outline_mask)
+		if (!outline
 		    || ((x == Setup->x - 1)
 			? (!BIT(Setup->mode, WRAP_PLAY)
 			   || !(blue[Setup->map_data[y]]
@@ -1414,7 +1416,7 @@ int Handle_player(int id, int player_team, int mychar, char *player_name,
     other->war_id = -1;
     other->name_width = 0;
     strlcpy(other->name, player_name, sizeof(other->name));
-    if (BIT(instruments, SHOW_SHIP_ID))
+    if (instruments.showShipId)
 	sprintf(other->id_string, "%d", id);
     else
 	strlcpy(other->id_string, player_name, sizeof(other->id_string));
@@ -2228,7 +2230,7 @@ int Client_setup(void)
 	 * without affecting old ones. It's still possible to turn in on
 	 * from the config menu during play for old maps.
 	 * -- But doesn't seem to work anyway if turned on? Well who cares */
-	CLR_BIT(instruments, SHOW_TEXTURED_WALLS);
+	instruments.showTexturedWalls = false;
     }
 
     RadarHeight = (RadarWidth * Setup->height) / Setup->width;
