@@ -362,7 +362,7 @@ void Tune_asteroid_prob(void);
  */
 int End_game(void);
 int Pick_team(int pick_for_type);
-void Server_info(char *str, unsigned max_size);
+void Server_info(char *str, size_t max_size);
 void Log_game(const char *heading);
 void Game_Over(void);
 void Server_log_admin_message(player *pl, const char *str);
@@ -426,7 +426,7 @@ void Convert_string_to_list(const char *value, list_t *list_ptr);
 int Parser_list_option(int *ind, char *buf);
 bool Parser(int argc, char **argv);
 int Tune_option(char *name, char *val);
-int Get_option_value(const char *name, char *value, unsigned size);
+int Get_option_value(const char *name, char *value, size_t size);
 
 /*
  * Prototypes for fileparser.c

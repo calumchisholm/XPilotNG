@@ -470,7 +470,7 @@ int Pick_team(int pick_for_type)
  *
  * TODO
 */
-void Server_info(char *str, unsigned max_size)
+void Server_info(char *str, size_t max_size)
 {
     int			i, j, k;
     player		*pl, **order, *best = NULL;

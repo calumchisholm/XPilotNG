@@ -497,7 +497,7 @@ int Tune_option(char *name, char *val)
 }
 
 
-int Get_option_value(const char *name, char *value, unsigned size)
+int Get_option_value(const char *name, char *value, size_t size)
 {
     option_desc		*opt;
 
