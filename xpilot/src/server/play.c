@@ -245,17 +245,18 @@ void Ball_is_destroyed(ballobject *ball)
     DFLOAT seconds = ((DFLOAT)frames) / framesPerSecond;
 
     if (timeStep != 1.0) {
-	DFLOAT frames12 = ((DFLOAT)frames) * timeStep;
+	DFLOAT normalized = ((DFLOAT)frames) * timeStep;
 
-	sprintf(msg," < The ball was loose for %d frames (best %d) "
-		"/ %.2f frames @ 12fps / %.2fs >",
-		frames, Rank_GetBestBall(pl), frames12, seconds);
+	sprintf(msg," < The ball was loose for %d frames "
+		"(equals %.2f frames with gamespeed=FPS) / %.2fs >",
+		frames, normalized, seconds);
+	Rank_BallRun(pl, normalized);
     } else {
-	sprintf(msg," < The ball was loose for %d frames (best %d) / %.2fs >",
-		frames, Rank_GetBestBall(pl), seconds);
+	sprintf(msg," < The ball was loose for %d frames / %.2fs >",
+		frames, seconds);
+	Rank_BallRun(pl, frames);
     }
     Set_message(msg);
-    Rank_BallRun(pl, frames);
 }
 
 
