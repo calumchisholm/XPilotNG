@@ -119,7 +119,7 @@ long	fuelSum;			/* Sum of fuel in all tanks */
 long	fuelMax;			/* How much fuel can you take? */
 short	fuelCurrent;			/* Number of currently used tank */
 short	numTanks;			/* Number of tanks */
-long	fuelCount;			/* Display fuel for how long? */
+DFLOAT	fuelTime;			/* Display fuel for how long? */
 int	fuelLevel1;			/* Fuel critical level */
 int	fuelLevel2;			/* Fuel warning level */
 int	fuelLevel3;			/* Fuel notify level */

@@ -357,7 +357,7 @@ bool Key_press_shield(keys_t key)
 
 bool Key_press_fuel(keys_t key)
 {
-    fuelCount = FUEL_NOTIFY;
+    fuelTime = FUEL_NOTIFY_TIME;
     return false;
 }
 
@@ -704,7 +704,7 @@ bool Key_release(keys_t key)
 
     case KEY_REFUEL:
     case KEY_REPAIR:
-	fuelCount = FUEL_NOTIFY;
+	fuelTime = FUEL_NOTIFY_TIME;
 	break;
 
     case KEY_SELECT_ITEM:

@@ -52,12 +52,12 @@
 #define HUD_OFFSET		20	/* Hud line offset */
 #define FUEL_GAUGE_OFFSET	6
 #define HUD_FUEL_GAUGE_SIZE	(2*(MIN_HUD_SIZE-HUD_OFFSET-FUEL_GAUGE_OFFSET))
-/*#define FUEL_NOTIFY		(3*FPS)*/
+#define FUEL_NOTIFY_TIME	3.0
 
 #define WARNING_DISTANCE	(VISIBILITY_DISTANCE*0.8)
 
 #define MSG_LIFE_TIME		120.0	/* Seconds */
-#define MSG_FLASH_TIME		110.0	/* Old messages have life time less
+#define MSG_FLASH_TIME		100.0	/* Old messages have life time less
 					   than this */
 
 #define TITLE_DELAY		500	/* Should probably change to seconds */

@@ -487,7 +487,7 @@ int Handle_self(int x, int y, int vx, int vy, int newHeading,
     memcpy(numItems, newNumItems, NUM_ITEMS * sizeof(u_byte));
     fuelCurrent = newCurrentTank;
     if (newFuelSum > fuelSum && selfVisible != 0) {
-	fuelCount = FUEL_NOTIFY;
+	fuelTime = FUEL_NOTIFY_TIME;
     }
     fuelSum = newFuelSum;
     fuelMax = newFuelMax;

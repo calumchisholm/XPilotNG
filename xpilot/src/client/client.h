@@ -300,7 +300,7 @@ extern long	fuelSum;		/* Sum of fuel in all tanks */
 extern long	fuelMax;		/* How much fuel can you take? */
 extern short	fuelCurrent;		/* Number of currently used tank */
 extern short	numTanks;		/* Number of tanks */
-extern long	fuelCount;		/* Display fuel for how long? */
+extern DFLOAT	fuelTime;		/* Display fuel for how long? */
 extern int	fuelLevel1;		/* Fuel critical level */
 extern int	fuelLevel2;		/* Fuel warning level */
 extern int	fuelLevel3;		/* Fuel notify level */

@@ -526,7 +526,7 @@ void Paint_HUD(void)
      * Show speed pointer
      */
     if (ptr_move_fact != 0.0
-	&& selfVisible != 0
+	&& selfVisible
 	&& (vel.x != 0 || vel.y != 0)) {
 	Segment_add(hudColor,
 		    ext_view_width / 2,
@@ -545,8 +545,8 @@ void Paint_HUD(void)
 		    (int) (ext_view_height / 2 - 100 * tsin(heading)));
     }
 
-    hudRadarMapScale = (DFLOAT) Setup->width / (DFLOAT) 256;
-    if (hudRadarEnemyColor > 0 || hudRadarOtherColor > 0)
+    if (hudRadarEnemyColor || hudRadarOtherColor) {
+	hudRadarMapScale = (DFLOAT) Setup->width / (DFLOAT) 256;
 	Paint_hudradar(
 	    hudRadarScale,
 	    (int)(hudRadarLimit * (active_view_width / 2)
@@ -555,11 +555,12 @@ void Paint_HUD(void)
 		  * hudRadarScale / hudRadarMapScale),
 	    hudRadarDotSize);
 
-    if (BIT(hackedInstruments, MAP_RADAR))
-	Paint_hudradar(hudRadarMapScale,
-		       active_view_width / 2,
-		       active_view_height / 2,
-		       SHIP_SZ);
+	if (BIT(hackedInstruments, MAP_RADAR))
+	    Paint_hudradar(hudRadarMapScale,
+			   active_view_width / 2,
+			   active_view_height / 2,
+			   SHIP_SZ);
+    }
 
     /* message scan hack by mara*/
     if (BIT(hackedInstruments, BALL_MSG_SCAN)) {
@@ -573,6 +574,7 @@ void Paint_HUD(void)
 	}
     }
 
+    /* kps - remove */
     if (!hudColor) {
 	return;
     }
@@ -642,7 +644,7 @@ void Paint_HUD(void)
     SET_FG(colors[hudColor].pixel);
 
     /* Fuel notify, HUD meter on */
-    if (fuelCount || fuelSum < fuelLevel3) {
+    if (fuelTime > 0.0 || fuelSum < fuelLevel3) {
 	did_fuel = 1;
 	sprintf(str, "%04d", (int)fuelSum);
 	rd.drawString(dpy, p_draw, gc,
@@ -746,53 +748,53 @@ void Paint_HUD(void)
 			gameFont->ascent + gameFont->descent);
     }
 
-    if (fuelCount > 0) {
-	fuelCount--;
+    if (fuelTime > 0.0) {
+	fuelTime -= timePerFrame;
+	if (fuelTime <= 0.0)
+	    fuelTime = 0.0;
     }
 
-    /* Fuel gauge, must be last */
-    if (!fuelGaugeColor)
-	return;
+    /* draw fuel gauge */
+    if (fuelGaugeColor &&
+	((fuelTime > 0.0)
+	 || (fuelSum < fuelLevel3
+	     && ((fuelSum < fuelLevel1 && (loopsSlow % 4) < 2)
+		 || (fuelSum < fuelLevel2
+		     && fuelSum > fuelLevel1
+		     && (loopsSlow % 8) < 4)
+		 || (fuelSum > fuelLevel2))))) {
 
-    SET_FG(colors[fuelGaugeColor].pixel);
+	SET_FG(colors[fuelGaugeColor].pixel);
+	rd.drawRectangle(dpy, p_draw, gc,
+			 WINSCALE(hud_pos_x + hudSize - HUD_OFFSET
+				  + FUEL_GAUGE_OFFSET) - 1,
+			 WINSCALE(hud_pos_y - hudSize + HUD_OFFSET
+				  + FUEL_GAUGE_OFFSET) - 1,
+			 WINSCALE(HUD_OFFSET - (2*FUEL_GAUGE_OFFSET)) + 3,
+			 WINSCALE(HUD_FUEL_GAUGE_SIZE) + 3);
+	Erase_4point(WINSCALE(hud_pos_x + hudSize - HUD_OFFSET
+			      + FUEL_GAUGE_OFFSET) - 1,
+		     WINSCALE(hud_pos_y - hudSize + HUD_OFFSET
+			      + FUEL_GAUGE_OFFSET) - 1,
+		     WINSCALE(HUD_OFFSET - (2*FUEL_GAUGE_OFFSET)) + 3,
+		     WINSCALE(HUD_FUEL_GAUGE_SIZE) + 3);
 
-    if (!((fuelCount)
-	  || (fuelSum < fuelLevel3
-	      && ((fuelSum < fuelLevel1 && (loopsSlow % 4) < 2)
-		  || (fuelSum < fuelLevel2
-		      && fuelSum > fuelLevel1
-		      && (loopsSlow % 8) < 4)
-		  || (fuelSum > fuelLevel2)))))
-	return;
-
-    rd.drawRectangle(dpy, p_draw, gc,
-		  WINSCALE(hud_pos_x + hudSize - HUD_OFFSET
-			+ FUEL_GAUGE_OFFSET) - 1,
-		  WINSCALE(hud_pos_y - hudSize + HUD_OFFSET
-			+ FUEL_GAUGE_OFFSET) - 1,
-		  WINSCALE(HUD_OFFSET - (2*FUEL_GAUGE_OFFSET)) + 3,
-		  WINSCALE(HUD_FUEL_GAUGE_SIZE) + 3);
-    Erase_4point(WINSCALE(hud_pos_x + hudSize - HUD_OFFSET
-		   + FUEL_GAUGE_OFFSET) - 1,
-		 WINSCALE(hud_pos_y - hudSize + HUD_OFFSET
-		   + FUEL_GAUGE_OFFSET) - 1,
-		 WINSCALE(HUD_OFFSET - (2*FUEL_GAUGE_OFFSET)) + 3,
-		 WINSCALE(HUD_FUEL_GAUGE_SIZE) + 3);
-
-    size = (HUD_FUEL_GAUGE_SIZE * fuelSum) / fuelMax;
-    rd.fillRectangle(dpy, p_draw, gc,
-                   WINSCALE(hud_pos_x + hudSize - HUD_OFFSET
-			+ FUEL_GAUGE_OFFSET) + 1,
-                   WINSCALE(hud_pos_y - hudSize + HUD_OFFSET
-			+ FUEL_GAUGE_OFFSET + HUD_FUEL_GAUGE_SIZE - size) + 1,
-		   WINSCALE(HUD_OFFSET - (2*FUEL_GAUGE_OFFSET)),
-		   WINSCALE(size));
-    Erase_rectangle(WINSCALE(hud_pos_x + hudSize - HUD_OFFSET
-			+ FUEL_GAUGE_OFFSET),
-                    WINSCALE(hud_pos_y - hudSize + HUD_OFFSET
-			+ FUEL_GAUGE_OFFSET + HUD_FUEL_GAUGE_SIZE - size),
-                    HUD_OFFSET - (2*FUEL_GAUGE_OFFSET) + 1, size + 1);
-
+	size = (HUD_FUEL_GAUGE_SIZE * fuelSum) / fuelMax;
+	rd.fillRectangle(dpy, p_draw, gc,
+			 WINSCALE(hud_pos_x + hudSize - HUD_OFFSET
+				  + FUEL_GAUGE_OFFSET) + 1,
+			 WINSCALE(hud_pos_y - hudSize + HUD_OFFSET
+				  + FUEL_GAUGE_OFFSET + HUD_FUEL_GAUGE_SIZE
+				  - size) + 1,
+			 WINSCALE(HUD_OFFSET - (2*FUEL_GAUGE_OFFSET)),
+			 WINSCALE(size));
+	Erase_rectangle(WINSCALE(hud_pos_x + hudSize - HUD_OFFSET
+				 + FUEL_GAUGE_OFFSET),
+			WINSCALE(hud_pos_y - hudSize + HUD_OFFSET
+				 + FUEL_GAUGE_OFFSET + HUD_FUEL_GAUGE_SIZE
+				 - size),
+			HUD_OFFSET - (2*FUEL_GAUGE_OFFSET) + 1, size + 1);
+    }
 }
 
 
