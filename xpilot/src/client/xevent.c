@@ -402,9 +402,9 @@ void xevent_keyboard(int queued)
 #endif
 }
 
-ipos	delta;
-ipos	mouse;		/* position of mouse pointer. */
-int	movement;	/* horizontal mouse movement. */
+static ipos	delta;
+ipos	mousePosition;	/* position of mouse pointer. */
+int	mouseMovement;	/* horizontal mouse movement. */
 
 
 void xevent_pointer(void)
@@ -422,7 +422,7 @@ void xevent_pointer(void)
 		 POINT point;
 
 		 GetCursorPos(&point);
-		 movement = point.x - draw_width/2;
+		 mouseMovement = point.x - draw_width/2;
 		 XWarpPointer(dpy, None, drawWindow,
 			      0, 0, 0, 0,
 			      draw_width/2, draw_height/2);
@@ -430,10 +430,10 @@ void xevent_pointer(void)
 		/* fix end */
 #endif
 
-	    if (movement != 0) {
-		Send_pointer_move(movement);
-		delta.x = draw_width / 2 - mouse.x;
-		delta.y = draw_height / 2 - mouse.y;
+	    if (mouseMovement != 0) {
+		Send_pointer_move(mouseMovement);
+		delta.x = draw_width / 2 - mousePosition.x;
+		delta.y = draw_height / 2 - mousePosition.y;
 		if (ABS(delta.x) > 3 * draw_width / 8
 		    || ABS(delta.y) > 1 * draw_height / 8) {
 
@@ -473,7 +473,7 @@ int win_xevent(XEvent event)
     audioEvents();
 #endif /* SOUND */
 
-    movement = 0;
+    mouseMovement = 0;
 
 #ifndef _WINDOWS
     switch (new_input) {

@@ -33,6 +33,13 @@ extern keydefs_t	*keydefs;
 extern int		num_keydefs;
 extern int		max_keydefs;
 
+extern int		talk_key_repeating;
+extern XEvent		talk_key_repeat_event;
+extern struct timeval	talk_key_repeat_time;
+
+extern ipos		mousePosition;	/* position of mouse pointer. */
+extern int		mouseMovement;	/* horizontal mouse movement. */
+
 bool Key_binding_callback(keys_t key, const char *str);
 keys_t Lookup_key(XEvent *event, KeySym ks, bool reset);
 void Key_event(XEvent *event);

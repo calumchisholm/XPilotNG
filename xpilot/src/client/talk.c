@@ -26,9 +26,6 @@
 char talk_version[] = VERSION;
 
 
-/* avoid trouble with Atoms and 64 bit archs */
-typedef CARD32  Atom32;
-
 /* Information window dimensions */
 #define TALK_TEXT_HEIGHT	(talkFont->ascent + talkFont->descent)
 #define TALK_OUTSIDE_BORDER	2

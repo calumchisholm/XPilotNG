@@ -26,20 +26,6 @@
 char xeventhandlers_version[] = VERSION;
 
 
-extern int	talk_key_repeating;  /* xevent.c */
-extern XEvent	talk_key_repeat_event;  /* xevent.c */
-extern struct timeval talk_key_repeat_time;
-extern ipos	mouse;		/* position of mouse pointer. */
-extern int	movement;	/* horizontal mouse movement. */
-
-#ifndef _WINDOWS
-/* avoid trouble with Atoms and 64 bit archs */
-typedef CARD32  Atom32;
-#endif
-
-/* store message in history, when it is sent? */
-extern bool save_talk_str;
-
 #ifdef DEVELOPMENT
 time_t	back_in_play_since;
 #endif
@@ -318,10 +304,10 @@ void MotionNotify_event(XEvent *event)
         if (pointerControl) {
 	    if (!talk_mapped) {
 	        if (!event->xmotion.send_event)
-		    movement += event->xmotion.x - mouse.x;
+		    mouseMovement += event->xmotion.x - mousePosition.x;
 	    }
-	    mouse.x = event->xmotion.x;
-	    mouse.y = event->xmotion.y;
+	    mousePosition.x = event->xmotion.x;
+	    mousePosition.y = event->xmotion.y;
 	}
     } else
         Widget_event(event);
