@@ -145,7 +145,7 @@ class Map:
 	elif d == 6:
 	    return self[loc.l()] in FILLED + REC_RD + REC_RU
 	elif d == 7:
-	    return self[loc] in FILLED + REC_LU + REC_LU
+	    return self[loc] in FILLED + REC_LD + REC_LU
     def coords(self, x = 0, y = 0):
 	return Wrapcoords(self.width, self.height, x, y)
 
@@ -259,7 +259,8 @@ def convert(options):
 	    checks[ord(map[loc]) - ord('A')] = check
 	if done[loc]:
 	    continue
-	if map[loc] in FILLED and map[loc.l()] not in FILLED + REC_RD + REC_RU:
+	if map[loc] in FILLED + REC_LD + REC_LU and \
+               map[loc.l()] not in FILLED + REC_RD + REC_RU:
 	    startloc = loc
 	    dir = 6
 	elif map[loc] in REC_RU:
@@ -286,6 +287,7 @@ def convert(options):
 	    if l == startloc and dir == startdir:
 		break
 	polys.append(poly)
+
     mxc = BCLICKS * width
     myc = BCLICKS * height
     for ball in balls:
