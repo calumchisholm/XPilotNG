@@ -992,20 +992,6 @@ xp_option_t default_options[] = {
 	XP_OPTFLAG_CONFIG_DEFAULT,
 	"How many seconds score objects remain visible on the map.\n"),
 
-
-    /* mouse stuff */
-    XP_BOOL_OPTION(
-	"pointerControl",
-	false,
-	&initialPointerControl,
-	NULL,
-	XP_OPTFLAG_DEFAULT,
-	"Enable mouse control.  This allows ship direction control by\n"
-	"moving the mouse to the left for an anti-clockwise turn and\n"
-	"moving the mouse to the right for a clockwise turn.\n"
-	"Also see the pointerButton options for use of the mouse buttons.\n"),
-
-
     /* message stuff */
     XP_INT_OPTION(
 	"charsPerSecond",
