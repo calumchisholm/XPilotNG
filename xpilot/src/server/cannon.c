@@ -141,9 +141,20 @@ void Cannon_add_item(cannon_t *c, int item_type, int amount)
     }
 }
 
+static inline int Cannon_get_initial_item(cannon_t *c, Item_t i)
+{
+    int init_amount;
+
+    init_amount = c->initial_items[i];
+    if (init_amount < 0)
+	init_amount = c->world->items[i].cannon_initial;
+
+    return init_amount;
+}
+
 void Cannon_throw_items(cannon_t *c)
 {
-    int i, dir, init_amount;
+    int i, dir;
     itemobject_t *item;
     double velocity;
     world_t *world = c->world;
@@ -151,10 +162,7 @@ void Cannon_throw_items(cannon_t *c)
     for (i = 0; i < NUM_ITEMS; i++) {
 	if (i == ITEM_FUEL)
 	    continue;
-	init_amount = c->initial_items[i];
-	if (init_amount < 0)
-	    init_amount = world->items[i].cannon_initial;
-	c->item[i] -= init_amount;
+	c->item[i] -= Cannon_get_initial_item(c, (Item_t)i);
 	while (c->item[i] > 0) {
 	    int amount = world->items[i].max_per_pack
 			 - (int)(rfrac() * (1 + world->items[i].max_per_pack
@@ -209,15 +217,11 @@ void Cannon_init(cannon_t *c)
 
 void Cannon_init_items(cannon_t *c)
 {
-    int i, init_amount;
-    world_t *world = c->world;
+    int i;
 
     for (i = 0; i < NUM_ITEMS; i++) {
 	c->item[i] = 0;
-	init_amount = c->initial_items[i];
-	if (init_amount < 0)
-	    init_amount = world->items[i].cannon_initial;
-	Cannon_add_item(c, i, init_amount);
+	Cannon_add_item(c, i, Cannon_get_initial_item(c, (Item_t)i));
     }
 }
 

@@ -413,21 +413,10 @@ void Pause_player(player_t *pl, bool on)
 
 	pl->obj_status	&= ~(KILL_OBJ_BITS);
 
-#if 0
 	/*
 	 * kps - possibly add option to make items reset
 	 * to initial when pausing
 	 */
-	if (options.pauseResetsItems) {
-	    world_t *world = pl->world;
-	    int i;
-
-	    for (i = 0; i < NUM_ITEMS; i++) {
-		if (!BIT(1U << i, ITEM_BIT_FUEL | ITEM_BIT_TANK))
-		    pl->item[i] = world->items[i].initial;
-	    }
-	}
-#endif
 
 	pl->forceVisible	= 0;
 	pl->ecmcount		= 0;
@@ -1027,8 +1016,8 @@ int Handle_keyboard(player_t *pl)
 		for (i = 0; i < NUM_ITEMS; i++) {
 		    if (++pl->lose_item >= NUM_ITEMS)
 			pl->lose_item = 0;
-		    if (BIT(1U << pl->lose_item,
-			    ITEM_BIT_FUEL | ITEM_BIT_TANK))
+		    if (pl->lose_item == ITEM_FUEL
+			|| pl->lose_item == ITEM_TANK)
 			/* can't lose fuel or tanks. */
 			continue;
 		    if (pl->item[pl->lose_item] > 0) {

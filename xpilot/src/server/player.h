@@ -239,6 +239,7 @@ typedef struct player {
     double	self_destruct_count;	/* if > 0, ticks before boom */
 
     int		item[NUM_ITEMS];	/* for each item type how many */
+    int		initial_item[NUM_ITEMS];/* items player had initially */
     int		lose_item;		/* which item to drop */
     int		lose_item_state;	/* lose item key state, 2=up,1=down */
 

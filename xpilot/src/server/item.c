@@ -91,7 +91,7 @@ void Item_damage(player_t *pl, double prob)
 	LIMIT(loss, 0.0, 1.0);
 
 	for (i = 0; i < NUM_ITEMS; i++) {
-	    if (!BIT(1U << i, ITEM_BIT_FUEL|ITEM_BIT_TANK)) {
+	    if (!(i == ITEM_FUEL || i == ITEM_TANK)) {
 		if (pl->item[i]) {
 		    double f = rfrac();
 
@@ -335,16 +335,15 @@ void Throw_items(player_t *pl)
 	return;
 
     for (item = 0; item < NUM_ITEMS; item++) {
-	if (!BIT(1U << item, ITEM_BIT_FUEL | ITEM_BIT_TANK)) {
-	    do {
-		num_items_to_throw
-		    = pl->item[item] - world->items[item].initial;
-		if (num_items_to_throw <= 0)
-		    break;
-		Place_item(world, pl, item);
-		remain = pl->item[item] - world->items[item].initial;
-	    } while (remain > 0 && remain < num_items_to_throw);
-	}
+	if (item == ITEM_FUEL || item == ITEM_TANK)
+	    continue;
+	do {
+	    num_items_to_throw = pl->item[item] - pl->initial_item[item];
+	    if (num_items_to_throw <= 0)
+		break;
+	    Place_item(world, pl, item);
+	    remain = pl->item[item] - pl->initial_item[item];
+	} while (remain > 0 && remain < num_items_to_throw);
     }
 
     Item_update_flags(pl);
@@ -372,11 +371,11 @@ void Detonate_items(player_t *pl)
 	owner_pl = pl;
 
     /*
-     * These are always immune to detonation.
+     * Initial items are immune to detonation.
      */
-    if ((pl->item[ITEM_MINE] -= world->items[ITEM_MINE].initial) < 0)
+    if ((pl->item[ITEM_MINE] -= pl->initial_item[ITEM_MINE]) < 0)
 	pl->item[ITEM_MINE] = 0;
-    if ((pl->item[ITEM_MISSILE] -= world->items[ITEM_MISSILE].initial) < 0)
+    if ((pl->item[ITEM_MISSILE] -= pl->initial_item[ITEM_MISSILE]) < 0)
 	pl->item[ITEM_MISSILE] = 0;
 
     /*
@@ -890,7 +889,7 @@ void do_lose_item(player_t *pl)
 	error("BUG: do_lose_item %d", item);
 	return;
     }
-    if (BIT(1U << pl->lose_item, ITEM_BIT_FUEL | ITEM_BIT_TANK))
+    if (item == ITEM_FUEL || item == ITEM_TANK)
 	return;
 
     if (pl->item[item] <= 0)

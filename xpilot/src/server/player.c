@@ -400,7 +400,7 @@ void Player_init_items(player_t *pl)
     base_t *base = pl->home_base;
 
     for (i = 0; i < NUM_ITEMS; i++) {
-	if (BIT(1U << i, ITEM_BIT_FUEL | ITEM_BIT_TANK))
+	if (i == ITEM_FUEL || i == ITEM_TANK))
 	    continue;
 
 	if (base && base->initial_items[i] >= 0)
@@ -422,6 +422,31 @@ void Player_init_items(player_t *pl)
     Player_init_fuel(pl, num_tanks, total_fuel);
 }
 #endif
+
+void Player_init_items(player_t *pl)
+{
+    world_t *world = pl->world;
+    int i;
+
+    /*
+     * Give player an initial set of items.
+     */
+    for (i = 0; i < NUM_ITEMS; i++) {
+	if (i == ITEM_FUEL || i == ITEM_TANK)
+	    pl->item[i] = 0;
+	else
+	    pl->item[i] = world->items[i].initial;
+    }
+
+    Player_init_fuel(pl, (double)world->items[ITEM_FUEL].initial);
+
+    /*
+     * Remember the amount of initial items. This way we can
+     * later figure out what items the player has picked up.
+     */
+    for (i = 0; i < NUM_ITEMS; i++)
+	pl->initial_item[i] = pl->item[i];
+}
 
 int Init_player(world_t *world, int ind, shipshape_t *ship, int type)
 {
@@ -446,13 +471,7 @@ int Init_player(world_t *world, int ind, shipshape_t *ship, int type)
     pl->mass = options.shipMass;
     pl->emptymass = options.shipMass;
 
-    for (i = 0; i < NUM_ITEMS; i++) {
-	if (!BIT(1U << i, ITEM_BIT_FUEL | ITEM_BIT_TANK))
-	    pl->item[i] = world->items[i].initial;
-    }
-
-    pl->fuel.sum = world->items[ITEM_FUEL].initial;
-    Player_init_fuel(pl, pl->fuel.sum);
+    Player_init_items(pl);
 
     if (options.allowShipShapes && ship)
 	pl->ship = ship;
@@ -1543,7 +1562,6 @@ void Kill_player(player_t *pl, bool add_rank_death)
 
 void Player_death_reset(player_t *pl, bool add_rank_death)
 {
-    int i;
     world_t *world = pl->world;
 
     if (Player_is_tank(pl)) {
@@ -1586,10 +1604,7 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
 	Player_set_state(pl, PL_STATE_APPEARING);
     }
 
-    for (i = 0; i < NUM_ITEMS; i++) {
-	if (!BIT(1U << i, ITEM_BIT_FUEL | ITEM_BIT_TANK))
-	    pl->item[i] = world->items[i].initial;
-    }
+    Player_init_items(pl);
 
     pl->forceVisible	= 0;
     assert(pl->recovery_count == RECOVERY_DELAY);
@@ -1601,8 +1616,6 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
     pl->damaged 	= 0;
     pl->stunned		= 0;
     pl->lock.distance	= 0;
-
-    Player_init_fuel(pl, (double)world->items[ITEM_FUEL].initial);
 
     if (add_rank_death) {
 	Rank_add_death(pl);
