@@ -872,6 +872,9 @@ int Talk_paste(char *data, size_t data_len, bool overwrite)
 	str_len = strlen(talk_str);
 	strlcpy(talk_backup, talk_str, sizeof(talk_backup));
     }
+    /* XTextWidth may return zero, avoid division by zero */
+    if (char_width == 0)
+	char_width = 1;
     /* !@# XXX This is wrong with proportional fonts */
     accept_len = (max_width / char_width) - str_len + 1;
     if (accept_len + str_len > max_len)
