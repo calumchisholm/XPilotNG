@@ -761,7 +761,8 @@ static void PlayerObjectCollision(int ind)
 		else if (selfImmunity) {
 		    continue;
 		}
-	    } else if (teamImmunity &&
+		/* changed from team to self immunity by kps */
+	    } else if (selfImmunity &&
 		       IS_TANK_PTR(pl) &&
 		       (pl->lock.pl_id == obj->id)) {
 		continue;
@@ -802,7 +803,12 @@ static void PlayerObjectCollision(int ind)
 		continue;
 	    }
 	}
-
+	/* laserhack */
+	else if (BIT(obj->type, OBJ_PULSE)) {
+	    pulseobject *pulse = PULSE_PTR(obj);
+	    if (pl->id == pulse->id && !pulse->refl)
+		continue;
+	}
 	/*
 	 * Objects actually only hit the player if they are really close.
 	 */
@@ -904,6 +910,14 @@ static void PlayerObjectCollision(int ind)
 	    /* don't explode cannon flak if it hits directly*/
 	    CLR_BIT(obj->mods.warhead, CLUSTER);
 	    break;
+
+	    /* laserhack */
+	case OBJ_PULSE:
+	    Player_collides_with_laser_pulse(ind, PULSE_PTR(obj));
+	    if (BIT(pl->status, KILLED)) {
+		return;
+	    }
+	    continue;
 
 	default:
 	    break;
@@ -1724,6 +1738,12 @@ static void AsteroidCollision(void)
 		Delta_mv(ast, obj);
 		damage = ED_SMART_SHOT_HIT
 			 / ((obj->mods.mini + 1) * (obj->mods.power + 1));
+		sound = true;
+		break;
+		/* laserhack */
+	    case OBJ_PULSE:
+		obj->life = 0;
+		damage = ED_LASER_HIT;
 		sound = true;
 		break;
 	    default:

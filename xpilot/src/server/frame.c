@@ -921,6 +921,22 @@ static void Frame_shots(int conn, int ind)
 	    }
 	    break;
 
+	    /* laserhack */
+	case OBJ_PULSE:
+	    {
+		pulseobject *pulse = PULSE_PTR(shot);
+
+		if (Team_immune(pulse->id, pl->id)) {
+		    color = BLUE;
+		} else if (pulse->id == pl->id
+			   && selfImmunity) {
+		    color = BLUE;
+		} else {
+		    color = RED;
+		}
+		Send_laser(conn, color, cx, cy, pulse->len, pulse->dir);
+	    }
+	break;
 	default:
 	    warn("Frame_shots: Shot type %d not defined.", shot->type);
 	    break;

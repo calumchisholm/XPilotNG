@@ -400,7 +400,7 @@ struct _pulseobject {
 
     int			dir;		/* Direction of the pulse */
     int			len;		/* Length of the pulse */
-
+    bool		refl;		/* Pulse was reflected ? */
 #ifdef __cplusplus
 			_pulseobject() {}
 #endif
