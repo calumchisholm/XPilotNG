@@ -20,8 +20,6 @@ AC_SUBST([XP_COPYRIGHT],["Copyright © 1991-2004 by Bjørn Stabell, Ken Ronny Scho
 AC_SUBST([XP_RELEASEDATE],["Mar 18, 2004"])
 AC_SUBST([XP_INSTLIBDIR],"$prefix/lib/xpilot-ng")
 AC_SUBST([XP_TITLE],["XPilotNG 4.6.0"])
-AC_SUBST([XP_WINVERSION],["4.6.0ng-NT13"])
-AC_SUBST([XP_VERSION_WINDOWS],["13"])
 
 dnl  Checks for options.
 dnl  We should have some general macro for these.
@@ -318,7 +316,6 @@ AC_CONFIG_FILES([ \
 	doc/man/Makefile \
 	doc/man/xpilot.man \
 	doc/man/xp-replay.man \
-	doc/man/xp-mapedit.man \
 	doc/man/xpilots.man \
 	lib/Makefile \
 	lib/fonts/Makefile \

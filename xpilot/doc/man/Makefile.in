@@ -36,16 +36,15 @@ POST_UNINSTALL = :
 host_triplet = @host@
 subdir = doc/man
 DIST_COMMON = README $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/xp-mapedit.man.in $(srcdir)/xp-replay.man.in \
-	$(srcdir)/xpilot.man.in $(srcdir)/xpilots.man.in
+	$(srcdir)/xp-replay.man.in $(srcdir)/xpilot.man.in \
+	$(srcdir)/xpilots.man.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h
-CONFIG_CLEAN_FILES = xpilot.man xp-replay.man xp-mapedit.man \
-	xpilots.man
+CONFIG_CLEAN_FILES = xpilot.man xp-replay.man xpilots.man
 SOURCES =
 DIST_SOURCES =
 man6dir = $(mandir)/man6
@@ -113,8 +112,6 @@ XP_COPYRIGHTDATE = @XP_COPYRIGHTDATE@
 XP_INSTLIBDIR = @XP_INSTLIBDIR@
 XP_RELEASEDATE = @XP_RELEASEDATE@
 XP_TITLE = @XP_TITLE@
-XP_VERSION_WINDOWS = @XP_VERSION_WINDOWS@
-XP_WINVERSION = @XP_WINVERSION@
 X_CFLAGS = @X_CFLAGS@
 X_EXTENSIONS_LIB = @X_EXTENSIONS_LIB@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
@@ -160,7 +157,7 @@ target_alias = @target_alias@
 target_cpu = @target_cpu@
 target_os = @target_os@
 target_vendor = @target_vendor@
-man6_MANS = xp-mapedit.man xp-replay.man xpilot.man xpilots.man
+man6_MANS = xp-replay.man xpilot.man xpilots.man
 EXTRA_DIST = $(man6_MANS)
 all: all-am
 
@@ -197,8 +194,6 @@ $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 xpilot.man: $(top_builddir)/config.status $(srcdir)/xpilot.man.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 xp-replay.man: $(top_builddir)/config.status $(srcdir)/xp-replay.man.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
-xp-mapedit.man: $(top_builddir)/config.status $(srcdir)/xp-mapedit.man.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 xpilots.man: $(top_builddir)/config.status $(srcdir)/xpilots.man.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@

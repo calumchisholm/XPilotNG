@@ -30,12 +30,9 @@
 #ifndef	VERSION_H
 #define	VERSION_H
 
-#ifndef _WINDOWS
-#  define TITLE			"@XP_TITLE@"
-#else
+#define TITLE			"@XP_TITLE@"
+#ifndef VERSION
 #  define VERSION		"@VERSION@"
-#  define TITLE			"@XP_WINVERSION@"
-#  define VERSION_WINDOWS	"@XP_VERSION_WINDOWS@"
 #endif
 #define AUTHORS			"@XP_AUTHORS@"
 #define COPYRIGHT		"@XP_COPYRIGHT@"

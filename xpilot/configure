@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT XP_AUTHORS XP_COPYRIGHTDATE XP_COPYRIGHT XP_RELEASEDATE XP_INSTLIBDIR XP_TITLE XP_WINVERSION XP_VERSION_WINDOWS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE RANLIB ac_ct_RANLIB CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS X_EXTENSIONS_LIB SDL_CONFIG SDL_CFLAGS SDL_LIBS SDL_EXTRA_LIBS GL_LIBS COND_SDL_CLIENT_TRUE COND_SDL_CLIENT_FALSE EGREP LIBOBJS POW_LIB LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT XP_AUTHORS XP_COPYRIGHTDATE XP_COPYRIGHT XP_RELEASEDATE XP_INSTLIBDIR XP_TITLE CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE RANLIB ac_ct_RANLIB CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS X_EXTENSIONS_LIB SDL_CONFIG SDL_CFLAGS SDL_LIBS SDL_EXTRA_LIBS GL_LIBS COND_SDL_CLIENT_TRUE COND_SDL_CLIENT_FALSE EGREP LIBOBJS POW_LIB LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1882,10 +1882,6 @@ XP_RELEASEDATE="Mar 18, 2004"
 XP_INSTLIBDIR="$prefix/lib/xpilot-ng"
 
 XP_TITLE="XPilotNG 4.6.0"
-
-XP_WINVERSION="4.6.0ng-NT13"
-
-XP_VERSION_WINDOWS="13"
 
 
 # Check whether --enable-dbe or --disable-dbe was given.
@@ -8432,7 +8428,7 @@ fi
 done
 
 
-                                                                                                                                                                                                                  ac_config_files="$ac_config_files Makefile README doc/Makefile doc/man/Makefile doc/man/xpilot.man doc/man/xp-replay.man doc/man/xp-mapedit.man doc/man/xpilots.man lib/Makefile lib/fonts/Makefile lib/maps/Makefile lib/textures/Makefile src/Makefile src/common/Makefile src/common/version.h src/client/Makefile src/client/items/Makefile src/client/sdl/Makefile src/server/Makefile src/replay/Makefile src/replay/tools/Makefile"
+                                                                                                                                                                                                        ac_config_files="$ac_config_files Makefile README doc/Makefile doc/man/Makefile doc/man/xpilot.man doc/man/xp-replay.man doc/man/xpilots.man lib/Makefile lib/fonts/Makefile lib/maps/Makefile lib/textures/Makefile src/Makefile src/common/Makefile src/common/version.h src/client/Makefile src/client/items/Makefile src/client/sdl/Makefile src/server/Makefile src/replay/Makefile src/replay/tools/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -9003,7 +8999,6 @@ do
   "doc/man/Makefile" ) CONFIG_FILES="$CONFIG_FILES doc/man/Makefile" ;;
   "doc/man/xpilot.man" ) CONFIG_FILES="$CONFIG_FILES doc/man/xpilot.man" ;;
   "doc/man/xp-replay.man" ) CONFIG_FILES="$CONFIG_FILES doc/man/xp-replay.man" ;;
-  "doc/man/xp-mapedit.man" ) CONFIG_FILES="$CONFIG_FILES doc/man/xp-mapedit.man" ;;
   "doc/man/xpilots.man" ) CONFIG_FILES="$CONFIG_FILES doc/man/xpilots.man" ;;
   "lib/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/Makefile" ;;
   "lib/fonts/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/fonts/Makefile" ;;
@@ -9146,8 +9141,6 @@ s,@XP_COPYRIGHT@,$XP_COPYRIGHT,;t t
 s,@XP_RELEASEDATE@,$XP_RELEASEDATE,;t t
 s,@XP_INSTLIBDIR@,$XP_INSTLIBDIR,;t t
 s,@XP_TITLE@,$XP_TITLE,;t t
-s,@XP_WINVERSION@,$XP_WINVERSION,;t t
-s,@XP_VERSION_WINDOWS@,$XP_VERSION_WINDOWS,;t t
 s,@CC@,$CC,;t t
 s,@CFLAGS@,$CFLAGS,;t t
 s,@LDFLAGS@,$LDFLAGS,;t t

@@ -30,12 +30,9 @@
 #ifndef	VERSION_H
 #define	VERSION_H
 
-#ifndef _WINDOWS
-#  define TITLE			"XPilotNG 4.6.0"
-#else
+#define TITLE			"XPilotNG 4.6.0"
+#ifndef VERSION
 #  define VERSION		"4.6.0"
-#  define TITLE			"4.6.0ng-NT13"
-#  define VERSION_WINDOWS	"13"
 #endif
 #define AUTHORS			"Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska, Uoti Urpala, Juha Lindström, Kristian Söderblom and Erik Andersson"
 #define COPYRIGHT		"Copyright © 1991-2004 by Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska, Uoti Urpala, Juha Lindström, Kristian Söderblom and Erik Andersson"
