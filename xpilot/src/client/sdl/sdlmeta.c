@@ -370,8 +370,6 @@ static bool join_server(Connect_param_t *conpar, server_info_t *sip)
             sizeof(conpar->server_name));
     strlcpy(conpar->server_addr, sip->ip_str, sizeof(conpar->server_addr));
     conpar->contact_port = sip->port;
-
-    printf("contacting server %s\n", conpar->server_addr);
     if (Contact_servers(1, &server_addr_ptr, 1, 0, 0, NULL,
 			0, NULL, NULL, NULL, NULL, conpar)) {
 	return true;
@@ -412,20 +410,21 @@ int Meta_window(Connect_param_t *conpar)
   meta = Init_MetaWidget(server_list);
   if (!meta) return -1;
 
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  gluOrtho2D(0, draw_width, draw_height, 0);
+  set_alphacolor(blackRGBA);
+  glBegin(GL_QUADS);
+  glVertex2i(0,0);
+  glVertex2i(draw_width,0);
+  glVertex2i(draw_width,draw_height);
+  glVertex2i(0,draw_height);
+  glEnd();
+
   while(1) {
 
-      glMatrixMode(GL_MODELVIEW);
-      glLoadIdentity();
-      glMatrixMode(GL_PROJECTION);
-      glLoadIdentity();
-      gluOrtho2D(0, draw_width, draw_height, 0);
-      set_alphacolor(blackRGBA);
-      glBegin(GL_QUADS);
-      glVertex2i(0,0);
-      glVertex2i(draw_width,0);
-      glVertex2i(draw_width,draw_height);
-      glVertex2i(0,draw_height);
-      glEnd();
       glEnable(GL_SCISSOR_TEST);
       DrawGLWidgetsi(meta, 0, 0, draw_width, draw_height);
       glDisable(GL_SCISSOR_TEST);
