@@ -131,9 +131,16 @@ void Gui_paint_ball(int x, int y, int style)
 	else
 	    Arc_add_rgb(rgb, ballColor, x - BALL_RADIUS, y - BALL_RADIUS,
 			2 * BALL_RADIUS, 2 * BALL_RADIUS, 0, 64 * 360);
-    } else
-	Bitmap_paint(drawPixmap, BM_BALL, WINSCALE(x - BALL_RADIUS),
-		     WINSCALE(y - BALL_RADIUS), 0);
+    } else {
+	if (style == 0xff) {
+	    Bitmap_paint(drawPixmap, BM_BALL, WINSCALE(x - BALL_RADIUS),
+			 WINSCALE(y - BALL_RADIUS), 0);
+	} else {
+	    Bitmap_paint_blended(drawPixmap, BM_BALL_GRAY,
+				 WINSCALE(x - BALL_RADIUS),
+				 WINSCALE(y - BALL_RADIUS), rgb);
+	}
+    }
 }
 
 

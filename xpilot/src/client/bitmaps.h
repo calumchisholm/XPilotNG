@@ -73,9 +73,10 @@
 #define BM_CHECKPOINT	41
 #define BM_METER	42
 #define BM_ASTEROIDCONC	43
+#define BM_BALL_GRAY    44
 
-#define NUM_OBJECT_BITMAPS 44
-#define NUM_BITMAPS	44
+#define NUM_OBJECT_BITMAPS 45
+#define NUM_BITMAPS	45
 
 #define BMS_UNINITIALIZED 0
 #define BMS_INITIALIZED 1
@@ -91,6 +92,7 @@ typedef struct {
     Pixmap		bitmap;
     Pixmap		mask;
     bbox_t		bbox;
+    int                 rgb; /* the color this image is blended with */
 } xp_bitmap_t;
 
 /* xp_pixmap_t holds all data related to one "logical" image.
