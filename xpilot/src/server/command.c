@@ -216,9 +216,9 @@ static Command_info commands[] = {
     {
 	"addr",
 	"addr",
-	"/addr <player name or ID number>. Show IP-address of player. "
-	"Non-operators don't see the whole IP-address.",
-	false,
+	"/addr <player name or ID number>. Show IP-address of player.  "
+	"(operator)",
+	true,
 	Cmd_addr
     },
     {
@@ -460,6 +460,9 @@ static int Cmd_addr(char *arg, player_t *pl, int oper, char *msg, size_t size)
 
     UNUSED_PARAM(pl);
 
+    if (!oper)
+	return CMD_RESULT_NOT_OPERATOR;
+
     if (!arg || !*arg)
 	return CMD_RESULT_NO_NAME;
 
@@ -469,18 +472,8 @@ static int Cmd_addr(char *arg, player_t *pl, int oper, char *msg, size_t size)
 
 	if (addr == NULL)
 	    snprintf(msg, size, "Unable to get address for %s.", pl2->name);
-	else {
-	    char buf[256];
-
-	    strlcpy(buf, addr, sizeof(buf));
-	    if (!pl->isoperator) {
-		size_t len = strlen(buf);
-
-		if (len > 2)
-		    strcpy(&buf[len - 2], "xx");
-	    }
-	    snprintf(msg, size, "%s plays from: %s.", pl2->name, buf);
-	}
+	else
+	    snprintf(msg, size, "%s plays from: %s.", pl2->name, addr);
     } else {
 	strlcpy(msg, errorstr, size);
 	return CMD_RESULT_ERROR;
