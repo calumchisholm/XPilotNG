@@ -693,6 +693,15 @@ void Gui_paint_ball_connector(int x_1, int y_1, int x_2, int y_2)
 
 void Gui_paint_mine(int x, int y, int teammine, char *name)
 {
+    Image_paint(teammine ? IMG_MINE_TEAM : IMG_MINE_OTHER,
+		x - 10, y - 7, 0, whiteRGBA);
+    if (name) {
+	mapprint(&mapfont, 
+		 teammine ? blueRGBA : whiteRGBA,
+		 CENTER, DOWN,
+		 x, y - 15, 
+		 "%s", name);
+    }
 }
 
 void Gui_paint_spark(int color, int x, int y)
