@@ -24,6 +24,7 @@
 #include "images.h"
 #include "text.h"
 #include "glwidgets.h"
+#include "scrap.h"
 
 /****************************************************/
 /* BEGIN: Main GLWidget stuff	    	    	    */
@@ -32,6 +33,8 @@
 static void option_callback( void *opt, const char *value );
 static void confmenu_callback( void );
 static void hover_optionWidget( int over, Uint16 x , Uint16 y , void *data );
+
+static char *scrap = NULL;
 
 GLWidget *Init_EmptyBaseGLWidget( void )
 {
@@ -429,11 +432,19 @@ GLWidget *FindGLWidget( GLWidget *list, Uint16 x, Uint16 y )
     return FindGLWidgeti( list, x, y );
 }
 
-void copytext(const char *text)
+void load_textscrap(char *text)
 {
-    int len = strlen(text);
-    snprintf(&copybuffer[0],MIN(255,len+1),"%s",text);
-    copybuffer[MIN(255,len+1)] = '\0';
+	{ /* Convert the scrap from UNIX text to Mac text */
+		char *cp;
+		int   i;
+		scrap = realloc(scrap, strlen(text)+1);
+		strcpy(scrap, text);
+		for ( cp=scrap, i=0; i<(int)strlen(scrap); ++cp, ++i ) {
+			if ( *cp == '\n' )
+				*cp = '\r';
+		}
+	}
+	put_scrap(T('T','E','X','T'), strlen(scrap), scrap);
 }
 /****************************************************/
 /* END: Main GLWidget stuff 	    	    	    */
@@ -950,7 +961,7 @@ static void button_LabelWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y,
     tmp = (LabelWidget *)(((GLWidget *)data)->wid_info);
     if (state == SDL_PRESSED) {
 	if (button == 1) {
-	    copytext((tmp->tex).text);
+	    if ((tmp->tex).text) load_textscrap((tmp->tex).text);
 	}
     }
 }
@@ -2997,6 +3008,7 @@ GLWidget *Init_ScrollPaneWidget( GLWidget *content )
 /**********************/
 static void SetBounds_MainWidget( GLWidget *widget, SDL_Rect *b );
 static void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );
+static void Close_MainWidget( GLWidget *widget );
 
 void MainWidget_ShowMenu( GLWidget *widget, bool show )
 {
@@ -3100,6 +3112,7 @@ static void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, 
     SDL_Event event;
     int i = 0;
     char c[2];
+    int scraplen;
     
     if (!data) return;
     tmp = (WrapperWidget *)(((GLWidget *)data)->wid_info);
@@ -3110,13 +3123,15 @@ static void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, 
 	}
 	if (button == 2) {
     	    if (Console_isVisible()) {
+	    	get_scrap(T('T','E','X','T'), &scraplen, &scrap);
+		if ( scraplen == 0 ) return;
 	    	event.type = SDL_KEYDOWN;
 		event.key.type = SDL_KEYDOWN;
 		event.key.state = SDL_PRESSED;
 		event.key.keysym.mod = KMOD_NONE;
     	    	c[0] = '\0';
-	    	while (copybuffer[i] != '\0') {
-		    c[0] = copybuffer[i];
+	    	while (scrap[i] != '\0') {
+		    c[0] = scrap[i];
 		    event.key.keysym.sym = SDLK_a;
 		    event.key.keysym.unicode = (Uint16)c[0];
 		    Console_process(&event);
@@ -3125,6 +3140,17 @@ static void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, 
 	    }
 	}
     }
+}
+
+static void Close_MainWidget ( GLWidget *widget )
+{
+    if (!widget) return;
+    if (widget->WIDGET !=MAINWIDGET) {
+    	error("Wrong widget type for Close_MainWidget [%i]",widget->WIDGET);
+	return;
+    }
+    
+    if ( scrap ) free(scrap);
 }
 
 GLWidget *Init_MainWidget( font_data *font )
@@ -3155,6 +3181,7 @@ GLWidget *Init_MainWidget( font_data *font )
     tmp->SetBounds 	= SetBounds_MainWidget;
     tmp->button     	= button_MainWidget;
     tmp->buttondata 	= tmp;
+    tmp->Close	    	= Close_MainWidget;
     
     if ( !AppendGLWidgetList(&(tmp->children),(wid_info->radar = Init_RadarWidget())) ) {
 	error("radar initialization failed");
@@ -3202,7 +3229,12 @@ GLWidget *Init_MainWidget( font_data *font )
 	return NULL;
     }
     
-    copybuffer[0] = '\0';
+    /* Set up the clipboard */
+    if ( init_scrap() < 0 ) {
+    	error("Couldn't init clipboard: %s\n");
+	Close_Widget(&tmp);
+    	return NULL;
+    }
 
     return tmp;
 }

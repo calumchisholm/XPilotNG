@@ -58,21 +58,21 @@ am__xpilot_ng_sdl_SOURCES_DIST = asteroid_data.h DT_drawtext.c \
 	DT_drawtext.h SDL_console.c SDL_console.h SDL_gfxPrimitives.c \
 	SDL_gfxPrimitives.h SDL_gfxPrimitives_font.h console.c \
 	console.h glwidgets.c glwidgets.h images.c images.h main.c \
-	radar.c radar.h sdlevent.c sdlgui.c sdlinit.c sdlkeys.c \
-	sdlkeys.h sdlpaint.c sdlpaint.h sdlwindow.c sdlwindow.h text.c \
-	text.h todo.c sdlmeta.h sdlmeta.c sdlinit.h xpclient_sdl.h \
-	gameloop.c gameloop_x.c win32hacks.c
+	scrap.c scrap.h radar.c radar.h sdlevent.c sdlgui.c sdlinit.c \
+	sdlkeys.c sdlkeys.h sdlpaint.c sdlpaint.h sdlwindow.c \
+	sdlwindow.h text.c text.h todo.c sdlmeta.h sdlmeta.c sdlinit.h \
+	xpclient_sdl.h gameloop.c gameloop_x.c win32hacks.c
 @COND_SDL_GAMELOOP_TRUE@am__objects_1 = gameloop.$(OBJEXT)
 @COND_SDL_GAMELOOP_FALSE@am__objects_2 = gameloop_x.$(OBJEXT)
 @COND_WINDOWS_TRUE@am__objects_3 = win32hacks.$(OBJEXT)
 am_xpilot_ng_sdl_OBJECTS = DT_drawtext.$(OBJEXT) SDL_console.$(OBJEXT) \
 	SDL_gfxPrimitives.$(OBJEXT) console.$(OBJEXT) \
 	glwidgets.$(OBJEXT) images.$(OBJEXT) main.$(OBJEXT) \
-	radar.$(OBJEXT) sdlevent.$(OBJEXT) sdlgui.$(OBJEXT) \
-	sdlinit.$(OBJEXT) sdlkeys.$(OBJEXT) sdlpaint.$(OBJEXT) \
-	sdlwindow.$(OBJEXT) text.$(OBJEXT) todo.$(OBJEXT) \
-	sdlmeta.$(OBJEXT) $(am__objects_1) $(am__objects_2) \
-	$(am__objects_3)
+	scrap.$(OBJEXT) radar.$(OBJEXT) sdlevent.$(OBJEXT) \
+	sdlgui.$(OBJEXT) sdlinit.$(OBJEXT) sdlkeys.$(OBJEXT) \
+	sdlpaint.$(OBJEXT) sdlwindow.$(OBJEXT) text.$(OBJEXT) \
+	todo.$(OBJEXT) sdlmeta.$(OBJEXT) $(am__objects_1) \
+	$(am__objects_2) $(am__objects_3)
 xpilot_ng_sdl_OBJECTS = $(am_xpilot_ng_sdl_OBJECTS)
 am__DEPENDENCIES_1 =
 xpilot_ng_sdl_DEPENDENCIES = $(top_builddir)/src/client/libxpclient.a \
@@ -86,12 +86,12 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/console.Po ./$(DEPDIR)/gameloop.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/gameloop_x.Po ./$(DEPDIR)/glwidgets.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/images.Po ./$(DEPDIR)/main.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/radar.Po ./$(DEPDIR)/sdlevent.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/sdlgui.Po ./$(DEPDIR)/sdlinit.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/sdlkeys.Po ./$(DEPDIR)/sdlmeta.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/sdlpaint.Po ./$(DEPDIR)/sdlwindow.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/text.Po ./$(DEPDIR)/todo.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/win32hacks.Po
+@AMDEP_TRUE@	./$(DEPDIR)/radar.Po ./$(DEPDIR)/scrap.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/sdlevent.Po ./$(DEPDIR)/sdlgui.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/sdlinit.Po ./$(DEPDIR)/sdlkeys.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/sdlmeta.Po ./$(DEPDIR)/sdlpaint.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/sdlwindow.Po ./$(DEPDIR)/text.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/todo.Po ./$(DEPDIR)/win32hacks.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
@@ -225,8 +225,8 @@ AM_CPPFLAGS = -DCONF_DATADIR=\"$(pkgdatadir)/\" \
 xpilot_ng_sdl_SOURCES = \
 	asteroid_data.h DT_drawtext.c DT_drawtext.h \
 	SDL_console.c SDL_console.h SDL_gfxPrimitives.c SDL_gfxPrimitives.h \
-	SDL_gfxPrimitives_font.h console.c console.h \
-	glwidgets.c glwidgets.h images.c images.h main.c radar.c radar.h \
+	SDL_gfxPrimitives_font.h console.c console.h glwidgets.c glwidgets.h \
+	images.c images.h main.c scrap.c scrap.h radar.c radar.h \
 	sdlevent.c sdlgui.c sdlinit.c sdlkeys.c sdlkeys.h sdlpaint.c \
 	sdlpaint.h sdlwindow.c sdlwindow.h text.c text.h todo.c \
 	sdlmeta.h sdlmeta.c sdlinit.h xpclient_sdl.h\
@@ -309,6 +309,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/images.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/radar.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scrap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdlevent.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdlgui.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdlinit.Po@am__quote@

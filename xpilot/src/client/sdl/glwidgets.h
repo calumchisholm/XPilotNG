@@ -95,8 +95,8 @@ GLWidget *FindGLWidgeti( GLWidget *widget, Uint16 x, Uint16 y );
 extern GLWidget *clicktarget[NUM_MOUSE_BUTTONS];
 extern GLWidget *hovertarget;
 
-char copybuffer[256];
-void copytext(const char *text);
+/* puts text into the copy buffer */
+void load_textscrap(char *text);
 /****************************************************/
 /* END: Main GLWidget stuff 	    	    	    */
 /****************************************************/
