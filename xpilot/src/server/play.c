@@ -352,6 +352,11 @@ bool Balltarget_hit_func(struct group *group, struct move *move)
 }
 
 
+int Cannon_hitmask(cannon_t *cannon)
+{
+    return 0;
+}
+
 void Cannon_restore_on_map(int ind)
 {
     cannon_t		*cannon = &World.cannon[ind];
@@ -360,6 +365,8 @@ void Cannon_restore_on_map(int ind)
     bx = CLICK_TO_BLOCK(cannon->pos.cx);
     by = CLICK_TO_BLOCK(cannon->pos.cy);
     World.block[bx][by] = CANNON;
+
+    groups[cannon->group_id].hit_mask = Cannon_hitmask(cannon);
 
     cannon->conn_mask = 0;
     cannon->last_change = frame_loops;
@@ -373,6 +380,8 @@ void Cannon_remove_from_map(int ind)
 
     cannon->dead_time = cannonDeadTime * TIME_FACT;
     cannon->conn_mask = 0;
+
+    groups[cannon->group_id].hit_mask = ALL_BITS;
 
     bx = CLICK_TO_BLOCK(cannon->pos.cx);
     by = CLICK_TO_BLOCK(cannon->pos.cy);
@@ -394,8 +403,10 @@ bool Cannon_hit_func(struct group *group, struct move *move)
     unsigned long cannon_mask;
 
     /* cannon is dead ? */
-    if (cannon->dead_time != 0)
+    if (cannon->dead_time != 0) {
+	xpprintf("BUG: Cannon_hit_func called for dead cannon.\n");
 	return false;
+    }
 
     if (move->obj == NULL)
 	return true;
@@ -427,6 +438,12 @@ bool Cannon_hit_func(struct group *group, struct move *move)
     return true;
 }
 
+int Target_hitmask(target_t *targ)
+{
+    if (targetTeamCollision)
+	return 0;
+    return HITMASK(targ->team);
+}
 
 void Target_restore_on_map(int ind)
 {
@@ -436,6 +453,8 @@ void Target_restore_on_map(int ind)
     bx = CLICK_TO_BLOCK(targ->pos.cx);
     by = CLICK_TO_BLOCK(targ->pos.cy);
     World.block[bx][by] = TARGET;
+
+    groups[targ->group_id].hit_mask = Target_hitmask(targ);
 
     targ->conn_mask = 0;
     targ->update_mask = (unsigned)-1;
@@ -454,6 +473,8 @@ void Target_remove_from_map(int ind)
     targ->damage = TARGET_DAMAGE;
     targ->dead_time = targetDeadTime * TIME_FACT;
 
+    groups[targ->group_id].hit_mask = ALL_BITS;
+
     /*
      * Destroy target.
      * Turn it into a space to simplify other calculations.
@@ -471,8 +492,10 @@ bool Target_hit_func(struct group *group, struct move *move)
     unsigned long target_mask;
 
     /* target is dead ? */
-    if (targ->dead_time != 0)
+    if (targ->dead_time != 0) {
+	xpprintf("BUG: Target_hit_func called for dead target.\n");
 	return false;
+    }
 
     if (move->obj == NULL)
 	return true;
