@@ -50,6 +50,7 @@
 #include "walls.h"
 #include "click.h"
 #include "objpos.h"
+#include "srecord.h"
 
 /* start */
 
@@ -3397,6 +3398,11 @@ void Turn_player(int ind)
     int		new_dir = MOD2((int)(pl->float_dir + 0.5f), RES);
     int		sign, hitmask;
 
+    if (recOpt)
+	if (record)
+	    *playback_data++ = new_dir;
+	else if (playback)
+	    new_dir = *playback_data++;
     if (new_dir == pl->dir) {
 	return;
     }

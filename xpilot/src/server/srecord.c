@@ -84,6 +84,7 @@ void Init_recording(void)
     static int oldMode = 0;
     int i, j;
 
+    recOpt = 1; /* Less robust but produces smaller files. */
     if (oldMode == 0) {
 	oldMode = recordMode + 10;
 	if (recordMode == 1) {

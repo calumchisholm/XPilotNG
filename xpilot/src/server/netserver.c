@@ -1289,6 +1289,9 @@ static void Handle_input(int fd, void *arg)
 	    *playback_shorts++ = 0xffff;
 	    return;
 	}
+	*playback_shorts++ = connp->r.len;
+	memcpy(playback_data, connp->r.buf, connp->r.len);
+	playback_data += connp->r.len;
 	recDataLen = 0;
     }
     else if (playback) {
@@ -1310,11 +1313,6 @@ static void Handle_input(int fd, void *arg)
 	char *pkt = connp->r.ptr;
 	type = (connp->r.ptr[0] & 0xFF);
 	recSpecial = 0;
-	if (record && recOpt && receive_tbl[type] == Receive_quit) {
-	    recSpecial = 1;
-	    *playback_data++ = connp->r.ptr[0];
-	    *playback_shorts++ = ++recDataLen;
-	}
 	result = (*receive_tbl[type])(ind);
 	if (result == -1) {
 	    /*
@@ -1324,11 +1322,11 @@ static void Handle_input(int fd, void *arg)
 	     */
 	    return;
 	}
-	if (record && recOpt && !recSpecial) {
+	if (record && recOpt && recSpecial) {
 	    int len = connp->r.ptr - pkt;
-	    recDataLen += len;
-	    memcpy(playback_data, pkt, len);
-	    playback_data += len;
+	    memmove(playback_data - (connp->r.buf + connp->r.len - pkt), playback_data - (connp->r.buf + connp->r.len - connp->r.ptr), connp->r.buf + connp->r.len - connp->r.ptr);
+	    playback_data -= len;
+	    *(playback_shorts - 1) -= len;
 	}
 
 	if (playback == rplayback) {
@@ -1349,8 +1347,6 @@ static void Handle_input(int fd, void *arg)
 	    connp->start = main_loops;
 	}
     }
-    if (record && recOpt)
-	*playback_shorts++ = recDataLen;
 }
 
 int Input(void)
@@ -3485,6 +3481,8 @@ static int Receive_pointer_move(int ind)
 	LIMIT(turnspeed, 0, 5*RES);
 
     pl->turnvel -= turndir * turnspeed;
+
+    recSpecial = 1;
 
     return 1;
 }
