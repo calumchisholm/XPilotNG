@@ -202,9 +202,11 @@ extern long		start_loops, end_loops;
 extern long		time_left;
 
 #define RESET_FG()	(current_foreground = -1)
-#define SET_FG(PIXEL)				\
-    if ((PIXEL) == current_foreground) ;	\
-    else XSetForeground(dpy, gc, current_foreground = (PIXEL))
+#define SET_FG(PIXEL) \
+do { \
+    if ((PIXEL) == current_foreground) ; \
+    else XSetForeground(dpy, gc, current_foreground = (PIXEL)); \
+} while (0)
 
 extern unsigned long	current_foreground;
 
