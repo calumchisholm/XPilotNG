@@ -22,19 +22,20 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifdef	_WINDOWS
-#include "NT/winX.h"
-#else
-#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
 #include <errno.h>
+#include <sys/types.h>
 
+#ifndef _WINDOWS
+#include <unistd.h>
 #include <X11/Xlib.h>
 #include <X11/Xos.h>
 #include <X11/Xutil.h>
+#else
+#include "NT/winX.h"
 #endif
 
 #include "version.h"
@@ -93,9 +94,9 @@ int		dispDepth;
 bool		mono;
 bool		colorSwitch;
 bool		multibuffer;
-bool		blockBitmaps;		/* Whether to draw everything as bitmaps. */
+bool		blockBitmaps;	/* Whether to draw everything as bitmaps. */
 
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
 
 /*
  * Dimensions of color cubes in decreasing
@@ -145,7 +146,7 @@ static struct Visual_class_name {
 };
 
 /*
- * Structure to hold pixel information 
+ * Structure to hold pixel information
  * for a color cube for PseudoColor visuals.
  */
 struct Color_cube {
@@ -503,7 +504,7 @@ int Colors_init(void)
      * Initialize the double buffering routine.
      */
     dbuf_state = NULL;
-    
+
     if (multibuffer) {
 	dbuf_state = start_dbuff(dpy,
 				 (colormap != 0)
@@ -671,7 +672,7 @@ static int Colors_init_block_bitmap_colors(void)
 
 
 /*
- * Converts the RGB colors used by polygon and edge styles 
+ * Converts the RGB colors used by polygon and edge styles
  * to device colors.
  */
 void Colors_init_style_colors(void)
@@ -679,7 +680,7 @@ void Colors_init_style_colors(void)
     int i;
     if (blockBitmaps && RGB) {
         for (i = 0; i < num_polygon_styles; i++)
-            polygon_styles[i].color = 
+            polygon_styles[i].color =
                 RGB2COLOR(polygon_styles[i].rgb);
         for (i = 0; i < num_edge_styles; i++)
             edge_styles[i].color =

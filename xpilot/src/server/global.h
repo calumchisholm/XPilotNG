@@ -95,7 +95,7 @@ extern char		*mapName;
 extern char		*mapAuthor;
 extern int 		contactPort;
 extern char		*serverHost;
-extern char		serverAddr[];
+extern char		*serverAddr;
 extern bool		crashWithPlayer;
 extern bool		bounceWithPlayer;
 extern bool		playerKillings;

@@ -40,18 +40,6 @@
 # include "paint.h"
 #endif
 
-#if 0
-#ifdef SPARC_CMAP_HACK
-# include <fcntl.h>
-# include <sys/ioctl.h>
-# if defined(SVR4) || defined(__svr4__)
-#  include <sys/fbio.h>
-# else
-#  include <sun/fbio.h>
-# endif
-#endif
-#endif
-
 
 char dbuff_version[] = VERSION;
 
@@ -404,4 +392,3 @@ void dbuff_list(Display *display)
     dbuff_list_dbe(display);
 #endif
 }
-

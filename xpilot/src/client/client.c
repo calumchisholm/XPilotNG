@@ -23,21 +23,20 @@
  */
 
 
-#ifdef	_WINDOWS
-#include "NT/winClient.h"
-#else
-#include <unistd.h>
 #include <stdlib.h>
-#include <sys/types.h>
 #include <stdio.h>
 #include <string.h>
-
-#if defined(__hpux)
+#include <errno.h>
 #include <time.h>
+#include <sys/types.h>
+
+#ifndef _WINDOWS
+#include <unistd.h>
+#include <X11/Xlib.h>
 #else
-#include <sys/time.h>
+#include "NT/winClient.h"
 #endif
-#endif	/* _WINDOWS */
+
 
 #include "version.h"
 #include "config.h"
@@ -154,7 +153,7 @@ int	oldMaxFPS;
 byte	lose_item;		/* index for dropping owned item */
 int	lose_item_active;	/* one of the lose keys is pressed */
 
-#ifdef	WINDOWSCALING
+#ifdef WINDOWSCALING
 DFLOAT scaleFactor;
 DFLOAT scaleFactor_s;
 #endif
@@ -1118,7 +1117,8 @@ int Handle_war(int robot_id, int killer_id)
 
     if ((robot = Other_by_id(robot_id)) == NULL) {
 	errno = 0;
-	IFNWINDOWS(error("Can't update war for non-existing player (%d,%d)", robot_id, killer_id);)
+	error("Can't update war for non-existing player (%d,%d)",
+	      robot_id, killer_id);
 	return 0;
     }
     if (killer_id == -1) {
@@ -1455,7 +1455,7 @@ int Client_init(char *server, unsigned server_version)
 	oldServer = 0;
 
     Make_table();
-#ifdef	WINDOWSCALING
+#ifdef WINDOWSCALING
     Init_scale_array();
 #endif
 
@@ -1556,7 +1556,7 @@ void Client_cleanup(void)
 
 int Client_fd(void)
 {
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
     return ConnectionNumber(dpy);
 #else
     return 0;
@@ -1565,7 +1565,7 @@ int Client_fd(void)
 
 int Client_input(int new_input)
 {
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
     return xevent(new_input);
 #else
     return 0;
@@ -1573,14 +1573,14 @@ int Client_input(int new_input)
 }
 void Client_flush(void)
 {
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
     XFlush(dpy);
 #endif
 }
 
 void Client_sync(void)
 {
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
     XSync(dpy, False);
 #endif
 }
@@ -1599,4 +1599,3 @@ int Check_client_fps(void)
     }
     return 0;
 }
-

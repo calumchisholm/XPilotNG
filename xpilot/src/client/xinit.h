@@ -103,10 +103,9 @@ extern int Motd_callback(int, void *, const char **);
 extern void Motd_destroy(void);
 extern void Expose_about_window(void);
 extern void Scale_dashes(void);
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 extern int Credits_callback(int, void *, const char **);
 #endif
 extern int Startup_server_motd(void);
 
 #endif
-

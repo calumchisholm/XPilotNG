@@ -23,12 +23,13 @@
  */
 /* Options parsing code contributed by Ted Lemon <mellon@ncd.com> */
 
-#ifdef	_WINDOWS
-#include "NT/winServer.h"
-#else
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
+
+#ifdef	_WINDOWS
+#include "NT/winServer.h"
 #endif
 
 #define SERVER
@@ -223,7 +224,7 @@ int             clientPortEnd;          /* Last one (these are for firewalls)*/
 
 extern char	conf_default_map_string[];	/* from common/config.c */
 
-#define	MAP(_x)		_x
+#define	MAP(_x)	 _x
 /* #define	MAP(_x)	 */
 
 /*
@@ -364,7 +365,7 @@ static optionDesc options[] = {
     {
 	"noQuit",
 	"noQuit",
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 	"true",
 #else
 	"false",

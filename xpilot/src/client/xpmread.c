@@ -21,7 +21,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-#include <unistd.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -31,8 +31,11 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
+#ifndef _WINDOWS
+#include <unistd.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#endif
 
 #include "version.h"
 #include "config.h"
@@ -486,8 +489,8 @@ static int xpm_colors_to_pixels(XPM *xpm, enum XPM_key key,
                     }
                 }
             } else {
-                pixels[i] = RGB(xcolor.red >> 8, 
-                                xcolor.green >> 8, 
+                pixels[i] = RGB(xcolor.red >> 8,
+                                xcolor.green >> 8,
                                 xcolor.blue >> 8);
             }
 	}
@@ -631,7 +634,7 @@ int xpm_picture_from_file(xp_picture_t *pic, char *filename)
     else {
         key = XPM_c;
     }
-    
+
     for (i = 0; i < xpm.ncolors; i++) {
 	memset(&xcolor, 0, sizeof(xcolor));
 	color_name = NULL;
@@ -669,7 +672,7 @@ int xpm_picture_from_file(xp_picture_t *pic, char *filename)
 	    }
 	}
 	else {
-            colors[i] = 
+            colors[i] =
                 RGB24(xcolor.red >> 8, xcolor.green >> 8, xcolor.blue >> 8);
 	}
     }
@@ -684,12 +687,12 @@ int xpm_picture_from_file(xp_picture_t *pic, char *filename)
     }
 
     for (p = 0; p < count; p++) {
-        if (!(pic->data[p] = 
+        if (!(pic->data[p] =
               malloc(pic->width * pic->height * sizeof(RGB_COLOR)))) {
             error("Not enough memory.");
             return -1;
         }
-        
+
         for (y = 0 ; y < pic->height ; y++) {
 	    for (x = 0; x < pic->width ; x++) {
                 i = x + p * pic->width + y * xpm.width;
@@ -797,4 +800,3 @@ char **xpm_data_from_pixmap(Pixmap pixmap)
 }
 
 #endif
-

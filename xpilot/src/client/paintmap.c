@@ -22,16 +22,18 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifdef	_WINDOWS
-#include "NT/winX.h"
-#else
-#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <errno.h>
+#include <sys/types.h>
 
+#ifndef _WINDOWS
+#include <unistd.h>
 #include <X11/Xlib.h>
 #include <X11/Xos.h>
+#else
+#include "NT/winX.h"
 #endif
 
 #include "version.h"
@@ -283,7 +285,7 @@ void Paint_world(void)
 
 
     wormDrawCount = (wormDrawCount + 1) & 7;
-    
+
     if (!BIT(Setup->mode, WRAP_PLAY)) {
 	if (world.x <= 0) {
 	    Gui_paint_border(0, 0, 0, Setup->height);
@@ -298,7 +300,7 @@ void Paint_world(void)
 	    Gui_paint_border(0, Setup->height, Setup->width, Setup->height);
 	}
     }
-    
+
     Gui_paint_visible_border(world.x + view_width/2 - MAX_VIEW_SIZE/2,
 			     world.y + view_height/2 - MAX_VIEW_SIZE/2,
 			     world.x + view_width/2 + MAX_VIEW_SIZE/2,
@@ -623,4 +625,3 @@ void Paint_world(void)
 	}
     }
 }
-

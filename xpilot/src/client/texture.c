@@ -21,12 +21,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-#ifndef	_WINDOWS
-#ifdef VMS
-#include <unixio.h>
-#endif
-#include <unistd.h>
-#endif
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -34,7 +28,8 @@
 #include <errno.h>
 #include <limits.h>
 
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
+#include <unistd.h>
 #include <X11/Xlib.h>
 #else
 #include "NT/winX.h"
@@ -112,7 +107,7 @@ static texture_info_t ball_texture_info = {
  */
 static Pixmap Texture_load_from_file(char *filename)
 {
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
     char		*dir, *colon;
     int			len;
     char		path[PATH_MAX + 1];
@@ -163,7 +158,7 @@ static Pixmap Texture_load(texture_info_t *ti)
 {
     Pixmap		pixmap = None;
 
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
     if (ti->status == TextureLoaded) {
 	pixmap = ti->pixmap;
     }
@@ -233,4 +228,3 @@ Pixmap Texture_ball(void)
     if ((bmp = Bitmap_get(top, BM_BALL_TEXTURE, 0)) == NULL) return None;
     return bmp->bitmap;
 }
-

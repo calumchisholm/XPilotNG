@@ -22,17 +22,19 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifdef	_WINDOWS
-#include "NT/winX.h"
-#include "NT/winBitmap.h"
-#else
-#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <errno.h>
+#include <sys/types.h>
 
+#ifndef _WINDOWS
+#include <unistd.h>
 #include <X11/Xlib.h>
 #include <X11/Xos.h>
+#else
+#include "NT/winX.h"
+#include "NT/winBitmap.h"
 #endif
 
 #include "gfx2d.h"
@@ -299,14 +301,14 @@ void Gui_paint_fuel(int x, int y, long fuel)
 	xp_bitmap_t *bit;
 
 	/* x + x * y will give a pseudo random number,
-         * so different fuelcells will not be displayed with the same 
+         * so different fuelcells will not be displayed with the same
          * image-frame.
          * The ABS is needed to ensure image is not negative even with
          * large scale factors. */
 
 	image = ABS( (loops + x + x * y) % (fuel_images * 2) );
 
-	/* the animation is played from image 0-15 then back again 
+	/* the animation is played from image 0-15 then back again
          * from image 15-0 */
 
 	if (image >= fuel_images)
@@ -331,7 +333,7 @@ void Gui_paint_fuel(int x, int y, long fuel)
                  WINSCALE(X(x + BITMAP_FUEL_BORDER)),
                  WINSCALE(Y(y + size + BITMAP_FUEL_BORDER)),
                  &area);
-            
+
             Erase_rectangle(WINSCALE(X(x)) - 1,
                             WINSCALE(Y(y + BLOCK_SZ)) - 1,
                             WINSCALE(BLOCK_SZ) + 2, WINSCALE(BLOCK_SZ) + 2);

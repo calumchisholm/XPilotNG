@@ -79,7 +79,7 @@ extern int sigprocmask(int how, const sigset_t *set, sigset_t *oset);
  * In Windows, just exiting won't tell the user the reason.
  * So, try to gracefully shutdown just the server thread
  */
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 extern	int ServerKilled;
 #define	ServerExit() ServerKilled = TRUE; return;
 #else
@@ -89,13 +89,13 @@ extern	int ServerKilled;
 /*
  * Macros to block out Windows only code (and never Windows code)
  */
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 #define IFWINDOWS(x)	x
 #else
 #define IFWINDOWS(x)
 #endif
 
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
 #define IFNWINDOWS(x)	x
 #else
 #define IFNWINDOWS(x)

@@ -14,10 +14,12 @@ static char sourceid[] =
 #endif
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
+#include <errno.h>
 
 #if defined(_WINDOWS)
-#	ifdef	_XPILOTNTSERVER_
+#	ifdef _XPILOTNTSERVER_
 #		include "../server/NT/winServer.h"
 		extern char *showtime(void);
 #	elif !defined(_XPMONNT_)
@@ -59,7 +61,7 @@ static char		progname[MAX_PROG_LENGTH];
  */
 void init_error(const char *prog)
 {
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
 #ifdef VMS
     char *p = strrchr(prog, ']');
 #else
@@ -82,7 +84,7 @@ void error(const char *fmt, ...)
 {
     va_list	 ap;			/* Argument pointer */
     int		 e = errno;		/* Store errno */
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 	char	s[512];
 #endif
 #ifdef VMS
@@ -95,7 +97,7 @@ void error(const char *fmt, ...)
     if (progname[0] != '\0')
 	fprintf(stderr, "%s: ", progname);
 
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
     vsprintf(s, fmt, ap);
 #else
     vfprintf(stderr, fmt, ap);
@@ -105,11 +107,11 @@ void error(const char *fmt, ...)
 	fprintf(stderr, " (%s)", strerror(e));
 
 
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 	IFWINDOWS( Trace("Error: %s\n", s); )
 /*	inerror = TRUE; */
 	{
-#		ifdef	_XPILOTNTSERVER_
+#		ifdef _XPILOTNTSERVER_
 		/* putting up a message box on the server is a bad thing.
 		   It kinda halts the server, which is a bad thing to do for
 		   the simple info messages (nick in use) that call this routine
@@ -118,7 +120,7 @@ void error(const char *fmt, ...)
 #		else
  		if (MessageBox(NULL, s, "Error", MB_OKCANCEL | MB_TASKMODAL) == IDCANCEL)
 		{
-#			ifdef	_XPMON_
+#			ifdef _XPMON_
 				xpmemShutdown();
 #			endif
 			ExitProcess(1);
@@ -215,10 +217,10 @@ void*	xpmalloc(size_t amount, char* file, int line)
 	curmemblock->mem[curmemblock->nextslot].file = file;
 	curmemblock->mem[curmemblock->nextslot].line = line;
 
-	_Trace("malloc: %p %5d bytes from %4d of %s\n", 
-		curmemblock->mem[curmemblock->nextslot].mem, 
-		curmemblock->mem[curmemblock->nextslot].size, 
-		curmemblock->mem[curmemblock->nextslot].line, 
+	_Trace("malloc: %p %5d bytes from %4d of %s\n",
+		curmemblock->mem[curmemblock->nextslot].mem,
+		curmemblock->mem[curmemblock->nextslot].size,
+		curmemblock->mem[curmemblock->nextslot].line,
 		curmemblock->mem[curmemblock->nextslot].file);
 	curmemblock->nextslot++;
 	return(tptr);
@@ -239,7 +241,7 @@ void*  xprealloc(void* tptr, size_t size, char* file, int line)
 				l->mem[i].size = size;
 				l->mem[i].file = file;
 				l->mem[i].line = line;
-				_Trace("realloc: %p %5d bytes from %4d of %s\n", 
+				_Trace("realloc: %p %5d bytes from %4d of %s\n",
 					l->mem[i].mem, l->mem[i].size, l->mem[i].line, l->mem[i].file);
 				return (tptr);
 			}
@@ -292,7 +294,7 @@ void	xpmemShutdown()
 		for (i=0; i<l->nextslot; i++)
 		{
 			if (l->mem[i].mem)
-				_Trace("leak: %p %5d bytes from %4d of %s\n", 
+				_Trace("leak: %p %5d bytes from %4d of %s\n",
 					l->mem[i].mem, l->mem[i].size, l->mem[i].line, l->mem[i].file);
 		}
 		hits += l->nextslot;

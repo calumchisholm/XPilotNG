@@ -22,18 +22,21 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifdef	_WINDOWS
-#include "NT/winX.h"
-#include "NT/winClient.h"
-#include <math.h>
-#else
-#include <unistd.h>
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <errno.h>
+#include <math.h>
+#include <sys/types.h>
 
+#ifndef _WINDOWS
+#include <unistd.h>
 #include <X11/Xlib.h>
 #include <X11/Xos.h>
+#else
+#include "NT/winX.h"
+#include "NT/winClient.h"
 #endif
 
 #include "version.h"
@@ -312,14 +315,14 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
     }
 
     if (BIT(Setup->mode, LIMITED_LIVES)) { /* lives left is a better info than distance in team games MM */
-	sprintf(str, "%03d", target->life); 
+	sprintf(str, "%03d", target->life);
     } else {
 	sprintf(str, "%03d", lock_dist / BLOCK_SZ);
     }
 
     if (BIT(Setup->mode, LIMITED_LIVES) || lock_dist !=0) {
 
- 	if (BIT(Setup->mode, LIMITED_LIVES) && target->life == 0) 
+ 	if (BIT(Setup->mode, LIMITED_LIVES) && target->life == 0)
 	    SET_FG(colors[RED].pixel);
 	else
 	    SET_FG(colors[hudColor].pixel);
@@ -366,7 +369,7 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
 			 WINSCALE(size), WINSCALE(size), 0, 64*360);
 		Erase_rectangle(WINSCALE(x), WINSCALE(y),
 				 WINSCALE(size), WINSCALE(size));
-		SET_FG(colors[hudColor].pixel);       
+		SET_FG(colors[hudColor].pixel);
 	    }
 	}
     }
@@ -493,9 +496,9 @@ void Paint_HUD(void)
 	    int len, width;
 
 	    /* Paint item symbol */
-	    Paint_item_symbol((u_byte)i, p_draw, gc, 
+	    Paint_item_symbol((u_byte)i, p_draw, gc,
 			horiz_pos - ITEM_SIZE,
-			vert_pos, 
+			vert_pos,
 			ITEM_HUD);
 
 	    if (i == lose_item) {
@@ -503,7 +506,7 @@ void Paint_HUD(void)
 		    if (lose_item_active < 0) {
 			lose_item_active++;
 		    }
-		    rd.drawRectangle(dpy, p_draw, gc, 
+		    rd.drawRectangle(dpy, p_draw, gc,
 				horiz_pos-ITEM_SIZE-2,
 				vert_pos-2, ITEM_SIZE+2, ITEM_SIZE+2);
 		}
@@ -663,9 +666,9 @@ void Paint_HUD(void)
 	return;
 
     rd.drawRectangle(dpy, p_draw, gc,
-		  WINSCALE(hud_pos_x + HUD_SIZE - HUD_OFFSET 
+		  WINSCALE(hud_pos_x + HUD_SIZE - HUD_OFFSET
 			+ FUEL_GAUGE_OFFSET) - 1,
-		  WINSCALE(hud_pos_y - HUD_SIZE + HUD_OFFSET 
+		  WINSCALE(hud_pos_y - HUD_SIZE + HUD_OFFSET
 			+ FUEL_GAUGE_OFFSET) - 1,
 		  WINSCALE(HUD_OFFSET - (2*FUEL_GAUGE_OFFSET)) + 3,
 		  WINSCALE(HUD_FUEL_GAUGE_SIZE) + 3);
@@ -678,15 +681,15 @@ void Paint_HUD(void)
 
     size = (HUD_FUEL_GAUGE_SIZE * fuelSum) / fuelMax;
     rd.fillRectangle(dpy, p_draw, gc,
-                   WINSCALE(hud_pos_x + HUD_SIZE - HUD_OFFSET 
+                   WINSCALE(hud_pos_x + HUD_SIZE - HUD_OFFSET
 			+ FUEL_GAUGE_OFFSET) + 1,
-                   WINSCALE(hud_pos_y - HUD_SIZE + HUD_OFFSET 
+                   WINSCALE(hud_pos_y - HUD_SIZE + HUD_OFFSET
 			+ FUEL_GAUGE_OFFSET + HUD_FUEL_GAUGE_SIZE - size) + 1,
 		   WINSCALE(HUD_OFFSET - (2*FUEL_GAUGE_OFFSET)),
 		   WINSCALE(size));
-    Erase_rectangle(WINSCALE(hud_pos_x + HUD_SIZE - HUD_OFFSET 
+    Erase_rectangle(WINSCALE(hud_pos_x + HUD_SIZE - HUD_OFFSET
 			+ FUEL_GAUGE_OFFSET),
-                    WINSCALE(hud_pos_y - HUD_SIZE + HUD_OFFSET 
+                    WINSCALE(hud_pos_y - HUD_SIZE + HUD_OFFSET
 			+ FUEL_GAUGE_OFFSET + HUD_FUEL_GAUGE_SIZE - size),
                     HUD_OFFSET - (2*FUEL_GAUGE_OFFSET) + 1, size + 1);
 
@@ -747,7 +750,7 @@ void Paint_messages(void)
 		msg->life = 0;
 		continue;
 	    }
-	} 
+	}
 #ifdef _WINDOWS
 	else if (msg->life-- <= 0) {
 		msg->txt[0] = '\0';
@@ -756,7 +759,7 @@ void Paint_messages(void)
 		continue;
 	    }
 #endif
-	
+
 	if (i < maxMessages) {
 	    x = BORDER;
 	    y = top_y;
@@ -778,7 +781,7 @@ void Paint_messages(void)
 
 #ifndef _WINDOWS
 	/*
-	 * it's an emphasized talk message 
+	 * it's an emphasized talk message
 	 */
 	if (selectionAndHistory && selection.draw.state == SEL_EMPHASIZED
 	    && i < maxMessages
@@ -866,7 +869,6 @@ void Paint_messages(void)
 		    l3 = len - selection.draw.x2 - 1;
 		}
 	    } /* last line */
-		
 
 	    if (ptr) {
 		XSetForeground(dpy, messageGC, colors[msg_color].pixel);
@@ -962,7 +964,7 @@ void Add_message(char *message)
 	if (show_reverse_scroll && last_msg_index == maxMessages - 1) {
 	    scrolling = true;
 	}
-	
+
 	/*
 	 * keep the emphasizing (`jumping' from talk window to talk messages)
 	 */
@@ -1004,7 +1006,7 @@ void Add_message(char *message)
 	     * the emphasizing vanishes, as it's `last' line
 	     * is `scrolled away'
 	     */
-	    selection.draw.state = SEL_SELECTED;	
+	    selection.draw.state = SEL_SELECTED;
 	} else {
 	    if (scrolling) {
 		selection.draw.y2--;
@@ -1119,4 +1121,3 @@ void Paint_recording(void)
     Erase_rectangle( x - 1, WINSCALE(10),
 			 w+2, gameFont->ascent + gameFont->descent);
 }
-

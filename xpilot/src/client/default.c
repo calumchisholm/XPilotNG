@@ -23,39 +23,25 @@
  */
 
 
-#ifdef	_WINDOWS
-#include "NT/winX.h"
-#include "NT/winXXPilot.h"
-extern	char	**Argv;
-extern	int		Argc;
-#endif
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <errno.h>
+#include <limits.h>
+#include <sys/types.h>
 
-#include "types.h"
-
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
+#include <unistd.h>
 #include <X11/Xos.h>
 #include <X11/keysym.h>
 #include <X11/Xlib.h>
 #include <X11/Xresource.h>
-#include <sys/types.h>
-#endif
-#ifdef	__apollo
-#    include <X11/ap_keysym.h>
-#endif
-#ifdef VMS
-#include "strcasecmp.h"
-#else
-#ifndef	_WINDOWS
-#include <unistd.h>
 #include <sys/param.h>
+#else
+#include "NT/winX.h"
+#include "NT/winXXPilot.h"
 #endif
-#endif
-#include <string.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <errno.h>
-#include <limits.h>
 
 #include "version.h"
 #include "config.h"
@@ -67,9 +53,15 @@ extern	int		Argc;
 #include "netclient.h"
 #include "xinit.h"
 #include "error.h"
+#include "types.h"
 #include "protoclient.h"
 #include "audio.h"
 #include "talk.h"
+
+#ifdef _WINDOWS
+extern char **Argv;
+extern int Argc;
+#endif
 
 char default_version[] = VERSION;
 
@@ -107,7 +99,7 @@ static char sourceid[] =
 #define TALK_FONT	"-*-fixed-bold-*-*-*-15-*-*-*-c-*-iso8859-1"
 #define KEY_LIST_FONT	"-*-fixed-medium-r-*-*-10-*-*-*-c-*-iso8859-1"
 
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
 #define MOTD_FONT	"-*-courier-bold-r-*--14-*-*-*-*-*-iso8859-1"
 #else
 #define MOTD_FONT	"-*-courier-bold-r-*-*-14-*-*-*-*-*-iso8859-1"
@@ -120,7 +112,7 @@ char			myClass[] = "XPilot";
 char  frameBuffer[MAX_CHARS]; /* frame buffer */
 #endif
 
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 const char*	winHelpFile;
 #endif
 
@@ -185,7 +177,7 @@ struct option {
     {
 	"autoServerMotdPopup",
 	NULL,
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 	"No",			/* temporary till i straighten out the motd woes. */
 #else
 	"Yes",
@@ -1715,7 +1707,7 @@ struct option {
 	"Specifies how many frames between radar window updates.\n"
 	},
 #endif
-#ifdef	WINDOWSCALING
+#ifdef WINDOWSCALING
     {
 	"scaleFactor",
 	NULL,
@@ -1762,7 +1754,7 @@ struct option {
 	KEY_DUMMY,
 	"Specifies the device name of the frame buffer.\n"
     },
-#endif    
+#endif
 #ifdef DEVELOPMENT
     {
         "test",
@@ -2151,7 +2143,7 @@ static void Usage(void)
     exit(1);
 }
 
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 void	GetWindowsProfileString(const char* section, const char* key,
 								const char* def, char* result, int size)
 {
@@ -2172,7 +2164,7 @@ static int Find_resource(XrmDatabase db, const char *resource,
 			 char *result, unsigned size, int *index)
 {
     int			i;
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
     int			len;
     char		str_name[80],
 			str_class[80],
@@ -2192,8 +2184,7 @@ static int Find_resource(XrmDatabase db, const char *resource,
 	}
     }
     sprintf(str_name, "%s.%s", myName, resource);
-    sprintf(str_class, "%s.%c%s", myClass,
-	    isupper(*resource) ? toupper(*resource) : *resource, resource + 1);
+    sprintf(str_class, "%s.%c%s", myClass, toupper(*resource), resource + 1);
 
     if (XrmGetResource(db, str_name, str_class, str_type, &rmValue) == True) {
 	if (rmValue.addr == NULL) {
@@ -2228,10 +2219,10 @@ static int Find_resource(XrmDatabase db, const char *resource,
     GetWindowsProfileString("Settings", resource, options[*index].fallback, result, size);
 
 #if 0
-    GetPrivateProfileString("Settings", resource, "", result, size, 
+    GetPrivateProfileString("Settings", resource, "", result, size,
 			    Get_xpilotini_file(1));
     if (result[0] == '\0') {
-	GetPrivateProfileString("Settings", resource, "", result, size, 
+	GetPrivateProfileString("Settings", resource, "", result, size,
 				Get_xpilotini_file(2));
 	if (result[0] == '\0') {
 	    strncpy(result, options[*index].fallback, size);
@@ -2296,7 +2287,7 @@ static void Get_float_resource(XrmDatabase db,
     char		resValue[MAX_CHARS];
 
     Find_resource(db, resource, resValue, sizeof resValue, &index);
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
     if (sscanf(resValue, "%f", result) <= 0) {
 #else
     if (sscanf(resValue, "%lf", result) <= 0) {
@@ -2304,7 +2295,7 @@ static void Get_float_resource(XrmDatabase db,
 	errno = 0;
 	error("Bad value \"%s\" for option \"%s\", using default...",
 	      resValue, resource);
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
 	sscanf(options[index].fallback, "%f", result);
 #else
 	sscanf(options[index].fallback, "%lf", result);
@@ -2335,7 +2326,7 @@ static void Get_bit_resource(XrmDatabase db, const char *resource,
     }
 }
 
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
 void Get_xpilotrc_file(char *path, unsigned size)
 {
     const char		*home = getenv("HOME");
@@ -2424,7 +2415,7 @@ char* Get_xpilotini_file(int level)
 }
 #endif
 
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
 
 static void Get_file_defaults(XrmDatabase *rDBptr)
 {
@@ -2534,7 +2525,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     int			firstKeyDef;
     keys_t		key;
     KeySym		ks;
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
 #endif
 
 #ifdef VMS
@@ -2545,7 +2536,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     XrmDatabase		argDB = 0, rDB = 0;
 
     extern void		Record_init(char *filename);
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
     XrmOptionDescRec	*xopt;
     int			size;
 
@@ -2707,7 +2698,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     strncpy(realname, realName, sizeof(realname) - 1);
     strncpy(name, nickName, sizeof(name) - 1);
 
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
     if (*name == '\0') {
 	/* Windows can have no default name */
 	strcpy(name, "NoName");
@@ -2771,7 +2762,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 		    }
 		}
 	    }
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
 	    fclose(fp);
 #endif
 	}
@@ -2826,7 +2817,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     colorSwitch = (i != 0) ? true : false;
     Get_bool_resource(rDB, "multibuffer", &i);
     multibuffer = (i != 0) ? true : false;
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
 	/* Windows already derived maxColors in InitWinX */
     Get_int_resource(rDB, "maxColors", &maxColors);
 #endif
@@ -2934,8 +2925,8 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 	Get_int_resource(rDB, "radarDivisor", &RadarDivisor);
 	Get_bool_resource(rDB, "threadedDraw", &ThreadedDraw);
     }
-#endif	
-#ifdef	WINDOWSCALING
+#endif
+#ifdef WINDOWSCALING
     Get_float_resource(rDB, "scaleFactor", &scaleFactor);
     if (scaleFactor == 0.0) {
 	scaleFactor = 1.0;
@@ -3010,7 +3001,6 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 		}
 	    }
 
-#ifndef NO_KEYSORT
 	    /* insertion sort. */
 	    for (j = num; j > 0; j--) {
 		if (ks >= keyDefs[j - 1].keysym) {
@@ -3025,11 +3015,6 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 		printf("bug key 0\n");
 		exit(1);
 	    }
-#else
-	    keyDefs[num].keysym = ks;
-	    keyDefs[num].key = key;
-	    num++;
-#endif
 	}
     }
     if (num < maxKeyDefs) {
@@ -3066,7 +3051,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 	}
     }
 
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
     XrmDestroyDatabase(rDB);
 
     free(xopt);
@@ -3079,7 +3064,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 
 void	defaultCleanup(void)
 {
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
     Get_xpilotini_file(-1);
 #endif
 
@@ -3165,4 +3150,3 @@ static void Start_testing(char testBuffer[])
     }
 }
 #endif
-

@@ -22,19 +22,18 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifdef	_WINDOWS
-#include "NT/winX.h"
-#include "NT/winXXPilot.h"
-#else
-
-#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
 #include <errno.h>
 
+#ifndef _WINDOWS
+#include <unistd.h>
 #include <X11/Xlib.h>
+#else
+#include "NT/winX.h"
+#include "NT/winXXpilot.h"
 #endif
 
 #include "version.h"
@@ -643,7 +642,7 @@ void aboutCleanup(void)
     }
 }
 
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 int Credits_callback(int widget_desc, void *data, const char **unused)
 {
     extern	void DoWinAboutBox();

@@ -35,7 +35,7 @@
 extern int Handle_motd(long off, char *buf, int len, long filesize);
 extern void aboutCleanup(void);
 
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 extern	void Motd_destroy();
 extern	void Keys_destroy();
 #endif
@@ -62,7 +62,7 @@ extern void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 			  char *nickName, char *dispName, char *shut_msg);
 extern void defaultCleanup(void);				/* memory cleanup */
 
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
 extern void Get_xpilotrc_file(char *, unsigned);
 #else
 extern	char* Get_xpilotini_file(int level);
@@ -148,14 +148,14 @@ void Widget_cleanup(void);
 /*
  * xinit.c
  */
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 extern	void WinXCreateItemBitmaps();
 #endif
 
 /*
  * winX - The Windows X emulator
  */
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 #define	WinXFlush(__w)	WinXFlush(__w)
 #else
 #define	WinXFlush(__w)

@@ -23,11 +23,12 @@
  */
 /* This piece of code was provided by Greg Renda (greg@ncd.com). */
 
-#ifdef	_WINDOWS
-#include <windows.h>
-#else
 #include <stdlib.h>
 #include <stdio.h>
+
+#ifdef _WINDOWS
+#include <windows.h>
+#else
 #endif
 
 #define SERVER

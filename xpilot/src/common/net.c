@@ -22,29 +22,18 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef	_WINDOWS
-#include <unistd.h>
-#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
 #include <sys/types.h>
-#if defined(__hpux) || defined(_WINDOWS)
 #include <time.h>
-#else
-#include <sys/time.h>
-#endif
-
-#if defined(_WINDOWS)
-#include "../client/NT/winClient.h"
-#include "NT/winNet.h"
-#else
-#include <sys/socket.h>
-#include <netinet/in.h>
-#endif
 
 #ifndef	_WINDOWS
+#include <unistd.h>
+#include <sys/time.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 #include <netdb.h>
 #endif
 
@@ -52,8 +41,10 @@
 #include <bstring.h>
 #endif
 
-#ifdef	_WINDOWS
-#undef	va_start		/* there are bad versions in windows.h's "stdarg.h" */
+#ifdef _WINDOWS
+#include "../client/NT/winClient.h"
+#include "NT/winNet.h"
+#undef	va_start	/* there are bad versions in windows.h's "stdarg.h" */
 #undef	va_end
 #include <varargs.h>
 #endif
@@ -339,7 +330,7 @@ int Sockbuf_read(sockbuf_t *sbuf)
 	    if (len == 0) {
 		return 0;
 	    }
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 		errno = WSAGetLastError();
 #endif
 	    if (errno == EINTR) {

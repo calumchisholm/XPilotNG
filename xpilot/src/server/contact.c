@@ -22,21 +22,23 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifdef	_WINDOWS
-#include "NT/winServer.h"
-#include <time.h>
-#include <process.h>
-#include <limits.h>
-#else
-#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <time.h>
-#if !defined(__hpux)
+#include <errno.h>
+#include <limits.h>
+#include <sys/types.h>
+
+#ifndef _WINDOWS
+#include <unistd.h>
 #include <sys/time.h>
 #endif
+
+#ifdef _WINDOWS
+#include "NT/winServer.h"
+#include <process.h>
 #endif
 
 #define SERVER

@@ -23,20 +23,23 @@
  */
 
 
-#ifdef	_WINDOWS
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <errno.h>
+#include <limits.h>
+#include <time.h>
+#include <sys/types.h>
+
+#ifndef _WINDOWS
+#include <unistd.h>
+#include <X11/Xlib.h>
+#include <X11/Xos.h>
+#else
 #include "NT/winX.h"
 #include "NT/winClient.h"
 #include "NT/winXXPilot.h"
 #include "netclient.h"
-#else
-#include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <limits.h>
-
-#include <X11/Xlib.h>
-#include <X11/Xos.h>
 #endif
 
 #include <time.h>
@@ -101,7 +104,7 @@ XGCValues	gcv;
 Window	top;			/* Top-level window (topshell) */
 Window	draw;			/* Main play window */
 Window	keyboard;		/* Keyboard window */
-#ifdef	_WINDOWS		/* Windows needs some dummy windows (size 0,0) */
+#ifdef _WINDOWS		/* Windows needs some dummy windows (size 0,0) */
 				/* so we can store the active fonts.  Windows only */
 				/* supports 1 active font per window */
 Window	textWindow;		/* for the GC into the config window */
@@ -173,7 +176,7 @@ void Paint_frame(void)
     static int		prev_damaged = 0;
     static int		prev_prev_damaged = 0;
 
-#ifdef	_WINDOWS	/* give any outgoing data a head start to the server */
+#ifdef _WINDOWS	/* give any outgoing data a head start to the server */
     Net_flush();	/* send anything to the server before returning to Windows */
 #endif
 
@@ -198,7 +201,7 @@ void Paint_frame(void)
        with an XSetForeground(white) confusing SET_FG */
     SET_FG(colors[BLACK].pixel);
 
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
     p_draw = draw;		/* let's try this */
     XSetForeground(dpy, gc, colors[BLACK].pixel);
     XFillRectangle(dpy, p_draw, gc, 0, 0, draw_width, draw_height);
@@ -286,7 +289,7 @@ void Paint_frame(void)
     if (p_radar != radar && radar_exposures > 0) {
 	if (BIT(instruments, SHOW_SLIDING_RADAR) == 0
 	    || BIT(Setup->mode, WRAP_PLAY) == 0) {
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
 	    XCopyArea(dpy, p_radar, radar, gc,
 		      0, 0, 256, RadarHeight, 0, 0);
 #else
@@ -316,7 +319,7 @@ void Paint_frame(void)
 	    w = 256 - x;
 	    h = RadarHeight - y;
 
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
 	    XCopyArea(dpy, p_radar, radar, gc,
 		      0, 0, x, y, w, h);
 	    XCopyArea(dpy, p_radar, radar, gc,
@@ -358,7 +361,7 @@ void Paint_frame(void)
 	     * DBE's XdbeBackground switch option is
 	     * probably faster than XFillRectangle.
 	     */
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
 	    if (dbuf_state->multibuffer_type != MULTIBUFFER_DBE) {
 		SET_FG(colors[BLACK].pixel);
 		XFillRectangle(dpy, p_draw, gc, 0, 0, draw_width, draw_height);
@@ -367,7 +370,7 @@ void Paint_frame(void)
 	}
     }
 
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
     if (talk_mapped == true) {
 	static bool toggle;
 	static long last_toggled;
@@ -380,7 +383,7 @@ void Paint_frame(void)
     }
 #endif
 
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
     Client_score_table();
     PaintWinClient();
 #endif
@@ -400,18 +403,18 @@ void Paint_score_background(int thisLine)
 	XClearWindow(dpy, players);
     } else {
 	int bgh, lh;
-	
+
 	XSetForeground(dpy, scoreListGC, colors[BLACK].pixel);
-	
+
 	if (Bitmap_get(players, BM_SCORE_BG, 0) != NULL &&
             Bitmap_get(players, BM_LOGO, 0) != NULL) {
             bgh = pixmaps[BM_SCORE_BG].height;
             lh  = pixmaps[BM_LOGO].height;
-	
+
             IFWINDOWS( XFillRectangle(dpy, players, scoreListGC,
                                       0, 0,
                                       players_width, bgh); )
-	    
+
                 Bitmap_paint(players, BM_SCORE_BG, 0, 0, 0);
             if (players_height > bgh + lh) {
                 XFillRectangle(dpy, players, scoreListGC,
@@ -420,7 +423,7 @@ void Paint_score_background(int thisLine)
                                players_height - (bgh + lh));
             }
             Bitmap_paint(players, BM_LOGO, 0, players_height - lh, 0);
-            
+
             XFlush(dpy);
         }
     }
@@ -656,5 +659,3 @@ void ShadowDrawString(Display* dpy, Window w, GC gc,
     XSetForeground(dpy, gc, fg);
     XDrawString(dpy, w, gc, x, y, str, strlen(str));
 }
-
-

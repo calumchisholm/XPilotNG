@@ -22,14 +22,14 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifdef	_WINDOWS
-#include "NT/winServer.h"
-#include <math.h>
-#else
 #include <stdlib.h>
-#endif
 #include <string.h>
 #include <stdio.h>
+#include <math.h>
+
+#ifdef _WINDOWS
+#include "NT/winServer.h"
+#endif
 
 #define SERVER
 #include "version.h"
@@ -210,7 +210,7 @@ int Player_lock_closest(int ind, int next)
 	}
 	if (TEAM(ind,i))
 	    l = FLT_MAX / 2;
-	else	    
+	else
 	    l = Wrap_length(Players[i]->pos.cx - pl->pos.cx,
 			    Players[i]->pos.cy - pl->pos.cy);
 	if (l >= dist && l < best) {

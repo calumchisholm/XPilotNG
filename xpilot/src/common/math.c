@@ -23,7 +23,9 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
+#include <errno.h>
 #include <math.h>
 
 #include "version.h"
@@ -117,4 +119,3 @@ void Make_table(void)
 	tbl_cos[i] = cos(i * (2.0 * PI / TABLE_SIZE));
     }
 }
-

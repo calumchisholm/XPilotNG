@@ -22,11 +22,11 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifdef	_WINDOWS
-#include <windows.h>
-#else
 #include <stdlib.h>
 #include <stdio.h>
+
+#ifdef	_WINDOWS
+#include <windows.h>
 #endif
 
 #define SERVER
@@ -325,4 +325,3 @@ void Set_world_rules(void)
 
     DEF_USED &= DEF_HAVE;
 }
-

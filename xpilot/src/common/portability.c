@@ -26,18 +26,13 @@
  * This file contains function wrappers around OS specific services.
  */
 
-#if !defined(_WINDOWS) && !defined(VMS)
-#include <unistd.h>
-#include <pwd.h>
-#endif
-
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
-/* KOERBER */
-#ifdef VMS
-#include "username.h"
+#ifndef _WINDOWS
+#include <unistd.h>
+#include <pwd.h>
 #endif
 
 #ifdef PLOCKSERVER
@@ -48,14 +43,14 @@
 # endif
 #endif
 
-#include "version.h"
-#include "config.h"
-#include "portability.h"
-
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 #include <windows.h>
 #include <process.h>
 #endif
+
+#include "version.h"
+#include "config.h"
+#include "portability.h"
 
 
 char portability_version[] = VERSION;
@@ -130,4 +125,3 @@ int is_this_windows()
     return 0;
 #endif
 }
-

@@ -22,17 +22,19 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef	_WINDOWS
-# include <unistd.h>
-#endif
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <sys/types.h>
+
 #ifndef	_WINDOWS
-# include <sys/types.h>
-# include <sys/param.h>
+#include <unistd.h>
+#include <sys/param.h>
+#include <netdb.h>
+#else
+#include "NT/winNet.h"
+#include "NT/winClient.h"
 #endif
 
 #ifdef	_WINDOWS

@@ -22,24 +22,22 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef	_WINDOWS
-# include <unistd.h>
-#endif
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
-#ifndef	_WINDOWS
-# include <sys/types.h>
-# include <sys/param.h>
-# include <netdb.h>
-# include <sys/time.h>
+#include <time.h>
+#include <sys/types.h>
+
+#ifndef _WINDOWS
+#include <unistd.h>
+#include <sys/param.h>
+#include <netdb.h>
+#include <sys/time.h>
 #else
-# include "NT/winNet.h"
-# include "NT/winClient.h"
-# include <time.h>
+#include "NT/winNet.h"
+#include "NT/winClient.h"
 #endif
 
 #include "version.h"
@@ -282,7 +280,7 @@ static bool Process_commands(sockbuf_t *ibuf,
     time_t		qsent = 0;
     static char		localhost[] = "127.0.0.1";
 
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
     auto_connect = TRUE;	/* I want to join */
     auto_shutdown = FALSE;
 #endif

@@ -22,34 +22,37 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
-/* Include files */
-#ifndef	_WINDOWS
-#include <unistd.h>
-#endif
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <signal.h>
+#include <setjmp.h>
+#include <errno.h>
+#include <time.h>
 #include <sys/types.h>
-#ifndef	_WINDOWS
-#ifdef _AIX
-#include <sys/select.h> /* _BSD not defined in <sys/types.h>, so done by hand */
-#endif
+
+#ifndef _WINDOWS
+#include <unistd.h>
 #include <sys/param.h>
 #include <sys/ioctl.h>
-#endif
-#if (SVR4)
-#include <sys/filio.h>
-#endif
-#if (_SEQUENT_)
-#include <sys/fcntl.h>
-#else
-#include <fcntl.h>
-#endif
-#if defined(__hpux) || defined(_WINDOWS)
-#include <time.h>
-#else
 #include <sys/time.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <arpa/inet.h>
+#include <netdb.h>
 #endif
 
-#if defined(_WINDOWS)
+#ifdef SVR4
+#include <sys/filio.h>
+#endif
+
+#ifdef __sun__
+#include <arpa/nameserver.h>
+#include <resolv.h>
+#endif
+
+#ifdef _WINDOWS
 #include "NT/winNet.h"
 /* Windows needs specific system calls for sockets: */
 #undef close
@@ -60,24 +63,6 @@
 #define read(x__, y__, z__) recv(x__, y__, z__,0)
 #undef write
 #define write(x__, y__, z__) send(x__, y__, z__,0)
-#else
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#endif
-
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <signal.h>
-#include <setjmp.h>
-#include <errno.h>
-
-#if defined(__sun__)
-#include <arpa/nameser.h>
-#include <resolv.h>
 #endif
 
 #ifdef TERMNET
@@ -624,7 +609,7 @@ void sock_get_local_hostname(char *name, unsigned size,
 {
     struct hostent	*he = NULL;
     struct hostent 	*xpilot_he = NULL;
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
     int			xpilot_len;
     char		*dot;
     char		xpilot_hostname[SOCK_HOSTNAME_LENGTH];
@@ -681,7 +666,7 @@ void sock_get_local_hostname(char *name, unsigned size,
 	return;
     }
 
-#ifndef	_WINDOWS	/* the lookup of xpilot can take FOREVER! zzzz...  */
+#ifndef _WINDOWS	/* the lookup of xpilot can take FOREVER! zzzz...  */
 
     /* if name starts with "xpilot" then we're done. */
     xpilot_len = strlen(xpilot);
@@ -819,7 +804,7 @@ static void sock_catch_alarm(int signum)
 
 static struct hostent *sock_get_host_by_name(const char *name)
 {
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
 
     struct hostent	*hp;
 
@@ -845,18 +830,18 @@ static struct hostent *sock_get_host_by_name(const char *name)
      * can take many minutes to time out.  WSACancelBlockingCall()
      * doesn't affect it.
      */
-    
+
     static char     chp[MAXGETHOSTSTRUCT+1];
     struct hostent* hp = (struct hostent*)&chp;
     HANDLE h;
     MSG msg;
     int i;
-    
+
     h = WSAAsyncGetHostByName(notifyWnd, WM_GETHOSTNAME, name,
                               chp, MAXGETHOSTSTRUCT);
-    
+
     for (i = 0; i < SOCK_GETHOST_TIMEOUT; i++) {
-        if (PeekMessage(&msg, NULL, WM_GETHOSTNAME, 
+        if (PeekMessage(&msg, NULL, WM_GETHOSTNAME,
                         WM_GETHOSTNAME, PM_REMOVE)) {
             return (WSAGETASYNCERROR(msg.lParam)) ? NULL : hp;
         }
@@ -864,13 +849,13 @@ static struct hostent *sock_get_host_by_name(const char *name)
     }
     WSACancelAsyncRequest(h);
     return NULL;
-    
+
 #endif
 }
 
 static struct hostent *sock_get_host_by_addr(const char *addr, int len, int type)
 {
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
 
     struct hostent	*hp;
 

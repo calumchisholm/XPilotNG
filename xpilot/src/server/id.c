@@ -22,12 +22,14 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifdef	_WINDOWS
-#include "NT/winServer.h"
-#else
-#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <errno.h>
+
+#ifndef _WINDOWS
+#include <unistd.h>
+#else
+#include "NT/winServer.h"
 #endif
 
 #define SERVER
@@ -107,4 +109,3 @@ void release_ID(int id)
     ID_queue[put_ID++ % NUM_IDS] = id;
     ID_inuse[id] = 0;
 }
-

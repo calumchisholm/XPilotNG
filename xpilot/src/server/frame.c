@@ -22,21 +22,20 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifdef	_WINDOWS
-#include "NT/winServer.h"
-#include <time.h>
-#include <limits.h>
-#else
-#include <unistd.h>
-#include <sys/types.h>
-#if !defined(VMS)
-#include <sys/param.h>
-#endif
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
+#include <errno.h>
 #include <time.h>
+#include <limits.h>
+#include <sys/types.h>
+
+#ifndef _WINDOWS
+#include <unistd.h>
+#include <sys/param.h>
+#else
+#include "NT/winServer.h"
 #endif
 
 #define SERVER

@@ -23,44 +23,29 @@
  */
 
 
-#ifdef	_WINDOWS
-#include "NT/winclient.h"
-#include "NT/winNet.h"
-#include "NT/winAudio.h"
-#include "NT/winX.h"
-#include "NT/winXThread.h"
-#include "NT/winXXPilot.h"
-#endif
-
-#include "types.h"
-
-#ifndef	_WINDOWS
-#include <unistd.h>
-#ifndef VMS
-#include <sys/param.h>
-#endif
-#endif
-#if defined(__hpux) || defined(_WINDOWS)
-#include <time.h>
-#else
-#include <sys/time.h>
-#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
 #include <errno.h>
-#ifdef VMS
-#include <socket.h>
-#include <in.h>
-#else
-#ifndef	_WINDOWS
+#include <time.h>
+#include <sys/types.h>
+
+#ifndef _WINDOWS
+#include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#endif
-#endif
-#ifndef	_WINDOWS
 #include <netdb.h>
+#include <sys/param.h>
+#include <sys/time.h>
+#include <X11/Xlib.h>
+#else
+#include "NT/winClient.h"
+#include "NT/winNet.h"
+#include "NT/winAudio.h"
+#include "NT/winX.h"
+#include "NT/winXThread.h"
+#include "NT/winXXPilot.h"
 #endif
 
 #include "version.h"
@@ -76,13 +61,14 @@
 #include "paintdata.h"
 #include "xinit.h"
 #include "pack.h"
+#include "types.h"
 #include "socklib.h"
 #include "protoclient.h"
 #include "portability.h"
 #include "talk.h"
 #include "bitmaps.h"
 
-#ifdef	SOUND
+#ifdef SOUND
 #include "audio.h"
 #endif
 
@@ -105,7 +91,7 @@ typedef struct {
 setup_t			*Setup;
 int			receive_window_size;
 long			last_loops;
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 int			received_self = FALSE;
 #endif
 /*
@@ -804,7 +790,7 @@ int Net_init(char *server, int port)
     unsigned	size;
     sock_t	sock;
 
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
     signal(SIGPIPE, SIG_IGN);
 #endif
 
@@ -1390,7 +1376,7 @@ int Net_input(void)
 	    }
 	}
 	if ((i == receive_window_size - 1 && i > 0)
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 		|| drawPending
 		|| (ThreadedDraw &&
 				!WaitForSingleObject(dinfo.eventNotDrawing, 0) == WAIT_OBJECT_0)
@@ -1676,7 +1662,7 @@ static void Check_view_dimensions(void)
     int			height_wanted = draw_height;
     int			srv_width, srv_height;
 
-#ifdef	WINDOWSCALING
+#ifdef WINDOWSCALING
     width_wanted = (int)(width_wanted * scaleFactor + 0.5);
     height_wanted = (int)(height_wanted * scaleFactor + 0.5);
 #endif
@@ -1874,7 +1860,7 @@ int Receive_self(void)
 		num_items,
 		currentTank, fuelSum, fuelMax, rbuf.len);
 
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 	received_self = TRUE;
 #endif
     return 1;
@@ -2810,7 +2796,7 @@ int Send_display(void)
     int			width_wanted = draw_width;
     int			height_wanted = draw_height;
 
-#ifdef	WINDOWSCALING
+#ifdef WINDOWSCALING
     width_wanted = (int)(width_wanted * scaleFactor + 0.5);
     height_wanted = (int)(height_wanted * scaleFactor + 0.5);
 #endif

@@ -22,39 +22,31 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifdef	_WINDOWS
-#include "NT/winClient.h"
-#include "NT/winNet.h"
-#define	QUERY_FUDGED
-
-#else
-#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <time.h>
+#include <sys/types.h>
 
-#ifdef VMS
-# include <socket.h>
-# include <in.h>
-# include <inet.h>
-#else
-# include <sys/types.h>
-# include <sys/param.h>
-# include <sys/socket.h>
-# include <sys/ioctl.h>
-# include <netinet/in.h>
-# include <arpa/inet.h>
-#endif
+#ifndef _WINDOWS
+#include <unistd.h>
+#include <sys/param.h>
+#include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
 #if defined(SVR4) || defined(__svr4__)
-# include <sys/sockio.h>
+#include <sys/sockio.h>
 #endif
 #include <sys/time.h>
-#ifndef LINUX0
-# include <net/if.h>
+#include <net/if.h>
+#else
+#include "NT/winClient.h"
+#include "NT/winNet.h"
+#define	QUERY_FUDGED
 #endif
-#include <netdb.h>
-#endif		/* _WINDOWS */
 
 #include "version.h"
 #include "config.h"
@@ -67,15 +59,6 @@ char query_version[] = VERSION;
 #ifndef	lint
 static char sourceid[] =
     "@(#)$Id$";
-#endif
-
-#if defined(LINUX0) || defined(VMS)
-# ifndef QUERY_FUDGED
-#  define QUERY_FUDGED
-# endif
-#endif
-#ifdef _IBMESA
-# define _SOCKADDR_LEN
 #endif
 
 #ifndef MAX_INTERFACE
@@ -218,12 +201,6 @@ static int Query_fudged(sock_t *sock, int port, char *msg, int msglen)
  * on one of the other interfaces in order to reduce the chance that
  * we get multiple responses from the same server.
  */
-
-/* KOERBER */
-#ifdef VMS
-#include "pack.h"
-static int		contact_port = SERVER_PORT;
-#endif
 
 int Query_all(sock_t *sock, int port, char *msg, int msglen)
 {

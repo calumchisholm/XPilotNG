@@ -22,29 +22,24 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifdef	_WINDOWS
-#include "NT/winServer.h"
-#include "NT/winSvrThread.h"
-#include <time.h>
-#include <limits.h>
-#else
-#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <signal.h>
+#include <errno.h>
 #include <time.h>
-#if !defined(__hpux) && !defined(_WINDOWS)
-#include <sys/time.h>
-#endif
+#include <limits.h>
+#include <sys/types.h>
+
+#ifndef _WINDOWS
+#include <unistd.h>
 #include <pwd.h>
-
-#if !defined(VMS)
 #include <sys/param.h>
+#else
+#include "NT/winServer.h"
+#include "NT/winSvrThread.h"
 #endif
-
-#endif	/* _WINDOWS */
 
 #ifdef PLOCKSERVER
 # if defined(__linux__)
@@ -96,7 +91,7 @@ ecm_t			*Ecms[MAX_TOTAL_ECMS];
 trans_t			*Transporters[MAX_TOTAL_TRANSPORTERS];
 int			GetInd[NUM_IDS + 1 + MAX_OBSERVERS];
 server			Server;
-char			serverAddr[24];
+char			*serverAddr;
 int			ShutdownServer = -1;
 int			ShutdownDelay = 1000;
 char			ShutdownReason[MAX_CHARS];
@@ -146,7 +141,7 @@ int main(int argc, char **argv)
 	         Changed to seedMT() in current version with new RNG */
     Check_server_versions();
     if (!Parser(argc, argv))
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
 	exit(0);
 #else
         return(0);
@@ -188,7 +183,7 @@ int main(int argc, char **argv)
 	    return(1);
 #endif
 	}
-	strncpy(serverAddr, addr, sizeof(serverAddr) - 1);
+	serverAddr = strdup(addr);
 	strncpy(Server.host, serverHost, sizeof(Server.host) - 1);
     }
     else {
@@ -209,7 +204,7 @@ int main(int argc, char **argv)
     if (Setup_net_server() == -1) {
 	End_game();
     }
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
     if (NoQuit) {
 	signal(SIGHUP, SIG_IGN);
     } else {
@@ -231,7 +226,7 @@ int main(int argc, char **argv)
     xpprintf("%s Server runs at %d frames per second\n", showtime(), framesPerSecond);
 #endif
 
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
     /* Windows returns here, we let the worker thread call sched() */
     install_timer_tick(ServerThreadTimerProc, timerResolution ? timerResolution : FPS);
 #else
@@ -379,7 +374,7 @@ void End_game(void)
     Free_cells();
     Log_game("END");			    /* Log end */
 
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
     exit (0);
 #endif
 }
@@ -595,7 +590,7 @@ static void Handle_signal(int sig_no)
 {
     errno = 0;
 
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
     switch (sig_no) {
 
     case SIGHUP:

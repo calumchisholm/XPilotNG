@@ -32,13 +32,13 @@
  * has a peculiar way of dealing with colors.
  */
 
-/* 
+/*
  * Public interface to xpmread.c.
  */
 extern Pixmap xpm_pixmap_from_data(const char **data);
 extern Pixmap xpm_pixmap_from_file(char *filename);
 extern int xpm_picture_from_file(xp_picture_t *pic, char *filename);
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
 extern XImage *xpm_image_from_pixmap(Pixmap pixmap);
 #endif
 #ifdef XPM_READ_C

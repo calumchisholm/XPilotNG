@@ -22,24 +22,22 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef	_WINDOWS
-# include <unistd.h>
-#endif
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
-#ifndef	_WINDOWS
-# include <sys/types.h>
-# include <sys/param.h>
-# include <sys/time.h>
-# include <netdb.h>
+#include <time.h>
+#include <sys/types.h>
+
+#ifndef _WINDOWS
+#include <unistd.h>
+#include <sys/param.h>
+#include <sys/time.h>
+#include <netdb.h>
 #else
-# include "NT/winNet.h"
-# include "NT/winClient.h"
-# include <time.h>
+#include "NT/winNet.h"
+#include "NT/winClient.h"
 #endif
 
 #include "version.h"
@@ -140,7 +138,7 @@ int main(int argc, char *argv[])
 
     init_error(argv[0]);
 
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
     srand( (unsigned)time( NULL ) );
 #else
     srand( (unsigned)time((time_t *)0) * getpid());
@@ -263,7 +261,7 @@ int main(int argc, char *argv[])
  */
 static void Check_client_versions(void)
 {
-#ifndef	_WINDOWS	/* gotta put this back in before source released */
+#ifndef _WINDOWS	/* gotta put this back in before source released */
 #ifdef SOUND
     extern char		audio_version[];
 #endif

@@ -54,17 +54,6 @@
  *    xpilot@xpilot.org.
  */
 
-#ifdef	_WINDOWS
-#include "NT/winX.h"
-#include "NT/winClient.h"
-#include "NT/winXXPilot.h"
-#else
-#ifdef VMS
-#include "strcasecmp.h"
-#else
-#include <unistd.h>
-#include <pwd.h>
-#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -72,9 +61,16 @@
 #include <errno.h>
 #include <limits.h>
 
+#ifndef _WINDOWS
+#include <unistd.h>
+#include <pwd.h>
 #include <X11/Xlib.h>
 #include <X11/Xos.h>
 #include <X11/Xutil.h>
+#else
+#include "NT/winX.h"
+#include "NT/winClient.h"
+#include "NT/winXXPilot.h"
 #endif
 
 #include "version.h"
@@ -161,7 +157,7 @@ static int Config_create_packetDropMeter(int widget_desc, int *height);
 static int Config_create_clock(int widget_desc, int *height);
 static int Config_create_clockAMPM(int widget_desc, int *height);
 static int Config_create_markingLights(int widget_desc, int *height);
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 static int Config_create_threadedDraw(int widget_desc, int *height);
 #endif
 #ifdef	WINDOWSCALING
@@ -289,7 +285,7 @@ static int		(*config_creator[])(int widget_desc, int *height) = {
     Config_create_packetDropMeter,
     Config_create_clock,
     Config_create_clockAMPM,
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 	Config_create_threadedDraw,
 #endif
 #ifdef	WINDOWSCALING
@@ -1083,7 +1079,7 @@ static int Config_create_clockAMPM(int widget_desc, int *height)
 			      (void *) SHOW_CLOCK_AMPM_FORMAT);
 }
 
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 static int Config_create_threadedDraw(int widget_desc, int *height)
 {
     return Config_create_bool(widget_desc, height, "threadedDraw",
@@ -1320,7 +1316,7 @@ static void Config_save_failed(const char *reason, const char **strptr)
     *strptr = "Saving failed...";
 }
 
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
 static int Xpilotrc_add(char *line)
 {
     int			size;
@@ -1399,7 +1395,7 @@ static void Xpilotrc_use(char *line)
 
 static void Config_save_resource(FILE *fp, const char *resource, char *value)
 {
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
     char		buf[256];
 
     sprintf(buf, "xpilot.%s:\t\t%s\n", resource, value);
@@ -1456,7 +1452,7 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Widget_draw(widget_desc);
     Client_flush();
 
-#ifndef	_WINDOWS	/* Windows does no file handling on its own.  fp=undefined */
+#ifndef _WINDOWS	/* Windows does no file handling on its own.  fp=undefined */
 #ifndef VMS
     Get_xpilotrc_file(oldfile, sizeof(oldfile));
     if (oldfile[0] == '\0') {
@@ -1543,7 +1539,7 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
 #if SOUND
     Config_save_int(fp, "maxVolume", maxVolume);
 #endif
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
     Config_save_bool(fp, "threadedDraw", ThreadedDraw);
 #endif
 #ifdef	WINDOWSCALING
@@ -1573,7 +1569,7 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
 	sprintf(buf, "modifierBank%d", i + 1);
 	Config_save_resource(fp, buf, modBankStr[i]);
     }
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
     Xpilotrc_end(fp);
     fclose(fp);
 #endif
@@ -1585,7 +1581,7 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     rename(newfile, oldfile);
 #endif
 
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
     /* save our window's position */
     {
 	WINDOWPLACEMENT	wp;

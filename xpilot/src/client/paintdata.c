@@ -22,16 +22,19 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifdef	_WINDOWS
-#include "NT/winX.h"
-#else
-#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
+#include <math.h>
+
+#ifndef _WINDOWS
+#include <unistd.h>
+#include <X11/Xlib.h>
+#else
+#include "NT/winX.h"
 #endif
 
-#include <math.h>
 #include "version.h"
 #include "config.h"
 #include "const.h"
@@ -633,7 +636,7 @@ int Handle_ball(int x, int y, int id)
     return 0;
 }
 
-int Handle_ship(int x, int y, int id, int dir, int shield, int cloak, int eshield, 
+int Handle_ship(int x, int y, int id, int dir, int shield, int cloak, int eshield,
 				int phased, int deflector)
 {
     ship_t	t;

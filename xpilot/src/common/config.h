@@ -62,8 +62,8 @@
 #    define COMPRESSED_MAPS
 #endif
 
-#ifdef	_WINDOWS
-#	ifdef	_DEBUG
+#ifdef _WINDOWS
+#	ifdef _DEBUG
 #		define	DEBUG	1
 #		define	D(x)	{x;}
 #	else
@@ -80,15 +80,15 @@
 /* Windows doesn't play with stdin/out well at all... */
 /* So for the client i route the "debug" printfs to the debug stream */
 /* The server gets 'real' messages routed to the messages window */
-#ifdef	_WINDOWS
-#	ifdef	_XPILOTNTSERVER_
-#	define	xpprintf	xpprintfW
-/*#	define	xpprintf	_Trace */
+#ifdef _WINDOWS
+#	ifdef _XPILOTNTSERVER_
+#	define	xpprintf xpprintfW
+/*#	define	xpprintf _Trace */
 #	else
-#	define	xpprintf	_Trace
+#	define	xpprintf _Trace
 #	endif
 #else
-#	define	xpprintf	printf
+#	define	xpprintf printf
 #endif
 
 char *Conf_libdir(void);

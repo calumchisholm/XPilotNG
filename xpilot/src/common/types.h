@@ -27,33 +27,10 @@
 
 #include <sys/types.h>
 
-#ifdef VMS
-typedef char byte;
-#else
 #ifndef	_WINDOWS
 typedef signed char	byte;
 #endif
-#endif
 typedef unsigned char	u_byte;
-
-#ifdef VMS
-#if !defined(CADDR_T) && !defined(__CADDR_T) && !defined(__SOCKET_TYPEDEFS)
-typedef char *caddr_t;
-#define CADDR_T
-#define __CADDR_T
-#endif
-#ifndef __SOCKET_TYPEDEFS
-typedef unsigned short  u_short;
-typedef unsigned short  u_long;
-typedef unsigned short  u_char;
-#define __SOCKET_TYPEDEFS
-#endif
-#endif
-
-
-#if (_SEQUENT_)
-typedef unsigned short	u_short;
-#endif
 
 /*
  * On some systems an enum is smaller than an int.
@@ -63,7 +40,7 @@ typedef unsigned short	u_short;
 #define false	0
 #define true	1
 
-#ifndef	_XPMONNT_
+#ifndef _XPMONNT_
 #define bool	int
 #endif
 
@@ -71,7 +48,7 @@ typedef unsigned short	u_short;
  * Windows does all its FPU work in doubles.  Using floats gives warnings
  * and causes everything to be promoted to doubles anyway...
  */
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
 typedef	float	DFLOAT;
 #else
 typedef	double	DFLOAT;
@@ -83,7 +60,7 @@ typedef struct { int x, y; }	ivec;
 typedef ivec			ipos;
 typedef struct { int x, y, w, h;} irec;
 
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 #define	strncasecmp(__s, __t, __l)	strnicmp(__s, __t, __l)
 #define	strcasecmp(__s, __t)	stricmp(__s, __t)
 #endif

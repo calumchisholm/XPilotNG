@@ -22,13 +22,14 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifdef	_WINDOWS
-#include "NT/winServer.h"
-#include <math.h>
-#else
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include <stdio.h>
+#include <errno.h>
+
+#ifdef _WINDOWS
+#include "NT/winServer.h"
 #endif
 
 #define SERVER
@@ -595,7 +596,7 @@ void Update_score_table(void)
 	}
     }
     updateScores = false;
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
     SendDialogUpdate();
 #endif
 }

@@ -26,7 +26,7 @@
 #define	CONST_H
 
 #include <limits.h>
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
 #include <math.h>
 #endif
 
@@ -53,16 +53,6 @@
 #	    define FLT_MAX	1e30f	/* should suffice :-) */
 #	endif
 #   endif
-#endif
-#ifndef	RAND_MAX
-    /*
-     * Ough!  If this is possible then we shouldn't be using RAND_MAX!
-     * Older systems which don't have RAND_MAX likely should have it
-     * to be defined as 32767, not as INT_MAX!
-     * We better get our own pseudo-random library to overcome this mess
-     * and get a uniform solution for everything.
-     */
-#   define  RAND_MAX	INT_MAX
 #endif
 
 /* Not everyone has PI (or M_PI defined). */

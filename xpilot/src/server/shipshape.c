@@ -22,6 +22,13 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
+#include <ctype.h>
+#include <math.h>
+
 #if defined(_WINDOWS)
 	/* need this for printf wrappers. */
 #	ifdef	_XPILOTNTSERVER_
@@ -30,13 +37,7 @@
 #		include "NT/winX.h"
 #		include "../client/NT/winClient.h"
 #	endif
-#else
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
 #endif
-
-#include <math.h>
 
 #define SERVER
 #include "version.h"

@@ -89,47 +89,22 @@
  * if the acknowledgement timer expires.
  */
 
-#ifdef	_WINDOWS
-#include "NT/winServer.h"
-#include <io.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <time.h>
-#include <limits.h>
-#else
-
-#include "types.h"
-#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <ctype.h>
 #include <fcntl.h>
-#include <sys/stat.h>
-
-/* Is this needed? */
-#if !defined(VMS)
-# include <sys/param.h>
-#endif
-
 #include <time.h>
-
-/* THIS IS INSIDE THE ELSE PART OF #ifdef _WINDOWS!!!!! Didn't remove it yet
-   because maybe it should be in use? */
-#ifdef	_WINDOWS
-#include "winNet.h"
-#include <io.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+
+#ifndef _WINDOWS
+#include <unistd.h>
 #else
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
+#include "NT/winServer.h"
+#include <io.h>
 #endif
-
-#endif
-
-#include <ctype.h>
 
 #define SERVER
 #include "version.h"
@@ -140,6 +115,7 @@
 #include "map.h"
 #include "pack.h"
 #include "bit.h"
+#include "types.h"
 #include "socklib.h"
 #include "sched.h"
 #include "srecord.h"
@@ -3282,8 +3258,8 @@ static int Receive_motd(int ind)
  * If this MOTD buffer hasn't been accessed for a while
  * then on the next access the MOTD file is checked for changes.
  */
-#ifdef	_WINDOWS
-#define	close(__a)	_close(__a)
+#ifdef _WINDOWS
+#define	close(__a) _close(__a)
 #endif
 int Get_motd(char *buf, int offset, int maxlen, int *size_ptr)
 {

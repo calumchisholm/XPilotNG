@@ -22,16 +22,16 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifdef	_WINDOWS
-#include "NT/winServer.h"
-#include <limits.h>
-#else
 #include <stdlib.h>
 #include <string.h>
-#endif
-
 #include <stdio.h>
+#include <errno.h>
 #include <math.h>
+#include <limits.h>
+
+#ifdef _WINDOWS
+#include "NT/winServer.h"
+#endif
 
 #define SERVER
 #include "version.h"

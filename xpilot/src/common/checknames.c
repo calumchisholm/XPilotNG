@@ -22,14 +22,15 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef	_WINDOWS
-#include <unistd.h>
-#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
 #include <ctype.h>
+
+#ifndef	_WINDOWS
+#include <unistd.h>
+#endif
 
 #include "version.h"
 #include "config.h"
@@ -214,4 +215,3 @@ void Fix_disp_name(char *name)
 	}
     }
 }
-

@@ -23,20 +23,18 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <errno.h>
+#include <math.h>
 
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
 #include <X11/Xlib.h>
 #include <X11/Xos.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
 #include <X11/Xmd.h>
-#ifdef	__apollo
-#    include <X11/ap_keysym.h>
-#endif
 #else
-#include <math.h>
 #include "NT/winX.h"
 #include "NT/winAudio.h"
 #include "NT/winClient.h"
@@ -158,7 +156,6 @@ keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
     keys_t ret = KEY_DUMMY;
     static int i = 0;
 
-#ifndef NO_KEYSORT
     if (reset) {
 	/* binary search since keyDefs is sorted on keysym. */
 	int lo = 0, hi = maxKeyDefs - 1;
@@ -185,19 +182,7 @@ keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
 	    i++;
 	}
     }
-#else
 
-    if (reset)
-	i = 0;
-
-    for (; i < maxKeyDefs; i++) {
-	if (keyDefs[i].keysym == ks) {
-	    ret = keyDefs[i].key;
-	    i++;
-	    break;
-	}
-    }
-#endif
     IFWINDOWS( Trace("Lookup_key: got key ks=%04X ret=%d\n", ks, ret); )
 
 #ifdef DEVELOPMENT
@@ -248,7 +233,7 @@ void Pointer_control_set_state(int onoff)
     }
 }
 
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
 
 static void Talk_set_state(bool onoff)
 {
@@ -373,7 +358,7 @@ bool Key_press_swap_settings(keys_t key)
 {
     DFLOAT _tmp;
 #define SWAP(a, b) (_tmp = (a), (a) = (b), (b) = _tmp)
-	
+
     SWAP(power, power_s);
     SWAP(turnspeed, turnspeed_s);
     SWAP(turnresistance, turnresistance_s);
@@ -522,12 +507,12 @@ bool Key_press(keys_t key)
     case KEY_FIRE_HEAT:
     case KEY_DROP_MINE:
     case KEY_DETACH_MINE:
-	Key_press_autoshield_hack(key);    
+	Key_press_autoshield_hack(key);
 	break;
 
     case KEY_SHIELD:
 	if (Key_press_shield(key))
-	    return true; 
+	    return true;
 	break;
 
     case KEY_REFUEL:
@@ -579,7 +564,7 @@ bool Key_press(keys_t key)
 #endif
     case KEY_SELECT_ITEM:
     case KEY_LOSE_ITEM:
-	if (!Key_press_select_lose_item(key)) 
+	if (!Key_press_select_lose_item(key))
 	    return false;
     default:
 	break;
@@ -752,7 +737,7 @@ XEvent	talk_key_repeat_event;
 
 void xevent_keyboard(int queued)
 {
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
     int			i, n;
     XEvent		event;
 #endif
@@ -766,7 +751,7 @@ void xevent_keyboard(int queued)
 	}
     }
 
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
     if (kdpy) {
 	n = XEventsQueued(kdpy, queued);
 	for (i = 0; i < n; i++) {
@@ -805,8 +790,8 @@ int	movement;	/* horizontal mouse movement. */
 
 
 void xevent_pointer()
-{ 
-#ifndef	_WINDOWS
+{
+#ifndef _WINDOWS
     XEvent		event;
 #endif
 
@@ -819,13 +804,13 @@ void xevent_pointer()
 		 POINT point;
 
 		 GetCursorPos(&point);
-		 movement = point.x - draw_width/2; 
+		 movement = point.x - draw_width/2;
 		 XWarpPointer(dpy, None, draw,
 			      0, 0, 0, 0,
 			      draw_width/2, draw_height/2);
 	    }
 		/* fix end */
-#endif 
+#endif
 
 	    if (movement != 0) {
 		Send_pointer_move(movement);
@@ -834,7 +819,7 @@ void xevent_pointer()
 		if (ABS(delta.x) > 3 * draw_width / 8
 		    || ABS(delta.y) > 1 * draw_height / 8) {
 
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
 		    memset(&event, 0, sizeof(event));
 		    event.type = MotionNotify;
 		    event.xmotion.display = dpy;
@@ -853,14 +838,14 @@ void xevent_pointer()
     }
 }
 
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
 int xevent(int new_input)
 #else
 int xevent(XEvent event)
 #endif
 {
     int			queued = 0;
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
     int			i, n;
     XEvent		event;
 #endif
@@ -875,7 +860,7 @@ int xevent(XEvent event)
 
     movement = 0;
 
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
     switch (new_input) {
     case 0: queued = QueuedAlready; break;
     case 1: queued = QueuedAfterReading; break;
@@ -891,13 +876,13 @@ int xevent(XEvent event)
 #endif
 	switch (event.type) {
 
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
 	    /*
 	     * after requesting a selection we are notified that we
 	     * can access it.
 	     */
 	case SelectionNotify:
-	    SelectionNotify_event(&event);    
+	    SelectionNotify_event(&event);
 	    break;
 	    /*
 	     * we are requested to provide a selection.
@@ -931,7 +916,7 @@ int xevent(XEvent event)
 	case UnmapNotify:
 	    UnmapNotify_event(&event);
 	    break;
-	    
+
 	case MappingNotify:
 	    XRefreshKeyboardMapping(&event.xmapping);
 	    break;
@@ -958,7 +943,7 @@ int xevent(XEvent event)
 	    break;
 
 	case ButtonRelease:
-	    if (ButtonRelease_event(&event) == -1) 
+	    if (ButtonRelease_event(&event) == -1)
 	        return -1;
 	    break;
 
@@ -974,13 +959,11 @@ int xevent(XEvent event)
 	default:
 	    break;
 	}
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
     }
 #endif
 
-    xevent_keyboard(queued);	
+    xevent_keyboard(queued);
     xevent_pointer();
     return 0;
 }
-
-

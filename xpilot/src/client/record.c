@@ -22,16 +22,15 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef	_WINDOWS
-#include <unistd.h>
-#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
 #include <ctype.h>
 #include <time.h>
 
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
+#include <unistd.h>
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -605,7 +604,7 @@ static int RDrawString(Display *display, Drawable drawable, GC gc,
     }
     return 0;
 }
-   
+
 static int RFillArc(Display *display, Drawable drawable, GC gc,
 		    int x, int y,
 		    unsigned height, unsigned width,
@@ -874,4 +873,3 @@ void Record_init(char *filename)
 	record_filename = strdup(filename);
     }
 }
-

@@ -42,7 +42,7 @@
 #include "item.h"
 #endif
 
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 #include "NT/winNet.h"
 #endif
 
@@ -191,7 +191,7 @@ struct _object {
     u_byte	rotation;		/* Rotation direction */
 
 #ifdef __cplusplus
-		_object() {}
+	 _object() {}
 #endif
 };
 

@@ -17,13 +17,14 @@ static char sccsid[] = "@(#)usleep.c	1.3 91/05/24 XLOCK";
  *	Changed usleep into micro_delay to forego any possible prototype clashes.
  */
 
-#if defined(_WINDOWS)
 #include <time.h>
-#include "NT/winNet.h"
-#else
-#include <unistd.h>
 #include <sys/types.h>
+
+#ifndef _WINDOWS
+#include <unistd.h>
 #include <sys/time.h>
+#else
+#include "NT/winNet.h"
 #endif
 
 #include "types.h"

@@ -25,12 +25,12 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-#ifdef	_WINDOWS
-#ifndef	_WINSOCKAPI_
+#ifdef _WINDOWS
+#ifndef _WINSOCKAPI_
 #include <winsock.h>
 #endif
 
-#ifndef	_WINX_H_
+#ifndef _WINX_H_
 #include "NT/winX.h"
 #endif
 #endif
@@ -177,7 +177,7 @@ typedef struct {
     int          rgb;             /* RGB values corresponding to color */
     int          texture;         /* The texture if drawn in texture mode */
     int          flags;           /* Flags about this style (see draw.h) */
-    int          def_edge_style;  /* The default style for edges */ 
+    int          def_edge_style;  /* The default style for edges */
 } polygon_style_t;
 
 
@@ -187,7 +187,7 @@ typedef struct {
     irec        bounds;         /* bounding box for the polygon */
     int         *edge_styles;   /* optional array of indexes to edge_styles */
     int         style;          /* index to polygon_styles array */
-} xp_polygon_t; 
+} xp_polygon_t;
 
 
 #define SCORE_OBJECT_COUNT	100
@@ -426,4 +426,3 @@ extern	void audioEvents();
 #endif
 
 #endif
-

@@ -22,25 +22,22 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef	_WINDOWS
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
+#include <errno.h>
+#include <time.h>
+
+#ifndef _WINDOWS
 #include <unistd.h>
+#include <sys/time.h>
 #include <X11/Xlib.h>
 #else
 #include "../common/NT/winX.h"
 #include "NT/winclient.h"
 #include "NT/winXXPilot.h"
 #endif
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <string.h>
-#include <errno.h>
-#include <sys/time.h>
-#ifdef _AIX
-#include <sys/select.h>
-#endif
-
 
 #include "version.h"
 #include "config.h"
@@ -1959,7 +1956,7 @@ static int Welcome_process_one_event(XEvent *event)
 	}
 	break;
 
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
     case MapNotify:
 	if (ignoreWindowManager == 1) {
 	    XSetInputFocus(dpy, top, RevertToParent, CurrentTime);

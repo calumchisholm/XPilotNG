@@ -22,17 +22,18 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifdef	_WINDOWS
-#include "NT/winX.h"
-#include "NT/winXXPilot.h"
-#else
-#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <errno.h>
 
+#ifndef _WINDOWS
+#include <unistd.h>
 #include <X11/Xlib.h>
 #include <X11/Xos.h>
+#else
+#include "NT/winX.h"
+#include "NT/winXXPilot.h"
 #endif
 
 #include "version.h"
@@ -74,7 +75,7 @@ static int	slidingradar_y;
 
 static void Copy_static_radar(void)
 {
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
     if (s_radar != p_radar) {
 	/* Draw static radar onto radar */
 	XCopyArea(dpy, s_radar, p_radar, gc,
@@ -93,7 +94,7 @@ static void Copy_static_radar(void)
 }
 
 
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 static void Windows_copy_sliding_radar(float xf, float yf)
 {
     slidingradar_x = (int)((pos.x * xf + 0.5) + 128) % 256;
@@ -264,7 +265,7 @@ void Paint_radar(void)
     slidingradar_x = 0;
     slidingradar_y = 0;
 
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
     if (BIT(instruments, SHOW_SLIDING_RADAR) != 0) {
 	/*
 	 * Hack to fix slidingradar in windows.
@@ -335,7 +336,7 @@ void Paint_world_radar_old(void)
 
     radar_exposures = 2;
 
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
     XSetForeground(dpy, s_radar, colors[BLACK].pixel);
     XFillRectangle(dpy, s_radar, radarGC, 0, 0, 256, RadarHeight);
 #else
@@ -451,7 +452,7 @@ void Paint_world_radar_old(void)
 			}
 			start = end = yp;
 			currColor = visibleColor[type];
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 			XSetForeground(dpy, s_radar, currColor);
 #else
 			XSetForeground(dpy, radarGC, colors[currColor].pixel);
@@ -540,7 +541,7 @@ void Paint_world_radar_old(void)
 			}
 			start = end = yp;
 			currColor = visibleColor[type];
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 			XSetForeground(dpy, s_radar, currColor);
 #else
 			XSetForeground(dpy, radarGC, colors[currColor].pixel);
@@ -590,7 +591,7 @@ void Paint_world_radar_old(void)
 		    }
 		    start = end = yp;
 		    currColor = visibleColor[type];
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 		    XSetForeground(dpy, s_radar, currColor);
 #else
 		    XSetForeground(dpy, radarGC, colors[currColor].pixel);

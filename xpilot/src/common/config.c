@@ -45,7 +45,7 @@
 #endif
 
 #ifndef	DEFAULT_MAP
-#    ifdef	_WINDOWS
+#    ifdef _WINDOWS
 #         define DEFAULT_MAP		"default.xp"
 #    else
 #         define DEFAULT_MAP		"globe.xp"
@@ -282,4 +282,3 @@ char *Conf_sounddir(void)
 
     return conf;
 }
-

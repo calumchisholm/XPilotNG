@@ -1,6 +1,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <errno.h>
+
 #define SERVER
 #include "const.h"
 #include "global.h"

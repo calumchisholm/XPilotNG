@@ -23,7 +23,7 @@
  */
 
 
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 #include "NT/winclient.h"
 #include "NT/winNet.h"
 #include "NT/winAudio.h"
@@ -74,7 +74,7 @@ int		Talk_macro(char *str);
 static char *Talk_macro_fields_info (char *buf, int *n_fields)
 {
     int			end_found = 0, level = 0;
-    
+
     *n_fields = 0;
     while (!end_found)
     {
@@ -106,14 +106,14 @@ static char *Talk_macro_fields_info (char *buf, int *n_fields)
     return buf;
 }
 
-/* Returns a string pointer to the wanted_field 
+/* Returns a string pointer to the wanted_field
  * This pointer must be freed after using it
  */
 static char *Talk_macro_get_field (char *buf, int wanted_field)
 {
     int  finished = 0, level = 0, field = 0, len;
     char *field_ptr, *start_ptr = NULL, *end_ptr = NULL;
-    
+
     while (!finished)
     {
 	switch (*buf)
@@ -158,7 +158,7 @@ static char *Talk_macro_get_field (char *buf, int wanted_field)
 	    break;
 	}
 	buf++;
-	
+
     }
     len = end_ptr - start_ptr;
     if ((field_ptr = (char *) malloc (len + 1)) == NULL) {
@@ -179,7 +179,7 @@ static int Talk_macro_parse_mesg(char *outbuf, char *inbuf, long pos, long max)
     char *tmpptr, *tmpptr1, *tmpptr2, *tmpptr3 = 0, *nextpos, *filename;
     other_t *player=NULL;
 
-    
+
     while ((c = *inbuf++) != '\0')
     {
 	if (pos >= max - 2)
@@ -310,12 +310,12 @@ static int Talk_macro_parse_mesg(char *outbuf, char *inbuf, long pos, long max)
 			break;
 		    }
 		    free (filename);
-		    
+
 		    /* Get filesize */
 		    fseek (fp, 0L, SEEK_END);
 		    fsize = ftell (fp);
 		    rewind (fp);
-		    
+
 		    if ((tmpptr = (char *)malloc(fsize+1)) == NULL) {
 			fclose (fp);
 			break;
@@ -343,7 +343,7 @@ static int Talk_macro_parse_mesg(char *outbuf, char *inbuf, long pos, long max)
 		    }
 		    inbuf = nextpos;
 		    pos = Talk_macro_parse_mesg (outbuf, tmpptr, pos, max);
-		    free (tmpptr); 
+		    free (tmpptr);
 		    break;
 		case 'n':
 		    outbuf[pos] = '\0';

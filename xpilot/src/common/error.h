@@ -11,13 +11,7 @@
 #ifndef	ERROR_H
 #define	ERROR_H
 
-/*
- * Prototypes and include files.
- */
-#include <errno.h>
-#include <stdio.h>
-
-#ifndef	_WINDOWS
+#ifndef _WINDOWS
 #if defined(__STDC__) && !defined(__sun__) || defined(__cplusplus)
 #   include <stdarg.h>
     extern void error(const char *fmt, ...);
@@ -28,7 +22,7 @@
 
 #else
     extern void error();
-#ifdef	_DEBUG
+#ifdef _DEBUG
 #define	Trace _Trace
 #else
 #define	Trace
@@ -37,7 +31,7 @@
 
 extern void init_error(const char *prog);
 
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 /* extern	HWND	alarmWnd;		Window for alarm timers */
 #endif
 /*
@@ -45,9 +39,9 @@ extern void init_error(const char *prog);
  */
 #if (defined(_WINDOWS) && defined(_DEBUG)) || !defined(_WINDOWS)
 
-/*#define	_MEMPOD	1*/
+/*#define _MEMPOD	1*/
 
-#ifdef	_MEMPOD
+#ifdef _MEMPOD
 extern	void xpmemShutdown();
 
 extern	void* xpmalloc(size_t, char*, int);
