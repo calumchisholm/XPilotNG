@@ -706,15 +706,14 @@ int Net_verify(char *real, char *nick, char *disp, int my_team)
  * 2) rbuf is used for receiving packets in (read/scanf).
  * 3) cbuf is used to copy the reliable data stream
  *    into from the raw and unreliable rbuf packets.
- *
- * kps - ng does not want this
- * server == NULL sets up for internal simulation
  */
 int Net_init(char *server, int port)
 {
     int			i;
     unsigned		size;
     sock_t		sock;
+
+    assert(server != NULL);
 
 #ifndef _WINDOWS
     signal(SIGPIPE, SIG_IGN);
@@ -741,8 +740,7 @@ int Net_init(char *server, int port)
 	}
     }
 
-
-    if (server && sock_connect(&sock, server, port) == -1) {
+    if (sock_connect(&sock, server, port) == -1) {
 	error("Can't connect to server %s on port %d", server, port);
 	sock_close(&sock);
 	return -1;
