@@ -395,7 +395,10 @@ xp_option_t xdefault_options[] = {
 	&mouseAccelInClient,
 	NULL,
 	XP_OPTFLAG_CONFIG_DEFAULT,
-	"Set to true if you want to set the mouse turn rates to be linear\n"),
+	"This option makes the client handle the mouse acceleration.\n"
+	"Options mouseAccelNum, mouseAccelDenom and mouseAccelThresh can\n"
+	"be used to fine tune the acceleration. The default values of these\n"
+	"three options give linear response to mouse movements.\n"),
 
     XP_INT_OPTION(
         "mouseAccelNum",
@@ -405,7 +408,7 @@ xp_option_t xdefault_options[] = {
 	&new_acc_num,
 	Set_mouseAccelNum,
 	XP_OPTFLAG_CONFIG_DEFAULT,
-	"Fine tune the mouse acceleration\n"),
+	"Mouse acceleration numerator.\n"),
 
     XP_INT_OPTION(
         "mouseAccelDenom",
@@ -415,7 +418,7 @@ xp_option_t xdefault_options[] = {
 	&new_acc_denom,
 	Set_mouseAccelDenom,
 	XP_OPTFLAG_CONFIG_DEFAULT,
-	"Set the mouse acceleration denominator\n"),
+	"Mouse acceleration denominator.\n"),
 
     XP_INT_OPTION(
         "mouseAccelThresh",
@@ -425,7 +428,7 @@ xp_option_t xdefault_options[] = {
 	&new_threshold,
 	Set_mouseAccelThresh,
 	XP_OPTFLAG_CONFIG_DEFAULT,
-	"Set the mouse acceleration threshold\n"),
+	"Mouse acceleration threshold.\n"),
 
 	
     /* X debug stuff */
