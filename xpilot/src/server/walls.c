@@ -749,10 +749,10 @@ static unsigned short *Shape_lines(const shape *s, int dir)
     lastshape = s;
     lastdir = dir;
 
-    pts = Shape_get_points((shape *)s, dir);
+    /*pts = Shape_get_points((shape *)s, dir);*/
     for (p = 0; p < s->num_points; p++) {
-	clpos pt = pts[p].clk;
-	/*clpos pt = Ship_get_point_clpos((shipobj *)s, p, dir);*/
+	/*clpos pt = pts[p].clk;*/
+	clpos pt = Ship_get_point_clpos((shipobj *)s, p, dir);
 	linet[p + os].start.cx = -pt.cx;
 	linet[p + os].start.cy = -pt.cy;
     }
@@ -1328,10 +1328,10 @@ static void Shape_move(const struct move *move, const shape *s,
     minline = -1;
     minpoint = -1;
 
-    pts = Shape_get_points((shape *)s, dir);
+    /*pts = Shape_get_points((shape *)s, dir);*/
     for (p = 0; p < s->num_points; p++) {
-	/*clpos pt = Ship_get_point_clpos((shipobj *)s, p, dir);*/
-	clpos pt = pts[p].clk;
+	clpos pt = Ship_get_point_clpos((shipobj *)s, p, dir);
+	/*clpos pt = pts[p].clk;*/
 	msx = WRAP_XCLICK(move->start.cx + pt.cx);
 	msy = WRAP_YCLICK(move->start.cy + pt.cy);
 	block = (msx >> B_SHIFT) + mapx * (msy >> B_SHIFT);
@@ -1432,8 +1432,8 @@ static int Shape_morph(const shape *shape1, int dir1, const shape *shape2,
 
     mv.hitmask = hitmask;
     mv.obj = (object *)obj;
-    pts1 = Shape_get_points((shape *)shape1, dir1);
-    pts2 = Shape_get_points((shape *)shape2, dir2);
+    /*pts1 = Shape_get_points((shape *)shape1, dir1);
+      pts2 = Shape_get_points((shape *)shape2, dir2);*/
 
     /* kps - can this happen ?? */
     if (shape1->num_points != shape2->num_points) {
@@ -1444,10 +1444,11 @@ static int Shape_morph(const shape *shape1, int dir1, const shape *shape2,
     for (i = 0; i < num_points; i++) {
 	clpos pt1, pt2;
 
-	/*pt1 = Ship_get_point_clpos((shipobj *)shape1, i, dir1);
-	  pt2 = Ship_get_point_clpos((shipobj *)shape2, i, dir2);*/
-	pt1 = pts1[i].clk;
-	pt2 = pts2[i].clk;
+	/*pt1 = pts1[i].clk;
+	  pt2 = pts2[i].clk;*/
+	pt1 = Ship_get_point_clpos((shipobj *)shape1, i, dir1);
+	pt2 = Ship_get_point_clpos((shipobj *)shape2, i, dir2);
+
 	mv.start.cx = x + pt1.cx;
 	mv.start.cy = y + pt1.cy;
 	mv.delta.cx = x + pt2.cx - mv.start.cx;
@@ -1475,8 +1476,10 @@ static int Shape_morph(const shape *shape1, int dir1, const shape *shape2,
 	xp = CENTER_XCLICK(linet[p].start.cx - x);
 	yp = CENTER_YCLICK(linet[p].start.cy - y);
 
-	pto1 = pts1[num_points - 1].clk;
-	ptn1 = pts2[num_points - 1].clk;
+	/*pto1 = pts1[num_points - 1].clk;
+	  ptn1 = pts2[num_points - 1].clk;*/
+	pto1 = Ship_get_point_clpos((shipobj *)shape1, num_points - 1, dir1);
+	ptn1 = Ship_get_point_clpos((shipobj *)shape2, num_points - 1, dir2);
 
 	xo1 = pto1.cx - xp;
 	yo1 = pto1.cy - yp;
@@ -1487,8 +1490,11 @@ static int Shape_morph(const shape *shape1, int dir1, const shape *shape2,
 	for (i = 0; i < num_points; i++) {
 	    clpos pto2, ptn2;
 
-	    pto2 = pts1[i].clk;
-	    ptn2 = pts2[i].clk;
+	    /*pto2 = pts1[i].clk;
+	      ptn2 = pts2[i].clk;*/
+	    pto2 = Ship_get_point_clpos((shipobj *)shape1, i, dir1);
+	    ptn2 = Ship_get_point_clpos((shipobj *)shape2, i, dir2);
+
 	    xo2 = pto2.cx - xp;
 	    yo2 = pto2.cy - yp;
 	    xn2 = ptn2.cx - xp;
