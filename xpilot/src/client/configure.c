@@ -222,7 +222,7 @@ static int Config_save_confirm_callback(int widget_desc, void *popup_desc,
 
 typedef struct xpilotrc {
     char	*line;
-    short	size;
+    size_t	size;
 } xpilotrc_t;
 
 static xpilotrc_t	*xpilotrc_ptr;
@@ -598,7 +598,7 @@ static int Config_create_bool(int widget_desc, int *height,
 
     if (*height + 2*config_entry_height + 2*config_space >= config_height)
 	return 0;
-    label_width = XTextWidth(textFont, str, strlen(str))
+    label_width = XTextWidth(textFont, str, (int)strlen(str))
 		  + 2 * config_text_space;
     offset = config_width - (config_space + config_bool_width);
     if (config_space + label_width > offset) {
@@ -631,26 +631,22 @@ static int Config_create_int(int widget_desc, int *height,
 			label_width,
 			intw;
 
-    if (*height + 2*config_entry_height + 2*config_space >= config_height) {
+    if (*height + 2*config_entry_height + 2*config_space >= config_height)
 	return 0;
-    }
-    label_width = XTextWidth(textFont, str, strlen(str))
+    label_width = XTextWidth(textFont, str, (int)strlen(str))
 		  + 2 * config_text_space;
     offset = config_width - (config_space + 2 * config_arrow_width
 	    + config_int_width);
     if (config_space + label_width > offset) {
-	if (*height + 3*config_entry_height + 2*config_space
-	    >= config_height) {
+	if (*height + 3*config_entry_height + 2*config_space >= config_height)
 	    return 0;
-	}
     }
     Widget_create_label(widget_desc, config_space, *height
 			+ (config_entry_height - config_text_height) / 2,
 			label_width, config_text_height, true,
 			0, str);
-    if (config_space + label_width > offset) {
+    if (config_space + label_width > offset)
 	*height += config_entry_height;
-    }
     intw = Widget_create_int(widget_desc, offset, *height
 			      + (config_entry_height - config_text_height) / 2,
 			     config_int_width, config_text_height,
@@ -676,26 +672,22 @@ static int Config_create_color(int widget_desc, int *height, int color,
 {
     int			offset,	label_width, colw;
  
-    if (*height + 2*config_entry_height + 2*config_space >= config_height) {
+    if (*height + 2*config_entry_height + 2*config_space >= config_height)
  	return 0;
-    }
-    label_width = XTextWidth(textFont, str, strlen(str))
+    label_width = XTextWidth(textFont, str, (int)strlen(str))
 	+ 2 * config_text_space;
     offset = config_width - (config_space + 2 * config_arrow_width
 			     + config_int_width);
     if (config_space + label_width > offset) {
- 	if (*height + 3*config_entry_height + 2*config_space
- 	    >= config_height) {
+ 	if (*height + 3*config_entry_height + 2*config_space >= config_height)
  	    return 0;
- 	}
     }
     Widget_create_label(widget_desc, config_space, *height
  			+ (config_entry_height - config_text_height) / 2,
  			label_width, config_text_height, true,
  			0, str);
-    if (config_space + label_width > offset) {
+    if (config_space + label_width > offset)
  	*height += config_entry_height;
-    }
     colw = Widget_create_color(widget_desc, color, offset, *height
 			       + (config_entry_height - config_text_height)/2,
 			       config_int_width, config_text_height,
@@ -718,7 +710,8 @@ static int Config_create_color(int widget_desc, int *height, int color,
 
 
 static int Config_create_float(int widget_desc, int *height,
-			       const char *str, double *val, double min, double max,
+			       const char *str, double *val,
+			       double min, double max,
 			       int (*callback)(int, void *, double *),
 			       void *data)
 {
@@ -726,26 +719,22 @@ static int Config_create_float(int widget_desc, int *height,
 			label_width,
 			floatw;
 
-    if (*height + 2*config_entry_height + 2*config_space >= config_height) {
+    if (*height + 2*config_entry_height + 2*config_space >= config_height)
 	return 0;
-    }
-    label_width = XTextWidth(textFont, str, strlen(str))
+    label_width = XTextWidth(textFont, str, (int)strlen(str))
 		  + 2 * config_text_space;
     offset = config_width - (config_space + 2 * config_arrow_width
 	    + config_float_width);
     if (config_space + label_width > offset) {
-	if (*height + 3*config_entry_height + 2*config_space
-	    >= config_height) {
+	if (*height + 3*config_entry_height + 2*config_space >= config_height)
 	    return 0;
-	}
     }
     Widget_create_label(widget_desc, config_space, *height
 			+ (config_entry_height - config_text_height) / 2,
 			label_width, config_text_height, true,
 			0, str);
-    if (config_space + label_width > offset) {
+    if (config_space + label_width > offset)
 	*height += config_entry_height;
-    }
     floatw = Widget_create_float(widget_desc, offset, *height
 				 + (config_entry_height
 				 - config_text_height) / 2,
@@ -1563,12 +1552,11 @@ static int Config_create_save(int widget_desc, int *height)
 			button_desc,
 			width = 2 * config_button_space
 				+ XTextWidth(buttonFont, save_str,
-					     strlen(save_str));
+					     (int)strlen(save_str));
 
     space = config_height - (*height + 2*config_entry_height + 2*config_space);
-    if (space < 0) {
+    if (space < 0)
 	return 0;
-    }
     button_desc =
 	Widget_create_activate(widget_desc,
 			       (config_width - width) / 2,
@@ -1576,9 +1564,8 @@ static int Config_create_save(int widget_desc, int *height)
 			       width, config_button_height,
 			       0, save_str,
 			       Config_save, (void *)save_str);
-    if (button_desc == NO_WIDGET) {
+    if (button_desc == NO_WIDGET)
 	return 0;
-    }
     *height += config_entry_height + config_space + space;
 
     return 1;
