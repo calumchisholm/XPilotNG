@@ -270,7 +270,7 @@ void remove_temp_wormhole(int ind);
  */
 void Break_asteroid(wireobject *asteroid);
 void Asteroid_update(void);
-#ifdef LIST_H_INCLUDED
+#ifdef LIST_H
 list_t Asteroid_get_list(void);
 #endif
 

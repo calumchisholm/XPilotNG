@@ -996,7 +996,6 @@ static void Xpmap_walls_to_polygons(void)
 
 void Xpmap_blocks_to_polygons(void)
 {
-    extern int num_polys;
     int i;
 
     /* create edgestyles and polystyles */
@@ -1036,5 +1035,5 @@ void Xpmap_blocks_to_polygons(void)
 	Xpmap_wormhole_to_polygon(i);
 #endif
 
-    xpprintf("Created %d polygons.\n", num_polys);
+    /*xpprintf("Created %d polygons.\n", num_polys);*/
 }
