@@ -31,9 +31,11 @@ typedef struct {
     keys_t		key;		/* key if not KEY_DUMMY */
     const char		*help;		/* user help (multiline) */
     unsigned		hash;		/* option name hashed. */
-} option;
+} cl_option_t;
 
-extern option	options[];
-extern int	optionsCount;	/* NELEM(options) */
+#if 0
+extern cl_option_t	*options;
+extern int		num_options;	/* number of options */
+#endif
 
 #endif

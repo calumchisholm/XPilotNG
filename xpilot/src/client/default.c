@@ -38,12 +38,71 @@ char myClass[] = "XPilot";
 
 keys_t buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
 
+int num_options = 0;
+int max_options = 0;
+#ifdef OPTIONHACK
+cl_option_t *options = NULL;
+#else
+cl_option_t options[];
+#endif
+
+static void Usage(void)
+{
+    int			i;
+
+    printf(
+"Usage: xpilot [-options ...] [server]\n"
+"Where options include:\n"
+"\n"
+	  );
+    for (i = 0; i < num_options; i++) {
+	printf("    -%s %s\n", options[i].name,
+	       (options[i].noArg == NULL) ? "<value>" : "");
+	if (options[i].help && options[i].help[0]) {
+	    const char *str;
+	    printf("        ");
+	    for (str = options[i].help; *str; str++) {
+		putchar(*str);
+		if (*str == '\n' && str[1])
+		    printf("        ");
+	    }
+	    if (str[-1] != '\n')
+		putchar('\n');
+	}
+	if (options[i].fallback && options[i].fallback[0]) {
+	    printf("        The default %s: %s.\n",
+		   (options[i].key == KEY_DUMMY)
+		       ? "value is"
+		       : (strchr(options[i].fallback, ' ') == NULL)
+			   ? "key is"
+			   : "keys are",
+		   options[i].fallback);
+	}
+	printf("\n");
+    }
+    printf(
+"Most of these options can also be set in the .xpilotrc file\n"
+"in your home directory.\n"
+"Each key option may have multiple keys bound to it and\n"
+"one key may be used by multiple key options.\n"
+"If no server is specified then xpilot will search\n"
+"for servers on your local network.\n"
+"For a listing of remote servers try: telnet meta.xpilot.org 4400 \n"
+	  );
+
+    exit(1);
+}
+
+
+
+
+
 
 #ifdef OPTIONHACK
 
 /* kps tries to make this work without Xrm */
 
-option options[] = {
+cl_option_t default_options[] = {
     {
 	"help",
 	"Yes",
@@ -54,25 +113,11 @@ option options[] = {
     }
 };
 
-typedef struct {
-    const char		*name;		/* option name */
-    const char		*noArg;		/* value for non-argument options */
-    const char		*fallback;	/* default value */
-    keys_t		key;		/* key if not KEY_DUMMY */
-    const char		*help;		/* user help (multiline) */
-    unsigned		hash;		/* option name hashed. */
-} cl_option_t;
-
-
-static int num_options = 0;
-static int max_options = 0;
-static cl_option_t *option_array = NULL;
-
 static inline cl_option_t *Option_by_index(int ind)
 {
     if (ind < 0 || ind >= num_options)
 	return NULL;
-    return &option_array[ind];
+    return &options[ind];
 }
 
 static inline cl_option_t *Find_option(const char *name)
@@ -80,8 +125,8 @@ static inline cl_option_t *Find_option(const char *name)
     int i;
 
     for (i = 0; i < num_options; i++) {
-	if (!strcasecmp(name, option_array[i].name))
-	    return &option_array[i];
+	if (!strcasecmp(name, options[i].name))
+	    return &options[i];
     }
 
     return NULL;
@@ -96,7 +141,7 @@ static void Insert_option(const char *name, const char *value)
     option.name = xp_safe_strdup(name);
     option.noArg = xp_safe_strdup(value);
 
-    STORE(cl_option_t, option_array, num_options, max_options, option);
+    STORE(cl_option_t, options, num_options, max_options, option);
 }
 
 /*
@@ -229,9 +274,6 @@ const char *Get_keyResourceString(keys_t key)
     return NULL;
 }
 
-
-
-
 void defaultCleanup(void)
 {
 }
@@ -304,7 +346,7 @@ extern char conf_soundfile_string[];
  * Help lines can span multiple lines, but for
  * the key help window only the first line is used.
  */
-option options[] = {
+cl_option_t options[] = {
     {
 	"help",
 	"Yes",
@@ -3010,54 +3052,6 @@ const char* Get_keyResourceString(keys_t key)
 }
 
 
-static void Usage(void)
-{
-    int			i;
-
-    printf(
-"Usage: xpilot [-options ...] [server]\n"
-"Where options include:\n"
-"\n"
-	  );
-    for (i = 0; i < NELEM(options); i++) {
-	printf("    -%s %s\n", options[i].name,
-	       (options[i].noArg == NULL) ? "<value>" : "");
-	if (options[i].help && options[i].help[0]) {
-	    const char *str;
-	    printf("        ");
-	    for (str = options[i].help; *str; str++) {
-		putchar(*str);
-		if (*str == '\n' && str[1])
-		    printf("        ");
-	    }
-	    if (str[-1] != '\n')
-		putchar('\n');
-	}
-	if (options[i].fallback && options[i].fallback[0]) {
-	    printf("        The default %s: %s.\n",
-		   (options[i].key == KEY_DUMMY)
-		       ? "value is"
-		       : (strchr(options[i].fallback, ' ') == NULL)
-			   ? "key is"
-			   : "keys are",
-		   options[i].fallback);
-	}
-	printf("\n");
-    }
-    printf(
-"Most of these options can also be set in the .xpilotrc file\n"
-"in your home directory.\n"
-"Each key option may have multiple keys bound to it and\n"
-"one key may be used by multiple key options.\n"
-"If no server is specified then xpilot will search\n"
-"for servers on your local network.\n"
-"For a listing of remote servers try: telnet meta.xpilot.org 4400 \n"
-	  );
-
-    exit(1);
-}
-
-
 static int Find_resource(XrmDatabase db, const char *resource,
 			 char *result, unsigned size, int *ind)
 {
@@ -3400,8 +3394,10 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 	/* The rest of the arguments are hostnames of servers. */
     }
 
-    if (Get_resource(argDB, "help", resValue, sizeof resValue) != 0)
+    if (Get_resource(argDB, "help", resValue, sizeof resValue) != 0) {
+	num_options = NELEM(options);
 	Usage();
+    }
 
     if (Get_resource(argDB, "version", resValue, sizeof resValue) != 0) {
 	puts(TITLE);
