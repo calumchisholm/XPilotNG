@@ -141,8 +141,10 @@ bool		asteroidConcentratorVisible;	/* Are asteroid concentrators visible? */
 int		wormTime;
 char		*defaultsFileName;	/* Name of defaults file... */
 char		*passwordFileName;	/* Name of password file... */
+#if 0
 char		*playerPasswordsFileName;	/* Name of player passwords file... */
 int		playerPasswordsFileSizeLimit;	/* Limit on player passwords file size */
+#endif
 char		*motdFileName;		/* Name of motd file */
 char		*scoreTableFileName;	/* Name of score table file */
 char		*adminMessageFileName;	/* Name of admin message file */
@@ -3397,6 +3399,7 @@ static option_desc options[] = {
 	"Setting this option to 0 disables the feature.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
+#if 0
     {
 	"playerPasswordsFileName",
 	"playerPasswordsFile",
@@ -3407,6 +3410,8 @@ static option_desc options[] = {
 	"The filename of the player passwords file to read when authenticating.\n",
 	OPT_COMMAND | OPT_DEFAULTS
     },
+#endif
+#if 0
     {
 	"playerPasswordsFileSizeLimit",
 	"playerPasswordsLimit",
@@ -3418,6 +3423,7 @@ static option_desc options[] = {
 	"if players change passwords!).\n",
 	OPT_COMMAND | OPT_DEFAULTS
     },
+#endif
 #if 0
     {
 	"allowPlayerPasswords",
