@@ -18,9 +18,6 @@ Developer: throat / kps
 Task: Rename turnpush related options to longer names.
 Developer: throat / kps
 
-Task: Add option for the TTL of cannon shots
-Developer: throat / kps
-
 Task: Make cannons fire if a player is "anywhere near" and not paused
        (this could be a bit harder without breaking old behavior.)
 Developer: throat / kps
