@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 	       Conf_localguru());
     }
 
-    /*Conf_print();*/
+    Conf_print();
 
     Argc = argc;
     Argv = argv;

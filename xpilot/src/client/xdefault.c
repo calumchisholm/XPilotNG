@@ -46,8 +46,10 @@ static bool testxcolors = false;
 /*
  * Default fonts
  */
-#define GAME_FONT	"-*-times-*-*-*--18-*-*-*-*-*-iso8859-1"
-#define MESSAGE_FONT	"-*-times-*-*-*--14-*-*-*-*-*-iso8859-1"
+#define GAME_FONT	"-*-fixed-medium-r-*--15-*-*-*-c-*-iso8859-1"
+/*"-*-times-*-*-*--18-*-*-*-*-*-iso8859-1"*/
+#define MESSAGE_FONT	"-*-fixed-medium-r-*--13-*-*-*-c-*-iso8859-1"
+/*"-*-times-*-*-*--14-*-*-*-*-*-iso8859-1"*/
 #define SCORE_LIST_FONT	"-*-fixed-bold-*-*--13-*-*-*-c-*-iso8859-1"
 #define BUTTON_FONT	"-*-*-bold-o-*--14-*-*-*-*-*-iso8859-1"
 #define TEXT_FONT	"-*-*-bold-i-*--14-*-*-*-p-*-iso8859-1"
