@@ -39,17 +39,15 @@ player *Get_player_by_name(char *str, int *error, char **errorstr_p)
 {
     int i;
     player *found_pl = NULL, *pl;
-    size_t len = strlen(str);
+    size_t len;
 
     if (str == NULL || (len = strlen(str)) == 0)
 	goto match_none;
 
-    /* kps - do we want to match on id ? */
-
     /* Look for an exact match on player nickname. */
     for (i = 0; i < NumPlayers; i++) {
 	pl = Players(i);
-	if (strcasecmp(pl->name, str) == 0)
+	if (!strcasecmp(pl->name, str))
 	    return pl;
     }
 
@@ -61,7 +59,7 @@ player *Get_player_by_name(char *str, int *error, char **errorstr_p)
 	    if (found_pl)
 		goto match_several;
 	    found_pl = pl;
-	    break;
+	    continue;
 	}
     }
     if (found_pl)
