@@ -12,11 +12,14 @@ removedopts = ['analyticalcollisiondetection', 'ecmsreprogramrobots', 'edgebounc
 # 'numberofrounds', 'numrounds' and 'roundstoplay' have been used for the same
 # thing
 
+illegalopts = ['noquit', 'plockserver', 'timerresolution']
+
 knownopts = ['allowclusters', 'allowheatseekers', 'allowlasermodifiers', 'allowmodifiers', 'allownukes', 'allowplayerbounces', 'allowplayercrashes', 'allowplayerkilling', 'allowshields', 'allowshipshapes', 'allowsmartmissiles', 'allowtorpedoes', 'allowviewing', 'ballkillscoremult', 'ballswallbounce', 'baseminerange', 'cannonitemprobmult', 'cannonsmartness', 'cannonsuseitems', 'checkpointradius', 'cloakedexhaust', 'cloakedshield', 'clusterkillscoremult', 'contactport', 'crashscoremult', 'debriswallbounce', 'defaultsfilename', 'denyhosts', 'destroyitemincollisionprob', 'detonateitemonkillprob', 'distinguishmissiles', 'dropitemonkillprob', 'dump', 'ecmsreprogrammines', 'edgewrap', 'explosionkillscoremult', 'firerepeatrate', 'framespersecond', 'friction', 'gameduration', 'gravity', 'gravityangle', 'gravityanticlockwise', 'gravityclockwise', 'gravitypoint', 'gravitypointsource', 'gravityvisible', 'heatkillscoremult', 'help', 'identifymines', 'idlerun', 'ignore20maxfps', 'ignore20maxfps', 'initialafterburners', 'initialarmor', 'initialautopilots', 'initialcloaks', 'initialdeflectors', 'initialecms', 'initialemergencyshields', 'initialemergencythrusts', 'initialfuel', 'initialhyperjumps', 'initiallasers', 'initialmines', 'initialmirrors', 'initialmissiles', 'initialphasings', 'initialrearshots', 'initialsensors', 'initialtanks', 'initialtractorbeams', 'initialtransporters', 'initialwideangles', 'itemafterburnerprob', 'itemarmorprob', 'itemautopilotprob', 'itemcloakprob', 'itemconcentratorprob', 'itemconcentratorradius', 'itemconcentratorvisible', 'itemdeflectorprob', 'itemecmprob', 'itememergencyshieldprob', 'itememergencythrustprob', 'itemenergypackprob', 'itemhyperjumpprob', 'itemlaserprob', 'itemmineprob', 'itemmirrorprob', 'itemmissileprob', 'itemphasingprob', 'itemprobmult', 'itemrearshotprob', 'itemsensorprob', 'itemswallbounce', 'itemtankprob', 'itemtractorbeamprob', 'itemtransporterprob', 'itemwideangleprob', 'keepshots', 'laserisstungun', 'laserkillscoremult', 'limitedlives', 'limitedvisibility', 'lockotherteam', 'loseitemdestroys', 'mapauthor', 'mapfilename', 'mapheight', 'mapname', 'mapwidth', 'maxafterburners', 'maxarmor', 'maxautopilots', 'maxcloaks', 'maxdeflectors', 'maxecms', 'maxemergencyshields', 'maxemergencythrusts', 'maxfuel', 'maxhyperjumps', 'maxitemdensity', 'maxlasers', 'maxmines', 'maxminesperpack', 'maxmirrors', 'maxmissiles', 'maxmissilesperpack', 'maxobjectwallbouncespeed', 'maxphasings', 'maxplayershots', 'maxrearshots', 'maxroundtime', 'maxsensors', 'maxshieldedwallbouncespeed', 'maxtanks', 'maxtractorbeams', 'maxtransporters', 'maxunshieldedwallbouncespeed', 'maxvisibilitydistance', 'maxwideangles', 'minefusetime', 'minelife', 'minescoremult', 'minesonradar', 'mineswallbounce', 'minvisibilitydistance', 'missilelife', 'missilesonradar', 'missileswallbounce', 'movingitemprob', 'noquit', 'nukeclusterdamage', 'nukeminmines', 'nukeminsmarts', 'nukesonradar', 'numberofrounds', 'objectwallbouncebrakefactor', 'objectwallbouncelifefactor', 'password', 'playerlimit', 'playersonradar', 'playerstartsshielded', 'playerwallbouncebrakefactor', 'plockserver', 'racelaps', 'recordmode', 'reporttometaserver', 'reset', 'resetonhuman', 'rogueheatprob', 'roguemineprob', 'rounddelay', 'runoverkillscoremult', 'searchdomainforxpilot', 'shieldeditempickup', 'shieldedmining', 'shipmass', 'shotkillscoremult', 'shotlife', 'shotmass', 'shotsgravity', 'shotspeed', 'shotswallbounce', 'shovekillscoremult', 'smartkillscoremult', 'sparkswallbounce', 'tankkillscoremult', 'targetkillteam', 'targetsync', 'targetteamcollision', 'teamcannons', 'teamfuel', 'teamimmunity', 'teamplay', 'timerresolution', 'timing', 'torpedokillscoremult', 'treasurecollisiondestroys', 'treasurecollisionmaykill', 'treasurekillteam', 'treasuresonradar', 'version', 'wallbouncedestroyitemprob', 'wallbouncefueldrainmult', 'worldlives', 'wormholevisible', 'wormtime', 'wreckagecollisionmaykill', 'mapdata']
 
 def checkopts(options):
     dany = 0
     unknown = []
+    illegal = []
     for opt in options.keys():
 	if opt in removedopts:
 	    if not dany:
@@ -24,11 +27,17 @@ def checkopts(options):
 		print >> sys.stderr, "Removing the following options:"
 	    print >>sys.stderr, opt + "  ",
 	    del options[opt]
+        elif opt in illegalopts:
+            del options[opt]
+            illegal.append(opt)
 	elif opt not in knownopts:
 	    del options[opt]
 	    unknown.append(opt)
     if dany:
 	print >> sys.stderr
+    if illegal:
+        print >> sys.stderr, "The following options may no more be set in map file"
+        print >>sys.stderr, illegal
     for opt in unknown:
 	print >> sys.stderr, "WARNING did not recognize option %s, removed!" % opt
 
