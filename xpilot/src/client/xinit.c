@@ -286,7 +286,7 @@ static void Init_spark_colors(void)
 	    } while (*src &&
 		     isascii(*src) &&
 		     isdigit(*src) &&
-		     ((dst - buf) < (sizeof(buf) - 1)));
+		     ((size_t)(dst - buf) < (sizeof(buf) - 1)));
 	    *dst = '\0';
 	    src--;
 	    if (sscanf(buf, "%u", &col) == 1) {

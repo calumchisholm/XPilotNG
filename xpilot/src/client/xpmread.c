@@ -259,11 +259,11 @@ static int xpm_parse_data(XPM_read *xpmr)
 	return xpm_read_error(xpmr, "Not enough memory");
     memset(xpmr->chars_mem, 0, size);
 
-    for (i = 0; i < xpmr->xpm->ncolors; i++) {
+    for (i = 0; i < (int)xpmr->xpm->ncolors; i++) {
 	xpmr->chars_ptr[i] = &xpmr->chars_mem[i * (xpmr->xpm->cpp + 1)];
 	if (!xpm_next_string(xpmr))
 	    return xpm_read_error(xpmr, "Premature end-of-data");
-	for (j = 0; j < xpmr->xpm->cpp; j++) {
+	for (j = 0; j < (int)xpmr->xpm->cpp; j++) {
 	    if (!(xpmr->chars_ptr[i][j] = xpmr->token[j]))
 		return xpm_read_error(xpmr, "Incomplete color specification");
 	}
@@ -291,22 +291,22 @@ static int xpm_parse_data(XPM_read *xpmr)
     if (!(xpmr->xpm->pixels = (unsigned char *)malloc(size)))
 	return xpm_read_error(xpmr, "Not enough memory");
     pixelp = xpmr->xpm->pixels;
-    for (j = 0; j < xpmr->xpm->height; j++) {
+    for (j = 0; j < (int)xpmr->xpm->height; j++) {
 	if (!xpm_next_string(xpmr))
 	    return xpm_read_error(xpmr, "Premature end-of-data");
 	str = xpmr->token;
-	for (i = 0; i < xpmr->xpm->width; i++) {
-	    for (k = 0; k < xpmr->xpm->ncolors; k++) {
-		for (m = 0; m < xpmr->xpm->cpp; m++) {
+	for (i = 0; i < (int)xpmr->xpm->width; i++) {
+	    for (k = 0; k < (int)xpmr->xpm->ncolors; k++) {
+		for (m = 0; m < (int)xpmr->xpm->cpp; m++) {
 		    if (xpmr->chars_ptr[k][m] != str[m])
 			break;
 		}
-		if (m == xpmr->xpm->cpp) {
+		if (m == (int)xpmr->xpm->cpp) {
 		    *pixelp = k;
 		    break;
 		}
 	    }
-	    if (k == xpmr->xpm->ncolors)
+	    if (k == (int)xpmr->xpm->ncolors)
 		return xpm_read_error(xpmr, "Unmatched pixel");
 	    pixelp++;
 	    str += xpmr->xpm->cpp;
@@ -444,7 +444,7 @@ static int xpm_colors_to_pixels(XPM *xpm, enum XPM_key key,
     XColor		xcolor;
     char		*color_name;
 
-    for (i = 0; i < xpm->ncolors; i++) {
+    for (i = 0; i < (int)xpm->ncolors; i++) {
 	memset(&xcolor, 0, sizeof(xcolor));
 	color_name = NULL;
 	for (k = key; k >= 0; k--) {
@@ -534,8 +534,8 @@ static XImage *xpm_convert_to_image(XPM *xpm)
 	return NULL;
     }
     ptr = (unsigned char *)xpm->pixels;
-    for (j = 0; j < xpm->height; j++) {
-	for (i = 0; i < xpm->width; i++) {
+    for (j = 0; j < (int)xpm->height; j++) {
+	for (i = 0; i < (int)xpm->width; i++) {
 	    XPutPixel(img, i, j, pixels[*ptr]);
 	    ptr++;
 	}
@@ -548,7 +548,8 @@ static Pixmap xpm_image_to_pixmap(XPM *xpm, XImage *img)
     Pixmap		pixmap;
     GC			pixgc;
 
-    pixmap = XCreatePixmap(dpy, drawPixmap, xpm->width, xpm->height, dispDepth);
+    pixmap = XCreatePixmap(dpy, drawPixmap,
+			   xpm->width, xpm->height, dispDepth);
     if (pixmap != None) {
 	pixgc = XCreateGC(dpy, pixmap, 0, NULL);
 	XPutImage(dpy, pixmap, pixgc, img, 0, 0, 0, 0, xpm->width, xpm->height);
@@ -619,7 +620,7 @@ int xpm_picture_from_file(xp_picture_t *pic, char *filename)
     } else
         key = XPM_c;
 
-    for (i = 0; i < xpm.ncolors; i++) {
+    for (i = 0; i < (int)xpm.ncolors; i++) {
 	memset(&xcolor, 0, sizeof(xcolor));
 	color_name = NULL;
 	for (k = key; k >= 0; k--) {

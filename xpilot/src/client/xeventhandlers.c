@@ -71,12 +71,11 @@ static void Selection_paste(Window win, unsigned prop, int Delete)
             XFree(data);
             return;
         }
-        if (Talk_paste((char*)data, nitems, False) == 0) {
+        if (Talk_paste((char*)data, nitems, False) == 0)
 	   /* talk window doesn't accept text anymore */
 	    return;
-	} else {
+	else
 	    save_talk_str = true;
-	}
         XFree(data);
     }
 }
@@ -181,7 +180,7 @@ int ClientMessage_event(XEvent *event)
     cmev = (XClientMessageEvent *)event;
     if (cmev->message_type == ProtocolAtom
 	&& cmev->format == 32
-	&& cmev->data.l[0] == KillAtom) {
+	&& (unsigned)cmev->data.l[0] == KillAtom) {
         XDestroyWindow(dpy, topWindow);
 	XSync(dpy, True);
 	printf("Quit\n");
@@ -193,9 +192,8 @@ int ClientMessage_event(XEvent *event)
 void FocusIn_event(XEvent *event)
 {
 #ifdef DEVELOPMENT
-    if (!gotFocus) {
+    if (!gotFocus)
         time(&back_in_play_since);
-    }
 #endif
     if (initialPointerControl && !talk_mapped) {
 	initialPointerControl = false;
@@ -220,12 +218,10 @@ void ConfigureNotify_event(XEvent *event)
     XConfigureEvent	*conf;
 
     conf = &(event->xconfigure);
-    if (conf->window == topWindow) {
+    if (conf->window == topWindow)
 	Resize(conf->window, conf->width, conf->height);
-    }
-    else {
+    else
         Widget_event(event);
-    }
 }
 #endif
 
@@ -234,12 +230,11 @@ void KeyChanged_event(XEvent *event)
 #ifdef DEVELOPMENT
     if (back_in_play_since) {
         time_t now = time(NULL);
-	if (now - back_in_play_since > 0) {
+	if (now - back_in_play_since > 0)
 	    back_in_play_since = 0;
-	} else {
+	else
 	    /* after popup ignore key events for 1 seconds. */
 	    return;
-	}
     }
 #endif
     if (event->xkey.window == topWindow)
@@ -270,8 +265,10 @@ void ButtonPress_event(XEvent *event)
 	    && !talk_mapped
 	    && event->xbutton.button <= MAX_POINTER_BUTTONS) {
 	    int i;
-	    for (i = 0; i < NUM_BUTTON_DEFS(event->xbutton.button-1); ++i) {
-	    	if (Key_press(buttonDefs[event->xbutton.button-1][i]))
+	    for (i = 0;
+		 i < (int)NUM_BUTTON_DEFS(event->xbutton.button - 1);
+		 i++) {
+	    	if (Key_press(buttonDefs[event->xbutton.button - 1][i]))
 		    Net_key_change();
 	    }
 	}
@@ -309,9 +306,8 @@ void ButtonPress_event(XEvent *event)
 #endif /* not _WINDOWS */
 	return;
     }
-    if (Widget_event(event) != 0) {
+    if (Widget_event(event) != 0)
         return;
-    }
     Expose_button_window(BLACK, event->xbutton.window);
 }
 
@@ -339,10 +335,11 @@ int ButtonRelease_event(XEvent *event)
 	    && !talk_mapped
 	    && event->xbutton.button <= MAX_POINTER_BUTTONS) {
 	    int i;
-	    for (i = 0; i < NUM_BUTTON_DEFS(event->xbutton.button-1); ++i) {
-	    	if (Key_release(buttonDefs[event->xbutton.button-1][i])) {
+	    for (i = 0;
+		 i < (int)NUM_BUTTON_DEFS(event->xbutton.button - 1);
+		 i++) {
+	    	if (Key_release(buttonDefs[event->xbutton.button - 1][i]))
 		    Net_key_change();
-		}
 	    }
 	}
 #ifndef _WINDOWS
