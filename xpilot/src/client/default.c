@@ -1237,7 +1237,7 @@ xp_option_t default_options[] = {
 
     XP_STRING_OPTION(
 	"texturePath",
-	CONF_TEXTUREDIR, /* was conf_texturedir_string */
+	CONF_TEXTUREDIR,
 	NULL, 0,
 	Set_texturePath, NULL, Get_texturePath,
 	XP_OPTFLAG_DEFAULT,

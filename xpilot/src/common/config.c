@@ -70,11 +70,11 @@ char *Conf_fontdir(void)
     return conf;
 }
 
-static char conf_default_map_string[] = CONF_DEFAULT_MAP;
-
 char *Conf_default_map(void)
 {
-    return conf_default_map_string;
+    static char conf[] = CONF_DEFAULT_MAP;
+
+    return conf;
 }
 
 char *Conf_servermotdfile(void)
@@ -104,28 +104,18 @@ char *Conf_logfile(void)
     return conf_logfile_string;
 }
 
-/* needed by client/default.c */
-char conf_ship_file_string[] = CONF_SHIP_FILE;
-
 char *Conf_ship_file(void)
 {
-    return conf_ship_file_string;
-}
+    static char conf[] = CONF_SHIP_FILE;
 
-/* needed by client/default.c */
-char conf_texturedir_string[] = CONF_TEXTUREDIR;
+    return conf;
+}
 
 char *Conf_texturedir(void)
 {
-    return conf_texturedir_string;
-}
+    static char conf[] = CONF_TEXTUREDIR;
 
-/* needed by client/default.c */
-char conf_soundfile_string[] = CONF_SOUNDFILE;
-
-char *Conf_soundfile(void)
-{
-    return conf_soundfile_string;
+    return conf;
 }
 
 char *Conf_localguru(void)
@@ -142,11 +132,11 @@ char *Conf_contactaddress(void)
     return conf;
 }
 
-static char conf_robotfile_string[] = CONF_ROBOTFILE;
-
 char *Conf_robotfile(void)
 {
-    return conf_robotfile_string;
+    static char conf[] = CONF_ROBOTFILE;
+
+    return conf;
 }
 
 char *Conf_zcat_ext(void)
@@ -170,6 +160,14 @@ char *Conf_sounddir(void)
     return conf;
 }
 
+char *Conf_soundfile(void)
+{
+    static char conf[] = CONF_SOUNDFILE;
+
+    return conf;
+}
+
+
 void Conf_print(void)
 {
     xpprintf("============================================================\n");
@@ -192,24 +190,23 @@ void Conf_print(void)
     xpprintf("DEVELOPMENT\n");
 #endif
 
+    xpprintf("Conf_localguru()          = %s\n", Conf_localguru());
+    xpprintf("Conf_contactaddress()     = %s\n", Conf_contactaddress());
     xpprintf("Conf_libdir()             = %s\n", Conf_libdir());
     xpprintf("Conf_defaults_file_name() = %s\n", Conf_defaults_file_name());
     xpprintf("Conf_password_file_name() = %s\n", Conf_password_file_name());
     xpprintf("Conf_mapdir()             = %s\n", Conf_mapdir());
     xpprintf("Conf_default_map()        = %s\n", Conf_default_map());
     xpprintf("Conf_servermotdfile()     = %s\n", Conf_servermotdfile());
-    xpprintf("Conf_localmotdfile()      = %s\n", Conf_localmotdfile());
+    xpprintf("Conf_robotfile()          = %s\n", Conf_robotfile());
     xpprintf("Conf_logfile()            = %s\n", Conf_logfile());
+    xpprintf("Conf_localmotdfile()      = %s\n", Conf_localmotdfile());
     xpprintf("Conf_ship_file()          = %s\n", Conf_ship_file());
     xpprintf("Conf_texturedir()         = %s\n", Conf_texturedir());
+    xpprintf("Conf_fontdir()            = %s\n", Conf_fontdir());
+    xpprintf("Conf_sounddir()           = %s\n", Conf_sounddir());
     xpprintf("Conf_soundfile()          = %s\n", Conf_soundfile());
-    xpprintf("Conf_localguru()          = %s\n", Conf_localguru());
-    xpprintf("Conf_contactaddress()     = %s\n", Conf_contactaddress());
-    xpprintf("Conf_robotfile()          = %s\n", Conf_robotfile());
     xpprintf("Conf_zcat_ext()           = %s\n", Conf_zcat_ext());
     xpprintf("Conf_zcat_format()        = %s\n", Conf_zcat_format());
-    xpprintf("Conf_soundir()            = %s\n", Conf_sounddir());
     xpprintf("============================================================\n");
 }
-
-
