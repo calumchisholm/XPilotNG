@@ -166,7 +166,7 @@ OS2_XLIB = -L$(X11ROOT)/xfree86/lib -L$(LIBRARY_PATH) -lX11 -lXext
 #                        (HELPFILE, MOTDFILE, LOGFILE, MAPDIR and TEXTUREDIR)
 #                        This should be set the same as LIBDIR above!
 #
-DEFS = -DSERVER_SOUND -DSSHACK	# -DDBE
+DEFS = -DSERVER_SOUND	# -DDBE
 
 INCS = $(AUDIOINC) $(CRYPTINC) $(EXPATINC) $(ZLIBINC) -I../common -I../client -I../../lib
 

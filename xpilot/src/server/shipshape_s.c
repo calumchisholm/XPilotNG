@@ -25,11 +25,8 @@
 
 char shipshape_s_version[] = VERSION;
 
-#ifdef SSHACK
+/* always do SSHACK, it seems to work */
 bool do_sshack = true;
-#else
-bool do_sshack = false;
-#endif
 
 extern void	Make_table(void);
 
