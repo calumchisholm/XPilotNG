@@ -198,6 +198,26 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
+	"treasureCollisionKills",
+	"treasureKills",
+	"true",
+	&options.treasureCollisionKills,
+	valBool,
+	tuner_dummy,
+	"Does a player die when hitting a ballarea?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"ballCollisionFuelDrain",
+	"ballFuelDrain",
+	"50",
+	&options.ballCollisionFuelDrain,
+	valReal,
+	tuner_dummy,
+	"How much fuel does a ball collision cost?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
 	"shotHitFuelDrainUsesKineticEnergy",
 	"kineticEnergyFuelDrain",
 	"true",

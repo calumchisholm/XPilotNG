@@ -612,7 +612,7 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
     group = linet[line >= num_lines ? point : line].group;
     type = groups[group].type;
     mapobj_ind = groups[group].mapobj_ind;
-    if (type == TREASURE) {
+    if (type == TREASURE && options.treasureCollisionKills) {
 	Player_crash(pl, CrashTreasure, NO_IND, 1);
 	return;
     }

@@ -51,6 +51,8 @@ extern struct options {
     double	pulseLife;
     bool	shotsGravity;
     bool	shotHitFuelDrainUsesKineticEnergy;
+    double      ballCollisionFuelDrain;
+    bool        treasureCollisionKills;
     double	fireRepeatRate;
     double	laserRepeatRate;
     bool	Log;
