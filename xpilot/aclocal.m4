@@ -45,7 +45,7 @@ AC_ARG_ENABLE(sdltest, [  --disable-sdltest       Do not try to compile and run 
      fi
   fi
 
-  AC_REQUIRE([AC_CANONICAL_TARGET])
+  AC_REQUIRE([AC_CANONICAL_HOST])
   PATH="$prefix/bin:$prefix/usr/bin:$PATH"
   AC_PATH_PROG(SDL_CONFIG, sdl-config, no, [$PATH])
   min_sdl_version=ifelse([$1], ,0.11.0,$1)

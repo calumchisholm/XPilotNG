@@ -58,76 +58,66 @@
 #  define CONF_FONTDIR			CONF_LIBDIR "fonts/"
 #endif
 
+#ifndef CONF_DEFAULTS_FILE_NAME
+#  define CONF_DEFAULTS_FILE_NAME	CONF_LIBDIR "defaults.txt"
+#endif
+
+#ifndef CONF_PASSWORD_FILE_NAME
+#  define CONF_PASSWORD_FILE_NAME	CONF_LIBDIR "password.txt"
+#endif
+
+/* not used currently */
+#ifndef CONF_PLAYER_PASSWORDS_FILE_NAME
+#  define CONF_PLAYER_PASSWORDS_FILE_NAME CONF_LIBDIR "player_passwords.txt"
+#endif
+
+#ifndef CONF_ROBOTFILE
+#  define CONF_ROBOTFILE		CONF_LIBDIR "robots.txt"
+#endif
+
+#ifndef CONF_SERVERMOTDFILE
+#  define CONF_SERVERMOTDFILE		CONF_LIBDIR "servermotd.txt"
+#endif
+
+#ifndef CONF_LOCALMOTDFILE
+#  define CONF_LOCALMOTDFILE		CONF_LIBDIR "localmotd.txt"
+#endif
+
+#ifndef CONF_LOGFILE
+#  define CONF_LOGFILE			CONF_LIBDIR "log.txt"
+#endif
+
+#ifndef CONF_SOUNDFILE
+#  define CONF_SOUNDFILE	  	CONF_SOUNDDIR "sounds.txt"
+#endif
+
+
 #ifndef _WINDOWS
-#  ifndef CONF_DEFAULTS_FILE_NAME
-#    define CONF_DEFAULTS_FILE_NAME	CONF_LIBDIR "defaults"
-#  endif
-#  ifndef CONF_PASSWORD_FILE_NAME
-#    define CONF_PASSWORD_FILE_NAME	CONF_LIBDIR "password"
-#  endif
-#  ifndef CONF_ROBOTFILE
-#    define CONF_ROBOTFILE		CONF_LIBDIR "robots"
-#  endif
-#  ifndef CONF_SERVERMOTDFILE
-#    define CONF_SERVERMOTDFILE		CONF_LIBDIR "servermotd"
-#  endif
-#  ifndef CONF_LOCALMOTDFILE
-#    define CONF_LOCALMOTDFILE		CONF_LIBDIR "localmotd"
-#  endif
-#  ifndef CONF_LOGFILE
-#    define CONF_LOGFILE		CONF_LIBDIR "log"
-#  endif
+
 #  ifndef CONF_SHIP_FILE
 #    define CONF_SHIP_FILE       	""
 #  endif
-#  ifndef CONF_SOUNDFILE
-#    define CONF_SOUNDFILE	  	CONF_SOUNDDIR "sounds"
-#  endif
+
 #  ifdef DEBUG
 #    define D(x)	x ;  fflush(stdout);
 #  else
 #    define D(x)
 #  endif
+
 #else /* _WINDOWS */
-#  ifndef CONF_DEFAULTS_FILE_NAME
-#    define CONF_DEFAULTS_FILE_NAME	CONF_LIBDIR "defaults.txt"
-#  endif
-#  ifndef CONF_PASSWORD_FILE_NAME
-#    define CONF_PASSWORD_FILE_NAME	CONF_LIBDIR "password.txt"
-#  endif
-#  ifndef CONF_ROBOTFILE
-#    define CONF_ROBOTFILE		CONF_LIBDIR "robots.txt"
-#  endif
-#  ifndef CONF_SERVERMOTDFILE
-#    define CONF_SERVERMOTDFILE		CONF_LIBDIR "servermotd.txt"
-#  endif
-#  ifndef CONF_LOCALMOTDFILE
-#    define CONF_LOCALMOTDFILE		CONF_LIBDIR "localmotd.txt"
-#  endif
-#  ifndef CONF_LOGFILE
-#    define CONF_LOGFILE		CONF_LIBDIR "log.txt"
-#  endif
+
 #  ifndef CONF_SHIP_FILE
 #    define CONF_SHIP_FILE		"XPilot.shp"
 #  endif
-#  ifndef CONF_SOUNDFILE
-#    define CONF_SOUNDFILE		CONF_SOUNDDIR "sounds.txt"
-#  endif
+
 #  ifdef _DEBUG
 #    define DEBUG	1
 #    define D(x)	x
 #  else
 #    define D(x)
 #  endif
-#endif /* _WINDOWS */
 
-#if 0 /* currently unused */
-#ifndef _WINDOWS
-#  define CONF_PLAYER_PASSWORDS_FILE_NAME CONF_LIBDIR "player_passwords"
-#else
-#  define CONF_PLAYER_PASSWORDS_FILE_NAME CONF_LIBDIR "player_passwords.txt"
-#endif
-#endif
+#endif /* _WINDOWS */
 
 /* Please don't change this one. */
 #define CONF_CONTACTADDRESS		"xpilot@xpilot.org"
