@@ -25,6 +25,7 @@
 
 #include "xpclient.h"
 
+
 char welcome_version[] = VERSION;
 
 /*
@@ -71,7 +72,7 @@ struct ServerInfo {
 	*playlist,
 	*sound,
 	*teambases_str,
-	*timing, *ip_str, *freebases, *queue_str, *domain, pingtime_str[5];
+      *timing, *ip_str, *freebases, *queue_str, *domain, pingtime_str[5];
     unsigned port,
 	ip, users, bases, fps, uptime, teambases, queue, pingtime;
     struct timeval start;
@@ -110,15 +111,28 @@ static int form_widget = NO_WIDGET;
 static int subform_widget = NO_WIDGET;
 static int subform_label_widget = NO_WIDGET;
 
+/* Size hints for these widges */
+static int form_x = 0;
+static int form_y = 0;
+static int subform_x;
+static int subform_y;
+static int subform_width;
+static int subform_height;
+static int subform_border;
+
+static int next_page_widget = NO_WIDGET;
+static int first_page_widget = NO_WIDGET;
+static int ping_servers_widget = NO_WIDGET;
+ 
 /*
  * An array of structures with information to join a local server.
  */
 static Connect_param_t *global_conpar;
 static Connect_param_t *localnet_conpars;
-
+static server_info_t   *global_sip;
 
 /*
- * States a connection to a meta server can be in.
+ * States a connection tso a meta server can be in.
  */
 enum MetaState {
     MetaConnecting = 0,
@@ -155,6 +169,7 @@ enum Welcome_mode {
     ModeLocalnet,
     ModeInternet,
     ModeServer,
+    ModeStatus,
     ModeHelp,
     ModeQuit
 };
@@ -179,9 +194,10 @@ static const char stat_header[] = "Status";
 /*
  * Other prototypes.
  */
-static int Welcome_process_one_event(XEvent * event);
+static int Welcome_process_one_event(XEvent * event, Connect_param_t * conpar);
 static int Welcome_show_server_list(Connect_param_t * conpar);
-
+static void Internet_widget_cleanup(void);
+static int Internet_cb(int widget, void *user_data, const char **text);
 
 /*
  * Print a message that we do not have enough memory.
@@ -195,12 +211,12 @@ static void Not_enough_memory(void)
 /*
  * Process only exposure events.
  */
-static void Welcome_process_exposure_events(void)
+static void Welcome_process_exposure_events(Connect_param_t * conpar)
 {
     XEvent event;
 
     while (XCheckMaskEvent(dpy, ExposureMask, &event))
-	Welcome_process_one_event(&event);
+	Welcome_process_one_event(&event, conpar);
 }
 
 /*
@@ -216,6 +232,7 @@ static int Welcome_create_label(int position, const char *label_text)
     int label_x, label_y, label_width, label_height;
     int subform_width = 0;
     int subform_height = 0;
+    Connect_param_t *conpar = (Connect_param_t *) global_conpar;
 
     Widget_destroy_children(subform_widget);	/*? */
     subform_label_widget = NO_WIDGET;
@@ -251,7 +268,7 @@ static int Welcome_create_label(int position, const char *label_text)
 	/* wait until mapped */
 	XSync(dpy, False);
 	/* draw widgets */
-	Welcome_process_exposure_events();
+	Welcome_process_exposure_events(conpar);
     }
 
     return subform_label_widget;
@@ -290,12 +307,28 @@ static int Local_status_cb(int widget, void *user_data, const char **text)
  */
 static void Localnet_cleanup(void)
 {
+
     if (localnet_conpars) {
 	free(localnet_conpars);
 	localnet_conpars = NULL;
     }
 }
 
+static void Internet_widget_cleanup(void)
+{
+
+    /* unmap pings as we cannot do this in the localnet callback */
+    if(ping_servers_widget)
+      Widget_unmap(ping_servers_widget);
+    if(first_page_widget)
+       Widget_unmap(first_page_widget);
+    if(next_page_widget)
+      Widget_unmap(next_page_widget);
+
+    Widget_map(form_widget);
+
+
+}
 /*
  * User wants us to search for servers on the local net.
  */
@@ -312,6 +345,8 @@ static int Localnet_cb(int widget, void *user_data, const char **text)
     char *server_addrs;
     char *name_ptrs[MAX_LOCAL_SERVERS];
     char *addr_ptrs[MAX_LOCAL_SERVERS];
+
+    Internet_widget_cleanup();
 
     Welcome_set_mode(ModeLocalnet);
 
@@ -617,11 +652,9 @@ static int Add_server_info(server_info_t * sip)
 	    if (it_sip->port == sip->port) {
 		/* work around bug in meta: keep server with highest uptime. */
 		if (it_sip->uptime > sip->uptime) {
-		    /* printf("duplicate: not adding\n"); */
 		    return -1;
 		} else {
 		    it = List_erase(server_list, it);
-		    /* printf("duplicate: replacing\n"); */
 		}
 	    }
 	}
@@ -827,6 +860,8 @@ static void Ping_servers(void)
     unsigned char reply_serial, reply_status;
     int outstanding;
     char buf[MSG_LEN];
+    
+    
 
     sprintf(buf, "Pinging servers (%d seconds)...",
 	    (maxwait + 500) / 1000);
@@ -1216,7 +1251,7 @@ static int Internet_server_join_cb(int widget, void *user_data,
  *
  * The idea is to show the characteristics to the user in more detail,
  * and choose team from this page, then click join.
- * Until work on this progresses stay with the simple Internet_server_join_cb().
+ * 
  */
 static int Internet_server_show_cb(int widget, void *user_data,
 				   const char **text)
@@ -1236,6 +1271,7 @@ static int Internet_server_show_cb(int widget, void *user_data,
     int max_label_width;
     int data_label_width;
     int player_label_width;
+    int increment = 0;
     char *p;
 
     struct Label {
@@ -1262,9 +1298,12 @@ static int Internet_server_show_cb(int widget, void *user_data,
 	/* 14 */ {"playlist", 1, 0, 0}
     };
     char *s;
-    /*char                        *d; */
 
-    Widget_destroy_children(subform_widget);
+    global_sip = sip;
+
+    Widget_destroy_children(subform_widget); 
+
+    welcome_mode = ModeStatus;
 
     Widget_get_dimensions(subform_widget, &subform_width, &subform_height);
 
@@ -1273,7 +1312,7 @@ static int Internet_server_show_cb(int widget, void *user_data,
     label_x = label_x_offset;
     label_y = label_y_offset;
     label_border = 1;
-    label_space = 10;
+    label_space = 5;
     label_height = textFont->ascent + textFont->descent + 5;
     data_label_width = 250;
     player_label_width = 500;
@@ -1314,12 +1353,29 @@ static int Internet_server_show_cb(int widget, void *user_data,
 			label_x + label_width, labels[i].yoff,
 			data_label_width, labels[i].height,
 			label_border, sip->hostname);
+
+    /* Create a join button to join this server */
+
+    Widget_create_activate(subform_widget,
+			   label_x + label_width + 2 *(data_label_width), 
+			   labels[i].yoff,
+			   data_label_width, labels[i].height,
+			   label_border, "Join This Server",
+			   Internet_server_join_cb, (void *) sip);
     i++;
+
 
     Widget_create_label(subform_widget,
 			label_x + label_width, labels[i].yoff,
 			data_label_width, labels[i].height,
 			label_border, sip->version);
+
+    Widget_create_activate(subform_widget,
+			   label_x + label_width + 2 *(data_label_width), 
+			   labels[i].yoff,
+			   data_label_width, labels[i].height,
+			   label_border, "Back to List",
+			   Internet_cb, (void *) global_conpar);
 
     i++;
 
@@ -1405,7 +1461,6 @@ static int Internet_server_show_cb(int widget, void *user_data,
        could be updated later to show those things by connecting to the
        player meta port instead of the game meta port */
 
-
     for (p = my_strtok(sip->playlist, ","); p; p = my_strtok(NULL, ",")) {
 
 	Widget_create_label(subform_widget,
@@ -1413,6 +1468,7 @@ static int Internet_server_show_cb(int widget, void *user_data,
 			    label_y,
 			    player_label_width, label_height,
 			    label_border, p);
+
 	label_y += label_height + label_space;
     }
 
@@ -1458,9 +1514,10 @@ static int Internet_ping_cb(int widget, void *user_data, const char **text)
     Connect_param_t *conpar = (Connect_param_t *) user_data;
 
     Ping_servers();
+
     if (Welcome_sort_server_list() == -1) {
-	Delete_server_list();
-	Welcome_create_label(1, "Not enough memory.");
+      Delete_server_list();
+      Welcome_create_label(1, "Not enough memory.");
     }
 
     server_it = List_begin(server_list);
@@ -1504,16 +1561,15 @@ static int Welcome_show_server_list(Connect_param_t * conpar)
     int server_width = XTextWidth(buttonFont, server_header,
 				  max_server_length);
     int server_border_width = 2 * (border ? border : 1);
-    int ping_width = XTextWidth(textFont, ping_header, 5)
-	+ extra_width + 2 * border;
-    int stat_width = XTextWidth(textFont, "Status", 10)
+    int ping_width = XTextWidth(textFont, ping_header, 5);
+    int stat_width = XTextWidth(textFont, "Status", 8)
 	+ extra_width + 2 * border;
     int xoff = space_width;
     int yoff = space_height;
     int text_height = textFont->ascent + textFont->descent;
     int button_height = buttonFont->ascent + buttonFont->descent;
     int label_height = MAX(text_height, button_height)
-	+ extra_height + 2 * border;
+	+ extra_height + 2 * border + 4;
     int player_offset = xoff;
     int queue_offset = player_offset + player_width + space_width;
     int bases_offset = queue_offset + queue_width + space_width;
@@ -1532,9 +1588,7 @@ static int Welcome_show_server_list(Connect_param_t * conpar)
     server_info_t *sip;
     list_iter_t start_server_it = server_it;
 
-    /*printf("map offset = %d\n", map_offset);
-      printf("Ping offset = %d\n", ping_offset);
-      printf("Server offset = %d\n", server_offset);*/
+
     Widget_get_dimensions(subform_widget, &subform_width, &subform_height);
 
     server_width =
@@ -1543,8 +1597,9 @@ static int Welcome_show_server_list(Connect_param_t * conpar)
 	    space_width - server_border_width);
 
     stat_offset = ping_offset + ping_width + space_width;
-    /*printf("Status offset = %d\n", stat_offset);*/
+    
     Widget_destroy_children(subform_widget);
+
 
     /* Players */
 
@@ -1664,80 +1719,68 @@ static int Welcome_show_server_list(Connect_param_t * conpar)
 			       Internet_server_show_cb, (void *) sip);
     }
 
+    int height_avail = subform_height - yoff;
+    static char next_text[] = "Next Server Page >>>";
+    static char first_text[] = "<< First Server Page";
+    static char ping_text[] = "Ping Servers";
+    int next_border = border ? border : 1;
+    int first_border = next_border;
+    int next_width = XTextWidth(buttonFont,
+				next_text,
+				strlen(next_text))
+      + extra_width + 2 * next_border;
+    int first_width = XTextWidth(buttonFont,
+				 first_text,
+				 strlen(first_text))
+      + extra_width + 2 * first_border;
+    int pingw_width = XTextWidth(buttonFont,
+				 ping_text,
+				 strlen(ping_text))
+      + extra_width + 2 * first_border;
+    
+    int next_height = label_height + 2 * (next_border - border);
+    int first_height = next_height;
+    int ping_height = next_height;
+    int next_x_offset = ping_offset;
+    int next_y_offset = yoff + (height_avail - next_height + 1) / 2;
+    
+    
+    if (!next_page_widget)
+      next_page_widget = Widget_create_activate(form_widget,
+						(int) (2*(top_width / 4)+next_width),
+						top_height - (next_height) - space_height,
+						next_width, next_height,
+						next_border, next_text,
+						Internet_next_page_cb, (void *) conpar);   
+    if (!first_page_widget)
+      first_page_widget = Widget_create_activate(form_widget,
+						 (int) (2*(top_width / 4)),
+						 top_height - (first_height) - space_height ,
+						 first_width, first_height,
+						 first_border, first_text,
+						 Internet_first_page_cb,
+						 (void *) conpar);
+    if (!ping_servers_widget)
+      ping_servers_widget = Widget_create_activate(form_widget,
+						   next_height,
+						   top_height - (next_height) - space_height,
+						   pingw_width, first_height,
+						   first_border, ping_text,
+						   Internet_ping_cb, (void *) conpar);
+    
+    
     if (server_it != List_end(server_list)) {
-	int height_avail = subform_height - yoff;
-	static char next_text[] = "Next Page";
-	static char first_text[] = "First Page";
-	int next_border = border ? border : 1;
-	int first_border = next_border;
-	int next_width = XTextWidth(buttonFont,
-				    next_text,
-				    strlen(next_text))
-	    + extra_width + 2 * next_border;
-	int first_width = XTextWidth(buttonFont,
-				     first_text,
-				     strlen(first_text))
-	    + extra_width + 2 * first_border;
-	int next_height = label_height + 2 * (next_border - border);
-	int first_height = next_height;
-	int next_x_offset = (height_avail - next_height + 1) / 2;
-	int next_y_offset = yoff + (height_avail - next_height + 1) / 2;
-	int first_x_offset = next_x_offset + next_width + next_x_offset;
-	int first_y_offset = next_y_offset;
-
-	Widget_create_activate(subform_widget,
-			       next_x_offset, next_y_offset,
-			       next_width, next_height,
-			       next_border, next_text,
-			       Internet_next_page_cb, (void *) conpar);
-
-	if (start_server_it != List_begin(server_list))
-	    Widget_create_activate(subform_widget,
-				   first_x_offset, first_y_offset,
-				   first_width, first_height,
-				   first_border, first_text,
-				   Internet_first_page_cb,
-				   (void *) conpar);
-
-    } else if (start_server_it != List_begin(server_list)) {
-	static char first_text[] = "First Page";
-	int first_border = border ? border : 1;
-	int first_width = XTextWidth(buttonFont,
-				     first_text,
-				     strlen(first_text))
-	    + extra_width + 2 * first_border;
-	int first_height = label_height + 2 * (first_border - border);
-	int first_x_offset = (first_height + 1) / 2;
-	int first_y_offset =
-	    subform_height - first_x_offset - first_height;
-
-	Widget_create_activate(subform_widget,
-			       first_x_offset, first_y_offset,
-			       first_width, first_height,
-			       first_border, first_text,
-			       Internet_first_page_cb, (void *) conpar);
+      Widget_map(next_page_widget); 
+      Widget_unmap(first_page_widget);
     }
-    {
-	static char ping_text[] = "Measure Lag";
-	int ping_border = border ? border : 1;
-	int ping_width = XTextWidth(buttonFont,
-				    ping_text,
-				    strlen(ping_text))
-	    + extra_width + 2 * ping_border;
-	int ping_height = label_height + 2 * (ping_border - border);
-	int ping_pad = (ping_height + 1) / 2;
-	int ping_x_offset = subform_width - ping_width - ping_pad;
-	int ping_y_offset = subform_height - ping_height - ping_pad;
-
-	Widget_create_activate(subform_widget,
-			       ping_x_offset, ping_y_offset,
-			       ping_width, ping_height,
-			       ping_border, ping_text,
-			       Internet_ping_cb, (void *) conpar);
+    else if (start_server_it != List_begin(server_list)) {
+      Widget_unmap(next_page_widget); 	
+      Widget_map(first_page_widget);
     }
-
+        
+    Widget_map(ping_servers_widget);    
     Widget_map_sub(subform_widget);
-
+    
     return -1;
 }
 
@@ -1833,16 +1876,10 @@ static int Welcome_create_windows(Connect_param_t * conpar)
 {
     int i;
     int form_border = 0;
-    int form_x = 0;
-    int form_y = 0;
     int form_width = top_width - 2 * form_border;
     int form_height = top_height - 2 * form_border;
-    int subform_x;
-    int subform_y;
-    int subform_width;
-    int subform_height;
-    int subform_border;
-    int button_border = 4;
+   
+    const int button_border = 4;
     int button_height = buttonFont->ascent
 	+ buttonFont->descent + 2 * button_border;
     int max_width;
@@ -1870,12 +1907,17 @@ static int Welcome_create_windows(Connect_param_t * conpar)
 	{"Quit", Quit_cb},
     };
 
-    LIMIT(form_width, 400, 1282);
-    LIMIT(form_height, 400, 1024);
+    /* set the size limitations on the window */
+    /* CB: I increased these as there is no reason for a limit */
+    /* also the game window now inherits the new size nicely */
+
+    LIMIT(form_width, 400, 1600);
+    LIMIT(form_height, 400, 1400);
     form_widget =
 	Widget_create_form(0, top,
 			   form_x, form_y,
 			   form_width, form_height, form_border);
+
     if (form_widget == NO_WIDGET)
 	return -1;
 
@@ -1916,7 +1958,8 @@ static int Welcome_create_windows(Connect_param_t * conpar)
     subform_border = 1;
     subform_width =
 	form_width - subform_x - subform_y - 2 * subform_border;
-    subform_height = form_height - 2 * subform_y - 2 * subform_border;
+    subform_height = form_height - 2 * subform_y - 2 * subform_border
+      - button_height;
     subform_widget =
 	Widget_create_form(form_widget, 0,
 			   subform_x, subform_y,
@@ -1940,6 +1983,10 @@ static void Welcome_destroy_windows(void)
     XFlush(dpy);
     form_widget = NO_WIDGET;
     subform_widget = NO_WIDGET;
+    next_page_widget = NO_WIDGET;
+    first_page_widget = NO_WIDGET;
+    ping_servers_widget = NO_WIDGET;
+ 
 }
 
 /*
@@ -1976,6 +2023,8 @@ static void Welcome_set_mode(enum Welcome_mode new_welcome_mode)
 	break;
     case ModeHelp:
 	break;
+    case ModeStatus:
+        break;
     case ModeQuit:
 	break;
     default:
@@ -1988,7 +2037,7 @@ static void Welcome_set_mode(enum Welcome_mode new_welcome_mode)
 /*
  * Process one event.
  */
-static int Welcome_process_one_event(XEvent * event)
+static int Welcome_process_one_event(XEvent * event, Connect_param_t * conpar)
 {
     XClientMessageEvent *cmev;
     XConfigureEvent *conf;
@@ -2043,19 +2092,59 @@ static int Welcome_process_one_event(XEvent * event)
 	break;
 
     case ConfigureNotify:
+
 	conf = &event->xconfigure;
 	if (conf->window == top) {
-	    top_width = conf->width;
-	    top_height = conf->height;
-	    LIMIT(top_width, MIN_TOP_WIDTH, MAX_TOP_WIDTH);
-	    LIMIT(top_height, MIN_TOP_HEIGHT, MAX_TOP_HEIGHT);
-#if 0
+	  if ((top_width == conf->width) &&  (top_height == conf->height)) 
+	    {
+	      /* This event came from a window move operation */
+              return 0;
+	    }
+	  top_width = conf->width;
+	  top_height = conf->height;
+	  LIMIT(top_width, MIN_TOP_WIDTH, MAX_TOP_WIDTH);
+	  LIMIT(top_height, MIN_TOP_HEIGHT, MAX_TOP_HEIGHT);
+
+	  switch (welcome_mode) {
+	  case ModeInternet :
+	  case ModeStatus   : 
 	    Welcome_destroy_windows();
+	    Delete_server_list();
 	    if (Welcome_create_windows(conpar) == -1)
-		return -1;
-#endif
-	} else
-	    Widget_event(event);
+	      return -1;
+	    
+	    Welcome_set_mode(ModeInternet);
+	    
+	    /* Popup an initial server list */
+	    if (Get_meta_data() > 0) {
+	      
+	      if (Welcome_sort_server_list() == -1) {
+		Welcome_create_label(1, "Not enough memory.");
+	      }
+	      server_it = List_begin(server_list);
+	      Welcome_show_server_list(conpar);
+	    }
+	    break;
+
+	  case ModeLocalnet:
+	    Welcome_destroy_windows();
+	    Delete_server_list();
+	    if (Welcome_create_windows(conpar) == -1)
+	      return -1;
+	    Welcome_set_mode(ModeLocalnet);  
+
+	  case ModeServer:
+	    break;
+	  case ModeHelp:
+	    break;
+	  case ModeQuit:
+	    break;
+	  default :
+	    break;
+	  }
+	} else {
+	  Widget_event(event);
+	}
 	break;
 #endif
 
@@ -2083,7 +2172,7 @@ static int Welcome_process_pending_events(Connect_param_t * conpar)
 
     while (XEventsQueued(dpy, QueuedAfterFlush) > 0) {
 	XNextEvent(dpy, &event);
-	result = Welcome_process_one_event(&event);
+	result = Welcome_process_one_event(&event, conpar);
 	if (result)
 	    return result;
     }
@@ -2115,7 +2204,7 @@ static int Welcome_input_loop(Connect_param_t * conpar)
 
     while (!quitting && !joining) {
 	XNextEvent(dpy, &event);
-	result = Welcome_process_one_event(&event);
+	result = Welcome_process_one_event(&event,conpar);
 	if (result)
 	    return result;
     }
