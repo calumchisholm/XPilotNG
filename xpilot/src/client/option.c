@@ -214,7 +214,7 @@ bool Set_int_option(xp_option_t *opt, int value, xp_option_origin_t origin)
 
 	if (value < opt->int_minval) {
 	    snprintf(msg, sizeof(msg),
-		     "Minumum value for option %s is %d. [*Client reply*]",
+		     "Minimum value for option %s is %d. [*Client reply*]",
 		     opt->name, opt->int_minval);
 	    Add_message(msg);
 	}
@@ -260,7 +260,7 @@ bool Set_double_option(xp_option_t *opt, double value,
 
 	if (value < opt->dbl_minval) {
 	    snprintf(msg, sizeof(msg),
-		     "Minumum value for option %s is %.3f. [*Client reply*]",
+		     "Minimum value for option %s is %.3f. [*Client reply*]",
 		     opt->name, opt->dbl_minval);
 	    Add_message(msg);
 	}
