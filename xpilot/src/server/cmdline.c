@@ -761,7 +761,7 @@ static optionDesc options[] = {
     {
 	"resetOnHuman",
 	"humanReset",
-	"no",
+	"0",
 	&resetOnHuman,
 	valInt,
 	tuner_dummy,
