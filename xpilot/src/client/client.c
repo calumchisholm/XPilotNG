@@ -146,6 +146,7 @@ char	modBankStr[NUM_MODBANKS][MAX_CHARS]; /* modifier banks */
 int	maxFPS;			/* Maximum FPS player wants from server */
 int	oldMaxFPS = 0;
 int	clientFPS = 1;	        /* How many fps we actually get */
+int	recordFPS = 0;		/* Optimal FPS to record at. */
 time_t	currentTime;	        /* Current value of time() */
 bool	newSecond = false;      /* True if time() incremented this frame */
 

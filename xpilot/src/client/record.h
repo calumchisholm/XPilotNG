@@ -73,7 +73,6 @@ struct recordable_drawing {
 extern struct recordable_drawing rd;	/* external Drawing interface */
 
 extern bool recording;	/* Are we recording or not. */
-extern int recordFPS;	/* FPS to record. */
 
 long Record_size(void);
 void Record_toggle(void);

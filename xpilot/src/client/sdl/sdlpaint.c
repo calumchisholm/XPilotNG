@@ -47,7 +47,6 @@ char sdlpaint_version[] = VERSION;
 /*
  * Globals.
  */
-static double       time_counter = 0.0;
 static TTF_Font     *scoreListFont;
 static char         *scoreListFontName = CONF_FONTDIR "VeraMoBd.ttf";
 static sdl_window_t scoreListWin;
@@ -305,50 +304,7 @@ void setupPaint_HUD(void)
 
 void Paint_frame(void)
 {
-    Check_view_dimensions();
-    
-    world.x = selfPos.x - (ext_view_width / 2);
-    world.y = selfPos.y - (ext_view_height / 2);
-    realWorld = world;
-    if (BIT(Setup->mode, WRAP_PLAY)) {
-	if (world.x < 0 && world.x + ext_view_width < Setup->width)
-	    world.x += Setup->width;
-	else if (world.x > 0 && world.x + ext_view_width >= Setup->width)
-	    realWorld.x -= Setup->width;
-	if (world.y < 0 && world.y + ext_view_height < Setup->height)
-	    world.y += Setup->height;
-	else if (world.y > 0 && world.y + ext_view_height >= Setup->height)
-	    realWorld.y -= Setup->height;
-    }
-
-    if (start_loops != end_loops)
-	warn("Start neq. End (%ld,%ld,%ld)", start_loops, end_loops, loops);
-    loops = end_loops;
-
-
-    /*
-     * If time() changed from previous value, assume one second has passed.
-     */
-    if (newSecond) {
-	/* kps - improve */
-	timePerFrame = 1.0 / clientFPS;
-
-	/* TODO: move this somewhere else */
-	/* check once per second if we are playing */
-	if (newSecond && self && !strchr("PW", self->mychar))
-	    played_this_round = true;
-    }
-
-    /*
-     * Instead of using loops to determining if things are drawn this frame,
-     * loopsSlow should be used. We don't want things to be drawn too fast
-     * at high fps.
-     */
-    time_counter += timePerFrame;
-    if (time_counter >= 1.0 / 12) {
-	loopsSlow++;
-	time_counter -= (1.0 / 12);
-    }
+    Paint_frame_start();
 
     if (damaged <= 0) {
     	/*glClear(GL_COLOR_BUFFER_BIT);*/

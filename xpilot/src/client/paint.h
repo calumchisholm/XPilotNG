@@ -135,6 +135,7 @@ void Paint_messages(void);
 void Paint_recording(void);
 void Paint_client_fps(void);
 void Paint_frame(void);
+void Paint_frame_start(void);
 void Game_over_action(u_byte status);
 int Team_color(int);
 int Life_color(other_t *other);

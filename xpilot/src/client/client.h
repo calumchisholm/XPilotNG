@@ -557,6 +557,7 @@ extern bool	pointerControl;		/* current state of mouse ship flying */
 extern int	maxFPS;			/* Client's own FPS */
 extern int 	oldMaxFPS;
 extern int	clientFPS;	        /* How many fps we actually get */
+extern int	recordFPS;		/* Optimal FPS to record at. */
 extern time_t	currentTime;	        /* Current value of time() */
 extern bool	newSecond;              /* True if time() incremented this frame */
 extern char	modBankStr[][MAX_CHARS];/* modifier banks strings */

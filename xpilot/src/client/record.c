@@ -46,7 +46,6 @@ char record_version[] = VERSION;
 static char		*record_filename = NULL;/* Name of recordfile. */
 static FILE		*recordFP = NULL;	/* File handle for writing
 						 * recording frames to. */
-int			recordFPS = 0;		/* FPS to record. */
 bool			recording = false;	/* Are we recording or not. */
 static bool		record_start = false;	/* Should we start recording
 						 * at the next frame. */
