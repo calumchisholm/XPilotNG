@@ -34,7 +34,8 @@ double	hudRadarScale;		/* Scale for hudradar drawing */
 double	hudRadarLimit;		/* Hudradar dots are not drawn if closer to
 				   your ship than this factor of visible
 				   range */
-int	hudSize;		/* Size for HUD drawing */
+int	hudSize;		/* Size for HUD drawing, depends on hudScale */
+static double	hudScale;	/* Scale for HUD drawing */
 
 /*
  * kps TODO:
@@ -353,6 +354,14 @@ static bool Set_sparkProb(xp_option_t *opt, double val)
     sparkProb = val;
     spark_rand = (int)(sparkProb * MAX_SPARK_RAND + 0.5);
     Check_view_dimensions();
+    return true;
+}
+
+static bool Set_hudScale(xp_option_t *opt, double value)
+{
+    (void)opt;
+    hudScale = value;
+    hudSize = (int)(MIN_HUD_SIZE * hudScale);
     return true;
 }
 
@@ -737,16 +746,15 @@ xp_option_t default_options[] = {
 	"A value of 1.0 means that the dots are not drawn for ships in\n"
 	"your active view area.\n"),
 
-    /* kps - change to hudScale */
-    XP_INT_OPTION(
-	"hudSize",
-	MIN_HUD_SIZE * 2,
-	MIN_HUD_SIZE,
-	MIN_HUD_SIZE * 6,
-	&hudSize,
-	NULL,
+    XP_DOUBLE_OPTION(
+	"hudScale",
+	2.0, /* default is 2 times "normal" size */
+	1.0,
+	6.0,
+	&hudScale,
+	Set_hudScale,
 	XP_OPTFLAG_CONFIG_DEFAULT,
-	"Which size to use for drawing the hud.\n"),
+	"Which scale to use for drawing the hud.\n"),
 
     XP_INT_OPTION(
 	"baseWarningType",
