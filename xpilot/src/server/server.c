@@ -60,6 +60,7 @@ static void Handle_signal(int sig_no);
 
 int main(int argc, char **argv)
 {
+    int timer_tick_rate;
     char *addr;
     world_t *world = &World;
 
@@ -177,7 +178,22 @@ int main(int argc, char **argv)
     teamcup_open_score_file();
     teamcup_round_start();
 
+#ifdef NEWSCHED
     install_timer_tick(Main_loop, FPS);
+#else
+    if (options.timerResolution > 0)
+	timer_tick_rate = options.timerResolution;
+    else
+	timer_tick_rate = FPS;
+
+# ifdef _WINDOWS
+    /* Windows returns here, we let the worker thread call sched() */
+    install_timer_tick(ServerThreadTimerProc, timer_tick_rate);
+# else
+    install_timer_tick(Main_loop, timer_tick_rate);
+
+# endif
+#endif
 
     sched();
     xpprintf("sched returned!?");

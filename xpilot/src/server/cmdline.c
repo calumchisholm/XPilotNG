@@ -3766,6 +3766,9 @@ void Timing_setup(world_t *world)
 {
     LIMIT(FPS, 1, MAX_SERVER_FPS);
     LIMIT(options.gameSpeed, 0.0, FPS);
+#ifndef NEWSCHED
+    LIMIT(options.timerResolution, 0, 100);
+#endif
     if (options.gameSpeed == 0.0)
 	options.gameSpeed = FPS;
     if (options.gameSpeed < FPS / 50.)
@@ -3832,5 +3835,10 @@ void Timing_setup(world_t *world)
     if (options.robotTicksPerSecond == 0)
 	options.robotTicksPerSecond = FPS;
     LIMIT(options.robotTicksPerSecond, 1, FPS);
+#ifdef NEWSCHED
     install_timer_tick(NULL, FPS);
+#else
+    install_timer_tick(NULL, options.timerResolution ? options.timerResolution
+		       : FPS);
+#endif
 }

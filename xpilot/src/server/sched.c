@@ -261,8 +261,12 @@ void sched(void)
 	    if (timer_handler)
 		(*timer_handler)();
 
-	    /*t_nextframe += frametime - 0.0000028571;*//*stable 50 fps as deity (2.6.x kernel)*/
+#if 0
+	    /* stable 50 fps as deity (2.6.x kernel) */
+	    t_nextframe += frametime - 0.0000028571;
+#else
 	    t_nextframe += frametime;
+#endif
 	}
 	else {
 	    for (i = max_fd; i >= min_fd; i--) {
