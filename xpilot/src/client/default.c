@@ -49,22 +49,60 @@ option options[] = {
     }
 };
 
+typedef struct {
+    const char *name;
+    const char *value;
+} cl_option_t;
+
+
+static int num_options = 0;
+static int max_options = 0;
+static cl_option_t *option_array = NULL;
+
+static cl_option_t *Find_option(const char *name)
+{
+    int i;
+
+    for (i = 0; i < num_options; i++) {
+	if (!strcasecmp(name, option_array[i].name))
+	    return &option_array[i];
+    }
+
+    return NULL;
+}
+
+static void Insert_option(const char *name, const char *value)
+{
+    cl_option_t option;
+
+    assert(Find_option(name) == NULL);
+
+    option.name = xp_safe_strdup(name);
+    option.value = xp_safe_strdup(value);
+
+    STORE(cl_option_t, option_array, num_options, max_options, option);
+}
 
 /*
  * This could also be used from a client '\set' command, e.g.
  * "\set scalefactor 1.5"
  */
 
-void Set_option(char *option, char *value)
+void Set_option(const char *name, const char *value)
 {
-    printf("setting option '%s' to '%s'\n", option, value);
-    
+    cl_option_t *opt;
 
-    
+    opt = Find_option(name);
+    if (!opt) {
+	Insert_option(name, value);
+	opt = Find_option(name);
+    }
+
+    printf("setting option '%s' to '%s'\n", opt->name, opt->value);
 }
 
 
-static void Parse_xpilotrc_line(char *line)
+static void Parse_xpilotrc_line(const char *line)
 {
     char *s;
 
@@ -112,7 +150,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     /*
      * Create data structure holding all options we know of and their values.
      */
-    warn("numoptions: %d", NELEM(options));
+    /*warn("numoptions: %d", NELEM(options));*/
 
     /*
      * Read options from xpilotrc.
