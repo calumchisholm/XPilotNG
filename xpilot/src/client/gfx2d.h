@@ -73,7 +73,7 @@ RGB_COLOR Picture_get_rotated_pixel(const xp_picture_t *picture,
 RGB_COLOR Picture_get_pixel(const xp_picture_t *picture, int image,
 			    int x, int y);
 RGB_COLOR Picture_get_pixel_area(const xp_picture_t *picture, int image, 
-				 double x1, double y1, double dx, double dy);
+				 double x_1, double y_1, double dx, double dy);
 void Picture_get_bounding_box(xp_picture_t *picture);
 
 #endif

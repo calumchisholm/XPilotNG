@@ -481,17 +481,17 @@ static void REndFrame(void)
     if (damaged) {
 	XGCValues			values;
 
-	XGetGCValues(dpy, gc, GCForeground, &values);
+	XGetGCValues(dpy, gameGC, GCForeground, &values);
 
 	RWriteByte(RC_DAMAGED);
 	if ((damaged & 1) != 0)
-	    XSetForeground(dpy, gc, colors[BLUE].pixel);
+	    XSetForeground(dpy, gameGC, colors[BLUE].pixel);
 	else
-	    XSetForeground(dpy, gc, colors[BLACK].pixel);
-	RWriteGC(gc, GCForeground | RTILEGC);
+	    XSetForeground(dpy, gameGC, colors[BLACK].pixel);
+	RWriteGC(gameGC, GCForeground | RTILEGC);
 	RWriteByte(damaged);
 
-	XSetForeground(dpy, gc, values.foreground);
+	XSetForeground(dpy, gameGC, values.foreground);
     }
 
     putc(RC_ENDFRAME, recordFP);
@@ -645,7 +645,7 @@ static void RPaintItemSymbol(unsigned char type, Drawable drawable, GC mygc,
 #endif
     if (drawable == p_draw) {
 	putc(RC_PAINTITEMSYMBOL, recordFP);
-	RWriteGC(gc, GCForeground | GCBackground);
+	RWriteGC(gameGC, GCForeground | GCBackground);
 	putc(type, recordFP);
 	RWriteShort(x);
 	RWriteShort(y);

@@ -443,7 +443,7 @@ void Bitmap_set_pixel(xp_pixmap_t * xp_pixmap,
     b = BLUE_VALUE(color);
     pixel = (RGB)(r, g, b);
     SET_FG(pixel);
-    XDrawPoint(dpy, xp_pixmap->bitmaps[bmp].bitmap, gc, x, y);
+    XDrawPoint(dpy, xp_pixmap->bitmaps[bmp].bitmap, gameGC, x, y);
 
     pixel = (color) ? 1 : 0;
     XSetForeground(dpy, maskGC, pixel);
@@ -456,10 +456,10 @@ void Bitmap_set_pixel(xp_pixmap_t * xp_pixmap,
  */
 void Bitmap_paint_area(Drawable d, xp_bitmap_t *bit, int x, int y, irec *r)
 {
-    XSetClipOrigin(dpy, gc, x - r->x, y - r->y);
-    XSetClipMask(dpy, gc, bit->mask);
-    XCopyArea(dpy, bit->bitmap, d, gc, r->x, r->y, r->w, r->h, x, y);
-    XSetClipMask(dpy, gc, None);
+    XSetClipOrigin(dpy, gameGC, x - r->x, y - r->y);
+    XSetClipMask(dpy, gameGC, bit->mask);
+    XCopyArea(dpy, bit->bitmap, d, gameGC, r->x, r->y, r->w, r->h, x, y);
+    XSetClipMask(dpy, gameGC, None);
 }
 
 

@@ -48,7 +48,7 @@ static void Copy_static_radar(void)
 #ifndef _WINDOWS
     if (s_radar != p_radar) {
 	/* Draw static radar onto radar */
-	XCopyArea(dpy, s_radar, p_radar, gc,
+	XCopyArea(dpy, s_radar, p_radar, gameGC,
 		  0, 0, 256, RadarHeight, 0, 0);
     } else {
 	/* Clear radar */

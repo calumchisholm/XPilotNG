@@ -38,8 +38,8 @@ struct recordable_drawing {
     int (*drawLines)(Display *display, Drawable drawable, GC gc,
 		     XPoint *points, int npoints, int mode);
     int (*drawLine)(Display *display, Drawable drawable, GC gc,
-		    int x1, int y1,
-		    int x2, int y2);
+		    int x_1, int y_1,
+		    int x_2, int y_2);
     int (*drawRectangle)(Display *display, Drawable drawable, GC gc,
 			 int x, int y,
 			 unsigned int width, unsigned int height);

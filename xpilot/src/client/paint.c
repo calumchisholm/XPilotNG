@@ -60,7 +60,7 @@ Display	*kdpy;			/* Keyboard display */
 short	about_page;		/* Which page is the player on? */
 unsigned short	team;		/* What team is the player on? */
 
-GC	gc;			/* GC for the game area */
+GC	gameGC;			/* GC for the game area */
 GC	messageGC;		/* GC for messages in the game area */
 GC	radarGC;		/* GC for the radar */
 GC	buttonGC;		/* GC for the buttons */
@@ -238,8 +238,8 @@ void Paint_frame(void)
 
 #ifdef _WINDOWS
     p_draw = draw;		/* let's try this */
-    XSetForeground(dpy, gc, colors[BLACK].pixel);
-    XFillRectangle(dpy, p_draw, gc, 0, 0, draw_width, draw_height);
+    XSetForeground(dpy, gameGC, colors[BLACK].pixel);
+    XFillRectangle(dpy, p_draw, gameGC, 0, 0, draw_width, draw_height);
 #endif
 
     rd.newFrame();
@@ -252,7 +252,7 @@ void Paint_frame(void)
 	if (prev_damaged || prev_prev_damaged) {
 	    /* clean up ecm damage */
 	    SET_FG(colors[BLACK].pixel);
-	    XFillRectangle(dpy, draw, gc, 0, 0, draw_width, draw_height);
+	    XFillRectangle(dpy, draw, gameGC, 0, 0, draw_width, draw_height);
 	}
 
 	Erase_start();
@@ -304,10 +304,10 @@ void Paint_frame(void)
     else {
 	/* Damaged. */
 
-	XSetFunction(dpy, gc, GXxor);
+	XSetFunction(dpy, gameGC, GXxor);
 	SET_FG(colors[BLACK].pixel ^ colors[BLUE].pixel);
-	XFillRectangle(dpy, draw, gc, 0, 0, draw_width, draw_height);
-	XSetFunction(dpy, gc, GXcopy);
+	XFillRectangle(dpy, draw, gameGC, 0, 0, draw_width, draw_height);
+	XSetFunction(dpy, gameGC, GXcopy);
 	SET_FG(colors[BLACK].pixel);
     }
     prev_prev_damaged = prev_damaged;
@@ -325,7 +325,7 @@ void Paint_frame(void)
 	if (BIT(instruments, SHOW_SLIDING_RADAR) == 0
 	    || BIT(Setup->mode, WRAP_PLAY) == 0) {
 #ifndef _WINDOWS
-	    XCopyArea(dpy, p_radar, radar, gc,
+	    XCopyArea(dpy, p_radar, radar, gameGC,
 		      0, 0, 256, RadarHeight, 0, 0);
 #else
 	    WinXBltPixToWin(p_radar, radar,
@@ -355,13 +355,13 @@ void Paint_frame(void)
 	    h = RadarHeight - y;
 
 #ifndef _WINDOWS
-	    XCopyArea(dpy, p_radar, radar, gc,
+	    XCopyArea(dpy, p_radar, radar, gameGC,
 		      0, 0, x, y, w, h);
-	    XCopyArea(dpy, p_radar, radar, gc,
+	    XCopyArea(dpy, p_radar, radar, gameGC,
 		      x, 0, w, y, 0, h);
-	    XCopyArea(dpy, p_radar, radar, gc,
+	    XCopyArea(dpy, p_radar, radar, gameGC,
 		      0, y, x, h, w, 0);
-	    XCopyArea(dpy, p_radar, radar, gc,
+	    XCopyArea(dpy, p_radar, radar, gameGC,
 		      x, y, w, h, 0, 0);
 #else
 	    Paint_world_radar();
@@ -373,13 +373,13 @@ void Paint_frame(void)
 
 #ifndef _WINDOWS
     if (dbuf_state->type == PIXMAP_COPY)
-	XCopyArea(dpy, p_draw, draw, gc,
+	XCopyArea(dpy, p_draw, draw, gameGC,
 		  0, 0, draw_width, draw_height, 0, 0);
 
     dbuff_switch(dbuf_state);
 
     if (dbuf_state->type == COLOR_SWITCH) {
-	XSetPlaneMask(dpy, gc, dbuf_state->drawing_planes);
+	XSetPlaneMask(dpy, gameGC, dbuf_state->drawing_planes);
 	XSetPlaneMask(dpy, messageGC, dbuf_state->drawing_planes);
     }
 #endif
@@ -396,7 +396,8 @@ void Paint_frame(void)
 #ifndef _WINDOWS
 	    if (dbuf_state->multibuffer_type != MULTIBUFFER_DBE) {
 		SET_FG(colors[BLACK].pixel);
-		XFillRectangle(dpy, p_draw, gc, 0, 0, draw_width, draw_height);
+		XFillRectangle(dpy, p_draw, gameGC,
+			       0, 0, draw_width, draw_height);
 	    }
 #endif
 	}

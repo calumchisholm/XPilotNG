@@ -252,8 +252,8 @@ static XFontStruct* Set_font(Display* dpy, GC gc,
     } else
 	XSetFont(dpy, gc, font->fid);
 #else
-	font = WinXLoadFont(fontName);
-	XSetFont(dpy, gc, font->fid);
+    font = WinXLoadFont(fontName);
+    XSetFont(dpy, gc, font->fid);
 #endif
 
     return font;
@@ -374,7 +374,7 @@ static void Init_disp_prop(Display *d, Window win,
     XSetIconName(d, win, msg);
 
     if (d != dpy)
-	    return;
+	return;
 
     /*
      * Specify IO error handler and the WM_DELETE_WINDOW atom in
@@ -411,9 +411,8 @@ int Init_top(void)
 	exit(1);
     }
 
-    if (Colors_init() == -1) {
+    if (Colors_init() == -1)
 	return -1;
-    }
 
     if (shieldDrawMode == -1) {
 	shieldDrawMode = 0;
@@ -428,12 +427,12 @@ int Init_top(void)
 	    && ProtocolVersion (dpy) == 11)
 	    shieldDrawMode = 1;
 
-	if (useErase){
-	/*
-	 * The NeWS X server doesn't orrectly erase shields.
-	 */
-	if (!strcmp(ServerVendor(dpy), "X11/NeWS - Sun Microsystems Inc."))
-	    shieldDrawMode = 1;
+	if (useErase) {
+	    /*
+	     * The NeWS X server doesn't orrectly erase shields.
+	     */
+	    if (!strcmp(ServerVendor(dpy), "X11/NeWS - Sun Microsystems Inc."))
+		shieldDrawMode = 1;
 	}
     }
 #endif
@@ -534,18 +533,17 @@ int Init_top(void)
 #undef COLORCHECK
 
     if (wallRadarColor >= maxColors
-	|| ((wallRadarColor & 5) && colorSwitch)) {
+	|| ((wallRadarColor & 5) && colorSwitch))
 	wallRadarColor = BLUE;
-    }
+
     if (targetRadarColor >= maxColors
-	|| ((targetRadarColor & 1) && colorSwitch)) {
+	|| ((targetRadarColor & 1) && colorSwitch))
 	/* should be & 5? !@# */
 	targetRadarColor = BLUE;
-    }
+
     if (decorRadarColor >= maxColors
-	|| ((decorRadarColor & 5) && colorSwitch)) {
+	|| ((decorRadarColor & 5) && colorSwitch))
 	decorRadarColor = 2;
-    }
 
 #define OPTIONCHECK(o, cmp1, max, cmp2, min, fmt, d) \
     if (o cmp1 (max) || o cmp2 (min)) { \
@@ -692,29 +690,21 @@ int Init_top(void)
     values
 	= GCLineWidth|GCLineStyle|GCCapStyle|GCJoinStyle|GCGraphicsExposures;
 
-    messageGC
-	= XCreateGC(dpy, top, values, &xgc);
-    radarGC
-	= XCreateGC(dpy, top, values, &xgc);
-    buttonGC
-	= XCreateGC(dpy, top, values, &xgc);
-    scoreListGC
-	= XCreateGC(dpy, top, values, &xgc);
-    textGC
-	= XCreateGC(dpy, top, values, &xgc);
-    talkGC
-	= XCreateGC(dpy, top, values, &xgc);
-    motdGC
-	= XCreateGC(dpy, top, values, &xgc);
-    gc
-	= XCreateGC(dpy, top, values, &xgc);
-    XSetBackground(dpy, gc, colors[BLACK].pixel);
+    messageGC	= XCreateGC(dpy, top, values, &xgc);
+    radarGC	= XCreateGC(dpy, top, values, &xgc);
+    buttonGC	= XCreateGC(dpy, top, values, &xgc);
+    scoreListGC	= XCreateGC(dpy, top, values, &xgc);
+    textGC	= XCreateGC(dpy, top, values, &xgc);
+    talkGC	= XCreateGC(dpy, top, values, &xgc);
+    motdGC	= XCreateGC(dpy, top, values, &xgc);
+    gameGC	= XCreateGC(dpy, top, values, &xgc);
+    XSetBackground(dpy, gameGC, colors[BLACK].pixel);
 
     /*
      * Set fonts
      */
     gameFont
-	= Set_font(dpy, gc, gameFontName, "gameFont");
+	= Set_font(dpy, gameGC, gameFontName, "gameFont");
     messageFont
 	= Set_font(dpy, messageGC, messageFontName, "messageFont");
     scoreListFont
@@ -728,7 +718,7 @@ int Init_top(void)
     motdFont
 	= Set_font(dpy, motdGC, motdFontName, "motdFont");
 
-    XSetState(dpy, gc,
+    XSetState(dpy, gameGC,
 	      WhitePixel(dpy, DefaultScreen(dpy)),
 	      BlackPixel(dpy, DefaultScreen(dpy)),
 	      GXcopy, AllPlanes);
@@ -750,7 +740,7 @@ int Init_top(void)
 	      GXcopy, AllPlanes);
 
     if (dbuf_state->type == COLOR_SWITCH)
-	XSetPlaneMask(dpy, gc, dbuf_state->drawing_planes);
+	XSetPlaneMask(dpy, gameGC, dbuf_state->drawing_planes);
 
 #endif
 
@@ -939,9 +929,8 @@ int Init_playing_windows(void)
     }
 
     XAutoRepeatOff(dpy);	/* We don't want any autofire, yet! */
-    if (kdpy) {
+    if (kdpy)
 	XAutoRepeatOff(kdpy);
-    }
 
     /*
      * Define a blank cursor for use with pointer control
@@ -978,7 +967,7 @@ int Init_playing_windows(void)
 }
 
 #ifdef _WINDOWS
-void WinXCreateItemBitmaps()
+void WinXCreateItemBitmaps(void)
 {
     int			i;
 
@@ -986,11 +975,13 @@ void WinXCreateItemBitmaps()
 	itemBitmaps[i][ITEM_HUD]
 	    = WinXCreateBitmapFromData(dpy, draw,
 				       (char *)itemBitmapData[i].data,
-				       ITEM_SIZE, ITEM_SIZE, colors[hudColor].pixel);
+				       ITEM_SIZE, ITEM_SIZE,
+				       colors[hudColor].pixel);
 	itemBitmaps[i][ITEM_PLAYFIELD]
 	    = WinXCreateBitmapFromData(dpy, draw,
 				       (char *)itemBitmapData[i].data,
-				       ITEM_SIZE, ITEM_SIZE, colors[RED].pixel);
+				       ITEM_SIZE, ITEM_SIZE,
+				       colors[RED].pixel);
     }
     Colors_init_block_bitmaps();
     
@@ -1009,25 +1000,27 @@ int Alloc_msgs(void)
 
 #ifndef _WINDOWS
     if (selectionAndHistory &&
-	((x2 = (message_t *)malloc(2 * MAX_MSGS * sizeof(message_t))) == NULL)){
+	((x2 = (message_t *)
+	  malloc(2 * MAX_MSGS * sizeof(message_t))) == NULL)){
 	error("No memory for history messages");
 	free(x);
 	return -1;
     }
-    if (selectionAndHistory) {
-	MsgBlock_pending	= x2;
-    }
+    if (selectionAndHistory)
+	MsgBlock_pending = x2;
 #endif
 
-    MsgBlock		= x;
+    MsgBlock = x;
 
     for (i = 0; i < 2 * MAX_MSGS; i++) {
 	if (i < MAX_MSGS) {
 	    TalkMsg[i] = x;
-	    IFNWINDOWS( if (selectionAndHistory) TalkMsg_pending[i] = x2 );
+	    IFNWINDOWS( if (selectionAndHistory)
+			TalkMsg_pending[i] = x2 );
 	} else {
 	    GameMsg[i - MAX_MSGS] = x;
-	    IFNWINDOWS( if (selectionAndHistory) GameMsg_pending[i - MAX_MSGS] = x2 );
+	    IFNWINDOWS( if (selectionAndHistory)
+			GameMsg_pending[i - MAX_MSGS] = x2 );
 	}
 	x->txt[0] = '\0';
 	x->len = 0;
@@ -1103,17 +1096,16 @@ static int Quit_callback(int widget_desc, void *data, const char **str)
 
 void Resize(Window w, int width, int height)
 {
-    if (w != top) {
+    if (w != top)
 	return;
-    }
+
     /* ignore illegal resizes */
     LIMIT(width, MIN_TOP_WIDTH, MAX_TOP_WIDTH);
     LIMIT(height, MIN_TOP_HEIGHT, MAX_TOP_HEIGHT);
     top_width = width;
     top_height = height;
-    if (!draw) {
+    if (!draw)
 	return;
-    }
 
     if (radar_score_mapped)
 	draw_width = top_width - 258;
@@ -1180,7 +1172,7 @@ int FatalError(Display *dpy)
     return(0);
 }
 
-void Scale_dashes()
+void Scale_dashes(void)
 {
     dashes[0] = WINSCALE(8);
     dashes[1] = WINSCALE(4);
@@ -1188,5 +1180,5 @@ void Scale_dashes()
     cdashes[0] = WINSCALE(3);
     cdashes[1] = WINSCALE(9);
 
-    XSetDashes(dpy, gc, 0, dashes, NUM_DASHES);
+    XSetDashes(dpy, gameGC, 0, dashes, NUM_DASHES);
 }

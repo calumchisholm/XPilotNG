@@ -133,7 +133,7 @@ extern Pixmap	itemBitmaps[][2];
 extern Pixmap	itemBitmaps[];
 #endif
 
-extern GC	gc, messageGC, radarGC, buttonGC, scoreListGC, textGC, talkGC;
+extern GC	gameGC, messageGC, radarGC, buttonGC, scoreListGC, textGC, talkGC;
 extern GC	motdGC;
 extern XGCValues gcv;
 extern Window	top, draw, keyboard, radar, players;

@@ -343,8 +343,8 @@ void Paint_world(void)
 	}
 	if (wallTileReady == 1) {
 	    wallTileDoit = true;
-	    XSetTile(dpy, gc, wallTile);
-	    XSetTSOrigin(dpy, gc, -WINSCALE(realWorld.x),
+	    XSetTile(dpy, gameGC, wallTile);
+	    XSetTSOrigin(dpy, gameGC, -WINSCALE(realWorld.x),
                          WINSCALE(realWorld.y));
 	}
     }
@@ -556,12 +556,12 @@ void Paint_world(void)
 			    fill_bottom_right = x + BLOCK_SZ;
 			}
 		    }
-		    if (type & BLUE_RIGHT) {
+		    if (type & BLUE_RIGHT)
 			fill_top_right = fill_bottom_right = x + BLOCK_SZ;
-		    }
-		    if (fill_top_left == -1) {
+
+		    if (fill_top_left == -1)
 			fill_top_left = fill_bottom_left = x;
-		    }
+
 		    if (fill_top_right != -1) {
 			points[0].x = WINSCALE(X(fill_bottom_left));
 			points[0].y = WINSCALE(Y(y));
@@ -572,17 +572,16 @@ void Paint_world(void)
 			points[3].x = WINSCALE(X(fill_bottom_right));
 			points[3].y = WINSCALE(Y(y));
 			points[4] = points[0];
-			if (wallTileDoit) {
-			    XSetFillStyle(dpy, gc, FillTiled);
-			} else {
+			if (wallTileDoit)
+			    XSetFillStyle(dpy, gameGC, FillTiled);
+			else
 			    SET_FG(colors[wallColor].pixel);
-			}
-			rd.fillPolygon(dpy, p_draw, gc,
+			rd.fillPolygon(dpy, p_draw, gameGC,
 				       points, 5,
 				       Convex, CoordModeOrigin);
-			if (wallTileDoit) {
-			    XSetFillStyle(dpy, gc, FillSolid);
-			}
+			if (wallTileDoit)
+			    XSetFillStyle(dpy, gameGC, FillSolid);
+
 			if (useErase){
 			    int left_x = MIN(fill_bottom_left, fill_top_left);
 			    int right_x = MAX(fill_bottom_right, fill_top_right);
@@ -610,17 +609,16 @@ void Paint_world(void)
 	    points[3].x = WINSCALE(X(x));
 	    points[3].y = WINSCALE(Y(y));
 	    points[4] = points[0];
-	    if (wallTileDoit) {
-		XSetFillStyle(dpy, gc, FillTiled);
-	    } else {
+	    if (wallTileDoit)
+		XSetFillStyle(dpy, gameGC, FillTiled);
+	    else
 		SET_FG(colors[wallColor].pixel);
-	    }
-	    rd.fillPolygon(dpy, p_draw, gc,
+	    rd.fillPolygon(dpy, p_draw, gameGC,
 			   points, 5,
 			   Convex, CoordModeOrigin);
-	    if (wallTileDoit) {
-		XSetFillStyle(dpy, gc, FillSolid);
-	    }
+	    if (wallTileDoit)
+		XSetFillStyle(dpy, gameGC, FillSolid);
+
 	    if (useErase){
 		int left_x = MIN(fill_bottom_left, fill_top_left);
 		Erase_rectangle(WINSCALE(X(left_x)) - 1,

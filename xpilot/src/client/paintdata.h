@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -205,7 +204,7 @@ extern long		time_left;
 #define SET_FG(PIXEL) \
 do { \
     if ((PIXEL) == current_foreground) ; \
-    else XSetForeground(dpy, gc, current_foreground = (PIXEL)); \
+    else XSetForeground(dpy, gameGC, current_foreground = (PIXEL)); \
 } while (0)
 
 extern unsigned long	current_foreground;
@@ -333,6 +332,6 @@ extern int Arc_add(int color,
 		   int angle1, int angle2);
 extern void Segment_start(void);
 extern void Segment_end(void);
-extern int Segment_add(int color, int x1, int y1, int x2, int y2);
+extern int Segment_add(int color, int x_1, int y_1, int x_2, int y_2);
 
 #endif
