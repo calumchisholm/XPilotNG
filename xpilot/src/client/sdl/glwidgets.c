@@ -2885,7 +2885,6 @@ GLWidget *Init_ScrollPaneWidget( GLWidget *content )
 /* Begin: MainWidget  */
 /**********************/
 static void SetBounds_MainWidget( GLWidget *widget, SDL_Rect *b );
-static void Close_MainWidget( GLWidget *widget );
 
 void MainWidget_ShowMenu( GLWidget *widget, bool show )
 {
@@ -2973,25 +2972,6 @@ static void SetBounds_MainWidget( GLWidget *widget, SDL_Rect *b )
     
 }
 
-static void Close_MainWidget( GLWidget *widget )
-{
-    WrapperWidget *wid_info;
-    
-    if (!widget) return;
-    if (widget->WIDGET != MAINWIDGET) {
-    	error("Wrong widget type for Close_MainWidget [%i]",widget->WIDGET);
-	return;
-    }
-
-    if (!(wid_info = (WrapperWidget *)(widget->wid_info))) {
-    	error("Close_MainWidget: wid_info missing!");
-	return;
-    }
-    
-    if (!(wid_info->showconf))
-    	Close_Widget(&(wid_info->confmenu));
-}
-
 GLWidget *Init_MainWidget( font_data *font )
 {
     GLWidget *tmp;
@@ -3010,7 +2990,6 @@ GLWidget *Init_MainWidget( font_data *font )
 	return NULL;
     }
     wid_info = ((WrapperWidget *)tmp->wid_info);
-    wid_info->confmenu	= NULL;
     wid_info->font	= font;
     wid_info->BORDER	= 10;
     wid_info->showconf	= true;
@@ -3018,10 +2997,8 @@ GLWidget *Init_MainWidget( font_data *font )
     tmp->WIDGET     	= MAINWIDGET;
     tmp->bounds.w   	= draw_width;
     tmp->bounds.h   	= draw_height;
-    /*tmp->button     	= button_MainWidget;*/
     tmp->buttondata 	= tmp;
     tmp->SetBounds 	= SetBounds_MainWidget;
-    tmp->Close	    	= Close_MainWidget;
     
     if ( !AppendGLWidgetList(&(tmp->children),(wid_info->radar = Init_RadarWidget())) ) {
 	error("radar initialization failed");

@@ -175,7 +175,7 @@ static void Radar_paint_world_blocks(GLWidget *radar, SDL_Surface *s)
 
 }
 
-static void Compute_bounds(ipos_t *min, ipos_t *max, const irec_t *b)
+static void Compute_bounds_radar(ipos_t *min, ipos_t *max, const irec_t *b)
 {
     min->x = (0 - (b->x + b->w)) / Setup->width;
     if (0 > b->x + b->w) min->x++;
@@ -205,7 +205,7 @@ static void Radar_paint_world_polygons(GLWidget *radar, SDL_Surface *s)
 
 	if (BIT(polygon_styles[polygons[i].style].flags,
 		STYLE_INVISIBLE_RADAR)) continue;
-	Compute_bounds(&min, &max, &polygons[i].bounds);
+	Compute_bounds_radar(&min, &max, &polygons[i].bounds);
 
 	for (xoff = min.x; xoff <= max.x; xoff++) {
 	    for (yoff = min.y; yoff <= max.y; yoff++) {
