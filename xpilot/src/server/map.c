@@ -191,16 +191,57 @@ int World_place_wormhole(world_t *world, clpos pos, wormType type)
     return ind;
 }
 
+
 /*
- * if 0 <= ind < OLD_MAX_CHECKS, the checkpoint is directly inserted
- * into the check array and it is assumed it has been allocated earlier
+ * Allocate checkpoints for an xp map.
  */
+static void alloc_old_checks(world_t *world)
+{
+    int i;
+    check_t t;
+    clpos pos = { -1, -1 };
+
+    t.pos = pos;
+
+    for (i = 0; i < OLD_MAX_CHECKS; i++)
+	STORE(check_t, world->checks, world->NumChecks, world->MaxChecks, t);
+    
+    world->NumChecks = 0;
+}
+
 int World_place_check(world_t *world, clpos pos, int ind)
 {
     check_t t;
 
+    if (!BIT(world->rules->mode, TIMING)) {
+	warn("Checkpoint on map with no timing.");
+	return NO_IND;
+    }
+
+    /* kps - need to do this for other map object types ? */
+    if (!World_contains_clpos(world, pos)) {
+	warn("Checkpoint outside world, ignoring.");
+	return NO_IND;
+    }
+
+    /*
+     * On xp maps we can have only 26 checkpoints.
+     */
     if (ind >= 0 && ind < OLD_MAX_CHECKS) {
-	world->checks[ind].pos = pos;
+	check_t *check;
+
+	if (world->NumChecks == 0)
+	    alloc_old_checks(world);
+
+	check = Checks(world, ind);
+
+	if (World_contains_clpos(world, check->pos)) {
+	    warn("Map contains too many '%c' checkpoints.", 'A' + ind);
+	    return NO_IND;
+	}
+
+	check->pos = pos;
+	world->NumChecks++;
 	return ind;
     }
 
@@ -462,7 +503,6 @@ bool Grok_map(world_t *world)
 
 	Xpmap_grok_map_data(world, options.mapData);
 	XFREE(options.mapData);
-	Xpmap_allocate_checks(world);
 	Xpmap_tags_to_internal_data(world, true);
 	Xpmap_find_map_object_teams(world);
     }
