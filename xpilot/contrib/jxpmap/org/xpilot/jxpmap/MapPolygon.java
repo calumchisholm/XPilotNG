@@ -76,11 +76,14 @@ public class MapPolygon extends MapObject {
         return new PolygonPopup(this);
     }
 
+    public Polygon getPolygon() {
+	return polygon;
+    }
+
     public PolygonStyle getStyle () {
         return style;
     }
-
-
+    
     public void setStyle (PolygonStyle style) {
         this.style = style;
     }
@@ -88,7 +91,6 @@ public class MapPolygon extends MapObject {
     public Rectangle getBounds () {
         return polygon.getBounds();
     }
-
 
     public boolean contains (Point p) {
         return polygon.contains(p);
@@ -98,7 +100,6 @@ public class MapPolygon extends MapObject {
     public int getZOrder () {
         return 20;
     }
-
 
     public Shape getPreviewShape () {
         return polygon;
