@@ -282,7 +282,7 @@ static bool Process_commands(sockbuf_t *ibuf,
 	    ibuf->sock.fd = SOCK_FD_INVALID;
 	}
 
-	privileged_cmd = (strchr("DKLMOR", c) != NULL) ? true : false;
+	privileged_cmd = (strchr("DKLMO", c) != NULL) ? true : false;
 	if (privileged_cmd) {
 	    if (!has_credentials) {
 		success = create_dgram_addr_socket(
