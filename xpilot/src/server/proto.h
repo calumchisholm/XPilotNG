@@ -198,7 +198,6 @@ void Fire_right_shot(player *pl, int type, int dir, int gun);
 void Fire_left_rshot(player *pl, int type, int dir, int gun);
 void Fire_right_rshot(player *pl, int type, int dir, int gun);
 void Make_treasure_ball(treasure_t *t);
-int Punish_team(player *pl, treasure_t *td, int cx, int cy);
 
 void Ball_hits_goal(ballobject *ball, struct group *groupptr);
 void Ball_is_replaced(ballobject *ball);

@@ -26,7 +26,7 @@
 char play_version[] = VERSION;
 
 
-int Punish_team(player *pl, treasure_t *td, int cx, int cy)
+static int Punish_team(player *pl, treasure_t *td, int cx, int cy)
 {
     static char		msg[MSG_LEN];
     int			i;
