@@ -16,7 +16,7 @@ class Poly:
         self. hasSpecialEdges = 0
         self.points = []
         self.type = MapPolygon.TYPE_NORMAL
-        self.team = 0
+        self.team = 1
 
 class PolyPoint:
     def __init__(self, x, y, style):

@@ -18,6 +18,7 @@ class MapPolygon(MapObject):
         self.style = style
         self.edgeStyles = edgeStyles
         self.type = self.TYPE_NORMAL
+        self.team = 1
 
     def getCreateHandler(self):
         return CreateHandler(self)
