@@ -108,7 +108,7 @@ void Pick_startpos(int ind)
 
     if (BIT(World.rules->mode, TIMING)) {	/* pick first free base */
 	for (i=0; i < World.NumBases; i++) {
-	    if (free_bases[World.baseorder[i].base_idx]) {
+	    if (free_bases[i]) {
 		break;
 	    }
 	}
@@ -131,8 +131,7 @@ void Pick_startpos(int ind)
 	      ind, World.NumBases, num_free, pick, seen);
 	End_game();
     } else {
-	pl->home_base = BIT(World.rules->mode, TIMING) ?
-	                World.baseorder[i].base_idx : i;
+	pl->home_base = i;
 	if (ind < NumPlayers) {
 	    for (i = 0; i < observerStart + NumObservers; i++) {
 		if (i == NumPlayers) {
@@ -1077,9 +1076,14 @@ void Race_game_over(void)
 	}
 	for (i = 0; i < num_ordered_players; i++) {
 	    pl = Players[order[i]];
-	    if (pl->home_base != World.baseorder[i].base_idx) {
-		pl->home_base = World.baseorder[i].base_idx;
-		for (j = 0; j < NumPlayers; j++) {
+	    if (pl->home_base != i) {
+		pl->home_base = i;
+		for (j = 0; j < observerStart + NumObservers; j++) {
+		    if (j == NumPlayers)
+			if (NumObservers)
+			    j = observerStart;
+			else
+			    break;
 		    if (Players[j]->conn != NOT_CONNECTED) {
 			Send_base(Players[j]->conn,
 				  pl->id,

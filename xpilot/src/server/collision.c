@@ -1409,28 +1409,6 @@ static void PlayerObjectCollision(int ind)
     }
 }
 
-int wormXY(int x, int y)
-{
-/*-BA Faster way to do this
- *    static int cache;
- *    int i;
- *
- *    if (World.wormHoles[cache].pos.x == x &&
- *	World.wormHoles[cache].pos.y == y)
- *	return cache;
- *
- *    for (i = 0; i < World.NumWormholes; i++)
- *	if (World.wormHoles[i].pos.x == x &&
- *	    World.wormHoles[i].pos.y == y)
- *	    break;
- *
- *    cache = i;
- *
- *    return i;
- */
-    return World.itemID[x][y];
-}
-
 
 static void LaserCollision(void)
 {

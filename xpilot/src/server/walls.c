@@ -1337,8 +1337,7 @@ int Polys_to_client(char *ptr)
 	store_short(&ptr, World.base[i].pos.y >> CLICK_SHIFT);
 	*ptr++ = World.base[i].dir;
     }
-    *ptr++ = World.NumFuels >> 8;
-    *ptr++ = World.NumFuels & 0xff;
+    store_short(&ptr, World.NumFuels);
     for (i = 0; i < World.NumFuels; i++) {
 	store_short(&ptr, World.fuel[i].clk_pos.x >> CLICK_SHIFT);
 	store_short(&ptr, World.fuel[i].clk_pos.y >> CLICK_SHIFT);
@@ -1350,6 +1349,7 @@ int Polys_to_client(char *ptr)
     }
     return ptr - start;
 }
+
 
 void Line_to_client(int *ptr)
 {
@@ -1548,12 +1548,13 @@ static void Tbox_hack(void)
 /* Include NCLLIN - 1 closest lines or all closer than CUTOFF (whichever
  * is less) in the line table for this block.
  * Include all lines closer than DICLOSE, however many there are.
- * If LINSIZE is not big enough for them all to fit in the allocated
- * temporary memory, print error and exit.
+ * LINSIZE tells the amout of temporary memory to reserve for the algorithm.
+ * If it is not large enough to hold the required lines, print error and
+ * exit.
  */
 
 #define DICLOSE (5 * CLICK)
-#define LINSIZE 100
+#define LINSIZE 50
 #define NCLLIN (10 + 1)
 static void Distance_init(void)
 {
@@ -2108,7 +2109,7 @@ static void Move_segment(move_state_t *ms)
 	if (!mi->wormhole_warps) {
 	    break;
 	}
-	hole = wormXY(block.x, block.y);
+	hole = World.itemID[block.x][block.y];
 	if (World.wormHoles[hole].type == WORM_OUT) {
 	    break;
 	}
@@ -2117,7 +2118,7 @@ static void Move_segment(move_state_t *ms)
 	    blk2.y = OBJ_Y_IN_BLOCKS(mi->pl);
 	    if (BIT(mi->pl->status, WARPED)) {
 		if (World.block[blk2.x][blk2.y] == WORMHOLE) {
-		    int oldhole = wormXY(blk2.x, blk2.y);
+		    int oldhole = World.itemID[blk2.x][blk2.y];
 		    if (World.wormHoles[oldhole].type == WORM_NORMAL
 			&& mi->pl->wormHoleDest == oldhole) {
 			/*

@@ -120,11 +120,6 @@ typedef struct {
 } base_t;
 
 typedef struct {
-    int		base_idx;	/* Index in World.base[] */
-    DFLOAT	dist;		/* Distance to first checkpoint */
-} baseorder_t;
-
-typedef struct {
     ipos	blk_pos;
     ipos	clk_pos;
     int		dir;
@@ -203,7 +198,6 @@ typedef struct {
     char	author[MAX_CHARS];
 
     u_byte	**block;        /* type of item in each block */
-    u_short	**itemID;       /* index into cannon/fuel/targets/treasure/itemConcentrator/bases/grav/wormhole, depending on value of corresponding block, -1 for space, walls, etc */
 
     vector	**gravity;
 
@@ -214,7 +208,6 @@ typedef struct {
     int		NumTeamBases;      /* How many 'different' teams are allowed */
     int		NumBases;
     base_t	*base;
-    baseorder_t	*baseorder;
     int		NumFuels;
     fuel_t	*fuel;
     int		NumGravs;
@@ -231,7 +224,6 @@ typedef struct {
     target_t    *targets;
     int		NumItemConcentrators;
     item_concentrator_t	*itemConcentrators;
-    long	nextEvent;
 } World_map;
 
 #endif

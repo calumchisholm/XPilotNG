@@ -61,9 +61,6 @@ static char sourceid[] =
 World_map World;
 
 
-static void Find_base_order(void);
-
-
 #ifdef DEBUG
 void Print_map(void)			/* Debugging only. */
 {
@@ -103,10 +100,6 @@ void Free_map(void)
     if (World.block) {
 	free(World.block);
 	World.block = NULL;
-    }
-    if (World.itemID) {
-	free(World.itemID);
-	World.itemID = NULL;
     }
     if (World.gravity) {
 	free(World.gravity);
@@ -149,9 +142,6 @@ void Alloc_map(void)
     World.block =
 	(unsigned char **)malloc(sizeof(unsigned char *)*World.x
 				 + World.x*sizeof(unsigned char)*World.y);
-    World.itemID =
-	(u_short **)malloc(sizeof(u_short *)*World.x
-				 + World.x*sizeof(u_short)*World.y);
     World.gravity =
 	(vector **)malloc(sizeof(vector *)*World.x
 			  + World.x*sizeof(vector)*World.y);
@@ -159,7 +149,7 @@ void Alloc_map(void)
     World.cannon = NULL;
     World.wormHoles = NULL;
     World.itemConcentrators = NULL;
-    if (World.block == NULL || World.itemID == NULL || World.gravity == NULL) {
+    if (World.block == NULL || World.gravity == NULL) {
 	Free_map();
 	error("Couldn't allocate memory for map (%d bytes)",
 	      World.x * (World.y * (sizeof(unsigned char) + sizeof(vector))
@@ -169,15 +159,11 @@ void Alloc_map(void)
     } else {
 	unsigned char *map_line;
 	unsigned char **map_pointer;
-	u_short *item_line;
-	u_short **item_pointer;
 	vector *grav_line;
 	vector **grav_pointer;
 
 	map_pointer = World.block;
 	map_line = (unsigned char*) ((unsigned char**)map_pointer + World.x);
-	item_pointer = World.itemID;
-	item_line = (u_short*) ((u_short**)item_pointer + World.x);
 	grav_pointer = World.gravity;
 	grav_line = (vector*) ((vector**)grav_pointer + World.x);
 
@@ -185,33 +171,11 @@ void Alloc_map(void)
 	    *map_pointer = map_line;
 	    map_pointer += 1;
 	    map_line += World.y;
-	    *item_pointer = item_line;
-	    item_pointer += 1;
-	    item_line += World.y;
 	    *grav_pointer = grav_line;
 	    grav_pointer += 1;
 	    grav_line += World.y;
 	}
     }
-}
-
-
-static void Map_error(int line_num)
-{
-#ifndef SILENT
-    static int prev_line_num, error_count;
-    const int max_error = 5;
-
-    if (line_num > prev_line_num) {
-	prev_line_num = line_num;
-	if (++error_count <= max_error) {
-	    xpprintf("Not enough map data on map data line %d\n", line_num);
-	}
-	else if (error_count - max_error == 1) {
-	    xpprintf("And so on...\n");
-	}
-    }
-#endif
 }
 
 
@@ -246,9 +210,6 @@ void Grok_map(void)
 	error("Cannot teamplay while in race mode -- ignoring teamplay");
 	CLR_BIT(World.rules->mode, TEAM_PLAY);
     }
-
-    if (BIT(World.rules->mode, TIMING))
-	Find_base_order();
 
 #ifndef	SILENT
     xpprintf("World....: %s\nBases....: %d\nMapsize..: %dx%d\nTeam play: %s\n",
@@ -616,31 +577,6 @@ void Grok_map(void)
 	    }
 	}
 
-	/*
-	 * Verify that the wormholes are consistent, i.e. that if
-	 * we have no 'out' wormholes, make sure that we don't have
-	 * any 'in' wormholes, and (less critical) if we have no 'in'
-	 * wormholes, make sure that we don't have any 'out' wormholes.
-	 */
-	if ((worm_norm) ? (worm_norm + worm_out < 2)
-	    : (worm_in) ? (worm_out < 1)
-	    : (worm_out > 0)) {
-
-	    int i;
-
-	    xpprintf("Inconsistent use of wormholes, removing them.\n");
-	    for (i=0; i<World.NumWormholes; i++)
-		{
-			World.block
-				[World.wormHoles[i].pos.x]
-				[World.wormHoles[i].pos.y] = SPACE;
-			World.itemID
-				[World.wormHoles[i].pos.x]
-				[World.wormHoles[i].pos.y] = (u_short) -1;
-		}
-	    World.NumWormholes = 0;
-	}
-
 	if (!wormTime) {
 	    for (i = 0; i < World.NumWormholes; i++) {
 		int j = (int)(rfrac() * World.NumWormholes);
@@ -648,12 +584,6 @@ void Grok_map(void)
 		    j = (int)(rfrac() * World.NumWormholes);
 		World.wormHoles[i].lastdest = j;
 	    }
-	}
-
-	if (BIT(World.rules->mode, TIMING) && World.NumChecks == 0) {
-	    xpprintf("No checkpoints found while race mode (timing) was set.\n");
-	    xpprintf("Turning off race mode.\n");
-	    CLR_BIT(World.rules->mode, TIMING);
 	}
 
 	/*
@@ -681,65 +611,10 @@ void Grok_map(void)
 		    World.cannon[i].team = team;
 		}
 	    }
-	    if (teamFuel) {
-		for (i=0; i<World.NumFuels; i++) {
-		    team = Find_closest_team(World.fuel[i].blk_pos.x,
-					     World.fuel[i].blk_pos.y);
-		    if (team == TEAM_NOT_SET) {
-			error("Couldn't find a matching team for fuelstation.");
-		    }
-		    World.fuel[i].team = team;
-		}
-	    }
 	}
     }
-
-    D( Print_map(); )
 }
 #endif
-
-
-/*
- * Determine the order in which players are placed
- * on starting positions after race mode reset.
- */
-static void Find_base_order(void)
-{
-    int			i, j, k, n;
-    DFLOAT		cx, cy, dist;
-
-    if (!BIT(World.rules->mode, TIMING)) {
-	World.baseorder = NULL;
-	return;
-    }
-    if ((n = World.NumBases) <= 0) {
-	error("Cannot support race mode in a map without bases");
-	exit(-1);
-    }
-
-    if ((World.baseorder = (baseorder_t *)
-	    malloc(n * sizeof(baseorder_t))) == NULL) {
-	error("Out of memory - baseorder");
-	exit(-1);
-    }
-
-    cx = World.check[0].x;
-    cy = World.check[0].y;
-    for (i = 0; i < n; i++) {
-	dist = Wrap_length(World.base[i].pos.x - cx,
-			   World.base[i].pos.y - cy) / CLICK;
-	for (j = 0; j < i; j++) {
-	    if (World.baseorder[j].dist > dist) {
-		break;
-	    }
-	}
-	for (k = i - 1; k >= j; k--) {
-	    World.baseorder[k + 1] = World.baseorder[k];
-	}
-	World.baseorder[j].base_idx = i;
-	World.baseorder[j].dist = dist;
-    }
-}
 
 
 DFLOAT Wrap_findDir(DFLOAT dx, DFLOAT dy)
@@ -973,10 +848,13 @@ void add_temp_wormholes(int xin, int yin, int xout, int yout, int ind)
     World.wormHoles[World.NumWormholes] = inhole;
     World.wormHoles[World.NumWormholes + 1] = outhole;
     World.block[xin][yin] = World.block[xout][yout] = WORMHOLE;
+/*
     World.itemID[xin][yin] = World.NumWormholes;
     World.itemID[xout][yout] = World.NumWormholes + 1;
+*/
     World.NumWormholes += 2;
 }
+
 
 void remove_temp_wormhole(int ind)
 {
@@ -984,7 +862,9 @@ void remove_temp_wormhole(int ind)
 
     hole = World.wormHoles[ind];
     World.block[hole.pos.x][hole.pos.y] = SPACE;
+/*
     World.itemID[hole.pos.x][hole.pos.y] = (u_short) -1;
+*/
     World.NumWormholes--;
     if (ind != World.NumWormholes) {
 	World.wormHoles[ind] = World.wormHoles[World.NumWormholes];
@@ -993,4 +873,3 @@ void remove_temp_wormhole(int ind)
 					    World.NumWormholes
 					    * sizeof(wormhole_t));
 }
-
