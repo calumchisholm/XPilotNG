@@ -2,6 +2,10 @@ package org.xpilot.jxpmap;
 
 import java.awt.BorderLayout;
 
+import java.io.InputStream;
+import java.io.FileInputStream;
+import java.io.BufferedInputStream;
+
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
@@ -27,14 +31,20 @@ public class PixmapEditor extends EditorPanel {
         pixmap.setFileName(nameField.getText());
         pixmap.setScalable(true);
         try {
-            pixmap.load();
-            return true;
+            InputStream in = new BufferedInputStream(
+                new FileInputStream(pixmap.getFileName()));
+            try {
+                pixmap.load(in);
+                return true;
+            } finally {
+                in.close();
+            }
         } catch (Exception e) {
             JOptionPane.showMessageDialog
                 (this, "Failed to load the specified image. Check the name.",
                  "Error", JOptionPane.ERROR_MESSAGE);
             return false;
-        }
+        }        
     }
 
 

@@ -8,6 +8,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -21,6 +24,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
+import org.xml.sax.InputSource;
 import org.xml.sax.helpers.DefaultHandler;
 
 
@@ -195,8 +199,11 @@ public class MapModel extends ModelObject {
     }
 
 
-    public void load (String fileName) 
-        throws IOException, SAXException, ParserConfigurationException {
+    public void load (String name) 
+    throws IOException, SAXException, ParserConfigurationException, 
+    XPDFile.ParseException {
+            
+        System.out.println("loading map " + name);
 
         edgeStyles.clear();
         LineStyle ls;
@@ -204,23 +211,20 @@ public class MapModel extends ModelObject {
         edgeStyles.add(ls);
         polyStyles.clear();
 
-        System.out.println("parsing map file: "+ fileName);
+        XPDFile xpd = XPDFile.load(new File(name));
+        XPDFile.Part first = (XPDFile.Part)xpd.get(0);
+        readXml(new String(first.data, "ISO8859_1"));
 
-        String uri = "file:" + new File(fileName).getAbsolutePath();
-        SAXParserFactory spf = SAXParserFactory.newInstance();
-        spf.setValidating(false);
-
-        XMLReader reader = spf.newSAXParser().getXMLReader();
-        reader.setContentHandler(new MapDocumentHandler());
-        reader.parse(uri);
-
-        System.out.println(fileName + " parsed successfully");
-        System.out.println("loading images");
-        
-        for (Iterator iter = pixmaps.iterator(); iter.hasNext();) {
-            Pixmap px = (Pixmap)iter.next();
-            System.out.println(px.getFileName());
-            px.load();
+        for (Iterator i = pixmaps.iterator(); i.hasNext();) {
+            Pixmap pixmap = (Pixmap)i.next();
+            for (Iterator j = xpd.iterator(); j.hasNext();) {
+                XPDFile.Part part = (XPDFile.Part)j.next();
+                if (pixmap.getFileName().equals(part.name))
+                    pixmap.load(new ByteArrayInputStream(part.data));
+            }
+            if (pixmap.getImage() == null)
+                throw new IOException("missing image: " 
+                    + pixmap.getFileName());
         }
 
         defEdgeStyle = (LineStyle)edgeStyles.get(edgeStyles.size() - 1);
@@ -228,44 +232,61 @@ public class MapModel extends ModelObject {
 
         System.out.println("ready");
     }
+    
+    
+    public void readXml (String xml) 
+    throws IOException, SAXException, ParserConfigurationException {
+        SAXParserFactory spf = SAXParserFactory.newInstance();
+        spf.setValidating(false);
+        XMLReader reader = spf.newSAXParser().getXMLReader();
+        reader.setContentHandler(new MapDocumentHandler());
+        reader.parse(new InputSource(new StringReader(xml)));
+    }
 
 
     public void save (File file) throws IOException {
         
-        FileWriter fw = new FileWriter(file);
-        try {
-            PrintWriter out = new PrintWriter(new BufferedWriter(fw));
-            out.println("<XPilotMap>");
+        StringWriter w = new StringWriter();
+        PrintWriter out = new PrintWriter(w);
+        out.println("<XPilotMap>");
+        
+        options.printXml(out);
 
-            options.printXml(out);
-
-            for (Iterator iter = pixmaps.iterator(); iter.hasNext();) {
-                Pixmap p = (Pixmap)iter.next();
-                p.printXml(out);
-            }
-
-            for (Iterator iter = edgeStyles.iterator(); iter.hasNext();) {
-                LineStyle s = (LineStyle)iter.next();
-                s.printXml(out);
-            }
-
-            for (Iterator iter = polyStyles.iterator(); iter.hasNext();) {
-                PolygonStyle s = (PolygonStyle)iter.next();
-                s.printXml(out);
-            }
-
-            for (int i = objects.size() - 1; i >= 0; i--) {
-                ((MapObject)objects.get(i)).printXml(out);
-            }
-
-            out.println("</XPilotMap>");
-            
-            out.flush();
-            out.close();
-
-        } finally {
-            try { fw.close(); } catch (IOException ignore) {}
+        for (Iterator iter = pixmaps.iterator(); iter.hasNext();) {
+            Pixmap p = (Pixmap)iter.next();
+            p.printXml(out);
         }
+
+        for (Iterator iter = edgeStyles.iterator(); iter.hasNext();) {
+            LineStyle s = (LineStyle)iter.next();
+            s.printXml(out);
+        }
+
+        for (Iterator iter = polyStyles.iterator(); iter.hasNext();) {
+            PolygonStyle s = (PolygonStyle)iter.next();
+            s.printXml(out);
+        }
+
+        for (int i = objects.size() - 1; i >= 0; i--) {
+            ((MapObject)objects.get(i)).printXml(out);
+        }
+
+        out.println("</XPilotMap>");
+        
+        String xmlName = file.getName();
+        int dot = xmlName.lastIndexOf('.');
+        if (dot != -1) xmlName = xmlName.substring(0, dot);
+        xmlName += ".xp2";
+        
+        XPDFile xpd = new XPDFile();
+        xpd.add(new XPDFile.Part(xmlName, w.toString().getBytes("ISO8859_1")));
+        for (Iterator i = pixmaps.iterator(); i.hasNext();) {
+            Pixmap pixmap = (Pixmap)i.next();
+            xpd.add(new XPDFile.Part(pixmap.getFileName(), 
+                new PPMEncoder().encode(pixmap.getImage())));
+        }
+        
+        xpd.save(file);
     }
 
 

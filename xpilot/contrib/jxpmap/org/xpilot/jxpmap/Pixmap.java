@@ -1,6 +1,7 @@
 package org.xpilot.jxpmap;
 
 import java.awt.image.BufferedImage;
+import java.io.InputStream;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -39,13 +40,12 @@ public class Pixmap extends ModelObject {
     }
     
     
-    public void load () throws IOException {
+    public void load (InputStream in) throws IOException {
         image = 
             new PPMDecoder().decode
-                (new BufferedInputStream
-                    (new FileInputStream(fileName)));
+                (new BufferedInputStream(in));
     }
-
+    
 
     public void printXml (PrintWriter out) throws IOException {
         
