@@ -433,6 +433,10 @@ static bool Msg_scan_for_ball_destruction(char *message)
     if (!self)
 	return false;
 
+    /* don't bother to count if we are not playing */
+    if (strchr("PTW", self->mychar))
+	return false;
+
     memset(&mn, 0, sizeof(mn));
     if (Msg_match_fmt(message,
 		      " < %n's (%t) team has destroyed team %t treasure >",

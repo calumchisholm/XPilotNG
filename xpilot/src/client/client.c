@@ -1298,15 +1298,24 @@ static void Print_roundend_messages(other_t **order)
 {
     static char		hackbuf[MSG_LEN];
     static char		hackbuf2[MSG_LEN];
+    static char		kdratio[16];
     char		*s;
     int			i;
     other_t		*other;
 
     roundend = false;
-		
-    sprintf(hackbuf, "Kill ratio - Round: %d/%d, Total: %d/%d",
+
+    if (killratio_totalkills == 0)
+	sprintf(kdratio, "0");
+    else if (killratio_totaldeaths == 0)
+	sprintf(kdratio, "infinite");
+    else
+	sprintf(kdratio, "%.2f",
+		(DFLOAT)killratio_totalkills / killratio_totaldeaths);
+
+    sprintf(hackbuf, "Kill ratio - Round: %d/%d, Total: %d/%d (%s)",
 	    killratio_kills, killratio_deaths,
-	    killratio_totalkills, killratio_totaldeaths);
+	    killratio_totalkills, killratio_totaldeaths, kdratio);
     killratio_kills = 0;
     killratio_deaths = 0;
     Add_message(hackbuf);
@@ -1328,7 +1337,7 @@ static void Print_roundend_messages(other_t **order)
 	    continue;
 
 	if (Using_score_decimals()) {
-	    sprintf(hackbuf2, "%s: %.*f  ", other->name,
+	    sprintf(hackbuf2, "%s: %.*f ", other->name,
 		    showScoreDecimals, other->score);
 	    if ((s - hackbuf) + strlen(hackbuf2) > MSG_LEN) {
 		Add_message(hackbuf);
@@ -1336,7 +1345,7 @@ static void Print_roundend_messages(other_t **order)
 	    }
 	    s += sprintf(s, "%s", hackbuf2);
 	} else {
-	    sprintf(hackbuf2, "%s: %d  ", other->name,
+	    sprintf(hackbuf2, "%s: %d ", other->name,
 		    (int) rint(other->score));
 	    if ((s - hackbuf) + strlen(hackbuf2) > MSG_LEN) {
 		Add_message(hackbuf);
