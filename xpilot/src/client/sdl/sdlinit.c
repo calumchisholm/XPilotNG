@@ -165,7 +165,7 @@ int Init_window(void)
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
 	if (videoFlags & SDL_FULLSCREEN)
-		if (!find_size(&draw_width, &draw_height))
+		if (!find_size((int*)&draw_width, (int*)&draw_height))
 			videoFlags ^= SDL_FULLSCREEN;
 
     if ((MainSDLSurface = SDL_SetVideoMode(draw_width,
