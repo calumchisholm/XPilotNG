@@ -184,7 +184,6 @@ void Timing_setup(void);
  * Prototypes for play.c
  */
 void Thrust(int ind);
-void Recoil(object *ship, object *shot);
 void Record_shove(player *pl, player *pusher, long time);
 void Delta_mv(object *ship, object *obj);
 void Delta_mv_elastic(object *obj1, object *obj2);

@@ -112,15 +112,6 @@ void Thrust(int ind)
 	);
 }
 
-/* Calculates the recoil if a ship fires a shot */
-void Recoil(object *ship, object *shot)
-{
-    ship->vel.x -= (((shot->vel.x - ship->vel.x) *
-	shot->mass) / ship->mass);
-    ship->vel.y -= (((shot->vel.y - ship->vel.y) *
-	shot->mass) / ship->mass);
-}
-
 void Record_shove(player *pl, player *pusher, long time)
 {
     shove_t		*shove = &pl->shove_record[pl->shove_next];

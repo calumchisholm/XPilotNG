@@ -1054,8 +1054,15 @@ void Fire_general_shot(int ind, unsigned short team, bool cannon,
      * firing each mini missile.
      */
     if (pl) {
-	for (i = 0; i < fired; i++)
-	    Recoil((object *)pl, mini_objs[i]);
+	DFLOAT dx, dy;
+
+	dx = dy = 0;
+	for (i = 0; i < fired; i++) {
+	    dx += (mini_objs[i]->vel.x - pl->vel.x) * mini_objs[i]->mass;
+	    dy += (mini_objs[i]->vel.y - pl->vel.y) * mini_objs[i]->mass;
+	}
+	pl->vel.x -= dx / pl->mass;
+	pl->vel.y -= dy / pl->mass;
     }
 }
 
