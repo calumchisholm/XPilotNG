@@ -83,6 +83,7 @@ extern int		robotsTalk, robotsLeave, robotLeaveLife;
 extern int		robotLeaveScore, robotLeaveRatio;
 extern int		robotTeam;
 extern bool		restrictRobots, reserveRobotTeam;
+extern int 		robotTicksPerSecond;
 extern World_map	World;
 extern server		Server;
 extern list_t		expandList;

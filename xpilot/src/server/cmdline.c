@@ -53,6 +53,7 @@ int		robotLeaveRatio;	/* Min ratio for robot to live (0=off)*/
 int		robotTeam;		/* Team for robots */
 bool		restrictRobots;		/* Restrict robots to robotTeam? */
 bool		reserveRobotTeam;	/* Allow only robots in robotTeam? */
+int		robotTicksPerSecond;	/* How often to do robot round tick? */
 int		ShotsMax;		/* Max shots pr. player */
 bool		ShotsGravity;		/* Shots affected by gravity */
 double		fireRepeatRate;		/* Ticks per autorepeat fire (0=off) */
@@ -608,6 +609,18 @@ static option_desc options[] = {
 	valBool,
 	tuner_dummy,
 	"Is the robot team only for robots?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"robotTicksPerSecond",
+	"robotTicks",
+	"0",
+	&robotTicksPerSecond,
+	valInt,
+	Timing_setup,
+	"How many times per second to call robot round tick?\n"
+	"The value will be limited into the range 1 to server FPS.\n" 
+	"A value of 0 means one tick per frame.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -3825,6 +3838,10 @@ void Timing_setup(void)
 	coriolisCosine = cos(cor_angle / timeStep);
 	coriolisSine = sin(cor_angle / timeStep);
     }
+
+    if (robotTicksPerSecond == 0)
+	robotTicksPerSecond = FPS;
+    LIMIT(robotTicksPerSecond, 1, FPS);
 
     install_timer_tick(NULL, timerResolution ? timerResolution : FPS);
 }
