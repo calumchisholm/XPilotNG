@@ -64,13 +64,13 @@ void Gui_paint_ball(int x, int y)
 }
 
 
-void Gui_paint_ball_connecter(int x1, int y1, int x2, int y2)
+void Gui_paint_ball_connector(int x_1, int y_1, int x_2, int y_2)
 {
-    x2 = X(x2);
-    y2 = Y(y2);
-    x1 = X(x1);
-    y1 = Y(y1);
-    Segment_add(connColor, x1, y1, x2, y2);
+    x_2 = X(x_2);
+    y_2 = Y(y_2);
+    x_1 = X(x_1);
+    y_1 = Y(y_1);
+    Segment_add(connColor, x_1, y_1, x_2, y_2);
 }
 
 static void Gui_paint_mine_name(int x, int y, char *name)
@@ -312,16 +312,16 @@ void Gui_paint_missiles_end(void)
 
 void Gui_paint_missile(int x, int y, int len, int dir)
 {
-   int		x1, x2, y1, y2;
+   int		x_1, x_2, y_1, y_2;
 
-    x1 = X(x);
-    y1 = Y(y);
-    x2 = (int)(x1 - tcos(dir) * len);
-    y2 = (int)(y1 + tsin(dir) * len);
+    x_1 = X(x);
+    y_1 = Y(y);
+    x_2 = (int)(x_1 - tcos(dir) * len);
+    y_2 = (int)(y_1 + tsin(dir) * len);
     rd.drawLine(dpy, p_draw, gameGC,
-	    WINSCALE(x1), WINSCALE(y1), WINSCALE(x2), WINSCALE(y2));
-    Erase_segment(4, WINSCALE(x1) , WINSCALE(y1),
-		  WINSCALE(x2) , WINSCALE(y2));
+		WINSCALE(x_1), WINSCALE(y_1), WINSCALE(x_2), WINSCALE(y_2));
+    Erase_segment(4, WINSCALE(x_1) , WINSCALE(y_1),
+		  WINSCALE(x_2) , WINSCALE(y_2));
 }
 
 
@@ -339,47 +339,45 @@ void Gui_paint_lasers_end(void)
 }
 
 
-void Gui_paint_laser(int color, int x1, int y1, int len, int dir)
+void Gui_paint_laser(int color, int x_1, int y_1, int len, int dir)
 {
-    int		x2, y2;
+    int		x_2, y_2;
 
-    x2 = (int)(x1 + len * tcos(dir));
-    y2 = (int)(y1 + len * tsin(dir));
+    x_2 = (int)(x_1 + len * tcos(dir));
+    y_2 = (int)(y_1 + len * tsin(dir));
     if ((unsigned)(color) >= NUM_COLORS)
 	color = WHITE;
     SET_FG(colors[color].pixel);
     rd.drawLine(dpy, p_draw, gameGC,
-	      WINSCALE(X(x1)), WINSCALE(Y(y1)),
-	      WINSCALE(X(x2)), WINSCALE(Y(y2)));
-    Erase_segment(3, WINSCALE(X(x1)), WINSCALE(Y(y1)),
-		     WINSCALE(X(x2)), WINSCALE(Y(y2)) );
+		WINSCALE(X(x_1)), WINSCALE(Y(y_1)),
+		WINSCALE(X(x_2)), WINSCALE(Y(y_2)));
+    Erase_segment(3, WINSCALE(X(x_1)), WINSCALE(Y(y_1)),
+		  WINSCALE(X(x_2)), WINSCALE(Y(y_2)));
 }
 
 
 void Gui_paint_paused(int x, int y, int count)
 {
     if (!texturedObjects) {
-
-	int		x0, y0;
+	int		x_0, y_0;
 	static int	pauseCharWidth = -1;
-
-	const int half_pause_size = 3*BLOCK_SZ/7;
+	const int	half_pause_size = 3*BLOCK_SZ/7;
 
 	if (pauseCharWidth < 0)
 	    pauseCharWidth = XTextWidth(gameFont, "P", 1);
 
 	SET_FG(colors[BLUE].pixel);
-	x0 = X(x - half_pause_size);
-	y0 = Y(y + half_pause_size);
+	x_0 = X(x - half_pause_size);
+	y_0 = Y(y + half_pause_size);
 	rd.fillRectangle(dpy, p_draw, gameGC,
-			 WINSCALE(x0), WINSCALE(y0),
+			 WINSCALE(x_0), WINSCALE(y_0),
 			 WINSCALE(2*half_pause_size+1),
 			 WINSCALE(2*half_pause_size+1));
 	if (count <= 0 || loopsSlow % 10 >= 5) {
 	    SET_FG(colors[WHITE].pixel);
 	    rd.drawRectangle(dpy, p_draw, gameGC,
-			     WINSCALE(x0 - 1),
-			     WINSCALE(y0 - 1),
+			     WINSCALE(x_0 - 1),
+			     WINSCALE(y_0 - 1),
 			     WINSCALE(2*(half_pause_size+1)),
 			     WINSCALE(2*(half_pause_size+1)));
 	    rd.drawString(dpy, p_draw, gameGC,
@@ -387,7 +385,7 @@ void Gui_paint_paused(int x, int y, int count)
 			  WINSCALE(Y(y-1)) + gameFont->ascent/2,
 			  "P", 1);
 	}
-	Erase_rectangle(WINSCALE(x0 - 1) - 1, WINSCALE(y0 - 1) - 1,
+	Erase_rectangle(WINSCALE(x_0 - 1) - 1, WINSCALE(y_0 - 1) - 1,
 			WINSCALE(2*half_pause_size+1)+3,
 			WINSCALE(2*half_pause_size+1)+3);
 
@@ -433,14 +431,14 @@ void Gui_paint_ecm(int x, int y, int size)
 }
 
 
-void Gui_paint_refuel(int x0, int y0, int x1, int y1)
+void Gui_paint_refuel(int x_0, int y_0, int x_1, int y_1)
 {
     if (!texturedObjects) {
 	rd.drawLine(dpy, p_draw, gameGC,
-		    WINSCALE(X(x0)), WINSCALE(Y(y0)),
-		    WINSCALE(X(x1)), WINSCALE(Y(y1)));
-	Erase_segment(1, WINSCALE(X(x0)), WINSCALE(Y(y0)),
-		      WINSCALE(X(x1)), WINSCALE(Y(y1)));
+		    WINSCALE(X(x_0)), WINSCALE(Y(y_0)),
+		    WINSCALE(X(x_1)), WINSCALE(Y(y_1)));
+	Erase_segment(1, WINSCALE(X(x_0)), WINSCALE(Y(y_0)),
+		      WINSCALE(X(x_1)), WINSCALE(Y(y_1)));
     }
     else {
 	int size = WINSCALE(8);
@@ -448,22 +446,23 @@ void Gui_paint_refuel(int x0, int y0, int x1, int y1)
 	int i;
 	int fuel[16] = { 1, 2, 3, 3, 2, 1, 0, 1, 2, 3, 2, 1, 2, 3, 3, 2 };
 
-	x0 = WINSCALE(X(x0));
-	y0 = WINSCALE(Y(y0));
-	x1 = WINSCALE(X(x1));
-	y1 = WINSCALE(Y(y1));
-	dx = (double)(x1 - x0) / 16;
-	dy = (double)(y1 - y0) / 16;
+	x_0 = WINSCALE(X(x_0));
+	y_0 = WINSCALE(Y(y_0));
+	x_1 = WINSCALE(X(x_1));
+	y_1 = WINSCALE(Y(y_1));
+	dx = (double)(x_1 - x_0) / 16;
+	dy = (double)(y_1 - y_0) / 16;
 	for (i = 0; i < 16; i++) {
-	    Bitmap_paint(p_draw, BM_REFUEL, (int)(x0 + (dx * i) - size / 2),
-			 (int)(y0 + (dy * i) - size / 2),
+	    Bitmap_paint(p_draw, BM_REFUEL,
+			 (int)(x_0 + (dx * i) - size / 2),
+			 (int)(y_0 + (dy * i) - size / 2),
 			 fuel[(loops + 16 - i) % 16]);
 	}
     }
 }
 
 
-void Gui_paint_connector(int x0, int y0, int x1, int y1, int tractor)
+void Gui_paint_connector(int x_0, int y_0, int x_1, int y_1, int tractor)
 {
     if (tractor)
 	rd.setDashes(dpy, gameGC, 0, cdashes, NUM_CDASHES);
@@ -471,22 +470,22 @@ void Gui_paint_connector(int x0, int y0, int x1, int y1, int tractor)
 	rd.setDashes(dpy, gameGC, 0, dashes, NUM_DASHES);
 
     rd.drawLine(dpy, p_draw, gameGC,
-	      WINSCALE(X(x0)), WINSCALE(Y(y0)),
-	      WINSCALE(X(x1)), WINSCALE(Y(y1)));
-    Erase_segment(1, WINSCALE(X(x0)), WINSCALE(Y(y0)),
-		  WINSCALE(X(x1)), WINSCALE(Y(y1)));
+	      WINSCALE(X(x_0)), WINSCALE(Y(y_0)),
+	      WINSCALE(X(x_1)), WINSCALE(Y(y_1)));
+    Erase_segment(1, WINSCALE(X(x_0)), WINSCALE(Y(y_0)),
+		  WINSCALE(X(x_1)), WINSCALE(Y(y_1)));
     if (tractor)
 	rd.setDashes(dpy, gameGC, 0, dashes, NUM_DASHES);
 }
 
 
-void Gui_paint_transporter(int x0, int y0, int x1, int y1)
+void Gui_paint_transporter(int x_0, int y_0, int x_1, int y_1)
 {
     rd.drawLine(dpy, p_draw, gameGC,
-		WINSCALE(X(x0)), WINSCALE(Y(y0)),
-		WINSCALE(X(x1)), WINSCALE(Y(y1)));
-    Erase_segment(1, WINSCALE(X(x0)), WINSCALE(Y(y0)),
-		  WINSCALE(X(x1)), WINSCALE(Y(y1)));
+		WINSCALE(X(x_0)), WINSCALE(Y(y_0)),
+		WINSCALE(X(x_1)), WINSCALE(Y(y_1)));
+    Erase_segment(1, WINSCALE(X(x_0)), WINSCALE(Y(y_0)),
+		  WINSCALE(X(x_1)), WINSCALE(Y(y_1)));
 }
 
 

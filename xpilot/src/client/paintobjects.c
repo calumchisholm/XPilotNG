@@ -184,7 +184,7 @@ static void Paint_balls(void)
 		ys = ship_ptr[j].y;
 
 		if (wrap(&xs, &ys))
-		    Gui_paint_ball_connecter(x, y, xs, ys);
+		    Gui_paint_ball_connector(x, y, xs, ys);
 	    }
 	}
 	RELEASE(ball_ptr, num_ball, max_ball);
