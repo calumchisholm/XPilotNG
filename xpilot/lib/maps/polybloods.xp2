@@ -33,7 +33,7 @@
 <Option name="initialsensors" value="0"/>
 <Option name="ecmsreprogrammines" value="yes"/>
 <Option name="targetkillteam" value="yes"/>
-<Option name="allowmodifiers" value="yes"/>
+<Option name="allowmodifiers" value="no"/>
 <Option name="playerwallbouncebrakefactor" value="0.5"/>
 <Option name="nukesonradar" value="yes"/>
 <Option name="itememergencythrustprob" value="0.2"/>
@@ -47,7 +47,7 @@
 <Option name="debriswallbounce" value="no"/>
 <Option name="itemsensorprob" value="0.7"/>
 <Option name="limitedlives" value="yes"/>
-<Option name="allowlasermodifiers" value="yes"/>
+<Option name="allowlasermodifiers" value="no"/>
 <Option name="reserverobotteam" value="no"/>
 <Option name="movingitemprob" value="0.5"/>
 <Option name="nukeminmines" value="3"/>
@@ -86,7 +86,7 @@
 <Option name="initialemergencythrusts" value="0"/>
 <Option name="allowplayerkilling" value="yes"/>
 <Option name="limitedvisibility" value="no"/>
-<Option name="mapname" value="Polygon Blood&apos;s Music 10 v7"/>
+<Option name="mapname" value="Polygon Blood&apos;s Music 10 v7.1"/>
 <Option name="laserisstungun" value="no"/>
 <Option name="itemtankprob" value="0.5"/>
 <Option name="missilesonradar" value="yes"/>
