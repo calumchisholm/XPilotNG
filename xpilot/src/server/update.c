@@ -1147,8 +1147,14 @@ static void Update_players(void)
 		power = AFTER_BURN_POWER(power, a);
 		f = AFTER_BURN_FUEL(f, a);
 	    }
+#if 1
 	    pl->acc.x = power * tcos(pl->dir) / inert;
 	    pl->acc.y = power * tsin(pl->dir) / inert;
+#else
+	    /* experimental code to use double precision for steering */
+	    pl->acc.x = power * cos(pl->float_dir * 2.0 * PI / RES) / inert;
+	    pl->acc.y = power * sin(pl->float_dir * 2.0 * PI / RES) / inert;
+#endif
 	    /* Decrement fuel */
 	    if (do_update_this_frame)
 		Player_add_fuel(pl, -f);
