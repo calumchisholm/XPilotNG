@@ -626,9 +626,23 @@ void Paint_world_radar_old(void)
     }
 }
 
+static void Compute_radar_bounds(ipos *min, ipos *max, const irec *b)
+{
+    min->x = (0 - (b->x + b->w)) / Setup->width;
+    if (0 > b->x + b->w) min->x++;
+    max->x = (0 + Setup->width - b->x) / Setup->width;
+    if (0 + Setup->width < b->x) max->x--;
+    min->y = (0 - (b->y + b->h)) / Setup->height;
+    if (0 > b->y + b->h) min->y++;
+    max->y = (0 + Setup->height - b->y) / Setup->height;
+    if (0 + Setup->height < b->y) max->y--;
+
+}
+
 void Paint_world_radar(void)
 {
-    int i,j,k;
+    int i, j, xoff, yoff;
+    ipos min, max;
     static XPoint poly[10000];
 
 #define DBG if(0) printf
@@ -659,57 +673,39 @@ void Paint_world_radar(void)
     XSetForeground(dpy, radarGC, colors[wallRadarColor].pixel);
 #endif
 
-    /*
-     * The radar is drawn 9 times into different locations
-     * so that polygons going over the world edge seem to
-     * appear on the other side. The locations are like
-     * the following:
-     * 012
-     * 345
-     * 678
-     * The copy number 4 is the world being displayed. Now if
-     * a polygon extends from 4 to 5, it appears on the left
-     * side of 4 because the copy drawn in 3 extends to 4.
-     */
-    for (k = 0; k < 9; k++) {
+    /* loop through all the polygons */
+    for (i = 0; i < num_polygons; i++) {
+	Compute_radar_bounds(&min, &max, &polygons[i].bounds);
+	for (xoff = min.x; xoff <= max.x; xoff++) {
+	    for (yoff = min.y; yoff <= max.y; yoff++) {
+		DBG("%d %d %d\n", i, xoff, yoff);
 
-	/* offsets of the current copy */
-	int x_offset = ((k % 3) - 1) * Setup->width;
-	int y_offset = ((k / 3) - 1) * Setup->height;
+		/* location of current polygon */
+		int x = polygons[i].points[0].x + xoff * Setup->width;
+		int y = - polygons[i].points[0].y + (1-yoff) * Setup->height;
 
-	/* loop through all the polygons */
-	for (i = 0; i < num_polygons; i++) {
+		if (BIT(polygon_styles[polygons[i].style].flags,
+			STYLE_INVISIBLE_RADAR)) continue;
 
-	    /* location of current polygon */
-	    int x = polygons[i].points[0].x + x_offset;
-	    int y = Setup->height - polygons[i].points[0].y + y_offset;
+		poly[0].x = (x * 256) / Setup->width;
+		poly[0].y = (y * RadarHeight) / Setup->height;
 
-	    if (BIT(polygon_styles[polygons[i].style].flags,
-		    STYLE_INVISIBLE_RADAR)) continue;
+		/* loop through the points in the current polygon */
+		for (j = 1; j < polygons[i].num_points; j++) {
 
-	    poly[0].x = (x * 256) / Setup->width;
-	    poly[0].y = (y * RadarHeight) / Setup->height;
+		    x += polygons[i].points[j].x;
+		    y -= polygons[i].points[j].y;
 
-	    DBG("poly[k=%d, i=%d, x=%d, y=%d] = ", k, i, x, y);
-	    DBG("(%d,%d) ", poly[0].x, poly[0].y);
+		    poly[j].x = (x * 256) / Setup->width;
+		    poly[j].y = (y * RadarHeight) / Setup->height;
+		}
 
-	    /* loop through the points in the current polygon */
-	    for (j = 1; j < polygons[i].num_points; j++) {
-
-		x += polygons[i].points[j].x;
-		y -= polygons[i].points[j].y;
-
-		poly[j].x = (x * 256) / Setup->width;
-		poly[j].y = (y * RadarHeight) / Setup->height;
-		DBG("(%d,%d) ", poly[j].x, poly[j].y);
+		XSetForeground(dpy, radarGC, fullColor ?
+			       polygon_styles[polygons[i].style].color :
+			       colors[wallRadarColor].pixel);
+		XFillPolygon(dpy, s_radar, radarGC, poly, polygons[i].num_points,
+			     Nonconvex, CoordModeOrigin);
 	    }
-
-	    DBG("\n");
-	    XSetForeground(dpy, radarGC, fullColor ?
-			   polygon_styles[polygons[i].style].color :
-			   colors[wallRadarColor].pixel);
-	    XFillPolygon(dpy, s_radar, radarGC, poly, polygons[i].num_points,
-			 Nonconvex, CoordModeOrigin);
 	}
     }
 
