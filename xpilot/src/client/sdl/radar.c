@@ -18,7 +18,7 @@ static GLuint      radar_texture;     /* above as an OpenGL texture */
 
 void Radar_cleanup( GLWidget *widget );
 static void Radar_paint( GLWidget *widget );
-void move(Sint16 xrel,Sint16 yrel,Uint16 x,Uint16 y, void *data);
+void move(Sint16 xrel,Sint16 yrel,Uint16 x,Uint16 y, void *data);
 
 #define RGBA(RGB) \
     ((RGB) & 0xff000000 ? (RGB) & 0xff000000 : 0xff000000 \
@@ -31,6 +31,39 @@ static int pow2_ceil(int t)
     int r;
     for (r = 1; r < t; r <<= 1);
     return r;
+}
+
+/*
+ * Maps map coordinates or radar coordinates to screen 
+ * coordinates.
+ */
+static void to_screen(GLWidget *radar, int *x, int *y, int from_w, int from_h)
+{
+    float fx, fy, sx, sy;
+    SDL_Rect rb = radar->bounds;
+
+    fx = *x * rb.w / from_w;
+    fy = *y * rb.h / from_h;
+
+    if (instruments.showSlidingRadar) {
+	sx = selfPos.x * rb.w / Setup->width;
+	sy = selfPos.y * rb.h / Setup->height;
+	fx = fx - sx;
+	fy = fy - sy;
+	if (fx < -rb.w/2)
+	    fx += rb.w;
+	else if (fx > rb.w/2)
+	    fx -= rb.w;
+	if (fy < -rb.h/2)
+	    fy += rb.h;
+	else if (fy > rb.h/2)
+	    fy -= rb.h;
+	fx += rb.w/2;
+	fy += rb.h/2;
+    }
+
+    *x = rb.x + (fx + 0.5);
+    *y = rb.y + rb.h - (fy + 0.5);
 }
 
 static void Radar_paint_border(GLWidget *radar)
@@ -187,40 +220,16 @@ static void Radar_paint_world_polygons(GLWidget *radar, SDL_Surface *s)
 static void Radar_paint_objects( GLWidget *radar )
 {
     int	i, x, y, s;
-    float fx, fy, sx, sy;
-    SDL_Rect rb = radar->bounds;
-
-    if (instruments.showSlidingRadar) {
-	sx = selfPos.x * rb.w / Setup->width;
-	sy = selfPos.y * rb.h / Setup->height;
-    }
 
     for (i = 0; i < num_radar; i++) {
-        fx = radar_ptr[i].x * rb.w / RadarWidth;
-        fy = radar_ptr[i].y * rb.h / RadarHeight;
-        s = radar_ptr[i].size;
-
-	if (instruments.showSlidingRadar) {
-            fx = fx - sx;
-            fy = fy - sy;
-	    if (fx < -rb.w/2)
-		fx += rb.w;
-	    else if (fx > rb.w/2)
-		fx -= rb.w;
-	    if (fy < -rb.h/2)
-		fy += rb.h;
-	    else if (fy > rb.h/2)
-		fy -= rb.h;
-	    fx += rb.w/2;
-	    fy += rb.h/2;
-        }
-
-	x = rb.x + (fx + 0.5) - s/2;
-	y = rb.y + rb.h - (fy + 0.5) - s/2;
-
+	x = radar_ptr[i].x;
+	y = radar_ptr[i].y;
+	s = radar_ptr[i].size;
+	to_screen(radar, &x, &y, RadarWidth, RadarHeight);
+	x -= s/2;
+	y -= s/2;
 	if (radar_ptr[i].type == friend) glColor3ub(0, 0xff, 0);
 	else glColor3ub(0xff, 0xff, 0xff);
-
 	glBegin(GL_QUADS);
 	glVertex2i(x, y);
 	glVertex2i(x + s, y);
@@ -229,8 +238,6 @@ static void Radar_paint_objects( GLWidget *radar )
 	glEnd();
     }
 
-    glEnd();
-
     if (num_radar)
 	RELEASE(radar_ptr, num_radar, max_radar);
 }
@@ -238,15 +245,59 @@ static void Radar_paint_objects( GLWidget *radar )
 /*
  * Paints player's ship and direction.
  */
-static void Radar_paint_self(float xf, float yf)
+static void Radar_paint_self(GLWidget *radar)
 {
+    int x, y, x2, y2;
+    SDL_Rect rb = radar->bounds;
+
+    if (!selfVisible) return;
+
+    if (instruments.showSlidingRadar) {
+	x = rb.x + rb.w/2;
+	/* the sliding radar seems to be off by roughly 1 pixel */
+	y = rb.y + rb.h/2 + 1;
+    } else {
+	x = rb.x + selfPos.x * rb.w / Setup->width;
+	y = rb.y + rb.h - selfPos.y * rb.h / Setup->height;
+    }
+    x2 = (int)(x + 8 * tcos(heading));
+    y2 = (int)(y - 8 * tsin(heading));
+
+    glColor4ub(0xff, 0xff, 0xff, 0xff);
+    glBegin(GL_LINES);
+    glVertex2i(x, y);
+    glVertex2i(x2, y2);
+    glEnd();
+
 }
 
 /*
- * Paints checkpoints.
+ * Paints the next checkpoint.
  */
-static void Radar_paint_checkpoints(float xf, float yf)
+static void Radar_paint_checkpoint(GLWidget *radar)
 {
+    int x, y;
+    if (BIT(Setup->mode, TIMING)) {
+	if (oldServer) {
+	    Check_pos_by_index(nextCheckPoint, &x, &y);
+	    x = x * BLOCK_SZ + BLOCK_SZ/2;
+	    y = y * BLOCK_SZ + BLOCK_SZ/2;
+	} else {
+	    irec b = checks[nextCheckPoint].bounds;
+	    x = b.x + b.w/2;
+	    y = b.y + b.h/2;
+	}
+	to_screen(radar, &x, &y, Setup->width, Setup->height);
+	
+	glColor4ub(0x50, 0x50, 0xff, 0xff);
+	glBegin(GL_QUADS);
+	glVertex2i(x - 3, y);
+	glVertex2i(x, y - 3);
+	glVertex2i(x + 3, y);
+	glVertex2i(x, y + 3);
+	glEnd();
+	
+    }    
 }
 
 void move(Sint16 xrel,Sint16 yrel,Uint16 x,Uint16 y, void *data)
@@ -422,9 +473,9 @@ static void Radar_paint( GLWidget *widget )
 	Radar_blit_world(&sr, &radar_bounds);
     }
 
-    Radar_paint_checkpoints(xf, yf);
+    Radar_paint_checkpoint( widget );
+    Radar_paint_self( widget );
     Radar_paint_objects( widget );
-    Radar_paint_self(xf, yf);
     Radar_paint_border( widget );
 }
 
