@@ -455,8 +455,8 @@ int Init_player(world_t *world, int ind, shipshape_t *ship)
     pl->player_fps = 50; /* Client should send a value after startup */
     pl->maxturnsps = MAX_SERVER_FPS;
 
-    Rank_clear_kills(pl);
-    Rank_clear_deaths(pl);
+    pl->kills = 0;
+    pl->deaths = 0;
 
     /*
      * If limited lives you will have to wait 'til everyone gets GAME OVER.
@@ -614,8 +614,8 @@ void Reset_all_players(world_t *world)
 	    }
 	}
 
-	Rank_clear_kills(pl);
-	Rank_clear_deaths(pl);
+	pl->kills = 0;
+	pl->deaths = 0;
 
 	if (!Player_is_paused(pl)
 	    && !Player_is_waiting(pl))

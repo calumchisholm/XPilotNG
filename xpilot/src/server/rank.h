@@ -58,17 +58,6 @@ void Rank_write_rankfile(void);
 void Rank_write_webpage(void);
 void Rank_show_ranks(void);
 
-/* these 2 don't really touch the rank stuff */
-static inline void Rank_clear_kills(player_t *pl)
-{
-    pl->kills = 0;
-}
-
-static inline void Rank_clear_deaths(player_t *pl)
-{
-    pl->deaths = 0;
-}
-
 static inline void Rank_add_score(player_t *pl, double points)
 {
     pl->score += points;
