@@ -519,7 +519,7 @@ void Paint_world(void)
 	    }
 	    else if (oldServer) {
 		if (!BIT(instruments, SHOW_FILLED_WORLD|SHOW_TEXTURED_WALLS)) {
-		    Gui_paint_walls(x, y, type, xi, yi);
+		    Gui_paint_walls(x, y, type);
 
 		    if ((type & BLUE_FUEL) == BLUE_FUEL) {
 			fuel = Fuel_by_pos(xi, yi);

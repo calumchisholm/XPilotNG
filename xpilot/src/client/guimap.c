@@ -27,7 +27,7 @@
 char guimap_version[] = VERSION;
 
 
-void Gui_paint_walls(int x, int y, int type, int xi, int yi)
+void Gui_paint_walls(int x, int y, int type)
 {
     if (!texturedObjects) {
 	if (type & BLUE_LEFT)
