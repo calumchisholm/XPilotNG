@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -189,7 +188,7 @@ tossOldestCacheEntry(void)
   free(oldest->sound);
   soundCacheBytes -= oldest->length;
   soundCacheEntries--;
-  bzero((char *) oldest, sizeof(struct SoundCache));
+  memset((char *) oldest, 0, sizeof(struct SoundCache));
 }
 
 

@@ -208,7 +208,7 @@ static int Simulate_frames(void)
 	Game_over_action(PLAYING);
 	Send_display();
 
-	bzero(newitems, sizeof(newitems));
+	memset(newitems, 0, sizeof(newitems));
 	newitems[ITEM_AFTERBURNER] = 2;
 	newitems[ITEM_AUTOPILOT] = 1;
 
