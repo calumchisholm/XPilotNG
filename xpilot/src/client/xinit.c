@@ -485,8 +485,8 @@ int Init_top(void)
 
     COLORCHECK(hudColor, BLUE);
     COLORCHECK(hudLockColor, hudColor);
-    COLORCHECK(hrColor1, RED);
-    COLORCHECK(hrColor2, BLUE);
+    COLORCHECK(hudRadarEnemyColor, RED);
+    COLORCHECK(hudRadarOtherColor, BLUE);
     COLORCHECK(shipShapesHackColor, BLACK);
     COLORCHECK(dirPtrColor, BLACK);
     COLORCHECK(msgScanBallColor, RED);
@@ -516,26 +516,6 @@ int Init_top(void)
     COLORCHECK(decorColor, RED);
 #undef COLORCHECK
 
-    if (hrSize >= SHIP_SZ || hrSize <= 0) {
-	hrSize = 6;
-    }
-    if (hrScale >= 4.0 || hrScale <= 0.5) {
-	hrScale = 1.5;
-    }
-    if (hrLimit > 5.0 || hrLimit < 0.0) {
-	hrLimit = 0.05;
-    }
-    if (hudSize >= 6 * MIN_HUD_SIZE || hudSize < MIN_HUD_SIZE) {
-	hudSize = MIN_HUD_SIZE;
-    }
-
-
-    if (scoreObjectTime > 10.0 || scoreObjectTime < 0.0) {
-	scoreObjectTime = 2.0;
-    }
-    if (baseWarningType > 3 || baseWarningType < 0) {
-	baseWarningType = 1;
-    }
     if (wallRadarColor >= maxColors
 	|| ((wallRadarColor & 5) && colorSwitch)) {
 	wallRadarColor = BLUE;
@@ -545,15 +525,27 @@ int Init_top(void)
 	/* should be & 5? !@# */
 	targetRadarColor = BLUE;
     }
-
-    if (charsPerSecond > 255 || charsPerSecond < 10) {
-	charsPerSecond = 50;
-    }
-
     if (decorRadarColor >= maxColors
 	|| ((decorRadarColor & 5) && colorSwitch)) {
 	decorRadarColor = 2;
     }
+
+#define OPTIONCHECK(o, cmp1, max, cmp2, min, fmt, d) \
+    if (o cmp1 (max) || o cmp2 (min)) { \
+      xpprintf("Value of option \"" #o "\" (" fmt ") is out of range, " \
+               "setting default value " #d ".\n", o); \
+      o = d ; }
+
+    OPTIONCHECK(hudRadarDotSize, >=, SHIP_SZ, <=, 0,   "%d",   6);
+    OPTIONCHECK(hudRadarScale,   >,  5.0,     <,  0.5, "%.2f", 1.5);
+    OPTIONCHECK(hudRadarLimit,   >,  5.0,     <,  0.0, "%.2f", 0.05);
+    OPTIONCHECK(hudSize,
+		>=, 6 * MIN_HUD_SIZE, <, MIN_HUD_SIZE, \
+		"%d", MIN_HUD_SIZE);
+    OPTIONCHECK(scoreObjectTime, >,  10.0,    <,  0.0, "%.2f", 2.0);
+    OPTIONCHECK(baseWarningType, >,  3,       <,  0,   "%d",   2);
+    OPTIONCHECK(charsPerSecond,  >,  255,     <,  10,  "%d",   50);
+#undef OPTIONCHECK
 
     shieldDrawMode = shieldDrawMode ? LineSolid : LineOnOffDash;
     radarDrawRectanglePtr = (mono ? XDrawRectangle : XFillRectangle);
