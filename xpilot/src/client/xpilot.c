@@ -248,6 +248,7 @@ extern char guimap_version[];
 extern char guiobjects_version[];
 extern char join_version[];
 extern char math_version[];
+extern char messages_version[];
 extern char net_version[];
 extern char netclient_version[];
 extern char paint_version[];
@@ -301,6 +302,7 @@ static void Check_client_versions(void)
 	{ "guiobjects", guiobjects_version },
 	{ "join", join_version },
 	{ "math", math_version },
+	{ "messages", messages_version },
 	{ "net", net_version },
 	{ "netclient", netclient_version },
 	{ "paint", paint_version },

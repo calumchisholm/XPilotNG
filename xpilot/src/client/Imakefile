@@ -96,7 +96,7 @@ SRCS = \
 	caudio.c client.c clientrank.c colors.c configure.c \
 	datagram.c dbuff.c default.c \
 	gfx2d.c gfx3d.c guimap.c guiobjects.c \
-	ignore.c join.c mapdata.c netclient.c \
+	ignore.c join.c mapdata.c messages.c netclient.c \
 	paint.c paintdata.c painthud.c paintmap.c \
 	paintobjects.c paintradar.c query.c record.c shipshape_c.c sim.c \
 	syslimit.c talk.c talkmacros.c textinterface.c texture.c \
@@ -110,7 +110,7 @@ OBJS = \
 	caudio.o client.o clientrank.o colors.o configure.o \
 	datagram.o dbuff.o default.o \
 	gfx2d.o gfx3d.o guimap.o guiobjects.o \
-	ignore.o join.o mapdata.o netclient.o \
+	ignore.o join.o mapdata.o messages.o netclient.o \
 	paint.o paintdata.o painthud.o paintmap.o \
 	paintobjects.o paintradar.o query.o record.o shipshape_c.o sim.o \
 	syslimit.o talk.o talkmacros.o textinterface.o texture.o \

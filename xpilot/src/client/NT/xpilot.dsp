@@ -260,6 +260,10 @@ SOURCE=..\mapdata.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\messages.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\netclient.c
 # End Source File
 # Begin Source File
