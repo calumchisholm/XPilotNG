@@ -30,73 +30,23 @@ bool		initialPointerControl = false;
 bool		pointerControl = false;
 extern Cursor	pointerControlCursor;
 
+#if 0
 int num_keydefs = 0;
 int max_keydefs = 0;
 keydefs_t *keydefs = NULL;
+#endif
 
 keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
 {
-    keys_t ret = KEY_DUMMY;
-
-#ifndef OLD_OPTIONS
-
-    ret = Generic_lookup_key((xp_keysym_t)ks, reset);
-
-#else
-    static int i = 0;
-
-    (void)event;
-
-#if 1 /* linear search */
-    if (reset)
-	i = 0;
-
-    /*
-     * Variable 'i' is already initialized.
-     * Use brute force linear search to find the key.
-     */
-    for (; i < num_keydefs; i++) {
-	if (ks == keydefs[i].keysym) {
-	    ret = keydefs[i].key;
-	    i++;
-	    break;
-	}
-    }
-#else /* binary search */
-    if (reset) {
-	/* binary search since keydefs is sorted on keysym. */
-	int lo = 0, hi = num_keydefs - 1;
-	while (lo < hi) {
-	    i = (lo + hi) >> 1;
-	    if (ks > keydefs[i].keysym)
-		lo = i + 1;
-	    else
-		hi = i;
-	}
-	if (lo == hi && ks == keydefs[lo].keysym) {
-	    while (lo > 0 && ks == keydefs[lo - 1].keysym)
-		lo--;
-	    i = lo;
-	    ret = keydefs[i].key;
-	    i++;
-	}
-    }
-    else {
-	if (i < num_keydefs && ks == keydefs[i].keysym) {
-	    ret = keydefs[i].key;
-	    i++;
-	}
-    }
-#endif
-#endif /* OLD_OPTIONS */
+    keys_t ret = Generic_lookup_key((xp_keysym_t)ks, reset);
 
     IFWINDOWS( Trace("Lookup_key: got key ks=%04X ret=%d\n", ks, ret) );
 
 #ifdef DEVELOPMENT
     if (reset && ret == KEY_DUMMY) {
-	static XComposeStatus	compose;
-	char			str[4];
-	int			count;
+	static XComposeStatus compose;
+	char str[4];
+	int count;
 
 	memset(str, 0, sizeof str);
 	count = XLookupString(&event->xkey, str, 1, &ks, &compose);
@@ -282,7 +232,6 @@ bool Key_press_toggle_fullscreen(void)
 
 void Key_event(XEvent *event)
 {
-#ifndef OLD_OPTIONS
     KeySym ks;
 
     if ((ks = XLookupKeysym(&event->xkey, 0)) == NoSymbol)
@@ -298,35 +247,6 @@ void Key_event(XEvent *event)
     default:
 	return;
     }
-
-#else
-    KeySym 		ks;
-    keys_t		key;
-    int			change = false;
-    bool		(*key_do)(keys_t);
-
-    switch(event->type) {
-    case KeyPress:
-	key_do = Key_press;
-	break;
-    case KeyRelease:
-	key_do = Key_release;
-	break;
-    default:
-	return;
-    }
-
-    if ((ks = XLookupKeysym(&event->xkey, 0)) == NoSymbol)
-	return;
-
-    for (key = Lookup_key(event, ks, true);
-	 key != KEY_DUMMY;
-	 key = Lookup_key(event, ks, false))
-	change |= (*key_do)(key);
-
-    if (change)
-	Net_key_change();
-#endif
 }
 
 void Talk_event(XEvent *event)
@@ -334,38 +254,6 @@ void Talk_event(XEvent *event)
     if (!Talk_do_event(event))
 	Talk_set_state(false);
 }
-
-/*
- * The option code calls this callback when key options are processed.
- */
-bool Key_binding_callback(keys_t key, const char *str)
-{
-    KeySym ks;
-    keydefs_t keydef;
-    int i;
-
-    assert(key != KEY_DUMMY);
-    assert(str);
-
-    if ((ks = XStringToKeysym(str)) == NoSymbol)
-	/* Invalid keysym */
-	return false;
-
-    for (i = 0; i < max_keydefs; i++) {
-	if (keydefs[i].keysym == ks
-	    && keydefs[i].key == key)
-	    /* This binding exists already. */
-	    return true;
-    }
-
-    keydef.keysym = ks;
-    keydef.key = key;
-
-    STORE(keydefs_t, keydefs, num_keydefs, max_keydefs, keydef);
-
-    return true;
-}
-
 
 int	talk_key_repeating;
 XEvent	talk_key_repeat_event;

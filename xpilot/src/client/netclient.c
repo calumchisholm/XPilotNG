@@ -41,7 +41,7 @@ typedef struct {
  * Exported variables.
  */
 char			hostname[SOCK_HOSTNAME_LENGTH];
-setup_t			*Setup;
+setup_t			*Setup = NULL;
 display_t               server_display;
 int			receive_window_size;
 long			last_loops;

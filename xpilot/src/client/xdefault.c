@@ -36,10 +36,6 @@ static bool testxafter = false;
 static bool testxcolors = false;
 #endif /* DEVELOPMENT */
 
-#ifndef OLD_OPTIONS
-
-static bool Set_texturedObjects(xp_option_t *opt, bool val);
-
 #define DISPLAY_ENV	"DISPLAY"
 #define DISPLAY_DEF	":0.0"
 #define KEYBOARD_ENV	"KEYBOARD"
@@ -313,7 +309,7 @@ xp_option_t xdefault_options[] = {
 
 };
 
-void Store_x_options(void)
+void Store_X_options(void)
 {
     STORE_OPTIONS(xdefault_options);
 }
@@ -345,7 +341,7 @@ static void X_after(Display *display)
 }
 #endif /* DEVELOPMENT */
 
-void Handle_x_options(void)
+void Handle_X_options(void)
 {
     char *ptr;
 
@@ -437,8 +433,3 @@ xp_keysym_t String_to_xp_keysym(const char *str)
 	return xpks;
     }
 }
-
-
-#endif
-
-

@@ -24,15 +24,6 @@
 #ifndef XEVENT_H
 #define XEVENT_H
 
-typedef struct {
-    KeySym	keysym;			/* Keysym-to-action array */
-    keys_t	key;
-} keydefs_t;
-
-extern keydefs_t	*keydefs;
-extern int		num_keydefs;
-extern int		max_keydefs;
-
 extern int		talk_key_repeating;
 extern XEvent		talk_key_repeat_event;
 extern struct timeval	talk_key_repeat_time;

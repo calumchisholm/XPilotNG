@@ -374,7 +374,6 @@ int Talk_macro(int i)
     return 0;
 }
 
-#ifndef OLD_OPTIONS
 
 static inline int index_by_option(xp_option_t *opt)
 {
@@ -562,4 +561,3 @@ void Store_talk_macro_options(void)
 {
     STORE_OPTIONS(talk_macro_options);
 }
-#endif

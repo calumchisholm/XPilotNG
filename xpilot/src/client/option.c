@@ -25,9 +25,6 @@
 
 char option_version[] = VERSION;
 
-#ifndef OLD_OPTIONS
-
-
 int num_options = 0;
 int max_options = 0;
 
@@ -237,14 +234,9 @@ static bool Set_string_option(xp_option_t *opt, const char *value)
     return retval;
 }
 
-typedef struct {
-    xp_keysym_t keysym;
-    keys_t key;
-} xp_keydefs_t;
-
-static xp_keydefs_t *xpkeydefs = NULL;
-static int num_xpkeydefs = 0;
-static int max_xpkeydefs = 0;
+xp_keydefs_t *keydefs = NULL;
+int num_keydefs = 0;
+int max_keydefs = 0;
 
 keys_t Generic_lookup_key(xp_keysym_t ks, bool reset)
 {
@@ -259,9 +251,9 @@ keys_t Generic_lookup_key(xp_keysym_t ks, bool reset)
      * Variable 'i' is already initialized.
      * Use brute force linear search to find the key.
      */
-    for (; i < num_xpkeydefs; i++) {
-	if (ks == xpkeydefs[i].keysym) {
-	    ret = xpkeydefs[i].key;
+    for (; i < num_keydefs; i++) {
+	if (ks == keydefs[i].keysym) {
+	    ret = keydefs[i].key;
 	    i++;
 	    break;
 	}
@@ -270,16 +262,16 @@ keys_t Generic_lookup_key(xp_keysym_t ks, bool reset)
     return ret;
 }
 
-static void Store_xpkeydef(int ks, keys_t key)
+static void Store_keydef(int ks, keys_t key)
 {
     int i;
-    xp_keydefs_t xpkeydef;
+    xp_keydefs_t keydef;
 
     /*
      * first check if pair (ks, key) already exists 
      */
-    for (i = 0; i < num_xpkeydefs; i++) {
-	xp_keydefs_t *kd = &xpkeydefs[i];
+    for (i = 0; i < num_keydefs; i++) {
+	xp_keydefs_t *kd = &keydefs[i];
 
 	if (kd->keysym == ks && kd->key == key) {
 	    warn("Pair (%d, %d) exist from before", ks, (int) key);
@@ -290,19 +282,19 @@ static void Store_xpkeydef(int ks, keys_t key)
 	}
     }
 
-    xpkeydef.keysym = ks;
-    xpkeydef.key = key;
+    keydef.keysym = ks;
+    keydef.key = key;
 
     /*
      * find first KEY_DUMMY after lazy deletion 
      */
-    for (i = 0; i < num_xpkeydefs; i++) {
-	xp_keydefs_t *kd = &xpkeydefs[i];
+    for (i = 0; i < num_keydefs; i++) {
+	xp_keydefs_t *kd = &keydefs[i];
 
 	if (kd->key == KEY_DUMMY) {
 	    assert(kd->keysym == XP_KS_UNKNOWN);
-	    /*warn("Store_xpkeydef: Found dummy at index %d", i);*/
-	    *kd = xpkeydef;
+	    /*warn("Store_keydef: Found dummy at index %d", i);*/
+	    *kd = keydef;
 	    return;
 	}
     }
@@ -310,22 +302,22 @@ static void Store_xpkeydef(int ks, keys_t key)
     /*
      * ok just store it then 
      */
-    STORE(xp_keydefs_t, xpkeydefs, num_xpkeydefs, max_xpkeydefs, xpkeydef);
+    STORE(xp_keydefs_t, keydefs, num_keydefs, max_keydefs, keydef);
 }
 
-static void Remove_key_from_xpkeydefs(keys_t key)
+static void Remove_key_from_keydefs(keys_t key)
 {
     int i;
 
     assert(key != KEY_DUMMY);
-    for (i = 0; i < num_xpkeydefs; i++) {
-	xp_keydefs_t *kd = &xpkeydefs[i];
+    for (i = 0; i < num_keydefs; i++) {
+	xp_keydefs_t *kd = &keydefs[i];
 
 	/*
 	 * lazy deletion 
 	 */
 	if (kd->key == key) {
-	    /*warn("Remove_key_from_xpkeydefs: Removing key at index %d", i);*/
+	    /*warn("Remove_key_from_keydefs: Removing key at index %d", i);*/
 	    kd->keysym = XP_KS_UNKNOWN;
 	    kd->key = KEY_DUMMY;
 	}
@@ -352,7 +344,7 @@ static bool Set_key_option(xp_option_t *opt, const char *value)
      */
     if (opt->key_string)
 	xp_free(opt->key_string);
-    Remove_key_from_xpkeydefs(opt->key);
+    Remove_key_from_keydefs(opt->key);
 
     /*
      * Store the new setting.
@@ -374,7 +366,7 @@ static bool Set_key_option(xp_option_t *opt, const char *value)
 	 * and if no successful bindings was done, the old setting should
 	 * be restored.
 	 */
-	Store_xpkeydef(ks, opt->key);
+	Store_keydef(ks, opt->key);
     }
 
     xp_free(valcpy);
@@ -801,6 +793,22 @@ const char *Get_keyResourceString(keys_t key)
 
 void defaultCleanup(void)
 {
+    if (keydefs) {
+	free(keydefs);
+	keydefs = NULL;
+    }
+    if (texturePath) {
+	free(texturePath);
+	texturePath = NULL;
+    }
+    if (shipShape) {
+	free(shipShape);
+	shipShape = NULL;
+    }
+
+#ifdef SOUND
+    audioCleanup();
+#endif /* SOUND */
 }
 
 #ifndef _WINDOWS
@@ -826,5 +834,3 @@ void Get_xpilotrc_file(char *path, unsigned size)
 #error "Function Get_xpilotrc_file() not implemented."
 }
 #endif /* _WINDOWS */
-
-#endif

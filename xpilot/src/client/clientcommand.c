@@ -223,19 +223,11 @@ void executeCommand(char *talk_str)
 	break;
     case 8:			/* set */
     case 9:			/* s */
-#ifndef OLD_OPTIONS
 	Set_command(argument);
-#else
-	Add_message("Not implemented. [*Client reply*]");
-#endif
 	break;
     case 10:			/* get */
     case 11:			/* g */
-#ifndef OLD_OPTIONS
 	Get_command(argument);
-#else
-	Add_message("Not implemented. [*Client reply*]");
-#endif
 	break;
     case 12:			/* quit */
     case 13:			/* q */

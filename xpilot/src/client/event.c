@@ -415,8 +415,6 @@ void Pointer_button_released(int button)
 }
 
 
-#ifndef OLD_OPTIONS
-
 void Keyboard_button_pressed(xp_keysym_t ks)
 {
     bool change = false;
@@ -582,7 +580,7 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keyFireShot",
-	"Return",
+	"Return Linefeed",
 	KEY_FIRE_SHOT,
 	"Fire shot.\n"
 	"Note that shields must be down to fire.\n"),
@@ -631,7 +629,7 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keyLockClose",
-	"Up",
+	"Select Up",
 	KEY_LOCK_CLOSE,
 	"Lock on closest player.\n"),
 
@@ -1190,4 +1188,3 @@ void Store_key_options(void)
 {
     STORE_OPTIONS(key_options);
 }
-#endif

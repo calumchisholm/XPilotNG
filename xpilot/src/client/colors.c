@@ -1111,9 +1111,7 @@ void Init_spark_colors(void)
 }
 
 
-#ifndef OLD_OPTIONS
-
-static bool Spark_colors_setfunc (xp_option_t *opt, const char *val)
+static bool Set_sparkColors (xp_option_t *opt, const char *val)
 {
     (void)opt;
     strlcpy(sparkColors, val, sizeof sparkColors);
@@ -1122,16 +1120,25 @@ static bool Spark_colors_setfunc (xp_option_t *opt, const char *val)
     return true;
 }
 
+static bool Set_maxColors (xp_option_t *opt, int val)
+{
+    (void)opt;
+    if (val == 4 || val == 8 || val == 16)
+	maxColors = val;
+    else
+	maxColors = MAX_COLORS;
+    return true;
+}
 xp_option_t color_options[] = {
 
     XP_INT_OPTION(
 	"maxColors",
 	MAX_COLORS,
-	MAX_COLORS,
+	4,
 	MAX_COLORS,
 	&maxColors,
-	NULL,
-	"The number of colors to use.  Valid values are 16, 16 and 16.\n"),
+	Set_maxColors,
+	"The number of colors to use.  Valid values are 4, 8 and 16.\n"),
 
     /* 16 user definable color values */
     XP_STRING_OPTION(
@@ -1280,7 +1287,7 @@ xp_option_t color_options[] = {
 	"5,6,7,3",
 	sparkColors,
 	sizeof sparkColors,
-	Spark_colors_setfunc, NULL, NULL,
+	Set_sparkColors, NULL, NULL,
 	"Which color numbers to use for spark and debris particles.\n"),
 
 #define COLOR_INDEX_OPTION(name, defval, valptr, help) \
@@ -1570,14 +1577,14 @@ XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, NULL, help)
 
     COLOR_INDEX_OPTION(
 	"selfLWColor",
-	1,
+	3,
 	&selfLWColor,
 	"Which color to use to paint your ship in when on last life.\n"
 	"Original color for this is red.\n"),
 
     COLOR_INDEX_OPTION(
 	"enemyLWColor",
-	1,
+	3,
 	&enemyLWColor,
 	"Which color to use to paint enemy ships in when on last life.\n"
 	"Original color for this is red.\n"),
@@ -1715,7 +1722,3 @@ void Store_color_options(void)
 {
     STORE_OPTIONS(color_options);
 }
-
-
-#endif /* OLD_OPTIONS */
-

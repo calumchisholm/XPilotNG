@@ -25,10 +25,6 @@
 
 char xpilot_version[] = VERSION;
 
-#ifndef	lint
-char xpilot_versionid[] = "@(#)$" TITLE " $";
-#endif
-
 char			**Argv;
 int			Argc;
 
@@ -40,7 +36,6 @@ static void printfile(const char *filename)
 {
     FILE		*fp;
     int			c;
-
 
     if ((fp = fopen(filename, "r")) == NULL)
 	return;
@@ -59,7 +54,6 @@ int main(int argc, char *argv[])
 {
     int				result, retval = 1;
     bool			auto_shutdown = false;
-    char			*cp;
 
     /*
      * --- Output copyright notice ---
@@ -89,48 +83,25 @@ int main(int argc, char *argv[])
     Check_client_versions();
 
     memset(&connectParam, 0, sizeof(Connect_param_t));
-    connectParam.contact_port = SERVER_PORT;
-    connectParam.team = TEAM_NOT_SET;
 
-#ifdef OLD_OPTIONS
-    *hostname = 0;
-    cp = getenv("XPILOTHOST");
-    if (cp)
-	strlcpy(hostname, cp, sizeof(hostname));
-    else
-        sock_get_local_hostname(hostname, sizeof hostname, 0);
-
-    cp = getenv("XPILOTUSER");
-    if (cp)
-	strlcpy(connectParam.user_name, cp, sizeof(connectParam.user_name));
-    else
-	Get_login_name(connectParam.user_name, sizeof(connectParam.user_name));
-#endif
-
-    IFWINDOWS( connectParam.disp_name[0] = '\0' );
-
-#ifndef OLD_OPTIONS
-    /*Set_key_binding_callback(Key_binding_callback);*/
+    /*
+     * --- Create global option array ---
+     */
     Store_default_options();
     Store_talk_macro_options();
     Store_key_options();
-    Store_x_options();
+    Store_X_options();
     Store_record_options();
     Store_color_options();
-#endif
 
     /*
      * --- Check commandline arguments and resource files ---
      */
     memset(&xpArgs, 0, sizeof(xp_args_t));
     Parse_options(&argc, argv);
-
     /*strcpy(clientname,connectParam.nick_name); */
 
-#ifndef OLD_OPTIONS
-    /*Usage();*/
-    Handle_x_options();
-#endif
+    Handle_X_options();
     
     /* CLIENTRANK */
     Init_saved_scores();

@@ -59,8 +59,8 @@ extern bool		quitting;
 /*
  * xdefault.c
  */
-extern void Store_x_options(void);
-extern void Handle_x_options(void);
+extern void Store_X_options(void);
+extern void Handle_X_options(void);
 
 /*
  * Prototypes for xinit.c
@@ -79,7 +79,6 @@ extern int Talk_place_cursor(XButtonEvent *xbutton, bool pending);
 extern void Talk_window_cut(XButtonEvent *xbutton);
 extern void Talk_cut_from_messages(XButtonEvent *xbutton);
 extern void Clear_selection(void);
-extern void Talk_reverse_cut(void);
 extern int FatalError(Display *);
 extern void Draw_score_table(void);
 extern void Resize(Window w, unsigned width, unsigned height);

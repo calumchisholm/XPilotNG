@@ -436,61 +436,55 @@ int About_callback(int widget_desc, void *data, const char **str)
 }
 
 /*****************************************************************************/
-	   int		keys_viewer = NO_WIDGET;
-static bool		keys_created = false;
+int		keys_viewer = NO_WIDGET;
 
 int Keys_callback(int widget_desc, void *data, const char **unused)
 {
     (void)widget_desc; (void)data; (void)unused;
-    if (keys_created == false) {
-	unsigned	bufsize = (num_keydefs * 64);
-	char		*buf = calloc(bufsize, 1),
-			*end = buf,
-			*str;
-	const char	*help;
-	int		i,
-			len,
-			maxkeylen = 0;
 
-	for (i = 0; i < num_keydefs; i++) {
-	    if ((str = XKeysymToString(keydefs[i].keysym)) != NULL
-		&& (len = strlen(str)) > maxkeylen) {
-		maxkeylen = len;
-	    }
-	}
-	for (i = 0; i < num_keydefs; i++) {
-	    if (!(str = XKeysymToString(keydefs[i].keysym))
-		|| !(help = Get_keyHelpString(keydefs[i].key))) {
-		continue;
-	    }
-	    if ((end - buf) + (maxkeylen + strlen(help) + 4) >= bufsize) {
-		bufsize += 4096;
-		xpprintf("realloc: %d\n", bufsize);
-		if (!(buf = (char *)realloc(buf, bufsize))) {
-		    error("No memory for key list");
-		    return 0;
-		}
-	    }
-	    sprintf(end, "%-*s  %s\n", maxkeylen, str, help);
-	    end += strlen(end);
-	}
-	keys_viewer =
-	    Widget_create_viewer(buf,
-				 end - buf,
-				 2*DisplayWidth(dpy, DefaultScreen(dpy))/3,
-				 4*DisplayHeight(dpy, DefaultScreen(dpy))/5,
-				 2,
-				 "XPilot - key reference", "XPilot:keys",
-				 motdFont);
-	if (keys_viewer == NO_WIDGET) {
-	    warn("Can't create key viewer");
-	    return 0;
-	}
+    unsigned	bufsize = (num_keydefs * 64);
+    char	*buf = calloc(bufsize, 1), *end = buf, *str;
+    const char	*help;
+    int		i, len, maxkeylen = 0;
 
-	keys_created = true;
+    for (i = 0; i < num_keydefs; i++) {
+	if ((str = XKeysymToString(keydefs[i].keysym)) != NULL
+	    && (len = strlen(str)) > maxkeylen) {
+	    maxkeylen = len;
+	}
     }
+    for (i = 0; i < num_keydefs; i++) {
+	if (!(str = XKeysymToString(keydefs[i].keysym))
+	    || !(help = Get_keyHelpString(keydefs[i].key)))
+	    continue;
+
+	if ((end - buf) + (maxkeylen + strlen(help) + 4) >= bufsize) {
+	    bufsize += 4096;
+	    xpprintf("realloc: %d\n", bufsize);
+	    if (!(buf = realloc(buf, bufsize))) {
+		error("No memory for key list");
+		return 0;
+	    }
+	}
+	sprintf(end, "%-*s  %s\n", maxkeylen, str, help);
+	end += strlen(end);
+    }
+    keys_viewer =
+	Widget_create_viewer(buf,
+			     end - buf,
+			     2*DisplayWidth(dpy, DefaultScreen(dpy))/3,
+			     4*DisplayHeight(dpy, DefaultScreen(dpy))/5,
+			     2,
+			     "XPilot - key reference", "XPilot:keys",
+			     motdFont);
+    if (keys_viewer == NO_WIDGET) {
+	warn("Can't create key viewer");
+	return 0;
+    }
+#if 0
     else if (keys_viewer != NO_WIDGET)
 	Widget_map(keys_viewer);
+#endif
     return 0;
 }
 
@@ -498,7 +492,7 @@ void Keys_destroy(void)
 {
     Widget_destroy(keys_viewer);
     keys_viewer = NO_WIDGET;
-    keys_created = false;
+    /*keys_created = false;*/
 }
 
 

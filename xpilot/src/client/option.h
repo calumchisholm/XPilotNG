@@ -285,4 +285,15 @@ typedef int xp_keysym_t;
 extern xp_keysym_t String_to_xp_keysym(const char *str);
 extern keys_t Generic_lookup_key(xp_keysym_t ks, bool reset);
 
+typedef struct {
+    xp_keysym_t	keysym;
+    keys_t	key;
+} xp_keydefs_t;
+
+extern xp_keydefs_t	*keydefs;
+extern int		num_keydefs;
+extern int		max_keydefs;
+
+
+
 #endif /* OPTION_H */

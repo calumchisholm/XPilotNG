@@ -908,8 +908,6 @@ void Record_init(const char *filename)
 }
 
 
-#ifndef OLD_OPTIONS
-
 static bool setRecordFile(xp_option_t *opt, const char *value)
 {
     (void)opt;
@@ -944,5 +942,3 @@ void Store_record_options(void)
 {
     STORE_OPTIONS(record_options);
 }
-#endif
-

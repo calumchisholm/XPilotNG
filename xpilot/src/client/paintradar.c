@@ -250,6 +250,9 @@ void Paint_radar(void)
 
 void Paint_sliding_radar(void)
 {
+    if (!Setup)
+	return;
+
     if (BIT(Setup->mode, WRAP_PLAY) == 0)
 	return;
 
