@@ -155,7 +155,7 @@ static void Set_swapper_state(player * pl)
 static int Cmd_addr(char *arg, player *pl, int oper, char *msg);
 static int Cmd_advance(char *arg, player *pl, int oper, char *msg);
 static int Cmd_ally(char *arg, player *pl, int oper, char *msg);
-static int Cmd_auth(char *arg, player *pl, int oper, char *msg);
+/*static int Cmd_auth(char *arg, player *pl, int oper, char *msg);*/
 static int Cmd_get(char *arg, player *pl, int oper, char *msg);
 static int Cmd_help(char *arg, player *pl, int oper, char *msg);
 static int Cmd_kick(char *arg, player *pl, int oper, char *msg);
@@ -168,7 +168,7 @@ static int Cmd_pause(char *arg, player *pl, int oper, char *msg);
 static int Cmd_queue(char *arg, player *pl, int oper, char *msg);
 static int Cmd_reset(char *arg, player *pl, int oper, char *msg);
 static int Cmd_set(char *arg, player *pl, int oper, char *msg);
-static int Cmd_setpass(char *arg, player *pl, int oper, char *msg);
+/*static int Cmd_setpass(char *arg, player *pl, int oper, char *msg);*/
 static int Cmd_stats(char *arg, player *pl, int oper, char *msg);
 static int Cmd_team(char *arg, player *pl, int oper, char *msg);
 static int Cmd_version(char *arg, player *pl, int oper, char *msg);
@@ -212,6 +212,7 @@ static Command_info commands[] = {
 	0,
 	Cmd_ally
     },
+#if 0
     {
 	"auth",
 	"au",
@@ -220,6 +221,7 @@ static Command_info commands[] = {
 	0,
 	Cmd_auth
     },
+#endif
     {
 	"get",
 	"g",
@@ -309,6 +311,7 @@ static Command_info commands[] = {
 	1,
 	Cmd_set
     },
+#if 0
     {
 	"setpass",
 	"setp",
@@ -317,6 +320,7 @@ static Command_info commands[] = {
 	0,
 	Cmd_setpass
     },
+#endif
     {
 	"stats",
 	"st",
@@ -627,7 +631,7 @@ static int Cmd_ally(char *arg, player *pl, int oper, char *msg)
     return result;
 }
 
-
+#if 0
 static int Cmd_auth(char *arg, player *pl, int oper, char *msg)
 {
     int r, i = -1;
@@ -705,7 +709,7 @@ static int Cmd_auth(char *arg, player *pl, int oper, char *msg)
 
     return CMD_RESULT_SUCCESS;
 }
-
+#endif
 
 static int Cmd_get(char *arg, player *pl, int oper, char *msg)
 {
@@ -1367,7 +1371,7 @@ static int Cmd_set(char *arg, player *pl, int oper, char *msg)
     return CMD_RESULT_ERROR;
 }
 
-
+#if 0
 static int Cmd_setpass(char *arg, player *pl, int oper, char *msg)
 {
     char *new_pw, *new_pw2, *old_pw;
@@ -1449,7 +1453,7 @@ static int Cmd_setpass(char *arg, player *pl, int oper, char *msg)
 
     return CMD_RESULT_SUCCESS;
 }
-
+#endif
 
 static int Cmd_version(char *arg, player *pl, int oper, char *msg)
 {

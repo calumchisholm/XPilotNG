@@ -1282,9 +1282,9 @@ static int Handle_login(int ind, char *errmsg, int errsize)
 {
     connection_t	*connp = &Conn[ind];
     player		*pl;
-    int			i, r, war_on_id, conn_bit, nick_mod = 0;
+    int			i, /*r,*/ war_on_id, conn_bit, nick_mod = 0;
     char		msg[MSG_LEN];
-    char		old_nick[MAX_NAME_LEN], *p;
+    char		old_nick[MAX_NAME_LEN] /*, *p */;
     const char		sender[] = "[*Server notice*]";
 
     if (NumPlayers - NumPseudoPlayers >= World.NumBases) {
@@ -1330,7 +1330,7 @@ static int Handle_login(int ind, char *errmsg, int errsize)
 	    return -1;
 	}
     }
-#if 0
+#if 1 /* player passwords currently disabled */
     if (Init_player(NumPlayers, connp->ship) <= 0) {
 	strlcpy(errmsg, "Init_player failed: no free ID", errsize);
 	return -1;

@@ -47,6 +47,7 @@ char auth_version[] = VERSION;
 extern int ShutdownServer;
 extern char ShutdownReason[];
 
+#if 0
 /*
  * This function returns -1 if an error occurred or 0 if there aren't any
  * nicks with password protection. Otherwise, it returns 1 and saves the
@@ -502,3 +503,4 @@ int Set_player_password(const char *nick, const char *password, int new)
 
     return r;
 }
+#endif
