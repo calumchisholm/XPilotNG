@@ -313,7 +313,6 @@ typedef struct player {
     int	 	flooding;
 
     bool	muted;			/* player started is muted? */
-    bool	isowner;		/* player started this server? */
     bool	isoperator;		/* player has operator privileges? */
     bool	want_audio;		/* player wants audio from server */
 

@@ -1026,6 +1026,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	    connp->team = Pick_team(PickForHuman);
     } else
 	connp->team = TEAM_NOT_SET;
+
     for (i = 0; i < NumPlayers; i++) {
 	if (strcasecmp(Player_by_index(i)->name, connp->nick) == 0) {
 	    warn("Name already in use %s", connp->nick);
@@ -1033,6 +1034,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	    return -1;
 	}
     }
+
     if (connp->rectype < 2) {
 	if (!Init_player(world, NumPlayers, connp->ship, PL_TYPE_HUMAN)) {
 	    strlcpy(errmsg, "Init_player failed: no free ID", errsize);
@@ -1054,8 +1056,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
     LegalizeName(pl->name, true);
     LegalizeName(pl->username, false);
     LegalizeHost(pl->hostname);
-    pl->isowner = (!strcmp(pl->username, Server.owner) &&
-		   !strcmp(connp->addr, "127.0.0.1"));
+
     pl->team = connp->team;
     pl->version = connp->version;
 
