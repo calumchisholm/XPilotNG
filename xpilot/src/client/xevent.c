@@ -244,6 +244,7 @@ void Pointer_control_set_state(int onoff)
 	    XSelectInput(dpy, draw, 0);
 	else
 	    XSelectInput(dpy, draw, ButtonPressMask | ButtonReleaseMask);
+	XFlush(dpy);
     }
 }
 
