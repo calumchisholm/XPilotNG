@@ -1564,16 +1564,15 @@ static void Distance_init(void)
     int *lineno, *dis;
     int lsx, lsy, ldx, ldy, temp, dist, n, i, bx, by, j, k;
     int base, height2, by2, width, height;
-    int distbound;
+    int distbound, size;
     unsigned short *lptr;
 
     /* max line delta 32767 */
 
     blockline = ralloc(NULL, mapx * mapy * sizeof(struct blockinfo));
-    llist = ralloc(NULL, mapx * mapy * LINSIZE * sizeof(short));
     lineno = ralloc(NULL, mapx * mapy * LINSIZE * sizeof(int));
     dis = ralloc(NULL, mapx * mapy * LINSIZE * sizeof(int));
-    lptr = llist;
+    size = 1; /* start with end marker */
     for (bx = 0; bx < mapx; bx++)
 	for (by = 0; by < mapy; by++)
 	    for (i = 0; i < LINSIZE; i++) {
@@ -1678,6 +1677,11 @@ static void Distance_init(void)
 			    }
 			if (dis[base + 0] > dis[base + n])
 			    dis[base + 0] = dis[base + n];
+			if (lineno[base + n] == 65535) {
+			    size++; /* more saved lines */
+			    if (n == 1)
+				size++; /* first this block, for 65535 */
+			}
 			dis[base + n] = dist;
 			lineno[base + n] = i;
 			goto stored;
@@ -1686,26 +1690,35 @@ static void Distance_init(void)
 		if (dist < dis[base + 0])
 		    dis[base + 0] = dist;
 		if (dist < B_CLICKS / 2 + DICLOSE) {
-		    printf("Not enough space in line table. Fix allocation in walls.c\n");
+		    printf("Not enough space in line table. "
+			   "Fix allocation in walls.c\n");
 		    exit(1);
 		}
 	    stored:
 		; /* semicolon for ansi compatibility */
 	    }
 	}
+    llist = ralloc(NULL, size * sizeof(short));
+    lptr = llist;
+    *lptr++ = 65535; /* All blocks with no lines stored point to this. */
     for (bx = 0; bx < mapx; bx++)
 	for (by = 0; by < mapy; by++) {
 	    base = (by * mapx + bx) * LINSIZE;
 	    k = bx + mapx * by;
 	    blockline[k].distance = dis[base + 0] - B_CLICKS / 2;
-	    blockline[k].lines = lptr;
-	    for (j = 1; j < LINSIZE && lineno[base + j] != 65535; j++)
-		*lptr++ = lineno[base + j];
-	    *lptr++ = 65535;
+	    if (lineno[base + 1] == 65535)
+		blockline[k].lines = llist;
+	    else {
+		blockline[k].lines = lptr;
+		for (j = 1; j < LINSIZE && lineno[base + j] != 65535; j++)
+		    *lptr++ = lineno[base + j];
+		*lptr++ = 65535;
+	    }
 	}
     free(lineno);
     free(dis);
 }
+
 
 static void Corner_init(void)
 {
