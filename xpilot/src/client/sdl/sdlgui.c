@@ -410,6 +410,14 @@ void Gui_paint_refuel(int x_0, int y_0, int x_1, int y_1)
 
 void Gui_paint_connector(int x_0, int y_0, int x_1, int y_1, int tractor)
 {
+    set_color(0xa0a0a0);
+    glLineStipple(tractor ? 2 : 4, 0xAAAA);
+    glEnable(GL_LINE_STIPPLE);
+    glBegin(GL_LINES);
+    glVertex2i(x_0, y_0);
+    glVertex2i(x_1, y_1);
+    glEnd();
+    glDisable(GL_LINE_STIPPLE);
 }
 
 void Gui_paint_transporter(int x_0, int y_0, int x_1, int y_1)
