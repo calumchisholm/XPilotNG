@@ -121,7 +121,9 @@ struct blockinfo {
 struct inside_block {
     short *y;
     short *lines;
-    short base_value;
+    struct inside_block *next;
+    short group;
+    char base_value;
 };
 
 struct inside_block *inside_table;
@@ -1392,7 +1394,6 @@ int Polys_to_client(char *ptr)
 }
 
 
-#if 1
 struct tempy {
     short y;
     struct tempy *next;
@@ -1418,76 +1419,90 @@ struct templine {
 #define POSMOD(x, y) ((x) >= 0 ? (x) % (y) : (x) % (y) + (y))
 
 
-int is_inside(int x, int y)
+int is_inside(int x, int y, int hit_mask)
 {
-    int block;
     short *ptr;
-    int inside;
-    int x1, x2, y1, y2, s;
+    int inside, x1, x2, y1, y2, s;
+    struct inside_block *gblock;
 
-    block = (x >> B_SHIFT) + mapx * (y >> B_SHIFT);
-    inside = inside_table[block].base_value;
-    if (inside_table[block].lines == NULL)
-	return inside;
-    x &= B_MASK;
-    y &= B_MASK;
-    ptr = inside_table[block].y;
-    if (ptr)
-	while (y > *ptr++)
-	    inside++;
-    ptr = inside_table[block].lines;
-    while (*ptr != 32767) {
-	x1 = *ptr++ - x;
-	y1 = *ptr++ - y;
-	x2 = *ptr++ - x;
-	y2 = *ptr++ - y;
-	if (y1 < 0) {
-	    if (y2 >= 0) {
-		if (x1 > 0 && x2 >= 0)
-		    inside++;
-		else if ((x1 >= 0 || x2 >= 0) &&
-			 (s = y1 * (x1 - x2) - x1 * (y1 - y2)) >= 0) {
-		    if (s == 0)
-			return 1;
-		    else
-			inside++;
-		}
+    gblock = &inside_table[(x >> B_SHIFT) + mapx * (y >> B_SHIFT)];
+    if (gblock->group == -1)
+	return -1;
+    do {
+	if (gblock->group && (groups[gblock->group].hit_mask & hit_mask)) {
+	    gblock = gblock->next;
+	    continue;
+	}
+	inside = gblock->base_value;
+	if (gblock->lines == NULL) {
+	    if (inside)
+		return gblock->group;
+	    else {
+		gblock = gblock->next;
+		continue;
 	    }
 	}
-	else
-	    if (y2 <= 0) {
-		if (y2 == 0) {
-		    if (x2 == 0 || (y1 ==0 && ((x1 <= 0 && x2 >= 0) ||
-					       (x1 >= 0 && x2 <= 0))))
-			return 1;
-		}
-		else if (x1 > 0 && x2 >= 0)
-		    inside++;
-		else if ((x1 >= 0 || x2 >= 0) &&
-			 (s = y1 * (x1 - x2) - x1 * (y1 - y2)) <= 0) {
-		    if (s == 0)
-			return 1;
-		    else
+	x &= B_MASK;
+	y &= B_MASK;
+	ptr = gblock->y;
+	if (ptr)
+	    while (y > *ptr++)
+		inside++;
+	ptr = gblock->lines;
+	while (*ptr != 32767) {
+	    x1 = *ptr++ - x;
+	    y1 = *ptr++ - y;
+	    x2 = *ptr++ - x;
+	    y2 = *ptr++ - y;
+	    if (y1 < 0) {
+		if (y2 >= 0) {
+		    if (x1 > 0 && x2 >= 0)
 			inside++;
+		    else if ((x1 >= 0 || x2 >= 0) &&
+			     (s = y1 * (x1 - x2) - x1 * (y1 - y2)) >= 0) {
+			if (s == 0)
+			    return gblock->group;
+			else
+			    inside++;
+		    }
 		}
 	    }
-    }
-    return inside & 1;
+	    else
+		if (y2 <= 0) {
+		    if (y2 == 0) {
+			if (x2 == 0 || (y1 ==0 && ((x1 <= 0 && x2 >= 0) ||
+						   (x1 >= 0 && x2 <= 0))))
+			    return gblock->group;
+		    }
+		    else if (x1 > 0 && x2 >= 0)
+			inside++;
+		    else if ((x1 >= 0 || x2 >= 0) &&
+			     (s = y1 * (x1 - x2) - x1 * (y1 - y2)) <= 0) {
+			if (s == 0)
+			    return gblock->group;
+			else
+			    inside++;
+		    }
+		}
+	}
+	if (inside & 1)
+	    return gblock->group;
+	gblock = gblock->next;
+    } while (gblock);
+    return -1;
 }
 
 
 static void closest_line(int bx, int by, double dist, int inside)
 {
-    if (dist == 0)
-	dist = 4 * B_CLICKS;
     if (dist <= temparray[bx + mapx *by].distance) {
-	if (dist == temparray[bx + mapx * by].distance) {
-	    /* dist need not be the best possible double representation of
-	     * the true distance, so this might not be detected */
-	    errno = 0;
-	    error("bx = %d, by = %d", bx, by);
-	    inside = 1;
-	}
+	if (dist == temparray[bx + mapx * by].distance)
+	    /* Must be joined polygons(s) if the map is legal
+	     * (the same line appears in both directions).
+	     * Both sides of this line are inside. */
+	    /* These lines could be removed from the table as a minor
+	     * optimization. */
+	     inside = 1;
 	temparray[bx + mapx * by].distance = dist;
 	temparray[bx + mapx * by].inside = inside;
     }
@@ -1522,6 +1537,8 @@ static void store_inside_line(int bx, int by, int ox, int oy, int dx, int dy)
     struct templine *s;
 
     block = bx + mapx * by;
+    ox = CENTER_XCLICK(ox - bx * B_CLICKS);
+    oy = CENTER_YCLICK(oy - by * B_CLICKS);
     if (oy >= 0 && oy < B_CLICKS && ox >= B_CLICKS)
 	insert_y(block, oy);
     if (oy + dy >= 0 && oy + dy < B_CLICKS && ox + dx >= B_CLICKS)
@@ -1536,82 +1553,99 @@ static void store_inside_line(int bx, int by, int ox, int oy, int dx, int dy)
 }
 
 
-static void finish_inside(void)
+static void finish_inside(int block, int group)
 {
-    int block, inside;
+    int inside;
+    struct inside_block *gblock;
     short *ptr;
     int x1, x2, y1, y2, s, j;
     struct tempy *yptr;
     struct templine *lptr;
+    void *tofree;
 
-    for (block = 0; block < mapx * mapy; block++) {
-	j = 0;
+    gblock = &inside_table[block];
+    if (gblock->group != -1) {
+	while (gblock->next) /* Maintain group order*/
+	    gblock = gblock->next;
+	gblock->next = ralloc(NULL, sizeof(struct inside_block));
+	gblock = gblock->next;
+    }
+    gblock->group = group;
+    gblock->next = NULL;
+    j = 0;
+    yptr = temparray[block].y;
+    while (yptr) {
+	j++;
+	yptr = yptr->next;
+    }
+    if (j > 0) {
+	ptr = ralloc(NULL, (j + 1) * sizeof(short));
+	gblock->y = ptr;
 	yptr = temparray[block].y;
 	while (yptr) {
-	    j++;
+	    *ptr++ = yptr->y;
+	    tofree = yptr;
 	    yptr = yptr->next;
+	    free(tofree);
 	}
-	if (j > 0) {
-	    ptr = ralloc(NULL, (j + 1) * sizeof(short));
-	    inside_table[block].y = ptr;
-	    yptr = temparray[block].y;
-	    while (yptr) {
-		*ptr++ = yptr->y;
-		yptr = yptr->next;
-	    }
-	    *ptr = 32767;
-	}
-	else
-	    inside_table[block].y = NULL;
-	j = 0;
+	*ptr = 32767;
+    }
+    else
+	gblock->y = NULL;
+    j = 0;
+    lptr = temparray[block].lines;
+    while (lptr) {
+	j++;
+	lptr = lptr->next;
+    }
+    if (j > 0) {
+	ptr = ralloc(NULL, (j * 4 + 1) * sizeof(short));
+	gblock->lines = ptr;
 	lptr = temparray[block].lines;
 	while (lptr) {
-	    j++;
+	    *ptr++ = lptr->x1;
+	    *ptr++ = lptr->y1;
+	    *ptr++ = lptr->x2;
+	    *ptr++ = lptr->y2;
+	    tofree = lptr;
 	    lptr = lptr->next;
+	    free(tofree);
 	}
-	if (j > 0) {
-	    ptr = ralloc(NULL, (j * 4 + 1) * sizeof(short));
-	    inside_table[block].lines = ptr;
-	    lptr = temparray[block].lines;
-	    while (lptr) {
-		*ptr++ = lptr->x1;
-		*ptr++ = lptr->y1;
-		*ptr++ = lptr->x2;
-		*ptr++ = lptr->y2;
-		lptr = lptr->next;
-	    }
-	    *ptr = 32767;
-	}
-	else
-	    inside_table[block].lines = NULL;
-	inside = temparray[block].inside;
-	if ( (ptr = inside_table[block].lines) != NULL) {
-	    while (*ptr != 32767) {
-		x1 = *ptr++ * 2 - B_CLICKS * 2 + 1;
-		y1 = *ptr++ * 2 + 1;
-		x2 = *ptr++ * 2 - B_CLICKS * 2 + 1;
-		y2 = *ptr++ * 2 + 1;
-		if (y1 < 0) {
-		    if (y2 >= 0) {
-			if (x1 > 0 && x2 >= 0)
-			    inside++;
-			else if ((x1 >= 0 || x2 >= 0) &&
-				 (s = y1 * (x1 - x2) - x1 * (y1 - y2)) > 0)
-			    inside++;
-		    }
+	*ptr = 32767;
+    }
+    else
+	gblock->lines = NULL;
+    inside = temparray[block].inside;
+    if ( (ptr = gblock->lines) != NULL) {
+	while (*ptr != 32767) {
+	    x1 = *ptr++ * 2 - B_CLICKS * 2 + 1;
+	    y1 = *ptr++ * 2 + 1;
+	    x2 = *ptr++ * 2 - B_CLICKS * 2 + 1;
+	    y2 = *ptr++ * 2 + 1;
+	    if (y1 < 0) {
+		if (y2 >= 0) {
+		    if (x1 > 0 && x2 >= 0)
+			inside++;
+		    else if ((x1 >= 0 || x2 >= 0) &&
+			     (s = y1 * (x1 - x2) - x1 * (y1 - y2)) > 0)
+			inside++;
 		}
-		else
-		    if (y2 <= 0) {
-			if (x1 > 0 && x2 >= 0)
-			    inside++;
-			else if ((x1 >= 0 || x2 >= 0) &&
-				 (s = y1 * (x1 - x2) - x1 * (y1 - y2)) < 0)
-			    inside++;
-		    }
 	    }
-	    inside_table[block].base_value = inside & 1;
+	    else
+		if (y2 <= 0) {
+		    if (x1 > 0 && x2 >= 0)
+			inside++;
+		    else if ((x1 >= 0 || x2 >= 0) &&
+			     (s = y1 * (x1 - x2) - x1 * (y1 - y2)) < 0)
+			inside++;
+		}
 	}
     }
+    gblock->base_value = inside & 1;
+    temparray[block].y = NULL;
+    temparray[block].lines = NULL;
+    temparray[block].inside = 2;
+    temparray[block].distance = 1e20;
 }
 
 
@@ -1626,118 +1660,127 @@ static void init_inside(void)
 	temparray[i].inside = 2;
 	temparray[i].y = NULL;
 	temparray[i].lines = NULL;
+	inside_table[i].y = NULL;
+	inside_table[i].lines = NULL;
+	inside_table[i].base_value = 0;
+	inside_table[i].group = -1;
+	inside_table[i].next = NULL;
     }
+}
+
+
+/* Calculate distance of intersection from lower right corner of the
+ * block counterclockwise along the edge. We don't return the true lengths
+ * but values which compare the same with each other.
+ * 'dir' is used to return whether the block is left through a horizontal
+ * or a vertical side or a corner. */
+static double edge_distance(int bx, int by, int ox, int oy, int dx, int dy,
+			  int *dir)
+{
+    int last_width = (World.cwidth - 1) % B_CLICKS + 1;
+    int last_height = (World.cheight - 1) % B_CLICKS + 1;
+    double xdist, ydist, dist;
+    ox = CENTER_XCLICK(ox - bx * B_CLICKS);
+    oy = CENTER_YCLICK(oy - by * B_CLICKS);
+    if (dx > 0)
+	xdist = ((bx == mapx - 1) ? last_width : B_CLICKS) - .5 - ox;
+    else if (dx < 0)
+	xdist = ox + .5;
+    else
+	xdist = 1e20; /* Something big enough to be > ydist, dx */
+    if (dy > 0)
+	ydist = ((by == mapy - 1) ? last_height : B_CLICKS) - .5 - oy;
+    else if (dy < 0)
+	ydist = oy + .5;
+    else
+	ydist = 1e20;
+    if (xdist > ABS(dx) && ydist > ABS(dy))
+	return -1;	/* Doesn't cross box boundary */
+    if (ABS(dy) * xdist == ABS(dx) * ydist)
+	*dir = 3;
+    else if (ABS(dy) * xdist < ABS(dx) * ydist)
+	*dir = 1;
+    else
+	*dir = 2;
+    if (*dir == 1)
+	if (dx > 0)
+	    dist = oy + dy * xdist / dx;
+	else
+	    dist = 5 * B_CLICKS - oy + dy * xdist / dx;
+    else
+	if (dy > 0)
+	    dist = 3 * B_CLICKS - ox - dx * ydist / dy;
+	else
+	    dist = 6 * B_CLICKS + ox - dx * ydist / dy;
+    return dist;
 }
 
 
 static void inside_test(void)
 {
-    int dx, dy, bx, by, ox, oy, startx, starty, x1, x2, y1, y2;
-    int i, j, last_height, last_width, num_points, minx, miny, poly;
-    int bx2, by2, maxx, maxy;
-    double xdist, ydist, dist;
+    int dx, dy, bx, by, ox, oy, startx, starty;
+    int i, j, num_points, minx, miny, poly, group;
+    int bx2, by2, maxx, maxy, dir;
+    double dist;
     int *edges;
 
     init_inside();
-    last_width = (World.cwidth - 1) % B_CLICKS + 1;
-    last_height = (World.cheight - 1) % B_CLICKS + 1;
-    for (poly = 0; poly < polyc; poly++) {
-	if (pdata[poly].is_decor)
+    for (group = 0; group <= num_groups; group++) {
+	minx = -1;
+	for (poly = 0; poly < polyc; poly++) {
+	    if (pdata[poly].is_decor || pdata[poly].group != group)
 	    continue;
-/*	group = pdata[poly].group; !@# */
-	num_points = pdata[poly].num_points;
-	dx = 0;
-	dy = 0;
-	startx = pdata[poly].x;
-	starty = pdata[poly].y;
-	bx = startx >> B_SHIFT;
-	by = starty >> B_SHIFT;
-	bx2 = minx = maxx = bx;
-	by2 = miny = maxy = by;
-	edges = pdata[poly].edges;
-	closest_line(bx, by, 1e10, 0); /* For polygons within one box */
-	for (j = 0; j < num_points; j++) {
-	    if (startx >> B_SHIFT != bx || starty >> B_SHIFT != by)
-		while (1);
-	    ox = startx & B_MASK;
-	    oy = starty & B_MASK;
-	    dx = *edges++;
-	    dy = *edges++;
-	    x1 = 0;
-	    y1 = 0;
-	    while (1) {	/* All boxes which contain a part of this line */
-		store_inside_line(bx, by, ox - x1, oy - y1, dx, dy);
-		x2 = x1 + ((bx == mapx - 1) ? last_width : B_CLICKS);
-		y2 = y1 + ((by == mapy - 1) ? last_height : B_CLICKS);
-		if (dx > 0)
-		    xdist = x2 - .5 - ox;
-		else if (dx < 0)
-		    xdist = ox - x1 + .5;
-		else
-		    xdist = 1e20; /* Something big enough to be > ydist, dx */
-		if (dy > 0)
-		    ydist = y2 - .5 - oy;
-		else if (dy < 0)
-		    ydist = oy - y1 + .5;
-		else
-		    ydist = 1e20;
-		if (xdist > ABS(dx) && ydist > ABS(dy))
-		    break;	/* Stops within same box */
-		/* Calculate distance of intersection from lower right corner
-		 * of box counterclockwise along the edge. We don't care about
-		 * lastwidth here as we are only interested in finding the line
-		 * with the smallest value. */
-		if (ABS(dy) * xdist < ABS(dx) * ydist) {
-		    if (dx > 0)
-			dist = oy - y1 + .5 + dy * xdist / dx;
-		    else
-			dist = 3 * B_CLICKS - oy + y1 - .5 + dy * xdist / dx;
-		}
-		else {
-		    if (dy > 0)
-			dist = 2 * B_CLICKS - ox + x1 - .5 - dx * ydist / dy;
-		    else
-			dist = 3 * B_CLICKS + ox - x1 + .5 - dx * ydist / dy;
-		}
-		closest_line(bx, by, dist, 0);
-		if (ABS(dy) * xdist <= ABS(dx) * ydist) {
-		    if (dx > 0) {
-			bx2++;
-			x1 = x2;
-		    }
-		    else {
-			bx2--;
-			x1 -= (bx == 0) ? last_width : B_CLICKS;
-		    }
+	    num_points = pdata[poly].num_points;
+	    dx = 0;
+	    dy = 0;
+	    startx = pdata[poly].x;
+	    starty = pdata[poly].y;
+	    /* Better wrapping for bx2/by2 could be selected for speed here,
+	     * but this keeping track of min/max at all is probably
+	     * unnoticeable in practice. */
+	    bx2 = bx = startx >> B_SHIFT;
+	    by2 = by = starty >> B_SHIFT;
+	    if (minx == -1) {
+		minx = maxx = bx2;
+		miny = maxy = by2;
+	    }
+	    edges = pdata[poly].edges;
+	    closest_line(bx, by, 1e10, 0); /* For polygons within one block */
+	    for (j = 0; j < num_points; j++) {
+		if (startx >> B_SHIFT != bx || starty >> B_SHIFT != by)
+		    while (1);
+		ox = startx & B_MASK;
+		oy = starty & B_MASK;
+		dx = *edges++;
+		dy = *edges++;
+		while (1) {  /* All blocks containing a part of this line */
+		    store_inside_line(bx, by, startx, starty, dx, dy);
+		    dist = edge_distance(bx, by, WRAP_XCLICK(startx + dx),
+				 WRAP_YCLICK(starty + dy), -dx, -dy, &dir);
+		    if (dist != -1)
+			closest_line(bx, by, dist, 1);
+		    dist = edge_distance(bx, by, startx, starty, dx, dy, &dir);
+		    if (dist == -1)
+			break;
+		    closest_line(bx, by, dist, 0);
+		    if (dir == 1 || dir == 3)
+			bx2 += (dx > 0) ? 1 : -1;
 		    if (bx2 > maxx)
 			maxx = bx2;
 		    if (bx2 < minx)
 			minx = bx2;
 		    bx = POSMOD(bx2, mapx);
-		    dist = 3 * B_CLICKS - dist;
-		}
-		if (ABS(dy) * xdist >= ABS(dx) * ydist) {
-		    if (dy > 0) {
-			by2++;
-			y1 = y2;
-		    }
-		    else {
-			by2--;
-			y1 -= (by == 0) ? last_height : B_CLICKS;
-		    }
+		    if (dir == 2 || dir == 3)
+			by2 += (dy > 0) ? 1 : -1;
 		    if (by2 > maxy)
 			maxy = by2;
 		    if (by2 < miny)
 			miny = by2;
 		    by = POSMOD(by2, mapy);
-		    if (dist == 0)
-			dist = 4 * B_CLICKS;
-		    dist = 5 * B_CLICKS - dist;
 		}
-		closest_line(bx, by, dist, 1);
+		startx = WRAP_XCLICK(startx + dx);
+		starty = WRAP_YCLICK(starty + dy);
 	    }
-	    startx = WRAP_XCLICK(startx + dx);
-	    starty = WRAP_YCLICK(starty + dy);
 	}
 	bx = maxx - minx + 1;
 	if (bx > 2 * mapx)
@@ -1749,39 +1792,25 @@ static void inside_test(void)
 	    if (i == mapy)
 		i = 0;
 	    bx2 = bx;
-	    x1 = 0;
+	    dir = 0;
 	    for (j = POSMOD(minx, mapx); bx2-- > 0; j++) {
 		if (j == mapx)
 		    j = 0;
 		if (temparray[j + mapx * i].inside < 2) {
-		    x1 = temparray[j + mapx * i].distance >= B_CLICKS &&
+		    dir = temparray[j + mapx * i].distance > B_CLICKS &&
 			temparray[j + mapx * i].inside == 1;
 		}
 		else {
-		    if (x1) {
-			fuel_t t;
-			extern int max_fuels;
-
+		    if (dir)
 			temparray[i * mapx + j].inside = 1;
-			inside_table[i * mapx + j].base_value = 1;
-/*			t.clk_pos.x = j * B_CLICKS + B_CLICKS / 2;
-			t.clk_pos.y = i * B_CLICKS + B_CLICKS / 2;
-			t.fuel = START_STATION_FUEL;
-			t.conn_mask = (unsigned)-1;
-			t.last_change = frame_loops;
-			t.team = 1;
-			STORE(fuel_t, World.fuel, World.NumFuels, max_fuels,t);
-*/		    }
 		}
-//		temparray[j + mapx * i].inside = 2;
-//		temparray[j + mapx * i].distance = 1e20;
+		if (bx2 < mapx)
+		    finish_inside(j + mapx * i, group);
 	    }
 	}
     }
-    finish_inside();
     return;
 }
-#endif
 
 
 /* Include NCLLIN - 1 closest lines or all closer than CUTOFF (whichever
@@ -2096,9 +2125,7 @@ void Walls_init(void)
     Distance_init();
     Corner_init();
     Ball_line_init();
-#if 1
     inside_test();
-#endif
     groups[0].type = FILLED;
 
     for (i = 0; i < linec; i++) {
