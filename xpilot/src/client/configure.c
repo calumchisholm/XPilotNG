@@ -109,7 +109,6 @@ static int Config_create_altPower(int widget_desc, int *height);
 static int Config_create_altTurnSpeed(int widget_desc, int *height);
 static int Config_create_altTurnResistance(int widget_desc, int *height);
 static int Config_create_showMessages(int widget_desc, int *height);
-static int Config_create_showHUD(int widget_desc, int *height);
 static int Config_create_mapRadar(int widget_desc, int *height);
 static int Config_create_clientRanker(int widget_desc, int *height);
 static int Config_create_showShipShapes(int widget_desc, int *height);
@@ -281,7 +280,6 @@ static int	(*config_creator_default[])(int widget_desc, int *height) = {
     Config_create_maxMessages,
     Config_create_messagesToStdout,
     Config_create_reverseScroll,
-    Config_create_showHUD,
     Config_create_mapRadar,
     Config_create_clientRanker,
     Config_create_showShipShapes,
@@ -813,15 +811,6 @@ static int Config_create_messagesColor(int widget_desc, int *height)
 static int Config_create_oldMessagesColor(int widget_desc, int *height)
 {
     return CONFIG_CREATE_COLOR(oldMessagesColor);
-}
-
-static int Config_create_showHUD(int widget_desc, int *height)
-{
-    return Config_create_bool(widget_desc, height, "showHUD",
-			      BIT(instruments, SHOW_HUD_INSTRUMENTS)
-				  ? true : false,
-			      Config_update_instruments,
-			      (void *) SHOW_HUD_INSTRUMENTS);
 }
 
 static int Config_create_mapRadar(int widget_desc, int *height)
@@ -1932,7 +1921,6 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_int(fp, "maxMessages", maxMessages);
     Config_save_int(fp, "messagesToStdout", messagesToStdout);
     Config_save_bool(fp, "reverseScroll", BIT(instruments, SHOW_REVERSE_SCROLL));
-    Config_save_bool(fp, "showHUD", BIT(instruments, SHOW_HUD_INSTRUMENTS));
     Config_save_bool(fp, "mapRadar", BIT(hackedInstruments, MAP_RADAR));
     Config_save_bool(fp, "clientRanker", BIT(hackedInstruments, CLIENT_RANKER));
     Config_save_bool(fp, "showLivesByShip", BIT(hackedInstruments, SHOW_LIVES_BY_SHIP));

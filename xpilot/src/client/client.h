@@ -45,11 +45,7 @@
 #include "item.h"
 #endif
 
-#define SHOW_HUD_INSTRUMENTS	(1L << 0)
-/*#define SHOW_HUD_VERTICAL	(1L << 1)
-  #define SHOW_HUD_HORIZONTAL	(1L << 2)*/
 #define SHOW_FUEL_METER		(1L << 3)
-/*#define SHOW_FUEL_GAUGE		(1L << 4)*/
 #define SHOW_TURNSPEED_METER	(1L << 5)
 #define SHOW_POWER_METER	(1L << 6)
 
@@ -57,8 +53,6 @@
 #define SHOW_PACKET_SIZE_METER	(1L << 10)
 #define SHOW_PACKET_LOSS_METER	(1L << 11)
 #define SHOW_PACKET_DROP_METER	(1L << 12)
-/*#define SHOW_CLOCK		(1L << 13)*/
-/*#define SHOW_ITEMS		(1L << 14)*/
 #define SHOW_MESSAGES		(1L << 15)
 
 #define SHOW_OUTLINE_WORLD	(1L << 17)

@@ -573,7 +573,7 @@ void Paint_HUD(void)
 	}
     }
 
-    if (!BIT(instruments, SHOW_HUD_INSTRUMENTS)) {
+    if (!hudColor) {
 	return;
     }
 

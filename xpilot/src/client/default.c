@@ -3121,7 +3121,6 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     hackedInstruments = 0;
 
     Get_bit_resource(rDB, "showMessages", &instruments, SHOW_MESSAGES);
-    Get_bit_resource(rDB, "showHUD", &instruments, SHOW_HUD_INSTRUMENTS);
 
     Get_bit_resource(rDB, "mapRadar", &hackedInstruments, MAP_RADAR);
     Get_bit_resource(rDB, "clientRanker", &hackedInstruments, CLIENT_RANKER);
