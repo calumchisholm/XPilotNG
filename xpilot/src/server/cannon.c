@@ -934,10 +934,13 @@ bool Cannon_hitfunc(group_t *gp, move_t *move)
 
 void Cannon_set_option(cannon_t *cannon, const char *name, const char *value)
 {
-    warn("setting cannon %p option %s to value %s", cannon, name, value);
+    Item_t item;
 
-    if (!strcasecmp(name, "initialafterburners"))
-	cannon->initial_items[ITEM_AFTERBURNER] = atoi(value);
-    if (!strcasecmp(name, "initiallasers"))
-	cannon->initial_items[ITEM_LASER] = atoi(value);
+    item = Item_by_option_name(name);
+    if (item != NO_ITEM) {
+	cannon->initial_items[item] = atoi(value);
+	return;
+    }
+
+    warn("This server doesn't support option %s for cannons.", name);
 }

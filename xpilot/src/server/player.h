@@ -556,6 +556,7 @@ static inline bool Is_cannon_id(int id)
 
 void Pick_startpos(player_t *pl);
 void Go_home(player_t *pl);
+Item_t Item_by_option_name(const char *name);
 void Base_set_option(base_t *base, const char *name, const char *value);
 void Compute_sensor_range(player_t *pl);
 void Player_add_tank(player_t *pl, double tank_fuel);
