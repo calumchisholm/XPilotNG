@@ -1812,7 +1812,7 @@ static void AsteroidCollision(void)
 /* do ball - object and ball - checkpoint collisions */
 static void BallCollision(void)
 {
-    int         i, j, obj_count, radius;
+    int         i, j, obj_count;
     int		ignored_object_types;
     object    **obj_list;
     object     *obj;
@@ -1866,7 +1866,7 @@ static void BallCollision(void)
 			 &obj_list, &obj_count);
 
 	for (j = 0; j < obj_count; j++) {
-	    bool hit;
+	    int radius;
 
 	    obj = obj_list[j];
 
@@ -1881,53 +1881,13 @@ static void BallCollision(void)
 	    }
 
 	    /* have we already done this ball pair? */
-	    if (obj->type == OBJ_BALL && obj <= OBJ_PTR(ball)) {
+	    if (obj->type == OBJ_BALL && obj <= OBJ_PTR(ball))
 		continue;
-	    }
 
 	    radius = (ball->pl_radius + obj->pl_radius) * CLICK;
-
-#if 1
 	    if (!in_range(OBJ_PTR(ball), obj, radius))
 		continue;
-#else
-	    if (is_polygon_map || !useOldCode) {
-		switch (obj->collmode) {
-		case 0:
-		    hit = in_range_simple(ball->pos.cx, ball->pos.cy,
-					  obj->pos.cx, obj->pos.cy,
-					  radius);
-		    break;
-		case 1:
-		    hit = in_range_acd(ball->prevpos.cx - obj->prevpos.cx,
-				       ball->prevpos.cy - obj->prevpos.cy,
-				       ball->extmove.cx - obj->extmove.cx,
-				       ball->extmove.cy - obj->extmove.cy,
-				       radius);
-		    break;
-		case 2:
-		    hit = in_range_partial(ball->prevpos.cx - obj->prevpos.cx,
-					   ball->prevpos.cy - obj->prevpos.cy,
-					   ball->extmove.cx - obj->extmove.cx,
-					   ball->extmove.cy - obj->extmove.cy,
-					   radius, obj->wall_time);
-		    break;
-		default:
-		    warn("Unimplemented collision mode %d", obj->collmode);
-		    continue;
-		}
-		if (!hit)
-		    continue;
-	    } else {
-		if (!in_range_acd_old(ball->prevpos.cx, ball->prevpos.cy,
-				      ball->pos.cx, ball->pos.cy,
-				      obj->prevpos.cx, obj->prevpos.cy,
-				      obj->pos.cx, obj->pos.cy,
-				      radius)) {
-		    continue;
-		}
-	    }
-#endif
+
 	    /* bang! */
 
 	    switch (obj->type) {
@@ -2021,7 +1981,6 @@ static void MineCollision(void)
 		continue;
 
 	    radius = (mineShotDetonateDistance + obj->pl_radius) * CLICK;
-
 	    if (!in_range(OBJ_PTR(mine), obj, radius))
 		continue;
 
