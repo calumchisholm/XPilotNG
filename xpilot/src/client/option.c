@@ -130,9 +130,8 @@ void Usage(void)
 	   "in your home directory.\n"
 	   "Each key option may have multiple keys bound to it and\n"
 	   "one key may be used by multiple key options.\n"
-	   "If no server is specified then xpilot will search\n"
-	   "for servers on your local network.\n"
-	   "For a listing of remote servers try: telnet meta.xpilot.org 4400 \n");
+	   "If no server is specified on the command line, xpilot will\n"
+	   "display a welcome screen where you can select a server.\n");
 
     exit(1);
 }
