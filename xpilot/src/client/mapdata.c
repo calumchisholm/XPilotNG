@@ -17,6 +17,9 @@
 #define R_OK 4
 #define X_OK 0
 #define mkdir(A,B) _mkdir(A)
+#define PATHSEP '\\'
+#else
+#define PATHSEP '/'
 #endif
 
 #include <zlib.h>
@@ -25,6 +28,7 @@
 #include "const.h"
 #include "error.h"
 
+#define DATADIR ".xpilot_data"
 #define COPY_BUF_SIZE 8192
 
 typedef struct {
@@ -47,8 +51,11 @@ int Mapdata_setup (const char *urlstr) {
 
     URL url;
     char *name, *dir, *ptr;
-    char path[1024];
+    char path[1024], buf[1024];
     int rv = FALSE;
+
+    memset(path, 0, sizeof(path));
+    memset(buf, 0, sizeof(buf));
 
     if (!Url_parse(urlstr, &url)) {
         error("malformed URL: %s", urlstr);
@@ -56,37 +63,56 @@ int Mapdata_setup (const char *urlstr) {
     }
 
     for (name = url.path + strlen(url.path) - 1; name > url.path; name--)
-        if (*(name - 1) == '/') break;
+        if (*(name - 1) == PATHSEP) break;
 
     if (*name == '\0') {
-        error("No file name in URL: %s", urlstr);
+        error("no file name in URL: %s", urlstr);
         goto end;
     }
 
     if (texturePath == NULL) {
-        error("Texture path is null");
+        error("texture path is null");
         goto end;
     }
-
-    strncpy(path, texturePath, 1024 - 1);
-    path[1024 - 1] = '\0';
 
     for (dir = strtok(texturePath, ":"); dir; dir = strtok(NULL, ":"))
         if (access(dir, R_OK | W_OK | X_OK) == 0)
             break;
-
+    
     if (dir == NULL) {
-        error("Couldn't access any directory in %s", path);
-        goto end;
-    }
+        
+        /* texturePath hasn't got a directory with proper access rights */
+        /* so lets create one into users home dir */
 
-    sprintf(path, "%s%s", dir, name);
+        char *home = getenv("HOME");
+        if (home == NULL) {
+            error("couldn't access any dir in %s and HOME is unset", path);
+            goto end;
+        }
+        
+        if (strlen(home) == 0) sprintf(buf, "%s", DATADIR);
+        else if (home[strlen(home) - 1] == PATHSEP) 
+            sprintf(buf, "%s%s", home, DATADIR);
+        else sprintf(buf, "%s%c%s", home, PATHSEP, DATADIR);
+
+        if (mkdir(buf, S_IRWXU | S_IRWXG | S_IRWXO) == -1) {
+            error("failed to create directory %s", dir);
+            goto end;
+        }
+
+        dir = buf;
+    }
+    
+    if (strlen(dir) == 0) sprintf(path, "%s", name);
+    else if (dir[strlen(dir) - 1] == PATHSEP) 
+        sprintf(path, "%s%s", dir, name);
+    else sprintf(path, "%s%c%s", dir, PATHSEP, name);
 
     if (strrchr(path, '.') == NULL) {
-        error("No extension in file name %s.", name);
+        error("no extension in file name %s.", name);
         goto end;
     }
-
+    
     /* temporarily make path point to the directory name */
     ptr = strrchr(path, '.');
     *ptr = '\0';
@@ -97,7 +123,7 @@ int Mapdata_setup (const char *urlstr) {
     } else {
         char *temp = malloc(strlen(texturePath) + strlen(path) + 2);
         if (temp == NULL) {
-            error("Not enough memory to new texturePath");
+            error("not enough memory to new texturePath");
             goto end;
         }
         sprintf(temp, "%s:%s", texturePath, path);
@@ -113,15 +139,15 @@ int Mapdata_setup (const char *urlstr) {
     /* reset path so that it points to the package file name */
     *ptr = '.';
 
-    printf("Downloading map data from %s to %s\n", urlstr, path);
+    printf("Downloading map data from %s to %s.\n", urlstr, path);
 
     if (!Mapdata_download(&url, path)) {
-        error("Downloading map data failed");
+        error("downloading map data failed");
         goto end;
     }
 
     if (!Mapdata_extract(path)) {
-        error("Extracting map data failed");
+        error("extracting map data failed");
         goto end;
     }
 
@@ -181,7 +207,7 @@ static int Mapdata_extract (const char *name) {
             return 0;
         }
 
-        sprintf(fname, "%s/", dir);
+        sprintf(fname, "%s%c", dir, PATHSEP);
 
         if (sscanf(buf, "%s\n%ld\n", fname + strlen(dir) + 1, &size) != 2) {
             error("failed to parse file info %s", buf);
@@ -190,13 +216,13 @@ static int Mapdata_extract (const char *name) {
         }
 
         /* security check */
-        if (strchr(fname + strlen(dir) + 1, '/') != NULL) {
+        if (strchr(fname + strlen(dir) + 1, PATHSEP) != NULL) {
             error("file name %s is illegal", fname);
             gzclose(in);
             return 0;
         }
 
-        printf("extracting %s (%ld)\n", fname, size);
+        printf("Extracting %s (%ld)\n", fname, size);
 
         if ((out = fopen(fname, "w")) == NULL) {
             error("failed to open %s for writing", buf);
@@ -258,12 +284,12 @@ static int Mapdata_download (const URL *url, const char *filePath)
     }
 
     if (sock_open_tcp(&s) == SOCK_IS_ERROR) {
-	error("Failed to create a socket");
+	error("failed to create a socket");
 	fclose(f);
 	return FALSE;
     }
     if (sock_connect(&s, url->host, url->port) == SOCK_IS_ERROR) {
-        error("Couldn't connect to download address");
+        error("couldn't connect to download address");
 	sock_close(&s);
         fclose(f);
         return FALSE;
