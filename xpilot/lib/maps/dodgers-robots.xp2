@@ -10,7 +10,6 @@
 <Option name="robotsleave" value="no"/>
 <Option name="robotteam" value="1"/>
 
-<Option name="constantspeed" value="1"/>
 <Option name="kineticenergyfueldrain" value="no"/>
 <Option name="baselesspausing" value="yes"/>
 
