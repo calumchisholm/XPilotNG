@@ -82,49 +82,56 @@ option options[] = {
 	"Yes",
 	"",
 	KEY_DUMMY,
-	"Display this help message.\n"
+	"Display this help message.\n",
+	0
     },
     {
 	"version",
 	"Yes",
 	"",
 	KEY_DUMMY,
-	"Show the source code version.\n"
+	"Show the source code version.\n",
+	0
     },
     {
 	"name",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"Set the nickname.\n"
+	"Set the nickname.\n",
+	0
     },
     {
 	"user",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"Set the username.\n"
+	"Set the username.\n",
+	0
     },
     {
 	"host",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"Set the hostname.\n"
+	"Set the hostname.\n",
+	0
     },
     {
 	"join",
 	"Yes",
 	"",
 	KEY_DUMMY,
-	"Join the game immediately, no questions asked.\n"
+	"Join the game immediately, no questions asked.\n",
+	0
     },
     {
 	"noLocalMotd",
 	"Yes",
 	"",
 	KEY_DUMMY,
-	"Do not display the local Message Of The Day.\n"
+	"Do not display the local Message Of The Day.\n",
+	0
     },
     {
 	"autoServerMotdPopup",
@@ -135,14 +142,16 @@ option options[] = {
 	"Yes",
 #endif
 	KEY_DUMMY,
-	"Automatically popup the MOTD of the server on startup.\n"
+	"Automatically popup the MOTD of the server on startup.\n",
+	0
     },
     {
 	"refreshMotd",
 	NULL,
 	"No",
 	KEY_DUMMY,
-	"Get a fresh copy of the server MOTD every time it is displayed.\n"
+	"Get a fresh copy of the server MOTD every time it is displayed.\n",
+	0
     },
     {
 	"text",
@@ -150,28 +159,32 @@ option options[] = {
 	"No",
 	KEY_DUMMY,
 	"Use the simple text interface to contact a server\n"
-	"instead of the graphical user interface.\n"
+	"instead of the graphical user interface.\n",
+	0
     },
     {
 	"list",
 	"Yes",
 	"",
 	KEY_DUMMY,
-	"List all servers running on the local network.\n"
+	"List all servers running on the local network.\n",
+	0
     },
     {
 	"team",
 	NULL,
 	TEAM_NOT_SET_STR,
 	KEY_DUMMY,
-	"Set the team to join.\n"
+	"Set the team to join.\n",
+	0
     },
     {
 	"display",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"Set the X display.\n"
+	"Set the X display.\n",
+	0
     },
     {
 	"keyboard",
@@ -180,7 +193,8 @@ option options[] = {
 	KEY_DUMMY,
 	"Set the X keyboard input if you want keyboard input from\n"
 	"another display.  The default is to use the keyboard input from\n"
-	"the X display.\n"
+	"the X display.\n",
+	0
     },
     {
 	"geometry",
@@ -188,7 +202,8 @@ option options[] = {
 	"1024x768",
 	KEY_DUMMY,
 	"Set the window size and position in standard X geometry format.\n"
-	"The maximum allowed window size is 1922x1440.\n"
+	"The maximum allowed window size is 1922x1440.\n",
+	0
     },
     {
 	"ignoreWindowManager",
@@ -198,7 +213,8 @@ option options[] = {
 	"Ignore the window manager when opening the top level player window.\n"
 	"This can be handy if you want to have your XPilot window on a preferred\n"
 	"position without window manager borders.  Also sometimes window managers\n"
-	"may interfere when switching colormaps.  This option may prevent that.\n"
+	"may interfere when switching colormaps.  This option may prevent that.\n",
+	0
     },
     {
 	"shutdown",
@@ -206,7 +222,8 @@ option options[] = {
 	"",
 	KEY_DUMMY,
 	"Shutdown the server with a message.\n"
-	"The message used is the first argument to this option.\n"
+	"The message used is the first argument to this option.\n",
+	0
     },
     {
 	"port",
@@ -216,7 +233,8 @@ option options[] = {
 	"Set the port number of the server.\n"
 	"Almost all servers use the default port, which is the\n"
 	"recommended policy.  You can find out about which port\n"
-	"is used by a server by querying the XPilot Meta server.\n"
+	"is used by a server by querying the XPilot Meta server.\n",
+	0
     },
     {
 	"shipShape",
@@ -230,7 +248,8 @@ option options[] = {
 	"distribution.  Note that there is a nifty Unix tool called editss for\n"
 	"easy ship creation.  There is XPShipEditor for Windows\n"
 	"and Ship Shaper for Java.  See the XPilot FAQ for details.\n"
-	"See also the \"shipShapeFile\" option below.\n"
+	"See also the \"shipShapeFile\" option below.\n",
+	0
     },
     {
 	"shipShapeFile",
@@ -248,7 +267,8 @@ option options[] = {
 	"one of the shipshapes defined in /home/myself/.shipshapes.\n"
 	"Each shipshape definition should be defined on only one line,\n"
 	"where all characters up to the first left parenthesis don't matter.\n"
-	/* shipshopshapshepshit getting nuts from all these shpshp-s. */
+	/* shipshopshapshepshit getting nuts from all these shpshp-s. */,
+	0
     },
     {
 	"power",
@@ -256,7 +276,8 @@ option options[] = {
 	"55.0",
 	KEY_DUMMY,
 	"Set the engine power.\n"
-	"Valid values are in the range 5-55.\n"
+	"Valid values are in the range 5-55.\n",
+	0
     },
     {
 	"turnSpeed",
@@ -265,7 +286,8 @@ option options[] = {
 	KEY_DUMMY,
 	"Set the ship's turn speed.\n"
 	"Valid values are in the range 4-64.\n"
-	"See also turnResistance.\n"
+	"See also turnResistance.\n",
+	0
     },
     {
 	"turnResistance",
@@ -276,7 +298,8 @@ option options[] = {
 	"This determines the speed at which a ship stops turning.\n"
 	"Valid values are in the range 0.0-1.0.\n"
 	"This should always be 0, other values are for compatibility.\n"
-	"See also turnSpeed.\n"
+	"See also turnSpeed.\n",
+	0
     },
     {
 	"altPower",
@@ -284,7 +307,8 @@ option options[] = {
 	"35.0",
 	KEY_DUMMY,
 	"Set the alternate engine power.\n"
-	"See also the keySwapSettings option.\n"
+	"See also the keySwapSettings option.\n",
+	0
     },
     {
 	"altTurnSpeed",
@@ -292,7 +316,8 @@ option options[] = {
 	"25.0",
 	KEY_DUMMY,
 	"Set the alternate ship's turn speed.\n"
-	"See also the keySwapSettings option.\n"
+	"See also the keySwapSettings option.\n",
+	0
     },
     {
 	"altTurnResistance",
@@ -300,28 +325,32 @@ option options[] = {
 	"0",
 	KEY_DUMMY,
 	"Set the alternate ship's turn resistance.\n"
-	"See also the keySwapSettings option.\n"
+	"See also the keySwapSettings option.\n",
+	0
     },
     {
 	"mapRadar",
 	NULL,
 	"Yes",
 	KEY_DUMMY,
-	"Paint radar dots' position on the map \n"
+	"Paint radar dots' position on the map \n",
+	0
     },
     {
 	"showShipShapes",
 	NULL,
 	"Yes",
 	KEY_DUMMY,
-	"Should others' shipshapes be displayed or not.\n"
+	"Should others' shipshapes be displayed or not.\n",
+	0
     },
     {
 	"showMyShipShape",
 	NULL,
 	"Yes",
 	KEY_DUMMY,
-	"Should your own shipshape be displayed or not.\n"
+	"Should your own shipshape be displayed or not.\n",
+	0
     },
     {
 	"ballMsgScan",
@@ -329,7 +358,8 @@ option options[] = {
 	"Yes",
 	KEY_DUMMY,
 	"Scan messages for BALL, SAFE, COVER and POP and paint \n"
-	"warning circles inside ship.\n"
+	"warning circles inside ship.\n",
+	0
     },
     /* these 2 should really be color options */
     {
@@ -337,7 +367,8 @@ option options[] = {
 	NULL,
 	"No",
 	KEY_DUMMY,
-	"Paint remaining lives next to ships.\n"
+	"Paint remaining lives next to ships.\n",
+	0
     },
     {
 	"showExtraBaseInfo",
@@ -345,42 +376,48 @@ option options[] = {
 	"Yes",
 	KEY_DUMMY,
 	"Paint remaining lives or D (dead), P (paused) or \n"
-	"W (waiting for next round) at base.\n"
+	"W (waiting for next round) at base.\n",
+	0
     },
     {
 	"fuelNotify",
 	NULL,
 	"500",
 	KEY_DUMMY,
-	"The limit when the HUD fuel bar will become visible.\n"
+	"The limit when the HUD fuel bar will become visible.\n",
+	0
     },
     {
 	"fuelWarning",
 	NULL,
 	"200",
 	KEY_DUMMY,
-	"The limit when the HUD fuel bar will start flashing.\n"
+	"The limit when the HUD fuel bar will start flashing.\n",
+	0
     },
     {
 	"fuelCritical",
 	NULL,
 	"100",
 	KEY_DUMMY,
-	"The limit when the HUD fuel bar will flash faster.\n"
+	"The limit when the HUD fuel bar will flash faster.\n",
+	0
     },
     {
 	"speedFactHUD",
 	NULL,
 	"0.0",
 	KEY_DUMMY,
-	"Should the HUD be moved, to indicate the current velocity?\n"
+	"Should the HUD be moved, to indicate the current velocity?\n",
+	0
     },
     {
 	"speedFactPTR",
 	NULL,
 	"0.0",
 	KEY_DUMMY,
-	"Uses a red line to indicate the current velocity and direction.\n"
+	"Uses a red line to indicate the current velocity and direction.\n",
+	0
     },
     {
 	"slidingRadar",
@@ -389,14 +426,16 @@ option options[] = {
 	KEY_DUMMY,
 	"If the game is in edgewrap mode then the radar will keep your\n"
 	"position on the radar in the center and raw the rest of the radar\n"
-	"around it.  Note that this requires a fast graphics system.\n"
+	"around it.  Note that this requires a fast graphics system.\n",
+	0
     },
     {
 	"outlineWorld",
 	NULL,
 	"No",
 	KEY_DUMMY,
-	"Draws only the outline of all the blue map constructs.\n"
+	"Draws only the outline of all the blue map constructs.\n",
+	0
     },
     {
 	"filledWorld",
@@ -405,7 +444,8 @@ option options[] = {
 	KEY_DUMMY,
 	"Draws the walls solid, filled with one color,\n"
 	"unless overridden by texture.\n"
-	"Be warned that this option needs fast graphics.\n"
+	"Be warned that this option needs fast graphics.\n",
+	0
     },
     {
 	"texturedWalls",
@@ -414,7 +454,8 @@ option options[] = {
 	KEY_DUMMY,
 	"Allows drawing polygon bitmaps specified by the (new-style) map\n"
 	"See also the wallTextureFile option.\n"
-	"Be warned that this needs a reasonably fast graphics system.\n"
+	"Be warned that this needs a reasonably fast graphics system.\n",
+	0
     },
     {
 	"wallTextureFile",
@@ -422,7 +463,8 @@ option options[] = {
 	"",
 	KEY_DUMMY,
 	"Specify a XPM format pixmap file to load wall texture from.\n"
-	"(this only affects old-style maps, generally useless)\n"
+	"(this only affects old-style maps, generally useless)\n",
+	0
     },
     {
 	"texturePath",
@@ -430,7 +472,8 @@ option options[] = {
 	conf_texturedir_string,
 	KEY_DUMMY,
 	"Search path for texture files.\n"
-	"This is a list of one or more directories separated by colons.\n"
+	"This is a list of one or more directories separated by colons.\n",
+	0
     },
     {
 	"fullColor",
@@ -439,7 +482,8 @@ option options[] = {
 	KEY_DUMMY,
 	"Whether to use a colors as close as possible to the specified ones\n"
 	"or use a few standard colors for everything. May require more\n"
-	"resources from your system.\n"
+	"resources from your system.\n",
+	0
     },
     {
 	"texturedObjects",
@@ -449,21 +493,24 @@ option options[] = {
 	"Whether to draw certain game objects with textures.\n"
 	"Be warned that this requires more graphics speed.\n"
 	"fullColor must be on for this to work.\n"
-	"You may also need to enable multibuffering or double-buffering.\n"
+	"You may also need to enable multibuffering or double-buffering.\n",
+	0
     },
     {
 	"showID",
 	NULL,
 	"No",
 	KEY_DUMMY,
-	"Should ID numbers be shown instead of ship names on the playfield?\n"
+	"Should ID numbers be shown instead of ship names on the playfield?\n",
+	0
     },
     {
 	"markingLights",
 	NULL,
 	"No",
 	KEY_DUMMY,
-	"Should the fighters have marking lights, just like airplanes?\n"
+	"Should the fighters have marking lights, just like airplanes?\n",
+	0
     },
     {
 	"sparkProb",
@@ -472,21 +519,24 @@ option options[] = {
 	KEY_DUMMY,
 	"The chance that sparks are drawn or not.\n"
 	"This gives a sparkling effect.\n"
-	"Valid values are in the range [0.0-1.0]\n"
+	"Valid values are in the range [0.0-1.0]\n",
+	0
     },
     {
 	"sparkSize",
 	NULL,
 	"2",
 	KEY_DUMMY,
-	"Size of sparks in pixels.\n"
+	"Size of sparks in pixels.\n",
+	0
     },
     {
 	"charsPerSecond",
 	NULL,
 	"50",
 	KEY_DUMMY,
-	"Speed in which messages appear on screen in characters per second.\n"
+	"Speed in which messages appear on screen in characters per second.\n",
+	0
     },
     {
 	"clockAMPM",
@@ -494,6 +544,7 @@ option options[] = {
 	"No",
 	KEY_DUMMY,
 	"12 or 24 hour format for clock display.\n",
+	0
     },
     {
 	"pointerControl",
@@ -503,14 +554,16 @@ option options[] = {
 	"Enable mouse control.  This allows ship direction control by\n"
 	"moving the mouse to the left for an anti-clockwise turn and\n"
 	"moving the mouse to the right for a clockwise turn.\n"
-	"Also see the pointerButton options for use of the mouse buttons.\n"
+	"Also see the pointerButton options for use of the mouse buttons.\n",
+	0
     },
     {
 	"gameFont",
 	NULL,
 	GAME_FONT,
 	KEY_DUMMY,
-	"The font used on the HUD and for most other text.\n"
+	"The font used on the HUD and for most other text.\n",
+	0
     },
     {
 	"scoreListFont",
@@ -518,28 +571,32 @@ option options[] = {
 	SCORE_LIST_FONT,
 	KEY_DUMMY,
 	"The font used on the score list.\n"
-	"This must be a non-proportional font.\n"
+	"This must be a non-proportional font.\n",
+	0
     },
     {
 	"buttonFont",
 	NULL,
 	BUTTON_FONT,
 	KEY_DUMMY,
-	"The font used on all buttons.\n"
+	"The font used on all buttons.\n",
+	0
     },
     {
 	"textFont",
 	NULL,
 	TEXT_FONT,
 	KEY_DUMMY,
-	"The font used in the help and about windows.\n"
+	"The font used in the help and about windows.\n",
+	0
     },
     {
 	"talkFont",
 	NULL,
 	TALK_FONT,
 	KEY_DUMMY,
-	"The font used in the talk window.\n"
+	"The font used in the talk window.\n",
+	0
     },
     {
 	"motdFont",
@@ -547,21 +604,24 @@ option options[] = {
 	MOTD_FONT,
 	KEY_DUMMY,
 	"The font used in the MOTD window and key list window.\n"
-	"This must be a non-proportional font.\n"
+	"This must be a non-proportional font.\n",
+	0
     },
     {
 	"messageFont",
 	NULL,
 	MESSAGE_FONT,
 	KEY_DUMMY,
-	"The font used for drawing messages.\n"
+	"The font used for drawing messages.\n",
+	0
     },
     {
 	"maxMessages",
 	NULL,
 	"8",
 	KEY_DUMMY,
-	"The maximum number of messages to display.\n"
+	"The maximum number of messages to display.\n",
+	0
     },
     {
 	"messagesToStdout",
@@ -571,14 +631,16 @@ option options[] = {
 	"Send messages to standard output.\n"
 	"0: Don't.\n"
 	"1: Only player messages.\n"
-	"2: Player and status messages.\n"
+	"2: Player and status messages.\n",
+	0
     },
     {
 	"reverseScroll",
 	NULL,
 	"No",
 	KEY_DUMMY,
-	"Reverse scroll direction of messages.\n"
+	"Reverse scroll direction of messages.\n",
+	0
     },
 #ifndef _WINDOWS
     {
@@ -587,7 +649,8 @@ option options[] = {
 	"Yes",
 	KEY_DUMMY,
 	"Provide cut&paste for the player messages and the talk window and\n"
-	"a `history' for the talk window.\n"
+	"a `history' for the talk window.\n",
+	0
     },
     {
 	"maxLinesInHistory",
@@ -595,7 +658,8 @@ option options[] = {
 	"32",
 	KEY_DUMMY,
 	"Number of your messages saved in the `history' of the talk window.\n"
-	"`history' is accessible with `keyTalkCursorUp/Down'.\n"
+	"`history' is accessible with `keyTalkCursorUp/Down'.\n",
+	0
     },
 #endif
     {
@@ -603,7 +667,8 @@ option options[] = {
 	NULL,
 	"5",
 	KEY_DUMMY,
-	"The size of shots in pixels.\n"
+	"The size of shots in pixels.\n",
+	0
     },
     {
 	"teamShotSize",
@@ -611,14 +676,16 @@ option options[] = {
 	"3",
 	KEY_DUMMY,
 	"The size of team shots in pixels.\n"
-	"Note that team shots are drawn in teamShotColor.\n"
+	"Note that team shots are drawn in teamShotColor.\n",
+	0
     },
     {
 	"teamShotColor",
 	NULL,
 	"2",
 	KEY_DUMMY,
-	"Which color number to use for drawing harmless shots.\n"
+	"Which color number to use for drawing harmless shots.\n",
+	0
     },
     {
 	"showNastyShots",
@@ -626,7 +693,8 @@ option options[] = {
 	"No",
 	KEY_DUMMY,
 	"Use the new Nasty Looking Shots or the original rectangle shots,\n"
-	"You will probably want to increase your shotSize if you use this.\n"
+	"You will probably want to increase your shotSize if you use this.\n",
+	0
     },
     {
 	"backgroundPointDist",
@@ -635,14 +703,16 @@ option options[] = {
 	KEY_DUMMY,
 	"The distance between points in the background measured in blocks.\n"
 	"These are drawn in empty map regions to keep feeling for which\n"
-	"direction the ship is moving to.\n"
+	"direction the ship is moving to.\n",
+	0
     },
     {
 	"backgroundPointSize",
 	NULL,
 	"2",
 	KEY_DUMMY,
-	"Specifies the size of the background points.  0 means no points.\n"
+	"Specifies the size of the background points.  0 means no points.\n",
+	0
     },
     {
 	"titleFlip",
@@ -651,21 +721,24 @@ option options[] = {
 	KEY_DUMMY,
 	"Should the title bar change or not.\n"
 	"Some window managers like twm may have problems with\n"
-	"flipping title bars.  Hence this option to turn it off.\n"
+	"flipping title bars.  Hence this option to turn it off.\n",
+	0
     },
     {
 	"toggleShield",
 	NULL,
 	"No",
 	KEY_DUMMY,
-	"Are shields toggled by a keypress only?\n"
+	"Are shields toggled by a keypress only?\n",
+	0
     },
     {
 	"autoShield", /* Don auto-shield hack */
 	NULL,
 	"Yes",
 	KEY_DUMMY,
-	"Are shields lowered automatically for weapon fire?\n"
+	"Are shields lowered automatically for weapon fire?\n",
+	0
     },
     {
 	"shieldDrawSolid",
@@ -674,21 +747,24 @@ option options[] = {
 	KEY_DUMMY,
 	"Are shields drawn in a solid line.\n"
 	"Not setting a value for this option will select the best value\n"
-	"automatically for your particular display system.\n"
+	"automatically for your particular display system.\n",
+	0
     },
     {
 	"showMessages",
 	NULL,
 	"Yes",
 	KEY_DUMMY,
-	"Should messages appear on screen.\n"
+	"Should messages appear on screen.\n",
+	0
     },
     {
 	"showItems",
 	NULL,
 	"Yes",
 	KEY_DUMMY,
-	"Should owned items be displayed permanently on the HUD?\n"
+	"Should owned items be displayed permanently on the HUD?\n",
+	0
     },
     {
 	"showItemsTime",
@@ -696,21 +772,24 @@ option options[] = {
 	"3.0",
 	KEY_DUMMY,
 	"If showItems is false, the time in seconds to display item\n"
-	"information on the HUD when it has changed.\n"
+	"information on the HUD when it has changed.\n",
+	0
     },
     {
 	"showScoreDecimals",
 	NULL,
 	"1",
 	KEY_DUMMY,
-	"The number of decimals to use when displaying scores.\n"
+	"The number of decimals to use when displaying scores.\n",
+	0
     },
     {
 	"receiveWindowSize",
 	NULL,
 	"3",
 	KEY_DUMMY,
-	"Too complicated.  Keep it on 3.\n"
+	"Too complicated.  Keep it on 3.\n",
+	0
     },
     {
 	"visual",
@@ -719,14 +798,16 @@ option options[] = {
 	KEY_DUMMY,
 	"Specify which visual to use for allocating colors.\n"
 	"To get a listing of all possible visuals on your dislay\n"
-	"set the argument for this option to list.\n"
+	"set the argument for this option to list.\n",
+	0
     },
     {
 	"erase",
 	"Yes",
 	"",
 	KEY_DUMMY,
-	"Use Erase(-hack) for slow X.\n"
+	"Use Erase(-hack) for slow X.\n",
+	0
     },
     {
 	"colorSwitch",
@@ -734,49 +815,56 @@ option options[] = {
 	"Yes",
 	KEY_DUMMY,
 	"Use color buffering or not.\n"
-	"Usually color buffering is faster, especially on 8-bit PseudoColor displays.\n"
+	"Usually color buffering is faster, especially on 8-bit PseudoColor displays.\n",
+	0
     },
     {
 	"multibuffer",
 	NULL,
 	"No",
 	KEY_DUMMY,
-	"Use the X windows multibuffer extension if present.\n"
+	"Use the X windows multibuffer extension if present.\n",
+	0
     },
     {
 	"maxColors",
 	NULL,
 	"16",
 	KEY_DUMMY,
-	"The number of colors to use.  Valid values are 4, 8 and 16.\n"
+	"The number of colors to use.  Valid values are 4, 8 and 16.\n",
+	0
     },
     {
 	"color0",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"The color value for the first color.\n"
+	"The color value for the first color.\n",
+	0
     },
     {
 	"color1",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"The color value for the second color.\n"
+	"The color value for the second color.\n",
+	0
     },
     {
 	"color2",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"The color value for the third color.\n"
+	"The color value for the third color.\n",
+	0
     },
     {
 	"color3",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"The color value for the fourth color.\n"
+	"The color value for the fourth color.\n",
+	0
     },
     {
 	"color4",
@@ -784,7 +872,8 @@ option options[] = {
 	"",
 	KEY_DUMMY,
 	"The color value for the fifth color.\n"
-	"This is only used if maxColors is set to 8 or 16.\n"
+	"This is only used if maxColors is set to 8 or 16.\n",
+	0
     },
     {
 	"color5",
@@ -792,7 +881,8 @@ option options[] = {
 	"",
 	KEY_DUMMY,
 	"The color value for the sixth color.\n"
-	"This is only used if maxColors is set to 8 or 16.\n"
+	"This is only used if maxColors is set to 8 or 16.\n",
+	0
     },
     {
 	"color6",
@@ -800,7 +890,8 @@ option options[] = {
 	"",
 	KEY_DUMMY,
 	"The color value for the seventh color.\n"
-	"This is only used if maxColors is set to 8 or 16.\n"
+	"This is only used if maxColors is set to 8 or 16.\n",
+	0
     },
     {
 	"color7",
@@ -808,7 +899,8 @@ option options[] = {
 	"",
 	KEY_DUMMY,
 	"The color value for the eighth color.\n"
-	"This is only used if maxColors is set to 8 or 16.\n"
+	"This is only used if maxColors is set to 8 or 16.\n",
+	0
     },
     {
 	"color8",
@@ -816,7 +908,8 @@ option options[] = {
 	"",
 	KEY_DUMMY,
 	"The color value for the nineth color.\n"
-	"This is only used if maxColors is set to 16.\n"
+	"This is only used if maxColors is set to 16.\n",
+	0
     },
     {
 	"color9",
@@ -824,7 +917,8 @@ option options[] = {
 	"",
 	KEY_DUMMY,
 	"The color value for the tenth color.\n"
-	"This is only used if maxColors is set to 16.\n"
+	"This is only used if maxColors is set to 16.\n",
+	0
     },
     {
 	"color10",
@@ -832,7 +926,8 @@ option options[] = {
 	"",
 	KEY_DUMMY,
 	"The color value for the eleventh color.\n"
-	"This is only used if maxColors is set to 16.\n"
+	"This is only used if maxColors is set to 16.\n",
+	0
     },
     {
 	"color11",
@@ -840,7 +935,8 @@ option options[] = {
 	"",
 	KEY_DUMMY,
 	"The color value for the twelfth color.\n"
-	"This is only used if maxColors is set to 16.\n"
+	"This is only used if maxColors is set to 16.\n",
+	0
     },
     {
 	"color12",
@@ -848,7 +944,8 @@ option options[] = {
 	"",
 	KEY_DUMMY,
 	"The color value for the thirteenth color.\n"
-	"This is only used if maxColors is set to 16.\n"
+	"This is only used if maxColors is set to 16.\n",
+	0
     },
     {
 	"color13",
@@ -856,7 +953,8 @@ option options[] = {
 	"",
 	KEY_DUMMY,
 	"The color value for the fourteenth color.\n"
-	"This is only used if maxColors is set to 16.\n"
+	"This is only used if maxColors is set to 16.\n",
+	0
     },
     {
 	"color14",
@@ -864,7 +962,8 @@ option options[] = {
 	"",
 	KEY_DUMMY,
 	"The color value for the fifteenth color.\n"
-	"This is only used if maxColors is set to 16.\n"
+	"This is only used if maxColors is set to 16.\n",
+	0
     },
     {
 	"color15",
@@ -872,14 +971,16 @@ option options[] = {
 	"",
 	KEY_DUMMY,
 	"The color value for the sixteenth color.\n"
-	"This is only used if maxColors is set to 16.\n"
+	"This is only used if maxColors is set to 16.\n",
+	0
     },
     {
 	"hudColor",
 	NULL,
 	"2",
 	KEY_DUMMY,
-	"Which color number to use for drawing the HUD.\n"
+	"Which color number to use for drawing the HUD.\n",
+	0
     },
     {
 	"hudHLineColor",
@@ -887,7 +988,8 @@ option options[] = {
 	"2",
 	KEY_DUMMY,
 	"Which color number to use for drawing the horizontal lines\n"
-	"in the HUD.\n"
+	"in the HUD.\n",
+	0
     },
     {
 	"hudVLineColor",
@@ -895,14 +997,16 @@ option options[] = {
 	"0",
 	KEY_DUMMY,
 	"Which color number to use for drawing the vertical lines\n"
-	"in the HUD.\n"
+	"in the HUD.\n",
+	0
     },
     {
 	"hudItemsColor",
 	NULL,
 	"2",
 	KEY_DUMMY,
-	"Which color number to use for drawing owned items on the HUD.\n"
+	"Which color number to use for drawing owned items on the HUD.\n",
+	0
     },
     {
 	"hudRadarEnemyColor",
@@ -910,7 +1014,8 @@ option options[] = {
 	"1",
 	KEY_DUMMY,
 	"Which color number to use for drawing hudradar dots\n"
-	"that represent enemy ships.\n"
+	"that represent enemy ships.\n",
+	0
     },
     {
 	"hudRadarOtherColor",
@@ -918,21 +1023,24 @@ option options[] = {
 	"2",
 	KEY_DUMMY,
 	"Which color number to use for drawing hudradar dots\n"
-	"that represent friendly ships or other objects.\n"
+	"that represent friendly ships or other objects.\n",
+	0
     },
     {
 	"hudRadarDotSize",
 	NULL,
 	"8",
 	KEY_DUMMY,
-	"Which size to use for drawing the hudradar dots.\n"
+	"Which size to use for drawing the hudradar dots.\n",
+	0
     },
     {
 	"hudRadarScale",
 	NULL,
 	"1.5",
 	KEY_DUMMY,
-	"The relative size of the hudradar.\n"
+	"The relative size of the hudradar.\n",
+	0
     },
     {
 	"hudRadarLimit",
@@ -941,77 +1049,88 @@ option options[] = {
 	KEY_DUMMY,
 	"Hudradar dots closer than this to your ship are not drawn.\n"
 	"A value of 1.0 means that the dots are not drawn for ships in\n"
-	"your active view area.\n"
+	"your active view area.\n",
+	0
     },
     {
 	"hudSize",
 	NULL,
 	"90",
 	KEY_DUMMY,
-	"Which size to use for drawing the hud.\n"
+	"Which size to use for drawing the hud.\n",
+	0
     },
     {
 	"dirPtrColor",
 	NULL,
 	"0",
 	KEY_DUMMY,
-	"Which color number to use for drawing the direction pointer hack.\n"
+	"Which color number to use for drawing the direction pointer hack.\n",
+	0
     },
     {
 	"shipShapesHackColor",
 	NULL,
 	"0",
 	KEY_DUMMY,
-	"Which color number to use for drawing the shipshapes hack.\n"
+	"Which color number to use for drawing the shipshapes hack.\n",
+	0
     },
     {
 	"hudLockColor",
 	NULL,
 	"0",
 	KEY_DUMMY,
-	"Which color number to use for drawing the lock on the HUD.\n"
+	"Which color number to use for drawing the lock on the HUD.\n",
+	0
     },
     {
 	"visibilityBorderColor",
 	NULL,
 	"2",
 	KEY_DUMMY,
-	"Which color number to use for drawing the visibility border.\n"
+	"Which color number to use for drawing the visibility border.\n",
+	0
     },
     {
 	"fuelGaugeColor",
 	NULL,
 	"0",
 	KEY_DUMMY,
-	"Which color number to use for drawing the fuel gauge.\n"
+	"Which color number to use for drawing the fuel gauge.\n",
+	0
     },
     {
 	"msgScanBallColor",
 	NULL,
 	"3",
 	KEY_DUMMY,
-	"Which color number to use for drawing ball message warning.\n"
+	"Which color number to use for drawing ball message warning.\n",
+	0
     },
     {
 	"msgScanSafeColor",
 	NULL,
 	"4",
 	KEY_DUMMY,
-	"Which color number to use for drawing safe message.\n"
+	"Which color number to use for drawing safe message.\n",
+	0
     },
     {
 	"msgScanCoverColor",
 	NULL,
 	"2",
 	KEY_DUMMY,
-	"Which color number to use for drawing cover message.\n"
+	"Which color number to use for drawing cover message.\n",
+	0
     },
     {
 	"msgScanPopColor",
 	NULL,
 	"11",
 	KEY_DUMMY,
-	"Which color number to use for drawing pop message.\n"
+	"Which color number to use for drawing pop message.\n",
+	0
     },
     {
 	"zeroLivesColor",
@@ -1019,7 +1138,8 @@ option options[] = {
 	"1",
 	KEY_DUMMY,
 	"Which color to associate with ships with zero lives left.\n"
-	"This can be used to paint for example ship and base names.\n"
+	"This can be used to paint for example ship and base names.\n",
+	0
     },
     {
 	"oneLifeColor",
@@ -1027,7 +1147,8 @@ option options[] = {
 	"3",
 	KEY_DUMMY,
 	"Which color to associate with ships with one life left.\n"
-	"This can be used to paint for example ship and base names.\n"
+	"This can be used to paint for example ship and base names.\n",
+	0
     },
     {
 	"twoLivesColor",
@@ -1035,7 +1156,8 @@ option options[] = {
 	"11",
 	KEY_DUMMY,
 	"Which color to associate with ships with two lives left.\n"
-	"This can be used to paint for example ship and base names.\n"
+	"This can be used to paint for example ship and base names.\n",
+	0
     },
     {
 	"manyLivesColor",
@@ -1043,7 +1165,8 @@ option options[] = {
 	"4",
 	KEY_DUMMY,
 	"Which color to associate with ships with more than two lives left.\n"
-	"This can be used to paint for example ship and base names.\n"
+	"This can be used to paint for example ship and base names.\n",
+	0
     },
     {
 	"selfLWColor",
@@ -1051,7 +1174,8 @@ option options[] = {
 	"1",
 	KEY_DUMMY,
 	"Which color to use to paint your ship in when on last life.\n"
-	"Original color for this is red.\n"
+	"Original color for this is red.\n",
+	0
     },
     {
 	"enemyLWColor",
@@ -1059,7 +1183,8 @@ option options[] = {
 	"1",
 	KEY_DUMMY,
 	"Which color to use to paint enemy ships in when on last life.\n"
-	"Original color for this is red.\n"
+	"Original color for this is red.\n",
+	0
     },
     {
 	"teamLWColor",
@@ -1067,63 +1192,72 @@ option options[] = {
 	"2",
 	KEY_DUMMY,
 	"Which color to use to paint teammate ships in when on last life.\n"
-	"Original color for this is green.\n"
+	"Original color for this is green.\n",
+	0
     },
     {
 	"shipNameColor",
 	NULL,
 	"2",
 	KEY_DUMMY,
-	"Which color number to use for drawing names of ships.\n"
+	"Which color number to use for drawing names of ships.\n",
+	0
     },
     {
 	"baseNameColor",
 	NULL,
 	"1",
 	KEY_DUMMY,
-	"Which color number to use for drawing names of bases.\n"
+	"Which color number to use for drawing names of bases.\n",
+	0
     },
     {
 	"mineNameColor",
 	NULL,
 	"2",
 	KEY_DUMMY,
-	"Which color number to use for drawing names of mines.\n"
+	"Which color number to use for drawing names of mines.\n",
+	0
     },
     {
 	"ballColor",
 	NULL,
 	"1",
 	KEY_DUMMY,
-	"Which color number to use for drawing balls.\n"
+	"Which color number to use for drawing balls.\n",
+	0
     },
     {
 	"connColor",
 	NULL,
 	"2",
 	KEY_DUMMY,
-	"Which color number to use for drawing connectors.\n"
+	"Which color number to use for drawing connectors.\n",
+	0
     },
     {
 	"fuelMeterColor",
 	NULL,
 	"0",
 	KEY_DUMMY,
-	"Which color number to use for drawing the fuel meter.\n"
+	"Which color number to use for drawing the fuel meter.\n",
+	0
     },
     {
 	"powerMeterColor",
 	NULL,
 	"0",
 	KEY_DUMMY,
-	"Which color number to use for drawing the power meter.\n"
+	"Which color number to use for drawing the power meter.\n",
+	0
     },
     {
 	"turnSpeedMeterColor",
 	NULL,
 	"0",
 	KEY_DUMMY,
-	"Which color number to use for drawing the turn speed meter.\n"
+	"Which color number to use for drawing the turn speed meter.\n",
+	0
     },
     {
 	"packetSizeMeterColor",
@@ -1131,7 +1265,8 @@ option options[] = {
 	"0",
 	KEY_DUMMY,
 	"Which color number to use for drawing the packet size meter.\n"
-	"Each bar is equavalent to 1024 bytes, for a maximum of 4096 bytes.\n"
+	"Each bar is equavalent to 1024 bytes, for a maximum of 4096 bytes.\n",
+	0
     },
     {
 	"packetLossMeterColor",
@@ -1139,7 +1274,8 @@ option options[] = {
 	"3",
 	KEY_DUMMY,
 	"Which color number to use for drawing the packet loss meter.\n"
-	"This gives the percentage of lost frames due to network failure.\n"
+	"This gives the percentage of lost frames due to network failure.\n",
+	0
     },
     {
 	"packetDropMeterColor",
@@ -1147,7 +1283,8 @@ option options[] = {
 	"0",
 	KEY_DUMMY,
 	"Which color number to use for drawing the packet drop meter.\n"
-	"This gives the percentage of dropped frames due to display slowness.\n"
+	"This gives the percentage of dropped frames due to display slowness.\n",
+	0
     },
     {
 	"packetLagMeterColor",
@@ -1155,42 +1292,48 @@ option options[] = {
 	"0",
 	KEY_DUMMY,
 	"Which color number to use for drawing the packet lag meter.\n"
-	"This gives the amount of lag in frames over the past one second.\n"
+	"This gives the amount of lag in frames over the past one second.\n",
+	0
     },
     {
 	"temporaryMeterColor",
 	NULL,
 	"3",
 	KEY_DUMMY,
-	"Which color number to use for drawing temporary meters.\n"
+	"Which color number to use for drawing temporary meters.\n",
+	0
     },
     {
 	"meterBorderColor",
 	NULL,
 	"2",
 	KEY_DUMMY,
-	"Which color number to use for drawing borders of meters.\n"
+	"Which color number to use for drawing borders of meters.\n",
+	0
     },
     {
 	"windowColor",
 	NULL,
 	"8",
 	KEY_DUMMY,
-	"Which color number to use for drawing windows.\n"
+	"Which color number to use for drawing windows.\n",
+	0
     },
     {
 	"buttonColor",
 	NULL,
 	"2",
 	KEY_DUMMY,
-	"Which color number to use for drawing buttons.\n"
+	"Which color number to use for drawing buttons.\n",
+	0
     },
     {
 	"borderColor",
 	NULL,
 	"1",
 	KEY_DUMMY,
-	"Which color number to use for drawing borders.\n"
+	"Which color number to use for drawing borders.\n",
+	0
     },
     {
 	"clockColor",
@@ -1198,42 +1341,48 @@ option options[] = {
 	"1",
 	KEY_DUMMY,
 	"Which color number to use for drawing the clock.\n"
-	"The clock is displayed in the top right of the score window.\n"
+	"The clock is displayed in the top right of the score window.\n",
+	0
     },
     {
 	"scoreColor",
 	NULL,
 	"1",
 	KEY_DUMMY,
-	"Which color number to use for drawing score list entries.\n"
+	"Which color number to use for drawing score list entries.\n",
+	0
     },
     {
 	"scoreSelfColor",
 	NULL,
 	"3",
 	KEY_DUMMY,
-	"Which color number to use for drawing your own score.\n"
+	"Which color number to use for drawing your own score.\n",
+	0
     },
     {
 	"scoreInactiveColor",
 	NULL,
 	"12",
 	KEY_DUMMY,
-	"Which color number to use for drawing inactive players's scores.\n"
+	"Which color number to use for drawing inactive players's scores.\n",
+	0
     },
     {
 	"scoreInactiveSelfColor",
 	NULL,
 	"12",
 	KEY_DUMMY,
-	"Which color number to use for drawing your score when inactive.\n"
+	"Which color number to use for drawing your score when inactive.\n",
+	0
     },
     {
 	"scoreOwnTeamColor",
 	NULL,
 	"4",
 	KEY_DUMMY,
-	"Which color number to use for drawing your own team score.\n"
+	"Which color number to use for drawing your own team score.\n",
+	0
     },
 
     {
@@ -1241,21 +1390,24 @@ option options[] = {
 	NULL,
 	"11",
 	KEY_DUMMY,
-	"Which color number to use for drawing enemy team score.\n"
+	"Which color number to use for drawing enemy team score.\n",
+	0
     },
     {
 	"scoreObjectColor",
 	NULL,
 	"4",
 	KEY_DUMMY,
-	"Which color number to use for drawing score objects.\n"
+	"Which color number to use for drawing score objects.\n",
+	0
     },
     {
 	"scoreObjectTime",
 	NULL,
 	"3.0",
 	KEY_DUMMY,
-	"How many seconds score objects remain visible on the map.\n"
+	"How many seconds score objects remain visible on the map.\n",
+	0
     },
     {
 	"baseWarningType",
@@ -1266,21 +1418,24 @@ option options[] = {
 	"A value of 0 disables base warning.\n"
 	"A value of 1 draws a red box on a base when someone has died.\n"
 	"A value of 2 makes the base name flash when someone has died.\n"
-	"A value of 3 combines the effects of values 1 and 2.\n"
+	"A value of 3 combines the effects of values 1 and 2.\n",
+	0
     },
     {
 	"wallColor",
 	NULL,
 	"2",
 	KEY_DUMMY,
-	"Which color number to use for drawing walls.\n"
+	"Which color number to use for drawing walls.\n",
+	0
     },
     {
 	"fuelColor",
 	NULL,
 	"3",
 	KEY_DUMMY,
-	"Which color number to use for drawing fuel stations.\n"
+	"Which color number to use for drawing fuel stations.\n",
+	0
     },
     {
 	"wallRadarColor",
@@ -1288,98 +1443,112 @@ option options[] = {
 	"8",
 	KEY_DUMMY,
 	"Which color number to use for drawing walls on the radar.\n"
-	"Valid values all even numbers smaller than maxColors.\n"
+	"Valid values all even numbers smaller than maxColors.\n",
+	0
     },
     {
 	"decorColor",
 	NULL,
 	"6",
 	KEY_DUMMY,
-	"Which color number to use for drawing decorations.\n"
+	"Which color number to use for drawing decorations.\n",
+	0
     },
     {
 	"backgroundPointColor",
 	NULL,
 	"2",
 	KEY_DUMMY,
-	"Which color number to use for drawing background points.\n"
+	"Which color number to use for drawing background points.\n",
+	0
     },
     {
 	"team0Color",
 	NULL,
 	"0",
 	KEY_DUMMY,
-	"Which color number to use for drawing team 0 objects.\n"
+	"Which color number to use for drawing team 0 objects.\n",
+	0
     },
     {
 	"team1Color",
 	NULL,
 	"0",
 	KEY_DUMMY,
-	"Which color number to use for drawing team 1 objects.\n"
+	"Which color number to use for drawing team 1 objects.\n",
+	0
     },
     {
 	"team2Color",
 	NULL,
 	"0",
 	KEY_DUMMY,
-	"Which color number to use for drawing team 2 objects.\n"
+	"Which color number to use for drawing team 2 objects.\n",
+	0
     },
     {
 	"team3Color",
 	NULL,
 	"0",
 	KEY_DUMMY,
-	"Which color number to use for drawing team 3 objects.\n"
+	"Which color number to use for drawing team 3 objects.\n",
+	0
     },
     {
 	"team4Color",
 	NULL,
 	"0",
 	KEY_DUMMY,
-	"Which color number to use for drawing team 4 objects.\n"
+	"Which color number to use for drawing team 4 objects.\n",
+	0
     },
     {
 	"team5Color",
 	NULL,
 	"0",
 	KEY_DUMMY,
-	"Which color number to use for drawing team 5 objects.\n"
+	"Which color number to use for drawing team 5 objects.\n",
+	0
     },
     {
 	"team6Color",
 	NULL,
 	"0",
 	KEY_DUMMY,
-	"Which color number to use for drawing team 6 objects.\n"
+	"Which color number to use for drawing team 6 objects.\n",
+	0
     },
     {
 	"team7Color",
 	NULL,
 	"0",
 	KEY_DUMMY,
-	"Which color number to use for drawing team 7 objects.\n"
+	"Which color number to use for drawing team 7 objects.\n",
+	0
     },
     {
 	"team8Color",
 	NULL,
 	"0",
 	KEY_DUMMY,
-	"Which color number to use for drawing team 8 objects.\n"
+	"Which color number to use for drawing team 8 objects.\n",
+	0
     },
     {
 	"team9Color",
 	NULL,
 	"0",
 	KEY_DUMMY,
-	"Which color number to use for drawing team 9 objects.\n"
+	"Which color number to use for drawing team 9 objects.\n",
+	0
     },
     {
 	"showDecor",
 	NULL,
 	"Yes",
 	KEY_DUMMY,
-	"Should decorations be displayed on the screen and radar?\n"
+	"Should decorations be displayed on the screen and radar?\n",
+	0
     },
     {
 	"decorRadarColor",
@@ -1387,42 +1556,48 @@ option options[] = {
 	"6",
 	KEY_DUMMY,
 	"Which color number to use for drawing decorations on the radar.\n"
-	"Valid values are all even numbers smaller than maxColors.\n"
+	"Valid values are all even numbers smaller than maxColors.\n",
+	0
     },
     {
 	"messagesColor",
 	NULL,
 	"12",
 	KEY_DUMMY,
-	"Which color number to use for drawing messages.\n"
+	"Which color number to use for drawing messages.\n",
+	0
     },
     {
 	"oldMessagesColor",
 	NULL,
 	"13",
 	KEY_DUMMY,
-	"Which color number to use for drawing old messages.\n"
+	"Which color number to use for drawing old messages.\n",
+	0
     },
     {
 	"clientRanker",
 	NULL,
 	"No",
 	KEY_DUMMY,
-	"Scan messages and make personal kill/death ranking.\n"
+	"Scan messages and make personal kill/death ranking.\n",
+	0
     },
     {
 	"outlineDecor",
 	NULL,
 	"No",
 	KEY_DUMMY,
-	"Draws only the outline of the map decoration.\n"
+	"Draws only the outline of the map decoration.\n",
+	0
     },
     {
 	"filledDecor",
 	NULL,
 	"No",
 	KEY_DUMMY,
-	"Draws filled decorations.\n"
+	"Draws filled decorations.\n",
+	0
     },
     {
 	"texturedDecor",
@@ -1430,14 +1605,16 @@ option options[] = {
 	"No",
 	KEY_DUMMY,
 	"Draws the map decoration filled with a texture pattern.\n"
-	"See also the decorTextureFile and texturedWalls options.\n"
+	"See also the decorTextureFile and texturedWalls options.\n",
+	0
     },
     {
 	"decorTextureFile",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"Specify a XPM format pixmap file to load the decor texture from.\n"
+	"Specify a XPM format pixmap file to load the decor texture from.\n",
+	0
     },
     {
 	"targetRadarColor",
@@ -1445,70 +1622,80 @@ option options[] = {
 	"4",
 	KEY_DUMMY,
 	"Which color number to use for drawing targets on the radar.\n"
-	"Valid values are all even numbers smaller than maxColors.\n"
+	"Valid values are all even numbers smaller than maxColors.\n",
+	0
     },
     {
 	"sparkColors",
 	NULL,
 	"5,6,7,3",
 	KEY_DUMMY,
-	"Which color numbers to use for spark and debris particles.\n"
+	"Which color numbers to use for spark and debris particles.\n",
+	0
     },
     {
 	"modifierBank1",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"The default weapon modifier values for the first modifier bank.\n"
+	"The default weapon modifier values for the first modifier bank.\n",
+	0
     },
     {
 	"modifierBank2",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"The default weapon modifier values for the second modifier bank.\n"
+	"The default weapon modifier values for the second modifier bank.\n",
+	0
     },
     {
 	"modifierBank3",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"The default weapon modifier values for the third modifier bank.\n"
+	"The default weapon modifier values for the third modifier bank.\n",
+	0
     },
     {
 	"modifierBank4",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"The default weapon modifier values for the fourth modifier bank.\n"
+	"The default weapon modifier values for the fourth modifier bank.\n",
+	0
     },
     {
 	"keyTurnLeft",
 	NULL,
 	"a",
 	KEY_TURN_LEFT,
-	"Turn left (anti-clockwise).\n"
+	"Turn left (anti-clockwise).\n",
+	0
     },
     {
 	"keyTurnRight",
 	NULL,
 	"s",
 	KEY_TURN_RIGHT,
-	"Turn right (clockwise).\n"
+	"Turn right (clockwise).\n",
+	0
     },
     {
 	"keyThrust",
 	NULL,
 	"Shift_R Shift_L",
 	KEY_THRUST,
-	"Thrust.\n"
+	"Thrust.\n",
+	0
     },
     {
 	"keyShield",
 	NULL,
 	"space Caps_Lock",
 	KEY_SHIELD,
-	"Raise or toggle the shield.\n"
+	"Raise or toggle the shield.\n",
+	0
     },
     {
 	"keyFireShot",
@@ -1516,126 +1703,144 @@ option options[] = {
 	"Return Linefeed",
 	KEY_FIRE_SHOT,
 	"Fire shot.\n"
-	"Note that shields must be down to fire.\n"
+	"Note that shields must be down to fire.\n",
+	0
     },
     {
 	"keyFireMissile",
 	NULL,
 	"backslash",
 	KEY_FIRE_MISSILE,
-	"Fire smart missile.\n"
+	"Fire smart missile.\n",
+	0
     },
     {
 	"keyFireTorpedo",
 	NULL,
 	"quoteright",
 	KEY_FIRE_TORPEDO,
-	"Fire unguided torpedo.\n"
+	"Fire unguided torpedo.\n",
+	0
     },
     {
 	"keyFireHeat",
 	NULL,
 	"semicolon",
 	KEY_FIRE_HEAT,
-	"Fire heatseeking missile.\n"
+	"Fire heatseeking missile.\n",
+	0
     },
     {
 	"keyFireLaser",
 	NULL,
 	"slash",
 	KEY_FIRE_LASER,
-	"Activate laser beam.\n"
+	"Activate laser beam.\n",
+	0
     },
     {
 	"keyDropMine",
 	NULL,
 	"Tab",
 	KEY_DROP_MINE,
-	"Drop a stationary mine.\n"
+	"Drop a stationary mine.\n",
+	0
     },
     {
 	"keyDetachMine",
 	NULL,
 	"bracketright",
 	KEY_DETACH_MINE,
-	"Detach a moving mine.\n"
+	"Detach a moving mine.\n",
+	0
     },
     {
 	"keyDetonateMines",
 	NULL,
 	"equal",
 	KEY_DETONATE_MINES,
-	"Detonate the mine you have dropped or thrown, which is closest to you.\n"
+	"Detonate the mine you have dropped or thrown, which is closest to you.\n",
+	0
     },
     {
 	"keyLockClose",
 	NULL,
 	"Select Up",
 	KEY_LOCK_CLOSE,
-	"Lock on closest player.\n"
+	"Lock on closest player.\n",
+	0
     },
     {
 	"keyLockNextClose",
 	NULL,
 	"Down",
 	KEY_LOCK_NEXT_CLOSE,
-	"Lock on next closest player.\n"
+	"Lock on next closest player.\n",
+	0
     },
     {
 	"keyLockNext",
 	NULL,
 	"Next Right",
 	KEY_LOCK_NEXT,
-	"Lock on next player.\n"
+	"Lock on next player.\n",
+	0
     },
     {
 	"keyLockPrev",
 	NULL,
 	"Prior Left",
 	KEY_LOCK_PREV,
-	"Lock on previous player.\n"
+	"Lock on previous player.\n",
+	0
     },
     {
 	"keyRefuel",
 	NULL,
 	"f Control_L Control_R",
 	KEY_REFUEL,
-	"Refuel.\n"
+	"Refuel.\n",
+	0
     },
     {
 	"keyRepair",
 	NULL,
 	"f",
 	KEY_REPAIR,
-	"Repair target.\n"
+	"Repair target.\n",
+	0
     },
     {
 	"keyCloak",
 	NULL,
 	"Delete BackSpace",
 	KEY_CLOAK,
-	"Toggle cloakdevice.\n"
+	"Toggle cloakdevice.\n",
+	0
     },
     {
 	"keyEcm",
 	NULL,
 	"bracketleft",
 	KEY_ECM,
-	"Use ECM.\n"
+	"Use ECM.\n",
+	0
     },
     {
 	"keySelfDestruct",
 	NULL,
 	"End",
 	KEY_SELF_DESTRUCT,
-	"Toggle self destruct.\n"
+	"Toggle self destruct.\n",
+	0
     },
     {
 	"keyIdMode",
 	NULL,
 	"u",
 	KEY_ID_MODE,
-	"Toggle User mode (show real names).\n"
+	"Toggle User mode (show real names).\n",
+	0
     },
     {
 	"keyPause",
@@ -1643,7 +1848,8 @@ option options[] = {
 	"Pause",
 	KEY_PAUSE,
 	"Toggle pause mode.\n"
-	"When the ship is stationary on its homebase.\n"
+	"When the ship is stationary on its homebase.\n",
+	0
     },
     {
 	"keySwapSettings",
@@ -1651,7 +1857,8 @@ option options[] = {
 	"Escape",
 	KEY_SWAP_SETTINGS,
 	"Swap control settings.\n"
-	"These are the power, turn speed and turn resistance settings.\n"
+	"These are the power, turn speed and turn resistance settings.\n",
+	0
     },
     {
         "keySwapScaleFactor",
@@ -1659,7 +1866,8 @@ option options[] = {
         "",
         KEY_SWAP_SCALEFACTOR,
         "Swap scalefactor settings.\n"
-        "These are the scalefactor settings.\n"
+        "These are the scalefactor settings.\n",
+	0
     },
     {
 	"keyChangeHome",
@@ -1667,315 +1875,360 @@ option options[] = {
 	"Home h",
 	KEY_CHANGE_HOME,
 	"Change home base.\n"
-	"When the ship is stationary on a new homebase.\n"
+	"When the ship is stationary on a new homebase.\n",
+	0
     },
     {
 	"keyConnector",
 	NULL,
 	"Control_L",
 	KEY_CONNECTOR,
-	"Connect to a ball.\n"
+	"Connect to a ball.\n",
+	0
     },
     {
 	"keyDropBall",
 	NULL,
 	"d",
 	KEY_DROP_BALL,
-	"Drop a ball.\n"
+	"Drop a ball.\n",
+	0
     },
     {
 	"keyTankNext",
 	NULL,
 	"e",
 	KEY_TANK_NEXT,
-	"Use the next tank.\n"
+	"Use the next tank.\n",
+	0
     },
     {
 	"keyTankPrev",
 	NULL,
 	"w",
 	KEY_TANK_PREV,
-	"Use the the previous tank.\n"
+	"Use the the previous tank.\n",
+	0
     },
     {
 	"keyTankDetach",
 	NULL,
 	"r",
 	KEY_TANK_DETACH,
-	"Detach the current tank.\n"
+	"Detach the current tank.\n",
+	0
     },
     {
 	"keyIncreasePower",
 	NULL,
 	"KP_Multiply",
 	KEY_INCREASE_POWER,
-	"Increase engine power.\n"
+	"Increase engine power.\n",
+	0
     },
     {
 	"keyDecreasePower",
 	NULL,
 	"KP_Divide",
 	KEY_DECREASE_POWER,
-	"Decrease engine power.\n"
+	"Decrease engine power.\n",
+	0
     },
     {
 	"keyIncreaseTurnspeed",
 	NULL,
 	"KP_Add",
 	KEY_INCREASE_TURNSPEED,
-	"Increase turnspeed.\n"
+	"Increase turnspeed.\n",
+	0
     },
     {
 	"keyDecreaseTurnspeed",
 	NULL,
 	"KP_Subtract",
 	KEY_DECREASE_TURNSPEED,
-	"Decrease turnspeed.\n"
+	"Decrease turnspeed.\n",
+	0
     },
     {
 	"keyTransporter",
 	NULL,
 	"t",
 	KEY_TRANSPORTER,
-	"Use transporter to steal an item.\n"
+	"Use transporter to steal an item.\n",
+	0
     },
     {
 	"keyDeflector",
 	NULL,
 	"o",
 	KEY_DEFLECTOR,
-	"Toggle deflector.\n"
+	"Toggle deflector.\n",
+	0
     },
     {
 	"keyHyperJump",
 	NULL,
 	"q",
 	KEY_HYPERJUMP,
-	"Teleport.\n"
+	"Teleport.\n",
+	0
     },
     {
 	"keyPhasing",
 	NULL,
 	"p",
 	KEY_PHASING,
-	"Use phasing device.\n"
+	"Use phasing device.\n",
+	0
     },
     {
 	"keyTalk",
 	NULL,
 	"m",
 	KEY_TALK,
-	"Toggle talk window.\n"
+	"Toggle talk window.\n",
+	0
     },
     {
 	"keyToggleNuclear",
 	NULL,
 	"n",
 	KEY_TOGGLE_NUCLEAR,
-	"Toggle nuclear weapon modifier.\n"
+	"Toggle nuclear weapon modifier.\n",
+	0
     },
     {
 	"keyToggleCluster",
 	NULL,
 	"c",
 	KEY_TOGGLE_CLUSTER,
-	"Toggle cluster weapon modifier.\n"
+	"Toggle cluster weapon modifier.\n",
+	0
     },
     {
 	"keyToggleImplosion",
 	NULL,
 	"i",
 	KEY_TOGGLE_IMPLOSION,
-	"Toggle implosion weapon modifier.\n"
+	"Toggle implosion weapon modifier.\n",
+	0
     },
     {
 	"keyToggleVelocity",
 	NULL,
 	"v",
 	KEY_TOGGLE_VELOCITY,
-	"Toggle explosion velocity weapon modifier.\n"
+	"Toggle explosion velocity weapon modifier.\n",
+	0
     },
     {
 	"keyToggleMini",
 	NULL,
 	"x",
 	KEY_TOGGLE_MINI,
-	"Toggle mini weapon modifier.\n"
+	"Toggle mini weapon modifier.\n",
+	0
     },
     {
 	"keyToggleSpread",
 	NULL,
 	"z",
 	KEY_TOGGLE_SPREAD,
-	"Toggle spread weapon modifier.\n"
+	"Toggle spread weapon modifier.\n",
+	0
     },
     {
 	"keyTogglePower",
 	NULL,
 	"b",
 	KEY_TOGGLE_POWER,
-	"Toggle power weapon modifier.\n"
+	"Toggle power weapon modifier.\n",
+	0
     },
     {
 	"keyToggleCompass",
 	NULL,
 	"KP_7",
 	KEY_TOGGLE_COMPASS,
-	"Toggle HUD/radar compass lock.\n"
+	"Toggle HUD/radar compass lock.\n",
+	0
     },
     {
 	"keyToggleAutoPilot",
 	NULL,
 	"h",
 	KEY_TOGGLE_AUTOPILOT,
-	"Toggle automatic pilot mode.\n"
+	"Toggle automatic pilot mode.\n",
+	0
     },
     {
 	"keyToggleLaser",
 	NULL,
 	"l",
 	KEY_TOGGLE_LASER,
-	"Toggle laser modifier.\n"
+	"Toggle laser modifier.\n",
+	0
     },
     {
 	"keyEmergencyThrust",
 	NULL,
 	"j",
 	KEY_EMERGENCY_THRUST,
-	"Pull emergency thrust handle.\n"
+	"Pull emergency thrust handle.\n",
+	0
     },
     {
 	"keyEmergencyShield",
 	NULL,
 	"g",
 	KEY_EMERGENCY_SHIELD,
-	"Toggle emergency shield power.\n"
+	"Toggle emergency shield power.\n",
+	0
     },
     {
 	"keyTractorBeam",
 	NULL,
 	"comma",
 	KEY_TRACTOR_BEAM,
-	"Use tractor beam in attract mode.\n"
+	"Use tractor beam in attract mode.\n",
+	0
     },
     {
 	"keyPressorBeam",
 	NULL,
 	"period",
 	KEY_PRESSOR_BEAM,
-	"Use tractor beam in repulse mode.\n"
+	"Use tractor beam in repulse mode.\n",
+	0
     },
     {
 	"keyClearModifiers",
 	NULL,
 	"k",
 	KEY_CLEAR_MODIFIERS,
-	"Clear current weapon modifiers.\n"
+	"Clear current weapon modifiers.\n",
+	0
     },
     {
 	"keyLoadModifiers1",
 	NULL,
 	"1",
 	KEY_LOAD_MODIFIERS_1,
-	"Load the weapon modifiers from bank 1.\n"
+	"Load the weapon modifiers from bank 1.\n",
+	0
     },
     {
 	"keyLoadModifiers2",
 	NULL,
 	"2",
 	KEY_LOAD_MODIFIERS_2,
-	"Load the weapon modifiers from bank 2.\n"
+	"Load the weapon modifiers from bank 2.\n",
+	0
     },
     {
 	"keyLoadModifiers3",
 	NULL,
 	"3",
 	KEY_LOAD_MODIFIERS_3,
-	"Load the weapon modifiers from bank 3.\n"
+	"Load the weapon modifiers from bank 3.\n",
+	0
     },
     {
 	"keyLoadModifiers4",
 	NULL,
 	"4",
 	KEY_LOAD_MODIFIERS_4,
-	"Load the weapon modifiers from bank 4.\n"
+	"Load the weapon modifiers from bank 4.\n",
+	0
     },
     {
 	"keyToggleOwnedItems",
 	NULL,
 	"KP_8",
 	KEY_TOGGLE_OWNED_ITEMS,
-	"Toggle list of owned items on HUD.\n"
+	"Toggle list of owned items on HUD.\n",
+	0
     },
     {
 	"keyToggleMessages",
 	NULL,
 	"KP_9",
 	KEY_TOGGLE_MESSAGES,
-	"Toggle showing of messages.\n"
+	"Toggle showing of messages.\n",
+	0
     },
     {
 	"keyReprogram",
 	NULL,
 	"quoteleft",
 	KEY_REPROGRAM,
-	"Reprogram modifier or lock bank.\n"
+	"Reprogram modifier or lock bank.\n",
+	0
     },
     {
 	"keyLoadLock1",
 	NULL,
 	"5",
 	KEY_LOAD_LOCK_1,
-	"Load player lock from bank 1.\n"
+	"Load player lock from bank 1.\n",
+	0
     },
     {
 	"keyLoadLock2",
 	NULL,
 	"6",
 	KEY_LOAD_LOCK_2,
-	"Load player lock from bank 2.\n"
+	"Load player lock from bank 2.\n",
+	0
     },
     {
 	"keyLoadLock3",
 	NULL,
 	"7",
 	KEY_LOAD_LOCK_3,
-	"Load player lock from bank 3.\n"
+	"Load player lock from bank 3.\n",
+	0
     },
     {
 	"keyLoadLock4",
 	NULL,
 	"8",
 	KEY_LOAD_LOCK_4,
-	"Load player lock from bank 4.\n"
+	"Load player lock from bank 4.\n",
+	0
     },
     {
 	"keyToggleRecord",
 	NULL,
 	"KP_5",
 	KEY_TOGGLE_RECORD,
-	"Toggle recording of session (see recordFile).\n"
+	"Toggle recording of session (see recordFile).\n",
+	0
     },
     {
         "keyToggleRadarScore",
         NULL,
         "",
         KEY_TOGGLE_RADAR_SCORE,
-        "Toggles the radar and score windows on and off.\n"
+        "Toggles the radar and score windows on and off.\n",
+	0
     },
     {
 	"keySelectItem",
 	NULL,
 	"KP_0 KP_Insert",
 	KEY_SELECT_ITEM,
-	"Select an item to lose.\n"
+	"Select an item to lose.\n",
+	0
     },
     {
 	"keyLoseItem",
 	NULL,
 	"KP_Delete KP_Decimal",
 	KEY_LOSE_ITEM,
-	"Lose the selected item.\n"
+	"Lose the selected item.\n",
+	0
     },
 #ifndef _WINDOWS
     {
@@ -1983,35 +2236,40 @@ option options[] = {
 	NULL,
 	"Print",
 	KEY_PRINT_MSGS_STDOUT,
-	"Print the current messages to stdout.\n"
+	"Print the current messages to stdout.\n",
+	0
     },
     {
 	"keyTalkCursorLeft",
 	NULL,
 	"Left",
 	KEY_TALK_CURSOR_LEFT,
-	"Move Cursor to the left in the talk window.\n"
+	"Move Cursor to the left in the talk window.\n",
+	0
     },
     {
 	"keyTalkCursorRight",
 	NULL,
 	"Right",
 	KEY_TALK_CURSOR_RIGHT,
-	"Move Cursor to the right in the talk window.\n"
+	"Move Cursor to the right in the talk window.\n",
+	0
     },
     {
 	"keyTalkCursorUp",
 	NULL,
 	"Up",
 	KEY_TALK_CURSOR_UP,
-	"Browsing in the history of the talk window.\n"
+	"Browsing in the history of the talk window.\n",
+	0
     },
     {
 	"keyTalkCursorDown",
 	NULL,
 	"Down",
 	KEY_TALK_CURSOR_DOWN,
-	"Browsing in the history of the talk window.\n"
+	"Browsing in the history of the talk window.\n",
+	0
     },
 #endif
     {
@@ -2019,49 +2277,56 @@ option options[] = {
 	NULL,
 	"KP_Enter",
 	KEY_POINTER_CONTROL,
-	"Toggle pointer control.\n"
+	"Toggle pointer control.\n",
+	0
     },
     {
 	"pointerButton1",
 	NULL,
 	"keyFireShot",
 	KEY_DUMMY,
-	"The key to activate when pressing the first mouse button.\n"
+	"The key to activate when pressing the first mouse button.\n",
+	0
     },
     {
 	"pointerButton2",
 	NULL,
 	"keyThrust",
 	KEY_DUMMY,
-	"The key to activate when pressing the second mouse button.\n"
+	"The key to activate when pressing the second mouse button.\n",
+	0
     },
     {
 	"pointerButton3",
 	NULL,
 	"keyDropBall",
 	KEY_DUMMY,
-	"The key to activate when pressing the third mouse button.\n"
+	"The key to activate when pressing the third mouse button.\n",
+	0
     },
     {
 	"pointerButton4",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"The key to activate when pressing the fourth mouse button.\n"
+	"The key to activate when pressing the fourth mouse button.\n",
+	0
     },
     {
 	"pointerButton5",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"The key to activate when pressing the fifth mouse button.\n"
+	"The key to activate when pressing the fifth mouse button.\n",
+	0
     },
     {
 	"maxFPS",
 	NULL,
 	"100",
 	KEY_DUMMY,
-	"Set client's maximum FPS supported.\n"
+	"Set client's maximum FPS supported.\n",
+	0
     },
     {
 	"recordFile",
@@ -2069,14 +2334,16 @@ option options[] = {
 	"",
 	KEY_DUMMY,
 	"An optional file where a recording of a game can be made.\n"
-	"If this file is undefined then recording isn't possible.\n"
+	"If this file is undefined then recording isn't possible.\n",
+	0
     },
     {
 	"clientRankFile",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"An optional file where clientside kill/death rank is stored.\n"
+	"An optional file where clientside kill/death rank is stored.\n",
+	0
     },
     {
 	"clientRankHTMLFile",
@@ -2084,7 +2351,8 @@ option options[] = {
 	"",
 	KEY_DUMMY,
 	"An optional file where clientside kill/death rank is\n"
-	"published in HTML format. \n"
+	"published in HTML format. \n",
+	0
     },
     {
 	"clientRankHTMLNOJSFile",
@@ -2092,21 +2360,24 @@ option options[] = {
 	"",
 	KEY_DUMMY,
 	"An optional file where clientside kill/death rank is\n"
-	"published in HTML format, w/o JavaScript. \n"
+	"published in HTML format, w/o JavaScript. \n",
+	0
     },
     {
 	"clientPortStart",
 	NULL,
 	"0",
 	KEY_DUMMY,
-	"Use UDP ports clientPortStart - clientPortEnd (for firewalls).\n"
+	"Use UDP ports clientPortStart - clientPortEnd (for firewalls).\n",
+	0
     },
     {
 	"clientPortEnd",
 	NULL,
 	"0",
 	KEY_DUMMY,
-	"Use UDP ports clientPortStart - clientPortEnd (for firewalls).\n"
+	"Use UDP ports clientPortStart - clientPortEnd (for firewalls).\n",
+	0
     },
 #ifdef _WINDOWS
     {
@@ -2114,14 +2385,16 @@ option options[] = {
 	NULL,
 	"No",
 	KEY_DUMMY,
-	"Tell Windows to do the heavy BitBlt in another thread\n"
+	"Tell Windows to do the heavy BitBlt in another thread\n",
+	0
 	},
     {
 	"radarDivisor",
 	NULL,
 	"1",
 	KEY_DUMMY,
-	"Specifies how many frames between radar window updates.\n"
+	"Specifies how many frames between radar window updates.\n",
+	0
 	},
 #endif
     {
@@ -2129,14 +2402,16 @@ option options[] = {
 	NULL,
 	"1.0",
 	KEY_DUMMY,
-	"Specifies scaling factor for the drawing window.\n"
+	"Specifies scaling factor for the drawing window.\n",
+	0
     },
     {
         "altScaleFactor",
         NULL,
         "2.0",
         KEY_DUMMY,
-        "Specifies alternative scaling factor for the drawing window.\n"
+        "Specifies alternative scaling factor for the drawing window.\n",
+	0
     },
 #ifdef SOUND
     {
@@ -2144,21 +2419,24 @@ option options[] = {
 	NULL,
 	conf_soundfile_string,
 	KEY_DUMMY,
-	"Specifies the sound file.\n"
+	"Specifies the sound file.\n",
+	0
     },
     {
 	"maxVolume",
 	NULL,
 	"100",
 	KEY_DUMMY,
-	"Specifies the volume to play sounds with.\n"
+	"Specifies the volume to play sounds with.\n",
+	0
     },
     {
 	"audioServer",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"Specifies the audio server to use.\n"
+	"Specifies the audio server to use.\n",
+	0
     },
 #endif
 #ifdef DEVELOPMENT
@@ -2167,7 +2445,8 @@ option options[] = {
         NULL,
         "",
         KEY_DUMMY,
-        "Which development testing parameters to use?\n"
+        "Which development testing parameters to use?\n",
+	0
     },
 #endif
 /* talk macros: */
@@ -2176,280 +2455,320 @@ option options[] = {
 	NULL,
 	"F1",
 	KEY_MSG_1,
-	"Sends the talkmessage stored in msg1.\n"
+	"Sends the talkmessage stored in msg1.\n",
+	0
     },
     {
 	"msg1",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"Talkmessage 1.\n"
+	"Talkmessage 1.\n",
+	0
     },
     {
 	"keySendMsg2",
 	NULL,
 	"F2",
 	KEY_MSG_2,
-	"Sends the talkmessage stored in msg2.\n"
+	"Sends the talkmessage stored in msg2.\n",
+	0
     },
     {
 	"msg2",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"Talkmessage 2.\n"
+	"Talkmessage 2.\n",
+	0
     },
     {
 	"keySendMsg3",
 	NULL,
 	"F3",
 	KEY_MSG_3,
-	"Sends the talkmessage stored in msg3.\n"
+	"Sends the talkmessage stored in msg3.\n",
+	0
     },
     {
 	"msg3",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"Talkmessage 3.\n"
+	"Talkmessage 3.\n",
+	0
     },
     {
 	"keySendMsg4",
 	NULL,
 	"F4",
 	KEY_MSG_4,
-	"Sends the talkmessage stored in msg4.\n"
+	"Sends the talkmessage stored in msg4.\n",
+	0
     },
     {
 	"msg4",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"Talkmessage 4.\n"
+	"Talkmessage 4.\n",
+	0
     },
     {
 	"keySendMsg5",
 	NULL,
 	"F5",
 	KEY_MSG_5,
-	"Sends the talkmessage stored in msg5.\n"
+	"Sends the talkmessage stored in msg5.\n",
+	0
     },
     {
 	"msg5",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"Talkmessage 5.\n"
+	"Talkmessage 5.\n",
+	0
     },
     {
 	"keySendMsg6",
 	NULL,
 	"F6",
 	KEY_MSG_6,
-	"Sends the talkmessage stored in msg6.\n"
+	"Sends the talkmessage stored in msg6.\n",
+	0
     },
     {
 	"msg6",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"Talkmessage 6.\n"
+	"Talkmessage 6.\n",
+	0
     },
     {
 	"keySendMsg7",
 	NULL,
 	"F7",
 	KEY_MSG_7,
-	"Sends the talkmessage stored in msg7.\n"
+	"Sends the talkmessage stored in msg7.\n",
+	0
     },
     {
 	"msg7",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"Talkmessage 7.\n"
+	"Talkmessage 7.\n",
+	0
     },
     {
 	"keySendMsg8",
 	NULL,
 	"F8",
 	KEY_MSG_8,
-	"Sends the talkmessage stored in msg8.\n"
+	"Sends the talkmessage stored in msg8.\n",
+	0
     },
     {
 	"msg8",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"Talkmessage 8.\n"
+	"Talkmessage 8.\n",
+	0
     },
     {
 	"keySendMsg9",
 	NULL,
 	"F9",
 	KEY_MSG_9,
-	"Sends the talkmessage stored in msg9.\n"
+	"Sends the talkmessage stored in msg9.\n",
+	0
     },
     {
 	"msg9",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"Talkmessage 9.\n"
+	"Talkmessage 9.\n",
+	0
     },
     {
 	"keySendMsg10",
 	NULL,
 	"F10",
 	KEY_MSG_10,
-	"Sends the talkmessage stored in msg10.\n"
+	"Sends the talkmessage stored in msg10.\n",
+	0
     },
     {
 	"msg10",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"Talkmessage 10.\n"
+	"Talkmessage 10.\n",
+	0
     },
     {
 	"keySendMsg11",
 	NULL,
 	"F11",
 	KEY_MSG_11,
-	"Sends the talkmessage stored in msg11.\n"
+	"Sends the talkmessage stored in msg11.\n",
+	0
     },
     {
 	"msg11",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"Talkmessage 11.\n"
+	"Talkmessage 11.\n",
+	0
     },
     {
 	"keySendMsg12",
 	NULL,
 	"F12",
 	KEY_MSG_12,
-	"Sends the talkmessage stored in msg12.\n"
+	"Sends the talkmessage stored in msg12.\n",
+	0
     },
     {
 	"msg12",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"Talkmessage 12.\n"
+	"Talkmessage 12.\n",
+	0
     },
     {
 	"keySendMsg13",
 	NULL,
 	"",
 	KEY_MSG_13,
-	"Sends the talkmessage stored in msg13.\n"
+	"Sends the talkmessage stored in msg13.\n",
+	0
     },
     {
 	"msg13",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"Talkmessage 13.\n"
+	"Talkmessage 13.\n",
+	0
     },
     {
 	"keySendMsg14",
 	NULL,
 	"",
 	KEY_MSG_14,
-	"Sends the talkmessage stored in msg14.\n"
+	"Sends the talkmessage stored in msg14.\n",
+	0
     },
     {
 	"msg14",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"Talkmessage 14.\n"
+	"Talkmessage 14.\n",
+	0
     },
     {
 	"keySendMsg15",
 	NULL,
 	"",
 	KEY_MSG_15,
-	"Sends the talkmessage stored in msg15.\n"
+	"Sends the talkmessage stored in msg15.\n",
+	0
     },
     {
 	"msg15",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"Talkmessage 15.\n"
+	"Talkmessage 15.\n",
+	0
     },
     {
 	"keySendMsg16",
 	NULL,
 	"",
 	KEY_MSG_16,
-	"Sends the talkmessage stored in msg16.\n"
+	"Sends the talkmessage stored in msg16.\n",
+	0
     },
     {
 	"msg16",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"Talkmessage 16.\n"
+	"Talkmessage 16.\n",
+	0
     },
     {
 	"keySendMsg17",
 	NULL,
 	"",
 	KEY_MSG_17,
-	"Sends the talkmessage stored in msg17.\n"
+	"Sends the talkmessage stored in msg17.\n",
+	0
     },
     {
 	"msg17",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"Talkmessage 17.\n"
+	"Talkmessage 17.\n",
+	0
     },
     {
 	"keySendMsg18",
 	NULL,
 	"",
 	KEY_MSG_18,
-	"Sends the talkmessage stored in msg18.\n"
+	"Sends the talkmessage stored in msg18.\n",
+	0
     },
     {
 	"msg18",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"Talkmessage 18.\n"
+	"Talkmessage 18.\n",
+	0
     },
     {
 	"keySendMsg19",
 	NULL,
 	"",
 	KEY_MSG_19,
-	"Sends the talkmessage stored in msg19.\n"
+	"Sends the talkmessage stored in msg19.\n",
+	0
     },
     {
 	"msg19",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"Talkmessage 19.\n"
+	"Talkmessage 19.\n",
+	0
     },
     {
 	"keySendMsg20",
 	NULL,
 	"",
 	KEY_MSG_20,
-	"Sends the talkmessage stored in msg20.\n"
+	"Sends the talkmessage stored in msg20.\n",
+	0
     },
     {
 	"msg20",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"Talkmessage 20.\n"
+	"Talkmessage 20.\n",
+	0
     },
 };
 
