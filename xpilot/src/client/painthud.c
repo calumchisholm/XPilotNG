@@ -202,8 +202,6 @@ void Paint_score_objects(void)
     if (!scoreObjectColor)
 	return;
 
-    /* kps - move SET_FG here ? */
-
     for (i = 0; i < MAX_SCORE_OBJECTS; i++) {
 	score_object_t*	sobj = &score_objects[i];
 	if (sobj->life_time > 0) {
