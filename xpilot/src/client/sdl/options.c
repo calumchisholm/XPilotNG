@@ -3277,12 +3277,13 @@ void Parse_options(int *argcp, char **argvp)
     LIMIT(receive_window_size,
 	  MIN_RECEIVE_WINDOW_SIZE, MAX_RECEIVE_WINDOW_SIZE);
 
-    Get_resource(rDB, "clientRankFile", resValue, sizeof resValue);
-    clientRankFile = xp_strdup(resValue);
-    Get_resource(rDB, "clientRankHTMLFile", resValue, sizeof resValue);
-    clientRankHTMLFile = xp_strdup(resValue);
-    Get_resource(rDB, "clientRankHTMLNOJSFile", resValue, sizeof resValue);
-    clientRankHTMLNOJSFile = xp_strdup(resValue);
+    Get_resource(rDB, "clientRankFile",
+		 clientRankFile, sizeof clientRankFile);
+    Get_resource(rDB, "clientRankHTMLFile",
+		 clientRankHTMLFile, sizeof clientRankHTMLFile);
+    Get_resource(rDB, "clientRankHTMLNOJSFile",
+		 clientRankHTMLNOJSFile, sizeof clientRankHTMLNOJSFile);
+
     Get_resource(rDB, "texturePath", resValue, sizeof resValue);
     texturePath = xp_strdup(resValue);
 
