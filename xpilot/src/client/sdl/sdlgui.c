@@ -1038,6 +1038,7 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_LINE_SMOOTH);
+    glLineWidth(2);
     set_alphacolor(Gui_calculate_ship_color(id,other));
 
     glBegin(GL_LINE_LOOP);
@@ -1047,6 +1048,7 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
     }
     glEnd();
 
+    glLineWidth(1);
     glDisable(GL_LINE_SMOOTH);
     glDisable(GL_BLEND);
 
