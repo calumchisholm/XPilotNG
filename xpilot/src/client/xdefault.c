@@ -114,6 +114,17 @@ xp_option_t xdefault_options[] = {
 	NULL,
 	"Use the X windows multibuffer extension if present.\n"),
 
+    XP_BOOL_OPTION(
+	"ignoreWindowManager",
+	false,
+	&ignoreWindowManager,
+	NULL,
+	"Ignore the window manager when opening the top level player window.\n"
+	"This can be handy if you want to have your XPilot window on a\n"
+	"preferred position without window manager borders.\n"
+	"Also sometimes window managers may interfere when switching\n"
+	"colormaps. This option may prevent that.\n"),
+
     XP_STRING_OPTION(
 	"gameFont",
 	GAME_FONT,

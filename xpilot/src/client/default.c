@@ -233,6 +233,16 @@ xp_option_t default_options[] = {
 	NULL,
         "Specifies alternative scaling factor for the drawing window.\n"),
 
+    XP_INT_OPTION(
+	"maxFPS",
+	100,
+	1,
+	200,
+	&maxFPS,
+	NULL,  /* we need a setfunc here */
+	"Set maximum FPS supported by the client. The server will try to\n"
+	"send at most this many frames per second to the client.\n"),
+
     /* instruments */
     
     XP_BOOL_OPTION(
@@ -495,18 +505,7 @@ xp_option_t default_options[] = {
 	"The maximum allowed window size is 1922x1440.\n",
 	0
     },
-    {
-	"ignoreWindowManager",
-	NULL,
-	"",
-	KEY_DUMMY,
-	"Ignore the window manager when opening the top level player window.\n"
-	"This can be handy if you want to have your XPilot window on a\n"
-	"preferred position without window manager borders.\n"
-	"Also sometimes window managers may interfere when switching\n"
-	"colormaps. This option may prevent that.\n",
-	0
-    },
+
     {
 	"shutdown",
 	NULL,
@@ -873,14 +872,7 @@ xp_option_t default_options[] = {
 	"The key to activate when pressing the fifth mouse button.\n",
 	0
     },
-    {
-	"maxFPS",
-	NULL,
-	"100",
-	KEY_DUMMY,
-	"Set client's maximum FPS supported.\n",
-	0
-    },
+
     {
 	"recordFile",
 	NULL,
