@@ -1,17 +1,17 @@
 package org.xpilot.jxpmap;
 
-import java.io.PrintWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 
-public class MapCheckPoint extends MapObject {
+public class CheckPoint extends MapObject {
 
 
-    public MapCheckPoint () {
+    public CheckPoint () {
         this(0, 0);
     }
 
 
-    public MapCheckPoint (int x, int y) {
+    public CheckPoint (int x, int y) {
         super("checkpoint.gif", x, y, 35 * 64, 35 * 64);
     }
 

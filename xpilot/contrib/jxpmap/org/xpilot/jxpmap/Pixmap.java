@@ -1,8 +1,10 @@
 package org.xpilot.jxpmap;
 
 import java.awt.image.BufferedImage;
-import java.io.*;
-import java.util.Map;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 public class Pixmap extends ModelObject {
     

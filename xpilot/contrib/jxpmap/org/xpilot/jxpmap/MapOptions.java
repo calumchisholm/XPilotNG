@@ -1,13 +1,14 @@
 package org.xpilot.jxpmap;
 
-import java.util.Properties;
+import java.awt.Dimension;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.HashMap;
-import java.awt.Dimension;
+import java.util.Properties;
+
 import javax.swing.JOptionPane;
-import java.io.PrintWriter;
-import java.io.IOException;
 
 public class MapOptions extends HashMap {
 

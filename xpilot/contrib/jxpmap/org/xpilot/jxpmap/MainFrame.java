@@ -1,24 +1,37 @@
 package org.xpilot.jxpmap;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
+
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
 
 public class MainFrame extends JFrame implements ActionListener {
 
     private MapCanvas canvas;
     private int zoom;
-
-    private JToggleButton btnNewPoly;
-    private JToggleButton btnNewFuel;
-    private JToggleButton btnNewBase;
-    private JToggleButton btnNewBall;
-    private JToggleButton btnNewCannon;
-    private JToggleButton btnNewCheckPoint;
-    private JToggleButton btnErase;
-    private JButton btnUndo;
-    private JButton btnRedo;
+    
+    private ButtonGroup toggleGroup;
     private JLabel lblZoom;
     private File mapFile;
 
@@ -114,64 +127,36 @@ public class MainFrame extends JFrame implements ActionListener {
 
     private void buildToolBar () {
 
-
-        JToolBar toolBar = new JToolBar(SwingConstants.VERTICAL);
-
-        btnNewPoly = createToggle
-            ("newPolygon", "/images/polyicon.gif", "New polygon");
-        toolBar.add(btnNewPoly);
-
-        btnNewFuel = createToggle
-            ("newFuel", "/images/fuelicon.gif", "New fuel station");
-        toolBar.add(btnNewFuel);
-
-        btnNewBase = createToggle
-            ("newBase", "/images/baseicon.gif", "New base");
-        toolBar.add(btnNewBase);
-
-        btnNewBall = createToggle
-            ("newBall", "/images/ballicon.gif", "New ball");
-        toolBar.add(btnNewBall);
-
-        btnNewCannon = createToggle
-            ("newCannon", "/images/cannonicon.gif", "New cannon");
-        toolBar.add(btnNewCannon);
-
-        btnNewCheckPoint = createToggle
-            ("newCheckPoint", "/images/checkicon.gif", "New checkpoint");
-        toolBar.add(btnNewCheckPoint);
-
-        btnErase = createToggle
-            ("toggleEraseMode", "/images/eraseicon.gif", "Erasing mode");
-        toolBar.add(btnErase);
-
-        toolBar.addSeparator();
-
-        JButton btn = createButton
-            ("zoomIn", "/images/zoominicon.gif", "Zoom in");
-        toolBar.add(btn);
-
-        btn = createButton
-            ("zoomOut", "/images/zoomouticon.gif", "Zoom out");
-        toolBar.add(btn);
-
-        lblZoom = new JLabel();
+        JToolBar tb1 = new JToolBar(SwingConstants.HORIZONTAL);
+        lblZoom = new JLabel("x1");
         lblZoom.setHorizontalAlignment(SwingConstants.CENTER);
         Font f = lblZoom.getFont();
-        lblZoom.setFont(f.deriveFont((float)(f.getSize() - 2)));
-        toolBar.add(lblZoom);
+        lblZoom.setFont(f.deriveFont((float)(f.getSize() - 2)));        
+        toggleGroup = new ButtonGroup();
 
-        toolBar.addSeparator();
+        tb1.add(newToggle("newWall", "/images/polyicon.gif", "New wall"));
+        tb1.add(newToggle("newBallArea", "/images/ballareaicon.gif", "New ball area"));        
+        tb1.add(newToggle("newBallTarget", "/images/balltargeticon.gif", "New ball target"));
+        tb1.add(newToggle("newDecor", "/images/decoricon.gif", "New decoration"));
+        tb1.add(newToggle("newTarget", "/images/targeticon.gif", "New target"));
+        tb1.add(newToggle("newCannon", "/images/cannonicon.gif", "New cannon"));        
+        tb1.add(newToggle("newFuel", "/images/fuelicon.gif", "New fuel station"));
+        tb1.add(newToggle("newBase", "/images/baseicon.gif", "New base"));
+        tb1.add(newToggle("newBall", "/images/ballicon.gif", "New ball"));
+        tb1.add(newToggle("newCheckPoint", "/images/checkicon.gif", "New checkpoint"));        
+        tb1.addSeparator();
+        tb1.add(newToggle("select", "/images/arrow.gif", "Select"));        
+        tb1.add(newToggle("eraseMode", "/images/eraseicon.gif", "Erasing mode"));
+        tb1.add(newToggle("copyMode", "/images/copyicon.gif", "Copy mode"));        
+        tb1.addSeparator();
+        tb1.add(newButton("zoomIn", "/images/zoominicon.gif", "Zoom in"));
+        tb1.add(newButton("zoomOut", "/images/zoomouticon.gif", "Zoom out"));
+        tb1.add(lblZoom);
+        tb1.addSeparator();
+        tb1.add(newButton("undo", "/images/undo.gif", "Undo"));
+        tb1.add(newButton("redo", "/images/redo.gif", "Redo"));
 
-        btnUndo = createButton
-            ("undo", "/images/undo.gif", "Undo");
-        toolBar.add(btnUndo);
-
-        btnRedo = createButton
-            ("redo", "/images/redo.gif", "Redo");
-        toolBar.add(btnRedo);
-
-        getContentPane().add(toolBar, BorderLayout.WEST);
+        getContentPane().add(tb1, BorderLayout.NORTH);
     }
 
 
@@ -183,7 +168,8 @@ public class MainFrame extends JFrame implements ActionListener {
 
 
     private void buildInputMap () {
-        InputMap im = canvas.getInputMap(canvas.WHEN_IN_FOCUSED_WINDOW);
+        InputMap im = canvas.getInputMap(
+            MapCanvas.WHEN_IN_FOCUSED_WINDOW);
         im.put(KeyStroke.getKeyStroke("control S"), "quickSave");
         im.put(KeyStroke.getKeyStroke("control L"), "quickOpen");
         im.put(KeyStroke.getKeyStroke("control Z"), "undo");
@@ -213,23 +199,23 @@ public class MainFrame extends JFrame implements ActionListener {
     }
     
 
-    private JToggleButton createToggle (String cmd, 
-                                        String name, 
-                                        String toolTip) {
-        JToggleButton b = new JToggleButton
-            (new ImageIcon(getClass().getResource(name)));
+    private JToggleButton newToggle(String cmd, String name, String toolTip) {
+        JToggleButton b =
+            new JToggleButton(new ImageIcon(getClass().getResource(name)));
         b.setToolTipText(toolTip);
         b.setActionCommand(cmd);
         b.addActionListener(this);
-        b.setMargin(new Insets(1, 1, 1, 1));
+        b.setPreferredSize(new Dimension(26, 26));
+        toggleGroup.add(b);
         return b;
     }
 
 
-    private JButton createButton (String cmd, String name, String toolTip) {
+    private JButton newButton(String cmd, String name, String toolTip) {
         JButton b = new JButton(new ImageIcon(getClass().getResource(name)));
         b.setToolTipText(toolTip);
         b.setActionCommand(cmd);
+        b.setPreferredSize(new Dimension(26, 26));
         b.addActionListener(this);
         return b;
     }
@@ -265,119 +251,70 @@ public class MainFrame extends JFrame implements ActionListener {
             lblZoom.setText("x1/" + (-zoom + 1));
         }
     }
-
     
-    private void newPolygon () {
-        
-        if (!btnNewPoly.isSelected()) {
-            canvas.repaint();
-            canvas.setCanvasEventHandler(null);
-            return;
-        }
-
-        updateToggles(btnNewPoly);
-        
+    private void select () {
         canvas.setErase(false);
-        canvas.setCanvasEventHandler(new CanvasEventAdapter () {
-                public void mousePressed (MouseEvent me) {
-                    CanvasEventHandler ceh = 
-                        new MapPolygon().getCreateHandler
-                            (new ToggleCommand(btnNewPoly));
+        canvas.setCopy(false);
+        canvas.setCanvasEventHandler(null);
+        canvas.repaint();
+    }
 
-                    canvas.setCanvasEventHandler(ceh);
-                    ceh.mousePressed(me);
-                }
-            });
+    private void newWall () {
+        newMapObject("newWall", new MapPolygon());
     }
     
+    private void newBallArea () {
+        newMapObject("newBallArea", new BallArea());
+    }
+
+    private void newBallTarget () {
+        newMapObject("newBallTarget", new BallTarget());
+    }
+    
+    private void newDecor () {
+        newMapObject("newDecor", new Decoration());
+    }
+    
+    private void newTarget () {
+        newMapObject("newTarget", new Target());
+    }    
     
     private void newFuel () {
-
-        if (!btnNewFuel.isSelected()) {
-            canvas.repaint();
-            canvas.setCanvasEventHandler(null);
-            return;
-        }
-
-        updateToggles(btnNewFuel);
-
-        canvas.setErase(false);
-        canvas.setCanvasEventHandler
-            (new MapFuel().getCreateHandler
-                (new ToggleCommand(btnNewFuel)));
+        newMapObject("newFuel", new Fuel());
     }
-
 
     private void newBase () {
-
-        if (!btnNewBase.isSelected()) {
-            canvas.repaint();
-            canvas.setCanvasEventHandler(null);
-            return;
-        }
-
-        updateToggles(btnNewBase);
-
-        canvas.setErase(false);
-        canvas.setCanvasEventHandler
-            (new MapBase().getCreateHandler
-                (new ToggleCommand(btnNewBase)));
+        newMapObject("newBase", new Base());
     }
 
-
     private void newBall () {
-
-        if (!btnNewBall.isSelected()) {
-            canvas.repaint();
-            canvas.setCanvasEventHandler(null);
-            return;
-        }
-
-        updateToggles(btnNewBall);
-
-        canvas.setErase(false);
-        canvas.setCanvasEventHandler
-            (new MapBall().getCreateHandler
-                (new ToggleCommand(btnNewBall)));
+        newMapObject("newBall", new Ball());    
     }
 
     private void newCannon () {
-
-        if (!btnNewCannon.isSelected()) {
-            canvas.repaint();
-            canvas.setCanvasEventHandler(null);
-            return;
-        }
-
-        updateToggles(btnNewCannon);
-
-        canvas.setErase(false);
-        canvas.setCanvasEventHandler
-            (new Cannon(canvas.getModel().getCannonStyle()).getCreateHandler
-                (new ToggleCommand(btnNewCannon)));
+        newMapObject("newCannon", new Cannon());
     }
 
     private void newCheckPoint () {
-
-        if (!btnNewCheckPoint.isSelected()) {
-            canvas.repaint();
-            canvas.setCanvasEventHandler(null);
-            return;
-        }
-
-        updateToggles(btnNewCheckPoint);
-
-        canvas.setErase(false);
-        canvas.setCanvasEventHandler
-            (new MapCheckPoint().getCreateHandler
-                (new ToggleCommand(btnNewCheckPoint)));
+        newMapObject("newCheckPoint", new CheckPoint());
     }
+    
+    private void newMapObject (String cmd, MapObject o) {
+        canvas.setErase(false);
+        canvas.setCopy(false);
+        canvas.setCanvasEventHandler(o.getCreateHandler(null));        
+    } 
 
 
-    private void toggleEraseMode () {
-        updateToggles(btnErase);
+    private void eraseMode () {
         canvas.setCanvasEventHandler(null);
-        canvas.setErase(!canvas.isErase());
+        canvas.setErase(true);
+        canvas.repaint();
+    }
+    
+    private void copyMode () {
+        canvas.setCanvasEventHandler(null);
+        canvas.setCopy(true);
         canvas.repaint();
     }
 
@@ -516,36 +453,13 @@ public class MainFrame extends JFrame implements ActionListener {
     private void undo () {
         if (canvas.getUndoManager().canUndo())
             canvas.getUndoManager().undo();
+        canvas.repaint();            
     }
 
     private void redo () {
         if (canvas.getUndoManager().canRedo())
             canvas.getUndoManager().redo();
-    }
-
-
-    private void updateToggles (JToggleButton boss) {
-        if (boss != btnNewPoly) btnNewPoly.setSelected(false);
-        if (boss != btnNewFuel) btnNewFuel.setSelected(false);
-        if (boss != btnNewBase) btnNewBase.setSelected(false);
-        if (boss != btnNewBall) btnNewBall.setSelected(false);
-        if (boss != btnNewCannon) btnNewCannon.setSelected(false);
-        if (boss != btnNewCheckPoint) btnNewCheckPoint.setSelected(false);
-        if (boss != btnErase) btnErase.setSelected(false);
-    }
-
-
-    private class ToggleCommand implements Runnable {
-
-        private JToggleButton b;
-
-        public ToggleCommand (JToggleButton b) {
-            this.b = b;
-        }
-
-        public void run () {
-            b.setSelected(!b.isSelected());
-        }
+        canvas.repaint();            
     }
 
 

@@ -1,11 +1,13 @@
 package org.xpilot.jxpmap;
 
-import java.awt.*;
-import javax.swing.*;
-import java.io.PrintWriter;
+import java.awt.GridLayout;
 import java.io.IOException;
+import java.io.PrintWriter;
 
-public class MapBase extends MapObject {
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+
+public class Base extends MapObject {
 
     private static final int LEFT = 0;
     private static final int DOWN = 1;
@@ -19,12 +21,12 @@ public class MapBase extends MapObject {
     private int team;
 
 
-    public MapBase () {
+    public Base () {
         this(0, 0, 32, 0);
     }
 
 
-    public MapBase (int x, int y, int dir, int team) {
+    public Base (int x, int y, int dir, int team) {
         super(null, x, y, 35 * 64, 35 * 64);
         setDir(dir);
         setTeam(team);
@@ -51,7 +53,7 @@ public class MapBase extends MapObject {
 
 
     public void setTeam (int team) {
-        if (team < 0 || team > 10)
+        if (team < -1 || team > 10)
             throw new IllegalArgumentException
                 ("illegal team: " + team);
         this.team = team;
@@ -94,12 +96,12 @@ public class MapBase extends MapObject {
 
         public BasePropertyEditor (MapCanvas canvas) {
 
-            setTitle("Base Properties");
+            setTitle("Base");
 
             cmbTeam = new JComboBox();
-            for (int i = 0; i < 10; i++) 
+            for (int i = -1; i <= 10; i++) 
                 cmbTeam.addItem(new Integer(i));
-            cmbTeam.setSelectedIndex(getTeam() - 1);
+            cmbTeam.setSelectedIndex(getTeam() + 1);
             
             cmbDir = new JComboBox();
             cmbDir.addItem("LEFT");
@@ -120,10 +122,10 @@ public class MapBase extends MapObject {
         
         
         public boolean apply () {
-            int newTeam = cmbTeam.getSelectedIndex();
+            int newTeam = cmbTeam.getSelectedIndex() - 1;
             int newDir = cmbDir.getSelectedIndex() * 32;
             if (newTeam != getTeam() || newDir != getDir())
-                canvas.setBaseProperties(MapBase.this, newTeam, newDir);
+                canvas.setBaseProperties(Base.this, newTeam, newDir);
             return true;
         }
     }

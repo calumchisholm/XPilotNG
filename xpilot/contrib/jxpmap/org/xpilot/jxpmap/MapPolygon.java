@@ -1,36 +1,40 @@
 package org.xpilot.jxpmap;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
+import java.awt.AWTEvent;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Polygon;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.Stroke;
+import java.awt.TexturePaint;
+import java.awt.event.InputEvent;
+import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
-import java.util.*;
-
-import java.io.PrintWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
 
 
 public class MapPolygon extends MapObject {
 
-    public static final int TYPE_NORMAL = 0;
-    public static final int TYPE_BALLAREA = 1;
-    public static final int TYPE_BALLTARGET = 2;
-    public static final int TYPE_DECORATION = 3;
-
-
     protected Polygon polygon;
     protected PolygonStyle style;
     protected ArrayList edgeStyles;
-    protected int type;
-    protected int team;
 
     public Object deepClone (Map context) {
 
         MapPolygon clone = (MapPolygon)super.deepClone(context);
 
         clone.polygon = new Polygon(polygon.xpoints, 
-                                    polygon.ypoints, 
-                                    polygon.npoints);
+            polygon.ypoints, 
+            polygon.npoints);
 
         clone.style = (PolygonStyle)style.deepClone(context);
 
@@ -42,6 +46,16 @@ public class MapPolygon extends MapObject {
         }
 
         return clone;
+    }
+    
+    public MapObject copy() {
+        MapPolygon copy = (MapPolygon)super.copy();
+        copy.polygon = new Polygon(polygon.xpoints, 
+            polygon.ypoints, 
+            polygon.npoints);
+        if (edgeStyles != null) 
+            copy.edgeStyles = new ArrayList(edgeStyles);
+        return copy;
     }
 
     public MapPolygon () {}
@@ -57,7 +71,10 @@ public class MapPolygon extends MapObject {
     public CanvasEventHandler getCreateHandler (Runnable r) {
         return new CreateHandler(r);
     }
-
+    
+    protected MapObjectPopup createPopup() {
+        return new PolygonPopup(this);
+    }
 
     public PolygonStyle getStyle () {
         return style;
@@ -67,27 +84,6 @@ public class MapPolygon extends MapObject {
     public void setStyle (PolygonStyle style) {
         this.style = style;
     }
-
-
-    public int getType () {
-        return type;
-    }
-
-
-    public void setType (int type) {
-        this.type = type;
-    }
-
-
-    public int getTeam () {
-        return team;
-    }
-
-
-    public void setTeam (int team) {
-        this.team = team;
-    }
-
 
     public Rectangle getBounds () {
         return polygon.getBounds();
@@ -112,6 +108,23 @@ public class MapPolygon extends MapObject {
     public void moveTo (int x, int y) {
         Rectangle r = getBounds();
         polygon.translate(x - r.x, y - r.y);
+    }
+    
+    
+    public void rotate (double angle) {
+        double cx = getBounds().getCenterX();
+        double cy = getBounds().getCenterY();
+        AffineTransform at = AffineTransform.getTranslateInstance(cx, cy);
+        at.rotate(angle);
+        at.translate(-cx, -cy);
+        Point p = new Point();
+        for (int i = 0; i < polygon.npoints; i++) {
+            p.x = polygon.xpoints[i];
+            p.y = polygon.ypoints[i];
+            at.transform(p, p);
+            polygon.xpoints[i] = p.x;
+            polygon.ypoints[i] = p.y;
+        }
     }
 
 
@@ -152,16 +165,6 @@ public class MapPolygon extends MapObject {
     public void printXml (PrintWriter out) throws IOException {
 
         if (polygon.npoints < 2) return;
-
-        if (getType() == TYPE_BALLAREA) {
-            out.print("<BallArea>");
-        } else if (getType() == TYPE_BALLTARGET) {
-            out.print("<BallTarget team=\"");
-            out.print(getTeam());
-            out.println("\">");
-        } else if (getType() == TYPE_DECORATION) {
-            out.println("<Decor>");
-        }
 
         out.print("<Polygon x=\"");
         out.print(polygon.xpoints[0]);
@@ -218,13 +221,6 @@ public class MapPolygon extends MapObject {
 
         out.println("</Polygon>");
 
-        if (getType() == TYPE_BALLAREA) {
-            out.println("</BallArea>");
-        } else if (getType() == TYPE_BALLTARGET) {
-            out.println("</BallTarget>");
-        } else if (getType() == TYPE_DECORATION) {
-            out.println("</Decor>");
-        }
     }
     
 
@@ -292,6 +288,10 @@ public class MapPolygon extends MapObject {
     public EditorPanel getPropertyEditor (MapCanvas canvas) {
         return new PolygonPropertyEditor(canvas, this);
     }
+    
+    public CanvasEventHandler getRotateHandler() {
+        return new RotateHandler();
+    }
 
 
     public boolean checkAwtEvent (MapCanvas canvas, AWTEvent evt) {
@@ -313,7 +313,7 @@ public class MapPolygon extends MapObject {
             
             double thresholdSq = 100 / (canvas.getScale() * canvas.getScale());
             if ((me.getModifiers() & InputEvent.BUTTON1_MASK) != 0
-                && me.getID() == me.MOUSE_PRESSED) {
+                && me.getID() == MouseEvent.MOUSE_PRESSED) {
                 
                 for (int pi = 0; pi < wraps.length; pi++) {
                     Point wp = wraps[pi];
@@ -349,7 +349,7 @@ public class MapPolygon extends MapObject {
                             if ((me.getModifiers() & 
                                  InputEvent.BUTTON1_MASK) != 0) {
                                 
-                                if (me.getID() == me.MOUSE_PRESSED) {
+                                if (me.getID() == MouseEvent.MOUSE_PRESSED) {
                                     canvas.insertPolygonPoint(this, i + 1, p);
                                     canvas.setCanvasEventHandler
                                         (new PolygonPointMoveHandler
@@ -359,7 +359,7 @@ public class MapPolygon extends MapObject {
                                 
                             } else {
                                 
-                                if (me.getID() == me.MOUSE_CLICKED) {
+                                if (me.getID() == MouseEvent.MOUSE_CLICKED) {
                                     EditorDialog.show
                                         (canvas, new EdgePropertyEditor
                                          (canvas, this, i),
@@ -394,12 +394,12 @@ public class MapPolygon extends MapObject {
 
 
     public Point getPoint (int i) {
-        if (i <= 0) throw new IllegalArgumentException("i = " + i);
+        if (i < 0) throw new IllegalArgumentException("i = " + i);
         return new Point(polygon.xpoints[i], polygon.ypoints[i]);
     }
 
     public void setPoint (int i, int x, int y) {
-        if (i <= 0 || i >= polygon.npoints)
+        if (i < 0 || i >= polygon.npoints)
             throw new IllegalArgumentException("i = " + i);
         polygon.xpoints[i] = x;
         polygon.ypoints[i] = y;
@@ -407,7 +407,7 @@ public class MapPolygon extends MapObject {
     }
     
     public void insertPoint (int i, Point p) {
-        if (i <= 0) throw new IllegalArgumentException("i = " + i);
+        if (i < 0) throw new IllegalArgumentException("i = " + i);
         int pc = polygon.npoints + 1;
         int xps[] = insert(p.x, polygon.xpoints, i);
         int yps[] = insert(p.y, polygon.ypoints, i);
@@ -445,7 +445,6 @@ public class MapPolygon extends MapObject {
 
         return rv;
     }
-
 
 
     private class CreateHandler extends CanvasEventAdapter {
@@ -496,17 +495,7 @@ public class MapPolygon extends MapObject {
                     MapPolygon.this.style = 
                         c.getModel().getDefaultPolygonStyle();
                     c.addMapObject(MapPolygon.this);
-
-                    // This hack consumes mouse released and mouse clicked
-                    // events associated with this mouse pressed event.
-                    // It prevents the property dialogs from appearing
-                    // when finishing a new polygon.
-                    c.setCanvasEventHandler(new CanvasEventAdapter () {
-                            public void mouseClicked (MouseEvent _me) {
-                                MapCanvas _c = (MapCanvas)_me.getSource();
-                                _c.setCanvasEventHandler(null);
-                            }
-                        });
+                    c.setCanvasEventHandler(newInstance().getCreateHandler(cmd));
                     if (cmd != null) cmd.run();
                     return;
                 }
@@ -601,6 +590,58 @@ public class MapPolygon extends MapObject {
         private void drawPreview (Graphics2D g, MapCanvas c) {
             c.drawShape(g, l1);
             c.drawShape(g, l2);
+        }
+    }
+    
+    
+    private class RotateHandler extends CanvasEventAdapter {
+        
+        private double cx, cy, angle;
+        private Stroke stroke;
+        private Shape origShape;
+        private Shape previewShape;
+        private AffineTransform backTx;
+        private boolean firstTime;
+        
+        public RotateHandler() {
+            cx = getBounds().getCenterX();
+            cy = getBounds().getCenterY();
+            origShape = AffineTransform.getTranslateInstance(
+                -cx , -cy).createTransformedShape(polygon);
+            backTx = AffineTransform.getTranslateInstance(cx, cy);
+            updatePreviewShape();
+            firstTime = true;
+        }
+        
+        public void mouseMoved(MouseEvent me) {
+            MapCanvas c = (MapCanvas)me.getSource();            
+            if (!firstTime) drawPreview(c);
+            angle = 2 * Math.PI * (cx - me.getX()) / (800 / c.getScale());
+            updatePreviewShape();
+            drawPreview(c);
+            firstTime = false;
+        }
+        
+        public void mousePressed(MouseEvent me) {
+            MapCanvas c = (MapCanvas)me.getSource();
+            if (!firstTime) drawPreview(c);
+            c.rotatePolygon(MapPolygon.this, angle);
+            c.setCanvasEventHandler(null);
+        }
+        
+        private void updatePreviewShape() {
+            AffineTransform at = AffineTransform.getRotateInstance(angle);
+            at.preConcatenate(backTx);
+            previewShape = at.createTransformedShape(origShape);
+        }
+                
+        private void drawPreview(MapCanvas c) {
+            Graphics2D g = (Graphics2D)c.getGraphics();
+            g.setXORMode(Color.black);
+            g.setColor(Color.white);
+            if (stroke == null) stroke = getPreviewStroke(c.getScale());
+            //g.setStroke(stroke);
+            c.drawShape(g, previewShape);
         }
     }    
 }

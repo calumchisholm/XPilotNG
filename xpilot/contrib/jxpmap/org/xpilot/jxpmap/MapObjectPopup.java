@@ -1,14 +1,16 @@
 package org.xpilot.jxpmap;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 
 public class MapObjectPopup extends JPopupMenu implements ActionListener {
 
 
-    private MapCanvas canvas;
-    private MapObject object;
+    protected MapCanvas canvas;
+    protected MapObject object;
     private JMenuItem itemToFront;
     private JMenuItem itemToBack;
     private JMenuItem itemRemove;
@@ -68,21 +70,19 @@ public class MapObjectPopup extends JPopupMenu implements ActionListener {
     
    
     protected void toFront () {
-        canvas.getModel().removeObject(object);
-        canvas.getModel().addToFront(object);
+        canvas.bringMapObject(object, true);
         canvas.repaint();
     }
 
 
     protected void toBack () {
-        canvas.getModel().removeObject(object);
-        canvas.getModel().addToBack(object);        
+        canvas.bringMapObject(object, false);
         canvas.repaint();
     }
 
 
     protected void remove () {
-        canvas.getModel().removeObject(object);
+        canvas.removeMapObject(object);
         canvas.repaint();
     }
 

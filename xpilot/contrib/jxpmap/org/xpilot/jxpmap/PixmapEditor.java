@@ -1,7 +1,10 @@
 package org.xpilot.jxpmap;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 
 public class PixmapEditor extends EditorPanel {
 
@@ -10,7 +13,7 @@ public class PixmapEditor extends EditorPanel {
     
 
     public PixmapEditor (Pixmap pixmap) {
-        setTitle("Image Properties");
+        setTitle("Image");
         this.pixmap = pixmap;
         setLayout(new BorderLayout());
         add(new JLabel("Name"), BorderLayout.WEST);

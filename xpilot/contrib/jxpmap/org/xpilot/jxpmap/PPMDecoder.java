@@ -1,7 +1,9 @@
 package org.xpilot.jxpmap;
 
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * PPMDecoder, based on Acme.JPM.Decoders.PpmDecoder of Jef Poskanzer

@@ -1,6 +1,6 @@
 package org.xpilot.jxpmap;
 
-import javax.swing.*;
+import javax.swing.JPanel;
 
 public class EditorPanel extends JPanel {
 

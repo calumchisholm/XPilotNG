@@ -1,8 +1,9 @@
 package org.xpilot.jxpmap;
 
-import java.awt.*;
-import javax.swing.*;
 import java.util.Iterator;
+
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
 
 public class EdgePropertyEditor extends EditorPanel {
 
@@ -22,7 +23,7 @@ public class EdgePropertyEditor extends EditorPanel {
         this.polygon = polygon;
         this.edgeIndex = edgeIndex;
         
-        setTitle("Edge Properties");
+        setTitle("Edge");
 
         add(new JLabel("Style:"));
         cmbStyle = new JComboBox();

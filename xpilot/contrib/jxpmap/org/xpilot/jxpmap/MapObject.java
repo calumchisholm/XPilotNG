@@ -1,12 +1,21 @@
 package org.xpilot.jxpmap;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.AWTEvent;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.Stroke;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
-import javax.swing.*;
-import java.io.PrintWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Map;
+
+import javax.swing.ImageIcon;
 
 
 public abstract class MapObject extends ModelObject {
@@ -15,12 +24,20 @@ public abstract class MapObject extends ModelObject {
     protected Stroke previewStroke;
     protected Image img;
     protected MapObjectPopup popup;
+    protected int team;
     
     public Object deepClone (Map context) {
         MapObject clone = (MapObject)super.deepClone(context);
         clone.bounds = new Rectangle(bounds);
-        clone.popup = new MapObjectPopup(clone);
+        clone.popup = null;
         return clone;
+    }
+    
+    public MapObject copy() {
+        MapObject copy = (MapObject)clone();
+        copy.bounds = new Rectangle(bounds);
+        copy.popup = null;
+        return copy;
     }
     
     public MapObject () {
@@ -39,12 +56,27 @@ public abstract class MapObject extends ModelObject {
 
 
     public MapObject (String imgName, int x, int y, int width, int height) {
-
         bounds = new Rectangle(x, y, width, height);
         if (imgName != null) setImage(imgName);
-        popup = new MapObjectPopup(this);
+    }
+    
+    
+    public MapObject newInstance() {
+        try {
+            return (MapObject)getClass().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException("MapObject creation failed: " + e);
+        } 
     }
 
+
+    public int getTeam () {
+        return team;
+    }
+    
+    public void setTeam (int team) {
+        this.team = team;
+    }
 
     public Rectangle getBounds () {
         return bounds;
@@ -87,6 +119,14 @@ public abstract class MapObject extends ModelObject {
         return getBounds();
     }
 
+    private MapObjectPopup getPopup() {
+        if (popup == null) popup = createPopup();
+        return popup;
+    }
+    
+    protected MapObjectPopup createPopup() {
+        return new MapObjectPopup(this);
+    }
 
     protected Stroke getPreviewStroke (float scale) {
         if (previewStroke == null) {
@@ -122,13 +162,16 @@ public abstract class MapObject extends ModelObject {
                 if (me.isPopupTrigger()) {
                     Point p = me.getPoint();
                     canvas.getTransform().transform(p, p);
-                    popup.show(canvas, p.x, p.y);
+                    getPopup().show(canvas, p.x, p.y);
                     return true;
 
                 } else {
                     if (evt.getID() == MouseEvent.MOUSE_PRESSED) {
                         if (canvas.isErase()) {
                             canvas.removeMapObject(this);
+                        } else if (canvas.isCopy()) {
+                            canvas.setCanvasEventHandler(
+                                copy().new CopyHandler(me));
                         } else {
                             canvas.setCanvasEventHandler(new MoveHandler(me));
                         }
@@ -209,7 +252,7 @@ public abstract class MapObject extends ModelObject {
             MapObject.this.moveTo(evt.getX() - offset.x, 
                                   evt.getY() - offset.y);
             c.addMapObject(MapObject.this);
-            c.setCanvasEventHandler(null);
+            c.setCanvasEventHandler(newInstance().getCreateHandler(cmd));
             if (cmd != null) cmd.run();
         }
     }
@@ -219,10 +262,10 @@ public abstract class MapObject extends ModelObject {
     protected class MoveHandler extends CanvasEventAdapter {
 
 
-        private Point offset;
-        private Shape preview;
-        private Shape toBeRemoved;
-        private Stroke stroke;
+        protected Point offset;
+        protected Shape preview;
+        protected Shape toBeRemoved;
+        protected Stroke stroke;
 
 
         public MoveHandler (MouseEvent evt) {
@@ -258,5 +301,21 @@ public abstract class MapObject extends ModelObject {
                             evt.getY() - offset.y);
             c.setCanvasEventHandler(null);
         }
+    }
+    
+    protected class CopyHandler extends MoveHandler {
+        
+        public CopyHandler(MouseEvent me) {
+            super(me);
+        }
+        
+        public void mouseReleased (MouseEvent evt) {
+            MapCanvas c = (MapCanvas)evt.getSource();
+            MapObject.this.moveTo(
+                evt.getX() - offset.x, 
+                evt.getY() - offset.y);
+            c.addMapObject(MapObject.this);
+            c.setCanvasEventHandler(null);
+        }        
     }
 }

@@ -1,9 +1,17 @@
 package org.xpilot.jxpmap;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.Iterator;
+import java.awt.Color;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JColorChooser;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 
 public class EdgeStyleEditor extends EditorPanel implements ActionListener {
 
@@ -29,7 +37,7 @@ public class EdgeStyleEditor extends EditorPanel implements ActionListener {
         this.isNew = isNew;
         this.model = canvas.getModel();
         
-        setTitle("Edge Style Properties");
+        setTitle("Edge Style");
         setLayout(new GridLayout(4, 2));
         
         add(new JLabel("Name:"));

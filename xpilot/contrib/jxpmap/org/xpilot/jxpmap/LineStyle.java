@@ -1,8 +1,10 @@
 package org.xpilot.jxpmap;
 
-import java.awt.*;
-import java.io.PrintWriter;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Stroke;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 public class LineStyle extends ModelObject {
 

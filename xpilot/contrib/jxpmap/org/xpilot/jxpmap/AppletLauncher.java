@@ -1,8 +1,9 @@
 package org.xpilot.jxpmap;
 
-import java.applet.*;
-import java.awt.*;
-import java.awt.event.*;
+import java.applet.Applet;
+import java.awt.Button;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class AppletLauncher extends Applet implements ActionListener {
 

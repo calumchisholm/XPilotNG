@@ -1,17 +1,17 @@
 package org.xpilot.jxpmap;
 
-import java.io.PrintWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 
-public class MapFuel extends MapObject {
+public class Fuel extends MapObject {
 
 
-    public MapFuel () {
+    public Fuel () {
         this(0, 0);
     }
 
     
-    public MapFuel (int x, int y) {
+    public Fuel (int x, int y) {
         super("fuel.gif", x, y, 35 * 64, 35 * 64);
     }
 

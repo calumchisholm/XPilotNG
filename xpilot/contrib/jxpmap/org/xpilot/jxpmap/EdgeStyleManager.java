@@ -1,14 +1,20 @@
 package org.xpilot.jxpmap;
 
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.border.*;
-import java.awt.event.*;
-import java.util.List;
-import java.util.ArrayList;
-import java.awt.Image;
-import java.awt.GridLayout;
 import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 public class EdgeStyleManager extends EditorPanel
     implements ListSelectionListener, ActionListener {

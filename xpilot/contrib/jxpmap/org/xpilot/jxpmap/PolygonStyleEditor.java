@@ -1,9 +1,18 @@
 package org.xpilot.jxpmap;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Iterator;
+
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JColorChooser;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 
 public class PolygonStyleEditor extends EditorPanel implements ActionListener {
 
@@ -30,7 +39,7 @@ public class PolygonStyleEditor extends EditorPanel implements ActionListener {
         this.model = canvas.getModel();
         this.isNew = isNew;
         
-        setTitle("Polygon Style Properties");
+        setTitle("Polygon Style");
         setLayout(new GridLayout(7, 2));
         
         add(new JLabel("Name:"));
