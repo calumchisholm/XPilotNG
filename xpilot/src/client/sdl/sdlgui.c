@@ -290,10 +290,11 @@ int Gui_init(void)
 	return -1;
     }
 
-    gluTessCallback(tess, GLU_TESS_BEGIN, (_GLUfuncptr)glBegin);
-	/* TODO: figure out proper casting here */
-    gluTessCallback(tess, GLU_TESS_VERTEX_DATA, (_GLUfuncptr)vertex_callback);
-    gluTessCallback(tess, GLU_TESS_END, (_GLUfuncptr)glEnd);
+    gluTessCallback(tess, GLU_TESS_BEGIN, glBegin);
+	/* TODO: figure out proper casting here do not use _GLUfuncptr */
+	/* it doesn't work on windows  or MAC OS X */
+    gluTessCallback(tess, GLU_TESS_VERTEX_DATA, vertex_callback);
+    gluTessCallback(tess, GLU_TESS_END, glEnd);
 
     for (i = 0; i < num_polygons; i++) {
 	tessellate_polygon(tess, i);
