@@ -32,6 +32,7 @@ typedef struct _valPair {
     char *name;
     char *value;
     void *def;
+    int origin; /* Origin of the setting */
 } valPair;
 
 enum valType {
@@ -53,8 +54,15 @@ typedef struct {
     enum valType	type;
     void		(*tuner)(void);
     const char		*helpLine;
-    const char*		mapperPos;	/* where in the xpmapper table this item appears */
+    const int		flags;	/* Where this can be set. */
 } optionDesc;
+
+enum optFlags {
+    OPT_MAP = 1 << 0,
+    OPT_CMDLINE = 1 << 1,
+    OPT_DEFAULT = 1 << 2,
+    OPT_ANY = 3
+};
 
 optionDesc*	findOption(const char* name);
 

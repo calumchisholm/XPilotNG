@@ -49,7 +49,7 @@
 #include "error.h"
 #include "click.h"
 #include "types.h"
-
+#include "commonproto.h"
 
 char option_version[] = VERSION;
 
@@ -59,7 +59,7 @@ char option_version[] = VERSION;
 
 #define	NHASH	199
 
-valPair    *hashArray[NHASH];
+static valPair    *hashArray[NHASH];
 
 
 /*
@@ -117,7 +117,8 @@ static valPair *newOption(const char *name, const char *value)
  * to the hash table regardless of override.   Either way, if def is nonzero,
  * it is attached to the name-value pair - this will only happen once anyway.
  */
-void addOption(const char *name, const char *value, int override, void *def)
+void addOption(const char *name, const char *value, int override, void *def,
+	       int origin)
 {
     valPair    *tmp;
     int         ix = hash(name);
@@ -125,13 +126,11 @@ void addOption(const char *name, const char *value, int override, void *def)
     for (tmp = hashArray[ix]; tmp; tmp = tmp->next)
 	if (!strcasecmp(name, tmp->name)) {
 	    if (override && value) {
-		char       *s = (char *)malloc(strlen(value) + 1);
-
-		if (!s)
-		    return;
+		char *s = xp_malloc(strlen(value) + 1);
 		free(tmp->value);
 		strcpy(s, value);
 		tmp->value = s;
+		tmp->origin = origin;
 	    }
 	    if (def)
 		tmp->def = def;
@@ -145,6 +144,7 @@ void addOption(const char *name, const char *value, int override, void *def)
 	return;
     tmp->def = def;
     tmp->next = hashArray[ix];
+    tmp->origin = origin;
     hashArray[ix] = tmp;
 }
 
@@ -485,7 +485,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 		value = *(attr + 1);
 	    attr += 2;
 	}
-	addOption(name, value, 0, NULL);
+	addOption(name, value, 0, NULL, OPT_MAP);
 	return;
     }
 
@@ -902,6 +902,14 @@ void parseOptions(void)
 	for (tmp = hashArray[i]; tmp; tmp = tmp->next) {
 	    /* Does it have a default?   (If so, get a pointer to it) */
 	    if ((desc = (optionDesc *)tmp->def) != NULL) {
+		if (tmp->origin != OPT_DEFAULT &&
+		    !(tmp->origin & desc->flags)) {
+		    errno = 0;
+		    error("%s may not be set in map file", desc->name);
+		    exit(1); /* Can't continue since the default value was
+			      * lost. This could be fixed with some extra
+			      * tricks if needed. */
+		}
 		if (desc->variable) {
 		    switch (desc->type) {
 

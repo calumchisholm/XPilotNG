@@ -241,6 +241,7 @@ extern int              eliminationRace;
 extern char             *dataURL;
 extern int	       	clientPortStart;
 extern int		clientPortEnd;
+extern char		*recordFileName;
 
 #endif
 

@@ -11,6 +11,7 @@
 #include "const.h"
 #include "global.h"
 #include "error.h"
+#include "proto.h"
 
 int   playback = 0;
 int   record = 0;
@@ -210,6 +211,13 @@ void Init_recording(void)
     static int oldMode = 0;
     int i;
 
+    if (!recordFileName) {
+	errno = 0;
+	error("Can't do anything with recordings when recordFileName isn't "
+	      "specified.");
+	recordMode = 0;
+	return;
+    }
     if (sizeof(int) != 4 || sizeof(short) != 2) {
 	errno = 0;
 	error("Recordings won't work on this machine.");
@@ -227,7 +235,7 @@ void Init_recording(void)
 	oldMode = recordMode + 10;
 	if (recordMode == 1) {
 	    record = rrecord = 1;
-	    recf1 = fopen("/tmp/serverrec", "wb");
+	    recf1 = fopen(recordFileName, "wb");
 	    if (!recf1) {
 		error("Opening record file failed");
 		exit(1);
@@ -244,7 +252,7 @@ void Init_recording(void)
 		*bufs[i].curp = bufs[i].start;
 		bufs[i].num_read = 0;
 	    }
-	    recf1 = fopen("/tmp/serverrec", "rb");
+	    recf1 = fopen(recordFileName, "rb");
 	    if (!recf1) {
 		error("Opening record file failed");
 		exit(1);
@@ -255,14 +263,14 @@ void Init_recording(void)
 	    return;
 	else {
 	    errno = 0;
-	    error("You IDIOT!!!");
-	    exit(1);
+	    error("Trying to start recording or playback when the server is\n"
+		  "already running, impossible.");
+	    return;
 	}
     }
     if (recordMode != 0 || oldMode < 11 || oldMode > 12) {
-	errno = 0;
-	error("You IDIOT!!!");
-	exit(1);
+	recordMode = oldMode - 10;
+	return;
     }
     if (oldMode == 11) {
 	Dump_data();
@@ -273,7 +281,7 @@ void Init_recording(void)
 	oldMode = 10;
 	errno = 0;
 	error("End of playback.");
-	exit(1); /* There might be better ways to stop playback? */
+	End_game();
     }
 }
 

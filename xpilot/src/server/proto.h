@@ -281,7 +281,8 @@ void Phasing(int ind, int on);
 /*
  * Prototypes for option.c
  */
-void addOption(const char *name, const char *value, int override, void *def);
+void addOption(const char *name, const char *value, int override, void *def,
+	       int origin);
 char *getOption(const char *name);
 bool parseDefaultsFile(const char *filename);
 bool parseMapFile(const char *filename);

@@ -214,12 +214,10 @@ int             constantScoring;        /* Fixed points for kills etc? */
 int             eliminationRace;        /* Last player drops each lap? */
 int		clientPortStart;	/* First UDP port for clients */
 int             clientPortEnd;          /* Last one (these are for firewalls)*/
+char		*recordFileName;
 
 
 extern char	conf_default_map_string[];	/* from common/config.c */
-
-#define	MAP(_x)	 _x
-/* #define	MAP(_x)	 */
 
 /*
  * Two functions which can be used if an option
@@ -244,7 +242,7 @@ static optionDesc options[] = {
 	valVoid,
 	tuner_none,
 	"Print out this help message.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"version",
@@ -254,7 +252,7 @@ static optionDesc options[] = {
 	valVoid,
 	tuner_none,
 	"Print version information.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"dump",
@@ -264,7 +262,7 @@ static optionDesc options[] = {
 	valVoid,
 	tuner_none,
 	"Print all options with their default values in defaultsfile format.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"gravity",
@@ -274,7 +272,7 @@ static optionDesc options[] = {
 	valReal,
 	tuner_none,
 	"Gravity strength.\n",
-	MAP("World")
+	OPT_ANY
     },
     {
 	"shipMass",
@@ -284,7 +282,7 @@ static optionDesc options[] = {
 	valReal,
 	tuner_none,
 	"Mass of fighters.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"shotMass",
@@ -294,7 +292,7 @@ static optionDesc options[] = {
 	valReal,
 	tuner_none,
 	"Mass of bullets.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"shotSpeed",
@@ -304,7 +302,7 @@ static optionDesc options[] = {
 	valReal,
 	tuner_none,
 	"Maximum speed of bullets.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"shotLife",
@@ -314,7 +312,7 @@ static optionDesc options[] = {
 	valInt,
 	tuner_none,
 	"Life of bullets in ticks.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"fireRepeatRate",
@@ -324,7 +322,7 @@ static optionDesc options[] = {
 	valInt,
 	tuner_dummy,
 	"Number of frames per automatic fire (0=off).\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxPlayerShots",
@@ -334,7 +332,7 @@ static optionDesc options[] = {
 	valInt,
 	tuner_none,
 	"Maximum allowed bullets per player.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"shotsGravity",
@@ -344,7 +342,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Are bullets afflicted by gravity.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"idleRun",
@@ -354,7 +352,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Does server calculate frames even if all human players quit?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"noQuit",
@@ -369,7 +367,7 @@ static optionDesc options[] = {
 	tuner_dummy,
 	"Does the server wait for new human players to show up\n"
 	"after all players have left.\n",
-	MAP(NULL)
+	OPT_CMDLINE
     },
     {
 	"mapWidth",
@@ -379,7 +377,7 @@ static optionDesc options[] = {
 	valInt,
 	tuner_none,
 	"Width of the world in pixels.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"mapHeight",
@@ -389,7 +387,7 @@ static optionDesc options[] = {
 	valInt,
 	tuner_none,
 	"Height of the world in pixels.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"mapFileName",
@@ -399,7 +397,7 @@ static optionDesc options[] = {
 	valString,
 	tuner_none,
 	"The filename of the map to use.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"mapName",
@@ -409,7 +407,7 @@ static optionDesc options[] = {
 	valString,
 	tuner_none,
 	"The title of the map.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"mapAuthor",
@@ -419,7 +417,7 @@ static optionDesc options[] = {
 	valString,
 	tuner_none,
 	"The name of the map author.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"contactPort",
@@ -429,7 +427,7 @@ static optionDesc options[] = {
 	valInt,
 	tuner_none,
 	"The server contact port number.\n",
-	MAP("General")
+	OPT_ANY
     },
     {
 	"serverHost",
@@ -439,7 +437,7 @@ static optionDesc options[] = {
 	valString,
 	tuner_none,
 	"The fully qualified domain name (for multihomed hosts).\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"allowPlayerCrashes",
@@ -449,7 +447,7 @@ static optionDesc options[] = {
 	valBool,
 	Set_world_rules,
 	"Can players overrun other players?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"allowPlayerBounces",
@@ -459,7 +457,7 @@ static optionDesc options[] = {
 	valBool,
 	Set_world_rules,
 	"Can players bounce with other players?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"allowPlayerKilling",
@@ -469,7 +467,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Should players be allowed to kill one other?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"allowShields",
@@ -479,7 +477,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Are shields allowed?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"playerStartsShielded",
@@ -489,7 +487,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Do players start with shields up?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"shotsWallBounce",
@@ -499,7 +497,7 @@ static optionDesc options[] = {
 	valBool,
 	Move_init,
 	"Do shots bounce off walls?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"ballsWallBounce",
@@ -509,7 +507,7 @@ static optionDesc options[] = {
 	valBool,
 	Move_init,
 	"Do balls bounce off walls?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"minesWallBounce",
@@ -519,7 +517,7 @@ static optionDesc options[] = {
 	valBool,
 	Move_init,
 	"Do mines bounce off walls?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"itemsWallBounce",
@@ -529,7 +527,7 @@ static optionDesc options[] = {
 	valBool,
 	Move_init,
 	"Do items bounce off walls?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"missilesWallBounce",
@@ -539,7 +537,7 @@ static optionDesc options[] = {
 	valBool,
 	Move_init,
 	"Do missiles bounce off walls?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"sparksWallBounce",
@@ -549,7 +547,7 @@ static optionDesc options[] = {
 	valBool,
 	Move_init,
 	"Do thrust spark particles bounce off walls to give reactive thrust?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"debrisWallBounce",
@@ -559,7 +557,7 @@ static optionDesc options[] = {
 	valBool,
 	Move_init,
 	"Do explosion debris particles bounce off walls?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"cloakedExhaust",
@@ -569,7 +567,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Do engines of cloaked ships generate exhaust?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"cloakedShield",
@@ -579,7 +577,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Can players use shields when cloaked?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxObjectWallBounceSpeed",
@@ -589,7 +587,7 @@ static optionDesc options[] = {
 	valReal,
 	Move_init,
 	"The maximum allowed speed for objects to bounce off walls.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxShieldedWallBounceSpeed",
@@ -599,7 +597,7 @@ static optionDesc options[] = {
 	valReal,
 	Move_init,
 	"The maximum allowed speed for a shielded player to bounce off walls.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxUnshieldedWallBounceSpeed",
@@ -609,7 +607,7 @@ static optionDesc options[] = {
 	valReal,
 	Move_init,
 	"Maximum allowed speed for an unshielded player to bounce off walls.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"playerWallBounceBrakeFactor",
@@ -619,7 +617,7 @@ static optionDesc options[] = {
 	valReal,
 	Move_init,
 	"Factor to slow down players when they hit the wall (between 0 and 1).\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"objectWallBounceBrakeFactor",
@@ -629,7 +627,7 @@ static optionDesc options[] = {
 	valReal,
 	Move_init,
 	"Factor to slow down objects when they hit the wall (between 0 and 1).\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"objectWallBounceLifeFactor",
@@ -639,7 +637,7 @@ static optionDesc options[] = {
 	valReal,
 	Move_init,
 	"Factor to reduce the life of objects after bouncing (between 0 and 1).\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"wallBounceFuelDrainMult",
@@ -649,7 +647,7 @@ static optionDesc options[] = {
 	valReal,
 	Move_init,
 	"Multiplication factor for player wall bounce fuel cost.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"wallBounceDestroyItemProb",
@@ -660,7 +658,7 @@ static optionDesc options[] = {
 	Move_init,
 	"The probability for each item a player owns to get destroyed\n"
 	"when the player bounces against a wall.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"reportToMetaServer",
@@ -670,7 +668,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Keep the meta server informed about our game?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
         "searchDomainForXPilot",
@@ -680,7 +678,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Search the local domain for the existence of xpilot.domain?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"denyHosts",
@@ -691,7 +689,7 @@ static optionDesc options[] = {
 	Set_deny_hosts,
 	"List of network addresses of computers which are denied service.\n"
 	"Each address may optionally be followed by a slash and a network mask.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"limitedVisibility",
@@ -701,7 +699,7 @@ static optionDesc options[] = {
 	valBool,
 	Set_world_rules,
 	"Should the players have a limited visibility?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"minVisibilityDistance",
@@ -711,7 +709,7 @@ static optionDesc options[] = {
 	valReal,
 	tuner_none,
 	"Minimum block distance for limited visibility, 0 for default.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxVisibilityDistance",
@@ -721,7 +719,7 @@ static optionDesc options[] = {
 	valReal,
 	tuner_none,
 	"Maximum block distance for limited visibility, 0 for default.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"limitedLives",
@@ -732,7 +730,7 @@ static optionDesc options[] = {
 	tuner_none,
 	"Should players have limited lives?\n"
 	"See also worldLives.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"worldLives",
@@ -742,7 +740,7 @@ static optionDesc options[] = {
 	valInt,
 	tuner_none,
 	"Number of lives each player has (no sense without limitedLives).\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"reset",
@@ -756,7 +754,7 @@ static optionDesc options[] = {
 	"removed from the world and all players including the winner(s)\n"
 	"will be transported back to their homebases.\n"
 	"This option is only effective when limitedLives is turned on.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"resetOnHuman",
@@ -767,7 +765,7 @@ static optionDesc options[] = {
 	tuner_dummy,
 	"Is the game restarted when there are less than resetOnHuman\n"
 	"humans present and a new human logs in?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"teamPlay",
@@ -777,7 +775,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Is the map a team play map?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"teamFuel",
@@ -787,7 +785,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Are fuelstations only available to team members?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"teamCannons",
@@ -797,7 +795,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Do cannons choose sides in teamPlay?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"cannonSmartness",
@@ -811,7 +809,7 @@ static optionDesc options[] = {
 	"2: good (small error),\n"
 	"3: accurate (aims at predicted player position).\n"
 	"Also influences use of weapons if cannonsUseItems is on.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"cannonsUseItems",
@@ -821,7 +819,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Do cannons use items?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"keepShots",
@@ -831,7 +829,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Do shots, mines and missiles remain after their owner leaves?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"teamImmunity",
@@ -841,7 +839,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Should other team members be immune to various shots thrust etc.?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"ecmsReprogramMines",
@@ -851,7 +849,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Is it possible to reprogram mines with ECMs?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"targetKillTeam",
@@ -861,7 +859,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Do team members die when their last target explodes?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"targetTeamCollision",
@@ -871,7 +869,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Do team members collide with their own target or not.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"targetSync",
@@ -881,7 +879,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Do all the targets of a team reappear/repair at the same time?",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"treasureKillTeam",
@@ -891,7 +889,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Do team members die when their treasure is destroyed?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"treasureCollisionDestroys",
@@ -901,7 +899,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Are balls destroyed when a player touches it?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"treasureCollisionMayKill",
@@ -911,7 +909,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Does a ball kill a player when the player touches it unshielded?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"wreckageCollisionMayKill",
@@ -921,7 +919,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Can ships be destroyed when hit by wreckage?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"timing",
@@ -931,7 +929,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Is the map a race mode map?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"edgeWrap",
@@ -941,7 +939,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Wrap around edges.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"gravityPoint",
@@ -952,7 +950,7 @@ static optionDesc options[] = {
 	tuner_none,
 	"If the gravity is a point source where does that gravity originate?\n"
 	"Specify the point int the form: x,y.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"gravityAngle",
@@ -962,7 +960,7 @@ static optionDesc options[] = {
 	valReal,
 	tuner_none,
 	"If gravity is along a uniform line, at what angle is that line?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"gravityPointSource",
@@ -972,7 +970,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Is gravity originating from a single point?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"gravityClockwise",
@@ -982,7 +980,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"If the gravity is a point source, is it clockwise?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"gravityAnticlockwise",
@@ -992,7 +990,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"If the gravity is a point source, is it anticlockwise?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"gravityVisible",
@@ -1002,7 +1000,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Are gravity mapsymbols visible to players?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"wormholeVisible",
@@ -1012,7 +1010,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Are wormhole mapsymbols visible to players?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"itemConcentratorVisible",
@@ -1022,7 +1020,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Are itemconcentrator mapsymbols visible to players?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"wormTime",
@@ -1032,7 +1030,7 @@ static optionDesc options[] = {
 	valSec,
 	tuner_none,
 	"Number of seconds wormholes will remain stable.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"defaultsFileName",
@@ -1042,7 +1040,7 @@ static optionDesc options[] = {
 	valString,
 	tuner_none,
 	"The filename of the defaults file to read on startup.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"framesPerSecond",
@@ -1052,7 +1050,7 @@ static optionDesc options[] = {
 	valInt,
 	tuner_none,
 	"The number of frames per second the server should strive for.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"allowSmartMissiles",
@@ -1062,7 +1060,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Should smart missiles be allowed?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"allowHeatSeekers",
@@ -1072,7 +1070,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Should heatseekers be allowed?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"allowTorpedoes",
@@ -1082,7 +1080,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Should torpedoes be allowed?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"allowNukes",
@@ -1092,7 +1090,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Should nuclear weapons be allowed?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"allowClusters",
@@ -1102,7 +1100,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Should cluster weapons be allowed?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"allowModifiers",
@@ -1112,7 +1110,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Should the weapon modifiers be allowed?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"allowLaserModifiers",
@@ -1122,7 +1120,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Can lasers be modified to be a different weapon?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"allowShipShapes",
@@ -1132,7 +1130,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Are players allowed to define their own ship shape?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"playersOnRadar",
@@ -1142,7 +1140,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Are players visible on the radar.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"missilesOnRadar",
@@ -1152,7 +1150,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Are missiles visible on the radar.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"minesOnRadar",
@@ -1162,7 +1160,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Are mines visible on the radar.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"nukesOnRadar",
@@ -1172,7 +1170,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Are nukes visible or highlighted on the radar.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"treasuresOnRadar",
@@ -1182,7 +1180,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Are treasure balls visible or highlighted on the radar.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"distinguishMissiles",
@@ -1192,7 +1190,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Are different types of missiles distinguished (by length).\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxMissilesPerPack",
@@ -1202,7 +1200,7 @@ static optionDesc options[] = {
 	valInt,
 	Tune_item_packs,
 	"The number of missiles gotten by picking up one missile item.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxMinesPerPack",
@@ -1212,7 +1210,7 @@ static optionDesc options[] = {
 	valInt,
 	Tune_item_packs,
 	"The number of mines gotten by picking up one mine item.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"identifyMines",
@@ -1222,7 +1220,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Are mine owner's names displayed.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"shieldedItemPickup",
@@ -1232,7 +1230,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Can items be picked up while shields are up?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"shieldedMining",
@@ -1242,7 +1240,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Can mines be thrown and placed while shields are up?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"laserIsStunGun",
@@ -1252,7 +1250,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Is the laser weapon a stun gun weapon?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"nukeMinSmarts",
@@ -1262,7 +1260,7 @@ static optionDesc options[] = {
 	valInt,
 	tuner_dummy,
 	"The minimum number of missiles needed to fire one nuclear missile.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"nukeMinMines",
@@ -1272,7 +1270,7 @@ static optionDesc options[] = {
 	valInt,
 	tuner_dummy,
 	"The minimum number of mines needed to make a nuclear mine.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"nukeClusterDamage",
@@ -1284,7 +1282,7 @@ static optionDesc options[] = {
 	"How much each cluster debris does damage wise from a nuke mine.\n"
 	"This helps to reduce the number of particles caused by nuclear mine\n"
 	"explosions, which improves server response time for such explosions.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"mineFuseTime",
@@ -1294,7 +1292,7 @@ static optionDesc options[] = {
 	valSec,
 	tuner_dummy,
 	"Time after which owned mines become deadly, zero means never.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"mineLife",
@@ -1304,7 +1302,7 @@ static optionDesc options[] = {
 	valInt,
 	tuner_none,
 	"Life of mines in ticks, zero means use default.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"missileLife",
@@ -1314,7 +1312,7 @@ static optionDesc options[] = {
 	valInt,
 	tuner_none,
 	"Life of missiles in ticks, zero means use default.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"baseMineRange",
@@ -1324,7 +1322,7 @@ static optionDesc options[] = {
 	valInt,
 	tuner_dummy,
 	"Range within which mines/bombs are not allowed.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"shotKillScoreMult",
@@ -1334,7 +1332,7 @@ static optionDesc options[] = {
 	valReal,
 	tuner_none,
 	"Multiplication factor to scale score for shot kills.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
         "torpedoKillScoreMult",
@@ -1344,7 +1342,7 @@ static optionDesc options[] = {
         valReal,
         tuner_none,
         "Multiplication factor to scale score for torpedo kills.\n",
-		MAP(NULL)
+		OPT_ANY
     },
     {
         "smartKillScoreMult",
@@ -1354,7 +1352,7 @@ static optionDesc options[] = {
         valReal,
         tuner_none,
         "Multiplication factor to scale score for smart missile kills.\n",
-		MAP(NULL)
+		OPT_ANY
     },
     {
         "heatKillScoreMult",
@@ -1364,7 +1362,7 @@ static optionDesc options[] = {
         valReal,
         tuner_none,
         "Multiplication factor to scale score for heatseeker kills.\n",
-		MAP(NULL)
+		OPT_ANY
     },
     {
         "clusterKillScoreMult",
@@ -1374,7 +1372,7 @@ static optionDesc options[] = {
         valReal,
         tuner_none,
         "Multiplication factor to scale score for cluster debris kills.\n",
-		MAP(NULL)
+		OPT_ANY
     },
     {
         "laserKillScoreMult",
@@ -1384,7 +1382,7 @@ static optionDesc options[] = {
         valReal,
         tuner_none,
         "Multiplication factor to scale score for laser kills.\n",
-		MAP(NULL)
+		OPT_ANY
     },
     {
         "tankKillScoreMult",
@@ -1394,7 +1392,7 @@ static optionDesc options[] = {
         valReal,
         tuner_none,
         "Multiplication factor to scale score for tank kills.\n",
-		MAP(NULL)
+		OPT_ANY
     },
     {
         "runoverKillScoreMult",
@@ -1404,7 +1402,7 @@ static optionDesc options[] = {
         valReal,
         tuner_none,
         "Multiplication factor to scale score for player runovers.\n",
-		MAP(NULL)
+		OPT_ANY
     },
     {
         "ballKillScoreMult",
@@ -1414,7 +1412,7 @@ static optionDesc options[] = {
         valReal,
         tuner_none,
         "Multiplication factor to scale score for ball kills.\n",
-		MAP(NULL)
+		OPT_ANY
     },
     {
         "explosionKillScoreMult",
@@ -1424,7 +1422,7 @@ static optionDesc options[] = {
         valReal,
         tuner_none,
         "Multiplication factor to scale score for explosion kills.\n",
-		MAP(NULL)
+		OPT_ANY
     },
     {
         "shoveKillScoreMult",
@@ -1434,7 +1432,7 @@ static optionDesc options[] = {
         valReal,
         tuner_none,
         "Multiplication factor to scale score for shove kills.\n",
-		MAP(NULL)
+		OPT_ANY
     },
     {
         "crashScoreMult",
@@ -1444,7 +1442,7 @@ static optionDesc options[] = {
         valReal,
         tuner_none,
         "Multiplication factor to scale score for player crashes.\n",
-		MAP(NULL)
+		OPT_ANY
     },
     {
         "mineScoreMult",
@@ -1454,7 +1452,7 @@ static optionDesc options[] = {
         valReal,
         tuner_none,
         "Multiplication factor to scale score for mine hits.\n",
-		MAP(NULL)
+		OPT_ANY
     },
     {
 	"movingItemProb",
@@ -1464,7 +1462,7 @@ static optionDesc options[] = {
 	valReal,
 	Set_misc_item_limits,
 	"Probability for an item to appear as moving.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"dropItemOnKillProb",
@@ -1474,7 +1472,7 @@ static optionDesc options[] = {
 	valReal,
 	Set_misc_item_limits,
 	"Probability for dropping an item (each item) when you are killed.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"detonateItemOnKillProb",
@@ -1484,7 +1482,7 @@ static optionDesc options[] = {
 	valReal,
 	Set_misc_item_limits,
 	"Probability for undropped items to detonate when you are killed.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"destroyItemInCollisionProb",
@@ -1494,7 +1492,7 @@ static optionDesc options[] = {
 	valReal,
 	Set_misc_item_limits,
 	"Probability for items (some items) to be destroyed in a collision.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"itemProbMult",
@@ -1504,7 +1502,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Item Probability Multiplication Factor scales all item probabilities.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"cannonItemProbMult",
@@ -1514,7 +1512,7 @@ static optionDesc options[] = {
 	valReal,
 	tuner_none,
 	"Average number of items a cannon gets per minute.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxItemDensity",
@@ -1524,7 +1522,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Maximum density [0.0-1.0] for items (max items per block).\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"itemConcentratorRadius",
@@ -1540,7 +1538,7 @@ static optionDesc options[] = {
 	"with probability itemConcentratorProb and anywhere the remainder of the time.\n"
 	"An item concentrator is drawn on screen as three rotating triangles.\n"
 	"The map symbol is the percentage symbol '%'.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"itemConcentratorProb",
@@ -1552,7 +1550,7 @@ static optionDesc options[] = {
 	"The probability, if any item concentrators are present, that they will be\n"
 	"used.  This proportion of items will be placed near item concentrators,\n"
 	"within itemConcentratorRadius.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"rogueHeatProb",
@@ -1562,7 +1560,7 @@ static optionDesc options[] = {
 	valReal,
 	tuner_dummy,
 	"Probability that unclaimed missile packs will go rogue.",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"rogueMineProb",
@@ -1572,7 +1570,7 @@ static optionDesc options[] = {
 	valReal,
 	tuner_dummy,
 	"Probability that unclaimed mine items will activate.",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"itemEnergyPackProb",
@@ -1582,7 +1580,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for an energy pack to appear.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"itemTankProb",
@@ -1592,7 +1590,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for an extra tank to appear.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"itemECMProb",
@@ -1602,7 +1600,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for an ECM item to appear.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"itemArmorProb",
@@ -1612,7 +1610,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for an armor item to appear.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"itemMineProb",
@@ -1622,7 +1620,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for a mine item to appear.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"itemMissileProb",
@@ -1632,7 +1630,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for a missile item to appear.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"itemCloakProb",
@@ -1642,7 +1640,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for a cloak item to appear.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"itemSensorProb",
@@ -1652,7 +1650,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for a sensor item to appear.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"itemWideangleProb",
@@ -1662,7 +1660,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for a wideangle item to appear.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"itemRearshotProb",
@@ -1672,7 +1670,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for a rearshot item to appear.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"itemAfterburnerProb",
@@ -1682,7 +1680,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for an afterburner item to appear.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"itemTransporterProb",
@@ -1692,7 +1690,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for a transporter item to appear.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"itemMirrorProb",
@@ -1702,7 +1700,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for a mirror item to appear.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"itemDeflectorProb",
@@ -1712,7 +1710,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for a deflector item to appear.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"itemHyperJumpProb",
@@ -1722,7 +1720,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for a hyperjump item to appear.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"itemPhasingProb",
@@ -1732,7 +1730,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for a phasing item to appear.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"itemLaserProb",
@@ -1742,7 +1740,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for a Laser item to appear.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"itemEmergencyThrustProb",
@@ -1752,7 +1750,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for an Emergency Thrust item to appear.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"itemTractorBeamProb",
@@ -1762,7 +1760,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for a Tractor Beam item to appear.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"itemAutopilotProb",
@@ -1772,7 +1770,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for an Autopilot item to appear.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"itemEmergencyShieldProb",
@@ -1782,7 +1780,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for an Emergency Shield item to appear.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"initialFuel",
@@ -1792,7 +1790,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How much fuel players start with, or the minimum after being killed.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"initialTanks",
@@ -1802,7 +1800,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many tanks players start with.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"initialECMs",
@@ -1812,7 +1810,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many ECMs players start with.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"initialArmor",
@@ -1822,7 +1820,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How much armor players start with.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"initialMines",
@@ -1832,7 +1830,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many mines players start with.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"initialMissiles",
@@ -1842,7 +1840,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many missiles players start with.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"initialCloaks",
@@ -1852,7 +1850,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many cloaks players start with.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"initialSensors",
@@ -1862,7 +1860,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many sensors players start with.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"initialWideangles",
@@ -1872,7 +1870,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many wideangles players start with.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"initialRearshots",
@@ -1882,7 +1880,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many rearshots players start with.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"initialAfterburners",
@@ -1892,7 +1890,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many afterburners players start with.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"initialTransporters",
@@ -1902,7 +1900,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many transporters players start with.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"initialMirrors",
@@ -1912,7 +1910,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many mirrors players start with.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxArmor",
@@ -1922,7 +1920,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the amount of armor per player.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"initialDeflectors",
@@ -1932,7 +1930,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many deflectors players start with.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"initialHyperJumps",
@@ -1942,7 +1940,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many hyperjumps players start with.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"initialPhasings",
@@ -1952,7 +1950,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many phasing devices players start with.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"initialLasers",
@@ -1962,7 +1960,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many lasers players start with.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"initialEmergencyThrusts",
@@ -1972,7 +1970,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many emergency thrusts players start with.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"initialTractorBeams",
@@ -1982,7 +1980,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many tractor/pressor beams players start with.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"initialAutopilots",
@@ -1992,7 +1990,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many autopilots players start with.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"initialEmergencyShields",
@@ -2002,7 +2000,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many emergency shields players start with.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxFuel",
@@ -2012,7 +2010,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the amount of fuel per player.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxTanks",
@@ -2022,7 +2020,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of tanks per player.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxECMs",
@@ -2032,7 +2030,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of ECMs per player.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxMines",
@@ -2042,7 +2040,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of mines per player.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxMissiles",
@@ -2052,7 +2050,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of missiles per player.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxCloaks",
@@ -2062,7 +2060,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of cloaks per player.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxSensors",
@@ -2072,7 +2070,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of sensors per player.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxWideangles",
@@ -2082,7 +2080,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of wides per player.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxRearshots",
@@ -2092,7 +2090,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of rearshots per player.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxAfterburners",
@@ -2102,7 +2100,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of afterburners per player.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxTransporters",
@@ -2112,7 +2110,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of transporters per player.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxMirrors",
@@ -2122,7 +2120,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of mirrors per player.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxDeflectors",
@@ -2132,7 +2130,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of deflectors per player.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxPhasings",
@@ -2142,7 +2140,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of phasing devices per players.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxHyperJumps",
@@ -2152,7 +2150,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of hyperjumps per player.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxEmergencyThrusts",
@@ -2162,7 +2160,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of emergency thrusts per player.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxLasers",
@@ -2172,7 +2170,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of lasers per player.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxTractorBeams",
@@ -2182,7 +2180,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of tractorbeams per player.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxAutopilots",
@@ -2192,7 +2190,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of autopilots per player.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxEmergencyShields",
@@ -2202,7 +2200,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of emergency shields per player.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"gameDuration",
@@ -2212,7 +2210,7 @@ static optionDesc options[] = {
 	valReal,
 	tuner_none,
 	"The duration of the game in minutes (aka. pizza mode).\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"allowViewing",
@@ -2222,7 +2220,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Do players get a full framerate while they're paused or waiting?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"friction",
@@ -2232,7 +2230,7 @@ static optionDesc options[] = {
 	valReal,
 	tuner_dummy,
 	"Fraction of velocity ship loses each frame.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"checkpointRadius",
@@ -2242,7 +2240,7 @@ static optionDesc options[] = {
 	valReal,
 	tuner_dummy,
 	"How close you have to be to a checkpoint to register - in blocks.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"raceLaps",
@@ -2252,7 +2250,7 @@ static optionDesc options[] = {
 	valInt,
 	tuner_none,
 	"How many laps a race is run over.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"lockOtherTeam",
@@ -2262,7 +2260,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Can you watch opposing players when rest of your team is still alive?\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"loseItemDestroys",
@@ -2272,7 +2270,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Destroy item that player drops. Otherwise drop it.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"roundDelay",
@@ -2282,7 +2280,7 @@ static optionDesc options[] = {
 	valInt,
 	tuner_dummy,
 	"Delay before start of each round, in seconds.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"maxRoundTime",
@@ -2292,7 +2290,7 @@ static optionDesc options[] = {
 	valInt,
 	tuner_dummy,
 	"The maximum duration of each round, in seconds.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"pLockServer",
@@ -2306,7 +2304,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_plock,
 	"Whether the server is prevented from being swapped out of memory.\n",
-	MAP("General")
+	OPT_CMDLINE
     },
     {
 	"timerResolution",
@@ -2318,7 +2316,7 @@ static optionDesc options[] = {
 	"If set to nonzero, xpilots requests signals from the OS at\n"
 	"1/timerResolution second intervals. Server will then compute a new\n"
 	"frame FPS times out of every timerResolution signals.\n",
-	MAP(NULL)
+	OPT_CMDLINE
     },
     {
 	"password",
@@ -2328,7 +2326,7 @@ static optionDesc options[] = {
 	valString,
 	tuner_dummy,
 	"The password neded to get operator privileges.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"numberOfRounds",
@@ -2338,7 +2336,7 @@ static optionDesc options[] = {
 	valInt,
 	tuner_dummy,
 	"The number of rounds to play. If 0, unlimited.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"playerLimit",
@@ -2349,7 +2347,7 @@ static optionDesc options[] = {
 	tuner_dummy,
 	"Allow only (number of bases)-playerLimit players to enter.\n"
 	"This option will probably change in future versions.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"recordMode",
@@ -2358,8 +2356,13 @@ static optionDesc options[] = {
 	&recordMode,
 	valInt,
 	Init_recording,
-	"If some makes this work reliably, change this description.\n",
-	MAP(NULL)
+	"If this is set to 1 when the server starts, the game is saved\n"
+	"in the file specified by recordFileName. If set to 2 at startup,\n"
+	"the server replays the recorded game. Joining players are\n"
+	"spectators who can watch the recorded game from anyone's\n"
+	"viewpoint. Can be set to 0 in the middle of a game to stop"
+	"recording.\n",
+	OPT_CMDLINE
     },
     {
 	"constantScoring",
@@ -2369,7 +2372,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Whether the scores given from various things are fixed.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"elimination",
@@ -2379,7 +2382,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Race mode where the last player drops out each lap.\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"dataURL",
@@ -2389,7 +2392,7 @@ static optionDesc options[] = {
 	valString,
 	tuner_dummy,
 	"URL where the client can get extra data for this map\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"clientPortStart",
@@ -2399,7 +2402,7 @@ static optionDesc options[] = {
 	valInt,
 	tuner_dummy,
 	"Use UDP ports clientPortStart - clientPortEnd (for firewalls)\n",
-	MAP(NULL)
+	OPT_ANY
     },
     {
 	"clientPortEnd",
@@ -2409,7 +2412,17 @@ static optionDesc options[] = {
 	valInt,
 	tuner_dummy,
 	"Use UDP ports clientPortStart - clientPortEnd (for firewalls)\n",
-	MAP(NULL)
+	OPT_ANY
+    },
+    {
+	"recordFileName",
+	"recordFile",
+	NULL,
+	&recordFileName,
+	valString,
+	tuner_none,
+	"Name of the file where server recordings are saved.\n",
+	OPT_CMDLINE
     }
 };
 
@@ -2457,63 +2470,6 @@ static void Parse_help(char *progname)
 "    Please refer to the manual pages, xpilots(6) and xpilot(6),\n"
 "    for more specific help.\n"
 	  );
-}
-
-static void Parse_dump_mapedit(char *progname)
-{
-    int			j;
-
-    xpprintf("# mapeditor value table\n");
-    xpprintf("# Generated for xpilot version %s\n", TITLE);
-    for (j = 0; j < NELEM(options); j++) {
-	if (options[j].type != valVoid) {
-	    if (options[j].mapperPos) {
-		xpprintf("$$\n");
-		xpprintf("%s\n%s\n%s\n%d\n%s\n",
-			options[j].name,
-			options[j].mapperPos,
-			options[j].commandLineOption,
-			options[j].type,
-			options[j].defaultValue
-			);
-	    }
-	}
-    }
-    xpprintf("\n");
-}
-
-static void Parse_dump_man(char *progname)
-{
-    int			j;
-
-    for (j = 0; j < NELEM(options); j++) {
-	if (options[j].type != valVoid) {
-	    int len = strlen(options[j].name);
-	    xpprintf("%s:%*s%s\n", options[j].name,
-		   (len < 40) ? (40 - len) : 1, "",
-		   (options[j].defaultValue != NULL)
-		       ? options[j].defaultValue
-		       : "");
-	}
-    }
-    xpprintf("\n");
-}
-
-static void Parse_dump_windows(char *progname)
-{
-    int			j;
-
-    for (j = 0; j < NELEM(options); j++) {
-	if (options[j].type != valVoid) {
-	    int len = strlen(options[j].name);
-	    xpprintf("%s:%*s%s\n", options[j].name,
-		   (len < 40) ? (40 - len) : 1, "",
-		   (options[j].defaultValue != NULL)
-		       ? options[j].defaultValue
-		       : "");
-	}
-    }
-    xpprintf("\n");
 }
 
 static void Parse_dump(char *progname)
@@ -2598,18 +2554,6 @@ int Parser(int argc, char **argv)
 	    Parse_dump(*argv);
 		return(FALSE);
 	}
-	if (strcmp("-dumpMapedit", argv[i]) == 0) {
-	    Parse_dump_mapedit(*argv);
-		return(FALSE);
-	}
-	if (strcmp("-dumpMan", argv[i]) == 0) {
-	    Parse_dump_man(*argv);
-		return(FALSE);
-	}
-	if (strcmp("-dumpWindows", argv[i]) == 0) {
-	    Parse_dump_windows(*argv);
-		return(FALSE);
-	}
 	if (strcmp("-version", argv[i]) == 0 || strcmp("-v", argv[i]) == 0) {
 	    puts(TITLE);
 		return(FALSE);
@@ -2621,9 +2565,11 @@ int Parser(int argc, char **argv)
 		    || !strcasecmp(options[j].name, argv[i] + 1)) {
 		    if (options[j].type == valBool) {
 			if (argv[i][0] == '-')
-			    addOption(options[j].name, "true", 1, NULL);
+			    addOption(options[j].name, "true", 1, NULL,
+				      OPT_CMDLINE);
 			else
-			    addOption(options[j].name, "false", 1, NULL);
+			    addOption(options[j].name, "false", 1, NULL,
+				      OPT_CMDLINE);
 		    } else if (options[j].type == valVoid) {
 				break;
 			} else {
@@ -2633,7 +2579,7 @@ int Parser(int argc, char **argv)
 				  options[j].commandLineOption);
 			} else
 			    addOption(options[j].name,
-				      argv[++i], 1, NULL);
+				      argv[++i], 1, NULL, OPT_CMDLINE);
 		    }
 		    break;
 		}
@@ -2687,7 +2633,8 @@ void cmdhack(void)
 {
     int j;
     for (j = 0; j < NELEM(options); j++)
-	addOption(options[j].name, options[j].defaultValue, 0, &options[j]);
+	addOption(options[j].name, options[j].defaultValue, 0, &options[j],
+		  OPT_DEFAULT);
 }
 
 /*
