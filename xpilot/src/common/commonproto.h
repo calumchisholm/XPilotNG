@@ -33,8 +33,8 @@ extern unsigned int randomMT(void);
 extern double rfrac(void);
 extern int mod(int x, int y);
 extern void Make_table(void);
-extern int ON(char *optval);
-extern int OFF(char *optval);
+extern int ON(const char *optval);
+extern int OFF(const char *optval);
 extern double findDir(double x, double y);
 
 /* strdup.c */
