@@ -110,16 +110,14 @@ static void Repair(int ind)
 bool team_dead(int team)
 {
     int i;
-    bool alive = false;
 
     for (i = 0; i < NumPlayers; i++) {
 	if (Players[i]->team == team &&
 	    BIT(Players[i]->status, PLAYING|GAME_OVER|PAUSE) == PLAYING) {
-	    alive = true;
-	    break;
+	    return false;
 	}
     }
-    return (!alive);
+    return true;
 }
 
 /*
