@@ -44,11 +44,8 @@
 /*******************Mapeditor*************/
 #define IDB_MAPTOOLSTOOLBAR		201
 #define IDB_BLOCKSTOOLBAR		202
-#define IDB_WALLTYPESUBBAR			203
-#define IDB_SHAPESUBBAR			204
-#define IDB_WORMHOLESUBBAR		205
-#define IDB_MAPMODIFYTOOLBAR	206
-#define IDB_POLARITYSUBBAR		207
+#define IDB_WORMHOLESUBBAR		204
+#define IDB_POLARITYSUBBAR		206
 
 #define IDR_MAPEDITORMENU		4001
 #define IDM_NEW					40001
@@ -68,21 +65,19 @@
 #define IDM_EDIT_COPY			40013
 #define IDM_EDIT_PASTE			40014
 #define IDM_CROP				40015
-
-#define IDM_FILLEDWORLD			40016
-#define IDM_TRANSPASTE			40017
 #define IDM_MAPDIR				40018
 #define IDM_SAVEALLPREFS		40019
 
 #define IDM_PROPERTIES			40020
+#define IDM_TYPESEDITOR			40021
 
 #define IDM_REFRESH				40023
 
 /*Buttons...Also correspond to some menu picks*/
 #define IDM_PEN				40100
-#define IDM_MODIFYITEM		40101
+//#define IDM_MODIFYITEM		40101
 #define IDM_ERASE			40102
-#define IDM_SELECT			40103
+//#define IDM_SELECT			40103
 #define IDM_ZOOMIN			40104
 #define IDM_ZOOMOUT			40105
 #define IDM_ROTATE			40106
@@ -96,7 +91,6 @@
 #define IDM_CHECKMAP		40114
 #define IDM_MAPSOURCE		40115
 #define IDM_LAUNCHMAP		40116
-#define IDM_SHAPE			40117
 
 #define IDD_MAPDATA			201			
 #define IDD_MAPDATA2		202
@@ -109,9 +103,20 @@
 #define IDD_SCRMULT			209
 #define IDD_COMMENTS		210
 #define IDD_ABOUT			211
-#define IDD_WILDPARAMS		212
-#define IDD_MAPERRORS		213
 #define IDD_NEWDOCUMENT		214
+#define IDD_TYPESEDITOR		215
+
+/*Controls for the types editor*/
+#define IDC_TYPESELECTOR		50000
+#define IDC_TYPESLISTCONTAINER	50001
+#define IDC_ADDTYPE				50002
+#define IDC_REMOVETYPES			50003
+
+#define IDS_POLYGONTYPE_C1              60001
+#define IDS_POLYGONTYPE_C2              60002
+#define IDS_POLYGONTYPE_C3              60003
+#define IDS_POLYGONTYPE_C4              60004
+#define IDS_POLYGONTYPE_C5              60005
 
 /*Controls for selection in the New Document Dialog*/
 #define IDC_RADIONEWMAPEDITOR		301
@@ -135,5 +140,3 @@
 #define IDC_SHIPNAME	13002
 #define IDC_SHIPAUTHOR	13003
 /**************End Shipeditor*********************/
-
-

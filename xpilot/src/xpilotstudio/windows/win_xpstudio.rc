@@ -61,11 +61,9 @@ END
 //
 
 IDB_BLOCKSTOOLBAR       BITMAP  DISCARDABLE     "res\\blocksbar.bmp"
-IDB_WALLTYPESUBBAR      BITMAP  DISCARDABLE     "res\\walltypesubbar.bmp"
 IDB_WORMHOLESUBBAR      BITMAP  DISCARDABLE     "res\\wormholesubbar.bmp"
 IDB_POLARITYSUBBAR      BITMAP  DISCARDABLE     "res\\polaritysubbar.bmp"
 IDB_MAPTOOLSTOOLBAR     BITMAP  DISCARDABLE     "res\\maptoolsbar.bmp"
-IDB_MAPMODIFYTOOLBAR    BITMAP  DISCARDABLE     "res\\mapmodifybar.bmp"
 IDB_SHIPTOOLSTOOLBAR    BITMAP  DISCARDABLE     "res\\shiptoolsbar.bmp"
 IDB_SHIPSYMSTOOLBAR     BITMAP  DISCARDABLE     "res\\shipsymsbar.bmp"
 IDB_LOGO                BITMAP  DISCARDABLE     "res\\win_logo.bmp"
@@ -78,6 +76,7 @@ IDB_LOGO                BITMAP  DISCARDABLE     "res\\win_logo.bmp"
 IDR_ACCELERATOR ACCELERATORS DISCARDABLE 
 BEGIN
     "C",            IDM_EDIT_COPY,          VIRTKEY, CONTROL, NOINVERT
+    "T",            IDM_TYPESEDITOR,        VIRTKEY, CONTROL, NOINVERT
     "V",            IDM_EDIT_PASTE,         VIRTKEY, CONTROL, NOINVERT
     VK_DELETE,      IDM_DELETEITEM,         VIRTKEY, NOINVERT
     VK_F1,          IDM_HELP,               VIRTKEY, NOINVERT
@@ -122,7 +121,7 @@ BEGIN
         MENUITEM "&Open...",                    IDM_OPEN
         MENUITEM "&Close",                      IDM_CLOSE, GRAYED
         MENUITEM SEPARATOR
-        MENUITEM "&Create Random Map...",       IDM_WILDMAP, GRAYED
+        MENUITEM "&Run Map Generator...",       IDM_WILDMAP, GRAYED
         MENUITEM SEPARATOR
         MENUITEM "&Save",                       IDM_SAVE
         MENUITEM "Save &As...",                 IDM_SAVEAS
@@ -158,11 +157,10 @@ BEGIN
         MENUITEM "Adjust &Down\tF8",            IDM_CYCLEVNEG, GRAYED
         MENUITEM "View Source\tF10",            IDM_MAPSOURCE, GRAYED
         MENUITEM "L&aunch Map\tF11",            IDM_LAUNCHMAP, GRAYED
+        MENUITEM "T&ypes Editor\tCtrl+T",       IDM_TYPESEDITOR
     END
     POPUP "&Settings"
     BEGIN
-        MENUITEM "Filled &World",               IDM_FILLEDWORLD, GRAYED
-        MENUITEM "Transparent &Paste",          IDM_TRANSPASTE, GRAYED
         MENUITEM "&Directories && Commands...", IDM_MAPDIR, GRAYED
         MENUITEM "Store &All Prefs When Saving", IDM_SAVEALLPREFS, GRAYED
     END
@@ -233,7 +231,7 @@ IDI_MAINICON            ICON    DISCARDABLE     "res\\mainicon.ico"
 IDD_SCRMULT DIALOGEX 0, 0, 382, 151
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Scoring Options"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     EDITTEXT        IDC_SHOTKILLSCOREMULT,92,0,60,12,ES_RIGHT | 
                     ES_AUTOHSCROLL,WS_EX_STATICEDGE
@@ -576,7 +574,7 @@ END
 IDD_MAPDATA5 DIALOGEX 0, 0, 382, 151
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Rounds, Connection opts..."
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     EDITTEXT        IDC_MAXROUNDTIME,65,17,59,12,ES_RIGHT | ES_AUTOHSCROLL | 
                     ES_NUMBER,WS_EX_STATICEDGE
@@ -1033,6 +1031,18 @@ BEGIN
     CONTROL         1002,IDC_STATIC,"Static",SS_BITMAP,78,7,171,137
 END
 
+IDD_TYPESEDITOR DIALOG DISCARDABLE  0, 0, 289, 170
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Edge,  Polygon, Bitmap Types"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "List1",IDC_TYPESLISTCONTAINER,"SysListView32",
+                    LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,29,
+                    275,134
+    COMBOBOX        IDC_TYPESELECTOR,7,7,70,62,CBS_DROPDOWNLIST | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1146,8 +1156,31 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 168
     END
+
+    IDD_TYPESEDITOR, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 282
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 163
+    END
 END
 #endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_POLYGONTYPE_C1      "ID"
+    IDS_POLYGONTYPE_C2      "COLOR"
+    IDS_POLYGONTYPE_C3      "DEF EDGE ID"
+    IDS_POLYGONTYPE_C4      "FLAGS"
+    IDS_POLYGONTYPE_C5      "TEXTURE"
+END
 
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////

@@ -70,7 +70,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /Ze /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
+# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
@@ -119,6 +119,10 @@ SOURCE=..\map.c
 # Begin Source File
 
 SOURCE=..\map_file.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\polygon.c
 # End Source File
 # Begin Source File
 
@@ -218,10 +222,6 @@ SOURCE=.\res\mainicon.ico
 # End Source File
 # Begin Source File
 
-SOURCE=.\res\mapmodifybar.bmp
-# End Source File
-# Begin Source File
-
 SOURCE=.\res\maptoolsbar.bmp
 # End Source File
 # Begin Source File
@@ -230,19 +230,11 @@ SOURCE=.\res\polaritysubbar.bmp
 # End Source File
 # Begin Source File
 
-SOURCE=.\res\shapesubbar.bmp
-# End Source File
-# Begin Source File
-
 SOURCE=.\res\shipsymsbar.bmp
 # End Source File
 # Begin Source File
 
 SOURCE=.\res\shiptoolsbar.bmp
-# End Source File
-# Begin Source File
-
-SOURCE=.\res\walltypesubbar.bmp
 # End Source File
 # Begin Source File
 

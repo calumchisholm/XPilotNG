@@ -25,7 +25,10 @@
 
 extern HINSTANCE hInst;
 DWORD dwChildStyle = WS_CHILD | WS_VISIBLE | WS_BORDER | WS_CAPTION ;
-
+#define C_COLUMNS 5 
+typedef struct myitem_tag {
+    LPSTR aCols[C_COLUMNS];
+ } MYITEM; 
 
 /***************************************************************************/
 /* PropSheetProc                                                           */
@@ -66,7 +69,7 @@ int CALLBACK PropSheetProc (HWND hwhndDlg, UINT uMsg, LPARAM lParam)
 /***************************************************************************/
 BOOL CreatePropertySheet (HWND hwndParent)
 {
-	int i, numsheets = 9;
+	int i, numsheets = 11;
 	int a[9] = {IDD_MAPDATA,
 		IDD_MAPDATA2,
 		IDD_MAPDATA3,
@@ -78,7 +81,7 @@ BOOL CreatePropertySheet (HWND hwndParent)
 		IDD_SCRMULT
 	};
 	PROPSHEETHEADER pshead ;
-	PROPSHEETPAGE   pspage[10] ;
+	PROPSHEETPAGE   pspage[11] ;
 
 
 	
@@ -97,9 +100,9 @@ BOOL CreatePropertySheet (HWND hwndParent)
 	pshead.pfnCallback = PropSheetProc ;
 	
 	// Zero out property PAGE data
-	ZeroMemory (&pspage, (numsheets+1) * sizeof (PROPSHEETPAGE)) ;
+	ZeroMemory (&pspage, numsheets * sizeof (PROPSHEETPAGE)) ;
 
-	for (i = 0; i < numsheets; i++)
+	for (i = 0; i < numsheets-2; i++)
 	{
 		pspage[i].dwSize      = sizeof (PROPSHEETPAGE) ;
 		pspage[i].dwFlags     = PSP_USECALLBACK | PSP_USEICONID ;
@@ -109,14 +112,25 @@ BOOL CreatePropertySheet (HWND hwndParent)
 		pspage[i].lParam      = (LPARAM) &dwChildStyle ;
 		pspage[i].pfnCallback = PrefsPageProc ;
 	}
+	//Types page
+	pspage[i].dwSize      = sizeof (PROPSHEETPAGE) ;
+	pspage[i].dwFlags     = PSP_USECALLBACK | PSP_USEICONID ;
+	pspage[i].hInstance   = hInst ;
+	pspage[i].pszTemplate = MAKEINTRESOURCE (IDD_TYPESEDITOR) ;
+	pspage[i].pfnDlgProc  = PrefsTypesDlgProc ;
+	pspage[i].lParam      = (LPARAM) &dwChildStyle ;
+	pspage[i].pfnCallback = PrefsPageProc ;	
+	i++;
+	
 	//Comments page
-	pspage[numsheets].dwSize      = sizeof (PROPSHEETPAGE) ;
-	pspage[numsheets].dwFlags     = PSP_USECALLBACK | PSP_USEICONID ;
-	pspage[numsheets].hInstance   = hInst ;
-	pspage[numsheets].pszTemplate = MAKEINTRESOURCE (IDD_COMMENTS) ;
-	pspage[numsheets].pfnDlgProc  = PrefsCommentsDlgProc ;
-	pspage[numsheets].lParam      = (LPARAM) &dwChildStyle ;
-	pspage[numsheets].pfnCallback = PrefsPageProc ;	
+	pspage[i].dwSize      = sizeof (PROPSHEETPAGE) ;
+	pspage[i].dwFlags     = PSP_USECALLBACK | PSP_USEICONID ;
+	pspage[i].hInstance   = hInst ;
+	pspage[i].pszTemplate = MAKEINTRESOURCE (IDD_COMMENTS) ;
+	pspage[i].pfnDlgProc  = PrefsCommentsDlgProc ;
+	pspage[i].lParam      = (LPARAM) &dwChildStyle ;
+	pspage[i].pfnCallback = PrefsPageProc ;	
+	
 	
 	return PropertySheet (&pshead) ;
 }
@@ -381,3 +395,135 @@ PrefsCommentsDlgProc (HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 		return FALSE ;
 	}
 }
+/***************************************************************************/
+/* PrefsTypesDlgProc                                                       */
+/* Arguments :                                                             */
+/*    hDlg                                                                 */
+/*    iMsg                                                                 */
+/*    wParam                                                               */
+/*    lParam                                                               */
+/* Purpose :   The procedure for the types editing dialog box              */
+/***************************************************************************/
+BOOL CALLBACK PrefsTypesDlgProc(HWND hwndDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
+{
+	LPXPSTUDIODOCUMENT lpXpStudioDocument;
+	LPMAPDOCUMENT lpMapDocument ;
+	int n;
+
+	switch(iMsg)
+	{
+	case WM_INITDIALOG :
+		lpXpStudioDocument = (LPXPSTUDIODOCUMENT) GetWindowLong (hwndActive, GWL_USERDATA);
+		lpMapDocument = lpXpStudioDocument->lpMapDocument;
+		
+		ComboBox_AddString(GetDlgItem (hwndDlg, IDC_TYPESELECTOR), "Edges\0");
+		ComboBox_AddString(GetDlgItem (hwndDlg, IDC_TYPESELECTOR), "Polygons\0");
+		
+		ComboBox_SetCurSel(GetDlgItem (hwndDlg, IDC_TYPESELECTOR), 0);
+		
+		InitListViewColumns(GetDlgItem (hwndDlg, IDC_TYPESLISTCONTAINER), 0);   
+		InitListViewItems(GetDlgItem (hwndDlg, IDC_TYPESLISTCONTAINER), lpMapDocument, 0);
+		//IDC_TYPESLISTCONTAINER
+		return TRUE;
+	case WM_COMMAND :
+		lpXpStudioDocument = (LPXPSTUDIODOCUMENT) GetWindowLong (hwndActive, GWL_USERDATA);
+		lpMapDocument = lpXpStudioDocument->lpMapDocument;
+		switch (HIWORD(wParam))
+		{
+		case CBN_SELCHANGE:
+			n = ComboBox_GetCurSel(GetDlgItem (hwndDlg, IDC_TYPESELECTOR));
+			InitListViewColumns(GetDlgItem (hwndDlg, IDC_TYPESLISTCONTAINER), n);   
+			InitListViewItems(GetDlgItem (hwndDlg, IDC_TYPESLISTCONTAINER), lpMapDocument, n);
+			return TRUE ;
+		}
+		return TRUE;
+	}
+	return FALSE;
+}
+
+
+// InitListViewColumns - adds columns to a list view control. 
+// Returns TRUE if successful, or FALSE otherwise. 
+// hwndLV - handle to the list view control. 
+BOOL WINAPI InitListViewColumns(HWND hwndLV, int vtype)
+{ 
+
+	char g_achTemp[256];     // temporary buffer
+	LVCOLUMN lvc; 
+    int iCol;
+
+	for (iCol = C_COLUMNS-1; iCol >= 0; iCol--) {
+		ListView_DeleteColumn(hwndLV, iCol);
+	}
+	// Initialize the LVCOLUMN structure. 
+    lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM; 
+    lvc.fmt = LVCFMT_LEFT;
+	lvc.cx = 100;
+	lvc.pszText = g_achTemp;  
+    // Add the columns.
+	for (iCol = 0; iCol < C_COLUMNS; iCol++) { 
+        lvc.iSubItem = iCol; 
+//		switch (vtype)
+//		{
+//			case //HERE
+        LoadString(hInst, IDS_POLYGONTYPE_C1 + iCol, 
+                g_achTemp, sizeof(g_achTemp)); 
+//		}
+        if (ListView_InsertColumn(hwndLV, iCol, &lvc) == -1) 
+            return FALSE;
+	}
+	return TRUE; 
+}  
+
+BOOL WINAPI InitListViewItems(HWND hwndLV, LPMAPDOCUMENT lpMapDocument,
+							  int vtype)
+{ 
+	LVITEM lvi;
+	int i = 0, iSubItem;
+	//char tmpColor[64];
+	//char tmp
+	
+	// Initialize LVITEM members that are common to all items. 
+    lvi.mask = LVIF_TEXT | LVIF_PARAM | LVIF_STATE | LVIF_IMAGE; 
+    lvi.state = 0;
+	lvi.stateMask = 0; 
+    lvi.pszText = LPSTR_TEXTCALLBACK;   // app. maintains text 
+    lvi.iImage = 0;                     
+
+	for (i = 0; lpMapDocument->MapGeometry.pstyles[i].id[0] != '\0'; i++)
+	{
+		// Allocate an application-defined structure to store the 
+        // item label and the text of each subitem. 
+        MYITEM *pItem = LocalAlloc(LPTR, sizeof(MYITEM));
+		pItem->aCols[0] = lpMapDocument->MapGeometry.pstyles[i].id;
+
+		for (iSubItem = 1; iSubItem < C_COLUMNS; iSubItem++)
+		{
+		pItem->aCols[iSubItem] = DupString("jlm2\0");
+        }  
+
+//		pItem->aCols[0] = DupString(lpMapDocument->MapGeometry.pstyles[i].id);
+//		pItem->aCols[1] = lpMapDocument->MapGeometry.pstyles[i].color;
+//		pItem->aCols[1] = DupString(lpMapDocument->MapGeometry.estyles[lpMapDocument->MapGeometry.pstyles[i].defedge_id].id);
+//		pItem->aCols[3] = lpMapDocument->MapGeometry.pstyles[i].flags;
+
+        
+		// Initialize item-specific LVITEM members.
+		lvi.iItem = i; 
+        lvi.iSubItem = 0;
+//		lvi.pszText = lpMapDocument->MapGeometry.pstyles[i].id;
+		lvi.lParam = (LPARAM) pItem;    // item data  
+        // Add the item.
+		ListView_InsertItem(hwndLV, &lvi); 
+	}
+	return FALSE;
+}  
+LPSTR DupString(LPSTR lpsz)
+{
+	int cb = lstrlen(lpsz) + 1; 
+	
+    LPSTR lpszNew = LocalAlloc(LMEM_FIXED, cb);
+	if (lpszNew != NULL) 
+        CopyMemory(lpszNew, lpsz, cb);
+	return lpszNew;
+}  

@@ -85,7 +85,6 @@ HFONT GetZoomFont(HDC hdc, LPMAPDOCUMENT lpMapDocument)
 /***************************************************************************/
 void DeleteZoomFont(HDC hdc, HFONT gotoFont)
 {
-
 	SetTextColor(hdc, RGB(0,0,0));
 	SetBkMode(hdc, OPAQUE);
 	DeleteObject(SelectObject(hdc, gotoFont));

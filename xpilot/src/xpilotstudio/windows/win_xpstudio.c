@@ -42,7 +42,6 @@ HWND hwndMapToolsToolBar = NULL;
 HWND hwndShapeToolBar = NULL;
 HWND hwndWormholeToolBar = NULL;
 HWND hwndPolarityToolBar = NULL;
-HWND hwndWallTypeToolBar = NULL;
 HWND hwndMapModifyToolBar = NULL;
 
 /*Ship Only Bars*/
@@ -128,7 +127,6 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
     if (!RegisterClassEx (&wndclass) )
 		return FALSE;
-
 
 	hMenuMain = LoadMenu (hInst, MAKEINTRESOURCE(IDR_MAINMENU));
 	hMenuMap = LoadMenu (hInst, MAKEINTRESOURCE(IDR_MAPEDITORMENU));
@@ -312,6 +310,7 @@ LRESULT CALLBACK MainWndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam
 		hMenu = GetMenu(hwnd);
 		switch (LOWORD (wParam))
 		{
+		case IDM_MAPPICK :
 		case IDM_MAP_WALL :
 		case IDM_MAP_CANNON :
 		case IDM_MAP_BASE :
@@ -331,7 +330,7 @@ LRESULT CALLBACK MainWndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam
 			SendMessage(hwnd, WM_COMMAND, (WPARAM) UPDATE_COMMANDS, 0);
 			return 0;
 
-		case IDM_MAP_WORM_NORMAL :
+/*		case IDM_MAP_WORM_NORMAL :
 		case IDM_MAP_WORM_OUT :
 		case IDM_MAP_WORM_IN :
 			iSelectionWormhole = LOWORD (wParam);
@@ -352,17 +351,9 @@ LRESULT CALLBACK MainWndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam
 				PostMessage (hwndActive, WM_COMMAND, IDM_UPDATE_ITEM_PARAMS, lParam);
 				InvalidateRect(hwndActive, NULL, TRUE);
 			}
-			return 0;
-		case IDM_MAP_HIDDEN :
-			bSegHidden = !bSegHidden;
-			SendMessage(hwnd, WM_COMMAND, (WPARAM) UPDATE_COMMANDS, 0);
-			if (IsWindow (hwndActive))
-			{
-				PostMessage (hwndActive, WM_COMMAND, IDM_UPDATE_ITEM_PARAMS, lParam);
-				InvalidateRect(hwndActive, NULL, TRUE);
-			}
-			return 0;
-		case IDM_PEN :
+			return 0;*/
+
+/*		case IDM_PEN :
 		case IDM_MODIFYITEM:
 			if (hwndActive)
 			{
@@ -382,7 +373,7 @@ LRESULT CALLBACK MainWndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam
 		case IDM_REORDERCHECKPOINT:
 			fDragging = FALSE;
 			iSelectionMapModify = LOWORD (wParam);
-			return 0;
+			return 0;*/
 		case IDM_NEW: 
 			if (!DialogBox (hWndInstance, MAKEINTRESOURCE(IDD_NEWDOCUMENT), hwnd, NewDocDlgProc))
 			{
@@ -664,14 +655,14 @@ void ShowMapPallete(HWND hwndLocClient, BOOL show)
 	{
 		if (lpMapDocument)
 		{
-			if (iSelectionMapTools == IDM_PEN)
-			{
+//			if (iSelectionMapTools == IDM_PEN)
+//			{
 				showms = TRUE;
-			}
-			else
-			{
-				showms = FALSE;
-			}
+//			}
+//			else
+//			{
+//				showms = FALSE;
+//			}
 		}
 		else
 			showms = FALSE;
@@ -764,17 +755,17 @@ void ShowMapPallete(HWND hwndLocClient, BOOL show)
 		case IDM_MAP_BALLTARGET:
 		case IDM_MAP_BALLAREA:
 		case IDM_MAP_DECOR:
-			ShowWindow(hwndWallTypeToolBar, SW_SHOW);
+//			ShowWindow(hwndWallTypeToolBar, SW_SHOW);
 			break;
 		default:
-			ShowWindow(hwndWallTypeToolBar, SW_HIDE);
+//			ShowWindow(hwndWallTypeToolBar, SW_HIDE);
 			break;
 		}
 	}
 	else
 	{
 			ShowWindow(hwndWormholeToolBar, SW_HIDE);
-			ShowWindow(hwndWallTypeToolBar, SW_HIDE);
+//			ShowWindow(hwndWallTypeToolBar, SW_HIDE);
 			ShowWindow(hwndLabelTeam, SW_HIDE);
 			ShowWindow(hwndEditTeam, SW_HIDE);
 			ShowWindow(hwndUpDownTeam, SW_HIDE);
@@ -809,7 +800,7 @@ void ShowShipPallete(HWND hwndLocClient, BOOL show)
 /*    iMsg                                                                 */
 /*    wParam                                                               */
 /*    lParam                                                               */
-/* Purpose :   The procedure for the Wild Map prefs                        */
+/* Purpose :   The procedure for the New Documents                         */
 /***************************************************************************/
 BOOL CALLBACK NewDocDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {

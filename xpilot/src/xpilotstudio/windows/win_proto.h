@@ -33,7 +33,6 @@ void ShowMapPallete(HWND, BOOL);
 void ShowShipPallete(HWND, BOOL);
 void ShowNoWindowPallete(HWND, BOOL);
 BOOL CALLBACK NewDocDlgProc (HWND, UINT, WPARAM, LPARAM);
-
 /*win_mapeditor*/
 HWND CreateMapEditor(HWND);
 LRESULT CALLBACK MapEditorWndProc (HWND, UINT, WPARAM, LPARAM) ;
@@ -83,3 +82,8 @@ int CALLBACK PropSheetProc (HWND, UINT, LPARAM);
 BOOL CALLBACK PrefsDefaultDlgProc (HWND, UINT, WPARAM, LPARAM);
 UINT CALLBACK PrefsPageProc (HWND, UINT, LPPROPSHEETPAGE);
 BOOL CALLBACK PrefsCommentsDlgProc (HWND, UINT, WPARAM, LPARAM);
+BOOL CALLBACK PrefsTypesDlgProc (HWND, UINT, WPARAM, LPARAM);
+BOOL WINAPI InitListViewColumns(HWND, int);
+BOOL WINAPI InitListViewItems(HWND, LPMAPDOCUMENT, int);
+LPSTR DupString(LPSTR);
+

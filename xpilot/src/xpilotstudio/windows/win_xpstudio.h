@@ -50,7 +50,6 @@ extern HWND hwndFileToolBar;
 extern HWND hwndMapSymsToolBar;
 extern HWND hwndMapToolsToolBar;
 extern HWND hwndWormholeToolBar;
-extern HWND hwndWallTypeToolBar;
 extern HWND hwndPolarityToolBar;
 extern HWND hwndMapModifyToolBar;
 

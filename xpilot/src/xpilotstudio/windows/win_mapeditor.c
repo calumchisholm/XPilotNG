@@ -70,10 +70,11 @@ LRESULT CALLBACK MapEditorWndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM l
 	LPMAPDOCUMENT lpMapDocument ;
 	PAINTSTRUCT ps ;
 	HDC         hdc ;
-//	RECT rect;
+	float zoom;
 	int iVscrollInc, iHscrollInc, x, y;
 	static int dx, dy;
 	char sbtext[100];
+	int rePick = FALSE;
 
 	switch (iMsg)
 	{
@@ -94,22 +95,24 @@ LRESULT CALLBACK MapEditorWndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM l
 		case IDM_PROPERTIES :
 			CreatePropertySheet(hwnd);
 			break;
-		case IDM_ZOOMIN :
-			if (lpMapDocument->view_zoom < 100)
+
+		case IDM_ZOOMOUT :
+			if (lpMapDocument->view_zoom < 7)
 			{
-				lpMapDocument->view_zoom += 5;
+				lpMapDocument->view_zoom *= 1.5;
 				InvalidateRect (hwnd, NULL, TRUE);
 			}
 			break;			
-		case IDM_ZOOMOUT :
-			if (lpMapDocument->view_zoom <= 6)
-				lpMapDocument->view_zoom = 2;
-			else
-				lpMapDocument->view_zoom -= 5;
-			InvalidateRect (hwnd, NULL, TRUE);
+		case IDM_ZOOMIN :
+			if (lpMapDocument->view_zoom > 1)
+			{
+				lpMapDocument->view_zoom *= 1/1.5;
+				InvalidateRect (hwnd, NULL, TRUE);
+			}
 			break;
 		case IDM_DELETEITEM :
-			if (lpMapDocument->selectedpoly || lpMapDocument->selecteditem)
+			if (lpMapDocument->selectedpoly || lpMapDocument->selecteditem
+				|| lpMapDocument->selectedvert)
 				DeleteMapItem(lpMapDocument);
 			break;
 		case IDM_REFRESH :
@@ -117,7 +120,7 @@ LRESULT CALLBACK MapEditorWndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM l
 			break;
 		case IDM_UPDATE_ITEM_PARAMS:
 			GetSetEnterableInfo();
-			UpdateSelected(lpMapDocument);
+			UpdateSelections(lpMapDocument, FALSE);
 			break;
 		}
 		//Right now we'll always repaint the entire window after a command.
@@ -156,14 +159,15 @@ LRESULT CALLBACK MapEditorWndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM l
 	case WM_VSCROLL :
 		lpXpStudioDocument = (LPXPSTUDIODOCUMENT) GetWindowLong (hwnd, GWL_USERDATA);
 		lpMapDocument = lpXpStudioDocument->lpMapDocument;
+		zoom = lpMapDocument->view_zoom;
 		switch (LOWORD (wParam))
 		{
 		case SB_LINEUP :
-			iVscrollInc = -35 ;
+			iVscrollInc = (int)(-35*zoom);
 			break ;
 			
 		case SB_LINEDOWN :
-			iVscrollInc = 35 ;
+			iVscrollInc = (int)(35*zoom);
 			break ;
 			
 		default :
@@ -172,14 +176,12 @@ LRESULT CALLBACK MapEditorWndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM l
 		
 		if (iVscrollInc != 0)
 		{
-			lpMapDocument->view_y += iVscrollInc ;
+			lpMapDocument->view_y += iVscrollInc;
 			while (lpMapDocument->view_y < 0)
 				lpMapDocument->view_y+= lpMapDocument->height;
 			while (lpMapDocument->view_y >= lpMapDocument->height)
 				lpMapDocument->view_y-= lpMapDocument->height;
 			InvalidateRect(hwnd, NULL, TRUE);
-//			ScrollWindow(hwnd, 0, -iVscrollInc, NULL, NULL) ;
-//			UpdateWindow(hwnd);
 			sprintf(sbtext, "view_x:%d view_y:%d zoom: %f", lpMapDocument->view_x,lpMapDocument->view_y, lpMapDocument->view_zoom);
 			SendMessage(hwndStatusBar, SB_SETTEXT, 0, (LPARAM) (LPSTR) sbtext);
 			ptBeg.y -= iVscrollInc;
@@ -188,14 +190,15 @@ LRESULT CALLBACK MapEditorWndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM l
 	case WM_HSCROLL :
 		lpXpStudioDocument = (LPXPSTUDIODOCUMENT) GetWindowLong (hwnd, GWL_USERDATA);
 		lpMapDocument = lpXpStudioDocument->lpMapDocument;
+		zoom = lpMapDocument->view_zoom;
 		switch (LOWORD (wParam))
 		{
 		case SB_LINEUP :
-			iHscrollInc = -35;
+			iHscrollInc = (int)(-35*zoom);
 			break;
 			
 		case SB_LINEDOWN :
-			iHscrollInc = 35;
+			iHscrollInc = (int)(35*zoom);
 			break;
 			
 		default :
@@ -210,9 +213,6 @@ LRESULT CALLBACK MapEditorWndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM l
 			while (lpMapDocument->view_x >= lpMapDocument->width)
 				lpMapDocument->view_x-= lpMapDocument->width;
 			InvalidateRect(hwnd, NULL, TRUE);
-	
-//			ScrollWindow(hwnd, -iHscrollInc, 0, NULL, NULL) ;
-//			UpdateWindow(hwnd);
 			sprintf(sbtext, "view_x:%d view_y:%d zoom: %f", lpMapDocument->view_x,lpMapDocument->view_y, lpMapDocument->view_zoom);
 			SendMessage(hwndStatusBar, SB_SETTEXT, 0, (LPARAM) (LPSTR) sbtext);
 			ptBeg.x -= iHscrollInc;
@@ -228,7 +228,7 @@ LRESULT CALLBACK MapEditorWndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM l
 			hwndTemp = hwnd;
 //			SetScrollRange (hwnd, SB_VERT, 0, 1, FALSE) ;
 
-			lpMapDocument->view_zoom =  ((float) (ps.rcPaint.right - ps.rcPaint.left) / (float) lpMapDocument->width);
+//			lpMapDocument->view_zoom =  ((float) (ps.rcPaint.right - ps.rcPaint.left) / (float) lpMapDocument->width);
 			
 /*			Rectangle(hdc, lpMapDocument->view_x,
 				lpMapDocument->view_y,
@@ -247,17 +247,17 @@ LRESULT CALLBACK MapEditorWndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM l
 	case WM_LBUTTONDOWN:
 		lpXpStudioDocument = (LPXPSTUDIODOCUMENT) GetWindowLong (hwnd, GWL_USERDATA);
 		lpMapDocument = lpXpStudioDocument->lpMapDocument;
+		zoom = lpMapDocument->view_zoom;
 
-//		SetCapture(hwnd);
 		GetCursorPos(&ptCurse);
 		ScreenToClient (hwnd, &ptCurse);
-		x = (ptCurse.x+lpMapDocument->view_x);
-		y = (ptCurse.y+lpMapDocument->view_y);
+		x = (int)(ptCurse.x*zoom+lpMapDocument->view_x);
+		y = (int)(ptCurse.y*zoom+lpMapDocument->view_y);
 		
-		switch (iSelectionMapTools)
+		if (iSelectionMapSyms != IDM_MAPPICK)
 		{
-		case IDM_PEN :
 			fDrawing = TRUE;
+			UpdateSelections(lpMapDocument, TRUE);
 			if(!CreateItem(lpMapDocument, WRAP_XPIXEL(x), lpMapDocument->height-WRAP_YPIXEL(y), dx, dy, iSelectionMapSyms, FALSE))
 			{
 			ptBeg.x = ptEnd.x = LOWORD (lParam);
@@ -266,12 +266,12 @@ LRESULT CALLBACK MapEditorWndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM l
 			DrawHighlightLine (hwnd, ptBeg, ptEnd);
 			dx = dy = 0;
 			}
-			break;
-		case IDM_MODIFYITEM :
-			DoModifyCommand(lpMapDocument, WRAP_XPIXEL(x), lpMapDocument->height-WRAP_YPIXEL(y), iSelectionMapModify);
+		}
+		else
+		{
+			DoModifyCommand(lpMapDocument, WRAP_XPIXEL(x), lpMapDocument->height-WRAP_YPIXEL(y), IDM_PICKITEM);
 			SendMessage(hwndLocFrame, WM_COMMAND, (WPARAM) UPDATE_COMMANDS, 0);
 			InvalidateRect(hwnd, NULL, TRUE);
-			break;
 		}
 
 		if (fDragging)
@@ -281,7 +281,101 @@ LRESULT CALLBACK MapEditorWndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM l
 			DrawHighlightLine (hwnd, ptBeg, ptEnd);
 		}
 		return 0;
+
+	case WM_MBUTTONDOWN:
+		lpXpStudioDocument = (LPXPSTUDIODOCUMENT) GetWindowLong (hwnd, GWL_USERDATA);
+		lpMapDocument = lpXpStudioDocument->lpMapDocument;
+		zoom = lpMapDocument->view_zoom;
+
+		GetCursorPos(&ptCurse);
+		ScreenToClient (hwnd, &ptCurse);
+		x = (int)(ptCurse.x*zoom+lpMapDocument->view_x);
+		y = (int)(ptCurse.y*zoom+lpMapDocument->view_y);
 		
+		if (lpMapDocument->selectedbool)
+		{
+			int move = FALSE;
+
+			if (lpMapDocument->selectedpoly && !lpMapDocument->selectedvert)
+			{
+				if (InsideSelected(lpMapDocument, WRAP_XPIXEL(x), lpMapDocument->height-WRAP_YPIXEL(y)) )
+				{
+					move = TRUE;
+				}
+				else
+					move = FALSE;
+			}
+			else
+				move = TRUE;
+
+			if (move == TRUE)
+			{
+				ptBeg.x = ptEnd.x = LOWORD (lParam);
+				ptBeg.y = ptEnd.y = HIWORD (lParam);
+				DoModifyCommand(lpMapDocument, WRAP_XPIXEL(x), lpMapDocument->height-WRAP_YPIXEL(y), IDM_MOVEITEM);
+			}
+			else
+			{
+			/*If we didn't select a point inside the polygon, we aren't moving
+				the selected polygon*/
+				rePick = TRUE;
+			}
+		}
+		else
+		{
+			/*If we dont have anything selected we need to repick*/
+			rePick = TRUE;
+		}
+
+		/*If we need to repick for any reason, do so*/
+		if (rePick)
+		{
+			SelectItem(lpMapDocument, WRAP_XPIXEL(x), lpMapDocument->height-WRAP_YPIXEL(y));
+			SendMessage(hwndLocFrame, WM_COMMAND, (WPARAM) UPDATE_COMMANDS, 0);
+			InvalidateRect(hwnd, NULL, TRUE);
+		}
+		return 0;
+		
+	case WM_MBUTTONUP:
+		lpXpStudioDocument = (LPXPSTUDIODOCUMENT) GetWindowLong (hwnd, GWL_USERDATA);
+		lpMapDocument = lpXpStudioDocument->lpMapDocument;
+		zoom = lpMapDocument->view_zoom;
+
+		GetCursorPos(&ptCurse);
+		ScreenToClient (hwnd, &ptCurse);
+		x = (int)(ptCurse.x*zoom+lpMapDocument->view_x);
+		y = (int)(ptCurse.y*zoom+lpMapDocument->view_y);
+		
+		if (fDragging)
+		{
+			ptBeg.x = ptEnd.x = LOWORD (lParam);
+			ptBeg.y = ptEnd.y = HIWORD (lParam);
+			DrawHighlightLine (hwnd, ptBeg, ptEnd);
+			DoModifyCommand(lpMapDocument, WRAP_XPIXEL(x), lpMapDocument->height-WRAP_YPIXEL(y), IDM_MOVEITEM);
+			SendMessage(hwndLocFrame, WM_COMMAND, (WPARAM) UPDATE_COMMANDS, 0);
+			InvalidateRect(hwnd, NULL, TRUE);
+		}
+		return 0;
+
+
+	case WM_RBUTTONDOWN:
+		lpXpStudioDocument = (LPXPSTUDIODOCUMENT) GetWindowLong (hwnd, GWL_USERDATA);
+		lpMapDocument = lpXpStudioDocument->lpMapDocument;
+
+		if (iSelectionMapSyms != IDM_MAPPICK)
+		{
+			if (!CreateItem(lpMapDocument, 0, 0, 0, 0, iSelectionMapSyms, TRUE))
+			{
+				fDrawing = FALSE;
+				InvalidateRect(hwnd, NULL, TRUE);
+				SetCursor (LoadCursor (NULL, IDC_ARROW));
+			DrawHighlightLine (hwnd, ptBeg, ptEnd);
+			ptBeg.x = ptBeg.y = ptEnd.x = ptEnd.y = 0;
+			}
+			break;
+		}
+		return 0;
+
 	case WM_MOUSEMOVE:
 		/*Verify that we should be processing this message. If this isnt the active window, then
 		we have no need to process this message for this window*/
@@ -293,98 +387,24 @@ LRESULT CALLBACK MapEditorWndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM l
 		lpMapDocument = lpXpStudioDocument->lpMapDocument;
 		GetCursorPos(&ptCurse);
 		ScreenToClient (hwnd, &ptCurse);
-		x = ptCurse.x + lpMapDocument->view_x;
-		y = ptCurse.y + lpMapDocument->view_y;
+		x = ptCurse.x+lpMapDocument->view_x;
+		y = ptCurse.y+lpMapDocument->view_y;
 
 		sprintf(sbtext, "X:%d Y:%d", WRAP_XPIXEL(x), lpMapDocument->height-WRAP_YPIXEL(y));
 		SendMessage(hwndStatusBar, SB_SETTEXT, 0, (LPARAM) (LPSTR) sbtext);
 
 		if (fDrawing || fDragging)
 		{
-//			switch (iSelectionMapTools)
-//			{
-//			case IDM_PEN :
 				SetCursor (LoadCursor (NULL, IDC_CROSS));
 				DrawHighlightLine (hwnd, ptBeg, ptEnd);
 				ptEnd.x = (x - lpMapDocument->view_x);
 				ptEnd.y = (y - lpMapDocument->view_y);
-				dx = ptEnd.x - ptBeg.x;
+				dx = (ptEnd.x - ptBeg.x);
 				dy = -(ptEnd.y - ptBeg.y);
 				DrawHighlightLine (hwnd, ptBeg, ptEnd);
-//				break;
-//			}
-		}
-		else
-			switch (iSelectionMapTools)
-			{
-				case IDM_MODIFYITEM:
-				switch (iSelectionMapModify)
-				{
-				case IDM_ADDVERTEX:
-					if (lpMapDocument->selectedpoly)
-					{
-						SetCursor (LoadCursor (NULL, IDC_CROSS));
-						DrawHighlightLine (hwnd, ptBeg, ptEnd);
-						ptBeg.x = lpMapDocument->selectedpoly->vertex[lpMapDocument->selectedpoly->num_verts-1].x - lpMapDocument->view_x;
-						ptBeg.y = lpMapDocument->height - lpMapDocument->selectedpoly->vertex[lpMapDocument->selectedpoly->num_verts-1].y - lpMapDocument->view_y;
-//						DrawHighlightLine (hwnd, ptBeg, ptEnd);
-						ptEnd.x = (x - lpMapDocument->view_x);
-						ptEnd.y = (y - lpMapDocument->view_y);
-						DrawHighlightLine (hwnd, ptBeg, ptEnd);
-					}
-					break;
-
-			case IDM_MOVEVERTEX:
-			case IDM_DELVERTEX:
-					if (lpMapDocument->selectedpoly)
-					{
-						lpMapDocument->numselvert = FindClosestVertex(lpMapDocument, lpMapDocument->selectedpoly, x,  lpMapDocument->height-y);
-						InvalidateRect(hwnd, NULL, TRUE);
-						//DrawVertexList(lpMapDocument, lpMapDocument->selectedpoly, IDM_MAP_WALL, lpMapDocument->view_x, lpMapDocument->view_y);
-					}
-					break;
-				}
-				break;
-			}
-
-
-		return 0;
-
-	case WM_RBUTTONDOWN:
-		lpXpStudioDocument = (LPXPSTUDIODOCUMENT) GetWindowLong (hwnd, GWL_USERDATA);
-		lpMapDocument = lpXpStudioDocument->lpMapDocument;
-		switch (iSelectionMapTools)
-		{
-		case IDM_PEN :
-			if (!CreateItem(lpMapDocument, 0, 0, 0, 0, iSelectionMapSyms, TRUE))
-			{
-				fDrawing = FALSE;
-				InvalidateRect(hwnd, NULL, TRUE);
-				SetCursor (LoadCursor (NULL, IDC_ARROW));
-			DrawHighlightLine (hwnd, ptBeg, ptEnd);
-			ptBeg.x = ptBeg.y = ptEnd.x = ptEnd.y = 0;
-			}
-			break;
-		}
-		switch (iSelectionMapModify)
-		{
-		case IDM_ADDVERTEX :
-			if (!CreateItem(lpMapDocument, 0, 0, 0, 0, iSelectionMapSyms, TRUE))
-			{
-				SendMessage(hwndMapModifyToolBar, TB_CHECKBUTTON, IDM_PICKITEM, TRUE); 
-				SendMessage(hwndLocFrame, WM_COMMAND, IDM_PICKITEM, TRUE);
-				lpMapDocument->selectedpoly->selected = FALSE;
-				lpMapDocument->selectedpoly = NULL;
-			}
-			fDrawing = FALSE;
-//			fCreatingPolygon = FALSE;
-			InvalidateRect(hwnd, NULL, TRUE);
-			SetCursor (LoadCursor (NULL, IDC_ARROW));
-			DrawHighlightLine (hwnd, ptBeg, ptEnd);
-			ptBeg.x = ptBeg.y = ptEnd.x = ptEnd.y = 0;
-			break;
 		}
 		return 0;
+
 
 	case WM_MDIACTIVATE:
 		if(lParam == (LPARAM) hwnd)
