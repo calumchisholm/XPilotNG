@@ -850,7 +850,8 @@ void SetBounds_BoolChooserWidget(GLWidget *widget, SDL_Rect *b)
 
 void BoolChooserWidget_SetValue(bool state, void *data)
 {
-    Set_bool_option(((BoolChooserWidget *)data)->opt, state);
+    Set_bool_option(((BoolChooserWidget *)data)->opt, state,
+		    xp_option_origin_config);
 }
 
 void Paint_BoolChooserWidget(GLWidget *widget)
@@ -1043,7 +1044,9 @@ void IntChooserWidget_Add( void *data )
     	step = 1;
     
     if (*(tmp->opt->int_ptr) < tmp->opt->int_maxval) {
-    	Set_int_option(tmp->opt, MIN( *(tmp->opt->int_ptr) + step, tmp->opt->int_maxval));
+    	Set_int_option(tmp->opt, MIN( *(tmp->opt->int_ptr) + step,
+				      tmp->opt->int_maxval),
+				      xp_option_origin_config);
     	if ( (*(tmp->opt->int_ptr)) > tmp->opt->int_minval)
 	    ((ArrowWidget *)tmp->leftarrow->wid_info)->locked = false;
     	if ( (*(tmp->opt->int_ptr)) == tmp->opt->int_maxval)
@@ -1073,7 +1076,10 @@ void IntChooserWidget_Subtract( void *data )
     	step = 1;
 
     if (*(tmp->opt->int_ptr) > tmp->opt->int_minval) {
-    	Set_int_option(tmp->opt, MAX( (*(tmp->opt->int_ptr)) - step, tmp->opt->int_minval) );
+    	Set_int_option(tmp->opt,
+		       MAX( (*(tmp->opt->int_ptr)) - step,
+			    tmp->opt->int_minval),
+		       xp_option_origin_config);
     	if ( (*(tmp->opt->int_ptr)) < tmp->opt->int_maxval)
 	    ((ArrowWidget *)tmp->rightarrow->wid_info)->locked = false;
     	if ( (*(tmp->opt->int_ptr)) == tmp->opt->int_minval)
@@ -1286,7 +1292,9 @@ void DoubleChooserWidget_Add( void *data )
     	step = 1000.0;
     
     if ( *(tmp->opt->dbl_ptr) < tmp->opt->dbl_maxval ) {
-    	Set_double_option( tmp->opt, MIN( (*(tmp->opt->dbl_ptr))+((tmp->opt->dbl_maxval)-(tmp->opt->dbl_minval))/step,tmp->opt->dbl_maxval ) );
+    	Set_double_option( tmp->opt,
+			   MIN( (*(tmp->opt->dbl_ptr))+((tmp->opt->dbl_maxval)-(tmp->opt->dbl_minval))/step,tmp->opt->dbl_maxval ),
+			   xp_option_origin_config);
     	if ( (*(tmp->opt->dbl_ptr)) > tmp->opt->dbl_minval )
 	    ((ArrowWidget *)tmp->leftarrow->wid_info)->locked = false;
     	if ( (*(tmp->opt->dbl_ptr)) >= tmp->opt->dbl_maxval )
@@ -1316,7 +1324,8 @@ void DoubleChooserWidget_Subtract( void *data )
     	step = 1000.0;
 
     if ( *(tmp->opt->dbl_ptr) > tmp->opt->dbl_minval ) {
-    	Set_double_option( tmp->opt, MAX( (*(tmp->opt->dbl_ptr))-((tmp->opt->dbl_maxval)-(tmp->opt->dbl_minval))/step,tmp->opt->dbl_minval ) );
+    	Set_double_option( tmp->opt, MAX( (*(tmp->opt->dbl_ptr))-((tmp->opt->dbl_maxval)-(tmp->opt->dbl_minval))/step,tmp->opt->dbl_minval ),
+			   xp_option_origin_config);
     	if ( (*(tmp->opt->dbl_ptr)) < tmp->opt->dbl_maxval )
 	    ((ArrowWidget *)tmp->rightarrow->wid_info)->locked = false;
     	if ( (*(tmp->opt->dbl_ptr)) <= tmp->opt->dbl_minval )
