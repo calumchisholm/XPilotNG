@@ -1224,8 +1224,9 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
 	      XSetTSOrigin(dpy, gc, -WINSCALE(realWorld.x),
 	      WINSCALE(realWorld.y));
 	    */
-	    XSetTSOrigin(dpy, gc, WINSCALE(polygon.bounds.x) - ship.x,
-		       ship.y - WINSCALE(polygon.bounds.y + polygon.bounds.h));
+	    XSetTSOrigin(dpy, gc, WINSCALE(polygon.bounds.x + xoff *
+		   Setup->width) - ship.x, ship.y - WINSCALE(polygon.bounds.y +
+		   polygon.bounds.h + yoff * Setup->height));
 	    XSetFillStyle(dpy, gc, FillTiled);
         } else {
 	notexture:
