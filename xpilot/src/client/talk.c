@@ -855,9 +855,9 @@ int Talk_paste(char *data, size_t data_len, bool overwrite)
     size_t max_width  = (TALK_WINDOW_WIDTH - 2*TALK_INSIDE_BORDER - 5);
 
     size_t accept_len;			/* for still matching the window */
-    char paste_buf[MAX_CHARS -2];	/* gets the XBuffer */
-    char tmp_str[MAX_CHARS - 2];
-    char talk_backup[MAX_CHARS - 2];	/* no `collision' with data */
+    char paste_buf[MAX_CHARS];	/* gets the XBuffer */
+    char tmp_str[MAX_CHARS];
+    char talk_backup[MAX_CHARS];	/* no `collision' with data */
     bool cursor_visible = false;
     int i;
 
