@@ -713,10 +713,9 @@ static option_desc options[] = {
     {
 	"tankShipShape",
 	"tankShipShape",
-	"(NM:fueltank)(AU:John E. Norlin)"
-	"(SH: 15,0 14,-5 9,-8 -5,-8 -3,-8 -3,0 "
-	"2,0 2,2 -3,2 -3,6 5,6 5,8 -5,8 -5,-8 "
-	"-9,-8 -14,-5 -15,0 -14,5 -9,8 9,8 14,5)"
+	"(NM:fueltank)"
+	"(SH: 15,0 14,5 9,8 -9,8 -14,5 -15,0 -14,-5 -9,-8 "
+	"9,-8 14,-5)"
 	"(EN: -15,0)(MG: 15,0)",
 	&tankShipShape,
 	valString,
