@@ -237,6 +237,7 @@ static int Local_join_cb(int widget, void *user_data, const char **text)
     return 0;
 }
 
+#if 0
 /*
  * User asked for status on a local server.
  */
@@ -247,6 +248,7 @@ static int Local_status_cb(int widget, void *user_data, const char **text)
     UNUSED_PARAM(widget); UNUSED_PARAM(user_data); UNUSED_PARAM(text);
     return 0;
 }
+#endif
 
 /* 
  * Cleanup when leaving the mode ModeLocalnet.
@@ -1149,7 +1151,7 @@ static int Internet_cb(int widget, void *user_data, const char **text)
     return 0;
 }
 
-
+#if 0
 /*
  * User pressed the Configure button.
  */
@@ -1161,6 +1163,7 @@ static int Configure_cb(int widget, void *user_data, const char **text)
 
     return 0;
 }
+#endif
 
 /*
  * User pressed the Server button.
