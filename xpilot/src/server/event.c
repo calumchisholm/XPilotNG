@@ -208,14 +208,6 @@ int Player_lock_closest(int ind, int next)
 	    || ALLIANCE(ind, i)) {
 	    continue;
 	}
-	/* kps - ng had this hack here, do we want it ? */
-#if 0
-	if (TEAM(ind,i))
-	    l = FLT_MAX / 2;
-	else
-	    l = Wrap_length(Players[i]->pos.cx - pl->pos.cx,
-			    Players[i]->pos.cy - pl->pos.cy);
-#endif
 	l = Wrap_length(Players[i]->pos.cx - pl->pos.cx,
 			Players[i]->pos.cy - pl->pos.cy);
 	if (l >= dist && l < best) {
