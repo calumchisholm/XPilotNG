@@ -71,7 +71,7 @@ int next_p2 ( int a )
 int LoadBMP(font_data *ft_font, const char * fname)
 {
     /* Status indicator */
-    int Status = 0;
+    int returnval = 0;
 
     /* Create storage space for the texture */
     SDL_Surface *TextureImage;
@@ -83,7 +83,7 @@ int LoadBMP(font_data *ft_font, const char * fname)
 	    ft_font->linespacing = ft_font->h*1.3;/*this is now recommended spacing*/
 	    ft_font->W[0] = TextureImage->w/16;
 	    /* Set the status to true */
-	    Status = 1;
+	    returnval = 1;
 
 	    /* Create The Texture */
 	    glGenTextures( NUM_TEXTURES, &ft_font->textures[0] );
@@ -108,7 +108,7 @@ int LoadBMP(font_data *ft_font, const char * fname)
     if ( TextureImage )
 	SDL_FreeSurface( TextureImage );
 
-    return Status;
+    return returnval;
 }
 
 GLuint SDL_GL_LoadTexture(SDL_Surface *surface, texcoord_t *texcoord)
@@ -472,7 +472,7 @@ bool render_text(font_data *ft_font, const char *text, string_tex_t *string_tex)
     if (!(ft_font->ttffont)) return false;
     if (!(string_tex)) return false;
     if (!strlen(text)) return false;
-        
+    
     SDL_Color white = { 0xFF, 0xFF, 0xFF, 0x00 };
     SDL_Color *forecol;
     SDL_Surface *glyph = NULL;

@@ -151,7 +151,7 @@ void Image_paint_area(int ind, int x, int y, int frame, irec *r, int c)
     tx1 = ((float)frame * img->frame_width + r->x) / img->data_width;
     ty1 = ((float)r->y) / img->data_height;
     tx2 = ((float)frame * img->frame_width + r->x + r->w) / img->data_width;
-    ty2 = ((float)r->y + r->h) / (img->data_height-1);
+    ty2 = ((float)r->y + r->h) / (img->data_height);
     /* this above -1 seems to keep individual stationary textures from changing */
     /* for fixing moving textures... dunno except going to window choords =( */
     

@@ -35,6 +35,7 @@ bool            pointerControl = false;
 
 static int	movement;	/* horizontal mouse movement. */
 static guiarea_t *target[NUM_MOUSE_BUTTONS];
+guiarea_t   	*hovertarget;
 
 int Process_event(SDL_Event *evt);
 
@@ -146,6 +147,7 @@ int Process_event(SDL_Event *evt)
     movement = 0;
     keylist *temp;
     int button,i=0;
+/*#define test*/
     
     if (Console_process(evt)) return 1;
     
@@ -177,7 +179,12 @@ int Process_event(SDL_Event *evt)
 	    button = evt->button.button;
 	    if ( (target[button-1] = find_guiarea(evt->button.x,evt->button.y)) ) {
 	    	if (target[button-1]->button) {
-		    target[button-1]->button(button,evt->button.state,evt->button.x,evt->button.y);
+		    target[button-1]->button(button,evt->button.state,
+		    	    	    	    evt->button.x,evt->button.y,
+					    target[button-1]->buttondata);
+#ifdef test
+    	    	    xpprintf("target[button-1]->buttondata:%i->%i\n",(int)target[button-1],(int)target[button-1]->buttondata);
+#endif
 		}
 	    }
 	    
@@ -198,8 +205,27 @@ int Process_event(SDL_Event *evt)
 	    /*for (i = 0;i<NUM_MOUSE_BUTTONS;++i)*/ /* dragdrop for all mouse buttons*/
 	    if (target[i]) { /*is button one pressed?*/
 	    	/*xpprintf("SDL_MOUSEBUTTONDOWN drag: area found!\n");*/
-	    	if (target[i]->motion)
-		    target[i]->motion(evt->motion.xrel,evt->motion.yrel,evt->button.x,evt->button.y);
+	    	if (target[i]->motion) {
+		    target[i]->motion(evt->motion.xrel,evt->motion.yrel,
+		    	    	    	evt->button.x,evt->button.y,
+					target[i]->motiondata);
+#ifdef test
+    	    	    xpprintf("target[i]->motiondata:%i->%i\n",(int)target[i],(int)target[i]->motiondata);
+#endif
+		}
+	    } else {
+    	    	guiarea_t *tmp = find_guiarea(evt->button.x,evt->button.y);
+		if (tmp != hovertarget) {
+		    if (tmp && tmp->hover)
+    	    	    	tmp->hover(true,evt->button.x,evt->button.y,tmp->hoverdata);
+    	    	    if (hovertarget && hovertarget->hover) {
+		    	hovertarget->hover(false,evt->button.x,evt->button.y,hovertarget->hoverdata);
+#ifdef test
+		    	xpprintf("hovertarget->hoverdata:%i->%i\n",(int)hovertarget,(int)hovertarget->hoverdata);
+#endif
+		    }
+		    hovertarget = tmp;
+		}
 	    }
 	}
 	break;
@@ -215,9 +241,14 @@ int Process_event(SDL_Event *evt)
 	    button = evt->button.button;
 	    if ( target[button-1] ) {
 	    	if (target[button-1]->button) {
-		    target[button-1]->button(button,evt->button.state,evt->button.x,evt->button.y);
-		    target[button-1] = NULL;
+		    target[button-1]->button(button,evt->button.state,
+		    	    	    	    	evt->button.x,evt->button.y,
+						target[button-1]->buttondata);
+#ifdef test
+    	    	    xpprintf("target[button-1]->buttondata:%i->%i\n",(int)target[button-1],(int)target[button-1]->buttondata);
+#endif
 		}
+		target[button-1] = NULL;
 	    }
 	}
 	break;

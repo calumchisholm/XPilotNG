@@ -46,6 +46,11 @@ enum {
 	RENDER_UNICODE
 } rendertype;
 
+typedef struct {
+    	float width;
+	float height;
+} fontbounds;
+
 /* The init function will create a font of
  * of the height h from the file fname.
  */
@@ -54,10 +59,6 @@ int fontinit(font_data *ft_font, const char * fname, unsigned int size);
 /* Free all the resources assosiated with the font.*/
 void fontclean(font_data *ft_font);
 
-typedef struct {
-    	float width;
-	float height;
-} fontbounds;
 /* loads a SDL surface onto a GL texture */
 GLuint SDL_GL_LoadTexture(SDL_Surface *surface, texcoord_t *texcoord);
 

@@ -23,12 +23,14 @@ const SDL_VideoInfo *videoInfo;
 /* Flags to pass to SDL_SetVideoMode */
 int videoFlags;
 SDL_Surface  *MainSDLSurface;
+widget_list_t *MainList = NULL;
 
 int Init_playing_windows(void)
 {
     char defaultfont[] = "defaultfont.bmp"; /* TODO make bmp fonts work */
     char testfont[] = "Test.ttf";
-    int fontsize = 12;
+    int gamefontsize = 12;
+    int messagefontsize = 16;
     int mapfontsize = 12;
     int value;
     /*char testfont[] = "/doze/windows/fonts/trebuc.ttf";*/
@@ -95,14 +97,14 @@ int Init_playing_windows(void)
     /* Set title for window */
     SDL_WM_SetCaption(TITLE, NULL);
     
-    if (fontinit(&gamefont,testfont,fontsize)) {
+    if (fontinit(&gamefont,testfont,gamefontsize)) {
     	error("fontinit failed with %s, reverting to default font %s",testfont,defaultfont);
-	if (fontinit(&gamefont,defaultfont,fontsize))
+	if (fontinit(&gamefont,defaultfont,gamefontsize))
 	    error("Default font failed! gamefont not available!");
     }
-    if (fontinit(&messagefont,testfont,fontsize)) {
+    if (fontinit(&messagefont,testfont,messagefontsize)) {
     	error("fontinit failed with %s, reverting to default font %s",testfont,defaultfont);
-	if (fontinit(&gamefont,defaultfont,fontsize))
+	if (fontinit(&gamefont,defaultfont,messagefontsize))
 	    error("Default font failed! messagefont not available!");
     }
     if (fontinit(&mapfont,testfont,mapfontsize)) {
@@ -115,7 +117,11 @@ int Init_playing_windows(void)
     sdl_init_colors();
     Init_spark_colors();
     */
-    if (Radar_init()) {
+    if (!(MainList=MakeWidgetList(NULL,NULL,NULL,NULL,NULL,NULL))) {
+	error("Main widget-list initialization failed");
+	return -1;
+    }
+    if (Radar_init(10,10,200,200)) {
 	error("radar initialization failed");
 	return -1;
     }
@@ -127,11 +133,13 @@ int Init_playing_windows(void)
 	error("gui initialization failed");
 	return -1;
     }
+    AddListGuiAreas(MainList);
     return 0;
 }
 
 void Quit(void) 
 {
+    CleanList(MainList);
     Gui_cleanup();
     Console_cleanup();
     Radar_cleanup();

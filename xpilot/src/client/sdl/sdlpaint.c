@@ -53,70 +53,14 @@ static guiarea_t    *scoreListArea;
 static bool         scoreListMoving;
 static guiarea_t    *window_guiarea;
 
-guiarea_t *register_guiarea(	SDL_Rect bounds,
-    	    	    	    	void (*button)(/*button*/Uint8,/*state*/Uint8,/*x*/Uint16,/*y*/Uint16),
-			    	void (*motion)(/*xrel*/Sint16,/*yrel*/Sint16,/*x*/Uint16,/*y*/Uint16)	)
-{
-    guiarea_t *tmp = (guiarea_t *)malloc(sizeof(guiarea_t));
-    tmp->bounds.x = bounds.x;
-    tmp->bounds.y = bounds.y;
-    tmp->bounds.w = bounds.w;
-    tmp->bounds.h = bounds.h;
-    tmp->button = button;
-    tmp->motion = motion;
-    tmp->next = guiarea_list;
-    guiarea_list = tmp;
-
-    return tmp;
-}
-
-bool unregister_guiarea(guiarea_t *guiarea)
-{
-    guiarea_t **tmp = &guiarea_list;
-    bool failure = true;
-    while(*tmp) {
-    	if (*tmp == guiarea) {
-	    failure = false;
-	    *tmp = (*tmp)->next;
-	    free(*tmp);
-	    *tmp = NULL;
-	    break;
-	}
-	tmp = (guiarea_t **)&((*tmp)->next);
-    }
-    
-    return failure;
-}
-
-guiarea_t *find_guiarea(Uint16 x,Uint16 y)
-{
-    guiarea_t *tmp = guiarea_list;
-    while(tmp) {
-    	if( 	(x >= tmp->bounds.x) && (x <= (tmp->bounds.x + tmp->bounds.w))
-	    &&	(y >= tmp->bounds.y) && (y <= (tmp->bounds.y + tmp->bounds.h))
-	    ) break;
-	tmp = tmp->next;
-    }
-    return tmp;
-}
-
-void clean_guiarea_list(void) {
-    guiarea_t *tmp = guiarea_list;
-    while(guiarea_list) {
-    	tmp = guiarea_list->next;
-	free(guiarea_list);
-	guiarea_list = tmp;
-    }
-}
-
-void select_button(Uint8 button,Uint8 state,Uint16 x,Uint16 y)
+void select_button(Uint8 button,Uint8 state,Uint16 x,Uint16 y, void *data)
 {
     if (state == SDL_PRESSED) {
 
-	select_bounds = malloc(sizeof(irec));
-	if ( !select_bounds )
-	    error("Can't malloc select_bounds!");
 	if (button == 1) {
+	    select_bounds = malloc(sizeof(irec));
+	    if ( !select_bounds )
+	    	error("Can't malloc select_bounds!");
 	    select_bounds->x = x;
 	    select_bounds->y = y;
 	    select_bounds->w = 0;
@@ -132,7 +76,7 @@ void select_button(Uint8 button,Uint8 state,Uint16 x,Uint16 y)
     }
 }
 
-void select_move(Sint16 xrel,Sint16 yrel,Uint16 x,Uint16 y)
+void select_move(Sint16 xrel,Sint16 yrel,Uint16 x,Uint16 y, void *data)
 {
     if(select_bounds) {
     	select_bounds->w += xrel;
@@ -175,7 +119,7 @@ int Resize_Window( int width, int height )
     return 0;
 }
 
-static void Scorelist_button(Uint8 button, Uint8 state, Uint16 x, Uint16 y)
+static void Scorelist_button(Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *data)
 {
     if (state == SDL_PRESSED) {
     	if (button == 1)
@@ -188,7 +132,7 @@ static void Scorelist_button(Uint8 button, Uint8 state, Uint16 x, Uint16 y)
     }
 }
 
-static void Scorelist_move(Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y)
+static void Scorelist_move(Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void *data)
 {
     if (scoreListMoving) {
 	scoreListWin.x += xrel;
@@ -211,7 +155,7 @@ static int Scorelist_init(void)
 	error("failed to init scorelist window");
 	return -1;
     }
-    scoreListArea = register_guiarea(r, Scorelist_button, Scorelist_move);
+    scoreListArea = register_guiarea(r, Scorelist_button, NULL, Scorelist_move, NULL, NULL, NULL);
     return 0;
 }
 
@@ -285,7 +229,7 @@ int Paint_init(void)
 
     select_bounds = NULL;
     SDL_Rect bounds = {0,0,draw_width,draw_height};
-    window_guiarea = register_guiarea(bounds,select_button,select_move);
+    window_guiarea = register_guiarea(bounds,select_button,NULL,select_move,NULL,NULL,NULL);
 
     for (i=0;i<MAX_SCORE_OBJECTS;++i)
     	score_object_texs[i].texture = 0;
@@ -294,18 +238,16 @@ int Paint_init(void)
     for (i=0;i<2*MAX_MSGS;++i)
     	message_texs[i].texture = 0;
     
-    
-    
     if (Scorelist_init() == -1)
 	return -1;
 
     //    scale = 1.171875;
-    scale = 1.0;
+    scale = 0.8;
     scaleFactor = 1.0 / scale;
-    scaleFactor_s = 1.0 / 0.8;
+    scaleFactor_s = 1.0;
     scoresChanged = true;
     players_exposed = true;
-        
+    
     return 0;
 }
 
@@ -316,6 +258,7 @@ void Paint_cleanup(void)
     Images_cleanup();
     TTF_Quit();
     clean_guiarea_list();
+
     for (i=0;i<MAX_SCORE_OBJECTS;++i)
     	if (score_object_texs[i].texture) free_string_texture(&score_object_texs[i]);
     for (i=0;i<MAX_METERS;++i)
@@ -382,8 +325,8 @@ void setupPaint_stationary(void)
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
-    glTranslatef((int)(-world.x * scale), (int)(-world.y * scale), 0);
-    glScalef(scale, scale, scale);
+    glTranslatef(rint(-world.x * scale), rint(-world.y * scale), 0);
+    glScalef(scale, scale, 0);
 }
 
 /* This one works best for things that move, since they don't get
@@ -398,7 +341,7 @@ void setupPaint_moving(void)
     glPushMatrix();
     glLoadIdentity();
     glTranslatef(-world.x * scale, -world.y * scale, 0);
-    glScalef(scale, scale, scale);
+    glScalef(scale, scale, 0);
 }
 
 void setupPaint_HUD(void)
@@ -420,8 +363,8 @@ void Paint_frame(void)
     static struct timeval timed[17][2];
     static bool timing = false;
     int i;
-    int measuretime = 100;
-
+    int measuretime = 100;    
+    
     world.x = selfPos.x - (ext_view_width / 2);
     world.y = selfPos.y - (ext_view_height / 2);
     realWorld = world;
@@ -523,13 +466,15 @@ void Paint_frame(void)
 
 	Paint_messages();       
 	if (timing) gettimeofday(&timed[11][1],NULL);
-	Radar_paint();
+	//Radar_paint();
 	if (timing) gettimeofday(&timed[12][1],NULL);
 	Console_paint();
 	if (timing) gettimeofday(&timed[13][1],NULL);
 	Scorelist_paint();
 	if (timing) gettimeofday(&timed[14][1],NULL);
 	Paint_select();
+	if (MainList)
+	    DrawWidgetList(MainList);
     	if (timing) gettimeofday(&timed[15][1],NULL);
 	
 	

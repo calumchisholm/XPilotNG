@@ -16,7 +16,9 @@ static SDL_Rect    radar_bounds;      /* radar position and dimensions */
 static SDL_Surface *radar_surface;     /* offscreen image with walls */
 static GLuint      radar_texture;     /* above as an OpenGL texture */
 static guiarea_t *guiarea;
-bool moving;
+
+void Radar_guiReg(void *LI);
+void Radar_guiUnReg(void *LI);
 
 #define RGBA(RGB) \
     ((RGB) & 0xff000000 ? (RGB) & 0xff000000 : 0xff000000 \
@@ -247,27 +249,12 @@ static void Radar_paint_checkpoints(float xf, float yf)
 {
 }
 
-void button(Uint8 button,Uint8 state,Uint16 x,Uint16 y)
+void move(Sint16 xrel,Sint16 yrel,Uint16 x,Uint16 y, void *data)
 {
-    if (state == SDL_PRESSED) {
-    	if (button == 1)
-	    moving = true;
-    }
-    
-    if (state == SDL_RELEASED) {
-    	if (button == 1)
-	    moving = false;
-    }
-}
-
-void move(Sint16 xrel,Sint16 yrel,Uint16 x,Uint16 y)
-{
-    if (moving) {
-    	radar_bounds.x += xrel;
-    	radar_bounds.y += yrel;
-	guiarea->bounds.x = radar_bounds.x;
-	guiarea->bounds.y = radar_bounds.y;
-    }
+    ((SDL_Rect *)(((widget_list_t *)data)->GuiRegData))->x += xrel;
+    ((SDL_Rect *)(((widget_list_t *)data)->GuiRegData))->y += yrel;
+    ((SDL_Rect *)(((widget_list_t *)data)->GuiUnRegData))->x = ((SDL_Rect *)(((widget_list_t *)data)->GuiRegData))->x;
+    ((SDL_Rect *)(((widget_list_t *)data)->GuiUnRegData))->y = ((SDL_Rect *)(((widget_list_t *)data)->GuiRegData))->y;
 }
 
 /*
@@ -276,17 +263,21 @@ void move(Sint16 xrel,Sint16 yrel,Uint16 x,Uint16 y)
  * For each frame OpenGL is used to paint rectangles with this walls
  * texture and on top of that the radar objects.
  */
-int Radar_init(void)
+int Radar_init(int x, int y, int w, int h)
 {
-    radar_bounds.x = 10;
-    radar_bounds.y = 10;
-    radar_bounds.w = 200;
-    radar_bounds.h = 200 * RadarHeight / RadarWidth;
+    static SDL_Rect *bounds;
+    
+    bounds = malloc(sizeof(SDL_Rect));
+    
+    radar_bounds.x = bounds->x = x;
+    radar_bounds.y = bounds->y = y;
+    radar_bounds.w = bounds->w = w;
+    radar_bounds.h = bounds->h = h * RadarHeight / RadarWidth;
 
     radar_surface =
 	SDL_CreateRGBSurface(SDL_SWSURFACE | SDL_SRCALPHA,
-                             pow2_ceil(radar_bounds.w),
-			     pow2_ceil(radar_bounds.h), 32,
+                             pow2_ceil(bounds->w),
+			     pow2_ceil(bounds->h), 32,
                              RMASK, GMASK, BMASK, AMASK);
     if (!radar_surface) {
         error("Could not create radar surface: %s", SDL_GetError());
@@ -307,7 +298,7 @@ int Radar_init(void)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                     GL_NEAREST);
 		    
-    guiarea = register_guiarea(radar_bounds,button,move);
+    AppendListItem(MainList,Radar_paint,bounds,Radar_guiReg,bounds,Radar_guiUnReg,NULL);
     
     return 0;
 }
@@ -344,11 +335,29 @@ static void Radar_blit_world(SDL_Rect *sr, SDL_Rect *dr)
     glDisable(GL_TEXTURE_2D);
 }
 
+void Radar_guiReg(void *LI)
+{
+    ((widget_list_t *)LI)->GuiUnRegData = register_guiarea(*(SDL_Rect *)(((widget_list_t *)LI)->GuiRegData),NULL,NULL,move,(widget_list_t *)LI,NULL,NULL);
+}
+
+void Radar_guiUnReg(void *LI)
+{
+    unregister_guiarea(((widget_list_t *)LI)->GuiUnRegData);
+    free(((widget_list_t *)LI)->DrawData);
+    ((widget_list_t *)LI)->DrawData = ((widget_list_t *)LI)->GuiRegData = NULL;
+    DelListItem(MainList,((widget_list_t *)LI));
+}
+
 /*
  * Paints the radar surface and objects to the screen.
  */
-void Radar_paint(void)
+void Radar_paint(void *LI)
 {
+    radar_bounds.x = ((SDL_Rect *)((widget_list_t *)LI)->DrawData)->x;
+    radar_bounds.y = ((SDL_Rect *)((widget_list_t *)LI)->DrawData)->y;
+    radar_bounds.w = ((SDL_Rect *)((widget_list_t *)LI)->DrawData)->w;
+    radar_bounds.h = ((SDL_Rect *)((widget_list_t *)LI)->DrawData)->h;
+    
     const float	xf = (float)radar_bounds.w / (float)Setup->width;
     const float yf = (float)radar_bounds.h / (float)Setup->height;
 
