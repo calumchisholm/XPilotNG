@@ -1544,7 +1544,7 @@ static int Welcome_show_server_list(Connect_param_t * conpar)
     const int extra_height = 4;
     const int space_width = 0 + 2 * border;
     const int space_height = 4 + 2 * border;
-    const int max_map_length = 30;
+    const int max_map_length = 32;
     const int max_version_length = 11;
     const int max_server_length = 37;
 
@@ -1678,7 +1678,7 @@ static int Welcome_show_server_list(Connect_param_t * conpar)
 
     for (; server_it != List_end(server_list); LI_FORWARD(server_it)) {
 	yoff += label_height + space_height;
-	if (yoff + 2 * label_height + 3 * space_height >= subform_height)
+	if (yoff + 1 * label_height >= subform_height)
 	    break;
 	sip = SI_DATA(server_it);
 	Widget_create_label(subform_widget,
