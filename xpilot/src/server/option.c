@@ -185,14 +185,19 @@ char *mapd;
 static void tagstart(void *data, const char *el, const char **attr)
 {
     if (!strcasecmp(el, "BallArea")) {
-	int team = atoi(*(attr + 1));
+	int team;
 	groupc++;
 	groups[groupc].type = TREASURE;
 	groups[groupc].team = team;
 	groups[groupc].hit_mask = BALL_BIT;
     }
     if (!strcasecmp(el, "BallTarget")) {
-	int team = atoi(*(attr + 1));
+	int team;
+	while (*attr) {
+	    if (!strcasecmp(*attr, "team"))
+		team = atoi(*(attr + 1));
+	    attr += 2;
+	}
 	groupc++;
 	groups[groupc].type = TREASURE;
 	groups[groupc].team = team;
@@ -200,12 +205,21 @@ static void tagstart(void *data, const char *el, const char **attr)
     }
 
     if (!strcasecmp(el, "Polygon")) {
+	int x, y;
+
+	while (*attr) {
+	    if (!strcasecmp(*attr, "x"))
+		x = atoi(*(attr + 1));
+	    if (!strcasecmp(*attr, "y"))
+		y = atoi(*(attr + 1));
+	    attr += 2;
+	}
 	polyc++;
 	ptscount = 1;
 	*poly++ = groupc;
 	polypts = poly++;
-	*poly++ = atoi(*(attr + 1));
-	*poly++ = atoi(*(attr + 3));
+	*poly++ = x;
+	*poly++ = y;
 	return;
     }
 
@@ -316,7 +330,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 
     
     if (!strcasecmp(el, "Mapdata")) {
-	int x = atoi(*(attr+1));
+	int x = atoi(*(attr+1));   /* This tag will be removed anyway... */
 	int y = atoi(*(attr+3));
 	int len = (x + 1) * y + 1;
 	int i;
@@ -338,14 +352,31 @@ static void tagstart(void *data, const char *el, const char **attr)
     }
 
     if (!strcasecmp(el, "Option")) {
-	addOption(*(attr + 1), *(attr + 3), 0, NULL);
+	const char *name, *value;
+	while (*attr) {
+	    if (!strcasecmp(*attr, "name"))
+		name = *(attr + 1);
+	    if (!strcasecmp(*attr, "value"))
+		value = *(attr + 1);
+	    attr += 2;
+	}
+	addOption(name, value, 0, NULL);
 	return;
     }
-    if (strcmp(el, "Offset"))
+    if (!strcmp(el, "Offset")) {
+	int x, y;
+	while (*attr) {
+	    if (!strcasecmp(*attr, "x"))
+		x = atoi(*(attr + 1));
+	    if (!strcasecmp(*attr, "y"))
+		y = atoi(*(attr + 1));
+	    attr += 2;
+	}
+	*poly++ = x;
+	*poly++ = y;
+	ptscount++;
 	return;
-    *poly++ = atoi(*(attr + 1));
-    *poly++ = atoi(*(attr + 3));
-    ptscount++;
+    }
     return;
 }
 
