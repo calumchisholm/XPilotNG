@@ -21,7 +21,7 @@
 #ifndef XPCLIENT_X11_H
 #define XPCLIENT_X11_H
 
-#include "xpclient.h"
+#include "..\xpclient.h"
 
 #ifdef HAVE_X11_X_H
 #  include <X11/X.h>

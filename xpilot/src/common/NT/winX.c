@@ -29,7 +29,7 @@
 *																			*
 *  						*
 \***************************************************************************/
-#include "../../client/xpclient_x11.h"
+#include "../../client/NT/xpclient_x11.h"
 /*
 #include "winX.h"
 #include "windows.h"
@@ -894,7 +894,7 @@ void WinXResize(void)
     draw_width = WinXUnscale(draw_width);
     draw_height = WinXUnscale(draw_height);
 
-    if (radarWindow && (instruments.showSlidingRadar)) {
+    if (radarWindow && (instruments.slidingRadar)) {
 	GetClientRect(xid[radarWindow].hwnd.hWnd, &rect);
 	InvalidateRect(xid[radarWindow].hwnd.hWnd, &rect, FALSE);
     }

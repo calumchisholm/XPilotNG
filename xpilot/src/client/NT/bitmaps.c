@@ -86,11 +86,7 @@ static int Bitmap_init(int img);
 static void Bitmap_picture_copy(xp_pixmap_t * xp_pixmap, int image);
 static void Bitmap_picture_scale(xp_pixmap_t * xp_pixmap, int image);
 
-#ifndef _WINDOWS
-static int Bitmap_create_begin(Drawable d, xp_pixmap_t * pm, int bmp);
-static int Bitmap_create_end(Drawable d);
-static void Bitmap_set_pixel(xp_pixmap_t *, int, int, int, RGB_COLOR);
-#endif
+
 
 /*
  * Adds the standard images into global pixmaps array.
@@ -455,105 +451,3 @@ void Bitmap_paint_blended(Drawable d, int img, int x, int y, int rgb)
 }
 
 
-#ifndef _WINDOWS
-/*
- * Maybe move this part to a sperate file.
- */
-
-extern unsigned long (*RGB) (int r, int g, int b);
-static GC maskGC;
-
-
-/**
- * Allocates and prepares a pixmap for drawing in a platform
- * dependent (UNIX) way.
- */
-static int Bitmap_create_begin(Drawable d, xp_pixmap_t * pm, int bmp)
-{
-    Drawable pixmap;
-
-    if (pm->bitmaps[bmp].bitmap) {
-	XFreePixmap(dpy, pm->bitmaps[bmp].bitmap);
-	pm->bitmaps[bmp].bitmap = None;
-    }
-    if (pm->bitmaps[bmp].mask) {
-	XFreePixmap(dpy, pm->bitmaps[bmp].mask);
-	pm->bitmaps[bmp].mask = None;
-    }
-
-    if (!(pixmap = XCreatePixmap(dpy, d, pm->width, pm->height, dispDepth))) {
-	error("Could not create pixmap");
-	return -1;
-    }
-    pm->bitmaps[bmp].bitmap = pixmap;
-
-    if (!(pixmap = XCreatePixmap(dpy, d, pm->width, pm->height, 1))) {
-	error("Could not create mask pixmap");
-	return -1;
-    }
-    pm->bitmaps[bmp].mask = pixmap;
-
-    if (!maskGC) {
-	XGCValues xgc;
-	unsigned long values;
-
-	xgc.line_width = 0;
-	xgc.line_style = LineSolid;
-	xgc.cap_style = CapButt;
-	xgc.join_style = JoinMiter;
-	xgc.graphics_exposures = False;
-	values =
-	    GCLineWidth | GCLineStyle | GCCapStyle | GCJoinStyle |
-	    GCGraphicsExposures;
-	maskGC = XCreateGC(dpy, pixmap, values, &xgc);
-    }
-
-    return 0;
-}
-
-/**
- * Deallocates resources needed when creating and drawing a pixmap.
- */
-static int Bitmap_create_end(Drawable d)
-{
-    UNUSED_PARAM(d);
-    return 0;
-}
-
-
-/*
- * Purpose: set 1 pixel in the device/OS dependent bitmap.
- */
-static void Bitmap_set_pixel(xp_pixmap_t * xp_pixmap,
-			     int bmp, int x, int y, RGB_COLOR color)
-{
-    unsigned long pixel;
-    int r, g, b;
-
-    r = RED_VALUE(color);
-    g = GREEN_VALUE(color);
-    b = BLUE_VALUE(color);
-    pixel = (RGB) (r, g, b);
-    SET_FG(pixel);
-    XDrawPoint(dpy, xp_pixmap->bitmaps[bmp].bitmap, gameGC, x, y);
-
-    pixel = (color) ? 1 : 0;
-    XSetForeground(dpy, maskGC, pixel);
-    XDrawPoint(dpy, xp_pixmap->bitmaps[bmp].mask, maskGC, x, y);
-}
-
-
-/**
- * Purpose: Paint an area r of xp_bitmap bit in a device dependent manner.
- */
-void Bitmap_paint_area(Drawable d, xp_bitmap_t * bit, int x, int y,
-		       irec_t * r)
-{
-    XSetClipOrigin(dpy, gameGC, x - r->x, y - r->y);
-    XSetClipMask(dpy, gameGC, bit->mask);
-    XCopyArea(dpy, bit->bitmap, d, gameGC, r->x, r->y,
-	      (unsigned)r->w, (unsigned)r->h, x, y);
-    XSetClipMask(dpy, gameGC, None);
-}
-
-#endif

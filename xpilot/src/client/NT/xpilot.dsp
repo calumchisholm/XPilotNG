@@ -86,8 +86,8 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:windows /debug /machine:I386
-# ADD LINK32 winmm.lib ..\..\..\zlib\lib\libz.lib /nologo /subsystem:windows /debug /machine:I386
-# SUBTRACT LINK32 /map
+# ADD LINK32 winmm.lib d:\xpilotbuild\zlib\lib\zdll.lib /nologo /subsystem:windows /debug /machine:I386
+# SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "XPilot - Win32 ReleasePentium"
 
@@ -115,7 +115,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:windows /map /machine:I386 /out:"Release/XPilotNT.exe"
-# ADD LINK32 winmm.lib ..\..\..\..\zlib\dll32\zlib.lib /nologo /subsystem:windows /map /machine:I386 /out:".\Release\XPilot.exe"
+# ADD LINK32 winmm.lib d:\xpilotbuild\zlib\lib\zdll.lib /nologo /subsystem:windows /map /machine:I386 /out:".\Release\XPilot.exe"
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
 PostBuild_Cmds=copy Release\XPilot.exe c:\XPilot
@@ -149,10 +149,6 @@ SOURCE=.\bitmaps.c
 # Begin Source File
 
 SOURCE=.\bitmaps.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\caudio.c
 # End Source File
 # Begin Source File
 
@@ -316,7 +312,7 @@ SOURCE=..\query.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\record.c
+SOURCE=.\record.c
 # End Source File
 # Begin Source File
 
@@ -361,7 +357,7 @@ SOURCE=.\xdefault.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\xevent.c
+SOURCE=.\xevent.c
 # End Source File
 # Begin Source File
 
@@ -390,6 +386,10 @@ SOURCE=.\xpaint.c
 # Begin Source File
 
 SOURCE=..\xpclient.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\xpclient_x11.h
 # End Source File
 # Begin Source File
 
@@ -475,6 +475,10 @@ SOURCE=.\winAudio.h
 # Begin Source File
 
 SOURCE=.\winBitmap.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\winBitmap.h
 # End Source File
 # Begin Source File
 

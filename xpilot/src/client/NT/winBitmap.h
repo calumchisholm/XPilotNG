@@ -27,12 +27,10 @@
 extern void PaintBitmap(Drawable d, int type, int x, int y,
 			int width, int height, int number);
 
-void Block_bitmap_set_pixel(xp_pixmap_t * xp_pixmap, int image,
+void Bitmap_set_pixel(xp_pixmap_t * xp_pixmap, int image,
 			    int x, int y, RGB_COLOR color);
-void Block_bitmap_paint(Drawable d, int type, int x, int y, int width,
-			int height, int number);
-void Block_bitmap_create_begin(Drawable d, xp_pixmap_t * xp_pixmap,
-			       int image, int width, int height);
-void Block_bitmap_create_end(Drawable d);
+void Bitmap_paint(Drawable d, int img, int x, int y, int bmp);
+int Bitmap_create_begin(Drawable d, xp_pixmap_t * pm, int bmp);
+int Bitmap_create_end(Drawable d);
 
 #endif
