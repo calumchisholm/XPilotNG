@@ -565,8 +565,8 @@ extern int	lose_item_active;	/* one of the lose keys is pressed */
 extern bool	autoServerMotdPopup;
 
 #ifdef SOUND
-extern char 	sounds[MAX_CHARS];	/* audio mappings */
-extern char 	audioServer[MAX_CHARS];	/* audio server */
+extern char 	sounds[PATH_MAX];	/* audio mappings */
+extern char 	audioServer[PATH_MAX];	/* audio server */
 extern int 	maxVolume;		/* maximum volume (in percent) */
 #endif /* SOUND */
 

@@ -62,7 +62,7 @@ static bool setGeometry(xp_option_t *opt, const char *value)
     if (mygeometry)
 	xp_free(mygeometry);
 
-    texturePath = xp_safe_strdup(value);
+    mygeometry = xp_safe_strdup(value);
     return true;
 }
 
@@ -541,6 +541,12 @@ xp_option_t default_options[] = {
 	NULL,
 	"Draws the map decoration filled with a texture pattern.\n"),
 
+    XP_BOOL_OPTION(
+	"clientRanker",
+	false,
+	&instruments.useClientRanker,
+	NULL,
+	"Scan messages and make personal kill/death ranking.\n"),
 
     XP_BOOL_OPTION(
 	"clockAMPM",
@@ -870,83 +876,56 @@ xp_option_t default_options[] = {
 	"Specifies how many frames between radar window updates.\n"),
 #endif
 
-#if 0
-
-
-
-
-
-
-
-
-
-
-
-    {
-	"clientRanker",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"Scan messages and make personal kill/death ranking.\n",
-	0
-    },
-
-
-
-
-    {
+    XP_STRING_OPTION(
 	"clientRankFile",
-	NULL,
 	"",
-	KEY_DUMMY,
-	"An optional file where clientside kill/death rank is stored.\n",
-	0
-    },
-    {
-	"clientRankHTMLFile",
-	NULL,
-	"",
-	KEY_DUMMY,
-	"An optional file where clientside kill/death rank is\n"
-	"published in HTML format. \n",
-	0
-    },
-    {
-	"clientRankHTMLNOJSFile",
-	NULL,
-	"",
-	KEY_DUMMY,
-	"An optional file where clientside kill/death rank is\n"
-	"published in HTML format, w/o JavaScript. \n",
-	0
-    },
+	clientRankFile,
+	sizeof clientRankFile,
+	NULL, NULL,
+	"An optional file where clientside kill/death rank is stored.\n"),
 
+    XP_STRING_OPTION(
+	"clientRankHTMLFile",
+	"",
+	clientRankHTMLFile,
+	sizeof clientRankHTMLFile,
+	NULL, NULL,
+	"An optional file where clientside kill/death rank is\n"
+	"published in HTML format.\n"),
+
+    XP_STRING_OPTION(
+	"clientRankHTMLNOJSFile",
+	"",
+	clientRankHTMLNOJSFile,
+	sizeof clientRankHTMLNOJSFile,
+	NULL, NULL,
+	"An optional file where clientside kill/death rank is\n"
+	"published in HTML format, w/o JavaScript.\n"),
 
 #ifdef SOUND
-    {
+    XP_STRING_OPTION(
 	"sounds",
-	NULL,
-	conf_soundfile_string,
-	KEY_DUMMY,
-	"Specifies the sound file.\n",
-	0
-    },
-    {
+	SOUNDFILE,
+	sounds, sizeof sounds,
+	NULL, NULL,
+	"Specifies the sound file.\n"),
+
+    XP_INT_OPTION(
 	"maxVolume",
+	100,
+	0,
+	100, /* kps - not sure what this value means, probably a percentage */
+	&maxVolume,
 	NULL,
-	"100",
-	KEY_DUMMY,
-	"Specifies the volume to play sounds with.\n",
-	0
-    },
-    {
+	"Specifies the volume to play sounds with.\n"),
+
+    XP_STRING_OPTION(
 	"audioServer",
-	NULL,
 	"",
+	audioServer, sizeof audioServer,
+	NULL, NULL,
 	KEY_DUMMY,
-	"Specifies the audio server to use.\n",
-	0
-    },
+	"Specifies the audio server to use.\n"),
 #endif
 #ifdef DEVELOPMENT
     {
@@ -958,10 +937,6 @@ xp_option_t default_options[] = {
 	0
     },
 #endif
-
-#endif
-
-
 
 };
 
@@ -4426,12 +4401,13 @@ void Parse_options(int *argcp, char **argvp)
 
     Get_resource(rDB, "recordFile", resValue, sizeof resValue);
     Record_init(resValue);
-    Get_resource(rDB, "clientRankFile", resValue, sizeof resValue);
-    clientRankFile = xp_strdup(resValue);
-    Get_resource(rDB, "clientRankHTMLFile", resValue, sizeof resValue);
-    clientRankHTMLFile = xp_strdup(resValue);
-    Get_resource(rDB, "clientRankHTMLNOJSFile", resValue, sizeof resValue);
-    clientRankHTMLNOJSFile = xp_strdup(resValue);
+    Get_resource(rDB, "clientRankFile",
+		 clientRankFile, sizeof clientRankFile);
+    Get_resource(rDB, "clientRankHTMLFile",
+		 clientRankHTMLFile, sizeof clientRankHTMLFile);
+    Get_resource(rDB, "clientRankHTMLNOJSFile",
+		 clientRankHTMLNOJSFile, sizeof clientRankHTMLNOJSFile);
+
     Get_resource(rDB, "texturePath", resValue, sizeof resValue);
     texturePath = xp_strdup(resValue);
 

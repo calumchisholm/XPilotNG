@@ -1,12 +1,10 @@
 #ifndef CLIENTRANK_H
 #define CLIENTRANK_H 1
 
-#include <string.h>
-
 extern char clientname[16];	/*assigned in xpilot.c :( */
-extern char *clientRankFile;	/* */
-extern char *clientRankHTMLFile;	/* */
-extern char *clientRankHTMLNOJSFile;	/* */
+extern char clientRankFile[PATH_MAX];
+extern char clientRankHTMLFile[PATH_MAX];
+extern char clientRankHTMLNOJSFile[PATH_MAX];
 
 typedef struct ScoreNode {
     char nick[16];
@@ -25,4 +23,4 @@ void Add_rank_Death(char *nick);
 int Get_kills(char *nick);
 int Get_deaths(char *nick);
 
-#endif				/* PAINTHUD_H */
+#endif

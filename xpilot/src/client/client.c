@@ -151,8 +151,8 @@ double	scaleFactor_s;
 bool	autoServerMotdPopup;
 
 #ifdef SOUND
-char 	sounds[MAX_CHARS];	/* audio mappings */
-char 	audioServer[MAX_CHARS];	/* audio server */
+char 	sounds[PATH_MAX];	/* audio mappings */
+char 	audioServer[PATH_MAX];	/* audio server */
 int 	maxVolume;		/* maximum volume (in percent) */
 #endif /* SOUND */
 

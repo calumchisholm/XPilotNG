@@ -27,9 +27,9 @@ char clientrank_version[] = VERSION;
 
 #define MAX_SCORES 500
 
-char *clientRankFile = NULL;
-char *clientRankHTMLFile = NULL;
-char *clientRankHTMLNOJSFile = NULL;
+char clientRankFile[PATH_MAX];
+char clientRankHTMLFile[PATH_MAX];
+char clientRankHTMLNOJSFile[PATH_MAX];
 
 /*
  * Defining one/both of CLIENTRANKINGPAGE/CLIENTNOJSRANKINGPAGE while leaving
@@ -166,7 +166,7 @@ static void Rank_score(void)
 	}
     }
 
-    if (clientRankHTMLFile != NULL) {
+    if (strlen(clientRankHTMLFile) > 0) {
 	FILE *const file = fopen(clientRankHTMLFile, "w");
 
 	if (file != NULL && fseek(file, 2000, SEEK_SET) == 0) {
@@ -186,7 +186,7 @@ static void Rank_score(void)
 	}
     }
 
-    if (clientRankHTMLNOJSFile != NULL) {
+    if (strlen(clientRankHTMLNOJSFile) > 0) {
 	FILE *const file = fopen(clientRankHTMLNOJSFile, "w");
 
 	if (file != NULL && fseek(file, 2000, SEEK_SET) == 0) {
@@ -212,7 +212,8 @@ static void Rank_score(void)
 	}
     }
 
-    if (clientRankHTMLFile == NULL && clientRankHTMLNOJSFile == NULL)
+    if (strlen(clientRankHTMLFile) == 0
+	&& strlen(clientRankHTMLNOJSFile) == 0)
 	warn("You have not specified clientRankHTMLFile or "
 	     "clientRankHTMLNOJSFile.");
 }
@@ -232,7 +233,7 @@ void Init_saved_scores(void)
 {
     int i = 0;
 
-    if (clientRankFile != NULL) {
+    if (strlen(clientRankFile) > 0) {
 	FILE *file = fopen(clientRankFile, "r");
 
 	if (file != NULL) {
@@ -329,7 +330,7 @@ void Print_saved_scores(void)
     FILE *file = NULL;
 
     Rank_score();
-    if (clientRankFile != NULL &&
+    if (strlen(clientRankFile) > 0 &&
 	(file = fopen(clientRankFile, "w")) != NULL) {
 	const int actual = fwrite(scores, sizeof(ScoreNode),
 				  MAX_SCORES, file);
