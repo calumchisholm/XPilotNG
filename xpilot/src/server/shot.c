@@ -1195,8 +1195,7 @@ void Delete_shot(int ind)
 		color = Player_by_id(shot->id)->color;
 	    else
 		color = WHITE;
-	    mass = options.ShotsMass;
-	    mass *= 3;
+	    mass = options.ShotsMass * 3;
 	    modv = 1 << shot->mods.velocity;
 	    num_modv = 4;
 	    if (BIT(shot->mods.nuclear, NUCLEAR)) {
@@ -1218,36 +1217,29 @@ void Delete_shot(int ind)
 		intensity = 512;
 	    else
 		intensity = 32;
-	    /*
-	     * Writing it like this:
-	     *   num_modv /= (shot->mods.mini + 1);
-	     * triggers a bug in HP C A.09.19.
-	     */
-	    num_modv = num_modv / ((double)(unsigned)shot->mods.mini + 1.0);
+	    /* Users of HP C A.09.19 get a decent compiler. */
+	    num_modv /= ((double)(unsigned)shot->mods.mini + 1.0);
 	}
 
 	if (BIT(shot->mods.nuclear, NUCLEAR)) {
 	    double nuke_factor;
+
 	    if (shot->type == OBJ_MINE)
 		nuke_factor = NUKE_MINE_EXPL_MULT * shot->mass / MINE_MASS;
 	    else
-		nuke_factor
-		    = NUKE_SMART_EXPL_MULT * shot->mass / MISSILE_MASS;
+		nuke_factor = NUKE_SMART_EXPL_MULT * shot->mass / MISSILE_MASS;
 
-	    nuke_factor
-		= (nuke_factor * (shot->mods.mini + 1)) / SHOT_MULT(shot);
-	    intensity = (int)(intensity * nuke_factor);
+	    nuke_factor *= ((shot->mods.mini + 1) / SHOT_MULT(shot));
+	    intensity *= nuke_factor;
 	}
 
 	if (BIT(shot->mods.warhead, IMPLOSION))
-	    /*intensity >>= 1;*/
 	    mass = -mass;
 
 	if (BIT(shot->type, OBJ_TORPEDO|OBJ_HEAT_SHOT|OBJ_SMART_SHOT))
 	    intensity /= (1 + shot->mods.power);
 
-	num_debris = (int)((0.20 * intensity * num_modv) +
-			   (0.10 * intensity * num_modv * rfrac()));
+	num_debris = (int)(intensity * num_modv * (0.20 + (0.10 * rfrac())));
 	min_life = 8 * life_modv;
 	max_life = (intensity >> 1) * life_modv;
 
