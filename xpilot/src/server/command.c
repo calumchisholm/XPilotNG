@@ -863,7 +863,7 @@ static int Cmd_mutepaused(char *arg, player_t *pl, int oper, char *msg)
 
 static int Cmd_nuke(char *arg, player_t *pl, int oper, char *msg)
 {
-    RankInfo *rank;
+    rankinfo_t *rank;
     player_t *pl2;
 
     UNUSED_PARAM(pl);
@@ -1102,8 +1102,8 @@ static int Cmd_stats(char *arg, player_t *pl, int oper, char *msg)
 	return CMD_RESULT_ERROR;
     }
 
-    if (pl2->conn == NULL) {
-	sprintf(msg, "Robots don't have ranking stats.");
+    if (pl2->rank == NULL) {
+	sprintf(msg, "Player doesn't have ranking stats.");
 	return CMD_RESULT_ERROR;
     }
 

@@ -1778,8 +1778,7 @@ void Delete_player(player_t *pl)
     if (Player_is_tank(pl))
 	NumPseudoPlayers--;
 
-    /* Ranking. */
-    if (Player_is_human(pl)) {
+    if (pl->rank) {
 	Rank_save_score(pl);
    	if (NumPlayers == NumRobots + NumPseudoPlayers) {
 	    Rank_write_webpage();

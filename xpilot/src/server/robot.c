@@ -774,6 +774,8 @@ static void Robot_create(world_t *world)
     NumPlayers++;
     NumRobots++;
 
+    Rank_get_saved_score(robot);
+
     if (BIT(world->rules->mode, TEAM_PLAY) && options.teamShareScore) {
 	if (teamp->NumMembers == 1)
 	    /* reset team score on first player */

@@ -460,7 +460,7 @@ typedef struct {
 } shove_t;
 
 struct robot_data;
-struct RankInfo;
+struct rankinfo;
 
 /* IMPORTANT
  *
@@ -609,7 +609,7 @@ struct player {
     int		isowner;		/* player started this server? */
     int		isoperator;		/* player has operator privileges? */
     int		rectype;		/* normal, saved or spectator */
-    struct RankInfo	*rank;
+    struct rankinfo	*rank;
 
     double	pauseTime;		/* seconds player has paused */
     double	idleTime;		/* seconds player has idled */

@@ -28,11 +28,11 @@
 #include "object.h"
 #endif
 
-typedef struct RankHead {
+typedef struct rankhead {
 	char magic[4];
 	uint32_t version;
 	uint32_t entries;
-} RankHead;
+} rankhead_t;
 
 #define RANK_MAGIC		"rNk7"
 #define RANK_VER_MK(maj,min)	((((maj)&0xffff)<<16) | ((min)&0xffff))
@@ -43,7 +43,7 @@ typedef struct RankHead {
 #define RANK_VER_CURRENT	RANK_VER_MK(RANK_VER_CUR_MAJ,RANK_VER_CUR_MIN)
 
 
-typedef struct RankEntry {
+typedef struct rankentry {
     char nick[MAX_CHARS];
     char real[MAX_CHARS];
     char host[MAX_CHARS];
@@ -61,13 +61,13 @@ typedef struct RankEntry {
     uint16_t ballsWon;
     uint16_t ballsCashed;
     uint16_t bestball;
-} RankEntry;
+} rankentry_t;
 
-typedef struct RankInfo {
-    struct RankEntry entry;
+typedef struct rankinfo {
+    rankentry_t entry;
     double score;
     player_t *pl;
-} RankInfo;
+} rankinfo_t;
 
 
 static inline void Rank_set_logout_message(player_t *pl, const char *msg)
@@ -77,8 +77,8 @@ static inline void Rank_set_logout_message(player_t *pl, const char *msg)
 }
 
 void Rank_get_stats(player_t *pl, char *buf);
-RankInfo *Rank_get_by_name(char *name);
-void Rank_nuke_score(RankInfo *rank);
+rankinfo_t *Rank_get_by_name(char *name);
+void Rank_nuke_score(rankinfo_t *rank);
 void Rank_init_saved_scores(void);
 void Rank_get_saved_score(player_t *pl);
 void Rank_save_score(player_t *pl);

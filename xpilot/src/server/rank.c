@@ -38,8 +38,8 @@ char rank_version[] = VERSION;
 
 /* Score data */
 static const char *xpilotscorefile = NULL;
-static RankHead rank_head;
-static RankInfo scores[MAX_SCORES];
+static rankhead_t rank_head;
+static rankinfo_t scores[MAX_SCORES];
 
 static int rankedplayer[MAX_SCORES];
 static double rankedscore[MAX_SCORES];
@@ -96,8 +96,9 @@ static void SortRankings(void)
        know low- and highmarks for each score before I can calculate the
        rank. */
     for (k = 0; k < MAX_SCORES; k++) {
-	RankInfo *score = &scores[k];
+	rankinfo_t *score = &scores[k];
 	double attenuation, kills, sc, kd, kr, hf;
+
 	if (score->entry.nick[0] == '\0')
 	    continue;
 
@@ -167,8 +168,9 @@ static void SortRankings(void)
 	int i;
 
 	for (i = 0; i < MAX_SCORES; i++) {
-	    RankInfo *score = &scores[i];
+	    rankinfo_t *score = &scores[i];
 	    double sc, kd, kr, hf, rsc, rkd, rkr, rhf, rank;
+
 	    rankedplayer[i] = i;
 	    if (score->entry.nick[0] == '\0') {
 		rankedscore[i] = -1;
@@ -240,12 +242,15 @@ void Rank_write_webpage(void)
 
     if (getenv(XPILOTNOJSRANKINGPAGE) != NULL) {
 	FILE *const file = fopen(getenv(XPILOTNOJSRANKINGPAGE), "w");
+
 	if (file != NULL) {
 	    int i;
+
 	    fprintf(file, "%s", headernojs);
 	    for (i = 0; i < MAX_SCORES; i++) {
 		const int j = rankedplayer[i];
-		const RankInfo *score = &scores[j];
+		const rankinfo_t *score = &scores[j];
+
 		if (score->entry.nick[0] != '\0') {
 		    fprintf(file,
 			    "<tr><td align=left><tt>%d</tt>"
@@ -285,7 +290,7 @@ void Rank_write_webpage(void)
 /* Return a line with the ranking status of the specified player. */
 void Rank_get_stats(player_t * pl, char *buf)
 {
-    RankInfo *score = pl->rank;
+    rankinfo_t *score = pl->rank;
 
     sprintf(buf, "%-15s  %4d/%4d, R: %3d, S: %5d, %2d/%2d/%2d/%2d (%d)",
 	    pl->name, score->entry.kills, score->entry.deaths,
@@ -303,7 +308,8 @@ void Rank_show_ranks(void)
     int i;
 
     for (i = 0; i < MAX_SCORES; i++) {
-	RankInfo *score = &scores[rankedplayer[i]];
+	rankinfo_t *score = &scores[rankedplayer[i]];
+
 	if (score->pl != NULL) {
 	    char msg[MSG_LEN];
 
@@ -317,9 +323,9 @@ void Rank_show_ranks(void)
 }
 
 
-static void
-Init_scorenode(RankInfo * node,
-	       const char nick[], const char real[], const char host[])
+static void Init_scorenode(rankinfo_t * node,
+			   const char nick[], const char real[],
+			   const char host[])
 {
     strlcpy(node->entry.nick, nick, MAX_CHARS);
     strlcpy(node->entry.real, real, MAX_CHARS);
@@ -339,9 +345,9 @@ Init_scorenode(RankInfo * node,
 }
 
 
-RankInfo *Rank_get_by_name(char *name)
+rankinfo_t *Rank_get_by_name(char *name)
 {
-    RankInfo *score;
+    rankinfo_t *score;
     int i;
 
     for (i = 0; i < MAX_SCORES; i++) {
@@ -354,7 +360,7 @@ RankInfo *Rank_get_by_name(char *name)
 }
 
 
-void Rank_nuke_score(RankInfo * node)
+void Rank_nuke_score(rankinfo_t * node)
 {
     Init_scorenode(node, "", "", "");
     node->entry.timestamp = 0;
@@ -377,7 +383,7 @@ void Rank_init_saved_scores(void)
 	if (file != NULL) {
 	    int actual;
 
-	    actual = fread(&rank_head, sizeof(RankHead), 1, file);
+	    actual = fread(&rank_head, sizeof(rankhead_t), 1, file);
 	    if (actual != 1) {
 		error("Error when reading score file!\n");
 		goto init_tail;
@@ -400,7 +406,8 @@ void Rank_init_saved_scores(void)
 	    }
 
 	    for (i = 0; i < (int)rank_head.entries; i++) {
-		RankInfo *node = &scores[i];
+		rankinfo_t *node = &scores[i];
+
 		actual = fread(&node->entry, sizeof(node->entry), 1, file);
 		if (actual != 1) {
 		    error("Error when reading score file!\n");
@@ -442,7 +449,7 @@ void Rank_init_saved_scores(void)
  */
 void Rank_get_saved_score(player_t * pl)
 {
-    RankInfo *score;
+    rankinfo_t *score;
     int oldest = 0, i;
 
     updateScores = true;
@@ -482,7 +489,7 @@ void Rank_get_saved_score(player_t * pl)
 /* A player has quit, save his info and mark him as not playing. */
 void Rank_save_score(player_t * pl)
 {
-    RankInfo *rank = pl->rank;
+    rankinfo_t *rank = pl->rank;
 
     rank->score = pl->score;
     Rank_set_logout_message(pl, rank_showtime());
@@ -495,12 +502,13 @@ void Rank_write_score_file(void)
 {
     FILE *file = NULL;
     char tmp_file[4096];
-    RankHead head;
+    rankhead_t head;
     int actual;
     int i;
 
     if (!xpilotscorefile)
 	return;
+
     actual = snprintf(tmp_file, sizeof(tmp_file), "%s-new", xpilotscorefile);
     if (actual < (int)strlen(xpilotscorefile)
 	|| actual > (int)sizeof(tmp_file))
@@ -522,7 +530,7 @@ void Rank_write_score_file(void)
 	return;
     }
     for (i = 0; i < (int)rank_head.entries; i++) {
-	RankEntry entry;
+	rankentry_t entry;
 	int idx = rankedplayer[i];
 
 	memcpy(&entry, &scores[idx].entry, sizeof(entry));
