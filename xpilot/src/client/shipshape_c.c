@@ -53,7 +53,7 @@ static int	debugShapeParsing = 0;
 static int	verboseShapeParsing;
 static int	shapeLimits;
 
-static int	Get_shape_keyword(char *keyw);
+extern int	Get_shape_keyword(char *keyw);
 extern void	Make_table(void);
 
 void Rotate_point(position pt[RES])
@@ -1368,63 +1368,6 @@ void Convert_ship_2_string(shipobj *w, char *buf, char *ext,
     if (debugShapeParsing) {
 	xpprintf("ship 2 str: %s %s\n", buf, ext);
     }
-}
-
-static int Get_shape_keyword(char *keyw)
-{
-#define NUM_SHAPE_KEYS	12
-
-    static char		shape_keys[NUM_SHAPE_KEYS][16] = {
-			    "shape:",
-			    "mainGun:",
-			    "leftGun:",
-			    "rightGun:",
-			    "leftLight:",
-			    "rightLight:",
-			    "engine:",
-			    "missileRack:",
-			    "name:",
-			    "author:",
-			    "leftRearGun:",
-			    "rightRearGun:",
-			};
-    static char		abbrev_keys[NUM_SHAPE_KEYS][4] = {
-			    "SH:",
-			    "MG:",
-			    "LG:",
-			    "RG:",
-			    "LL:",
-			    "RL:",
-			    "EN:",
-			    "MR:",
-			    "NM:",
-			    "AU:",
-			    "LR:",
-			    "RR:",
-			};
-    int			i;
-
-    /* non-abbreviated keywords start with a lower case letter. */
-    if (islower(*keyw)) {
-	for (i = 0; i < NUM_SHAPE_KEYS; i++) {
-	    if (!strcmp(keyw, shape_keys[i])) {
-		break;
-	    }
-	}
-    }
-    /* abbreviated keywords start with an upper case letter. */
-    else if (isupper(*keyw)) {
-	for (i = 0; i < NUM_SHAPE_KEYS; i++) {
-	    if (!strcmp(keyw, abbrev_keys[i])) {
-		break;
-	    }
-	}
-    }
-    /* dunno what this is. */
-    else {
-	i = -1;
-    }
-    return(i);
 }
 
 void Calculate_shield_radius(shipobj *w)

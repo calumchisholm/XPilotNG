@@ -260,6 +260,7 @@ extern char paintradar_version[];
 extern char portability_version[];
 extern char query_version[];
 extern char record_version[];
+extern char shipshape_version[];
 extern char shipshape_c_version[];
 extern char socklib_version[];
 extern char talk_version[];
@@ -314,6 +315,7 @@ static void Check_client_versions(void)
 	{ "portability", portability_version },
 	{ "query", query_version },
 	{ "record", record_version },
+	{ "shipshape", shipshape_version },
 	{ "shipshape_c", shipshape_c_version },
 	{ "socklib", socklib_version },
 	{ "talk", talk_version },

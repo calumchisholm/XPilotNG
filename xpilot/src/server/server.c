@@ -889,6 +889,7 @@ extern char sched_version[];
 extern char score_version[];
 extern char server_version[];
 extern char ship_version[];
+extern char shipshape_version[];
 extern char shipshape_s_version[];
 extern char shot_version[];
 extern char socklib_version[];
@@ -941,6 +942,7 @@ static void Check_server_versions(void)
 	{ "score", score_version },
 	{ "server", server_version },
 	{ "ship", ship_version },
+	{ "shipshape", shipshape_version },
 	{ "shipshape_s", shipshape_s_version },
 	{ "shot", shot_version },
 	{ "socklib", socklib_version },

@@ -31,7 +31,7 @@ depend:: includes
 SRCS = checknames.c config.c error.c \
 	list.c math.c net.c \
 	portability.c randommt.c \
-	socklib.c \
+	shipshape.c socklib.c \
 	strcasecmp.c strdup.c strlcpy.c \
 	xpmemory.c
 
@@ -39,7 +39,7 @@ SRCS = checknames.c config.c error.c \
 OBJS = checknames.o config.o error.o \
 	list.o math.o net.o \
 	portability.o randommt.o \
-	socklib.o \
+	shipshape.o socklib.o \
 	strcasecmp.o strdup.o strlcpy.o \
 	xpmemory.o
 
