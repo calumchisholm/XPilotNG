@@ -1367,12 +1367,16 @@ static void IntChooserWidget_Add( void *data )
     if (!data) return;
     tmp = ((IntChooserWidget *)((GLWidget *)data)->wid_info);
 
-    if (tmp->direction > 0)
-    	step = 100/clientFPS;
-    else
+    if (tmp->direction > 0) {
+     	step = (++tmp->duration)*(tmp->maxval-tmp->minval)/(MAX(1,MIN(maxFPS,FPS))*3);
+    } else {
     	step = 1;
-    
-    if (*(tmp->value) < tmp->maxval) {
+    }
+
+    if (*(tmp->value) > tmp->maxval) {
+    	((ArrowWidget *)tmp->rightarrow->wid_info)->locked = true;
+    } else if (step) {
+    	tmp->duration = 0;
     	*(tmp->value) = MIN( *(tmp->value) + step, tmp->maxval);
     	
 	if (tmp->callback) tmp->callback( tmp->data, NULL );
@@ -1388,25 +1392,29 @@ static void IntChooserWidget_Add( void *data )
 	    error("Failed to make value (%s=%i) texture for IntChooserWidget!\n",
 	    	((LabelWidget *)(tmp->name->wid_info))->tex.text,*(tmp->value));
     } else {
-    	((ArrowWidget *)tmp->rightarrow->wid_info)->locked = true;
+    	++tmp->direction;
     }
 }
 
 static void IntChooserWidget_Subtract( void *data )
 {
     IntChooserWidget *tmp;
-    int step;
     char valuetext[16];
+    int step;
     
     if (!data) return;
     tmp = ((IntChooserWidget *)((GLWidget *)data)->wid_info);
 
-    if (tmp->direction < 0)
-    	step = 100/clientFPS;
-    else
+    if (tmp->direction < 0) {
+    	step = (++tmp->duration)*(tmp->maxval-tmp->minval)/(MAX(1,MIN(maxFPS,FPS))*3);
+    } else {
     	step = 1;
+    }
 
-    if (*(tmp->value) > tmp->minval) {
+    if (*(tmp->value) < tmp->minval) {
+    	((ArrowWidget *)tmp->leftarrow->wid_info)->locked = true;
+    } else if (step) {
+    	tmp->duration = 0;
     	*(tmp->value) = MAX( (*(tmp->value)) - step, tmp->minval);
 
 	if (tmp->callback) tmp->callback( tmp->data, NULL );
@@ -1422,7 +1430,7 @@ static void IntChooserWidget_Subtract( void *data )
 	    error("Failed to make value (%s=%i) texture for IntChooserWidget!\n",
 	    ((LabelWidget *)(tmp->name->wid_info))->tex.text,*(tmp->value));
     } else {
-    	((ArrowWidget *)tmp->leftarrow->wid_info)->locked = true;
+    	--tmp->direction;
     }
 }
 
@@ -1627,12 +1635,12 @@ static void DoubleChooserWidget_Add( void *data )
     tmp = ((DoubleChooserWidget *)((GLWidget *)data)->wid_info);
 
     if (tmp->direction > 0)
-    	step = ((double)clientFPS)*10.0;
+    	step = (tmp->maxval-tmp->minval)/(((double)clientFPS)*10.0);
     else
-    	step = 1000.0;
+    	step = 0.01;
     
     if ( *(tmp->value) < tmp->maxval ) {
-    	*(tmp->value) = MIN( (*(tmp->value))+((tmp->maxval)-(tmp->minval))/step,tmp->maxval );
+    	*(tmp->value) = MIN( (*(tmp->value))+step,tmp->maxval );
 	
 	if ( tmp->callback ) tmp->callback( tmp->data, NULL );
 
@@ -1661,12 +1669,12 @@ static void DoubleChooserWidget_Subtract( void *data )
     tmp = ((DoubleChooserWidget *)((GLWidget *)data)->wid_info);
 
     if (tmp->direction < 0)
-    	step = ((double)clientFPS)*10.0;
+    	step = (tmp->maxval-tmp->minval)/(((double)clientFPS)*10.0);
     else
-    	step = 1000.0;
+    	step = 0.01;
 
     if ( *(tmp->value) > tmp->minval ) {
-    	*(tmp->value) = MAX( (*(tmp->value))-((tmp->maxval)-(tmp->minval))/step,tmp->minval );
+    	*(tmp->value) = MAX( (*(tmp->value))-step,tmp->minval );
 	
     	if ( tmp->callback ) tmp->callback( tmp->data, NULL );
 

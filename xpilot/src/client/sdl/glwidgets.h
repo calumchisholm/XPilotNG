@@ -255,6 +255,7 @@ typedef struct {
     GLWidget	    *leftarrow;
     GLWidget	    *rightarrow;
     int     	    direction;
+    int     	    duration;
     Uint32     	    *fgcolor;
     Uint32     	    *bgcolor;
     void    	    (*callback)(void *tmp, const char *value);
