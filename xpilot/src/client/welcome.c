@@ -682,6 +682,7 @@ static char *my_strtok(char *buf, const char *sep)
     char *ptr;
     char *start;
 
+
     if (buf)
 	oldbuf = buf;
 
@@ -1272,7 +1273,8 @@ static int Internet_server_show_cb(int widget, void *user_data,
     int data_label_width;
     int player_label_width;
     int increment = 0;
-    char *p;
+    char *p = NULL;
+    char *playslist = xp_strdup(sip->playlist);
 
     struct Label {
 	const char *label;
@@ -1461,7 +1463,9 @@ static int Internet_server_show_cb(int widget, void *user_data,
        could be updated later to show those things by connecting to the
        player meta port instead of the game meta port */
 
-    for (p = my_strtok(sip->playlist, ","); p; p = my_strtok(NULL, ",")) {
+    /* my_strtok destroys playslist */
+
+    for (p = my_strtok(playslist, ","); p; p = my_strtok(NULL, ",")) {
 
 	Widget_create_label(subform_widget,
 			    label_x + label_width,
