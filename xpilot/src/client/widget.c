@@ -407,6 +407,27 @@ static void Widget_draw_input(widget_t *widget, const char *str)
 		str, strlen(str));
 }
 
+static void Widget_draw_color(widget_t *widget, const char *str, int color)
+{
+    /* Setup the background color */
+    XSetWindowBackground(dpy, widget->window, colors[color].pixel);
+   
+    if (colors[color].pixel == colors[WHITE].pixel) {
+	/* change the text color to black */
+	XSetForeground(dpy, textGC, colors[BLACK].pixel);
+    } else {
+	/* change the text color to white */
+	XSetForeground(dpy, textGC, colors[WHITE].pixel);
+    }
+    XClearWindow(dpy, widget->window);
+    XDrawString(dpy, widget->window, textGC,
+		(widget->width
+		 - XTextWidth(textFont, str, strlen(str))) / 2,
+		textFont->ascent
+		+(widget->height - (textFont->ascent + textFont->descent)) / 2,
+		str, strlen(str));
+}
+
 static void Widget_draw_arrow(widget_t *widget)
 {
     int			bg,
@@ -606,6 +627,7 @@ static void Widget_draw_expose(int widget_desc, XExposeEvent *expose)
     widget_entry_t		*entryw;
     widget_activate_t		*activw;
     widget_int_t		*intw;
+    widget_color_t		*colorw;
     widget_float_t		*floatw;
     char			buf[16];
 
@@ -676,6 +698,16 @@ static void Widget_draw_expose(int widget_desc, XExposeEvent *expose)
 #endif
 	Widget_draw_input(widget, buf);
 	break;
+
+    case WIDGET_INPUT_COLOR:
+ 	if (expose && expose->count > 0)
+ 	    break;
+ 	colorw = (widget_color_t *) widget->sub;
+ 
+ 	/* update the integer index value */
+ 	sprintf(buf, "%d", *colorw->val);
+ 	Widget_draw_color(widget, buf, *colorw->val);
+ 	break;
 
     case WIDGET_INPUT_FLOAT:
 	if (expose && expose->count > 0)
@@ -883,6 +915,7 @@ static void Widget_button(XEvent *event, int widget_desc, bool pressed)
     widget_form_t		*pullw;
     widget_activate_t		*activw;
     widget_int_t		*intw;
+    widget_color_t		*colorw;
     widget_float_t		*floatw;
     widget_arrow_t		*arroww;
     widget_entry_t		*entryw;
@@ -890,6 +923,7 @@ static void Widget_button(XEvent *event, int widget_desc, bool pressed)
 				ival,
 				sub_widget_desc;
     DFLOAT			fval,
+				cval,
 				delta,
 				fmin,
 				offset,
@@ -1046,6 +1080,38 @@ static void Widget_button(XEvent *event, int widget_desc, bool pressed)
 
 		}
 		break;
+
+ 	    case WIDGET_INPUT_COLOR:
+		colorw = (widget_color_t *) sub_widget->sub;
+
+		cval = *colorw->val;
+		LIMIT(cval, colorw->min, colorw->max);
+		if (widget->type == WIDGET_BUTTON_ARROW_RIGHT) {
+		    if (cval == *colorw->val) {
+			cval++;
+		    }
+		}
+		if (widget->type == WIDGET_BUTTON_ARROW_LEFT) {
+		    if (cval == *colorw->val) {
+			cval--;
+		    }
+		}
+		LIMIT(cval, colorw->min, colorw->max);
+		if (cval != *colorw->val) {
+		    *colorw->val = cval; 
+ 
+		    Widget_draw(sub_widget_desc);
+  		}
+#ifdef _WINDOWS
+ 		{
+		    widget_t* widget = Widget_pointer(sub_widget_desc);
+		    WinXFlush(widget->window);
+		    widget = Widget_pointer(widget_desc);
+		    WinXFlush(widget->window);
+ 		}
+#endif
+		break;
+
 	    case WIDGET_INPUT_FLOAT:
 		floatw = (widget_float_t *) sub_widget->sub;
 		fval = *floatw->val;
@@ -1639,6 +1705,53 @@ int Widget_create_int(int parent_desc,
     XSelectInput(dpy, window, ExposureMask);
     widget_desc = Widget_create(WIDGET_INPUT_INT, "input_int", window,
 				width, height, intw);
+    if (widget_desc == NO_WIDGET) {
+	return NO_WIDGET;
+    }
+    if (Widget_add_child(parent_desc, widget_desc) == NO_WIDGET) {
+	Widget_destroy(widget_desc);
+	return NO_WIDGET;
+    }
+    return widget_desc;
+}
+
+int Widget_create_color(int parent_desc, int color,
+ 		        int x, int y, int width, int height,
+ 		        int border, int *val, int min, int max,
+ 		        int (*callback)(int, void *, int *),
+ 		        void *user_data)
+{
+    int			widget_desc;
+    Window		window;
+    widget_t		*parent_widget;
+    widget_color_t	*colorw;
+    
+    if ((parent_widget = Widget_pointer(parent_desc)) == NULL
+	|| parent_widget->type != WIDGET_FORM) {
+	errno = 0;
+	error("Widget_create_int: Invalid parent widget");
+	return NO_WIDGET;
+    }
+    if ((colorw = (widget_color_t *) malloc(sizeof(*colorw))) == NULL) {
+	error("No memory for int widget");
+	return NO_WIDGET;
+    }
+    colorw->val = val;
+    colorw->min = min;
+    colorw->max = max;
+    colorw->callback = callback;
+    colorw->user_data = user_data;
+    
+    window =
+	XCreateSimpleWindow(dpy, parent_widget->window,
+			    x, y, width, height,
+			    border, colors[color].pixel,
+			    colors[color].pixel);
+    
+    XSelectInput(dpy, window, ExposureMask);
+    
+    widget_desc = Widget_create(WIDGET_INPUT_COLOR, "input_color", window,
+				width, height, colorw);
     if (widget_desc == NO_WIDGET) {
 	return NO_WIDGET;
     }

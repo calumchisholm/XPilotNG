@@ -711,6 +711,53 @@ static int Config_create_int(int widget_desc, int *height,
     return intw;
 }
 
+static int Config_create_color(int widget_desc, int *height, int color,
+			       const char *str, int *val, int min, int max,
+			       int (*callback)(int, void *, int *), void *data)
+{
+    int			offset,	label_width, colw;
+ 
+    if (*height + 2*config_entry_height + 2*config_space >= config_height) {
+ 	return 0;
+    }
+    label_width = XTextWidth(textFont, str, strlen(str))
+	+ 2 * config_text_space;
+    offset = config_width - (config_space + 2 * config_arrow_width
+			     + config_int_width);
+    if (config_space + label_width > offset) {
+ 	if (*height + 3*config_entry_height + 2*config_space
+ 	    >= config_height) {
+ 	    return 0;
+ 	}
+    }
+    Widget_create_label(widget_desc, config_space, *height
+ 			+ (config_entry_height - config_text_height) / 2,
+ 			label_width, config_text_height,
+ 			0, str);
+    if (config_space + label_width > offset) {
+ 	*height += config_entry_height;
+    }
+    colw = Widget_create_color(widget_desc, color, offset, *height
+			       + (config_entry_height - config_text_height)/2,
+			       config_int_width, config_text_height,
+			       0, val, min, max, callback, data);
+    offset += config_int_width;
+    Widget_create_arrow_left(widget_desc, offset, *height
+			     + (config_entry_height - config_arrow_height)/2,
+ 			     config_arrow_width, config_arrow_height,
+ 			     0, colw);
+    offset += config_arrow_width;
+    Widget_create_arrow_right(widget_desc, offset, *height
+			      + (config_entry_height - config_arrow_height)/2,
+ 			      config_arrow_width, config_arrow_height,
+ 			      0, colw);
+    *height += config_entry_height + config_space;
+
+    return colw;
+}
+ 
+
+
 static int Config_create_float(int widget_desc, int *height,
 			       const char *str, DFLOAT *val, DFLOAT min, DFLOAT max,
 			       int (*callback)(int, void *, DFLOAT *),
@@ -843,7 +890,7 @@ static int Config_create_reverseScroll(int widget_desc, int *height)
 }
 
 #define CONFIG_CREATE_COLOR(c) \
-Config_create_int(widget_desc, height, #c , &c, 0, maxColors - 1, NULL, NULL)
+Config_create_color(widget_desc, height, c, #c, &c, 0, maxColors-1, NULL, NULL)
 
 static int Config_create_messagesColor(int widget_desc, int *height)
 {
