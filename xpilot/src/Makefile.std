@@ -262,7 +262,7 @@ SRCS0 = checknames.c config.c cmw.c error.c list.c math.c net.c \
 #
 # Client program xpilot
 #
-OBJS1 = about.o blockbitmaps.o \
+OBJS1 = about.o bitmaps.o \
 	caudio.o client.o colors.o configure.o \
 	datagram.o dbuff.o default.o \
 	gfx2d.o gfx3d.o guimap.o guiobjects.o \
@@ -271,9 +271,9 @@ OBJS1 = about.o blockbitmaps.o \
 	paintobjects.o paintradar.o query.o record.o \
 	syslimit.o talk.o talkmacros.o textinterface.o texture.o \
 	usleep.o welcome.o widget.o xeventhandlers.o \
-	xevent.o xinit.o xpilot.o xpmread.o shipshape.o \
+	xevent.o xinit.o xpilot.o xpmread.o shipshape.o mapdata.o \
 	$(AUDIOOBJ)
-SRCS1 = about.c blockbitmaps.c \
+SRCS1 = about.c bitmaps.c \
 	caudio.c client.c colors.c configure.c \
 	datagram.c dbuff.c default.c \
 	gfx2d.c gfx3d.c guimap.c guiobjects.c \
@@ -282,7 +282,7 @@ SRCS1 = about.c blockbitmaps.c \
 	paintobjects.c paintradar.c query.c record.c \
 	syslimit.c talk.c talkmacros.c textinterface.c texture.c \
 	usleep.c welcome.c widget.c xeventhandlers.c \
-	xevent.c xinit.c xpilot.c xpmread.c shipshape.c \
+	xevent.c xinit.c xpilot.c xpmread.c shipshape.c mapdata.c \
 	$(AUDIOSRC)
 
 #

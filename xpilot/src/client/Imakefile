@@ -94,7 +94,7 @@ INCLUDES = $(AUDIOINC) -I$(COMMON) -I../../lib/
 
 # keep this variable consistent with its counterpart in ../Makefile.std
 SRCS = \
-	about.c blockbitmaps.c \
+	about.c bitmaps.c \
 	caudio.c client.c colors.c configure.c \
 	datagram.c dbuff.c default.c \
 	gfx2d.c gfx3d.c guimap.c guiobjects.c \
@@ -108,7 +108,7 @@ SRCS = \
 
 # keep this variable consistent with its counterpart in ../Makefile.std
 OBJS = \
-	about.o blockbitmaps.o \
+	about.o bitmaps.o \
 	caudio.o client.o colors.o configure.o \
 	datagram.o dbuff.o default.o \
 	gfx2d.o gfx3d.o guimap.o guiobjects.o \
