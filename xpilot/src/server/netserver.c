@@ -740,7 +740,7 @@ int Check_connection(char *real, char *nick, char *dpy, char *addr)
     return -1;
 }
 
-static void Create_client_socket(sock_t *socket, int *port)
+static void Create_client_socket(sock_t *sock, int *port)
 {
     int i;
 
@@ -753,40 +753,40 @@ static void Create_client_socket(sock_t *socket, int *port)
     if (!clientPortStart || !clientPortEnd ||
 	(clientPortStart > clientPortEnd)) {
 
-        if (sock_open_udp(socket, serverAddr, 0) == SOCK_IS_ERROR) {
-            error("Cannot create datagram socket (%d)", socket->error.error);
-	    socket->fd = -1;
+        if (sock_open_udp(sock, serverAddr, 0) == SOCK_IS_ERROR) {
+            error("Cannot create datagram socket (%d)", sock->error.error);
+	    sock->fd = -1;
 	    return;
         }
     }
     else {
         for (i = clientPortStart; i <= clientPortEnd; i++) {
-            if (sock_open_udp(socket, serverAddr, i) != SOCK_IS_ERROR)
+            if (sock_open_udp(sock, serverAddr, i) != SOCK_IS_ERROR)
 		goto found;
 	}
 	error("Could not find a usable port in given port range");
-	socket->fd = -1;
+	sock->fd = -1;
 	return;
     }
  found:
-    if ((*port = sock_get_port(socket)) == -1) {
+    if ((*port = sock_get_port(sock)) == -1) {
 	error("Cannot get port from socket");
 	goto error;
     }
-    if (sock_set_non_blocking(socket, 1) == -1) {
+    if (sock_set_non_blocking(sock, 1) == -1) {
 	error("Cannot make client socket non-blocking");
 	goto error;
     }
-    if (sock_set_receive_buffer_size(socket, SERVER_RECV_SIZE + 256) == -1)
+    if (sock_set_receive_buffer_size(sock, SERVER_RECV_SIZE + 256) == -1)
 	error("Cannot set receive buffer size to %d", SERVER_RECV_SIZE + 256);
 
-    if (sock_set_send_buffer_size(socket, SERVER_SEND_SIZE + 256) == -1)
+    if (sock_set_send_buffer_size(sock, SERVER_SEND_SIZE + 256) == -1)
 	error("Cannot set send buffer size to %d", SERVER_SEND_SIZE + 256);
 
     return;
  error:
-    sock_close(socket);
-    socket->fd = -1;
+    sock_close(sock);
+    sock->fd = -1;
     return;
 }
 
@@ -1515,7 +1515,6 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
     }
 
     if (connp->version < MY_VERSION) {
-	const char sender[] = "[*Server notice*]";
 	sprintf(msg, "Server runs version %s. %s", VERSION, sender);
 	Set_player_message(pl, msg);
 	if (!FEATURE(connp, F_FASTRADAR)) {
@@ -1633,7 +1632,7 @@ static void Handle_input(int fd, void *arg)
     connection_t	*connp = arg;
     int			type,
 			result,
-			(**receive_tbl)(connection_t *connp);
+			(**receive_tbl)(connection_t *);
     short		*pbscheck = NULL;
     char		*pbdcheck = NULL;
 
@@ -1880,7 +1879,6 @@ int Send_self(connection_t *connp,
 	      char *mods)
 {
     int			n;
-    u_byte		stat = (u_byte)status;
 
     /* assumes connp->version >= 0x4203 */
     n = Packet_printf(&connp->w,
@@ -1909,7 +1907,7 @@ int Send_self(connection_t *connp,
 		      connp->view_width, connp->view_height,
 		      connp->debris_colors,
 
-		      stat,
+		      (u_byte)status,
 		      autopilotlight
 	);
     if (n <= 0)
