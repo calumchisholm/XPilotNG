@@ -1059,9 +1059,11 @@ static bool Set_sparkColors (xp_option_t *opt, const char *val)
 static bool Set_maxColors (xp_option_t *opt, int val)
 {
     (void)opt;
-    if (val == 4 || val == 8 || val == 16)
+    if (val == 4 || val == 8) {
+	warn("WARNING: Values 4 or 8 for maxColors are not actively "
+	     "supported. Use at own risk.");
 	maxColors = val;
-    else
+    } else
 	maxColors = MAX_COLORS;
     return true;
 }
@@ -1123,8 +1125,7 @@ static xp_option_t color_options[] = {
 	MAX_COLOR_LEN,
 	NULL, NULL, NULL,
 	XP_OPTFLAG_DEFAULT,
-	"The color value for the fifth color.\n"
-	"This is only used if maxColors is set to 8 or 16.\n"),
+	"The color value for the fifth color.\n"),
 
     XP_STRING_OPTION(
 	"color5",
@@ -1133,8 +1134,7 @@ static xp_option_t color_options[] = {
 	MAX_COLOR_LEN,
 	NULL, NULL, NULL,
 	XP_OPTFLAG_DEFAULT,
-	"The color value for the sixth color.\n"
-	"This is only used if maxColors is set to 8 or 16.\n"),
+	"The color value for the sixth color.\n"),
 
     XP_STRING_OPTION(
 	"color6",
@@ -1143,8 +1143,7 @@ static xp_option_t color_options[] = {
 	MAX_COLOR_LEN,
 	NULL, NULL, NULL,
 	XP_OPTFLAG_DEFAULT,
-	"The color value for the seventh color.\n"
-	"This is only used if maxColors is set to 8 or 16.\n"),
+	"The color value for the seventh color.\n"),
 
     XP_STRING_OPTION(
 	"color7",
@@ -1153,8 +1152,7 @@ static xp_option_t color_options[] = {
 	MAX_COLOR_LEN,
 	NULL, NULL, NULL,
 	XP_OPTFLAG_DEFAULT,
-	"The color value for the eighth color.\n"
-	"This is only used if maxColors is set to 8 or 16.\n"),
+	"The color value for the eighth color.\n"),
 
     XP_STRING_OPTION(
 	"color8",
@@ -1163,8 +1161,7 @@ static xp_option_t color_options[] = {
 	MAX_COLOR_LEN,
 	NULL, NULL, NULL,
 	XP_OPTFLAG_DEFAULT,
-	"The color value for the nineth color.\n"
-	"This is only used if maxColors is set to 16.\n"),
+	"The color value for the ninth color.\n"),
 
     XP_STRING_OPTION(
 	"color9",
@@ -1173,8 +1170,7 @@ static xp_option_t color_options[] = {
 	MAX_COLOR_LEN,
 	NULL, NULL, NULL,
 	XP_OPTFLAG_DEFAULT,
-	"The color value for the tenth color.\n"
-	"This is only used if maxColors is set to 16.\n"),
+	"The color value for the tenth color.\n"),
 
     XP_STRING_OPTION(
 	"color10",
@@ -1183,8 +1179,7 @@ static xp_option_t color_options[] = {
 	MAX_COLOR_LEN,
 	NULL, NULL, NULL,
 	XP_OPTFLAG_DEFAULT,
-	"The color value for the eleventh color.\n"
-	"This is only used if maxColors is set to 16.\n"),
+	"The color value for the eleventh color.\n"),
 
     XP_STRING_OPTION(
 	"color11",
@@ -1193,8 +1188,7 @@ static xp_option_t color_options[] = {
 	MAX_COLOR_LEN,
 	NULL, NULL, NULL,
 	XP_OPTFLAG_DEFAULT,
-	"The color value for the twelfth color.\n"
-	"This is only used if maxColors is set to 16.\n"),
+	"The color value for the twelfth color.\n"),
 
     XP_STRING_OPTION(
 	"color12",
@@ -1203,8 +1197,7 @@ static xp_option_t color_options[] = {
 	MAX_COLOR_LEN,
 	NULL, NULL, NULL,
 	XP_OPTFLAG_DEFAULT,
-	"The color value for the thirteenth color.\n"
-	"This is only used if maxColors is set to 16.\n"),
+	"The color value for the thirteenth color.\n"),
 
     XP_STRING_OPTION(
 	"color13",
@@ -1213,8 +1206,7 @@ static xp_option_t color_options[] = {
 	MAX_COLOR_LEN,
 	NULL, NULL, NULL,
 	XP_OPTFLAG_DEFAULT,
-	"The color value for the fourteenth color.\n"
-	"This is only used if maxColors is set to 16.\n"),
+	"The color value for the fourteenth color.\n"),
 
     XP_STRING_OPTION(
 	"color14",
@@ -1223,8 +1215,7 @@ static xp_option_t color_options[] = {
 	MAX_COLOR_LEN,
 	NULL, NULL, NULL,
 	XP_OPTFLAG_DEFAULT,
-	"The color value for the fifteenth color.\n"
-	"This is only used if maxColors is set to 16.\n"),
+	"The color value for the fifteenth color.\n"),
 
     XP_STRING_OPTION(
 	"color15",
@@ -1233,9 +1224,7 @@ static xp_option_t color_options[] = {
 	MAX_COLOR_LEN,
 	NULL, NULL, NULL,
 	XP_OPTFLAG_DEFAULT,
-	"The color value for the sixteenth color.\n"
-	"This is only used if maxColors is set to 16.\n"),
-
+	"The color value for the sixteenth color.\n"),
 
     XP_STRING_OPTION(
 	"sparkColors",
