@@ -648,7 +648,10 @@ void Do_general_transporter(world_t *world, int id, clpos_t pos,
 	t.victim_id = victim->id;
 	t.id = (pl ? pl->id : NO_ID);
 	t.count = 5.0;
-	Arraylist_add(world->transporters, &t);
+	if (Arraylist_add(world->transporters, &t) < 0) {
+	    sound_play_sensors(pos, TRANSPORTER_FAIL_SOUND);
+	    return;
+	}
 	sound_play_sensors(pos, TRANSPORTER_SUCCESS_SOUND);
     }
 
@@ -909,24 +912,22 @@ void Fire_general_ecm(world_t *world, int id, int team, clpos_t pos)
     smartobject_t *smart;
     mineobject_t *mine;
     double closest_mine_range = world->hypotenuse;
-    int i, j;
+    int i, j, ecm_ind;
     double range, perim, damage;
-    player_t *p;
-    ecm_t *ecm, t;
-    player_t *pl = Player_by_id(id);
+    player_t *p, *pl = Player_by_id(id);
+    ecm_t t;
     /*cannon_t *cannon = Cannon_by_id(world, id);*/
 
     t.pos = pos;
     t.id = (pl ? pl->id : NO_ID);
     t.size = ECM_DISTANCE;
-    Arraylist_add(world->ecms, &t);
+    ecm_ind = Arraylist_add(world->ecms, &t);
+    if (ecm_ind < 0)
+	return;
 
-    /*
-     * Arraylist_add could return index ??
-     * Here I assume the added ecm goes last in the list.
-     */
-    ecm = Ecm_by_index(world, Num_ecms(world) - 1);
     if (pl) {
+	ecm_t *ecm = Ecm_by_index(world, ecm_ind);
+
 	pl->ecmcount++;
 	pl->item[ITEM_ECM]--;
 	Player_add_fuel(pl, ED_ECM);

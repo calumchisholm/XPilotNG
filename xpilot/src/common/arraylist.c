@@ -20,6 +20,9 @@
 
 #include "xpcommon.h"
 
+#define ARRAYLIST_INITIAL_NUM_ELEMENTS 16
+#define ARRAYLIST_ELEMENT_ALIGNMENT sizeof(double)
+
 void *Arraylist_get(arraylist_t *alp, int ind)
 {
     if (ind < 0 || ind >= alp->num_elements)
@@ -27,33 +30,32 @@ void *Arraylist_get(arraylist_t *alp, int ind)
     return Arraylist_get_element_pointer(alp, ind);
 }
 
-static void Arraylist_out_of_memory(void)
-{
-    fatal("Arraylist: Out of memory");
-}
-
-void Arraylist_add(arraylist_t *alp, void *element)
+int Arraylist_add(arraylist_t *alp, void *element)
 {
     size_t n;
+    void *p;
 
     if (alp->num_elements < alp->max_elements) {
-	void *p = Arraylist_get_element_pointer(alp, alp->num_elements);
-
+	p = Arraylist_get_element_pointer(alp, alp->num_elements);
 	memcpy(p, element, alp->element_size);
-	alp->num_elements++;
-	return;
+	return alp->num_elements++;
     }
 
-    n = alp->max_elements * 2;
-    alp->elements = realloc(alp->elements, n * alp->element_padded_size);
-    if (alp->elements == NULL)
-	Arraylist_out_of_memory();
+    if (alp->max_elements >= ARRAYLIST_INITIAL_NUM_ELEMENTS)
+	n = alp->max_elements * 2;
+    else
+	n = ARRAYLIST_INITIAL_NUM_ELEMENTS;
+    p = realloc(alp->elements, n * alp->element_padded_size);
+    if (p == NULL)
+	return -1;
+
+    alp->elements = p;
     alp->max_elements = n;
 
-    Arraylist_add(alp, element);
+    return Arraylist_add(alp, element);
 }
 
-void Arraylist_remove(arraylist_t *alp, int ind)
+void Arraylist_fast_remove(arraylist_t *alp, int ind)
 {
     void *p, *last_p;
 
@@ -76,9 +78,6 @@ void Arraylist_remove(arraylist_t *alp, int ind)
     memcpy(p, last_p, alp->element_padded_size);
     alp->num_elements--;
 }
-
-#define ARRAYLIST_INITIAL_NUM_ELEMENTS 16
-#define ARRAYLIST_ELEMENT_ALIGNMENT sizeof(double)
 
 arraylist_t *Arraylist_alloc(size_t element_size)
 {
@@ -112,7 +111,5 @@ arraylist_t *Arraylist_alloc(size_t element_size)
     return alp;
 
  failed:
-    Arraylist_out_of_memory();
-    /* never comes here */
     return NULL;
 }

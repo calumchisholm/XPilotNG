@@ -62,11 +62,11 @@ void *Arraylist_get(arraylist_t *alp, int ind);
 /* Set element at index 'ind' (possibly overwriting old element). */
 void Arraylist_set(arraylist_t *alp, int ind, void *element);
 
-/* Add element at end of list. */
-void Arraylist_add(arraylist_t *alp, void *element);
+/* Add element at end of list, return its index or -1 if failed. */
+int Arraylist_add(arraylist_t *alp, void *element);
 
-/* Insert element at position 'ind'. */
-void Arraylist_insert(arraylist_t *alp, int ind, void *element);
+/* Insert element at position 'ind', return its 'ind' or -1 if failed. */
+int Arraylist_insert(arraylist_t *alp, int ind, void *element);
 
 /* Remove element at 'ind', require preservation of element order. */
 void Arraylist_remove(arraylist_t *alp, int ind);
@@ -77,8 +77,8 @@ void Arraylist_fast_remove(arraylist_t *alp, int ind);
 /* Make max elements equal num elements. */
 void Arraylist_trim(arraylist_t *alp);
 
-/* Make sure max elements is at least equal to this. */
-void Arraylist_ensure_capacity(arraylist_t *alp, int capacity);
+/* Make sure max elements is at least 'capacity', return 'capacity' or -1. */
+int Arraylist_ensure_capacity(arraylist_t *alp, int capacity);
 
 /* Returns true if this list contains the specified element. */
 bool Arraylist_contains(arraylist_t *alp, void *element);
@@ -93,8 +93,14 @@ typedef struct {
     size_t	element_padded_size;
 } arraylist_iterator_t;
 
+
+/* Might implement something like this, but don't count on it. */
 arraylist_iterator_t *Arraylist_iterator(arraylist_t *alp);
+void Arraylist_iterator_free(arraylist_iterator_t *ip);
+/* Initialise static iterator whose pointer is 'ip' */
+void Arraylist_static_iterator(arraylist_t *alp, arraylist_iterator_t *ip);
 bool Iterator_has_next(arraylist_iterator_t *ip);
 void *Iterator_get_next(arraylist_iterator_t *ip);
+
 
 #endif

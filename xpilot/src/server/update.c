@@ -560,7 +560,7 @@ static void Ecm_update(world_t *world)
 	    --world->NumEcms;
 	    world->ecms[i] = world->ecms[world->NumEcms];
 #else
-	    Arraylist_remove(world->ecms, i);
+	    Arraylist_fast_remove(world->ecms, i);
 #endif
 	    i--;
 	}
@@ -580,7 +580,7 @@ static void Transporter_update(world_t *world)
 	    world->transporters[i]
 		= world->transporters[world->NumTransporters];
 #else
-	    Arraylist_remove(world->transporters, i);
+	    Arraylist_fast_remove(world->transporters, i);
 #endif
 	    i--;
 	}
