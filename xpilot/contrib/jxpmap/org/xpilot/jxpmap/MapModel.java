@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.math.BigDecimal;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
@@ -621,7 +622,14 @@ public class MapModel extends ModelObject {
                     poly.type = 5;
                     poly.team = Integer.parseInt(atts.getValue("team"));
                     
-                } 
+                } else if (name.equalsIgnoreCase("frictionarea")) {
+                    
+                    poly = new PolyTag();
+                    poly.type = 6;
+                    poly.friction = new BigDecimal(
+                        atts.getValue("friction"));
+                    
+                }
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -702,6 +710,7 @@ public class MapModel extends ModelObject {
             List points;
             int type, team, dir, x, y;
             boolean hasSpecialEdges;
+            BigDecimal friction;
             
             PolyTag() {
                 points = new ArrayList();
@@ -760,7 +769,9 @@ public class MapModel extends ModelObject {
                     case 4: 
                         return new Cannon(awtp, ps.ref, edges, team, x, y, dir); 
                     case 5: 
-                        return new Target(awtp, ps.ref, edges, team); 
+                        return new Target(awtp, ps.ref, edges, team);
+                    case 6:
+                        return new FrictionArea(awtp, ps.ref, edges, friction);                        
                     default:
                         return new MapPolygon(awtp, ps.ref, edges); 
                 }                

@@ -25,7 +25,7 @@ public class FrictionArea extends MapPolygon {
     }
     
     public FrictionArea(Polygon p, PolygonStyle style, ArrayList edgeStyles,
-    BigDecimal firction) {
+    BigDecimal friction) {
         super(p, style, edgeStyles);
         setFriction(friction);
     }
@@ -34,8 +34,8 @@ public class FrictionArea extends MapPolygon {
         return friction;
     }
     
-    public void setFriction(BigDecimal value) {
-        this.friction = value;
+    public void setFriction(BigDecimal value) {      
+        this.friction = value;       
     }
 
     public void printXml(PrintWriter out) throws IOException {
