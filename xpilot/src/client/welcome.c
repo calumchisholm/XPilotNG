@@ -1273,7 +1273,6 @@ static int Internet_server_show_cb(int widget, void *user_data,
     int max_label_width;
     int data_label_width;
     int player_label_width;
-    int increment = 0;
     char *p = NULL;
     char *playslist = xp_strdup(sip->playlist);
     static char longest_text[] = "                              ";
@@ -1749,8 +1748,6 @@ static int Welcome_show_server_list(Connect_param_t * conpar)
 			       Internet_server_show_cb, (void *) sip);
     }
 
-    int height_avail = subform_height - yoff;
- 
     int next_border = border ? border : 1;
     int first_border = next_border;
     int next_width = XTextWidth(buttonFont,
