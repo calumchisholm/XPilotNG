@@ -665,7 +665,6 @@ static void Xpmap_treasure_to_polygon(int ind)
     polystyle = P_get_poly_id("treasure_ps");
     edgestyle = P_get_edge_id("treasure_es");
 
-    /*printf(__FUNCTION__ ": team = %d\n", treasure->team);*/
     cx = treasure->pos.cx - BLOCK_CLICKS / 2;
     cy = treasure->pos.cy - BLOCK_CLICKS / 2;
 
@@ -799,7 +798,7 @@ static void Xpmap_cannon_polygon(cannon_t *cannon,
     P_end_polygon();
 }
 
-/* someone write some code to rotate a cannon in any angle */
+
 static void Xpmap_cannon_to_polygon(int ind)
 {
     int ps, es;
@@ -809,10 +808,10 @@ static void Xpmap_cannon_to_polygon(int ind)
     es = P_get_edge_id("cannon_es");
 
     P_start_cannon(c->team, ind);
-    /* we need a more general function for this purpose */
     Xpmap_cannon_polygon(c, ps, es);
     P_end_cannon();
 }
+
 
 #define N 12
 /* kps - do we want a polygon for out wormholes ??? */
@@ -1076,9 +1075,6 @@ void Xpmap_blocks_to_polygons(void)
 
     Xpmap_walls_to_polygons();
 
-    /* kps - if you want to see the polygons in the client (use the polygon
-     * protocol , do this */
-    /*is_polygon_map = 1;*/
     if (polygonMode)
 	is_polygon_map = TRUE;
 
