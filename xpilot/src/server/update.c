@@ -550,10 +550,10 @@ static void Cannon_update(void)
 {
     int i;
     for (i = 0; i < World.NumCannons; i++) {
-	cannon_t *cannon = &World.cannon[i];
+	cannon_t *c = &World.cannon[i];
 
-	if (cannon->dead_time > 0) {
-	    if ((cannon->dead_time -= timeStep) <= 0)
+	if (c->dead_time > 0) {
+	    if ((c->dead_time -= timeStep) <= 0)
 		Cannon_restore_on_map(i);
 	    continue;
 	} else {
@@ -566,10 +566,10 @@ static void Cannon_update(void)
 		Cannon_check_defense(i);
 	    }
 	    if (do_update_this_frame
-		&& !BIT(cannon->used, HAS_EMERGENCY_SHIELD)
-		&& !BIT(cannon->used, HAS_PHASING_DEVICE)
-		&& (cannon->damaged <= 0)
-		&& (cannon->tractor_count <= 0)
+		&& !BIT(c->used, HAS_EMERGENCY_SHIELD)
+		&& !BIT(c->used, HAS_PHASING_DEVICE)
+		&& (c->damaged <= 0)
+		&& (c->tractor_count <= 0)
 		&& rfrac() * 16 < 1) {
 		Cannon_check_fire(i);
 	    }
@@ -589,36 +589,37 @@ static void Cannon_update(void)
 		}
 	    }
 	}
-	if ((cannon->damaged -= timeStep) <= 0)
-	    cannon->damaged = 0;
-	if (cannon->tractor_count > 0) {
-	    int ind = GetInd(cannon->tractor_target);
+	if ((c->damaged -= timeStep) <= 0)
+	    c->damaged = 0;
+	if (c->tractor_count > 0) {
+	    int ind = GetInd(c->tractor_target);
+	    player *tpl = Player_by_id(c->tractor_target);
 
-	    if ((Wrap_length(Players(ind)->pos.cx - cannon->pos.cx,
-			    Players(ind)->pos.cy - cannon->pos.cy)
-		 < TRACTOR_MAX_RANGE(cannon->item[ITEM_TRACTOR_BEAM]) * CLICK)
-		&& BIT(Players(ind)->status, PLAYING|GAME_OVER|KILLED|PAUSE)
+	    if ((Wrap_length(tpl->pos.cx - c->pos.cx,
+			     tpl->pos.cy - c->pos.cy)
+		 < TRACTOR_MAX_RANGE(c->item[ITEM_TRACTOR_BEAM]) * CLICK)
+		&& BIT(tpl->status, PLAYING|GAME_OVER|KILLED|PAUSE)
 		   == PLAYING) {
-		General_tractor_beam(-1, cannon->pos.cx, cannon->pos.cy,
-				     cannon->item[ITEM_TRACTOR_BEAM], ind,
-				     cannon->tractor_is_pressor);
-		if ((cannon->tractor_count -= timeStep) <= 0)
-		    cannon->tractor_count = 0;
+		General_tractor_beam(-1, c->pos.cx, c->pos.cy,
+				     c->item[ITEM_TRACTOR_BEAM], ind,
+				     c->tractor_is_pressor);
+		if ((c->tractor_count -= timeStep) <= 0)
+		    c->tractor_count = 0;
 	    } else {
-		cannon->tractor_count = 0;
+		c->tractor_count = 0;
 	    }
 	}
-	if (cannon->emergency_shield_left > 0) {
-	    if ((cannon->emergency_shield_left -= timeStep) <= 0) {
-		CLR_BIT(cannon->used, HAS_EMERGENCY_SHIELD);
-		sound_play_sensors(cannon->pos.cx, cannon->pos.cy,
+	if (c->emergency_shield_left > 0) {
+	    if ((c->emergency_shield_left -= timeStep) <= 0) {
+		CLR_BIT(c->used, HAS_EMERGENCY_SHIELD);
+		sound_play_sensors(c->pos.cx, c->pos.cy,
 				   EMERGENCY_SHIELD_OFF_SOUND);
 	    }
 	}
-	if (cannon->phasing_left > 0) {
-	    if ((cannon->phasing_left -= timeStep) <= 0) {
-		CLR_BIT(cannon->used, HAS_PHASING_DEVICE);
-	        sound_play_sensors(cannon->pos.cx, cannon->pos.cy,
+	if (c->phasing_left > 0) {
+	    if ((c->phasing_left -= timeStep) <= 0) {
+		CLR_BIT(c->used, HAS_PHASING_DEVICE);
+	        sound_play_sensors(c->pos.cx, c->pos.cy,
 				   PHASING_OFF_SOUND);
 	    }
 	}
