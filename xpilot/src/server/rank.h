@@ -68,7 +68,7 @@ typedef struct RankEntry {
 typedef struct RankInfo {
     struct RankEntry entry;
     double score;
-    struct player_t *pl;
+    player_t *pl;
 } RankInfo;
 
 

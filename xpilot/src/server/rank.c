@@ -474,7 +474,7 @@ void Rank_get_saved_score(player_t * pl)
     Init_scorenode(score, pl->name, pl->username, pl->hostname);
     strcpy(score->entry.logout, "playing");
     score->pl = pl;
-    score->entry.timestamp = time(0);
+    score->entry.timestamp = time(NULL);
     pl->score = 0;
     pl->rank = score;
 }
