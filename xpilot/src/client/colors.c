@@ -1068,6 +1068,33 @@ static bool Set_maxColors (xp_option_t *opt, int val)
     return true;
 }
 
+static bool Set_color (xp_option_t *opt, const char *val)
+{
+    char *buf = Option_get_private_data(opt);
+
+    /*warn("Set_color: name = %s, val = %s, buf = %p", opt->name, val, buf);*/
+
+    strlcpy(buf, val, MAX_COLOR_LEN);
+
+    /* kps - HACK */
+    {
+	char *s, *semicolon;
+	/* this should be done in the option.c code */
+	semicolon = strchr(buf, ';');
+	if (semicolon)
+	    *semicolon = '\0';
+
+	/* XParseColor doesn't want spaces after the color spec */
+	s = buf;
+	while (*s && !isspace(*s))
+	    s++;
+	*s = '\0';
+    }
+    /* kps - HACK */
+
+    return true;
+}
+
 
 static xp_option_t color_options[] = {
 
@@ -1087,7 +1114,7 @@ static xp_option_t color_options[] = {
 	XP_COLOR0,
 	color_names[0],
 	MAX_COLOR_LEN,
-	NULL, NULL, NULL,
+	Set_color, color_names[0], NULL,
 	XP_OPTFLAG_DEFAULT,
 	"The color value for the first color.\n"),
 
@@ -1096,7 +1123,7 @@ static xp_option_t color_options[] = {
 	XP_COLOR1,
 	color_names[1],
 	MAX_COLOR_LEN,
-	NULL, NULL, NULL,
+	Set_color, color_names[1], NULL,
 	XP_OPTFLAG_DEFAULT,
 	"The color value for the second color.\n"),
 
@@ -1105,7 +1132,7 @@ static xp_option_t color_options[] = {
 	XP_COLOR2,
 	color_names[2],
 	MAX_COLOR_LEN,
-	NULL, NULL, NULL,
+	Set_color, color_names[2], NULL,
 	XP_OPTFLAG_DEFAULT,
 	"The color value for the third color.\n"),
 
@@ -1114,7 +1141,7 @@ static xp_option_t color_options[] = {
 	XP_COLOR3,
 	color_names[3],
 	MAX_COLOR_LEN,
-	NULL, NULL, NULL,
+	Set_color, color_names[3], NULL,
 	XP_OPTFLAG_DEFAULT,
 	"The color value for the fourth color.\n"),
 
@@ -1123,7 +1150,7 @@ static xp_option_t color_options[] = {
 	XP_COLOR4,
 	color_names[4],
 	MAX_COLOR_LEN,
-	NULL, NULL, NULL,
+	Set_color, color_names[4], NULL,
 	XP_OPTFLAG_DEFAULT,
 	"The color value for the fifth color.\n"),
 
@@ -1132,7 +1159,7 @@ static xp_option_t color_options[] = {
 	XP_COLOR5,
 	color_names[5],
 	MAX_COLOR_LEN,
-	NULL, NULL, NULL,
+	Set_color, color_names[5], NULL,
 	XP_OPTFLAG_DEFAULT,
 	"The color value for the sixth color.\n"),
 
@@ -1141,7 +1168,7 @@ static xp_option_t color_options[] = {
 	XP_COLOR6,
 	color_names[6],
 	MAX_COLOR_LEN,
-	NULL, NULL, NULL,
+	Set_color, color_names[6], NULL,
 	XP_OPTFLAG_DEFAULT,
 	"The color value for the seventh color.\n"),
 
@@ -1150,7 +1177,7 @@ static xp_option_t color_options[] = {
 	XP_COLOR7,
 	color_names[7],
 	MAX_COLOR_LEN,
-	NULL, NULL, NULL,
+	Set_color, color_names[7], NULL,
 	XP_OPTFLAG_DEFAULT,
 	"The color value for the eighth color.\n"),
 
@@ -1159,7 +1186,7 @@ static xp_option_t color_options[] = {
 	XP_COLOR8,
 	color_names[8],
 	MAX_COLOR_LEN,
-	NULL, NULL, NULL,
+	Set_color, color_names[8], NULL,
 	XP_OPTFLAG_DEFAULT,
 	"The color value for the ninth color.\n"),
 
@@ -1168,7 +1195,7 @@ static xp_option_t color_options[] = {
 	XP_COLOR9,
 	color_names[9],
 	MAX_COLOR_LEN,
-	NULL, NULL, NULL,
+	Set_color, color_names[9], NULL,
 	XP_OPTFLAG_DEFAULT,
 	"The color value for the tenth color.\n"),
 
@@ -1177,7 +1204,7 @@ static xp_option_t color_options[] = {
 	XP_COLOR10,
 	color_names[10],
 	MAX_COLOR_LEN,
-	NULL, NULL, NULL,
+	Set_color, color_names[10], NULL,
 	XP_OPTFLAG_DEFAULT,
 	"The color value for the eleventh color.\n"),
 
@@ -1186,7 +1213,7 @@ static xp_option_t color_options[] = {
 	XP_COLOR11,
 	color_names[11],
 	MAX_COLOR_LEN,
-	NULL, NULL, NULL,
+	Set_color, color_names[11], NULL,
 	XP_OPTFLAG_DEFAULT,
 	"The color value for the twelfth color.\n"),
 
@@ -1195,7 +1222,7 @@ static xp_option_t color_options[] = {
 	XP_COLOR12,
 	color_names[12],
 	MAX_COLOR_LEN,
-	NULL, NULL, NULL,
+	Set_color, color_names[12], NULL,
 	XP_OPTFLAG_DEFAULT,
 	"The color value for the thirteenth color.\n"),
 
@@ -1204,7 +1231,7 @@ static xp_option_t color_options[] = {
 	XP_COLOR13,
 	color_names[13],
 	MAX_COLOR_LEN,
-	NULL, NULL, NULL,
+	Set_color, color_names[13], NULL,
 	XP_OPTFLAG_DEFAULT,
 	"The color value for the fourteenth color.\n"),
 
@@ -1213,7 +1240,7 @@ static xp_option_t color_options[] = {
 	XP_COLOR14,
 	color_names[14],
 	MAX_COLOR_LEN,
-	NULL, NULL, NULL,
+	Set_color, color_names[14], NULL,
 	XP_OPTFLAG_DEFAULT,
 	"The color value for the fifteenth color.\n"),
 
@@ -1222,7 +1249,7 @@ static xp_option_t color_options[] = {
 	XP_COLOR15,
 	color_names[15],
 	MAX_COLOR_LEN,
-	NULL, NULL, NULL,
+	Set_color, color_names[15], NULL,
 	XP_OPTFLAG_DEFAULT,
 	"The color value for the sixteenth color.\n"),
 
