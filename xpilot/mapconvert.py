@@ -400,8 +400,12 @@ def convert(options):
     for name, value in options.items():
 	print '<Option name="%s" value="%s"/>' % (name, encode(value))
     print '</GeneralOptions>'
-    print '<Edgestyle id="xpbluethin" width="0" color="4E7CFF" style="0"/>'
-    print '<Polystyle id="xpblue" color="4E7CFF" defedge="xpbluethin"/>'
+    print '<Edgestyle id="xpbluehidden" width="-1" color="4E7CFF" style="0"/>'
+    print '<Edgestyle id="xpredhidden" width="-1" color="FF3A27" style="0"/>'
+    print '<Edgestyle id="yellow" width="2" color="FFFF00" style="0"/>'
+    print '<Polystyle id="xpblue" color="4E7CFF" defedge="xpbluehidden" flags="1"/>'
+    print '<Polystyle id="xpred" color="FF3A27" defedge="xpredhidden" flags="1"/>'
+    print '<Polystyle id="emptyyellow" color="FF" defedge="yellow" flags="0"/>'
 
     for p in polys2:
 	print '<Polygon x="%d" y="%d" style="xpblue">' % tuple(p[-1][:2])
@@ -444,12 +448,12 @@ def convert(options):
     for ball in balls:
 	print '<Ball team="%d" x="%d" y="%d"/>' % (ball.team, ball.x, ball.y)
 	print '<BallArea team="%d">' % ball.team
-	print '<Polygon x="%d" y="%d" style="xpblue">' % (ball.x - 1120, ball.y - 640)
+	print '<Polygon x="%d" y="%d" style="xpred">' % (ball.x - 1120, ball.y - 640)
 	print '<Offset x="2240" y="0"/> <Offset x="0" y="2240"/>'
 	print '<Offset x="-2240" y="0"/> <Offset x="0" y="-2240"/>'
 	print '</Polygon></BallArea>'
 	print '<BallTarget team="%d">' % ball.team
-	print '<Polygon x="%d" y="%d" style="xpblue">' % (ball.x - 480, ball.y)
+	print '<Polygon x="%d" y="%d" style="emptyyellow">' % (ball.x - 480, ball.y)
 	print '<Offset x="960" y="0"/> <Offset x="0" y="960"/>'
 	print '<Offset x="-960" y="0"/> <Offset x="0" y="-960"/>'
 	print '</Polygon></BallTarget>'
