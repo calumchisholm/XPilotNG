@@ -1474,15 +1474,14 @@ int Client_init(char *server, unsigned server_version)
 
 int Client_setup(void)
 {
-    if (oldServer)
-	if (Map_init() == -1) {
-	    return -1;
-	}
-    Map_dots();
-    Map_restore(0, 0, Setup->x, Setup->y);
-    Map_blue(0, 0, Setup->x, Setup->y);
+    if (oldServer) {
+        if (Map_init() == -1) return -1;
+        Map_dots();
+        Map_restore(0, 0, Setup->x, Setup->y);
+        Map_blue(0, 0, Setup->x, Setup->y);
+    }
 
-    RadarHeight = (RadarWidth * Setup->y) / Setup->x;
+    RadarHeight = (RadarWidth * Setup->height) / Setup->width;
 
     if (Init_playing_windows() == -1) {
 	return -1;

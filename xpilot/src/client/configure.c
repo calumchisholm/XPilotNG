@@ -1177,7 +1177,7 @@ static int Config_update_instruments(int widget_desc, void *data, bool *val)
 	Paint_world_radar();
     }
     
-    if (BIT(bit, outline_mask)) {
+    if (BIT(bit, outline_mask) && oldServer) {
 	/* only do the map recalculations if really needed. */
 	if (!BIT(old_instruments, outline_mask)
 	     != !BIT(instruments, outline_mask)) {

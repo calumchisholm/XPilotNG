@@ -262,7 +262,7 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
     XPoint	points[64];
 
     if (mapdiag == 0) {
-	mapdiag = (int)LENGTH(Setup->x * BLOCK_SZ, Setup->y * BLOCK_SZ);
+	mapdiag = (int)LENGTH(Setup->width, Setup->height);
     }
 
     /*

@@ -344,6 +344,7 @@ int Net_setup(void)
 		    error("Can't read setup info from reliable data buffer");
 		    return -1;
 		}
+
 		/*
 		 * Do some consistency checks on the server setup structure.
 		 */

@@ -706,15 +706,17 @@ void Paint_world_radar(void)
     XSetPlaneMask(dpy, radarGC,
                   AllPlanes&(~(dpl_2[0]|dpl_2[1])));
 
-  for (i = 0;; i++) {
-    int dead_time, damage, xi, yi;
-    if (Target_by_index(i, &xi, &yi, &dead_time, &damage) == -1) {
-      break;
+  if (oldServer) {
+    for (i = 0;; i++) {
+      int dead_time, damage, xi, yi;
+      if (Target_by_index(i, &xi, &yi, &dead_time, &damage) == -1) {
+	break;
+      }
+      if (dead_time) {
+	continue;
+      }
+      Paint_radar_block(xi, yi, targetRadarColor);
     }
-    if (dead_time) {
-      continue;
-    }
-    Paint_radar_block(xi, yi, targetRadarColor);
   }
 }
 
