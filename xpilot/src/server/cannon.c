@@ -563,7 +563,7 @@ static void Cannon_fire(int ind, int weapon, int target, int dir)
 	    /* FALLTHROUGH */
 	case 0:
 	    Fire_general_shot(NULL, c->team, 1, cx, cy, OBJ_TORPEDO,
-			      dir, mods, -1);
+			      dir, mods, NO_ID);
 	    sound_play_sensors(cx, cy, FIRE_TORPEDO_SOUND);
 	    played = true;
 	    break;
@@ -659,7 +659,7 @@ static void Cannon_fire(int ind, int weapon, int target, int dir)
 			* (-c->item[ITEM_WIDEANGLE] +  i);
 	    a_dir = MOD2(a_dir, RES);
 	    Fire_general_shot(NULL, c->team, 1, cx, cy, OBJ_CANNON_SHOT,
-			      a_dir, mods, -1);
+			      a_dir, mods, NO_ID);
 	}
 	/* I'm not sure cannons should use rearshots.
 	   After all, they are restricted to 60 degrees when picking their
@@ -670,7 +670,7 @@ static void Cannon_fire(int ind, int weapon, int target, int dir)
 			* (-((c->item[ITEM_REARSHOT] - 1) * 0.5) + i));
 	    a_dir = MOD2(a_dir, RES);
 	    Fire_general_shot(NULL, c->team, 1, cx, cy, OBJ_CANNON_SHOT,
-			      a_dir, mods, -1);
+			      a_dir, mods, NO_ID);
 	}
     }
 

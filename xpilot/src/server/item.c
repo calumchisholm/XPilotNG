@@ -490,7 +490,7 @@ void Detonate_items(int ind)
 		CLR_BIT(mods.nuclear, NUCLEAR);
 	    }
 	    Fire_general_shot(owner_pl, 0, pl->team, pl->pos.cx, pl->pos.cy,
-			      type, (int)(rfrac() * RES), mods, -1);
+			      type, (int)(rfrac() * RES), mods, NO_ID);
 	}
     }
 }

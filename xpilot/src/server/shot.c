@@ -438,7 +438,7 @@ void Fire_main_shot(player *pl, int type, int dir)
     cx = pl->pos.cx + m_gun.cx;
     cy = pl->pos.cy + m_gun.cy;
 
-    Fire_general_shot(pl, pl->team, 0, cx, cy, type, dir, pl->mods, -1);
+    Fire_general_shot(pl, pl->team, 0, cx, cy, type, dir, pl->mods, NO_ID);
 }
 
 void Fire_shot(player *pl, int type, int dir)
@@ -447,7 +447,7 @@ void Fire_shot(player *pl, int type, int dir)
 	return;
 
     Fire_general_shot(pl, pl->team, 0, pl->pos.cx, pl->pos.cy,
-		      type, dir, pl->mods, -1);
+		      type, dir, pl->mods, NO_ID);
 }
 
 void Fire_left_shot(player *pl, int type, int dir, int gun)
@@ -462,7 +462,7 @@ void Fire_left_shot(player *pl, int type, int dir, int gun)
     cx = pl->pos.cx + l_gun.cx;
     cy = pl->pos.cy + l_gun.cy;
 
-    Fire_general_shot(pl, pl->team, 0, cx, cy, type, dir, pl->mods, -1);
+    Fire_general_shot(pl, pl->team, 0, cx, cy, type, dir, pl->mods, NO_ID);
 }
 
 void Fire_right_shot(player *pl, int type, int dir, int gun)
@@ -477,7 +477,7 @@ void Fire_right_shot(player *pl, int type, int dir, int gun)
     cx = pl->pos.cx + r_gun.cx;
     cy = pl->pos.cy + r_gun.cy;
 
-    Fire_general_shot(pl, pl->team, 0, cx, cy, type, dir, pl->mods, -1);
+    Fire_general_shot(pl, pl->team, 0, cx, cy, type, dir, pl->mods, NO_ID);
 }
 
 void Fire_left_rshot(player *pl, int type, int dir, int gun)
@@ -492,7 +492,7 @@ void Fire_left_rshot(player *pl, int type, int dir, int gun)
     cx = pl->pos.cx + l_rgun.cx;
     cy = pl->pos.cy + l_rgun.cy;
 
-    Fire_general_shot(pl, pl->team, 0, cx, cy, type, dir, pl->mods, -1);
+    Fire_general_shot(pl, pl->team, 0, cx, cy, type, dir, pl->mods, NO_ID);
 }
 
 void Fire_right_rshot(player *pl, int type, int dir, int gun)
@@ -507,13 +507,13 @@ void Fire_right_rshot(player *pl, int type, int dir, int gun)
     cx = pl->pos.cx + r_rgun.cx;
     cy = pl->pos.cy + r_rgun.cy;
 
-    Fire_general_shot(pl, pl->team, 0, cx, cy, type, dir, pl->mods, -1);
+    Fire_general_shot(pl, pl->team, 0, cx, cy, type, dir, pl->mods, NO_ID);
 }
 
 void Fire_general_shot(player *pl, unsigned short team, bool cannon,
 		       int cx, int cy,
 		       int type, int dir,
-		       modifiers mods, int target)
+		       modifiers mods, int target_id)
 {
     char		msg[MSG_LEN];
     int			used,
@@ -640,7 +640,7 @@ void Fire_general_shot(player *pl, unsigned short team, bool cannon,
 	    lock = -1;
 #else  /* HEAT_LOCK */
 	    if (pl == NULL) {
-		lock = target;
+		lock = target_id;
 	    } else {
 		if (!BIT(pl->lock.tagged, LOCK_PLAYER)
 		|| ((pl->lock.distance > pl->sensor_range)
@@ -662,7 +662,7 @@ void Fire_general_shot(player *pl, unsigned short team, bool cannon,
 
 	case OBJ_SMART_SHOT:
 	    if (pl == NULL) {
-		lock = target;
+		lock = target_id;
 	    } else {
 		if (!BIT(pl->lock.tagged, LOCK_PLAYER)
 		|| ((pl->lock.distance > pl->sensor_range)
@@ -1402,7 +1402,7 @@ void Delete_shot(int ind)
 	    Fire_general_shot(NULL, TEAM_NOT_SET, 0,
 			      shot->pos.cx, shot->pos.cy,
 			      OBJ_HEAT_SHOT, (int)(rfrac() * RES),
-			      mods, -1);
+			      mods, NO_ID);
 	}
     }
     else if (addBall) {

@@ -208,7 +208,7 @@ void Connector_force(int ind);
 void Fire_shot(player *pl, int type, int dir);
 void Fire_general_shot(player *pl, unsigned short team, bool cannon,
 		       int cx, int cy, int type, int dir,
-		       modifiers mods, int target);
+		       modifiers mods, int target_id);
 void Fire_normal_shots(player *pl);
 void Fire_main_shot(player *pl, int type, int dir);
 void Fire_shot(player *pl, int type, int dir);
