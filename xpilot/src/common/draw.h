@@ -146,17 +146,15 @@ typedef struct {			/* Defines wire-obj, i.e. ship */
 } shipobj;
 
 extern shipobj *Default_ship(void);
-extern void Free_ship_shape(shipobj *w);
+extern void Free_ship_shape(shipobj *ship);
 extern shipobj *Parse_shape_str(char *str);
 extern shipobj *Convert_shape_str(char *str);
-extern void Calculate_shield_radius(shipobj *w);
+extern void Calculate_shield_radius(shipobj *ship);
 extern int Validate_shape_str(char *str);
-extern void Convert_ship_2_string(shipobj *w, char *buf, char *ext,
+extern void Convert_ship_2_string(shipobj *ship, char *buf, char *ext,
 				  unsigned shape_version);
-extern int shape2wire(char *ship_shape_str, shipobj *w);
 extern void Rotate_point(shapepos pt[RES]);
 extern void Rotate_position(position pt[RES]);
-extern void Rotate_ship(shipobj *w);
 extern shapepos ipos2shapepos(ipos pos);
 extern position shapepos2position(shapepos pt);
 extern shapepos *Shape_get_points(shape *s, int dir);
