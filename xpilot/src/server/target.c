@@ -25,23 +25,23 @@
 
 #include "xpserver.h"
 
-void Target_update(world_t *world)
+void Target_update(void)
 {
     int i, j;
 
-    for (i = 0; i < Num_targets(world); i++) {
-	target_t *targ = Target_by_index(world, i);
+    for (i = 0; i < Num_targets(); i++) {
+	target_t *targ = Target_by_index(i);
 
 	if (targ->dead_ticks > 0) {
 	    if ((targ->dead_ticks -= timeStep) <= 0) {
-		World_restore_target(world, targ);
+		World_restore_target(targ);
 
 		if (options.targetSync) {
-		    for (j = 0; j < Num_targets(world); j++) {
-			target_t *t = Target_by_index(world, j);
+		    for (j = 0; j < Num_targets(); j++) {
+			target_t *t = Target_by_index(j);
 
 			if (t->team == targ->team)
-			    World_restore_target(world, t);
+			    World_restore_target(t);
 		    }
 		}
 	    }
@@ -73,7 +73,6 @@ void Object_hits_target(object_t *obj, target_t *targ, double player_cost)
     int win_team_members = 0, lose_team_members = 0,
 	targets_remaining = 0, targets_total = 0;
     vector_t zero_vel = {0.0, 0.0};
-    world_t *world = &World;
     bool somebody = false;
 
     /* a normal shot or a direct mine hit work, cannons don't */
@@ -140,10 +139,9 @@ void Object_hits_target(object_t *obj, target_t *targ, double player_cost)
     if (targ->damage > 0.0)
 	return;
 
-    World_remove_target(world, targ);
+    World_remove_target(targ);
 
-    Make_debris(world,
-		targ->pos,
+    Make_debris(targ->pos,
 		zero_vel,
 		NO_ID,
 		targ->team,
@@ -179,8 +177,8 @@ void Object_hits_target(object_t *obj, target_t *targ, double player_cost)
 	}
     }
     if (somebody) {
-	for (j = 0; j < Num_targets(world); j++) {
-	    target_t *t = Target_by_index(world, j);
+	for (j = 0; j < Num_targets(); j++) {
+	    target_t *t = Target_by_index(j);
 
 	    if (t->team == targ->team) {
 		targets_total++;
@@ -236,7 +234,7 @@ void Target_set_hitmask(int group, target_t *targ)
     P_set_hitmask(targ->group, Target_hitmask(targ));
 }
 
-void Target_init(world_t *world)
+void Target_init(void)
 {
     int group;
 
@@ -244,7 +242,7 @@ void Target_init(world_t *world)
 	group_t *gp = groupptr_by_id(group);
 
 	if (gp->type == TARGET)
-	    Target_set_hitmask(group, Target_by_index(world, gp->mapobj_ind));
+	    Target_set_hitmask(group, Target_by_index(gp->mapobj_ind));
     }
 
 #if 0
@@ -252,7 +250,7 @@ void Target_init(world_t *world)
 #endif
 }
 
-void World_restore_target(world_t *world, target_t *targ)
+void World_restore_target(target_t *targ)
 {
     blkpos_t blk = Clpos_to_blkpos(targ->pos);
     int i;
@@ -262,7 +260,7 @@ void World_restore_target(world_t *world, target_t *targ)
     int obj_count, i;
 
     /* check for objects that are where the target appears */
-    Cell_get_objects(world, targ->pos, 4, /* should depend on target size */
+    Cell_get_objects(targ->pos, 4, /* should depend on target size */
 		     300, &obj_list, &obj_count);
     warn("obj_count = %d", obj_count);
     for (i = 0; i < obj_count; i++) {
@@ -270,7 +268,7 @@ void World_restore_target(world_t *world, target_t *targ)
     }
 #endif
 
-    World_set_block(world, blk, TARGET);
+    World_set_block(blk, TARGET);
 
     for (i = 0; i < num_polys; i++) {
 	poly_t *poly = &pdata[i];
@@ -291,12 +289,12 @@ void World_restore_target(world_t *world, target_t *targ)
     P_set_hitmask(targ->group, Target_hitmask(targ));
 }
 
-void World_remove_target(world_t *world, target_t *targ)
+void World_remove_target(target_t *targ)
 {
     blkpos_t blk = Clpos_to_blkpos(targ->pos);
     int i;
 
-    targ->update_mask = (unsigned) -1;
+    targ->update_mask = ~0;
     /* is this necessary? (done also in Target_restore_on_map() ) */
     targ->damage = TARGET_DAMAGE;
     targ->dead_ticks = options.targetDeadTicks;
@@ -305,7 +303,7 @@ void World_remove_target(world_t *world, target_t *targ)
      * Destroy target.
      * Turn it into a space to simplify other calculations.
      */
-    World_set_block(world, blk, SPACE);
+    World_set_block(blk, SPACE);
 
     for (i = 0; i < num_polys; i++) {
 	poly_t *poly = &pdata[i];

@@ -213,12 +213,11 @@ void Get_recording_data(void)
     }
 }
 
-void Init_recording(world_t *world)
+void Init_recording(void)
 {
     static int oldMode = 0;
     int i;
 
-    UNUSED_PARAM(world);
     if (!options.recordFileName) {
 	if (options.recordMode != 0)
 	    warn("Can't do anything with recordings when recordFileName "

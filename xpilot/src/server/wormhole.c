@@ -28,12 +28,11 @@
 
 shape_t		wormhole_wire;
 
-void Wormhole_line_init(world_t *world)
+void Wormhole_line_init(void)
 {
     int i;
     static clpos_t coords[MAX_SHIP_PTS];
 
-    UNUSED_PARAM(world);
     wormhole_wire.num_points = MAX_SHIP_PTS;
     for (i = 0; i < MAX_SHIP_PTS; i++) {
 	wormhole_wire.pts[i] = coords + i;
@@ -47,8 +46,7 @@ void Wormhole_line_init(world_t *world)
 
 void Object_hits_wormhole(object_t *obj, int ind)
 {
-    /*world_t *world = &World;
-      wormhole_t *wormhole = Wormhole_by_index(world, ind);*/
+    /*wormhole_t *wormhole = Wormhole_by_index(ind);*/
 
     SET_BIT(obj->obj_status, WARPING);
     obj->wormHoleHit = ind;
@@ -68,8 +66,6 @@ void Object_hits_wormhole(object_t *obj, int ind)
  */
 static void Warp_balls(player_t *pl, clpos_t dest)
 {
-    world_t *world = pl->world;
-
     /*
      * Don't connect to balls while warping.
      */
@@ -93,26 +89,26 @@ static void Warp_balls(player_t *pl, clpos_t dest)
 
 		ballpos.cx = b->pos.cx + dest.cx - pl->pos.cx;
 		ballpos.cy = b->pos.cy + dest.cy - pl->pos.cy;
-		ballpos = World_wrap_clpos(world, ballpos);
-		if (!World_contains_clpos(world, ballpos)
+		ballpos = World_wrap_clpos(ballpos);
+		if (!World_contains_clpos(ballpos)
 		    || (shape_is_inside(ballpos.cx, ballpos.cy, hitmask,
 					(object_t *)b, &ball_wire, 0)
 			!= NO_GROUP)) {
 		    b->life = 0.0;
 		    continue;
 		}
-		Object_position_set_clpos(world, b, ballpos);
+		Object_position_set_clpos(b, ballpos);
 		Object_position_remember(b);
 		b->vel.x *= WORM_BRAKE_FACTOR;
 		b->vel.y *= WORM_BRAKE_FACTOR;
-		Cell_add_object(world, b);
+		Cell_add_object(b);
 	    }
 	}
     }
 }
 
 
-static int Find_wormhole_dest(world_t *world, wormhole_t *wh_hit, player_t *pl)
+static int Find_wormhole_dest(wormhole_t *wh_hit, player_t *pl)
 {
     int wh_dest, wcx, wcy, nearestFront, nearestRear;
     double proximity, proxFront, proxRear;
@@ -125,8 +121,8 @@ static int Find_wormhole_dest(world_t *world, wormhole_t *wh_hit, player_t *pl)
 
     if (rfrac() < 0.1) {
 	do
-	    wh_dest = (int)(rfrac() * Num_wormholes(world));
-	while (Wormhole_by_index(world, wh_dest)->type == WORM_IN
+	    wh_dest = (int)(rfrac() * Num_wormholes());
+	while (Wormhole_by_index(wh_dest)->type == WORM_IN
 	       || pl->wormHoleHit == wh_dest);
 	return wh_dest;
     }
@@ -134,8 +130,8 @@ static int Find_wormhole_dest(world_t *world, wormhole_t *wh_hit, player_t *pl)
     nearestFront = nearestRear = -1;
     proxFront = proxRear = 1e20;
 
-    for (wh_dest = 0; wh_dest < Num_wormholes(world); wh_dest++) {
-	wormhole_t *wh = Wormhole_by_index(world, wh_dest);
+    for (wh_dest = 0; wh_dest < Num_wormholes(); wh_dest++) {
+	wormhole_t *wh = Wormhole_by_index(wh_dest);
 
 	if (wh_dest == pl->wormHoleHit
 	    || wh->type == WORM_IN)
@@ -167,8 +163,8 @@ static int Find_wormhole_dest(world_t *world, wormhole_t *wh_hit, player_t *pl)
 	    wh_dest = nearestFront;
 	else {
 	    do
-		wh_dest = (int)(rfrac() * Num_wormholes(world));
-	    while (Wormhole_by_index(world, wh_dest)->type == WORM_IN
+		wh_dest = (int)(rfrac() * Num_wormholes());
+	    while (Wormhole_by_index(wh_dest)->type == WORM_IN
 		   || wh_dest == pl->wormHoleHit);
 	}
     }
@@ -184,17 +180,16 @@ void Traverse_wormhole(player_t *pl)
 {
     clpos_t dest;
     int wh_dest;
-    world_t *world = pl->world;
-    wormhole_t *wh_hit = Wormhole_by_index(world, pl->wormHoleHit);
+    wormhole_t *wh_hit = Wormhole_by_index(pl->wormHoleHit);
 
 #if 0
     warn("player %s is in Traverse_wormhole", pl->name);
 #endif
 
-    wh_dest = Find_wormhole_dest(world, wh_hit, pl);
+    wh_dest = Find_wormhole_dest(wh_hit, pl);
 
     sound_play_sensors(pl->pos, WORM_HOLE_SOUND);
-    dest = Wormhole_by_index(world, wh_dest)->pos;
+    dest = Wormhole_by_index(wh_dest)->pos;
 
     Warp_balls(pl, dest);
 
@@ -223,13 +218,12 @@ void Traverse_wormhole(player_t *pl)
 void Hyperjump(player_t *pl)
 {
     clpos_t dest;
-    world_t *world = pl->world;
     int counter;
     hitmask_t hitmask = NONBALL_BIT | HITMASK(pl->team); /* kps - ok ? */
 
     /* Try to find empty space to hyperjump to. */
     for (counter = 20; counter > 0; counter--) {
-	dest = World_get_random_clpos(world);
+	dest = World_get_random_clpos();
 	if (shape_is_inside(dest.cx, dest.cy, hitmask,
 			    (object_t *)pl, (shape_t *)pl->ship,
 			    pl->dir)
@@ -273,8 +267,7 @@ hitmask_t Wormhole_hitmask(wormhole_t *wormhole)
 bool Wormhole_hitfunc(group_t *gp, move_t *move)
 {
     object_t *obj = move->obj;
-    world_t *world = &World;
-    wormhole_t *wormhole = Wormhole_by_index(world, gp->mapobj_ind);
+    wormhole_t *wormhole = Wormhole_by_index(gp->mapobj_ind);
 
     if (wormhole->type == WORM_OUT)
 	return false;
@@ -328,20 +321,20 @@ bool Wormhole_hitfunc(group_t *gp, move_t *move)
 #endif
 }
 
-void World_remove_wormhole(world_t *world, wormhole_t *wormhole)
+void World_remove_wormhole(wormhole_t *wormhole)
 {
     blkpos_t blk = Clpos_to_blkpos(wormhole->pos);
 
-    World_set_block(world, blk, wormhole->lastblock);
+    World_set_block(blk, wormhole->lastblock);
 }
 
-bool Verify_wormhole_consistency(world_t *world)
+bool Verify_wormhole_consistency(void)
 {
     int i, worm_in = 0, worm_out = 0, worm_norm = 0;
 
     /* count wormhole types */
-    for (i = 0; i < Num_wormholes(world); i++) {
-	int type = Wormhole_by_index(world, i)->type;
+    for (i = 0; i < Num_wormholes(); i++) {
+	int type = Wormhole_by_index(i)->type;
 
 	if (type == WORM_NORMAL)
 	    worm_norm++;
@@ -381,17 +374,17 @@ bool Verify_wormhole_consistency(world_t *world)
 }
 
 /* kps - remove this */
-void Set_wormhole_initial_destinations(world_t *world)
+void Set_wormhole_initial_destinations(void)
 {
     int i;
 
     if (!options.wormholeStableTicks) {
-	for (i = 0; i < Num_wormholes(world); i++) {
-	    int j = (int)(rfrac() * Num_wormholes(world));
+	for (i = 0; i < Num_wormholes(); i++) {
+	    int j = (int)(rfrac() * Num_wormholes());
 
-	    while (Wormhole_by_index(world, j)->type == WORM_IN)
-		j = (int)(rfrac() * Num_wormholes(world));
-	    Wormhole_by_index(world, i)->lastdest = j;
+	    while (Wormhole_by_index(j)->type == WORM_IN)
+		j = (int)(rfrac() * Num_wormholes());
+	    Wormhole_by_index(i)->lastdest = j;
 	}
     }
 }

@@ -25,7 +25,7 @@
 
 #include "xpserver.h"
 
-void Make_treasure_ball(world_t *world, treasure_t *t)
+void Make_treasure_ball(treasure_t *t)
 {
     ballobject_t *ball;
     clpos_t pos = t->pos;
@@ -52,7 +52,7 @@ void Make_treasure_ball(world_t *world, treasure_t *t)
     ball->vel.y = 0;		/* longer to the ground */
     ball->acc.x = 0;
     ball->acc.y = 0;
-    Object_position_init_clpos(world, OBJ_PTR(ball), pos);
+    Object_position_init_clpos(OBJ_PTR(ball), pos);
     ball->id = NO_ID;
     ball->ball_owner = NO_ID;
     ball->team = t->team;
@@ -65,17 +65,17 @@ void Make_treasure_ball(world_t *world, treasure_t *t)
     ball->ball_treasure = t;
     ball->ball_loose_ticks = 0;
     ball->ball_style = t->ball_style;
-    Cell_add_object(world, OBJ_PTR(ball));
+    Cell_add_object(OBJ_PTR(ball));
 
     t->have = true;
 }
 
-void Treasure_init(world_t *world)
+void Treasure_init(void)
 {
     int i;
 
-    for (i = 0; i < Num_treasures(world); i++)
-	Make_treasure_ball(world, Treasure_by_index(world, i));
+    for (i = 0; i < Num_treasures(); i++)
+	Make_treasure_ball(Treasure_by_index(i));
 }
 
 /*
@@ -118,12 +118,11 @@ void Ball_is_destroyed(ballobject_t *ball)
 
 static int Punish_team(player_t *pl, treasure_t *td, clpos_t pos)
 {
-    world_t *world = pl->world;
     double win_score = 0.0, lose_score = 0.0, por;
     int i, win_team_members = 0, lose_team_members = 0;
     bool somebody = false;
 
-    Check_team_members (world, td->team);
+    Check_team_members (td->team);
     if (td->team == pl->team)
 	return 0;
 	
@@ -164,7 +163,6 @@ void Ball_hits_goal(ballobject_t *ball, group_t *gp)
 {
     player_t *owner;
     treasure_t *td;
-    world_t *world = &World;
     int i;
 
     if (gp->type != TREASURE) {
@@ -193,7 +191,7 @@ void Ball_hits_goal(ballobject_t *ball, group_t *gp)
     }
     if (gp->team == owner->team &&
         td->team != options.specialBallTeam) {
-	treasure_t *tt = Treasure_by_index(world, gp->mapobj_ind);
+	treasure_t *tt = Treasure_by_index(gp->mapobj_ind);
 
 	Ball_is_destroyed(ball);
 
@@ -282,7 +280,6 @@ extern bool in_legacy_mode_ball_hack;
 bool Balltarget_hitfunc(group_t *gp, move_t *move)
 {
     ballobject_t *ball = NULL;
-    world_t *world = &World;
 
     /* this can happen if is_inside is called for a balltarget with
        a NULL obj */

@@ -67,8 +67,7 @@ void Place_mine(player_t *pl)
 	return;
     }
 
-    Place_general_mine(pl->world, pl->id, pl->team, GRAVITY, pl->pos,
-		       zero_vel, pl->mods);
+    Place_general_mine(pl->id, pl->team, GRAVITY, pl->pos, zero_vel, pl->mods);
 }
 
 
@@ -91,23 +90,22 @@ void Place_moving_mine(player_t *pl)
 	}
     }
 
-    Place_general_mine(pl->world, pl->id, pl->team, GRAVITY, pl->pos,
-		       vel, pl->mods);
+    Place_general_mine(pl->id, pl->team, GRAVITY, pl->pos, vel, pl->mods);
 }
 
-void Place_general_mine(world_t *world, int id, int team, int status,
+void Place_general_mine(int id, int team, int status,
 			clpos_t pos, vector_t vel, modifiers_t mods)
 {
     int used, i, minis;
     double life, drain, mass;
     vector_t mv;
     player_t *pl = Player_by_id(id);
-    cannon_t *cannon = Cannon_by_id(world, id);
+    cannon_t *cannon = Cannon_by_id(id);
 
     if (NumObjs + Mods_get(mods, ModsMini) >= MAX_TOTAL_SHOTS)
 	return;
 
-    pos = World_wrap_clpos(world, pos);
+    pos = World_wrap_clpos(pos);
 
     if (pl && Player_is_killed(pl))
 	life = rfrac() * 12;
@@ -117,12 +115,12 @@ void Place_general_mine(world_t *world, int id, int team, int status,
 	life = options.mineLife;
 
     if (!Mods_get(mods, ModsCluster))
-	Mods_set(&mods, ModsVelocity, 0, world);
+	Mods_set(&mods, ModsVelocity, 0);
     if (!Mods_get(mods, ModsMini))
-	Mods_set(&mods, ModsSpread, 0, world);
+	Mods_set(&mods, ModsSpread, 0);
 
     if (options.nukeMinSmarts <= 0)
-	Mods_set(&mods, ModsNuclear, 0, world);
+	Mods_set(&mods, ModsNuclear, 0);
     if (Mods_get(mods, ModsNuclear)) {
 	if (pl) {
 	    used = ((Mods_get(mods, ModsNuclear) & MODS_FULLNUCLEAR)
@@ -162,7 +160,7 @@ void Place_general_mine(world_t *world, int id, int team, int status,
 		if (pl_i->home_base == NULL)
 		    continue;
 		if (pl_i->id != pl->id
-		    && !Team_immune(world, pl_i->id, pl->id)
+		    && !Team_immune(pl_i->id, pl->id)
 		    && !Player_is_tank(pl_i)) {
 		    if (Wrap_length(pos.cx - pl_i->home_base->pos.cx,
 				    pos.cy - pl_i->home_base->pos.cy)
@@ -204,7 +202,7 @@ void Place_general_mine(world_t *world, int id, int team, int status,
 	mine->team = team;
 	mine->mine_owner = mine->id;
 	mine->mine_count = 0.0;
-	Object_position_init_clpos(world, OBJ_PTR(mine), pos);
+	Object_position_init_clpos(OBJ_PTR(mine), pos);
 	if (minis > 1) {
 	    int space = RES/minis, dir;
 	    double spread = (double)(Mods_get(mods, ModsSpread) + 1);
@@ -240,7 +238,7 @@ void Place_general_mine(world_t *world, int id, int team, int status,
 	mine->mods = mods;
 	mine->pl_range = (int)(MINE_RANGE / minis);
 	mine->pl_radius = MINE_RADIUS;
-	Cell_add_object(world, OBJ_PTR(mine));
+	Cell_add_object(OBJ_PTR(mine));
     }
 }
 
@@ -254,7 +252,6 @@ void Place_general_mine(world_t *world, int id, int team, int status,
  */
 void Detonate_mines(player_t *pl)
 {
-    world_t *world = pl->world;
     int i, closest = -1;
     double dist, min_dist = world->hypotenuse * CLICK + 1;
 
@@ -372,7 +369,7 @@ void Fire_main_shot(player_t *pl, int type, int dir)
     pos.cx = pl->pos.cx + m_gun.cx;
     pos.cy = pl->pos.cy + m_gun.cy;
 
-    Fire_general_shot(pl->world, pl->id, pl->team, pos, type,
+    Fire_general_shot(pl->id, pl->team, pos, type,
 		      dir, pl->mods, NO_ID);
 }
 
@@ -381,7 +378,7 @@ void Fire_shot(player_t *pl, int type, int dir)
     if (!Player_can_fire_shot(pl))
 	return;
 
-    Fire_general_shot(pl->world, pl->id, pl->team, pl->pos, type,
+    Fire_general_shot(pl->id, pl->team, pl->pos, type,
 		      dir, pl->mods, NO_ID);
 }
 
@@ -396,7 +393,7 @@ void Fire_left_shot(player_t *pl, int type, int dir, int gun)
     pos.cx = pl->pos.cx + l_gun.cx;
     pos.cy = pl->pos.cy + l_gun.cy;
 
-    Fire_general_shot(pl->world, pl->id, pl->team, pos, type,
+    Fire_general_shot(pl->id, pl->team, pos, type,
 		      dir, pl->mods, NO_ID);
 }
 
@@ -411,7 +408,7 @@ void Fire_right_shot(player_t *pl, int type, int dir, int gun)
     pos.cx = pl->pos.cx + r_gun.cx;
     pos.cy = pl->pos.cy + r_gun.cy;
 
-    Fire_general_shot(pl->world, pl->id, pl->team, pos, type,
+    Fire_general_shot(pl->id, pl->team, pos, type,
 		      dir, pl->mods, NO_ID);
 }
 
@@ -426,7 +423,7 @@ void Fire_left_rshot(player_t *pl, int type, int dir, int gun)
     pos.cx = pl->pos.cx + l_rgun.cx;
     pos.cy = pl->pos.cy + l_rgun.cy;
 
-    Fire_general_shot(pl->world, pl->id, pl->team, pos, type,
+    Fire_general_shot(pl->id, pl->team, pos, type,
 		      dir, pl->mods, NO_ID);
 }
 
@@ -441,11 +438,11 @@ void Fire_right_rshot(player_t *pl, int type, int dir, int gun)
     pos.cx = pl->pos.cx + r_rgun.cx;
     pos.cy = pl->pos.cy + r_rgun.cy;
 
-    Fire_general_shot(pl->world, pl->id, pl->team, pos, type,
+    Fire_general_shot(pl->id, pl->team, pos, type,
 		      dir, pl->mods, NO_ID);
 }
 
-void Fire_general_shot(world_t *world, int id, int team,
+void Fire_general_shot(int id, int team,
 		       clpos_t pos, int type, int dir,
 		       modifiers_t mods, int target_id)
 {
@@ -460,15 +457,15 @@ void Fire_general_shot(world_t *world, int id, int team,
     object_t *mini_objs[MODS_MINI_MAX + 1];
     torpobject_t *torp;
     player_t *pl = Player_by_id(id);
-    cannon_t *cannon = Cannon_by_id(world, id);
+    cannon_t *cannon = Cannon_by_id(id);
 
     if (NumObjs >= MAX_TOTAL_SHOTS)
 	return;
 
     if (!Mods_get(mods, ModsCluster))
-	Mods_set(&mods, ModsVelocity, 0, world);
+	Mods_set(&mods, ModsVelocity, 0);
     if (!Mods_get(mods, ModsMini))
-	Mods_set(&mods, ModsSpread, 0, world);
+	Mods_set(&mods, ModsSpread, 0);
 
     if (cannon) {
 	mass = CANNON_SHOT_MASS;
@@ -518,7 +515,7 @@ void Fire_general_shot(world_t *world, int id, int team,
 	    return;
 
 	if (options.nukeMinSmarts <= 0)
-	    Mods_set(&mods, ModsNuclear, 0, world);
+	    Mods_set(&mods, ModsNuclear, 0);
 	if (Mods_get(mods, ModsNuclear)) {
 	    if (pl) {
 		used = ((Mods_get(mods, ModsNuclear) & MODS_FULLNUCLEAR)
@@ -902,8 +899,8 @@ void Fire_general_shot(world_t *world, int id, int team,
 	    side = CLICK_TO_PIXEL(
 		Ship_get_m_rack_clpos(pl->ship, rack_no, 0).cy);
 	}
-	shotpos = World_wrap_clpos(world, shotpos);
-	Object_position_init_clpos(world, shot, shotpos);
+	shotpos = World_wrap_clpos(shotpos);
+	Object_position_init_clpos(shot, shotpos);
 
 	if (type == OBJ_SHOT || !pl)
 	    angle = 0.0;
@@ -997,7 +994,7 @@ void Fire_general_shot(world_t *world, int id, int team,
 	shot->mods  	= mods;
 	shot->pl_range  = pl_range;
 	shot->pl_radius = pl_radius;
-	Cell_add_object(world, shot);
+	Cell_add_object(shot);
 
 	mini_objs[fired] = shot;
 	fired++;
@@ -1088,7 +1085,7 @@ void Fire_normal_shots(player_t *pl)
 
 
 /* Removes shot from array */
-void Delete_shot(world_t *world, int ind)
+void Delete_shot(int ind)
 {
     object_t *shot = Obj[ind];	/* Used when swapping places */
     ballobject_t *ball;
@@ -1107,7 +1104,7 @@ void Delete_shot(world_t *world, int ind)
 	break;
 
     case OBJ_ASTEROID:
-	Break_asteroid(world, WIRE_PTR(shot));
+	Break_asteroid(WIRE_PTR(shot));
 	break;
 
     case OBJ_BALL:
@@ -1146,8 +1143,7 @@ void Delete_shot(world_t *world, int ind)
 			  NONBALL_BIT | NOTEAM_BIT, OBJ_PTR(ball)) != NO_GROUP)
 		break;
 
-	    Make_debris(world,
-			ball->prevpos,
+	    Make_debris(ball->prevpos,
 			ball->vel,
 			ball->id,
 			ball->team,
@@ -1250,8 +1246,7 @@ void Delete_shot(world_t *world, int ind)
 	     intensity, num_debris, min_life, max_life);
 #endif
 
-	Make_debris(world,
-		    shot->prevpos,
+	Make_debris(shot->prevpos,
 		    shot->vel,
 		    shot->id,
 		    shot->team,
@@ -1333,7 +1328,7 @@ void Delete_shot(world_t *world, int ind)
 	break;
     }
 
-    Cell_remove_object(world, shot);
+    Cell_remove_object(shot);
     shot->life = 0;
     shot->type = 0;
     shot->mass = 0;
@@ -1343,28 +1338,28 @@ void Delete_shot(world_t *world, int ind)
     if (addMine || addHeat) {
 	Mods_clear(&mods);
 	if (rfrac() <= 0.333)
-	    Mods_set(&mods, ModsCluster, 1, world);
+	    Mods_set(&mods, ModsCluster, 1);
 	if (rfrac() <= 0.333)
-	    Mods_set(&mods, ModsImplosion, 1, world);
+	    Mods_set(&mods, ModsImplosion, 1);
 	Mods_set(&mods, ModsVelocity,
-		 (int)(rfrac() * (MODS_VELOCITY_MAX + 1)), world);
+		 (int)(rfrac() * (MODS_VELOCITY_MAX + 1)));
 	Mods_set(&mods, ModsPower,
-		 (int)(rfrac() * (MODS_POWER_MAX + 1)), world);
+		 (int)(rfrac() * (MODS_POWER_MAX + 1)));
 	if (addMine) {
 	    long gravity_status = ((rfrac() < 0.5) ? GRAVITY : 0);
 	    vector_t zero_vel = { 0.0, 0.0 };
 
-	    Place_general_mine(world, NO_ID, TEAM_NOT_SET, gravity_status,
+	    Place_general_mine(NO_ID, TEAM_NOT_SET, gravity_status,
 			       shot->pos, zero_vel, mods);
 	}
 	else if (addHeat)
-	    Fire_general_shot(world, NO_ID, TEAM_NOT_SET, shot->pos,
+	    Fire_general_shot(NO_ID, TEAM_NOT_SET, shot->pos,
 			      OBJ_HEAT_SHOT, (int)(rfrac() * RES),
 			      mods, NO_ID);
     }
     else if (addBall) {
 	ball = BALL_PTR(shot);
-	Make_treasure_ball(world, ball->ball_treasure);
+	Make_treasure_ball(ball->ball_treasure);
     }
 }
 
@@ -1414,7 +1409,7 @@ void Delete_shot(world_t *world, int ind)
  * Changed the value (max_spring_ratio) at which the string snaps
  * from 0.25 to 0.30.  Not sure if that helps enough, or too much.
  */
-void Update_connector_force(world_t *world, ballobject_t *ball)
+void Update_connector_force(ballobject_t *ball)
 {
     player_t		*pl = Player_by_id(ball->id);
     vector_t		D;
@@ -1469,7 +1464,7 @@ void Update_connector_force(world_t *world, ballobject_t *ball)
     ball->vel.y += -D.y * accell * timeStep;
 }
 
-void Update_torpedo(world_t *world, torpobject_t *torp)
+void Update_torpedo(torpobject_t *torp)
 {
     double acc;
 
@@ -1489,7 +1484,7 @@ void Update_torpedo(world_t *world, torpobject_t *torp)
     torp->vel.y += acc * tsin(torp->missile_dir);
 }
 
-void Update_missile(world_t *world, missileobject_t *missile)
+void Update_missile(missileobject_t *missile)
 {
     player_t *pl;
     int angle, theta;
@@ -1798,7 +1793,7 @@ void Update_missile(world_t *world, missileobject_t *missile)
     missile->vel.y = tsin(missile->missile_dir) * shot_speed;
 }
 
-void Update_mine(world_t *world, mineobject_t *mine)
+void Update_mine(mineobject_t *mine)
 {
     UNUSED_PARAM(world);
 

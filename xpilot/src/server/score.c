@@ -116,20 +116,14 @@ void Handle_Scoring(scoretype_t st, player_t *killer, player_t *victim, void *ex
     double sc = 0.0,sc2 = 0.0,factor = 0.0;
     int i_tank_owner = 0,j = 0;
     player_t *true_killer;
-    world_t *world;
     
-    if (killer)
-    	world = killer->world;
-    else if (victim)
-    	world = victim->world;
-    else {
+    if (!(killer || victim)) {
     	warn("Attempted to score with neither victim nor killer");
 	return;
     }
     
     switch(st) {
     	case SCORE_CANNON_KILL:
-	    if (!world) break;
 	    sc = Rate(Get_Score(killer), ((cannon_t *)extra)->score)
 	    	* options.cannonKillScoreMult;
 	    if (BIT(world->rules->mode, TEAM_PLAY)
@@ -228,7 +222,7 @@ void Handle_Scoring(scoretype_t st, player_t *killer, player_t *victim, void *ex
 	    break;
     	case SCORE_SHOT_DEATH:
 	    if (BIT(((object_t *)extra)->obj_status, FROMCANNON)) {
-		cannon_t *cannon = Cannon_by_id(world, ((object_t *)extra)->id);
+		cannon_t *cannon = Cannon_by_id(((object_t *)extra)->id);
 
 		/*KHS: for cannon dodgers; cannon hit substracts*/
 		/* fixed percentage of score */		
@@ -315,7 +309,9 @@ void Handle_Scoring(scoretype_t st, player_t *killer, player_t *victim, void *ex
     	    {
 	    double por, win_score = 0.0, lose_score = 0.0;
     	    int win_team_members = 0, lose_team_members = 0,targets_remaining = 0, targets_total = 0;
+	    target_t *targ = (target_t *)extra;
     	    bool somebody = false;
+
     	    if (BIT(world->rules->mode, TEAM_PLAY)) {
 	    	for (j = 0; j < NumPlayers; j++) {
 	    	    player_t *pl = Player_by_index(j);
@@ -325,7 +321,7 @@ void Handle_Scoring(scoretype_t st, player_t *killer, player_t *victim, void *ex
 		    	|| Player_is_waiting(pl))
 		    	continue;
 
-	    	    if (pl->team == ((target_t *)extra)->team) {
+	    	    if (pl->team == targ->team) {
 		    	lose_score +=  Get_Score(pl);
 		    	lose_team_members++;
 		    	if (!Player_is_dead(pl))
@@ -338,10 +334,10 @@ void Handle_Scoring(scoretype_t st, player_t *killer, player_t *victim, void *ex
 	    	}
     	    }
     	    if (somebody) {
-	    	for (j = 0; j < Num_targets(world); j++) {
-	    	    target_t *t = Target_by_index(world, j);
+	    	for (j = 0; j < Num_targets(); j++) {
+	    	    target_t *t = Target_by_index(j);
 
-	    	    if (t->team == ((target_t *)extra)->team) {
+	    	    if (t->team == targ->team) {
 		    	targets_total++;
 		    	if (t->dead_ticks <= 0)
 		    	    targets_remaining++;
@@ -351,14 +347,14 @@ void Handle_Scoring(scoretype_t st, player_t *killer, player_t *victim, void *ex
     	    if (!somebody)
 	    	break;
 
-    	    sound_play_sensors(((target_t *)extra)->pos, DESTROY_TARGET_SOUND);
+    	    sound_play_sensors(targ->pos, DESTROY_TARGET_SOUND);
 
     	    if (targets_remaining > 0) {
 	    	sc = Rate(Get_Score(killer), TARGET_SCORE)/4;
 	    	sc = sc * (targets_total - targets_remaining) / (targets_total + 1);
 	    	if (sc >= 0.01)
 	    	    if (!options.zeroSumScoring) Score(killer, sc,
-		    	    	((target_t *)extra)->pos, "Target: ");
+		    	    	targ->pos, "Target: ");
 	    	break;
     	    }
 
@@ -376,17 +372,17 @@ void Handle_Scoring(scoretype_t st, player_t *killer, player_t *victim, void *ex
 	    	    || Player_is_waiting(pl))
 	    	    continue;
 
-	    	if (pl->team == ((target_t *)extra)->team) {
+	    	if (pl->team == targ->team) {
 	    	    if (options.targetKillTeam
 		    	&& targets_remaining == 0
 		    	&& Player_is_alive(pl))
 		    	Player_set_state(pl, PL_STATE_KILLED);
 	    	    if (!options.zeroSumScoring) Score(pl, -sc,
-		    	    	((target_t *)extra)->pos, "Target: ");
+		    	    	targ->pos, "Target: ");
 	    	} else if (pl->team == killer->team &&
 		    	(pl->team != TEAM_NOT_SET || pl->id == killer->id))
 	    	    if (!options.zeroSumScoring) Score(pl, por,
-		    	    	((target_t *)extra)->pos, "Target: ");
+		    	    	targ->pos, "Target: ");
     	    }
 	    break;
 	    }
@@ -394,6 +390,7 @@ void Handle_Scoring(scoretype_t st, player_t *killer, player_t *victim, void *ex
 	    {
     	    double win_score = 0.0, lose_score = 0.0, por;
     	    int i, win_team_members = 0, lose_team_members = 0;
+	    treasure_t *treasure = (treasure_t *)extra;
     	    bool somebody = false;
 
     	    if (BIT(world->rules->mode, TEAM_PLAY)) {
@@ -404,7 +401,7 @@ void Handle_Scoring(scoretype_t st, player_t *killer, player_t *victim, void *ex
 		    	|| (Player_is_paused(pl_i) && pl_i->pause_count <= 0)
 		    	|| Player_is_waiting(pl_i))
 		    	continue;
-	    	    if (pl_i->team == ((treasure_t *)extra)->team) {
+	    	    if (pl_i->team == treasure->team) {
 		    	lose_score += Get_Score(pl_i);
 		    	lose_team_members++;
 		    	if (!Player_is_dead(pl_i))
@@ -420,13 +417,13 @@ void Handle_Scoring(scoretype_t st, player_t *killer, player_t *victim, void *ex
     	    if (!somebody) {
 	    	if (!options.zeroSumScoring)
 		    Score(killer, Rate( Get_Score(killer),
-		    	    TREASURE_SCORE)/2, ((treasure_t *)extra)->pos,
+		    	    TREASURE_SCORE)/2, treasure->pos,
 			    "Treasure:");
 	    	break;
     	    }
 
-    	    ((treasure_t *)extra)->destroyed++;
-    	    world->teams[((treasure_t *)extra)->team].TreasuresLeft--;
+    	    treasure->destroyed++;
+    	    world->teams[treasure->team].TreasuresLeft--;
     	    world->teams[killer->team].TreasuresDestroyed++;
 
     	    sc  = 3 * Rate(win_score, lose_score);
@@ -440,8 +437,8 @@ void Handle_Scoring(scoretype_t st, player_t *killer, player_t *victim, void *ex
 	    	    || Player_is_waiting(pl_i))
 	    	    continue;
 
-	    	if (pl_i->team == ((treasure_t *)extra)->team) {
-	    	    Score(pl_i, -sc, ((treasure_t *)extra)->pos, "Treasure: ");
+	    	if (pl_i->team == treasure->team) {
+	    	    Score(pl_i, -sc, treasure->pos, "Treasure: ");
 	    	    Rank_lost_ball(pl_i);
 	    	    if (options.treasureKillTeam)
 		    	Player_set_state(pl_i, PL_STATE_KILLED);
@@ -454,7 +451,7 @@ void Handle_Scoring(scoretype_t st, player_t *killer, player_t *victim, void *ex
 		    	Rank_won_ball(pl_i);
 	    	    }
 	    	    Score(pl_i, (pl_i->id == killer->id ? 3*por : 2*por),
-		    	    	((treasure_t *)extra)->pos, "Treasure: ");
+		    	    	treasure->pos, "Treasure: ");
 	    	}
     	    }
 

@@ -27,12 +27,11 @@
 
 #define GRAV_RANGE  10
 
-static void Compute_global_gravity(world_t *world)
+static void Compute_global_gravity(void)
 {
-    int			xi, yi, dx, dy;
-    double		xforce, yforce, strength;
-    double		theta;
-    vector_t		*grav;
+    int xi, yi, dx, dy;
+    double xforce, yforce, strength, theta;
+    vector_t *grav;
 
     if (options.gravityPointSource == false) {
 	theta = (options.gravityAngle * PI) / 180.0;
@@ -96,7 +95,7 @@ static void Compute_grav_tab(vector_t grav_tab[GRAV_RANGE+1][GRAV_RANGE+1])
 }
 
 
-static void Compute_local_gravity(world_t *world)
+static void Compute_local_gravity(void)
 {
     int xi, yi, i, gx, gy, ax, ay, dx, dy, gtype;
     int first_xi, last_xi, first_yi, last_yi, mod_xi, mod_yi;
@@ -116,8 +115,8 @@ static void Compute_local_gravity(world_t *world)
 	min_yi -= MIN(GRAV_RANGE, world->y);
 	max_yi += MIN(GRAV_RANGE, world->y);
     }
-    for (i = 0; i < Num_gravs(world); i++) {
-	grav_t *g = Grav_by_index(world, i);
+    for (i = 0; i < Num_gravs(); i++) {
+	grav_t *g = Grav_by_index(i);
 
 	gx = CLICK_TO_BLOCK(g->pos.cx);
 	gy = CLICK_TO_BLOCK(g->pos.cy);
@@ -198,8 +197,8 @@ static void Compute_local_gravity(world_t *world)
 }
 
 
-void Compute_gravity(world_t *world)
+void Compute_gravity(void)
 {
-    Compute_global_gravity(world);
-    Compute_local_gravity(world);
+    Compute_global_gravity();
+    Compute_local_gravity();
 }

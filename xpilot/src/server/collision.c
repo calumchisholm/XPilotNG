@@ -159,11 +159,11 @@ static bool in_range(object_t *obj1, object_t *obj2, double range)
     return hit;
 }
 
-static void PlayerCollision(world_t *world);
+static void PlayerCollision(void);
 static void PlayerObjectCollision(player_t *pl);
-static void AsteroidCollision(world_t *world);
-static void BallCollision(world_t *world);
-static void MineCollision(world_t *world);
+static void AsteroidCollision(void);
+static void BallCollision(void);
+static void MineCollision(void);
 static void Player_collides_with_ball(player_t *pl, ballobject_t *ball);
 static void Player_collides_with_item(player_t *pl, itemobject_t *item);
 static void Player_collides_with_mine(player_t *pl, mineobject_t *mine);
@@ -172,16 +172,16 @@ static void Player_collides_with_asteroid(player_t *pl, wireobject_t *obj);
 static void Player_collides_with_killing_shot(player_t *pl, object_t *obj);
 
 
-void Check_collision(world_t *world)
+void Check_collision(void)
 {
-    BallCollision(world);
-    MineCollision(world);
-    PlayerCollision(world);
-    AsteroidCollision(world);
+    BallCollision();
+    MineCollision();
+    PlayerCollision();
+    AsteroidCollision();
 }
 
 
-static void PlayerCollision(world_t *world)
+static void PlayerCollision(void)
 {
     int i, j;
     player_t *pl;
@@ -192,7 +192,7 @@ static void PlayerCollision(world_t *world)
 	if (!Player_is_alive(pl))
 	    continue;
 
-	if (!World_contains_clpos(world, pl->pos)) {
+	if (!World_contains_clpos(pl->pos)) {
 	    Player_set_state(pl, PL_STATE_KILLED);
 	    Set_message_f("%s left the known universe.", pl->name);
 	    Handle_Scoring(SCORE_WALL_DEATH,NULL,pl,NULL);
@@ -233,7 +233,7 @@ static void PlayerCollision(world_t *world)
 		 * The choosing of the first line may not be easy however.
 		 */
 
-		if (Team_immune(world, pl->id, pl_j->id)
+		if (Team_immune(pl->id, pl_j->id)
 		    || PSEUDO_TEAM(pl, pl_j))
 		    continue;
 
@@ -461,7 +461,6 @@ static void PlayerObjectCollision(player_t *pl)
     int j, obj_count;
     double range, radius;
     object_t *obj, **obj_list;
-    world_t *world = pl->world;
 
     /*
      * Collision between a player and an object.
@@ -470,7 +469,7 @@ static void PlayerObjectCollision(player_t *pl)
 	return;
 
     if (NumObjs >= options.cellGetObjectsThreshold)
-	Cell_get_objects(world, pl->pos, 4, 500, &obj_list, &obj_count);
+	Cell_get_objects(pl->pos, 4, 500, &obj_list, &obj_count);
     else {
 	obj_list = Obj;
 	obj_count = NumObjs;
@@ -497,7 +496,7 @@ static void PlayerObjectCollision(player_t *pl)
 		       Player_is_tank(pl) &&
 		       (pl->lock.pl_id == obj->id))
 		continue;
-	    else if (Team_immune(world, obj->id, pl->id))
+	    else if (Team_immune(obj->id, pl->id))
 		continue;
 	    else if (Player_is_paused(Player_by_id(obj->id)))
 		continue;
@@ -602,7 +601,7 @@ static void PlayerObjectCollision(player_t *pl)
 
 	case OBJ_CANNON_SHOT:
 	    /* don't explode cannon flak if it hits directly */
-	    Mods_set(&obj->mods, ModsCluster, 0, world);
+	    Mods_set(&obj->mods, ModsCluster, 0);
 	    break;
 
 	case OBJ_PULSE:
@@ -637,8 +636,6 @@ static void PlayerObjectCollision(player_t *pl)
 
 static void Player_collides_with_ball(player_t *pl, ballobject_t *ball)
 {
-    world_t *world = pl->world;
-
     /*
      * The ball is special, usually players bounce off of it with
      * shields up, or die with shields down.  The treasure may
@@ -696,7 +693,6 @@ static void Player_collides_with_item(player_t *pl, itemobject_t *item)
 {
     int old_have;
     enum Item item_index = (enum Item) item->item_type;
-    world_t *world = pl->world;
 
     if (IsOffensiveItem(item_index)) {
 	int off_items = CountOffensiveItems(pl);
@@ -1018,7 +1014,6 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
     player_t *kp = NULL;
     cannon_t *cannon = NULL; 
     double drainfactor, drain;
-    world_t *world = pl->world;
 
     /*
      * Player got hit by a potentially deadly object.
@@ -1109,7 +1104,7 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 	case OBJ_SHOT:
 	case OBJ_CANNON_SHOT:
 	    if (BIT(obj->obj_status, FROMCANNON)) {
-		cannon = Cannon_by_id(world, obj->id);
+		cannon = Cannon_by_id(obj->id);
 
 		sound_play_sensors(pl->pos, PLAYER_HIT_CANNONFIRE_SOUND);
 		Set_message_f("%s was hit by cannonfire.", pl->name);
@@ -1167,7 +1162,7 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
     }
 }
 
-static void AsteroidCollision(world_t *world)
+static void AsteroidCollision(void)
 {
     int j, radius, obj_count;
     object_t *ast;
@@ -1189,10 +1184,10 @@ static void AsteroidCollision(world_t *world)
 	if (ast->life <= 0.0)
 	    continue;
 
-	assert(World_contains_clpos(world, ast->pos));
+	assert(World_contains_clpos(ast->pos));
 
 	if (NumObjs >= options.cellGetObjectsThreshold)
-	    Cell_get_objects(world, ast->pos, ast->pl_radius / BLOCK_SZ + 1,
+	    Cell_get_objects(ast->pos, ast->pl_radius / BLOCK_SZ + 1,
 			     300, &obj_list, &obj_count);
 	else {
 	    obj_list = Obj;
@@ -1316,7 +1311,7 @@ static void AsteroidCollision(world_t *world)
 
 
 /* do ball - object and ball - checkpoint collisions */
-static void BallCollision(world_t *world)
+static void BallCollision(void)
 {
     int i, j, obj_count;
     int	ignored_object_types;
@@ -1352,7 +1347,7 @@ static void BallCollision(world_t *world)
 	    player_t *owner = Player_by_id(ball->ball_owner);
 
 	    if (!options.ballrace_connect || ball->id == owner->id) {
-		clpos_t cpos = Check_by_index(world, owner->check)->pos;
+		clpos_t cpos = Check_by_index(owner->check)->pos;
 
 		if (Wrap_length(ball->pos.cx - cpos.cx,
 				ball->pos.cy - cpos.cy)
@@ -1366,7 +1361,7 @@ static void BallCollision(world_t *world)
 	    continue;
 
 	if (NumObjs >= options.cellGetObjectsThreshold)
-	    Cell_get_objects(world, ball->pos, 4, 300, &obj_list, &obj_count);
+	    Cell_get_objects(ball->pos, 4, 300, &obj_list, &obj_count);
 	else {
 	    obj_list = Obj;
 	    obj_count = NumObjs;
@@ -1436,7 +1431,7 @@ static void BallCollision(world_t *world)
 
 
 /* do mine - object collisions */
-static void MineCollision(world_t *world)
+static void MineCollision(void)
 {
     int i, j, obj_count;
     object_t **obj_list;
@@ -1455,7 +1450,7 @@ static void MineCollision(world_t *world)
 	    continue;
 
 	if (NumObjs >= options.cellGetObjectsThreshold)
-	    Cell_get_objects(world, mine->pos, 4, 300, &obj_list, &obj_count);
+	    Cell_get_objects(mine->pos, 4, 300, &obj_list, &obj_count);
 	else {
 	    obj_list = Obj;
 	    obj_count = NumObjs;

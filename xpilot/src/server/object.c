@@ -91,7 +91,7 @@ static anyobject_t *objArray;
 
 #define SHOWTYPESIZE(T) warn("sizeof(" #T ") = %d", sizeof(T))
 
-void Alloc_shots(world_t *world, int number)
+void Alloc_shots(int number)
 {
     anyobject_t		*x;
     int			i;
@@ -122,14 +122,13 @@ void Alloc_shots(world_t *world, int number)
 	Obj[i] = &(x->obj);
 	/* kps - shouldn't be necessary */
 	/*MINE_PTR(Obj[i])->mine_owner = NO_ID;*/
-	Cell_init_object(world, Obj[i]);
+	Cell_init_object(Obj[i]);
 	x++;
     }
 }
 
-void Free_shots(world_t *world)
+void Free_shots(void)
 {
-    UNUSED_PARAM(world);
     XFREE(objArray);
 }
 

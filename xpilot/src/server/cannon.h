@@ -87,7 +87,7 @@ extern long CANNON_USE_ITEM;
 /* cannon smartness is 0 to this value */
 #define CANNON_SMARTNESS_MAX	3
 
-void Cannon_update(world_t *world, bool tick);
+void Cannon_update(bool tick);
 void Cannon_init(cannon_t *cannon);
 void Cannon_init_items(cannon_t *cannon);
 void Cannon_add_item(cannon_t *cannon, int type, int amount);
@@ -99,8 +99,8 @@ void Cannon_dies(cannon_t *cannon, player_t *pl);
 hitmask_t Cannon_hitmask(cannon_t *cannon);
 void Cannon_set_hitmask(int group, cannon_t *cannon);
 bool Cannon_hitfunc(group_t *groupptr, move_t *move);
-void World_restore_cannon(world_t *world, cannon_t *cannon);
-void World_remove_cannon(world_t *world, cannon_t *cannon);
+void World_restore_cannon(cannon_t *cannon);
+void World_remove_cannon(cannon_t *cannon);
 void Cannon_set_option(cannon_t *cannon, const char *name, const char *value);
 
 static inline int Cannon_get_smartness(cannon_t *c)
@@ -138,14 +138,14 @@ static inline double Cannon_get_shot_speed(cannon_t *cannon)
     return options.cannonShotSpeed;
 }
 
-static inline cannon_t *Cannon_by_id(world_t *world, int id)
+static inline cannon_t *Cannon_by_id(int id)
 {
     int ind;
 
     if (id < MIN_CANNON_ID || id > MAX_CANNON_ID)
 	return NULL;
     ind = id - MIN_CANNON_ID;
-    return Cannon_by_index(world, ind);
+    return Cannon_by_index(ind);
 }
 
 #endif

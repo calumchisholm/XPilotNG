@@ -127,7 +127,7 @@ static inline bool can_hit(group_t *gp, move_t *move)
     return gp->hitfunc(gp, move);
 }
 
-void Move_init(world_t *world)
+void Move_init(void)
 {
     LIMIT(options.maxObjectWallBounceSpeed, 0, world->hypotenuse);
     LIMIT(options.maxShieldedWallBounceSpeed, 0, world->hypotenuse);
@@ -171,8 +171,6 @@ void Move_init(world_t *world)
 
 void Object_crash(object_t *obj, int crashtype, int mapobj_ind)
 {
-    world_t *world = &World;
-
     switch (crashtype) {
 
     default:
@@ -193,7 +191,7 @@ void Object_crash(object_t *obj, int crashtype, int mapobj_ind)
 
     case CrashTarget:
 	obj->life = 0;
-	Object_hits_target(obj, Target_by_index(world, mapobj_ind), -1.0);
+	Object_hits_target(obj, Target_by_index(mapobj_ind), -1.0);
 	break;
 
     case CrashWall:
@@ -207,7 +205,7 @@ void Object_crash(object_t *obj, int crashtype, int mapobj_ind)
 
     case CrashCannon:
 	obj->life = 0;
-	Object_hits_cannon(obj, Cannon_by_index(world, mapobj_ind));
+	Object_hits_cannon(obj, Cannon_by_index(mapobj_ind));
 	break;
 
     case CrashUnknown:
@@ -221,7 +219,6 @@ void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
 {
     const char *howfmt = NULL;
     const char *hudmsg = NULL;
-    world_t *world = pl->world;
 
     msg[0] = '\0';
 
@@ -264,7 +261,7 @@ void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
 	howfmt = "%s smashed%s against a target";
 	hudmsg = "[Target]";
 	sound_play_sensors(pl->pos, PLAYER_HIT_WALL_SOUND);
-	Object_hits_target(OBJ_PTR(pl), Target_by_index(world, mapobj_ind), -1.0);
+	Object_hits_target(OBJ_PTR(pl), Target_by_index(mapobj_ind), -1.0);
 	break;
 
     case CrashTreasure:
@@ -275,7 +272,7 @@ void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
 
     case CrashCannon:
         {
-	    cannon_t *cannon = Cannon_by_index(world, mapobj_ind);
+	    cannon_t *cannon = Cannon_by_index(mapobj_ind);
 
 	    if (!Player_uses_emergency_shield(pl)) {
 		howfmt = "%s smashed%s against a cannon";
@@ -405,7 +402,7 @@ void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
     if (Player_is_killed(pl)
 	&&  Get_Score(pl) < 0
 	&& Player_is_robot(pl)) {
-	pl->home_base = Base_by_index(world, 0);
+	pl->home_base = Base_by_index(0);
 	Pick_startpos(pl);
     }
 }
@@ -467,7 +464,6 @@ static int Bounce_object(object_t *obj, move_t *move, int line, int point)
     double c, s, wall_brake_factor = options.objectWallBounceBrakeFactor;
     int group, type;
     int mapobj_ind;
-    world_t *world = &World;
 
     group = linet[line >= num_lines ? point : line].group;
     type = groups[group].type;
@@ -493,7 +489,7 @@ static int Bounce_object(object_t *obj, move_t *move, int line, int point)
 
     if (type == TARGET) {
 	obj->life = 0;
-	Object_hits_target(obj, Target_by_index(world, mapobj_ind), -1.0);
+	Object_hits_target(obj, Target_by_index(mapobj_ind), -1.0);
 	return 0;
     }
 
@@ -589,7 +585,6 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
     double cl, sl;		/* cosine and sine of line angle */
     double x, y, l2, l;
     int group, type, mapobj_ind;
-    world_t *world = pl->world;
     bool constant_speed_subtracted
     	    = (pl->last_wall_touch == frame_loops ? true : false);
 	
@@ -661,7 +656,7 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 
 	if (cost && type == TARGET)
 	    Object_hits_target(OBJ_PTR(pl),
-			       Target_by_index(world, mapobj_ind),
+			       Target_by_index(mapobj_ind),
 			       cost / 4.0);
     }
 
@@ -1549,7 +1544,6 @@ static void store_4byte(int value, unsigned char **start, int *offset, int *sz)
 
 int Polys_to_client(unsigned char **start)
 {
-    world_t *world = &World;
     int i, j, startx, starty, dx, dy;
     int *edges;
     int size, offset;
@@ -1612,9 +1606,9 @@ int Polys_to_client(unsigned char **start)
 	    starty = dy;
 	}
     }
-    STORE1(Num_bases(world));
-    for (i = 0; i < Num_bases(world); i++) {
-	base_t *base = Base_by_index(world, i);
+    STORE1(Num_bases());
+    for (i = 0; i < Num_bases(); i++) {
+	base_t *base = Base_by_index(i);
 	if (base->team == TEAM_NOT_SET)
 	    STORE1(0);
 	else
@@ -1623,9 +1617,9 @@ int Polys_to_client(unsigned char **start)
 	STORE2(base->pos.cy >> CLICK_SHIFT);
 	STORE1(base->dir);
     }
-    STORE2(Num_fuels(world));
-    for (i = 0; i < Num_fuels(world); i++) {
-	fuel_t *fs = Fuel_by_index(world, i);
+    STORE2(Num_fuels());
+    for (i = 0; i < Num_fuels(); i++) {
+	fuel_t *fs = Fuel_by_index(i);
 
 	STORE2(fs->pos.cx >> CLICK_SHIFT);
 	STORE2(fs->pos.cy >> CLICK_SHIFT);
@@ -1963,7 +1957,6 @@ static void allocate_inside(void)
 static double edge_distance(int bx, int by, int ox, int oy, int dx, int dy,
 			  int *dir)
 {
-    world_t *world = &World;
     int last_width = (world->cwidth - 1) % B_CLICKS + 1;
     int last_height = (world->cheight - 1) % B_CLICKS + 1;
     double xdist, ydist, dist;
@@ -2391,12 +2384,11 @@ static void Corner_init(void)
 }
 
 
-void Ball_line_init(world_t *world)
+void Ball_line_init(void)
 {
     int i;
     static clpos_t coords[MAX_SHIP_PTS];
 
-    UNUSED_PARAM(world);
     LIMIT(options.ballRadius, 0, BALL_RADIUS);
     ball_wire.num_points = MAX_SHIP_PTS;
     for (i = 0; i < MAX_SHIP_PTS; i++) {
@@ -2463,7 +2455,7 @@ static void Poly_to_lines(void)
     return;
 }
 
-void Walls_init(world_t *world)
+void Walls_init(void)
 {
     double x, y, l2;
     int i;
@@ -2483,7 +2475,7 @@ void Walls_init(world_t *world)
      * sides of a moving polygon shape. */
     Corner_init();
 
-    Ball_line_init(world);
+    Ball_line_init();
 
     /* Initialize the data structures used when determining whether a given
      * arbitrary point on the map is inside something. */
@@ -2504,7 +2496,7 @@ void Walls_init(world_t *world)
 	    warn("Option mapData is not supported on polygon maps.");
 	    warn("Server automatically creates block map from polygons.");
 	}
-	Create_blockmap_from_polygons(world);
+	Create_blockmap_from_polygons();
     }
 }
 
@@ -2513,7 +2505,6 @@ static void Move_asteroid(object_t *obj)
 {
     move_t mv;
     struct collans ans;
-    world_t *world = &World;
     wireobject_t *asteroid = (wireobject_t *)obj;
 
     mv.delta.cx = FLOAT_TO_CLICK(obj->vel.x * timeStep);
@@ -2559,8 +2550,8 @@ static void Move_asteroid(object_t *obj)
 	    }
 	}
     }
-    Object_position_set_clvec(world, obj, mv.start);
-    Cell_add_object(world, obj);
+    Object_position_set_clvec(obj, mv.start);
+    Cell_add_object(obj);
     return;
 }
 
@@ -2570,7 +2561,6 @@ static void Move_ball(object_t *obj)
     move_t mv;
     struct collans ans;
     int owner;
-    world_t *world = &World;
 
     mv.delta.cx = FLOAT_TO_CLICK(obj->vel.x * timeStep);
     mv.delta.cy = FLOAT_TO_CLICK(obj->vel.y * timeStep);
@@ -2584,9 +2574,9 @@ static void Move_ball(object_t *obj)
 
 	pos.cx = obj->pos.cx + mv.delta.cx;
 	pos.cy = obj->pos.cy + mv.delta.cy;
-	pos = World_wrap_clpos(world, pos);
-	Object_position_set_clpos(world, obj, pos);
-	Cell_add_object(world, obj);
+	pos = World_wrap_clpos(pos);
+	Object_position_set_clpos(obj, pos);
+	Cell_add_object(obj);
 	return;
     }
     owner = BALL_PTR(obj)->ball_owner;
@@ -2624,8 +2614,8 @@ static void Move_ball(object_t *obj)
 	    }
 	}
     }
-    Object_position_set_clvec(world, obj, mv.start);
-    Cell_add_object(world, obj);
+    Object_position_set_clvec(obj, mv.start);
+    Cell_add_object(obj);
     return;
 }
 
@@ -2637,7 +2627,6 @@ void Move_object(object_t *obj)
     struct collans ans;
     int trycount = 5000;
     int team;            /* !@# should make TEAM_NOT_SET 0 */
-    world_t *world = &World;
 
     mv.obj = obj;
     Object_position_remember(obj);
@@ -2701,8 +2690,8 @@ void Move_object(object_t *obj)
 	    }
 	}
     }
-    Object_position_set_clvec(world, obj, mv.start);
-    Cell_add_object(world, obj);
+    Object_position_set_clvec(obj, mv.start);
+    Cell_add_object(obj);
     return;
 }
 
@@ -2715,7 +2704,6 @@ void Move_player(player_t *pl)
     struct collans ans;
     double fric = friction;
     vector_t oldv;
-    world_t *world = pl->world;
 
     if (!Player_is_alive(pl)) {
 	pos.cx = pl->pos.cx + FLOAT_TO_CLICK(pl->vel.x * timeStep);
@@ -2733,15 +2721,15 @@ void Move_player(player_t *pl)
     /* Figure out which friction to use. */
     if (Player_is_phasing(pl))
 	fric = friction;
-    else if (Num_frictionAreas(world) > 0) {
+    else if (Num_frictionAreas() > 0) {
 	int group, i;
 
 	in_move_player = true;
 	
 	group = is_inside(pl->pos.cx, pl->pos.cy, NONBALL_BIT, (object_t *)pl);
 	if (group != NO_GROUP) {
-	    for (i = 0; i < Num_frictionAreas(world); i++) {
-		friction_area_t *fa = FrictionArea_by_index(world, i);
+	    for (i = 0; i < Num_frictionAreas(); i++) {
+		friction_area_t *fa = FrictionArea_by_index(i);
 
 		if (fa->group == group) {
 		    fric = fa->friction;
@@ -2781,7 +2769,7 @@ void Move_player(player_t *pl)
     if (Player_is_phasing(pl)) {
 	pos.cx = pl->pos.cx + mv.delta.cx;
 	pos.cy = pl->pos.cy + mv.delta.cy;
-	pos = World_wrap_clpos(world, pos);
+	pos = World_wrap_clpos(pos);
 	Player_position_set_clpos(pl, pos);
     } else {
 	mv.hitmask = NONBALL_BIT | HITMASK(pl->team);

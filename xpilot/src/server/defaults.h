@@ -70,7 +70,7 @@ typedef struct _option_desc {
     const char		*defaultValue;
     void		*variable;
     enum valType	type;
-    void		(*tuner)(world_t *world);
+    void		(*tuner)(void);
     const char		*helpLine;
     int			flags;		/* allowable option origins. */
 } option_desc;

@@ -143,8 +143,6 @@ static void Send_info_about_player(player_t *pl)
 
 static void Set_swapper_state(player_t *pl)
 {
-    world_t *world = pl->world;
-
     if (BIT(pl->have, HAS_BALL))
 	Detach_ball(pl, NULL);
 
@@ -522,7 +520,6 @@ static int Cmd_advance(char *arg, player_t *pl, bool oper,
 
 static int Cmd_ally(char *arg, player_t *pl, bool oper, char *msg, size_t size)
 {
-    world_t *world = pl->world;
     char *command;
     int result = CMD_RESULT_SUCCESS;
     static const char usage[] =
@@ -1019,7 +1016,6 @@ static int Cmd_queue(char *arg, player_t *pl, bool oper, char *msg, size_t size)
 static int Cmd_reset(char *arg, player_t *pl, bool oper, char *msg, size_t size)
 {
     int i;
-    world_t *world = pl->world;
 
     if (!oper)
 	return CMD_RESULT_NOT_OPERATOR;
@@ -1031,7 +1027,7 @@ static int Cmd_reset(char *arg, player_t *pl, bool oper, char *msg, size_t size)
 	    if (!Player_is_paused(pl_i))
 		Rank_set_score(pl_i, 0.0);
 	}
-	Reset_all_players(world);
+	Reset_all_players();
 	if (options.gameDuration == -1)
 	    options.gameDuration = 0;
 	roundsPlayed = 0;
@@ -1043,7 +1039,7 @@ static int Cmd_reset(char *arg, player_t *pl, bool oper, char *msg, size_t size)
 	teamcup_game_start();
     }
     else {
-	Reset_all_players(world);
+	Reset_all_players();
 	if (options.gameDuration == -1)
 	    options.gameDuration = 0;
 
@@ -1076,7 +1072,6 @@ static int Cmd_team(char *arg, player_t *pl, bool oper, char *msg, size_t size)
 {
     int i, team, swap_allowed;
     char *arg2;
-    world_t *world = pl->world;
 
     UNUSED_PARAM(oper);
 
@@ -1115,7 +1110,7 @@ static int Cmd_team(char *arg, player_t *pl, bool oper, char *msg, size_t size)
 	}
 
 	for (i = 0; i < MAX_TEAMS ; i++) {
-	    team_t *t = Team_by_index(world, i);
+	    team_t *t = Team_by_index(i);
 
 	    /* Can't queue to two teams at once. */
 	    if (t->SwapperId == pl->id)

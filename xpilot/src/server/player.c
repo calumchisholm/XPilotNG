@@ -62,25 +62,24 @@ void Pick_startpos(player_t *pl)
     int ind = GetInd(pl->id), i, num_free, pick = 0, seen = 0, order, min_order = INT_MAX;
     static int prev_num_bases = 0;
     static char	*free_bases = NULL;
-    world_t *world = pl->world;
 
     if (Player_is_tank(pl)) {
-	pl->home_base = Base_by_index(world, 0);
+	pl->home_base = Base_by_index(0);
 	return;
     }
 
-    if (prev_num_bases != Num_bases(world)) {
-	prev_num_bases = Num_bases(world);
+    if (prev_num_bases != Num_bases()) {
+	prev_num_bases = Num_bases();
 	XFREE(free_bases);
-	free_bases = XMALLOC(char, Num_bases(world));
+	free_bases = XMALLOC(char, Num_bases());
 	if (free_bases == NULL) {
 	    error("Can't allocate memory for free_bases");
 	    End_game();
 	}
     }
 
-    for (i = 0; i < Num_bases(world); i++) {
-	if (Base_by_index(world, i)->team == pl->team) {
+    for (i = 0; i < Num_bases(); i++) {
+	if (Base_by_index(i)->team == pl->team) {
 	    free_bases[i] = 1;
 	} else {
 	    free_bases[i] = 0;	/* other team */
@@ -99,9 +98,9 @@ void Pick_startpos(player_t *pl)
     }
 
     /* find out the lowest order of all free bases */
-    for (i = 0; i < Num_bases(world); i++) {
+    for (i = 0; i < Num_bases(); i++) {
 	if (free_bases[i] != 0) {
-	    order = Base_by_index(world, i)->order;
+	    order = Base_by_index(i)->order;
 	    if (order < min_order) {
 	        min_order = order;
 	    }
@@ -110,9 +109,9 @@ void Pick_startpos(player_t *pl)
 	
     /* mark all bases with higher order as occupied */
     num_free = 0;
-    for (i = 0; i < Num_bases(world); i++) {
+    for (i = 0; i < Num_bases(); i++) {
 	if (free_bases[i] != 0) {
-	    if (Base_by_index(world, i)->order <= min_order) {
+	    if (Base_by_index(i)->order <= min_order) {
 		num_free++;
 	    } else {
 		free_bases[i] = 0;
@@ -123,7 +122,7 @@ void Pick_startpos(player_t *pl)
     /* pick a random base of all bases marked free */
     pick = (int)(rfrac() * num_free);
     seen = 0;
-    for (i = 0; i < Num_bases(world); i++) {
+    for (i = 0; i < Num_bases(); i++) {
 	if (free_bases[i] != 0) {
 	    if (seen < pick)
 		seen++;
@@ -132,12 +131,12 @@ void Pick_startpos(player_t *pl)
 	}
     }
 
-    if (i == Num_bases(world)) {
+    if (i == Num_bases()) {
 	error("Can't pick startpos (ind=%d,num=%d,free=%d,pick=%d,seen=%d)",
-	      ind, Num_bases(world), num_free, pick, seen);
+	      ind, Num_bases(), num_free, pick, seen);
 	End_game();
     } else {
-	pl->home_base = Base_by_index(world, i);
+	pl->home_base = Base_by_index(i);
 	if (ind < NumPlayers) {
 	    for (i = 0; i < spectatorStart + NumSpectators; i++) {
 		player_t *pl_i;
@@ -163,7 +162,6 @@ void Go_home(player_t *pl)
     int ind = GetInd(pl->id), i, dir, check;
     double vx, vy, velo;
     clpos_t pos, initpos;
-    world_t *world = pl->world;
 
     if (Player_is_tank(pl)) {
 	/*NOTREACHED*/
@@ -180,7 +178,7 @@ void Go_home(player_t *pl)
 	    check = pl->check - 1;
 	else
 	    check = world->NumChecks - 1;
-	pos = Check_by_index(world, check)->pos;
+	pos = Check_by_index(check)->pos;
 	vx = (rfrac() - 0.5) * 0.1;
 	vy = (rfrac() - 0.5) * 0.1;
 	velo = LENGTH(vx, vy);
@@ -254,7 +252,6 @@ void Compute_sensor_range(player_t *pl)
 {
     static int init = 0;
     static double EnergyRangeFactor;
-    world_t *world = pl->world;
 
     if (!init) {
 	if (options.minVisibilityDistance <= 0.0)
@@ -381,7 +378,6 @@ static void Player_init_fuel(player_t *pl, double total_fuel)
 {
     double fuel = total_fuel;
     int i;
-    world_t *world = pl->world;
 
     pl->fuel.num_tanks  = 0;
     pl->fuel.current    = 0;
@@ -408,7 +404,6 @@ void Player_init_items(player_t *pl)
 {
     int i, num_tanks;
     double total_fuel;
-    world_t *world = pl->world;
     base_t *base = pl->home_base;
 
     for (i = 0; i < NUM_ITEMS; i++) {
@@ -437,7 +432,6 @@ void Player_init_items(player_t *pl)
 
 void Player_init_items(player_t *pl)
 {
-    world_t *world = pl->world;
     int i;
 
     /*
@@ -460,7 +454,7 @@ void Player_init_items(player_t *pl)
 	pl->initial_item[i] = pl->item[i];
 }
 
-int Init_player(world_t *world, int ind, shipshape_t *ship, int type)
+int Init_player(int ind, shipshape_t *ship, int type)
 {
     player_t *pl = Player_by_index(ind);
     visibility_t *v = pl->visibility;
@@ -468,7 +462,6 @@ int Init_player(world_t *world, int ind, shipshape_t *ship, int type)
 
     memset(pl, 0, sizeof(player_t));
     pl->visibility = v;
-    pl->world = world;
 
     /*
      * Make sure floats, doubles and pointers are correctly zeroed.
@@ -631,7 +624,7 @@ void Free_players(void)
 
 
 
-void Update_score_table(world_t *world)
+void Update_score_table(void)
 {
     int i, j, check;
     player_t *pl;
@@ -674,7 +667,7 @@ void Update_score_table(world_t *world)
 }
 
 
-void Reset_all_players(world_t *world)
+void Reset_all_players(void)
 {
     player_t *pl;
     int i, j;
@@ -727,22 +720,22 @@ void Reset_all_players(world_t *world)
 		 */
 		ball->ball_owner = 0;
 		CLR_BIT(ball->obj_status, RECREATE);
-		Delete_shot(world, j);
+		Delete_shot(j);
 	    }
 	}
 
 	/* Reset the treasures */
-	for (i = 0; i < Num_treasures(world); i++) {
-	    treasure_t *treasure = Treasure_by_index(world, i);
+	for (i = 0; i < Num_treasures(); i++) {
+	    treasure_t *treasure = Treasure_by_index(i);
 
 	    treasure->destroyed = 0;
 	    treasure->have = false;
-	    Make_treasure_ball(world, treasure);
+	    Make_treasure_ball(treasure);
 	}
 
 	/* Reset the teams */
 	for (i = 0; i < MAX_TEAMS; i++) {
-	    team_t *teamp = Team_by_index(world, i);
+	    team_t *teamp = Team_by_index(i);
 
 	    teamp->TreasuresDestroyed = 0;
 	    teamp->TreasuresLeft
@@ -751,11 +744,11 @@ void Reset_all_players(world_t *world)
 
 	if (options.endOfRoundReset) {
 	    /* Reset the targets */
-	    for (i = 0; i < Num_targets(world); i++) {
-		target_t *targ = Target_by_index(world, i);
+	    for (i = 0; i < Num_targets(); i++) {
+		target_t *targ = Target_by_index(i);
 
 		if (targ->damage != TARGET_DAMAGE || targ->dead_ticks > 0)
-		    World_restore_target(world, targ);
+		    World_restore_target(targ);
 	    }
 	}
     }
@@ -780,11 +773,11 @@ void Reset_all_players(world_t *world)
 
     roundtime = options.maxRoundTime * FPS;
 
-    Update_score_table(world);
+    Update_score_table();
 }
 
 
-void Check_team_members(world_t *world, int team)
+void Check_team_members(int team)
 {
     player_t *pl;
     team_t *teamp;
@@ -800,7 +793,7 @@ void Check_team_members(world_t *world, int team)
 	    && pl->home_base != NULL)
 	    members++;
     }
-    teamp = Team_by_index(world, team);
+    teamp = Team_by_index(team);
     if (teamp->NumMembers != members) {
 	warn("Server has reset team %d members from %d to %d",
 	     team, teamp->NumMembers, members);
@@ -937,7 +930,7 @@ void Count_rounds(void)
 }
 
 
-void Team_game_over(world_t *world, int winning_team, const char *reason)
+void Team_game_over(int winning_team, const char *reason)
 {
     int i, j, num_best_players, *best_players;
     double average_score, best_ratio;
@@ -994,7 +987,7 @@ void Team_game_over(world_t *world, int winning_team, const char *reason)
 
     teamcup_round_end(winning_team);
 
-    Reset_all_players(world);
+    Reset_all_players();
 
     Count_rounds();
 
@@ -1008,7 +1001,7 @@ void Team_game_over(world_t *world, int winning_team, const char *reason)
     Rank_show_ranks();
 }
 
-void Individual_game_over(world_t *world, int winner)
+void Individual_game_over(int winner)
 {
     int i, j, num_best_players, *best_players;
     double average_score, best_ratio;
@@ -1068,14 +1061,14 @@ void Individual_game_over(world_t *world, int winner)
 	}
     }
 
-    Reset_all_players(world);
+    Reset_all_players();
 
     Count_rounds();
 
     free(best_players);
 }
 
-void Compute_game_status(world_t *world)
+void Compute_game_status(void)
 {
     int i;
     char msg[MSG_LEN];
@@ -1084,7 +1077,7 @@ void Compute_game_status(world_t *world)
 	roundtime--;
 
     if (BIT(world->rules->mode, TIMING))
-	Race_compute_game_status(world);
+	Race_compute_game_status();
     else if (BIT(world->rules->mode, TEAM_PLAY)) {
 
 	/* Do we have a winning team ? */
@@ -1166,7 +1159,7 @@ void Compute_game_status(world_t *world)
 
 		team_win[i] = 1;
 		team_ptr = &(world->teams[i]);
-		specialballteam_ptr = Team_by_index(world, options.specialBallTeam);
+		specialballteam_ptr = Team_by_index(options.specialBallTeam);
 		
 		if (options.specialBallTeam < 0 || options.specialBallTeam >=MAX_TEAMS ||
 		    specialballteam_ptr->NumTreasures == 0)
@@ -1210,7 +1203,7 @@ void Compute_game_status(world_t *world)
 	    }
 	    if (winners == 1) {
 		sprintf(msg, " by destroying %d treasures", max_destroyed);
-		Team_game_over(world, winning_team, msg);
+		Team_game_over(winning_team, msg);
 		return;
 	    }
 
@@ -1238,7 +1231,7 @@ void Compute_game_status(world_t *world)
 			" by destroying %d treasures"
 			" and successfully defending %d",
 			max_destroyed, max_left);
-		Team_game_over(world, winning_team, msg);
+		Team_game_over(winning_team, msg);
 		return;
 	    }
 
@@ -1255,7 +1248,7 @@ void Compute_game_status(world_t *world)
 		sprintf(msg, " by destroying %d treasures, saving %d, and "
 			"scoring %.2f points",
 			max_destroyed, max_left, max_score);
-		Team_game_over(world, winning_team, msg);
+		Team_game_over(winning_team, msg);
 		return;
 	    }
 
@@ -1270,14 +1263,14 @@ void Compute_game_status(world_t *world)
 	    }
 	    bp -= 2;
 	    *bp = '\0';
-	    Team_game_over(world, -1, msg);
+	    Team_game_over(-1, msg);
 
 	}
 	else if (num_dead_teams > 0) {
 	    if (num_alive_teams == 1)
-		Team_game_over(world, winning_team, " by staying alive");
+		Team_game_over(winning_team, " by staying alive");
 	    else
-		Team_game_over(world, -1, " as everyone died");
+		Team_game_over(-1, " as everyone died");
 	}
 	else {
 	    /*
@@ -1295,7 +1288,7 @@ void Compute_game_status(world_t *world)
 					- world->teams[j].NumEmptyTreasures
 					- world->teams[j].TreasuresLeft);
 	    if (treasures_destroyed)
-		Team_game_over(world, winning_team, " by staying in the game");
+		Team_game_over(winning_team, " by staying in the game");
 	}
 
     } else {
@@ -1325,16 +1318,16 @@ void Compute_game_status(world_t *world)
 	}
 
 	if (num_alive_players == 1 && num_active_players > 1)
-	    Individual_game_over(world, winner);
+	    Individual_game_over(winner);
 	else if (num_alive_players == 0 && num_active_players >= 1)
-	    Individual_game_over(world, -1);
+	    Individual_game_over(-1);
 	else if (num_alive_robots > 1
 		    && num_alive_players == num_alive_robots
 		    && num_active_humans > 0)
-	    Individual_game_over(world, -2);
+	    Individual_game_over(-2);
 	else if (options.maxRoundTime > 0 && roundtime == 0) {
 	    Set_message("Timer expired. Round ends now.");
-	    Individual_game_over(world, -1);
+	    Individual_game_over(-1);
 	}
     }
 }
@@ -1343,8 +1336,7 @@ void Delete_player(player_t *pl)
 {
     int ind = GetInd(pl->id), i, j, id = pl->id;
     object_t *obj;
-    world_t *world = pl->world;
-    team_t *teamp = Team_by_index(world, pl->team);
+    team_t *teamp = Team_by_index(pl->team);
 
     /* call before important player structures are destroyed */
     Leave_alliance(pl);
@@ -1373,7 +1365,7 @@ void Delete_player(player_t *pl)
 	obj = Obj[i];
 	if (obj->id == id) {
 	    if (obj->type == OBJ_BALL) {
-		Delete_shot(world, i);
+		Delete_shot(i);
 		BALL_PTR(obj)->ball_owner = NO_ID;
 	    }
 	    else if (obj->type == OBJ_DEBRIS
@@ -1457,7 +1449,7 @@ void Delete_player(player_t *pl)
     GetIndArray[Player_by_index(ind)->id] = ind;
     GetIndArray[Player_by_index(NumPlayers)->id] = NumPlayers;
 
-    Check_team_members(world, pl->team);
+    Check_team_members(pl->team);
 
     for (i = NumPlayers - 1; i >= 0; i--) {
 	player_t *pl_i = Player_by_index(i);
@@ -1574,8 +1566,6 @@ void Kill_player(player_t *pl, bool add_rank_death)
 
 void Player_death_reset(player_t *pl, bool add_rank_death)
 {
-    world_t *world = pl->world;
-
     if (Player_is_tank(pl)) {
 	Delete_player(pl);
 	return;
@@ -1641,7 +1631,7 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
 }
 
 /* determines if two players are immune to eachother */
-bool Team_immune(world_t *world, int id1, int id2)
+bool Team_immune(int id1, int id2)
 {
     player_t *pl1, *pl2;
 

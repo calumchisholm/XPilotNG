@@ -56,8 +56,8 @@ static inline void Mods_clear(modifiers_t *mods)
 }
 
 void Mods_to_string(modifiers_t mods, char *dst, size_t size);
-int Mods_set(modifiers_t *mods, modifier_t modifier, int val, world_t *world);
+int Mods_set(modifiers_t *mods, modifier_t modifier, int val);
 int Mods_get(modifiers_t mods, modifier_t modifier);
-void Mods_filter(modifiers_t *mods, world_t *world);
+void Mods_filter(modifiers_t *mods);
 
 #endif

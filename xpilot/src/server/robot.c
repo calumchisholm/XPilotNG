@@ -541,11 +541,10 @@ void Parse_robot_file(void)
 /*
  * First time initialization of all the robot stuff.
  */
-void Robot_init(world_t *world)
+void Robot_init(void)
 {
     int i, result, n;
 
-    UNUSED_PARAM(world);
     /*
      * For each robot driver call its initialization function.
      * If this function returns 0 then remember this robot driver.
@@ -674,7 +673,7 @@ static void Robot_talks(enum robot_talk_t says_what,
 }
 
 
-static void Robot_create(world_t *world)
+static void Robot_create(void)
 {
     player_t *robot;
     robot_t *rob;
@@ -726,7 +725,7 @@ static void Robot_create(world_t *world)
     }
     rob_type = &robot_types[new_data->robot_types_ind];
 
-    Init_player(world, NumPlayers,
+    Init_player(NumPlayers,
 		options.allowShipShapes ? Parse_shape_str(rob->shape) : NULL,
 		PL_TYPE_ROBOT);
 
@@ -746,7 +745,7 @@ static void Robot_create(world_t *world)
     robot->check = 0;
     if (BIT(world->rules->mode, TEAM_PLAY)) {
 	robot->team = Pick_team(PL_TYPE_ROBOT);
-	teamp = Team_by_index(world, robot->team);
+	teamp = Team_by_index(robot->team);
 	assert(teamp); /* if teamplay, can't have TEAM_NOT_SET */
 	teamp->NumMembers++;
 	teamp->NumRobots++;
@@ -983,13 +982,13 @@ static bool Robot_check_leave(player_t *pl)
 /*
  * On each round we call the robot type round ticker.
  */
-static void Robot_round_tick(world_t *world)
+static void Robot_round_tick(void)
 {
     int i;
 
     if (NumRobots > 0) {
 	for (i = 0; i < num_robot_types; i++)
-	    (*robot_types[i].robot_round_tick)(world);
+	    (*robot_types[i].robot_round_tick)();
     }
 }
 
@@ -1011,7 +1010,7 @@ static void Tank_play(player_t *pl)
 /*
  * Update robots. If 'tick' is true, robot AI routines will be called.
  */
-void Robot_update(world_t *world, bool tick)
+void Robot_update(bool tick)
 {
     int i;
     static double new_robot_delay;
@@ -1021,7 +1020,7 @@ void Robot_update(world_t *world, bool tick)
     num_playing_ships = num_any_ships - NumPseudoPlayers;
     if ((num_playing_ships < options.maxRobots
 	 || NumRobots < options.minRobots)
-	&& num_playing_ships < Num_bases(world)
+	&& num_playing_ships < Num_bases()
 	&& num_any_ships < NUM_IDS
 	&& NumRobots < MAX_ROBOTS
 	&& !(BIT(world->rules->mode, TEAM_PLAY)
@@ -1031,14 +1030,14 @@ void Robot_update(world_t *world, bool tick)
 
 	new_robot_delay += timeStep;
 	if (new_robot_delay >= ROBOT_CREATE_DELAY) {
-	    Robot_create(world);
+	    Robot_create();
 	    new_robot_delay = 0;
 	}
     }
     else {
 	new_robot_delay = 0;
 	if (NumRobots > 0) {
-	    if ((num_playing_ships > Num_bases(world))
+	    if ((num_playing_ships > Num_bases())
 		|| (num_any_ships > NUM_IDS)
 		|| (num_playing_ships > options.maxRobots
 		    && NumRobots > options.minRobots))
@@ -1052,7 +1051,7 @@ void Robot_update(world_t *world, bool tick)
     if (NumRobots <= 0 && NumPseudoPlayers <= 0)
 	return;
 
-    Robot_round_tick(world);
+    Robot_round_tick();
 
     for (i = 0; i < NumPlayers; i++) {
 	player_t *pl = Player_by_index(i);

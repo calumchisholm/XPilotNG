@@ -129,10 +129,8 @@ static void asciidump(void *p, size_t size)
 
 static char meta_update_string[MAX_STR_LEN];
 
-void Meta_update_max_size_tuner(world_t *world)
+void Meta_update_max_size_tuner(void)
 {
-    UNUSED_PARAM(world);
-
     LIMIT(options.metaUpdateMaxSize, 1, (int) sizeof(meta_update_string));
 }
 
@@ -147,7 +145,6 @@ void Meta_update(bool change)
     const char *game_mode;
     static time_t lastMetaSendTime = 0;
     static int queue_length = 0;
-    world_t *world = &World;
     bool first;
 
     if (!options.reportToMetaServer)
@@ -162,7 +159,7 @@ void Meta_update(bool change)
 	}
     }
 
-    Meta_update_max_size_tuner(world);
+    Meta_update_max_size_tuner();
     max_size = options.metaUpdateMaxSize;
 
     lastMetaSendTime = currentTime;
@@ -192,7 +189,7 @@ void Meta_update(bool change)
 	bool firstteam = true;
 
 	for (i = 0; i < MAX_TEAMS; i++) {
-	    team_t *team = Team_by_index(world, i);
+	    team_t *team = Team_by_index(i);
 
 	    if (i == options.robotTeam && options.reserveRobotTeam)
 		continue;
@@ -210,7 +207,7 @@ void Meta_update(bool change)
     }
     else
 	snprintf(freebases, sizeof(freebases), "=%d",
-		 Num_bases(world) - num_active_players - login_in_progress);
+		 Num_bases() - num_active_players - login_in_progress);
 
     snprintf(string, max_size,
 	     "add server %s\n"
@@ -231,7 +228,7 @@ void Meta_update(bool change)
 	     "add sound %s\n",
 	     Server.host, num_active_players,
 	     META_VERSION, world->name, world->x, world->y, world->author,
-	     Num_bases(world), FPS, options.contactPort,
+	     Num_bases(), FPS, options.contactPort,
 	     game_mode, world->NumTeamBases, freebases,
 	     BIT(world->rules->mode, TIMING) ? 1:0,
 	     (long)(time(NULL) - serverStartTime),

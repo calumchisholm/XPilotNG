@@ -30,8 +30,6 @@
 /*
  * The world whose map we are currently parsing.
  */
-static world_t *current_world = NULL;
-
 static bool parsing_general_options = false;
 static cannon_t *current_cannon = NULL;
 static base_t *current_base = NULL;
@@ -40,7 +38,6 @@ static void tagstart(void *data, const char *el, const char **attr)
 {
     static double scale = 1;
     static bool xptag = false;
-    world_t *world = current_world;
 
     UNUSED_PARAM(data);
     if (!strcasecmp(el, "XPilotMap")) {
@@ -206,7 +203,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 		pos.cy = (click_t)(atoi(*(attr + 1)) * scale);
 	    attr += 2;
 	}
-	World_place_check(world, pos, -1);
+	World_place_check(pos, -1);
 	return;
     }
 
@@ -223,7 +220,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 		pos.cy = (click_t)(atoi(*(attr + 1)) * scale);
 	    attr += 2;
 	}
-	World_place_fuel(world, pos, team);
+	World_place_fuel(pos, team);
 	return;
     }
 
@@ -249,8 +246,8 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    warn("Illegal team number in base tag.\n");
 	    exit(1);
 	}
-	ind = World_place_base(world, pos, dir, team, order);
-	current_base = Base_by_index(world, ind);
+	ind = World_place_base(pos, dir, team, order);
+	current_base = Base_by_index(ind);
 	return;
     }
 
@@ -270,7 +267,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 		style = P_get_poly_id(*(attr + 1));
 	    attr += 2;
 	}
-	World_place_treasure(world, pos, team, false, style);
+	World_place_treasure(pos, team, false, style);
 	return;
     }
 
@@ -289,9 +286,9 @@ static void tagstart(void *data, const char *el, const char **attr)
 		dir = atoi(*(attr + 1));
 	    attr += 2;
 	}
-	cannon_ind = World_place_cannon(world, pos, dir, team);
+	cannon_ind = World_place_cannon(pos, dir, team);
 	P_start_cannon(cannon_ind);
-	current_cannon = Cannon_by_index(world, cannon_ind);
+	current_cannon = Cannon_by_index(cannon_ind);
 	return;
     }
 
@@ -308,7 +305,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 		pos.cy = (click_t)(atoi(*(attr + 1)) * scale);
 	    attr += 2;
 	}
-	target_ind = World_place_target(world, pos, team);
+	target_ind = World_place_target(pos, team);
 	P_start_target(target_ind);
 	return;
     }
@@ -323,7 +320,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 		pos.cy = (click_t)(atoi(*(attr + 1)) * scale);
 	    attr += 2;
 	}
-	World_place_item_concentrator(world, pos);
+	World_place_item_concentrator(pos);
 	return;
     }
 
@@ -337,7 +334,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 		pos.cy = (click_t)(atoi(*(attr + 1)) * scale);
 	    attr += 2;
 	}
-	World_place_asteroid_concentrator(world, pos);
+	World_place_asteroid_concentrator(pos);
 	return;
     }
 
@@ -380,7 +377,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    warn("Illegal type in grav tag.\n");
 	    exit(1);
 	}
-	World_place_grav(world, pos, force, type);
+	World_place_grav(pos, force, type);
 	return;
     }
 
@@ -409,7 +406,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 
 	    attr += 2;
 	}
-	wh_ind = World_place_wormhole(world, pos, type);
+	wh_ind = World_place_wormhole(pos, type);
 	P_start_wormhole(wh_ind);
 	return;
     }
@@ -424,7 +421,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 		fric = atof(*(attr + 1));
 	    attr += 2;
 	}
-	area_ind = World_place_friction_area(world, pos, fric);
+	area_ind = World_place_friction_area(pos, fric);
 	P_start_friction_area(area_ind);
 	return;
     }
@@ -481,8 +478,6 @@ static void tagstart(void *data, const char *el, const char **attr)
 
 static void tagend(void *data, const char *el)
 {
-    world_t *world = current_world;
-
     UNUSED_PARAM(data);
     if (!strcasecmp(el, "Decor"))
 	P_end_decor();
@@ -510,7 +505,7 @@ static void tagend(void *data, const char *el)
 	/* ok, got to the end of options */
 	Options_parse();
 	/* kps - this can fail - fix */
-	Grok_map_options(world);
+	Grok_map_options();
     }
     return;
 }
@@ -540,7 +535,7 @@ bool isXp2MapFile(FILE* ifile)
     return false;
 }
 
-bool parseXp2MapFile(char* fname, optOrigin opt_origin, world_t *world)
+bool parseXp2MapFile(char* fname, optOrigin opt_origin)
 {
     gzFile in;
     char buff[8192];
@@ -548,8 +543,6 @@ bool parseXp2MapFile(char* fname, optOrigin opt_origin, world_t *world)
     unsigned left;
     XML_Parser p = XML_ParserCreate(NULL);
 
-    current_world = world;
-    
     UNUSED_PARAM(opt_origin);
     if (!p) {
 	warn("Creating Expat instance for map parsing failed.\n");

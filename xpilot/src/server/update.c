@@ -34,10 +34,10 @@ int		roundtime = -1;		/* time left this round */
 static double	time_to_tick = 1.0;	/* game time till next tick */
 static bool	tick = false; 		/* new tick of game time this frame */
 
-static inline void update_object_speed(world_t *world, object_t *obj)
+static inline void update_object_speed(object_t *obj)
 {
     if (BIT(obj->obj_status, GRAVITY)) {
-	vector_t gravity = World_gravity(world, obj->pos);
+	vector_t gravity = World_gravity(obj->pos);
 
 	obj->vel.x += (obj->acc.x + gravity.x) * timeStep;
 	obj->vel.y += (obj->acc.y + gravity.y) * timeStep;
@@ -60,7 +60,6 @@ static void Transport_to_home(player_t *pl)
     clpos_t startpos;
     double dx, dy, t, m;
     const double T = RECOVERY_DELAY;
-    world_t *world = pl->world;
 
     if (pl->home_base == NULL) {
 	pl->vel.x = 0;
@@ -75,7 +74,7 @@ static void Transport_to_home(player_t *pl)
 	    check = pl->check - 1;
 	else
 	    check = world->NumChecks - 1;
-	startpos = Check_by_index(world, check)->pos;
+	startpos = Check_by_index(check)->pos;
     } else
 	startpos = pl->home_base->pos;
 
@@ -288,7 +287,6 @@ static void do_Autopilot (player_t *pl)
     const double auto_pilot_settings_delta = 15.0 / FPS;
     const double auto_pilot_turn_factor = 2.5;
     const double auto_pilot_dead_velocity = 0.5;
-    world_t *world = pl->world;
 
     /*
      * If the last movement touched a wall then we shouldn't
@@ -314,7 +312,7 @@ static void do_Autopilot (player_t *pl)
     } else
 	afterburners = pl->item[ITEM_AFTERBURNER];
 
-    gravity = World_gravity(world, pl->pos);
+    gravity = World_gravity(pl->pos);
 
     /*
      * Due to rounding errors if the velocity is very small we were probably
@@ -427,7 +425,7 @@ static void do_Autopilot (player_t *pl)
 }
 
 
-static void Fuel_update(world_t *world)
+static void Fuel_update(void)
 {
     int i;
     double fuel;
@@ -439,8 +437,8 @@ static void Fuel_update(world_t *world)
     fuel = (NumPlayers * STATION_REGENERATION * timeStep);
     frames_per_update = (int)(MAX_STATION_FUEL / (fuel * BLOCK_SZ));
 
-    for (i = 0; i < Num_fuels(world); i++) {
-	fuel_t *fs = Fuel_by_index(world, i);
+    for (i = 0; i < Num_fuels(); i++) {
+	fuel_t *fs = Fuel_by_index(i);
 
 	if (fs->fuel == MAX_STATION_FUEL)
 	    continue;
@@ -460,7 +458,7 @@ static void Fuel_update(world_t *world)
 
 bool in_legacy_mode_ball_hack = false;
 
-static void legacy_mode_ball_hack(world_t *world, ballobject_t *ball)
+static void legacy_mode_ball_hack(ballobject_t *ball)
 {
     int group;
     group_t *gp;
@@ -485,7 +483,7 @@ static void legacy_mode_ball_hack(world_t *world, ballobject_t *ball)
     /*warn("set loose ticks to 0 for ball %p", ball);*/
 }
 
-static void Misc_object_update(world_t *world)
+static void Misc_object_update(void)
 {
     int i;
     object_t *obj;
@@ -500,14 +498,14 @@ static void Misc_object_update(world_t *world)
 	}
 
 	if (obj->type == OBJ_MINE)
-	    Update_mine(world, MINE_PTR(obj));
+	    Update_mine(MINE_PTR(obj));
 
 	else if (obj->type == OBJ_TORPEDO)
-	    Update_torpedo(world, TORP_PTR(obj));
+	    Update_torpedo(TORP_PTR(obj));
 
 	else if (obj->type == OBJ_SMART_SHOT
 		 || obj->type == OBJ_HEAT_SHOT)
-	    Update_missile(world, MISSILE_PTR(obj));
+	    Update_missile(MISSILE_PTR(obj));
 
 	else if (obj->type == OBJ_BALL) {
 	    ballobject_t *ball = BALL_PTR(obj);
@@ -515,9 +513,9 @@ static void Misc_object_update(world_t *world)
 	    ball->ball_loose_ticks += timeStep;
 
 	    if (options.legacyMode)
-		legacy_mode_ball_hack(world, ball);
+		legacy_mode_ball_hack(ball);
 
-	    Update_connector_force(world, ball);
+	    Update_connector_force(ball);
 	}
 
 	else if (obj->type == OBJ_WRECKAGE) {
@@ -535,19 +533,19 @@ static void Misc_object_update(world_t *world)
 	    LIMIT(pulse->pulse_len, 0, options.pulseLength);
 	}
 
-	update_object_speed(world, obj);
+	update_object_speed(obj);
 
 	if (!(obj->type == OBJ_ASTEROID))
 	    Move_object(obj);
     }
 }
 
-static void Ecm_update(world_t *world)
+static void Ecm_update(void)
 {
     int i;
 
-    for (i = 0; i < Num_ecms(world); i++) {
-	ecm_t *ecm = Ecm_by_index(world, i);
+    for (i = 0; i < Num_ecms(); i++) {
+	ecm_t *ecm = Ecm_by_index(i);
 
 	if ((ecm->size *= ecmSizeFactor) < 1.0) {
 	    if (ecm->id != NO_ID) {
@@ -567,12 +565,12 @@ static void Ecm_update(world_t *world)
     }
 }
 
-static void Transporter_update(world_t *world)
+static void Transporter_update(void)
 {
     int i;
 
-    for (i = 0; i < Num_transporters(world); i++) {
-	transporter_t *trans = Transporter_by_index(world, i);
+    for (i = 0; i < Num_transporters(); i++) {
+	transporter_t *trans = Transporter_by_index(i);
 
 	if ((trans->count -= timeStep) <= 0) {
 #if 0
@@ -718,8 +716,7 @@ static void Use_items(player_t *pl)
  */
 static void Do_refuel(player_t *pl)
 {
-    world_t *world = pl->world;
-    fuel_t *fs = Fuel_by_index(world, pl->fs);
+    fuel_t *fs = Fuel_by_index(pl->fs);
 
     if ((Wrap_length(pl->pos.cx - fs->pos.cx,
 		     pl->pos.cy - fs->pos.cy) > 90.0 * CLICK)
@@ -761,8 +758,7 @@ static void Do_refuel(player_t *pl)
  */
 static void Do_repair(player_t *pl)
 {
-    world_t *world = pl->world;
-    target_t *targ = Target_by_index(world, pl->repair_target);
+    target_t *targ = Target_by_index(pl->repair_target);
 
     if ((Wrap_length(pl->pos.cx - targ->pos.cx,
 		     pl->pos.cy - targ->pos.cy) > 90.0 * CLICK)
@@ -836,7 +832,7 @@ static inline void Update_visibility(player_t *pl, int ind)
  * Player loop. Computes miscellaneous updates.
  *
  */
-static void Update_players(world_t *world)
+static void Update_players(void)
 {
     int i;
     player_t *pl;
@@ -1033,14 +1029,14 @@ static void Update_players(world_t *world)
 	}
 	
 	if (options.legacyMode) {
-	    update_object_speed(world, OBJ_PTR(pl));
+	    update_object_speed(OBJ_PTR(pl));
 	    Move_player(pl);
 	}
 	else {
 	    vector_t acc = pl->acc;
 
 	    if (BIT(pl->obj_status, GRAVITY)) {
-		vector_t gravity = World_gravity(world, pl->pos);
+		vector_t gravity = World_gravity(pl->pos);
 
 		acc.x += gravity.x;
 		acc.y += gravity.y;
@@ -1139,7 +1135,7 @@ static void Update_players(world_t *world)
 /********** **********
  * Updating objects and the like.
  */
-void Update_objects(world_t *world)
+void Update_objects(void)
 {
     int i;
     player_t *pl;
@@ -1158,7 +1154,7 @@ void Update_objects(world_t *world)
 	time_to_tick += 1.0;
     }
 
-    Robot_update(world, tick);
+    Robot_update(tick);
 
     /*
      * Fast aim:
@@ -1201,20 +1197,20 @@ void Update_objects(world_t *world)
 	    if (world->items[i].num < world->items[i].max
 		&& world->items[i].chance > 0
 		&& (rfrac() * world->items[i].chance) < 1.0f)
-		Place_item(world, NULL, i);
+		Place_item(NULL, i);
     }
 
-    Fuel_update(world);
-    Misc_object_update(world);
-    Asteroid_update(world);
-    if (Num_ecms(world) > 0)
-	Ecm_update(world);
-    if (Num_transporters(world) > 0)
-	Transporter_update(world);
-    if (Num_cannons(world) > 0)
-	Cannon_update(world, tick);
-    if (Num_targets(world) > 0)
-	Target_update(world);
+    Fuel_update();
+    Misc_object_update();
+    Asteroid_update();
+    if (Num_ecms() > 0)
+	Ecm_update();
+    if (Num_transporters() > 0)
+	Transporter_update();
+    if (Num_cannons() > 0)
+	Cannon_update(tick);
+    if (Num_targets() > 0)
+	Target_update();
 
     if (!options.fastAim)
 	Players_turn();
@@ -1227,7 +1223,7 @@ void Update_objects(world_t *world)
 	}
     }
 
-    Update_players(world);
+    Update_players();
 
     for (i = 0; i < NumPlayers; i++) {
 	pl = Player_by_index(i);
@@ -1237,8 +1233,8 @@ void Update_objects(world_t *world)
 	}
     }
 
-    for (i = Num_wormholes(world) - 1; i >= 0; i--) {
-	wormhole_t *wh = Wormhole_by_index(world, i);
+    for (i = Num_wormholes() - 1; i >= 0; i--) {
+	wormhole_t *wh = Wormhole_by_index(i);
 
 	if ((wh->countdown -= timeStep) <= 0)
 	    wh->countdown = 0;
@@ -1272,7 +1268,7 @@ void Update_objects(world_t *world)
     /*
      * Checking for collision, updating score etc. (see collision.c)
      */
-    Check_collision(world);
+    Check_collision();
 
     /*
      * Update tanks, Kill players that ought to be killed.
@@ -1322,12 +1318,12 @@ void Update_objects(world_t *world)
 	/* Balls never die of old age. */
 	if (obj->type == OBJ_BALL) {
 	    if (obj->life <= 0)
-		Delete_shot(world, i);
+		Delete_shot(i);
 	    continue;
 	}
 
 	if ((obj->life -= timeStep) <= 0)
-	    Delete_shot(world, i);
+	    Delete_shot(i);
     }
 
      /*
@@ -1347,11 +1343,11 @@ void Update_objects(world_t *world)
      * (not called after Game_Over() )
      */
     if (options.gameDuration >= 0.0 || options.maxRoundTime > 0)
-	Compute_game_status(world);
+	Compute_game_status();
 
     /*
      * Now update labels if need be.
      */
     if (updateScores && ((frame_loops % UPDATE_SCORE_DELAY) == 0))
-	Update_score_table(world);
+	Update_score_table();
 }

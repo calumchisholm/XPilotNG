@@ -25,7 +25,7 @@
 
 #include "xpserver.h"
 
-void Race_compute_game_status(world_t *world)
+void Race_compute_game_status(void)
 {
     /*
      * We need a completely separate scoring system for race mode.
@@ -243,7 +243,7 @@ void Race_compute_game_status(world_t *world)
      */
     if (options.maxRoundTime > 0 && roundtime == 0) {
 	Set_message("Timer expired. Race ends now.");
-	Race_game_over(world);
+	Race_game_over();
 	return;
     }
 
@@ -263,10 +263,10 @@ void Race_compute_game_status(world_t *world)
     else if (num_finished_players == 0 || num_alive_players > 1)
 	return;
 
-    Race_game_over(world);
+    Race_game_over();
 }
 
-void Race_game_over(world_t *world)
+void Race_game_over(void)
 {
     player_t *pl;
     int i, j, k,
@@ -306,7 +306,7 @@ void Race_game_over(world_t *world)
 	for (i = 0; i < num_ordered_players; i++) {
 	    pl = Player_by_index(order[i]);
 	    if (pl->home_base->ind != i) {
-		pl->home_base = Base_by_index(world, i);
+		pl->home_base = Base_by_index(i);
 		for (j = 0; j < spectatorStart + NumSpectators; j++) {
 		    if (j == NumPlayers) {
 			if (NumSpectators)
@@ -378,10 +378,8 @@ void Race_game_over(world_t *world)
 	Set_message("No-one even managed to complete one lap, you should be "
 		    "ashamed of yourselves.");
 
-    /* kps - ng swapped these two for some reason*/
     Count_rounds();
-
-    Reset_all_players(world);
+    Reset_all_players();
 }
 
 void Player_reset_timing(player_t *pl)
@@ -397,7 +395,6 @@ void Player_reset_timing(player_t *pl)
 void Player_pass_checkpoint(player_t *pl)
 {
     int j;
-    world_t *world = pl->world;
 
     if (pl->check == 0) {
 	pl->round++;
@@ -457,13 +454,11 @@ void Player_pass_checkpoint(player_t *pl)
 
 void PlayerCheckpointCollision(player_t *pl)
 {
-    world_t *world = pl->world;
-
     if (!BIT(world->rules->mode, TIMING))
 	return;
 
     if (Player_is_active(pl)) {
-	check_t *check = Check_by_index(world, pl->check);
+	check_t *check = Check_by_index(pl->check);
 
 	if (pl->round != 0)
 	    pl->time++;

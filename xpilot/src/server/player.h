@@ -340,8 +340,6 @@ typedef struct player {
 #define PRIV_NOAUTOKICK		1
 #define PRIV_AUTOKICKLAST	2
 
-    world_t	*world;			/* World player is in */
-
     double	snafu_count;		/* Misc. snafus */
 
 } player_t;
@@ -586,8 +584,6 @@ static inline bool Player_owns_tank(player_t *pl, player_t *tank)
  */
 static inline bool Players_are_teammates(player_t *pl1, player_t *pl2)
 {
-    world_t *world = pl1->world;
-
     if (BIT(world->rules->mode, TEAM_PLAY)
 	&& pl1->team != TEAM_NOT_SET
 	&& pl1->team == pl2->team)
@@ -729,13 +725,13 @@ void Player_hit_armor(player_t *pl);
 void Player_used_kill(player_t *pl);
 void Player_set_mass(player_t *pl);
 void Player_init_items(player_t *pl);
-int Init_player(world_t *world, int ind, shipshape_t *ship, int type);
+int Init_player(int ind, shipshape_t *ship, int type);
 void Alloc_players(int number);
 void Free_players(void);
-void Update_score_table(world_t *world);
-void Reset_all_players(world_t *world);
-void Check_team_members(world_t *world, int);
-void Compute_game_status(world_t *world);
+void Update_score_table(void);
+void Reset_all_players(void);
+void Check_team_members(int);
+void Compute_game_status(void);
 void Delete_player(player_t *pl);
 void Add_spectator(player_t *pl);
 void Delete_spectator(player_t *pl);
@@ -743,9 +739,9 @@ void Detach_ball(player_t *pl, ballobject_t *ball);
 void Kill_player(player_t *pl, bool add_rank_death);
 void Player_death_reset(player_t *pl, bool add_rank_death);
 void Count_rounds(void);
-void Team_game_over(world_t *world, int winning_team, const char *reason);
-void Individual_game_over(world_t *world, int winner);
-bool Team_immune(world_t *world, int id1, int id2);
+void Team_game_over(int winning_team, const char *reason);
+void Individual_game_over(int winner);
+bool Team_immune(int id1, int id2);
 
 static inline void Player_set_float_dir(player_t *pl, double new_float_dir)
 {

@@ -94,7 +94,7 @@
  */
 typedef struct {
     const char		*name;
-    void		(*robot_round_tick)(world_t *world);
+    void		(*robot_round_tick)(void);
     void		(*robot_create)(player_t *robot, char *str);
     void		(*robot_go_home)(player_t *robot);
     void		(*robot_play)(player_t *robot);
@@ -165,10 +165,10 @@ typedef struct robot_default_data {
  * Prototypes for robot.c
  */
 void Parse_robot_file(void);
-void Robot_init(world_t *world);
+void Robot_init(void);
 void Robot_delete(player_t *robot, bool kicked);
 void Robot_destroy(player_t *robot);
-void Robot_update(world_t *world, bool tick);
+void Robot_update(bool tick);
 void Robot_invite(player_t *robot, player_t *inviter);
 void Robot_war(player_t *robot, player_t *killer);
 void Robot_reset_war(player_t *robot);

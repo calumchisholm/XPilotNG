@@ -327,7 +327,7 @@ static void parseLine(char **map_ptr, optOrigin opt_origin)
 /*
  * Parse a file containing defaults (and possibly a map).
  */
-static bool parseOpenFile(FILE * ifile, optOrigin opt_origin, world_t *world)
+static bool parseOpenFile(FILE * ifile, optOrigin opt_origin)
 {
     int n;
     size_t map_offset, map_size;
@@ -345,7 +345,7 @@ static bool parseOpenFile(FILE * ifile, optOrigin opt_origin, world_t *world)
      */
     if (isXp2MapFile(ifile)) {
 	is_polygon_map = true;
-	return parseXp2MapFile(FileName, opt_origin, world);
+	return parseXp2MapFile(FileName, opt_origin);
     }
 
     /*
@@ -660,7 +660,7 @@ static void closeDefaultsFile(FILE *fp)
 /*
  * Parse a file containing defaults.
  */
-bool parseDefaultsFile(const char *filename, world_t *world)
+bool parseDefaultsFile(const char *filename)
 {
     FILE *ifile;
     bool result;
@@ -668,7 +668,7 @@ bool parseDefaultsFile(const char *filename, world_t *world)
     if ((ifile = openDefaultsFile(filename)) == NULL)
 	return false;
 
-    result = parseOpenFile(ifile, OPT_DEFAULTS, world);
+    result = parseOpenFile(ifile, OPT_DEFAULTS);
     closeDefaultsFile(ifile);
 
     return true;
@@ -678,7 +678,7 @@ bool parseDefaultsFile(const char *filename, world_t *world)
 /*
  * Parse a file containing password.
  */
-bool parsePasswordFile(const char *filename, world_t *world)
+bool parsePasswordFile(const char *filename)
 {
     FILE *ifile;
     bool result;
@@ -686,7 +686,7 @@ bool parsePasswordFile(const char *filename, world_t *world)
     if ((ifile = openDefaultsFile(filename)) == NULL)
 	return false;
 
-    result = parseOpenFile(ifile, OPT_PASSWORD, world);
+    result = parseOpenFile(ifile, OPT_PASSWORD);
     closeDefaultsFile(ifile);
 
     return true;
@@ -696,7 +696,7 @@ bool parsePasswordFile(const char *filename, world_t *world)
 /*
  * Parse a file containing a map.
  */
-bool parseMapFile(const char *filename, world_t *world)
+bool parseMapFile(const char *filename)
 {
     FILE *ifile;
     bool result;
@@ -704,7 +704,7 @@ bool parseMapFile(const char *filename, world_t *world)
     if ((ifile = openMapFile(filename)) == NULL)
 	return false;
 
-    result = parseOpenFile(ifile, OPT_MAP, world);
+    result = parseOpenFile(ifile, OPT_MAP);
     closeMapFile(ifile);
 
     return result;

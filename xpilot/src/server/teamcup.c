@@ -148,8 +148,8 @@ void teamcup_round_end(int winning_team)
 {
     int i, j, *list, best, team_players[MAX_TEAMS];
     double team_score[MAX_TEAMS];
-    double best_score = (double)(-100000); /* hack */
-    double double_max = (double)(100000); /* hack */
+    double best_score = -FLT_MAX;
+    double double_max = FLT_MAX;
     player_t *pl;
 
     if (!options.teamcup)
@@ -185,7 +185,7 @@ void teamcup_round_end(int winning_team)
 
 	list[best] = NumPlayers;
 	pl = Player_by_index(best);
-	teamcup_log("%d\t%d\t%2d/%d\t%s\n", pl->team, (int) Get_Score(pl),
+	teamcup_log("%d\t%.0f\t%2d/%d\t%s\n", pl->team, Get_Score(pl),
 		    pl->kills, pl->deaths, pl->name);
 
 	if (team_score[pl->team] == double_max)

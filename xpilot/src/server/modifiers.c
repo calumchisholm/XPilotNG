@@ -230,7 +230,7 @@ static inline void Set_laser_modifier(modifiers_t *mods, int value)
 /*
  * Returns 0 if ok, -1 if not allowed.
  */
-int Mods_set(modifiers_t *mods, modifier_t modifier, int val, world_t *world)
+int Mods_set(modifiers_t *mods, modifier_t modifier, int val)
 {
     bool allow = false;
 
@@ -371,24 +371,24 @@ void Mods_to_string(modifiers_t mods, char *modstr, size_t size)
 }
 
 
-void Mods_filter(modifiers_t *mods, world_t *world)
+void Mods_filter(modifiers_t *mods)
 {
     if (!BIT(world->rules->mode, ALLOW_NUKES))
-	Mods_set(mods, ModsNuclear, 0, world);
+	Mods_set(mods, ModsNuclear, 0);
 
     if (!BIT(world->rules->mode, ALLOW_CLUSTERS))
-	Mods_set(mods, ModsCluster, 0, world);
+	Mods_set(mods, ModsCluster, 0);
 
     if (!BIT(world->rules->mode, ALLOW_MODIFIERS)) {
-	Mods_set(mods, ModsImplosion, 0, world);
-	Mods_set(mods, ModsVelocity, 0, world);
-	Mods_set(mods, ModsMini, 0, world);
-	Mods_set(mods, ModsSpread, 0, world);
-	Mods_set(mods, ModsPower, 0, world);
+	Mods_set(mods, ModsImplosion, 0);
+	Mods_set(mods, ModsVelocity, 0);
+	Mods_set(mods, ModsMini, 0);
+	Mods_set(mods, ModsSpread, 0);
+	Mods_set(mods, ModsPower, 0);
     }
 
     if (!BIT(world->rules->mode, ALLOW_LASER_MODIFIERS))
-	Mods_set(mods, ModsLaser, 0, world);
+	Mods_set(mods, ModsLaser, 0);
 }
 
 static int str2num (const char **strp, int min, int max)
@@ -410,7 +410,6 @@ void Player_set_modbank(player_t *pl, int bank, const char *str)
     const char *cp;
     modifiers_t mods;
     int mini, velocity, spread, power;
-    world_t *world = pl->world;
 
     if (bank >= NUM_MODBANKS)
 	return;
@@ -422,48 +421,48 @@ void Player_set_modbank(player_t *pl, int bank, const char *str)
 	case 'F': case 'f':
 	    if (*(cp+1) == 'N' || *(cp+1) == 'n')
 		Mods_set(&mods, ModsNuclear,
-			 MODS_NUCLEAR|MODS_FULLNUCLEAR, world);
+			 MODS_NUCLEAR|MODS_FULLNUCLEAR);
 	    break;
 	case 'N': case 'n':
 	    if (Mods_get(mods, ModsNuclear) == 0)
-		Mods_set(&mods, ModsNuclear, MODS_NUCLEAR, world);
+		Mods_set(&mods, ModsNuclear, MODS_NUCLEAR);
 	    break;
 	case 'C': case 'c':
-	    Mods_set(&mods, ModsCluster, 1, world);
+	    Mods_set(&mods, ModsCluster, 1);
 	    break;
 	case 'I': case 'i':
-	    Mods_set(&mods, ModsImplosion, 1, world);
+	    Mods_set(&mods, ModsImplosion, 1);
 	    break;
 	case 'V': case 'v':
 	    cp++;
 	    velocity = str2num (&cp, 0, MODS_VELOCITY_MAX);
-	    Mods_set(&mods, ModsVelocity, velocity, world);
+	    Mods_set(&mods, ModsVelocity, velocity);
 	    cp--;
 	    break;
 	case 'X': case 'x':
 	    cp++;
 	    mini = str2num (&cp, 1, MODS_MINI_MAX+1) - 1;
-	    Mods_set(&mods, ModsMini, mini, world);
+	    Mods_set(&mods, ModsMini, mini);
 	    cp--;
 	    break;
 	case 'Z': case 'z':
 	    cp++;
 	    spread = str2num (&cp, 0, MODS_SPREAD_MAX);
-	    Mods_set(&mods, ModsSpread, spread, world);
+	    Mods_set(&mods, ModsSpread, spread);
 	    cp--;
 	    break;
 	case 'B': case 'b':
 	    cp++;
 	    power = str2num (&cp, 0, MODS_POWER_MAX);
-	    Mods_set(&mods, ModsPower, power, world);
+	    Mods_set(&mods, ModsPower, power);
 	    cp--;
 	    break;
 	case 'L': case 'l':
 	    cp++;
 	    if (*cp == 'S' || *cp == 's')
-		Mods_set(&mods, ModsLaser, MODS_LASER_STUN, world);
+		Mods_set(&mods, ModsLaser, MODS_LASER_STUN);
 	    if (*cp == 'B' || *cp == 'b')
-		Mods_set(&mods, ModsLaser, MODS_LASER_BLIND, world);
+		Mods_set(&mods, ModsLaser, MODS_LASER_BLIND);
 	    break;
 	default:
 	    /* Ignore unknown modifiers. */

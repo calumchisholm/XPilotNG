@@ -53,9 +53,8 @@ static cell_dist_t *cell_dist;
 static size_t cell_dist_size;
 
 
-static void Free_cell_dist(world_t *world)
+static void Free_cell_dist(void)
 {
-    UNUSED_PARAM(world);
     XFREE(cell_dist);
 }
 
@@ -84,7 +83,7 @@ static int Compare_cell_dist(const void *a, const void *b)
 }
 
 
-static void Init_cell_dist(world_t *world)
+static void Init_cell_dist(void)
 {
     cell_dist_t *dists;
     int x, y;
@@ -95,7 +94,7 @@ static void Init_cell_dist(world_t *world)
     int cell_max_up;
     int cell_max_down;
 
-    Free_cell_dist(world);
+    Free_cell_dist();
 
     if (BIT(world->rules->mode, WRAP_PLAY)) {
 	cell_max_right = MIN(MAX_CELL_DIST, (world->x / 2));
@@ -133,20 +132,20 @@ static void Init_cell_dist(world_t *world)
 }
 
 
-void Free_cells(world_t *world)
+void Free_cells(void)
 {
     XFREE(Cells);
-    Free_cell_dist(world);
+    Free_cell_dist();
 }
 
 
-void Alloc_cells(world_t *world)
+void Alloc_cells(void)
 {
     size_t size;
     cell_node_t *cell_ptr;
     int x, y;
 
-    Free_cells(world);
+    Free_cells();
 
     size = sizeof(cell_node_t *) * world->x;
     size += sizeof(cell_node_t) * world->x * world->y;
@@ -165,14 +164,12 @@ void Alloc_cells(world_t *world)
 	}
     }
 
-    Init_cell_dist(world);
+    Init_cell_dist();
 }
 
 
-void Cell_init_object(world_t *world, object_t *obj)
+void Cell_init_object(object_t *obj)
 {
-    UNUSED_PARAM(world);
-
     /* put obj on list with only itself. */
     obj->cell.next = &(obj->cell);
     obj->cell.prev = &(obj->cell);
@@ -182,7 +179,7 @@ void Cell_init_object(world_t *world, object_t *obj)
 }
 
 
-void Cell_add_object(world_t *world, object_t *obj)
+void Cell_add_object(object_t *obj)
 {
     blkpos_t bpos = Clpos_to_blkpos(obj->pos);
     cell_node_t *obj_node_ptr, *cell_node_ptr;
@@ -199,7 +196,7 @@ void Cell_add_object(world_t *world, object_t *obj)
     next->prev = prev;
     prev->next = next;
 
-    if (!World_contains_clpos(world, obj->pos)) {
+    if (!World_contains_clpos(obj->pos)) {
 	/* put obj on list with only itself. */
 	obj_node_ptr->next = obj_node_ptr;
 	obj_node_ptr->prev = obj_node_ptr;
@@ -214,12 +211,11 @@ void Cell_add_object(world_t *world, object_t *obj)
 }
 
 
-void Cell_remove_object(world_t *world, object_t *obj)
+void Cell_remove_object(object_t *obj)
 {
     cell_node_t *obj_node_ptr;
     cell_node_t *next, *prev;
 
-    UNUSED_PARAM(world);
     obj_node_ptr = &(obj->cell);
     next = obj_node_ptr->next;
     prev = obj_node_ptr->prev;
@@ -237,8 +233,7 @@ void Cell_remove_object(world_t *world, object_t *obj)
 }
 
 
-void Cell_get_objects(world_t *world,
-		      clpos_t pos,
+void Cell_get_objects(clpos_t pos,
 		      int range,
 		      int max_obj_count,
 		      object_t *** obj_list, int *count_ptr)

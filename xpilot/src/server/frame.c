@@ -43,7 +43,7 @@ typedef unsigned short shuffle_t;
  *	(world.cx >= realWorld.cx && world.cy >= realWorld.cy)
  */
 typedef struct {
-    clpos_t	world;			/* Lower left hand corner is this */
+    clpos_t	unrealWorld;		/* Lower left hand corner is this */
 					/* world coordinate */
     clpos_t	realWorld;		/* If the player is on the edge of
 					   the screen, these are the world
@@ -124,7 +124,7 @@ static unsigned		fastshot_num[DEBRIS_TYPES * 2],
  */
 static inline bool clpos_inview(click_visibility_t *v, clpos_t pos)
 {
-    clpos_t wpos = v->world, rwpos = v->realWorld;
+    clpos_t wpos = v->unrealWorld, rwpos = v->realWorld;
 
     if (!((pos.cx > wpos.cx && pos.cx < wpos.cx + view_cwidth)
 	  || (pos.cx > rwpos.cx && pos.cx < rwpos.cx + view_cwidth)))
@@ -135,7 +135,7 @@ static inline bool clpos_inview(click_visibility_t *v, clpos_t pos)
     return true;
 }
 
-#define DEBRIS_STORE(world,xd,yd,color,offset) \
+#define DEBRIS_STORE(xd,yd,color,offset) \
     int			i;						  \
     if (xd < 0)								  \
 	xd += world->width;						  \
@@ -170,27 +170,27 @@ static inline bool clpos_inview(click_visibility_t *v, clpos_t pos)
     ptr_[num_].y = (unsigned char) yd;					  \
     num_++;
 
-static void fastshot_store(world_t *world, int cx, int cy, int color, int offset)
+static void fastshot_store(int cx, int cy, int color, int offset)
 {
     int xf = CLICK_TO_PIXEL(cx),
 	yf = CLICK_TO_PIXEL(cy);
 #define ptr_		(fastshot_ptr[i])
 #define num_		(fastshot_num[i])
 #define max_		(fastshot_max[i])
-    DEBRIS_STORE(world, xf, yf, color, offset);
+    DEBRIS_STORE(xf, yf, color, offset);
 #undef ptr_
 #undef num_
 #undef max_
 }
 
-static void debris_store(world_t *world, int cx, int cy, int color)
+static void debris_store(int cx, int cy, int color)
 {
     int xf = CLICK_TO_PIXEL(cx),
 	yf = CLICK_TO_PIXEL(cy);
 #define ptr_		(debris_ptr[i])
 #define num_		(debris_num[i])
 #define max_		(debris_max[i])
-    DEBRIS_STORE(world, xf, yf, color, 0);
+    DEBRIS_STORE(xf, yf, color, 0);
 #undef ptr_
 #undef num_
 #undef max_
@@ -247,7 +247,6 @@ static void Frame_radar_buffer_send(connection_t *conn, player_t *pl)
     const int radar_width = 256;
     int radar_height, radar_x, radar_y, send_x, send_y;
     shuffle_t *radar_shuffle;
-    world_t *world = pl->world;
 
     radar_height = (radar_width * world->height) / world->width;
 
@@ -317,7 +316,6 @@ static void Frame_radar_buffer_free(void)
 
 static int Frame_status(connection_t *conn, player_t *pl)
 {
-    world_t *world = pl->world;
     static char modsstr[MAX_CHARS];
     int n, lock_ind, lock_id = NO_ID, lock_dist = 0, lock_dir = 0;
     int showautopilot;
@@ -411,17 +409,16 @@ static void Frame_map(connection_t *conn, player_t *pl)
     const int target_packet_size = 7;
     const int polystyle_packet_size = 5;
     int bytes_left = 2000, max_packet, packet_count;
-    world_t *world = pl->world;
 
     packet_count = 0;
     max_packet = MAX(5, bytes_left / target_packet_size);
     i = MAX(0, pl->last_target_update);
-    for (k = 0; k < Num_targets(world); k++) {
+    for (k = 0; k < Num_targets(); k++) {
 	target_t *targ;
 
-	if (++i >= Num_targets(world))
+	if (++i >= Num_targets())
 	    i = 0;
-	targ = Target_by_index(world, i);
+	targ = Target_by_index(i);
 	if (BIT(targ->update_mask, conn_bit)
 	    || (BIT(targ->conn_mask, conn_bit) == 0
 		&& clpos_inview(&cv, targ->pos))) {
@@ -436,12 +433,12 @@ static void Frame_map(connection_t *conn, player_t *pl)
     packet_count = 0;
     max_packet = MAX(5, bytes_left / cannon_packet_size);
     i = MAX(0, pl->last_cannon_update);
-    for (k = 0; k < Num_cannons(world); k++) {
+    for (k = 0; k < Num_cannons(); k++) {
 	cannon_t *cannon;
 
-	if (++i >= Num_cannons(world))
+	if (++i >= Num_cannons())
 	    i = 0;
-	cannon = Cannon_by_index(world, i);
+	cannon = Cannon_by_index(i);
 	if (clpos_inview(&cv, cannon->pos)) {
 	    if (BIT(cannon->conn_mask, conn_bit) == 0) {
 		Send_cannon(conn, i, (int)cannon->dead_ticks);
@@ -456,13 +453,13 @@ static void Frame_map(connection_t *conn, player_t *pl)
     packet_count = 0;
     max_packet = MAX(5, bytes_left / fuel_packet_size);
     i = MAX(0, pl->last_fuel_update);
-    for (k = 0; k < Num_fuels(world); k++) {
+    for (k = 0; k < Num_fuels(); k++) {
 	fuel_t *fs;
 
-	if (++i >= Num_fuels(world))
+	if (++i >= Num_fuels())
 	    i = 0;
 
-	fs = Fuel_by_index(world, i);
+	fs = Fuel_by_index(i);
 	if (BIT(fs->conn_mask, conn_bit) == 0) {
 	    if ((CENTER_XCLICK(fs->pos.cx - pl->pos.cx) <
 		 (view_width << CLICK_SHIFT) + BLOCK_CLICKS) &&
@@ -574,12 +571,11 @@ static void Frame_shots(connection_t *conn, player_t *pl)
     int ldir = 0, i, k, color, fuzz = 0, teamshot, len, obj_count;
     object_t *shot, **obj_list;
     int hori_blocks, vert_blocks;
-    world_t *world = pl->world;
 
     hori_blocks = (view_width + (BLOCK_SZ - 1)) / (2 * BLOCK_SZ);
     vert_blocks = (view_height + (BLOCK_SZ - 1)) / (2 * BLOCK_SZ);
     if (NumObjs >= options.cellGetObjectsThreshold)
-	Cell_get_objects(world, pl->pos, MAX(hori_blocks, vert_blocks),
+	Cell_get_objects(pl->pos, MAX(hori_blocks, vert_blocks),
 			 num_object_shuffle, &obj_list, &obj_count);
     else {
 	obj_list = Obj;
@@ -607,7 +603,7 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 			  - tcos(pulse->pulse_dir) * pulse->pulse_len * CLICK);
 		pos.cy = (click_t)(pos.cy
 			  - tsin(pulse->pulse_dir) * pulse->pulse_len * CLICK);
-		pos = World_wrap_clpos(world, pos);
+		pos = World_wrap_clpos(pos);
 		ldir = pulse->pulse_dir;
 		if (!clpos_inview(&cv, pos))
 		    continue;
@@ -656,9 +652,8 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 		    color = debris_colors - 1;
 	    }
 
-	    debris_store(world,
-			 shot->pos.cx - cv.world.cx,
-			 shot->pos.cy - cv.world.cy,
+	    debris_store(shot->pos.cx - cv.unrealWorld.cx,
+			 shot->pos.cy - cv.unrealWorld.cy,
 			 color);
 	    break;
 
@@ -679,7 +674,7 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 
 	case OBJ_SHOT:
 	case OBJ_CANNON_SHOT:
-	    if (Team_immune(world, shot->id, pl->id)
+	    if (Team_immune(shot->id, pl->id)
 		|| (shot->id != NO_ID
 		    && Player_is_paused(Player_by_id(shot->id)))
 		|| (shot->id == NO_ID
@@ -698,9 +693,8 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 	    } else
 		teamshot = 0;
 
-	    fastshot_store(world,
-			   shot->pos.cx - cv.world.cx,
-			   shot->pos.cy - cv.world.cy,
+	    fastshot_store(shot->pos.cx - cv.unrealWorld.cx,
+			   shot->pos.cy - cv.unrealWorld.cy,
 			   color, teamshot);
 	    break;
 
@@ -748,7 +742,7 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 		    && Player_is_paused(Player_by_id(mine->id))) {
 		    laid_by_team = 1;
 		} else {
-		    laid_by_team = (Team_immune(world, mine->id, pl->id)
+		    laid_by_team = (Team_immune(mine->id, pl->id)
 				    || (BIT(mine->obj_status, OWNERIMMUNE)
 					&& mine->mine_owner == pl->id));
 		    if (confused) {
@@ -766,7 +760,7 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 		int item_type = item->item_type;
 
 		if (BIT(item->obj_status, RANDOM_ITEM))
-		    item_type = Choose_random_item(world);
+		    item_type = Choose_random_item();
 
 		Send_item(conn, pos, item_type);
 	    }
@@ -776,7 +770,7 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 	    {
 		pulseobject_t *pulse = PULSE_PTR(shot);
 
-		if (Team_immune(world, pulse->id, pl->id))
+		if (Team_immune(pulse->id, pl->id))
 		    color = BLUE;
 		else if (pulse->id == pl->id && options.selfImmunity)
 		    color = BLUE;
@@ -795,17 +789,16 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 static void Frame_ships(connection_t *conn, player_t *pl)
 {
     int i, k;
-    world_t *world = pl->world;
 
-    for (i = 0; i < Num_ecms(world); i++) {
-	ecm_t *ecm = Ecm_by_index(world, i);
+    for (i = 0; i < Num_ecms(); i++) {
+	ecm_t *ecm = Ecm_by_index(i);
 
 	if (clpos_inview(&cv, ecm->pos))
 	    Send_ecm(conn, ecm->pos, (int)ecm->size);
     }
 
-    for (i = 0; i < Num_transporters(world); i++) {
-	transporter_t *trans = Transporter_by_index(world, i);
+    for (i = 0; i < Num_transporters(); i++) {
+	transporter_t *trans = Transporter_by_index(i);
 	player_t *victim = Player_by_id(trans->victim_id);
 	player_t *tpl = Player_by_id(trans->id);
 	clpos_t	pos = (tpl ? tpl->pos : trans->pos);
@@ -819,8 +812,8 @@ static void Frame_ships(connection_t *conn, player_t *pl)
 	    Send_trans(conn, victim->pos, pos);
     }
 
-    for (i = 0; i < Num_cannons(world); i++) {
-	cannon_t *cannon = Cannon_by_index(world, i);
+    for (i = 0; i < Num_cannons(); i++) {
+	cannon_t *cannon = Cannon_by_index(i);
 
 	if (cannon->tractor_count > 0) {
 	    player_t *t = Player_by_id(cannon->tractor_target_id);
@@ -893,14 +886,14 @@ static void Frame_ships(connection_t *conn, player_t *pl)
 	}
 
 	if (Player_is_refueling(pl_i)) {
-	    fuel_t *fs = Fuel_by_index(world, pl_i->fs);
+	    fuel_t *fs = Fuel_by_index(pl_i->fs);
 
 	    if (clpos_inview(&cv, fs->pos))
 		Send_refuel(conn, fs->pos, pl_i->pos);
 	}
 
 	if (Player_is_repairing(pl_i)) {
-	    target_t *targ = Target_by_index(world, pl_i->repair_target);
+	    target_t *targ = Target_by_index(pl_i->repair_target);
 
 	    if (clpos_inview(&cv, targ->pos))
 		/* same packet as refuel */
@@ -935,7 +928,6 @@ static void Frame_radar(connection_t *conn, player_t *pl)
     int i, k, mask, shownuke, size;
     object_t *shot;
     clpos_t pos;
-    world_t *world = pl->world;
 
     Frame_radar_buffer_reset();
 
@@ -1048,8 +1040,6 @@ static void Frame_lose_item_state(player_t *pl)
 
 static void Frame_parameters(connection_t *conn, player_t *pl)
 {
-    world_t *world = pl->world;
-
     Get_display_parameters(conn, &view_width, &view_height,
 			   &debris_colors, &spark_rand);
     debris_x_areas = (view_width + 255) >> 8;
@@ -1058,17 +1048,21 @@ static void Frame_parameters(connection_t *conn, player_t *pl)
 
     view_cwidth = view_width * CLICK;
     view_cheight = view_height * CLICK;
-    cv.world.cx = pl->pos.cx - view_cwidth / 2;	/* Scroll */
-    cv.world.cy = pl->pos.cy - view_cheight / 2;
-    cv.realWorld = cv.world;
+    cv.unrealWorld.cx = pl->pos.cx - view_cwidth / 2;	/* Scroll */
+    cv.unrealWorld.cy = pl->pos.cy - view_cheight / 2;
+    cv.realWorld = cv.unrealWorld;
     if (BIT (world->rules->mode, WRAP_PLAY)) {
-	if (cv.world.cx < 0 && cv.world.cx + view_cwidth < world->cwidth)
-	    cv.world.cx += world->cwidth;
-	else if (cv.world.cx > 0 && cv.world.cx + view_cwidth >= world->cwidth)
+	if (cv.unrealWorld.cx < 0
+	    && cv.unrealWorld.cx + view_cwidth < world->cwidth)
+	    cv.unrealWorld.cx += world->cwidth;
+	else if (cv.unrealWorld.cx > 0
+		 && cv.unrealWorld.cx + view_cwidth >= world->cwidth)
 	    cv.realWorld.cx -= world->cwidth;
-	if (cv.world.cy < 0 && cv.world.cy + view_cheight < world->cheight)
-	    cv.world.cy += world->cheight;
-	else if (cv.world.cy > 0 && cv.world.cy + view_cheight >=world->cheight)
+	if (cv.unrealWorld.cy < 0
+	    && cv.unrealWorld.cy + view_cheight < world->cheight)
+	    cv.unrealWorld.cy += world->cheight;
+	else if (cv.unrealWorld.cy > 0
+		 && cv.unrealWorld.cy + view_cheight >=world->cheight)
 	    cv.realWorld.cy -= world->cheight;
     }
 }

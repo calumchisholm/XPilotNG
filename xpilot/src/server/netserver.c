@@ -94,7 +94,7 @@
 
 #include "xpserver.h"
 
-static int Init_setup(world_t *world);
+static int Init_setup(void);
 static int Handle_listening(connection_t *connp);
 static int Handle_setup(connection_t *connp);
 static int Handle_login(connection_t *connp, char *errmsg, size_t errsize);
@@ -192,12 +192,12 @@ static void Feature_init(connection_t *connp)
  * We only setup this structure once to save time when new
  * players log in during play.
  */
-static int Init_setup(world_t *world)
+static int Init_setup(void)
 {
     size_t size;
     unsigned char *mapdata;
 
-    Oldsetup = Xpmap_init_setup(world);
+    Oldsetup = Xpmap_init_setup();
 
     if (!is_polygon_map) {
 	if (Oldsetup)
@@ -298,11 +298,9 @@ static void Init_receive(void)
  */
 int Setup_net_server(void)
 {
-    world_t *world = &World;
-
     Init_receive();
 
-    if (Init_setup(world) == -1)
+    if (Init_setup() == -1)
 	return -1;
     /*
      * The number of connections is limited by the number of bases
@@ -997,7 +995,6 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
     player_t *pl;
     int i, conn_bit;
     const char sender[] = "[*Server notice*]";
-    world_t *world = &World;
 
     if (BIT(world->rules->mode, TEAM_PLAY)) {
 	if (connp->team < 0 || connp->team >= MAX_TEAMS
@@ -1007,7 +1004,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	else if (world->teams[connp->team].NumBases <= 0)
 	    connp->team = TEAM_NOT_SET;
 	else {
-	    Check_team_members(world, connp->team);
+	    Check_team_members(connp->team);
 	    if (world->teams[connp->team].NumMembers
 		- world->teams[connp->team].NumRobots
 		>= world->teams[connp->team].NumBases)
@@ -1027,13 +1024,13 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
     }
 
     if (connp->rectype < 2) {
-	if (!Init_player(world, NumPlayers, connp->ship, PL_TYPE_HUMAN)) {
+	if (!Init_player(NumPlayers, connp->ship, PL_TYPE_HUMAN)) {
 	    strlcpy(errmsg, "Init_player failed: no free ID", errsize);
 	    return -1;
 	}
 	pl = Player_by_index(NumPlayers);
     } else {
-	if (!Init_player(world, spectatorStart + NumSpectators,
+	if (!Init_player(spectatorStart + NumSpectators,
 			 connp->ship, PL_TYPE_HUMAN))
 	    return -1;
 	pl = Player_by_index(spectatorStart + NumSpectators);
@@ -1063,7 +1060,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	}
 	Rank_get_saved_score(pl);
 	if (pl->team != TEAM_NOT_SET && pl->home_base != NULL) {
-	    team_t *teamp = Team_by_index(world, pl->team);
+	    team_t *teamp = Team_by_index(pl->team);
 
 	    teamp->NumMembers++;
 	}
@@ -1183,8 +1180,8 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
     }
 
     conn_bit = (1 << connp->ind);
-    for (i = 0; i < Num_cannons(world); i++) {
-	cannon_t *cannon = Cannon_by_index(world, i);
+    for (i = 0; i < Num_cannons(); i++) {
+	cannon_t *cannon = Cannon_by_index(i);
 	/*
 	 * The client assumes at startup that all cannons are active.
 	 */
@@ -1193,8 +1190,8 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	else
 	    CLR_BIT(cannon->conn_mask, conn_bit);
     }
-    for (i = 0; i < Num_fuels(world); i++) {
-	fuel_t *fs = Fuel_by_index(world, i);
+    for (i = 0; i < Num_fuels(); i++) {
+	fuel_t *fs = Fuel_by_index(i);
 	/*
 	 * The client assumes at startup that all fuelstations are filled.
 	 */
@@ -1203,8 +1200,8 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	else
 	    CLR_BIT(fs->conn_mask, conn_bit);
     }
-    for (i = 0; i < Num_targets(world); i++) {
-	target_t *targ = Target_by_index(world, i);
+    for (i = 0; i < Num_targets(); i++) {
+	target_t *targ = Target_by_index(i);
 	/*
 	 * The client assumes at startup that all targets are not damaged.
 	 */
@@ -1240,11 +1237,11 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	&& ((NumPlayers - NumPseudoPlayers - NumRobots)
 	    <= options.resetOnHuman)) {
 	if (BIT(world->rules->mode, TIMING))
-	    Race_game_over(world);
+	    Race_game_over();
 	else if (BIT(world->rules->mode, TEAM_PLAY))
-	    Team_game_over(world, -1, "");
+	    Team_game_over(-1, "");
 	else if (BIT(world->rules->mode, LIMITED_LIVES))
-	    Individual_game_over(world, -1);
+	    Individual_game_over(-1);
     }
 
     if (NumPlayers == 1) {
@@ -1662,7 +1659,6 @@ int Send_score(connection_t *connp, int id, double score,
 int Send_timing(connection_t *connp, int id, int check, int round)
 {
     int num_checks = OLD_MAX_CHECKS;
-    world_t *world = &World;
 
     if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
 	warn("Connection not ready for timing(%d,%d)",
@@ -2473,7 +2469,6 @@ static int Receive_ack_cannon(connection_t *connp)
     unsigned char ch;
     int n;
     unsigned short num;
-    world_t *world = &World;
     cannon_t *cannon;
 
     if ((n = Packet_scanf(&connp->r, "%c%ld%hu",
@@ -2482,11 +2477,11 @@ static int Receive_ack_cannon(connection_t *connp)
 	    Destroy_connection(connp, "read error");
 	return n;
     }
-    if (num >= Num_cannons(world)) {
+    if (num >= Num_cannons()) {
 	Destroy_connection(connp, "bad cannon ack");
 	return -1;
     }
-    cannon = Cannon_by_index(world, num);
+    cannon = Cannon_by_index(num);
     if (loops_ack > cannon->last_change)
 	SET_BIT(cannon->conn_mask, 1 << connp->ind);
 
@@ -2499,7 +2494,6 @@ static int Receive_ack_fuel(connection_t *connp)
     unsigned char ch;
     int n;
     unsigned short num;
-    world_t *world = &World;
     fuel_t *fs;
 
     if ((n = Packet_scanf(&connp->r, "%c%ld%hu",
@@ -2508,11 +2502,11 @@ static int Receive_ack_fuel(connection_t *connp)
 	    Destroy_connection(connp, "read error");
 	return n;
     }
-    if (num >= Num_fuels(world)) {
+    if (num >= Num_fuels()) {
 	Destroy_connection(connp, "bad fuel ack");
 	return -1;
     }
-    fs = Fuel_by_index(world, num);
+    fs = Fuel_by_index(num);
     if (loops_ack > fs->last_change)
 	SET_BIT(fs->conn_mask, 1 << connp->ind);
     return 1;
@@ -2524,7 +2518,6 @@ static int Receive_ack_target(connection_t *connp)
     unsigned char ch;
     int n;
     unsigned short num;
-    world_t *world = &World;
     target_t *targ;
 
     if ((n = Packet_scanf(&connp->r, "%c%ld%hu",
@@ -2533,7 +2526,7 @@ static int Receive_ack_target(connection_t *connp)
 	    Destroy_connection(connp, "read error");
 	return n;
     }
-    if (num >= Num_targets(world)) {
+    if (num >= Num_targets()) {
 	Destroy_connection(connp, "bad target ack");
 	return -1;
     }
@@ -2549,7 +2542,7 @@ static int Receive_ack_target(connection_t *connp)
      * destroyed targets could have been displayed with
      * a diagonal cross through them.
      */
-    targ = Target_by_index(world, num);
+    targ = Target_by_index(num);
     if (loops_ack > targ->last_change) {
 	SET_BIT(targ->conn_mask, 1 << connp->ind);
 	CLR_BIT(targ->update_mask, 1 << connp->ind);

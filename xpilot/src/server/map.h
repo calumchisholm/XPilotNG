@@ -78,6 +78,7 @@
 #define DIR_DOWN		(3*RES/4)
 
 typedef struct world world_t;
+extern world_t		World, *world;
 
 typedef struct fuel {
     clpos_t	pos;
@@ -103,7 +104,6 @@ typedef struct base {
 } base_t;
 
 typedef struct cannon {
-    world_t	*world;
     clpos_t	pos;
     int		dir;
     uint32_t	conn_mask;
@@ -273,23 +273,21 @@ struct world {
     bool	have_options;
 };
 
-extern world_t		World;
-
-static inline void World_set_block(world_t *world, blkpos_t blk, int type)
+static inline void World_set_block(blkpos_t blk, int type)
 {
     assert (! (blk.bx < 0 || blk.bx >= world->x
 	       || blk.by < 0 || blk.by >= world->y));
     world->block[blk.bx][blk.by] = type;
 }
 
-static inline int World_get_block(world_t *world, blkpos_t blk)
+static inline int World_get_block(blkpos_t blk)
 {
     assert (! (blk.bx < 0 || blk.bx >= world->x
 	       || blk.by < 0 || blk.by >= world->y));
     return world->block[blk.bx][blk.by];
 }
 
-static inline bool World_contains_clpos(world_t *world, clpos_t pos)
+static inline bool World_contains_clpos(clpos_t pos)
 {
     if (pos.cx < 0 || pos.cx >= world->cwidth)
 	return false;
@@ -298,7 +296,7 @@ static inline bool World_contains_clpos(world_t *world, clpos_t pos)
     return true;
 }
 
-static inline clpos_t World_get_random_clpos(world_t *world)
+static inline clpos_t World_get_random_clpos(void)
 {
     clpos_t pos;
 
@@ -308,7 +306,7 @@ static inline clpos_t World_get_random_clpos(world_t *world)
     return pos;
 }
 
-static inline int World_wrap_xclick(world_t *world, int cx)
+static inline int World_wrap_xclick(int cx)
 {
     while (cx < 0)
 	cx += world->cwidth;
@@ -318,7 +316,7 @@ static inline int World_wrap_xclick(world_t *world, int cx)
     return cx;
 }
 
-static inline int World_wrap_yclick(world_t *world, int cy)
+static inline int World_wrap_yclick(int cy)
 {
     while (cy < 0)
 	cy += world->cheight;
@@ -328,46 +326,46 @@ static inline int World_wrap_yclick(world_t *world, int cy)
     return cy;
 }
 
-static inline clpos_t World_wrap_clpos(world_t *world, clpos_t pos)
+static inline clpos_t World_wrap_clpos(clpos_t pos)
 {
-    pos.cx = World_wrap_xclick(world, pos.cx);
-    pos.cy = World_wrap_yclick(world, pos.cy);
+    pos.cx = World_wrap_xclick(pos.cx);
+    pos.cy = World_wrap_yclick(pos.cy);
 
     return pos;
 }
 
-#define Num_asteroidConcs(w)	Arraylist_get_num_elements((w)->asteroidConcs)
-#define Num_bases(w)		Arraylist_get_num_elements((w)->bases)
-#define Num_cannons(w)		Arraylist_get_num_elements((w)->cannons)
-#define Num_ecms(w)		Arraylist_get_num_elements((w)->ecms)
-#define Num_frictionAreas(w)	Arraylist_get_num_elements((w)->frictionAreas)
-#define Num_fuels(w)		Arraylist_get_num_elements((w)->fuels)
-#define Num_gravs(w)		Arraylist_get_num_elements((w)->gravs)
-#define Num_itemConcs(w)	Arraylist_get_num_elements((w)->itemConcs)
-#define Num_targets(w)		Arraylist_get_num_elements((w)->targets)
-#define Num_transporters(w)	Arraylist_get_num_elements((w)->transporters)
-#define Num_treasures(w)	Arraylist_get_num_elements((w)->treasures)
-#define Num_wormholes(w)	Arraylist_get_num_elements((w)->wormholes)
+#define Num_asteroidConcs()	Arraylist_get_num_elements(world->asteroidConcs)
+#define Num_bases()		Arraylist_get_num_elements(world->bases)
+#define Num_cannons()		Arraylist_get_num_elements(world->cannons)
+#define Num_ecms()		Arraylist_get_num_elements(world->ecms)
+#define Num_frictionAreas()	Arraylist_get_num_elements(world->frictionAreas)
+#define Num_fuels()		Arraylist_get_num_elements(world->fuels)
+#define Num_gravs()		Arraylist_get_num_elements(world->gravs)
+#define Num_itemConcs()	Arraylist_get_num_elements(world->itemConcs)
+#define Num_targets()		Arraylist_get_num_elements(world->targets)
+#define Num_transporters()	Arraylist_get_num_elements(world->transporters)
+#define Num_treasures()	Arraylist_get_num_elements(world->treasures)
+#define Num_wormholes()	Arraylist_get_num_elements(world->wormholes)
 
-#define AsteroidConc_by_index(w, i) \
-	((asteroid_concentrator_t *)Arraylist_get((w)->asteroidConcs, (i)))
-#define Base_by_index(w, i)	((base_t *)Arraylist_get((w)->bases, (i)))
-#define Cannon_by_index(w, i)	((cannon_t *)Arraylist_get((w)->cannons, (i)))
-#define Ecm_by_index(w, i)	((ecm_t *)Arraylist_get((w)->ecms, (i)))
-#define FrictionArea_by_index(w, i) \
-	((friction_area_t *)Arraylist_get((w)->frictionAreas, (i)))
-#define Fuel_by_index(w, i)	((fuel_t *)Arraylist_get((w)->fuels, (i)))
-#define Grav_by_index(w, i)	((grav_t *)Arraylist_get((w)->gravs, (i)))
-#define ItemConc_by_index(w, i) \
-	((item_concentrator_t *)Arraylist_get((w)->itemConcs, (i)))
-#define Target_by_index(w, i)	((target_t *)Arraylist_get((w)->targets, (i)))
-#define Treasure_by_index(w, i)	((treasure_t *)Arraylist_get((w)->treasures, (i)))
-#define Wormhole_by_index(w, i)	((wormhole_t *)Arraylist_get((w)->wormholes, (i)))
-#define Transporter_by_index(w, i) \
-	((transporter_t *)Arraylist_get((w)->transporters, (i)))
+#define AsteroidConc_by_index(i) \
+	((asteroid_concentrator_t *)Arraylist_get(world->asteroidConcs, (i)))
+#define Base_by_index(i)	((base_t *)Arraylist_get(world->bases, (i)))
+#define Cannon_by_index(i)	((cannon_t *)Arraylist_get(world->cannons, (i)))
+#define Ecm_by_index(i)	((ecm_t *)Arraylist_get(world->ecms, (i)))
+#define FrictionArea_by_index(i) \
+	((friction_area_t *)Arraylist_get(world->frictionAreas, (i)))
+#define Fuel_by_index(i)	((fuel_t *)Arraylist_get(world->fuels, (i)))
+#define Grav_by_index(i)	((grav_t *)Arraylist_get(world->gravs, (i)))
+#define ItemConc_by_index(i) \
+	((item_concentrator_t *)Arraylist_get(world->itemConcs, (i)))
+#define Target_by_index(i)	((target_t *)Arraylist_get(world->targets, (i)))
+#define Treasure_by_index(i)	((treasure_t *)Arraylist_get(world->treasures, (i)))
+#define Wormhole_by_index(i)	((wormhole_t *)Arraylist_get(world->wormholes, (i)))
+#define Transporter_by_index(i) \
+	((transporter_t *)Arraylist_get(world->transporters, (i)))
 
 
-static inline check_t *Check_by_index(world_t *world, int ind)
+static inline check_t *Check_by_index(int ind)
 {
     if (ind >= 0 && ind < world->NumChecks)
 	return &world->checks[ind];
@@ -377,7 +375,7 @@ static inline check_t *Check_by_index(world_t *world, int ind)
 /*
  * Here the index is the team number.
  */
-static inline team_t *Team_by_index(world_t *world, int ind)
+static inline team_t *Team_by_index(int ind)
 {
     if (ind >= 0 && ind < MAX_TEAMS)
 	return &world->teams[ind];

@@ -47,16 +47,16 @@ long CANNON_USE_ITEM = (ITEM_BIT_FUEL|ITEM_BIT_WIDEANGLE
 			|ITEM_BIT_TRACTOR_BEAM|ITEM_BIT_MISSILE
 			|ITEM_BIT_PHASING);
 
-void Cannon_update(world_t *world, bool tick)
+void Cannon_update(bool tick)
 {
     int i;
 
-    for (i = 0; i < Num_cannons(world); i++) {
-	cannon_t *c = Cannon_by_index(world, i);
+    for (i = 0; i < Num_cannons(); i++) {
+	cannon_t *c = Cannon_by_index(i);
 
 	if (c->dead_ticks > 0) {
 	    if ((c->dead_ticks -= timeStep) <= 0)
-		World_restore_cannon(world, c);
+		World_restore_cannon(c);
 	    continue;
 	}
 
@@ -101,7 +101,7 @@ void Cannon_update(world_t *world, bool tick)
 				  tpl->pos.cy - c->pos.cy)
 		 < TRACTOR_MAX_RANGE(c->item[ITEM_TRACTOR_BEAM]) * CLICK)
 		&& Player_is_alive(tpl)) {
-		General_tractor_beam(world, c->id, c->pos,
+		General_tractor_beam(c->id, c->pos,
 				     c->item[ITEM_TRACTOR_BEAM],
 				     tpl, c->tractor_is_pressor);
 		if ((c->tractor_count -= timeStep) <= 0)
@@ -131,8 +131,6 @@ void Cannon_update(world_t *world, bool tick)
    fuel is given in 'units', but is stored in fuelpacks. */
 void Cannon_add_item(cannon_t *c, int item_type, int amount)
 {
-    world_t *world = c->world;
-
     switch (item_type) {
     case ITEM_TANK:
 	c->item[ITEM_TANK] += amount;
@@ -157,7 +155,7 @@ static inline int Cannon_get_initial_item(cannon_t *c, Item_t i)
 
     init_amount = c->initial_items[i];
     if (init_amount < 0)
-	init_amount = c->world->items[i].cannon_initial;
+	init_amount = world->items[i].cannon_initial;
 
     return init_amount;
 }
@@ -167,7 +165,6 @@ void Cannon_throw_items(cannon_t *c)
     int i, dir;
     itemobject_t *item;
     double velocity;
-    world_t *world = c->world;
 
     for (i = 0; i < NUM_ITEMS; i++) {
 	if (i == ITEM_FUEL)
@@ -191,7 +188,7 @@ void Cannon_throw_items(cannon_t *c)
 		dir = MOD2(dir, RES);
 		item->id = NO_ID;
 		item->team = TEAM_NOT_SET;
-		Object_position_init_clpos(world, OBJ_PTR(item), c->pos);
+		Object_position_init_clpos(OBJ_PTR(item), c->pos);
 		velocity = rfrac() * 6;
 		item->vel.x = tcos(dir) * velocity;
 		item->vel.y = tsin(dir) * velocity;
@@ -203,7 +200,7 @@ void Cannon_throw_items(cannon_t *c)
 		item->pl_range = ITEM_SIZE / 2;
 		item->pl_radius = ITEM_SIZE / 2;
 		world->items[i].num++;
-		Cell_add_object(world, OBJ_PTR(item));
+		Cell_add_object(OBJ_PTR(item));
 	    }
 	    c->item[i] -= amount;
 	}
@@ -283,7 +280,6 @@ static int Cannon_select_defense(cannon_t *c)
    modes 1 - 3 use progressively more accurate detection. */
 static int Cannon_in_danger(cannon_t *c)
 {
-    world_t *world = c->world;
     const int range = 4 * BLOCK_SZ;
     const uint32_t kill_shots = (KILLING_SHOTS) | OBJ_MINE_BIT | OBJ_SHOT_BIT
 	| OBJ_PULSE_BIT | OBJ_SMART_SHOT_BIT | OBJ_HEAT_SHOT_BIT
@@ -299,7 +295,7 @@ static int Cannon_in_danger(cannon_t *c)
 	return false;
 
     if (NumObjs >= options.cellGetObjectsThreshold)
-	Cell_get_objects(world, c->pos, range, max_objs,
+	Cell_get_objects(c->pos, range, max_objs,
 			 &obj_list, &obj_count);
     else {
 	obj_list = Obj;
@@ -411,7 +407,6 @@ static int Cannon_select_weapon(cannon_t *c)
  */
 static void Cannon_aim(cannon_t *c, int weapon, player_t **pl_p, int *dir)
 {
-    world_t *world = c->world;
     double speed = Cannon_get_shot_speed(c);
     double range = Cannon_get_max_shot_life(c) * speed;
     double visualrange = (CANNON_DISTANCE
@@ -573,7 +568,6 @@ static void Cannon_aim(cannon_t *c, int weapon, player_t **pl_p, int *dir)
    have more than one possible use. */
 static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 {
-    world_t *world = c->world;
     modifiers_t	mods;
     bool played = false;
     int i, smartness = Cannon_get_smartness(c);
@@ -584,18 +578,18 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
     switch (weapon) {
     case CW_MINE:
 	if (rfrac() < 0.25)
-	    Mods_set(&mods, ModsCluster, 1, world);
+	    Mods_set(&mods, ModsCluster, 1);
 
 	if (rfrac() >= 0.2)
-	    Mods_set(&mods, ModsImplosion, 1, world);
+	    Mods_set(&mods, ModsImplosion, 1);
 
 	Mods_set(&mods, ModsPower,
-		 (int)(rfrac() * (MODS_POWER_MAX + 1)), world);
+		 (int)(rfrac() * (MODS_POWER_MAX + 1)));
 	Mods_set(&mods, ModsVelocity, 
-		 (int)(rfrac() * (MODS_VELOCITY_MAX + 1)), world);
+		 (int)(rfrac() * (MODS_VELOCITY_MAX + 1)));
 
 	if (rfrac() < 0.5) {	/* place mine in front of cannon */
-	    Place_general_mine(world, c->id, c->team, FROMCANNON,
+	    Place_general_mine(c->id, c->team, FROMCANNON,
 			       c->pos, zero_vel, mods);
 	    sound_play_sensors(c->pos, DROP_MINE_SOUND);
 	    played = true;
@@ -603,14 +597,14 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 	    vector_t vel;
 
 	    Mods_set(&mods, ModsMini,
-		     (int)(rfrac() * MODS_MINI_MAX) + 1, world);
+		     (int)(rfrac() * MODS_MINI_MAX) + 1);
 	    Mods_set(&mods, ModsSpread,
-		     (int)(rfrac() * (MODS_SPREAD_MAX + 1)), world);
+		     (int)(rfrac() * (MODS_SPREAD_MAX + 1)));
 
 	    speed = speed * 0.5 + 0.1 * smartness;
 	    vel.x = tcos(dir) * speed;
 	    vel.y = tsin(dir) * speed;
-	    Place_general_mine(world, c->id, c->team, GRAVITY|FROMCANNON,
+	    Place_general_mine(c->id, c->team, GRAVITY|FROMCANNON,
 			       c->pos, vel, mods);
 	    sound_play_sensors(c->pos, DROP_MOVING_MINE_SOUND);
 	    played = true;
@@ -619,15 +613,15 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 	break;
     case CW_MISSILE:
 	if (rfrac() < 0.333)
-	    Mods_set(&mods, ModsCluster, 1, world);
+	    Mods_set(&mods, ModsCluster, 1);
 
 	if (rfrac() >= 0.25)
-	    Mods_set(&mods, ModsImplosion, 1, world);
+	    Mods_set(&mods, ModsImplosion, 1);
 
 	Mods_set(&mods, ModsPower,
-		 (int)(rfrac() * (MODS_POWER_MAX + 1)), world);
+		 (int)(rfrac() * (MODS_POWER_MAX + 1)));
 	Mods_set(&mods, ModsVelocity, 
-		 (int)(rfrac() * (MODS_VELOCITY_MAX + 1)), world);
+		 (int)(rfrac() * (MODS_VELOCITY_MAX + 1)));
 
 	/* Because cannons don't have missile racks, all mini missiles
 	   would be fired from the same point and appear to the players
@@ -642,7 +636,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 	switch ((int)(rfrac() * (1 + smartness))) {
 	default:
 	    if (options.allowSmartMissiles) {
-		Fire_general_shot(world, c->id, c->team, c->pos,
+		Fire_general_shot(c->id, c->team, c->pos,
 				  OBJ_SMART_SHOT, dir, mods, pl->id);
 		sound_play_sensors(c->pos, FIRE_SMART_SHOT_SOUND);
 		played = true;
@@ -652,7 +646,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 	case 1:
 	    if (options.allowHeatSeekers
 		&& Player_is_thrusting(pl)) {
-		Fire_general_shot(world, c->id, c->team, c->pos,
+		Fire_general_shot(c->id, c->team, c->pos,
 				  OBJ_HEAT_SHOT, dir, mods, pl->id);
 		sound_play_sensors(c->pos, FIRE_HEAT_SHOT_SOUND);
 		played = true;
@@ -660,7 +654,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 	    }
 	    /* FALLTHROUGH */
 	case 0:
-	    Fire_general_shot(world, c->id, c->team, c->pos,
+	    Fire_general_shot(c->id, c->team, c->pos,
 			      OBJ_TORPEDO, dir, mods, NO_ID);
 	    sound_play_sensors(c->pos, FIRE_TORPEDO_SOUND);
 	    played = true;
@@ -673,14 +667,14 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 	   so we don't use them often */
 	if ((rfrac() * (8 - smartness)) >= 1)
 	    Mods_set(&mods, ModsLaser,
-		     (int)(rfrac() * (MODS_LASER_MAX + 1)), world);
+		     (int)(rfrac() * (MODS_LASER_MAX + 1)));
 
-	Fire_general_laser(world, c->id, c->team, c->pos, dir, mods);
+	Fire_general_laser(c->id, c->team, c->pos, dir, mods);
 	sound_play_sensors(c->pos, FIRE_LASER_SOUND);
 	played = true;
 	break;
     case CW_ECM:
-	Fire_general_ecm(world, c->id, c->team, c->pos);
+	Fire_general_ecm(c->id, c->team, c->pos);
 	c->item[ITEM_ECM]--;
 	sound_play_sensors(c->pos, ECM_SOUND);
 	played = true;
@@ -698,7 +692,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 	    int item = -1;
 	    double amount = 0.0;
 
-	    Do_general_transporter(world, c->id, c->pos, pl, &item, &amount);
+	    Do_general_transporter(c->id, c->pos, pl, &item, &amount);
 	    if (item != -1)
 		Cannon_add_item(c, item, amount);
 	} else {
@@ -709,8 +703,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
     case CW_GASJET:
 	/* use emergency thrusts to make extra big jets */
 	if ((rfrac() * (c->item[ITEM_EMERGENCY_THRUST] + 1)) >= 1) {
-	    Make_debris(world,
-			c->pos,
+	    Make_debris(c->pos,
 			zero_vel,
 			NO_ID,
 			c->team,
@@ -726,8 +719,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 			3.0, 20.0);
 	    c->item[ITEM_EMERGENCY_THRUST]--;
 	} else {
-	    Make_debris(world,
-			c->pos,
+	    Make_debris(c->pos,
 			zero_vel,
 			NO_ID,
 			c->team,
@@ -749,7 +741,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
     case CW_SHOT:
     default:
 	if (options.cannonFlak)
-	    Mods_set(&mods, ModsCluster, 1, world);
+	    Mods_set(&mods, ModsCluster, 1);
 	/* smarter cannons fire more accurately and
 	   can therefore narrow their bullet streams */
 	for (i = 0; i < (1 + 2 * c->item[ITEM_WIDEANGLE]); i++) {
@@ -757,7 +749,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 			+ (4 - smartness)
 			* (-c->item[ITEM_WIDEANGLE] +  i);
 	    a_dir = MOD2(a_dir, RES);
-	    Fire_general_shot(world, c->id, c->team, c->pos,
+	    Fire_general_shot(c->id, c->team, c->pos,
 			      OBJ_CANNON_SHOT, a_dir, mods, NO_ID);
 	}
 	/* I'm not sure cannons should use rearshots.
@@ -768,7 +760,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 			+ (4 - smartness)
 			* (-((c->item[ITEM_REARSHOT] - 1) * 0.5) + i));
 	    a_dir = MOD2(a_dir, RES);
-	    Fire_general_shot(world, c->id, c->team, c->pos,
+	    Fire_general_shot(c->id, c->team, c->pos,
 			      OBJ_CANNON_SHOT, a_dir, mods, NO_ID);
 	}
     }
@@ -800,15 +792,13 @@ void Object_hits_cannon(object_t *obj, cannon_t *c)
 
 void Cannon_dies(cannon_t *c, player_t *pl)
 {
-    world_t *world = c->world;
     vector_t zero_vel = { 0.0, 0.0 };
 
-    World_remove_cannon(world, c);
+    World_remove_cannon(c);
     Cannon_throw_items(c);
     Cannon_init(c);
     sound_play_sensors(c->pos, CANNON_EXPLOSION_SOUND);
-    Make_debris(world,
-		c->pos,
+    Make_debris(c->pos,
 		zero_vel,
 		NO_ID,
 		c->team,
@@ -821,8 +811,7 @@ void Cannon_dies(cannon_t *c, player_t *pl)
 		(int)(c->dir - (RES * 0.2)), (int)(c->dir + (RES * 0.2)),
 		20.0, 50.0,
 		8.0, 68.0);
-    Make_wreckage(world,
-		  c->pos,
+    Make_wreckage(c->pos,
 		  zero_vel,
 		  NO_ID,
 		  c->team,
@@ -842,8 +831,6 @@ void Cannon_dies(cannon_t *c, player_t *pl)
 
 hitmask_t Cannon_hitmask(cannon_t *cannon)
 {
-    world_t *world = &World;
-
     if (cannon->dead_ticks > 0)
 	return ALL_BITS;
     if (BIT(world->rules->mode, TEAM_PLAY) && options.teamImmunity)
@@ -859,12 +846,12 @@ void Cannon_set_hitmask(int group, cannon_t *cannon)
 }
 
 
-void World_restore_cannon(world_t *world, cannon_t *cannon)
+void World_restore_cannon(cannon_t *cannon)
 {
     blkpos_t blk = Clpos_to_blkpos(cannon->pos);
     int i;
 
-    World_set_block(world, blk, CANNON);
+    World_set_block(blk, CANNON);
 
     for (i = 0; i < num_polys; i++) {
 	poly_t *poly = &pdata[i];
@@ -883,7 +870,7 @@ void World_restore_cannon(world_t *world, cannon_t *cannon)
     P_set_hitmask(cannon->group, Cannon_hitmask(cannon));
 }
 
-void World_remove_cannon(world_t *world, cannon_t *cannon)
+void World_remove_cannon(cannon_t *cannon)
 {
     blkpos_t blk = Clpos_to_blkpos(cannon->pos);
     int i;
@@ -891,7 +878,7 @@ void World_remove_cannon(world_t *world, cannon_t *cannon)
     cannon->dead_ticks = options.cannonDeadTicks;
     cannon->conn_mask = 0;
 
-    World_set_block(world, blk, SPACE);
+    World_set_block(blk, SPACE);
 
     for (i = 0; i < num_polys; i++) {
 	poly_t *poly = &pdata[i];
@@ -916,8 +903,7 @@ extern struct move_parameters mp;
 bool Cannon_hitfunc(group_t *gp, move_t *move)
 {
     object_t *obj = move->obj;
-    world_t *world = &World;
-    cannon_t *cannon = Cannon_by_index(world, gp->mapobj_ind);
+    cannon_t *cannon = Cannon_by_index(gp->mapobj_ind);
     unsigned long cannon_mask;
 
     /* this should never happen if hitmasks are ok */

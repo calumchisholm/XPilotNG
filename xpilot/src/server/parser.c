@@ -323,10 +323,9 @@ static bool Parse_check_info_request(char **argv, int i)
  * and read the server defaults file and map file.
  * Then convert the map data into a World structure.
  */
-bool Parser(int argc, char **argv, world_t *world)
+bool Parser(int argc, char **argv)
 {
     int i;
-    bool status;
     char *fname;
     option_desc *desc;
 
@@ -375,17 +374,17 @@ bool Parser(int argc, char **argv, world_t *world)
      * Read local defaults file
      */
     if ((fname = Option_get_value("defaultsFileName", NULL)) != NULL)
-	parseDefaultsFile(fname, world);
+	parseDefaultsFile(fname);
     else
-	parseDefaultsFile(Conf_defaults_file_name(), world);
+	parseDefaultsFile(Conf_defaults_file_name());
 
     /*
      * Read local password file
      */
     if ((fname = Option_get_value("passwordFileName", NULL)) != NULL)
-	parsePasswordFile(fname, world);
+	parsePasswordFile(fname);
     else
-	parsePasswordFile(Conf_password_file_name(), world);
+	parsePasswordFile(Conf_password_file_name());
 
     /*
      * Read map file if map data not found yet.
@@ -395,16 +394,16 @@ bool Parser(int argc, char **argv, world_t *world)
      */
     if (!(fname = Option_get_value("mapData", NULL))) {
 	if ((fname = Option_get_value("mapFileName", NULL)) != NULL) {
-	    if (!parseMapFile(fname, world)) {
+	    if (!parseMapFile(fname)) {
 		xpprintf("Unable to read %s, trying to open %s\n",
 			 fname, Conf_default_map());
-		if (!parseMapFile(Conf_default_map(), world))
+		if (!parseMapFile(Conf_default_map()))
 		    xpprintf("Unable to read %s\n", Conf_default_map());
 	    }
 	} else {
 	    xpprintf("Map not specified, trying to open %s\n",
 		     Conf_default_map());
-	    if (!parseMapFile(Conf_default_map(), world))
+	    if (!parseMapFile(Conf_default_map()))
 		xpprintf("Unable to read %s\n", Conf_default_map());
 	}
     }
@@ -418,9 +417,7 @@ bool Parser(int argc, char **argv, world_t *world)
     /*
      * Construct the World structure from the options.
      */
-    status = Grok_map(world);
-
-    return status;
+    return Grok_map();
 }
 
 
@@ -438,7 +435,6 @@ int Tune_option(char *name, char *val)
     int ival;
     double fval;
     option_desc *opt;
-    world_t *world = &World;
 
     if (!(opt = Find_option_by_name(name)))
 	return -2;	/* Variable not found */
@@ -451,7 +447,7 @@ int Tune_option(char *name, char *val)
 	if (Convert_string_to_int(val, &ival) != true)
 	    return 0;
 	*(int *)opt->variable = ival;
-	(*opt->tuner)(world);
+	(*opt->tuner)();
 	return 1;
     case valBool:
 	if (ON(val))
@@ -460,13 +456,13 @@ int Tune_option(char *name, char *val)
 	    *(bool *)opt->variable = false;
 	else
 	    return 0;
-	(*opt->tuner)(world);
+	(*opt->tuner)();
 	return 1;
     case valReal:
 	if (Convert_string_to_float(val, &fval) != true)
 	    return 0;
 	*(double *)opt->variable = fval;
-	(*opt->tuner)(world);
+	(*opt->tuner)();
 	return 1;
     case valString:
 	{
@@ -477,7 +473,7 @@ int Tune_option(char *name, char *val)
 	    if (*(char **)(opt->variable) != opt->defaultValue)
 		free(*(char **)opt->variable);
 	    *(char **)opt->variable = s;
-	    (*opt->tuner)(world);
+	    (*opt->tuner)();
 	    return 1;
 	}
     default:

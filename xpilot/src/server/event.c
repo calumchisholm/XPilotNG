@@ -53,8 +53,6 @@ bool team_dead(int team)
  */
 static bool Player_lock_allowed(player_t *pl, player_t *lock_pl)
 {
-    world_t *world = pl->world;
-
     /* we can never lock on ourselves, nor on NULL. */
     if (lock_pl == NULL || pl->id == lock_pl->id)
 	return false;
@@ -172,15 +170,14 @@ int Player_lock_closest(player_t *pl, bool next)
 
 static void Player_change_home(player_t *pl)
 {
-    world_t *world = pl->world;
     player_t *pl2 = NULL;
     base_t *base2 = NULL;
     base_t *enemybase = NULL;
     double l, dist = 1e19;
     int i;
 
-    for (i = 0; i < Num_bases(world); i++) {
-	base_t *base = Base_by_index(world, i);
+    for (i = 0; i < Num_bases(); i++) {
+	base_t *base = Base_by_index(i);
 
 	l = Wrap_length(pl->pos.cx - base->pos.cx,
 			pl->pos.cy - base->pos.cy);
@@ -273,14 +270,13 @@ static void Player_refuel(player_t *pl)
 {
     int i;
     double l, dist = 1e19;
-    world_t *world = pl->world;
 
     if (!BIT(pl->have, HAS_REFUEL))
 	return;
 
     CLR_BIT(pl->used, USES_REFUEL);
-    for (i = 0; i < Num_fuels(world); i++) {
-	fuel_t *fs = Fuel_by_index(world, i);
+    for (i = 0; i < Num_fuels(); i++) {
+	fuel_t *fs = Fuel_by_index(i);
 
 	l = Wrap_length(pl->pos.cx - fs->pos.cx,
 			pl->pos.cy - fs->pos.cy);
@@ -298,14 +294,13 @@ static void Player_repair(player_t *pl)
 {
     int i;
     double l, dist = 1e19;
-    world_t *world = pl->world;
 
     if (!BIT(pl->have, HAS_REPAIR))
 	return;
 
     CLR_BIT(pl->used, USES_REPAIR);
-    for (i = 0; i < Num_targets(world); i++) {
-	target_t *targ = Target_by_index(world, i);
+    for (i = 0; i < Num_targets(); i++) {
+	target_t *targ = Target_by_index(i);
 
 	if (targ->team == pl->team
 	    && targ->dead_ticks <= 0) {
@@ -324,7 +319,6 @@ static void Player_repair(player_t *pl)
 /* Player pressed pause key. */
 static void Player_toggle_pause(player_t *pl)
 {
-    world_t *world = pl->world;
     enum pausetype {
 	unknown, paused, hoverpaused
     } pausetype = unknown;
@@ -348,7 +342,7 @@ static void Player_toggle_pause(player_t *pl)
 	    minv = 5.0;
 	    pausetype = hoverpaused;
 	}
-	minv += VECTOR_LENGTH(World_gravity(world, pl->pos));
+	minv += VECTOR_LENGTH(World_gravity(pl->pos));
 	if (pl->velocity > minv) {
 	    Set_player_message(pl,
 		       "You need to slow down to pause. [*Server notice*]");
@@ -461,7 +455,6 @@ static void Player_toggle_compass(player_t *pl)
 
 void Pause_player(player_t *pl, bool on)
 {
-    world_t *world = pl->world;
     int i;
 
     /* kps - add support for pausing robots ? */
@@ -559,7 +552,6 @@ int Handle_keyboard(player_t *pl)
 {
     int i, key;
     bool pressed;
-    world_t *world = pl->world;
 
     assert(!Player_is_killed(pl));
 
@@ -764,13 +756,13 @@ int Handle_keyboard(player_t *pl)
 		switch (Mods_get(pl->mods, ModsNuclear)) {
 		case MODS_NUCLEAR:
 		    Mods_set(&pl->mods, ModsNuclear,
-			     MODS_NUCLEAR|MODS_FULLNUCLEAR, world);
+			     MODS_NUCLEAR|MODS_FULLNUCLEAR);
 		    break;
 		case 0:
-		    Mods_set(&pl->mods, ModsNuclear, MODS_NUCLEAR, world);
+		    Mods_set(&pl->mods, ModsNuclear, MODS_NUCLEAR);
 		    break;
 		default:
-		    Mods_set(&pl->mods, ModsNuclear, 0, world);
+		    Mods_set(&pl->mods, ModsNuclear, 0);
 		    break;
 		}
 
@@ -780,7 +772,7 @@ int Handle_keyboard(player_t *pl)
 		{
 		    int cluster = Mods_get(pl->mods, ModsCluster);
 
-		    Mods_set(&pl->mods, ModsCluster, !cluster, world);
+		    Mods_set(&pl->mods, ModsCluster, !cluster);
 		}
 		break;
 
@@ -788,7 +780,7 @@ int Handle_keyboard(player_t *pl)
 		{
 		    int implosion = Mods_get(pl->mods, ModsImplosion);
 
-		    Mods_set(&pl->mods, ModsImplosion, !implosion, world);
+		    Mods_set(&pl->mods, ModsImplosion, !implosion);
 		}
 		break;
 
@@ -800,7 +792,7 @@ int Handle_keyboard(player_t *pl)
 			velocity = 0;
 		    else
 			velocity++;
-		    Mods_set(&pl->mods, ModsVelocity, velocity, world);
+		    Mods_set(&pl->mods, ModsVelocity, velocity);
 		}
 		break;
 
@@ -812,7 +804,7 @@ int Handle_keyboard(player_t *pl)
 			mini = 0;
 		    else
 			mini++;
-		    Mods_set(&pl->mods, ModsMini, mini, world);
+		    Mods_set(&pl->mods, ModsMini, mini);
 		}
 		break;
 
@@ -824,7 +816,7 @@ int Handle_keyboard(player_t *pl)
 			spread = 0;
 		    else
 			spread++;
-		    Mods_set(&pl->mods, ModsSpread, spread, world);
+		    Mods_set(&pl->mods, ModsSpread, spread);
 		}
 		break;
 
@@ -836,7 +828,7 @@ int Handle_keyboard(player_t *pl)
 			laser = 0;
 		    else
 			laser++;
-		    Mods_set(&pl->mods, ModsLaser, laser, world);
+		    Mods_set(&pl->mods, ModsLaser, laser);
 		}
 		break;
 
@@ -848,7 +840,7 @@ int Handle_keyboard(player_t *pl)
 			power = 0;
 		    else
 			power++;
-		    Mods_set(&pl->mods, ModsPower, power, world);
+		    Mods_set(&pl->mods, ModsPower, power);
 		}
 		break;
 
@@ -870,7 +862,7 @@ int Handle_keyboard(player_t *pl)
 		    *m = pl->mods;
 		else {
 		    pl->mods = *m;
-		    Mods_filter(&pl->mods, world);
+		    Mods_filter(&pl->mods);
 		}
 		break;
 	    }

@@ -102,7 +102,7 @@ void Item_damage(player_t *pl, double prob)
     }
 }
 
-int Choose_random_item(world_t *world)
+int Choose_random_item(void)
 {
     int i;
     double item_prob_sum = 0;
@@ -125,7 +125,7 @@ int Choose_random_item(world_t *world)
     return i;
 }
 
-void Place_item(world_t *world, player_t *pl, int item)
+void Place_item(player_t *pl, int item)
 {
     int num_lose, num_per_pack, place_count, dist;
     long grav, rand_item;
@@ -194,8 +194,8 @@ void Place_item(world_t *world, player_t *pl, int item)
 	    else
 		pos.cy += (BLOCK_CLICKS + (int)(rfrac() * 8 * CLICK));
 	}
-	pos = World_wrap_clpos(world, pos);
-	if (!World_contains_clpos(world, pos))
+	pos = World_wrap_clpos(pos);
+	if (!World_contains_clpos(pos))
 	    return;
 
 	if (is_inside(pos.cx, pos.cy, NOTEAM_BIT | NONBALL_BIT, NULL)
@@ -213,10 +213,9 @@ void Place_item(world_t *world, player_t *pl, int item)
 	else
 	    rand_item = 0;
 
-	if (Num_itemConcs(world) > 0
+	if (Num_itemConcs() > 0
 	    && rfrac() < options.itemConcentratorProb)
-	    con = ItemConc_by_index(world,
-				    (int)(rfrac() * Num_itemConcs(world)));
+	    con = ItemConc_by_index((int)(rfrac() * Num_itemConcs()));
 	else
 	    con = NULL;
 	/*
@@ -239,11 +238,11 @@ void Place_item(world_t *world, player_t *pl, int item)
 					 * BLOCK_CLICKS) + 1));
 		pos.cx = (click_t)(con->pos.cx + dist * tcos(dir));
 		pos.cy = (click_t)(con->pos.cy + dist * tsin(dir));
-		pos = World_wrap_clpos(world, pos);
-		if (!World_contains_clpos(world, pos))
+		pos = World_wrap_clpos(pos);
+		if (!World_contains_clpos(pos))
 		    continue;
 	    } else
-		pos = World_get_random_clpos(world);
+		pos = World_get_random_clpos();
 
 	    if (is_inside(pos.cx, pos.cy, NOTEAM_BIT | NONBALL_BIT, NULL)
 		== NO_GROUP)
@@ -278,7 +277,7 @@ void Place_item(world_t *world, player_t *pl, int item)
 		vel.y += tsin(dir) * v;
 	    }
 	} else {
-	    vector_t gravity = World_gravity(world, pos);
+	    vector_t gravity = World_gravity(pos);
 
 	    vel.x -= options.gravity * gravity.x;
 	    vel.y -= options.gravity * gravity.y;
@@ -287,15 +286,15 @@ void Place_item(world_t *world, player_t *pl, int item)
 	}
     }
 
-    Make_item(world, pos, vel, item, num_per_pack, grav | rand_item);
+    Make_item(pos, vel, item, num_per_pack, grav | rand_item);
 }
 
-void Make_item(world_t *world, clpos_t pos, vector_t vel,
+void Make_item(clpos_t pos, vector_t vel,
 	       int type, int num_per_pack, int status)
 {
     itemobject_t *item;
 
-    if (!World_contains_clpos(world, pos))
+    if (!World_contains_clpos(pos))
 	return;
 
     if (world->items[type].num >= world->items[type].max)
@@ -310,7 +309,7 @@ void Make_item(world_t *world, clpos_t pos, vector_t vel,
     item->obj_status = status;
     item->id = NO_ID;
     item->team = TEAM_NOT_SET;
-    Object_position_init_clpos(world, OBJ_PTR(item), pos);
+    Object_position_init_clpos(OBJ_PTR(item), pos);
     item->vel = vel;
     item->acc.x =
     item->acc.y = 0.0;
@@ -321,13 +320,12 @@ void Make_item(world_t *world, clpos_t pos, vector_t vel,
     item->pl_radius = ITEM_SIZE/2;
 
     world->items[type].num++;
-    Cell_add_object(world, OBJ_PTR(item));
+    Cell_add_object(OBJ_PTR(item));
 }
 
 void Throw_items(player_t *pl)
 {
     int num_items_to_throw, remain, item;
-    world_t *world = pl->world;
 
     if (!options.dropItemOnKillProb || !pl)
 	return;
@@ -339,7 +337,7 @@ void Throw_items(player_t *pl)
 	    num_items_to_throw = pl->item[item] - pl->initial_item[item];
 	    if (num_items_to_throw <= 0)
 		break;
-	    Place_item(world, pl, item);
+	    Place_item(pl, item);
 	    remain = pl->item[item] - pl->initial_item[item];
 	} while (remain > 0 && remain < num_items_to_throw);
     }
@@ -357,7 +355,6 @@ void Detonate_items(player_t *pl)
     player_t *owner_pl;
     int i;
     modifiers_t mods;
-    world_t *world = pl->world;
 
     if (!Player_is_killed(pl))
 	return;
@@ -394,11 +391,11 @@ void Detonate_items(player_t *pl)
 	    mods = pl->mods;
 	    if (Mods_get(mods, ModsNuclear)
 		&& pl->item[ITEM_MINE] < options.nukeMinMines)
-		Mods_set(&mods, ModsNuclear, 0, world);
+		Mods_set(&mods, ModsNuclear, 0);
 
 	    vel.x = pl->vel.x + speed * tcos(dir);
 	    vel.y = pl->vel.y + speed * tsin(dir);
-	    Place_general_mine(world, owner_pl->id, pl->team, GRAVITY,
+	    Place_general_mine(owner_pl->id, pl->team, GRAVITY,
 			       pl->pos, vel, mods);
 	}
     }
@@ -425,9 +422,9 @@ void Detonate_items(player_t *pl)
 	    mods = pl->mods;
 	    if (Mods_get(mods, ModsNuclear)
 		&& pl->item[ITEM_MISSILE] < options.nukeMinSmarts)
-		Mods_set(&mods, ModsNuclear, 0, world);
+		Mods_set(&mods, ModsNuclear, 0);
 
-	    Fire_general_shot(world, owner_pl->id, pl->team, pl->pos,
+	    Fire_general_shot(owner_pl->id, pl->team, pl->pos,
 			      type, (int)(rfrac() * RES), mods, NO_ID);
 	}
     }
@@ -454,19 +451,18 @@ void Tractor_beam(player_t *pl)
 	CLR_BIT(pl->used, USES_TRACTOR_BEAM);
 	return;
     }
-    General_tractor_beam(pl->world, pl->id, pl->pos,
-			 pl->item[ITEM_TRACTOR_BEAM], locked_pl,
-			 pl->tractor_is_pressor);
+    General_tractor_beam(pl->id, pl->pos, pl->item[ITEM_TRACTOR_BEAM],
+			 locked_pl, pl->tractor_is_pressor);
 }
 
-void General_tractor_beam(world_t *world, int id, clpos_t pos,
+void General_tractor_beam(int id, clpos_t pos,
 			  int items, player_t *victim, bool pressor)
 {
     double maxdist = TRACTOR_MAX_RANGE(items);
     double maxforce = TRACTOR_MAX_FORCE(items), percent, force, dist, cost, a;
     int theta;
     player_t *pl = Player_by_id(id);
-    /*cannon_t *cannon = Cannon_by_id(world, id);*/
+    /*cannon_t *cannon = Cannon_by_id(id);*/
 
     dist = Wrap_length(pos.cx - victim->pos.cx,
 		       pos.cy - victim->pos.cy) / CLICK;
@@ -514,7 +510,7 @@ void Do_deflector(player_t *pl)
     Player_add_fuel(pl, ED_DEFLECTOR);
 
     if (NumObjs >= options.cellGetObjectsThreshold)
-	Cell_get_objects(pl->world, pl->pos, (int)(range / BLOCK_CLICKS + 1),
+	Cell_get_objects(pl->pos, (int)(range / BLOCK_CLICKS + 1),
 			 200, &obj_list, &obj_count);
     else {
 	obj_list = Obj;
@@ -533,7 +529,7 @@ void Do_deflector(player_t *pl)
 		|| options.selfImmunity)
 		continue;
 	} else {
-	    if (Team_immune(pl->world, obj->id, pl->id))
+	    if (Team_immune(obj->id, pl->id))
 		continue;
 	}
 
@@ -590,7 +586,7 @@ void Do_transporter(player_t *pl)
 
 	if (pl_i == pl
 	    || !Player_is_active(pl_i)
-	    || Team_immune(pl->world, pl->id, pl_i->id)
+	    || Team_immune(pl->id, pl_i->id)
 	    || Player_is_tank(pl_i)
 	    || Player_is_phasing(pl_i))
 	    continue;
@@ -611,10 +607,10 @@ void Do_transporter(player_t *pl)
     }
 
     /* victim found */
-    Do_general_transporter(pl->world, pl->id, pl->pos, victim, NULL, NULL);
+    Do_general_transporter(pl->id, pl->pos, victim, NULL, NULL);
 }
 
-void Do_general_transporter(world_t *world, int id, clpos_t pos,
+void Do_general_transporter(int id, clpos_t pos,
 			    player_t *victim, int *itemp, double *amountp)
 {
     char msg[MSG_LEN];
@@ -622,7 +618,7 @@ void Do_general_transporter(world_t *world, int id, clpos_t pos,
     int i, item = ITEM_FUEL;
     double amount;
     player_t *pl = Player_by_id(id);
-    /*cannon_t *cannon = Cannon_by_id(world, id);*/
+    /*cannon_t *cannon = Cannon_by_id(id);*/
 
     /* choose item type to steal */
     for (i = 0; i < 50; i++) {
@@ -897,7 +893,7 @@ void do_lose_item(player_t *pl)
 
     if (!options.loseItemDestroys
 	&& !Player_is_phasing(pl))
-	Place_item(pl->world, pl, item);
+	Place_item(pl, item);
     else
 	pl->item[item]--;
 
@@ -905,7 +901,7 @@ void do_lose_item(player_t *pl)
 }
 
 
-void Fire_general_ecm(world_t *world, int id, int team, clpos_t pos)
+void Fire_general_ecm(int id, int team, clpos_t pos)
 {
     object_t *shot;
     mineobject_t *closest_mine = NULL;
@@ -916,7 +912,7 @@ void Fire_general_ecm(world_t *world, int id, int team, clpos_t pos)
     double range, perim, damage;
     player_t *p, *pl = Player_by_id(id);
     ecm_t t;
-    /*cannon_t *cannon = Cannon_by_id(world, id);*/
+    /*cannon_t *cannon = Cannon_by_id(id);*/
 
     t.pos = pos;
     t.id = (pl ? pl->id : NO_ID);
@@ -926,7 +922,7 @@ void Fire_general_ecm(world_t *world, int id, int team, clpos_t pos)
 	return;
 
     if (pl) {
-	ecm_t *ecm = Ecm_by_index(world, ecm_ind);
+	ecm_t *ecm = Ecm_by_index(ecm_ind);
 
 	pl->ecmcount++;
 	pl->item[ITEM_ECM]--;
@@ -965,7 +961,7 @@ void Fire_general_ecm(world_t *world, int id, int team, clpos_t pos)
 		    if (smart->smart_lock_id != owner_pl->id)
 			continue;
 		}
-	    } else if ((pl && Team_immune(world, pl->id, owner_pl->id))
+	    } else if ((pl && Team_immune(pl->id, owner_pl->id))
 		       || (BIT(world->rules->mode, TEAM_PLAY)
 			   && team == shot->team))
 		continue;
@@ -1057,8 +1053,8 @@ void Fire_general_ecm(world_t *world, int id, int team, clpos_t pos)
 
     /* in non-team mode cannons are immune to cannon ECMs */
     if (BIT(world->rules->mode, TEAM_PLAY) || pl) {
-	for (i = 0; i < Num_cannons(world); i++) {
-	    cannon_t *c = Cannon_by_index(world, i);
+	for (i = 0; i < Num_cannons(); i++) {
+	    cannon_t *c = Cannon_by_index(i);
 
 	    if (BIT(world->rules->mode, TEAM_PLAY)
 		&& c->team == team)
@@ -1175,7 +1171,7 @@ void Fire_ecm(player_t *pl)
 	|| Player_is_phasing(pl))
 	return;
 
-    Fire_general_ecm(pl->world, pl->id, pl->team, pl->pos);
+    Fire_general_ecm(pl->id, pl->team, pl->pos);
 }
 
 Item_t Item_by_option_name(const char *name)

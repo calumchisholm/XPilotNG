@@ -30,7 +30,6 @@
 void Fire_laser(player_t *pl)
 {
     clpos_t m_gun, pos;
-    world_t *world = pl->world;
 
     if (frame_time
 	<= pl->laser_time + options.laserRepeatRate - timeStep + 1e-3)
@@ -47,25 +46,25 @@ void Fire_laser(player_t *pl)
 		+ FLOAT_TO_CLICK(pl->vel.x * timeStep);
 	    pos.cy = pl->pos.cy + m_gun.cy
 		+ FLOAT_TO_CLICK(pl->vel.y * timeStep);
-	    pos = World_wrap_clpos(world, pos);
+	    pos = World_wrap_clpos(pos);
 	    if (is_inside(pos.cx, pos.cy, NONBALL_BIT | NOTEAM_BIT, NULL)
 		!= NO_GROUP)
 		return;
-	    Fire_general_laser(pl->world, pl->id, pl->team, pos,
+	    Fire_general_laser(pl->id, pl->team, pos,
 			       pl->dir, pl->mods);
 	}
     }
 }
 
-void Fire_general_laser(world_t *world, int id, int team, clpos_t pos,
-			int dir, modifiers_t mods)
+void Fire_general_laser(int id, int team, clpos_t pos, int dir,
+			modifiers_t mods)
 {
     double life;
     pulseobject_t *pulse;
     player_t *pl = Player_by_id(id);
-    /*cannon_t *cannon = Cannon_by_id(world, id);*/
+    /*cannon_t *cannon = Cannon_by_id(id);*/
 
-    if (!World_contains_clpos(world, pos)) {
+    if (!World_contains_clpos(pos)) {
 	warn("Fire_general_laser: outside world.\n");
 	return;
     }
@@ -86,7 +85,7 @@ void Fire_general_laser(world_t *world, int id, int team, clpos_t pos,
 
     pulse->id		= (pl ? pl->id : NO_ID);
     pulse->team 	= team;
-    Object_position_init_clpos(world, OBJ_PTR(pulse), pos);
+    Object_position_init_clpos(OBJ_PTR(pulse), pos);
     pulse->vel.x 	= options.pulseSpeed * tcos(dir);
     pulse->vel.y 	= options.pulseSpeed * tsin(dir);
     pulse->acc.x 	= 0;
@@ -106,7 +105,7 @@ void Fire_general_laser(world_t *world, int id, int team, clpos_t pos,
     pulse->pulse_len  	= 0 /*options.pulseLength * CLICK*/;
     pulse->pulse_refl 	= false;
 
-    Cell_add_object(world, OBJ_PTR(pulse));
+    Cell_add_object(OBJ_PTR(pulse));
 
     if (pl)
 	pl->num_pulses++;
@@ -124,7 +123,7 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 
     if (kp == NULL)
 	/* Perhaps it was a cannon pulse? */
-	cannon = Cannon_by_id(pl->world, pulse->id);
+	cannon = Cannon_by_id(pulse->id);
 
     pl->forceVisible += 1;
     if (Player_has_mirror(pl)

@@ -81,7 +81,7 @@ int Contact_init(void)
  * Return the number of kicked robots.
  * Don't kick more than one robot.
  */
-static int Kick_robot_players(world_t *world, int team)
+static int Kick_robot_players(int team)
 {
     int i;
 
@@ -675,7 +675,7 @@ static void Queue_ack(struct queued_player *qp, int qpos)
     qp->last_ack_sent = main_loops;
 }
 
-void Queue_loop(world_t *world)
+void Queue_loop(void)
 {
     struct queued_player *qp, *prev = 0, *next = 0;
     int qpos = 0, login_port;
@@ -721,11 +721,11 @@ void Queue_loop(world_t *world)
 	if (last_unqueued_loops + 2 + (FPS >> 2) < main_loops) {
 	    int lim = (int)MIN(options.playerLimit,
 			       options.baselessPausing
-			       ? 1e6 : Num_bases(world));
+			       ? 1e6 : Num_bases());
 
 	    /* is there a homebase available? */
 	    if (NumPlayers - NumPseudoPlayers + login_in_progress < lim
-		|| !game_lock && ((Kick_robot_players(world, TEAM_NOT_SET)
+		|| !game_lock && ((Kick_robot_players(TEAM_NOT_SET)
 		    && NumPlayers - NumPseudoPlayers + login_in_progress < lim)
 		|| (Kick_paused_players(TEAM_NOT_SET) &&
 		    NumPlayers - NumPseudoPlayers + login_in_progress < lim))){
@@ -739,7 +739,7 @@ void Queue_loop(world_t *world)
 			     && options.reserveRobotTeam) ||
 			    (world->teams[qp->team].NumMembers
 			     >= world->teams[qp->team].NumBases &&
-			     !Kick_robot_players(world, qp->team) &&
+			     !Kick_robot_players(qp->team) &&
 			     !Kick_paused_players(qp->team)))
 			    qp->team = TEAM_NOT_SET;
 		    }
@@ -748,7 +748,7 @@ void Queue_loop(world_t *world)
 			if (qp->team == TEAM_NOT_SET && !game_lock) {
 			    if (NumRobots
 				> world->teams[options.robotTeam].NumRobots) {
-				Kick_robot_players(world, TEAM_NOT_SET);
+				Kick_robot_players(TEAM_NOT_SET);
 				qp->team = Pick_team(PL_TYPE_HUMAN);
 			    }
 			}
@@ -992,14 +992,13 @@ static int Check_address(char *str)
     return 0;
 }
 
-void Set_deny_hosts(world_t *world)
+void Set_deny_hosts(void)
 {
     char *list, *tok, *slash;
     int n = 0;
     unsigned long addr, mask;
     static char list_sep[] = ",;: \t\n";
 
-    UNUSED_PARAM(world);
     num_addr_mask = 0;
     XFREE(addr_mask_list);
     if (!(list = xp_strdup(options.denyHosts)))

@@ -59,12 +59,12 @@
  */
 static inline int WRAP_XCLICK(int cx)
 {
-    return World_wrap_xclick(&World, cx);
+    return World_wrap_xclick(cx);
 }
 
 static inline int WRAP_YCLICK(int cy)
 {
-    return World_wrap_yclick(&World, cy);
+    return World_wrap_yclick(cy);
 }
 
 
@@ -74,44 +74,44 @@ static inline int WRAP_YCLICK(int cy)
  * half the map size then it is wrapped.
  */
 #define WRAP_DCX(dcx)	\
-	(BIT(World.rules->mode, WRAP_PLAY) \
-	    ? ((dcx) < - (World.cwidth >> 1) \
-		? (dcx) + World.cwidth \
-		: ((dcx) > (World.cwidth >> 1) \
-		    ? (dcx) - World.cwidth \
+	(BIT(world->rules->mode, WRAP_PLAY) \
+	    ? ((dcx) < - (world->cwidth >> 1) \
+		? (dcx) + world->cwidth \
+		: ((dcx) > (world->cwidth >> 1) \
+		    ? (dcx) - world->cwidth \
 		    : (dcx))) \
 	    : (dcx))
 
 #define WRAP_DCY(dcy)	\
-	(BIT(World.rules->mode, WRAP_PLAY) \
-	    ? ((dcy) < - (World.cheight >> 1) \
-		? (dcy) + World.cheight \
-		: ((dcy) > (World.cheight >> 1) \
-		    ? (dcy) - World.cheight \
+	(BIT(world->rules->mode, WRAP_PLAY) \
+	    ? ((dcy) < - (world->cheight >> 1) \
+		? (dcy) + world->cheight \
+		: ((dcy) > (world->cheight >> 1) \
+		    ? (dcy) - world->cheight \
 		    : (dcy))) \
 	    : (dcy))
 
 #define TWRAP_XCLICK(x_) \
-     ((x_) > 0 ? (x_) % World.cwidth : \
-      ((x_) % World.cwidth + World.cwidth))
+     ((x_) > 0 ? (x_) % world->cwidth : \
+      ((x_) % world->cwidth + world->cwidth))
 
 #define TWRAP_YCLICK(y_) \
-     ((y_) > 0 ? (y_) % World.cheight : \
-      ((y_) % World.cheight + World.cheight))
+     ((y_) > 0 ? (y_) % world->cheight : \
+      ((y_) % world->cheight + world->cheight))
 
 
 #define CENTER_XCLICK(X) \
-        (((X) < -(World.cwidth >> 1)) ? \
-             (X) + World.cwidth : \
-             (((X) >= (World.cwidth >> 1)) ? \
-                 (X) - World.cwidth : \
+        (((X) < -(world->cwidth >> 1)) ? \
+             (X) + world->cwidth : \
+             (((X) >= (world->cwidth >> 1)) ? \
+                 (X) - world->cwidth : \
                  (X)))
 
 #define CENTER_YCLICK(X) \
-        (((X) < -(World.cheight >> 1)) ? \
-	     (X) + World.cheight : \
-	     (((X) >= (World.cheight >> 1)) ? \
-	         (X) - World.cheight : \
+        (((X) < -(world->cheight >> 1)) ? \
+	     (X) + world->cheight : \
+	     (((X) >= (world->cheight >> 1)) ? \
+	         (X) - world->cheight : \
 	         (X)))
 
 #if 0 /* kps -moved to common/draw.h because shipshapes needs this */

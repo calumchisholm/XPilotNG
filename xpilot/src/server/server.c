@@ -59,14 +59,16 @@ int main(int argc, char **argv)
 {
     int timer_tick_rate;
     char *addr;
-    world_t *world = &World;
+
+    /* world is a global now */
+    world = &World;
 
     if (sock_startup() < 0) {
     	warn("Error initializing sockets\n");
 	return 1;
     }
 
-    if (World_init(world) < 0) {
+    if (World_init() < 0) {
 	warn("Error initializing world\n");
 	return 1;
     }
@@ -97,27 +99,27 @@ int main(int argc, char **argv)
     /* Make trigonometric tables */
     Make_table();
 
-    if (!Parser(argc, argv, world))
+    if (!Parser(argc, argv))
 	exit(1);
 
-    Init_recording(world);
+    Init_recording();
     /* Lock the server into memory */
     plock_server(options.pLockServer);
 
-    Asteroid_line_init(world);
-    Wormhole_line_init(world);
-    Walls_init(world);
+    Asteroid_line_init();
+    Wormhole_line_init();
+    Walls_init();
 
     /* Allocate memory for players, shots and messages */
-    Alloc_players(Num_bases(world) + MAX_PSEUDO_PLAYERS + MAX_SPECTATORS);
-    spectatorStart = Num_bases(world) + MAX_PSEUDO_PLAYERS;
-    Alloc_shots(world, MAX_TOTAL_SHOTS);
-    Alloc_cells(world);
+    Alloc_players(Num_bases() + MAX_PSEUDO_PLAYERS + MAX_SPECTATORS);
+    spectatorStart = Num_bases() + MAX_PSEUDO_PLAYERS;
+    Alloc_shots(MAX_TOTAL_SHOTS);
+    Alloc_cells();
 
-    Move_init(world);
-    Robot_init(world);
-    Treasure_init(world);
-    Hitmasks_init(world);
+    Move_init();
+    Robot_init();
+    Treasure_init();
+    Hitmasks_init();
 
     Rank_init_saved_scores();
 
@@ -147,8 +149,8 @@ int main(int argc, char **argv)
 
     Meta_init();
 
-    Timing_setup(world);
-    Check_playerlimit(world);
+    Timing_setup();
+    Check_playerlimit();
 
     if (Setup_net_server() == -1)
 	End_game();
@@ -202,7 +204,6 @@ int main(int argc, char **argv)
 
 void Main_loop(void)
 {
-    world_t *world = &World;
     struct timeval tv1, tv2;
     double t1, t2;
 
@@ -241,7 +242,7 @@ void Main_loop(void)
 	    }
 	}
 
-	Update_objects(world);
+	Update_objects();
 
 	if ((main_loops % CONF_UPDATES_PR_FRAME) == 0)
 	    Frame_update();
@@ -263,7 +264,7 @@ void Main_loop(void)
     }
 
     playback = record = 0;
-    Queue_loop(world);
+    Queue_loop();
     playback = rplayback;
     record = rrecord;
 
@@ -301,7 +302,6 @@ int End_game(void)
 {
     player_t *pl;
     char msg[MSG_LEN];
-    world_t *world = &World;
 
     record = rrecord;
     playback = rplayback; /* Could be called from signal handler */
@@ -331,7 +331,7 @@ int End_game(void)
 
     if (options.recordMode != 0) {
 	options.recordMode = 0;
-	Init_recording(world);
+	Init_recording();
     }
 
     /* Tell meta server that we are gone. */
@@ -344,9 +344,9 @@ int End_game(void)
     Rank_write_rankfile();
 
     Free_players();
-    Free_shots(world);
-    World_free(world);
-    Free_cells(world);
+    Free_shots();
+    World_free();
+    Free_cells();
     Free_options();
     Log_game("END");
 
@@ -379,7 +379,6 @@ int Pick_team(int pick_for_type)
     player_t *pl;
     int playing[MAX_TEAMS], free_bases[MAX_TEAMS], available_teams[MAX_TEAMS];
     double team_score[MAX_TEAMS], losing_score;
-    world_t *world = &World;
 
     /* If game_lock is on, can't join playing teams (might be able to join
      * paused). */
@@ -489,7 +488,6 @@ void Server_info(char *str, size_t max_size)
     int i, j, k;
     player_t *pl, **order;
     char name[MAX_CHARS], lblstr[MAX_CHARS], msg[MSG_LEN];
-    world_t *world = &World;
 
     snprintf(str, max_size,
 	     "SERVER VERSION..: %s\n"
@@ -507,7 +505,7 @@ void Server_info(char *str, size_t max_size)
 	     Describe_game_status(),
 	     FPS,
 	     world->name, world->author, world->width, world->height,
-	     NumPlayers, Num_bases(world));
+	     NumPlayers, Num_bases());
 
     assert(strlen(str) < max_size);
 
@@ -598,7 +596,6 @@ void Log_game(const char *heading)
     char timenow[81];
     struct tm *ptr;
     time_t lt;
-    world_t *world = &World;
 
     if (!options.Log)
 	return;
@@ -626,7 +623,6 @@ void Game_Over(void)
     int i, win_team = TEAM_NOT_SET, lose_team = TEAM_NOT_SET;
     char msg[MSG_LEN];
     player_t *win_pl = NULL, *lose_pl = NULL;
-    world_t *world = &World;
 
     Set_message("Game over...");
 
@@ -834,7 +830,7 @@ bool Friction_area_hitfunc(group_t *groupptr, move_t *move)
 /*
  * Handling of group properties
  */
-void Team_immunity_init(world_t *world)
+void Team_immunity_init(void)
 {
     int group;
 
@@ -842,7 +838,7 @@ void Team_immunity_init(world_t *world)
 	group_t *gp = groupptr_by_id(group);
 
 	if (gp->type == CANNON) {
-	    cannon_t *cannon = Cannon_by_index(world, gp->mapobj_ind);
+	    cannon_t *cannon = Cannon_by_index(gp->mapobj_ind);
 
 	    assert(cannon->group == group);
 	    Cannon_set_hitmask(group, cannon);
@@ -856,9 +852,9 @@ void Team_immunity_init(world_t *world)
 }
 
 /* kps - called at server startup to initialize hit masks */
-void Hitmasks_init(world_t *world)
+void Hitmasks_init(void)
 {
-    Target_init(world);
-    Team_immunity_init(world);
+    Target_init();
+    Team_immunity_init();
 }
 

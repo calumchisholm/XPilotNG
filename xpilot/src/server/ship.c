@@ -56,8 +56,7 @@ void Make_thrust_sparks(player_t *pl)
 
     /* floor(tot_sparks + rfrac()) randomly rounds up or down to an integer,
      * so that the expectation value of the result is tot_sparks */
-    Make_debris(pl->world,
-		pos,
+    Make_debris(pos,
 		pl->vel,
 		pl->id,
 		pl->team,
@@ -71,8 +70,7 @@ void Make_thrust_sparks(player_t *pl)
 		1.0, max_speed,
 		3.0, max_life);
 
-    Make_debris(pl->world,
-		pos,
+    Make_debris(pos,
 		pl->vel,
 		pl->id,
 		pl->team,
@@ -311,7 +309,6 @@ void Update_tanks(pl_fuel_t *ft)
  */
 void Tank_handle_detach(player_t *pl)
 {
-    world_t *world = pl->world;
     player_t *tank;
     int i, ct;
 
@@ -339,7 +336,7 @@ void Tank_handle_detach(player_t *pl)
      * Player structures contain pointers to dynamic memory...
      */
 
-    Init_player(world, NumPlayers,
+    Init_player(NumPlayers,
 		options.allowShipShapes
 		? Parse_shape_str(options.tankShipShape) : NULL,
 		PL_TYPE_TANK);
@@ -463,8 +460,7 @@ void Tank_handle_detach(player_t *pl)
  */
 
 /* Create debris particles */
-void Make_debris(world_t  *world,
-		 clpos_t  pos,
+void Make_debris(clpos_t  pos,
 		 vector_t vel,
 		 int      owner_id,
 		 int      owner_team,
@@ -486,8 +482,8 @@ void Make_debris(world_t  *world,
     if (!options.useDebris)
 	return;
 
-    pos = World_wrap_clpos(world, pos);
-    if (!World_contains_clpos(world, pos))
+    pos = World_wrap_clpos(pos);
+    if (!World_contains_clpos(pos))
 	return;
 
     if (max_life < min_life)
@@ -499,7 +495,7 @@ void Make_debris(world_t  *world,
     Mods_clear(&mods);
 
     if (type == OBJ_SHOT) {
-	Mods_set(&mods, ModsCluster, 1, world);
+	Mods_set(&mods, ModsCluster, 1);
 	if (!options.shotsGravity)
 	    CLR_BIT(status, GRAVITY);
     }
@@ -517,7 +513,7 @@ void Make_debris(world_t  *world,
 	debris->color = color;
 	debris->id = owner_id;
 	debris->team = owner_team;
-	Object_position_init_clpos(world, debris, pos);
+	Object_position_init_clpos(debris, pos);
 	dir = MOD2(min_dir + (int)(rfrac() * (max_dir - min_dir)), RES);
 	dirplus = MOD2(dir + 1, RES);
 	diroff = rfrac();
@@ -544,13 +540,12 @@ void Make_debris(world_t  *world,
 	debris->pl_radius = radius;
 	debris->obj_status = status;
 	debris->mods = mods;
-	Cell_add_object(world, debris);
+	Cell_add_object(debris);
     }
 }
 
 
-void Make_wreckage(world_t *world,
-		   clpos_t  pos,
+void Make_wreckage(clpos_t  pos,
 		   vector_t vel,
 		   int      owner_id,
 		   int      owner_team,
@@ -570,8 +565,8 @@ void Make_wreckage(world_t *world,
     if (!options.useWreckage)
 	return;
 
-    pos = World_wrap_clpos(world, pos);
-    if (!World_contains_clpos(world, pos))
+    pos = World_wrap_clpos(pos);
+    if (!World_contains_clpos(pos))
 	return;
 
     if (max_life < min_life)
@@ -609,7 +604,7 @@ void Make_wreckage(world_t *world,
 	wreckage->type = OBJ_WRECKAGE;
 
 	/* Position */
-	Object_position_init_clpos(world, OBJ_PTR(wreckage), pos);
+	Object_position_init_clpos(OBJ_PTR(wreckage), pos);
 
 	/* Direction */
 	dir = MOD2(min_dir + (int)(rfrac() * MOD2(max_dir - min_dir, RES)),
@@ -649,7 +644,7 @@ void Make_wreckage(world_t *world,
 	wreckage->pl_radius = radius;
 	wreckage->obj_status = status;
 	wreckage->mods = mods;
-	Cell_add_object(world, OBJ_PTR(wreckage));
+	Cell_add_object(OBJ_PTR(wreckage));
     }
 }
 
@@ -666,8 +661,7 @@ void Explode_fighter(player_t *pl)
     /* reduce debris since we also create wreckage objects */
     min_debris >>= 1; /* Removed *2.0 from range */
 
-    Make_debris(pl->world,
-		pl->pos,
+    Make_debris(pl->pos,
 		pl->vel,
 		pl->id,
 		pl->team,
@@ -681,8 +675,7 @@ void Explode_fighter(player_t *pl)
 		20.0, 20.0 + pl->mass * 0.5,
 		5.0, 5.0 + pl->mass * 1.5);
 
-    Make_wreckage(pl->world,
-		  pl->pos,
+    Make_wreckage(pl->pos,
 		  pl->vel,
 		  pl->id,
 		  pl->team,
