@@ -108,7 +108,6 @@ int AddOption(char *name, char *value);
 int YesNo(char *val);
 char *StrToNum(char *string, int len, int type);
 int LoadMapData(char *value);
-char *getMultilineValue();
 
 /* prototypes for round.c */
 int RoundMapArea(HandlerInfo info);

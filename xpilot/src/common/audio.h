@@ -118,7 +118,7 @@ enum {
 
 #ifdef _CAUDIO_C_
 
-static char    *soundNames[] =
+static const char    *soundNames[] =
 {
     "start",
     "fire_shot",

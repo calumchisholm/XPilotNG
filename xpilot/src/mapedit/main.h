@@ -46,10 +46,8 @@
 #include                 "tools.h"
 #include                 "expose.h"
 #include                 "file.h"
-#include                 "round.h"
 #include                 "help.h"
 #include                 "grow.h"
-#include                 "forms.h"
 
 #define MAPWIDTH         0
 #define MAPHEIGHT        1
@@ -332,8 +330,8 @@ typedef struct {
 
 /* RTT */
 typedef struct {
-    char *name;
-    char *value;
+    const char *name;
+    const char *value;
 } charlie;
 /* RTT */
 
@@ -358,9 +356,9 @@ extern map_data_t clipdata;
 extern xpmap_t map;
 
 typedef struct {
-    char *name, *altname, *label;
+    const char *name, *altname, *label;
     int length, type;
-    char *charvar;
+    const char *charvar;
     int *intvar;
     int row, column, sheet, space;
 } prefs_t;
