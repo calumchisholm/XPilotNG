@@ -344,7 +344,7 @@ static bool Really_empty_space(player *pl, int x, int y)
     int group, cx, cy, i, j;
     int delta = BLOCK_CLICKS / 4;
     int inside = 0, outside = 0;
-    int hitmask = NONBALL_BIT; /* kps - ok ? */
+    hitmask_t hitmask = NONBALL_BIT; /* kps - ok ? */
 
     (void)pl;
     /*
