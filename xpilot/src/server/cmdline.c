@@ -3422,6 +3422,16 @@ static option_desc opts[] = {
 	"Enable improved precision steering and aiming of main gun.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
+    { /* kps - temp hack to disable ball styles during runtime */
+	"ballStyles",
+	"ballStyles",
+	"true",
+	&options.ballStyles,
+	valBool,
+	tuner_dummy,
+	"Send ball styles to clients.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
     {
 	"ignoreMaxFPS",
 	"ignoreMaxFPS",

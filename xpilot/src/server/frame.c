@@ -794,7 +794,8 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 	    {
 		ballobject_t *ball = BALL_PTR(shot);
 
-		Send_ball(conn, pos, ball->id, ball->style);
+		Send_ball(conn, pos, ball->id,
+			  options.ballStyles ? ball->style : 0xff);
 		break;
 	    }
 	    break;
