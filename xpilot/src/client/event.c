@@ -32,12 +32,16 @@ char event_version[] = VERSION;
 #define MAX_BUTTON_DEFS		10
 
 static BITV_DECL(keyv, NUM_KEYS);
+static unsigned char keyv_new[NUM_KEYS];
 
 keys_t buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
 
 char *pointerButtonBindings[MAX_POINTER_BUTTONS] =
 { NULL, NULL, NULL, NULL, NULL };
 
+int Key_get_count(keys_t key);
+bool Key_inc_count(keys_t key);
+bool Key_dec_count(keys_t key);
 
 static void Pointer_control_newbie_message(void)
 {
@@ -92,6 +96,7 @@ static void Clear_buttonDefs(int ind)
 
 int Key_init(void)
 {
+    int i;
     if (sizeof(keyv) != KEYBOARD_SIZE) {
 	warn("%s, %d: keyv size %d, KEYBOARD_SIZE is %d",
 	     __FILE__, __LINE__,
@@ -99,6 +104,9 @@ int Key_init(void)
 	exit(1);
     }
     memset(keyv, 0, sizeof keyv);
+    for (i=0; i < NUM_KEYS; ++i)
+    	keyv_new[i] = 0;
+    
     BITV_SET(keyv, KEY_SHIELD);
 
     return 0;
@@ -258,8 +266,12 @@ static bool Key_press_no(void)
 
 static bool Key_press_exit(void)
 {
+    int i;
     /* exit pointer control if exit key pressed in pointer control mode */
     if (pointerControl) {
+    	/* this releases mouse, so we clear the mouse buttons so they don't lock on */
+	for (i=0;i<MAX_POINTER_BUTTONS;++i)
+	    Pointer_button_released(i);
 	Pointer_control_newbie_message();
 	return Key_press_pointer_control();
     }
@@ -275,10 +287,52 @@ static bool Key_press_exit(void)
     return false;	/* server doesn't need to know */
 }
 
+int Key_get_count(keys_t key)
+{
+   if (key >= NUM_KEYS) return -1;
+   else return keyv_new[key];
+}
+
+bool Key_inc_count(keys_t key)
+{
+    if (key >= NUM_KEYS) return false;
+    if (keyv_new[key]<255) {
+    	++keyv_new[key];
+	return true;
+    } else return false;
+}
+
+bool Key_dec_count(keys_t key)
+{
+    if (key >= NUM_KEYS) return false;
+    if (keyv_new[key]>0) {
+    	--keyv_new[key];
+	return true;
+    } else return false;
+}
+
+void Key_clear_counts(void)
+{
+    int i;
+    bool change = false;
+
+    for (i=0; i < NUM_KEYS; ++i) {
+    	if (keyv_new[i] > 0) {
+    	    keyv_new[i] = 1;
+	    change |= Key_release(i);
+	}
+    }
+    
+    if (change)
+	Net_key_change();
+}
+
 bool Key_press(keys_t key)
 {
     static bool thrusthelp = false;
-
+    bool countchange;
+    int keycount, i;
+    
     /* in quit mode only these keys can be used */
     if (quit_mode) {
 	switch (key) {
@@ -291,6 +345,18 @@ bool Key_press(keys_t key)
 	default:
 	    return false;
 	}
+    }
+    
+    countchange = Key_inc_count(key);
+    keycount = Key_get_count(key);
+    
+    /* keycount -1 means this was a client only key, we don't count those */
+    if ( keycount != -1 ) { 
+        /* if countchange is false it means that Key_<inc|dec>_count() failed to
+         * change the count due to being at the end of the range (should be very rare)
+         * keycount != 1 means that this key was already pressed (multiple key mappings)
+         */
+        if ((!countchange) || (keycount != 1)) return true;
     }
 
     Key_check_talk_macro(key);
@@ -365,6 +431,10 @@ bool Key_press(keys_t key)
 	return Key_press_decrease_turnspeed();
 
     case KEY_TALK:
+    	/* this releases mouse in x11 client, so we clear the mouse buttons so they don't lock on */
+	if (pointerControl)
+            for (i=0;i<MAX_POINTER_BUTTONS;++i)
+                Pointer_button_released(i);
 	return Key_press_talk();
 
     case KEY_TOGGLE_OWNED_ITEMS:
@@ -374,6 +444,10 @@ bool Key_press(keys_t key)
 	return Key_press_show_messages();
 
     case KEY_POINTER_CONTROL:
+    	/* this releases mouse, so we clear the mouse buttons so they don't lock on */
+    	if (pointerControl)
+    	    for (i=0;i<MAX_POINTER_BUTTONS;++i)
+    	    	Pointer_button_released(i);
 	Pointer_control_newbie_message();
 	return Key_press_pointer_control();
 
@@ -413,6 +487,22 @@ bool Key_press(keys_t key)
 
 bool Key_release(keys_t key)
 {
+    bool countchange;
+    int keycount;
+    
+    countchange = Key_dec_count(key);
+    keycount = Key_get_count(key);
+
+    if ( keycount != -1 ) { /* -1 means this was a client only key, we don't count those */
+        /* if countchange is false it means that Key_<inc|dec>_count() failed to
+         * change the count due to being at the end of the range (happens to most key releases
+	 * let through from talk mode)
+         * keycount != 0 means that some physical keys remain pressed that map to this xpilot key 
+         */
+        if ((!countchange) || (keycount != 0)) return true;
+    }
+
+
     switch (key) {
     case KEY_ID_MODE:
     case KEY_TALK:

@@ -146,7 +146,8 @@ int Process_event(SDL_Event *evt)
 	break;
 	
     case SDL_KEYUP:
-	if (Console_isVisible()) break;
+        /* letting release events through to prevent some keys from locking */
+	/*if (Console_isVisible()) break;*/
 	Keyboard_button_released((xp_keysym_t)evt->key.keysym.sym);
 	break;
 	

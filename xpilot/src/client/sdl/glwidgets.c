@@ -3181,26 +3181,41 @@ GLWidget *Init_MainWidget( font_data *font )
     tmp->buttondata 	= tmp;
     tmp->Close	    	= Close_MainWidget;
     
+    if ( !AppendGLWidgetList(&(tmp->children),
+    	    (wid_info->game_msgs = Init_ListWidget(wid_info->BORDER,tmp->bounds.h-wid_info->BORDER,
+	    &nullRGBA,&nullRGBA,&greenRGBA,LW_UP,LW_RIGHT,true)))
+	) {
+	error("Failed to initialize game msg list");
+	Close_Widget(&tmp);
+	return NULL;
+    }
+    
+    if ( !AppendGLWidgetList(&(tmp->children),
+    	    (wid_info->alert_msgs = Init_ListWidget(tmp->bounds.w/2,tmp->bounds.h/2-50,
+	    &nullRGBA,&nullRGBA,&greenRGBA,LW_UP,LW_HCENTER,false)))
+	) {
+	error("Failed to initialize alert msg list");
+	Close_Widget(&tmp);
+	return NULL;
+    }
+    
     if ( !AppendGLWidgetList(&(tmp->children),(wid_info->radar = Init_RadarWidget())) ) {
 	error("radar initialization failed");
 	Close_Widget(&tmp);
 	return NULL;
     }
+    
     if ( !AppendGLWidgetList(&(tmp->children),(wid_info->scorelist = Init_ScorelistWidget())) ) {
 	error("scorelist initialization failed");
 	Close_Widget(&tmp);
 	return NULL;
     }
+    
     if ( !AppendGLWidgetList(&(tmp->children),(wid_info->confmenu = Init_ConfMenuWidget(0,0))) ) {
 	error("confmenu initialization failed");
 	Close_Widget(&tmp);
 	return NULL;
     }
-    b.w = wid_info->confmenu->bounds.w;
-    b.h = wid_info->confmenu->bounds.h;
-    b.x = tmp->bounds.w - b.w - 16;
-    b.y = tmp->bounds.h - b.h - 16;
-    SetBounds_GLWidget(wid_info->confmenu,&b);
     
     if ( !AppendGLWidgetList(&(tmp->children),
     	    	(wid_info->chat_msgs = Init_ListWidget(wid_info->radar->bounds.w + 2*wid_info->BORDER,wid_info->BORDER,
@@ -3210,22 +3225,12 @@ GLWidget *Init_MainWidget( font_data *font )
 	Close_Widget(&tmp);
 	return NULL;
     }
-    if ( !AppendGLWidgetList(&(tmp->children),
-    	    (wid_info->game_msgs = Init_ListWidget(wid_info->BORDER,tmp->bounds.h-wid_info->BORDER,
-	    &nullRGBA,&nullRGBA,&greenRGBA,LW_UP,LW_RIGHT,true)))
-	) {
-	error("Failed to initialize game msg list");
-	Close_Widget(&tmp);
-	return NULL;
-    }
-    if ( !AppendGLWidgetList(&(tmp->children),
-    	    (wid_info->alert_msgs = Init_ListWidget(tmp->bounds.w/2,tmp->bounds.h/2-50,
-	    &nullRGBA,&nullRGBA,&greenRGBA,LW_UP,LW_HCENTER,false)))
-	) {
-	error("Failed to initialize alert msg list");
-	Close_Widget(&tmp);
-	return NULL;
-    }
+    
+    b.w = wid_info->confmenu->bounds.w;
+    b.h = wid_info->confmenu->bounds.h;
+    b.x = tmp->bounds.w - b.w - 16;
+    b.y = tmp->bounds.h - b.h - 16;
+    SetBounds_GLWidget(wid_info->confmenu,&b);
     
     /* Set up the clipboard */
     if ( init_scrap() < 0 ) {

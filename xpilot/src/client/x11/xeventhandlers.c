@@ -204,6 +204,7 @@ void UnmapNotify_event(XEvent *event)
     }
     gotFocus = false;
     XAutoRepeatOn(dpy);
+    Key_clear_counts();
 }
 
 void ConfigureNotify_event(XEvent *event)
@@ -249,6 +250,10 @@ void KeyChanged_event(XEvent *event)
     if (event->xkey.window == topWindow)
         Key_event(event);
     else if (event->xkey.window == talkWindow) {
+        /* letting release events through to prevent some keys from locking */
+        if (event->type == KeyRelease) { 
+            Key_event(event);
+        }
         if (event->type == KeyPress) {
 	    talk_key_repeating = 1;
 	    gettimeofday(&talk_key_repeat_time, NULL);
