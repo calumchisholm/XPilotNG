@@ -58,43 +58,43 @@ char laser_version[] = VERSION;
  */
 void Laser_pulse_hits_player(int ind, pulseobject *pulse)
 {
-    player		*pl;
-    player		*vicpl = Players(ind);
+    player		*kp;
+    player		*pl = Players(ind);
     int			killer;
     DFLOAT		sc;
     char		msg[MSG_LEN];
 
     if (pulse->id != NO_ID) {
 	killer = GetInd(pulse->id);
-	pl = Players(killer);
+	kp = Players(killer);
     } else {
 	killer = -1;
-	pl = NULL;
+	kp = NULL;
     }
 
-    vicpl->forceVisible += 1;
-    if (BIT(vicpl->have, HAS_MIRROR)
-	&& (rfrac() * (2 * vicpl->item[ITEM_MIRROR])) >= 1) {
+    pl->forceVisible += 1;
+    if (BIT(pl->have, HAS_MIRROR)
+	&& (rfrac() * (2 * pl->item[ITEM_MIRROR])) >= 1) {
 	/*pulse->pos.cx = cx - tcos(pulse->dir) * 0.5 * PULSE_SAMPLE_DISTANCE;
 	  pulse->pos.cy = cy - tsin(pulse->dir) * 0.5 * PULSE_SAMPLE_DISTANCE;*/
 	/* is this ok ? */
-	pulse->dir = (int)Wrap_cfindDir(vicpl->pos.cx - pulse->pos.cx,
-					vicpl->pos.cy - pulse->pos.cy)
+	pulse->dir = (int)Wrap_cfindDir(pl->pos.cx - pulse->pos.cx,
+					pl->pos.cy - pulse->pos.cy)
 		     * 2 - RES / 2 - pulse->dir;
 	pulse->dir = MOD2(pulse->dir, RES);
 	
 	pulse->vel.x = pulseSpeed * tcos(pulse->dir);
 	pulse->vel.y = pulseSpeed * tsin(pulse->dir);
 
-	pulse->life += vicpl->item[ITEM_MIRROR];
+	pulse->life += pl->item[ITEM_MIRROR];
 	pulse->len = 0 /*PULSE_LENGTH*/;
 	pulse->refl = true;
 	/**refl = true;*/
 	return;
     }
 
-    sound_play_sensors(vicpl->pos.cx, vicpl->pos.cy, PLAYER_EAT_LASER_SOUND);
-    if (BIT(vicpl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
+    sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_EAT_LASER_SOUND);
+    if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
 	== (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
 	return;
     if (pulse->type != OBJ_PULSE) {
@@ -113,70 +113,70 @@ void Laser_pulse_hits_player(int ind, pulseobject *pulse)
     if (BIT(pulse->mods.laser, STUN)
 	|| (laserIsStunGun == true
 	    && allowLaserModifiers == false)) {
-	if (BIT(vicpl->used, HAS_SHIELD|HAS_LASER|HAS_SHOT)
-	    || BIT(vicpl->status, THRUSTING)) {
-	    if (pl) {
+	if (BIT(pl->used, HAS_SHIELD|HAS_LASER|HAS_SHOT)
+	    || BIT(pl->status, THRUSTING)) {
+	    if (kp) {
 		sprintf(msg,
 			"%s got paralysed by %s's stun laser.",
-			vicpl->name, pl->name);
-		if (vicpl->id == pl->id)
+			pl->name, kp->name);
+		if (pl->id == kp->id)
 		    strcat(msg, " How strange!");
 	    } else {
 		sprintf(msg,
 			"%s got paralysed by a stun laser.",
-			vicpl->name);
+			pl->name);
 	    }
 	    Set_message(msg);
-	    CLR_BIT(vicpl->used,
+	    CLR_BIT(pl->used,
 		    HAS_SHIELD|HAS_LASER|OBJ_SHOT);
-	    CLR_BIT(vicpl->status, THRUSTING);
-	    vicpl->stunned += 5;
+	    CLR_BIT(pl->status, THRUSTING);
+	    pl->stunned += 5;
 	}
     } else if (BIT(pulse->mods.laser, BLIND)) {
-	vicpl->damaged += (12 + 6);
-	vicpl->forceVisible += (12 + 6);
-	if (pl)
-	    Record_shove(vicpl, pl, frame_loops + 12 + 6);
+	pl->damaged += (12 + 6);
+	pl->forceVisible += (12 + 6);
+	if (kp)
+	    Record_shove(pl, kp, frame_loops + 12 + 6);
     } else {
-	Add_fuel(&(vicpl->fuel), (long)ED_LASER_HIT);
-	if (!BIT(vicpl->used, HAS_SHIELD)
-	    && !BIT(vicpl->have, HAS_ARMOR)) {
-	    SET_BIT(vicpl->status, KILLED);
-	    if (pl) {
+	Add_fuel(&(pl->fuel), (long)ED_LASER_HIT);
+	if (!BIT(pl->used, HAS_SHIELD)
+	    && !BIT(pl->have, HAS_ARMOR)) {
+	    SET_BIT(pl->status, KILLED);
+	    if (kp) {
 		sprintf(msg,
 			"%s got roasted alive by %s's laser.",
-			vicpl->name, pl->name);
-		if (vicpl->id == pl->id) {
-		    sc = Rate(0, pl->score)
+			pl->name, kp->name);
+		if (pl->id == kp->id) {
+		    sc = Rate(0, kp->score)
 			* laserKillScoreMult
 			* selfKillScoreMult;
-		    Score(pl, -sc, pl->pos.cx, pl->pos.cy, pl->name);
+		    Score(kp, -sc, kp->pos.cx, kp->pos.cy, kp->name);
 		    strcat(msg, " How strange!");
 		} else {
-		    sc = Rate(pl->score, vicpl->score)
+		    sc = Rate(kp->score, pl->score)
 			* laserKillScoreMult;
-		    Score_players(killer, sc, vicpl->name, ind, -sc, pl->name);
+		    Score_players(kp, sc, pl->name, pl, -sc, kp->name);
 		}
 	    } else {
-		sc = Rate(CANNON_SCORE, vicpl->score) / 4;
-		Score(vicpl, -sc, vicpl->pos.cx, vicpl->pos.cy, "Cannon");
+		sc = Rate(CANNON_SCORE, pl->score) / 4;
+		Score(pl, -sc, pl->pos.cx, pl->pos.cy, "Cannon");
 		if (BIT(World.rules->mode, TEAM_PLAY)
-		    && vicpl->team != pulse->team)
+		    && pl->team != pulse->team)
 		    TEAM_SCORE(pulse->team, sc);
 		sprintf(msg,
 			"%s got roasted alive by cannonfire.",
-			vicpl->name);
+			pl->name);
 	    }
-	    sound_play_sensors(vicpl->pos.cx, vicpl->pos.cy,
+	    sound_play_sensors(pl->pos.cx, pl->pos.cy,
 			       PLAYER_ROASTED_SOUND);
 	    Set_message(msg);
-	    if (pl && pl->id != vicpl->id) {
-		Rank_AddLaserKill(pl);
+	    if (kp && kp->id != pl->id) {
+		Rank_AddLaserKill(kp);
 		Robot_war(ind, killer);
 	    }
 	}
-	if (!BIT(vicpl->used, HAS_SHIELD)
-	    && BIT(vicpl->have, HAS_ARMOR)) {
+	if (!BIT(pl->used, HAS_SHIELD)
+	    && BIT(pl->have, HAS_ARMOR)) {
 	    Player_hit_armor(ind);
 	}
     }

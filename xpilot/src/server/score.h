@@ -71,7 +71,7 @@ DFLOAT Rate(DFLOAT winner, DFLOAT loser);
  * KK 28-4-98: Same for killing your own tank.
  * KK 7-11-1: And for killing a member of your alliance
  */
-void Score_players(int winner, DFLOAT winner_score, char *winner_msg,
-		   int loser, DFLOAT loser_score, char *loser_msg);
+void Score_players(player *winner_pl, DFLOAT winner_score, char *winner_msg,
+		   player *loser_pl, DFLOAT loser_score, char *loser_msg);
 
 #endif
