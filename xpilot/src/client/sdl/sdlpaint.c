@@ -279,11 +279,13 @@ bool Set_scaleFactor(xp_option_t *opt, double val)
 {
     scaleFactor = val;
     scale = 1 / val;
+    return true;
 }
 
 bool Set_altScaleFactor(xp_option_t *opt, double val)
 {
     scaleFactor_s = val;
+    return true;
 }
 
 int Paint_init(void)
