@@ -390,6 +390,9 @@ void Paint_score_entry(int entry_num, other_t *other, bool is_team)
 	raceStr[2] = ' ';
 
 	lineSpacing = TTF_FontLineSkip(scoreListFont) + 1;
+	/* kps - workaround for broken TTF_FontLineSkip */
+	if (lineSpacing == 1)
+	    lineSpacing = 15;
 	firstLine = 2*SCORE_BORDER + lineSpacing;
     }
     scoreEntryRect.y = firstLine + lineSpacing * entry_num;
