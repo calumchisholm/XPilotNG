@@ -668,17 +668,14 @@ static inline bool is_noarg_option(const char *name)
     return true;
 }
 
-void Parse_options(int *argcp, char **argvp)
+void Xpilotrc_read(const char *path)
 {
-    char path[PATH_MAX + 1];
     char buf[BUFSIZ];
     FILE *fp;
-    int arg_ind, num_remaining_args, num_servers = 0, i;
 
     /*
      * Read options from xpilotrc.
      */
-    Get_xpilotrc_file(path, sizeof(path));
     warn("Using xpilotrc file %s\n", path);
     if (strlen(path) > 0 && ((fp = fopen(path, "r")) != NULL)) {
 	while (fgets(buf, sizeof buf, fp)) {
@@ -696,6 +693,18 @@ void Parse_options(int *argcp, char **argvp)
 	}
 	fclose(fp);
     }
+
+
+
+}
+
+void Parse_options(int *argcp, char **argvp)
+{
+    int arg_ind, num_remaining_args, num_servers = 0, i;
+    char path[PATH_MAX + 1];
+
+    Get_xpilotrc_file(path, sizeof(path));
+    Xpilotrc_read(path);
 
     /*
      * Here we step trough argc - 1 arguments, leaving
