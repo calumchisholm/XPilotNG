@@ -52,11 +52,9 @@ int CALLBACK PropSheetProc (HWND hwhndDlg, UINT uMsg, LPARAM lParam)
 	default :
 		// Unknown message
 		break ;
-		
 	}
 	return FALSE;
 }
-
 /***************************************************************************/
 /* CreatePropertySheet                                                     */
 /* Arguments :                                                             */
@@ -68,8 +66,21 @@ int CALLBACK PropSheetProc (HWND hwhndDlg, UINT uMsg, LPARAM lParam)
 /***************************************************************************/
 BOOL CreatePropertySheet (HWND hwndParent)
 {
+	int i, numsheets = 9;
+	int a[9] = {IDD_MAPDATA,
+		IDD_MAPDATA2,
+		IDD_MAPDATA3,
+		IDD_MAPDATA4,
+		IDD_MAPDATA5,
+		IDD_INITITEMS,
+		IDD_MAXITEMS,
+		IDD_PROBS,
+		IDD_SCRMULT
+	};
 	PROPSHEETHEADER pshead ;
 	PROPSHEETPAGE   pspage[10] ;
+
+
 	
 	// Initialize property sheet HEADER data
 	ZeroMemory (&pshead, sizeof (PROPSHEETHEADER)) ;
@@ -80,105 +91,32 @@ BOOL CreatePropertySheet (HWND hwndParent)
 	pshead.hInstance   = hInst ;
 	pshead.hIcon       = LoadIcon (hInst, MAKEINTRESOURCE(IDI_MAINICON)) ;
 	pshead.pszCaption  = "Map Preferences" ;
-	pshead.nPages      = 10 ;
+	pshead.nPages      = numsheets ;
 	pshead.nStartPage  = 0 ;
 	pshead.ppsp        = pspage ;
 	pshead.pfnCallback = PropSheetProc ;
 	
 	// Zero out property PAGE data
-	ZeroMemory (&pspage, 10 * sizeof (PROPSHEETPAGE)) ;
-	
-	// PAGE 1 -- Map Preferences page
-	pspage[0].dwSize      = sizeof (PROPSHEETPAGE) ;
-	pspage[0].dwFlags     = PSP_USECALLBACK | PSP_USEICONID ;
-	pspage[0].hInstance   = hInst ;
-	pspage[0].pszTemplate = MAKEINTRESOURCE (IDD_MAPDATA) ;
-	pspage[0].pfnDlgProc  = PrefsDefaultDlgProc ;
-	pspage[0].lParam      = (LPARAM) &dwChildStyle ;
-	pspage[0].pfnCallback = PrefsPageProc ;
-	
-	// PAGE 2 -- Map Preferences page
-	pspage[1].dwSize      = sizeof (PROPSHEETPAGE) ;
-	pspage[1].dwFlags     = PSP_USECALLBACK | PSP_USEICONID ;
-	pspage[1].hInstance   = hInst ;
-	pspage[1].pszTemplate = MAKEINTRESOURCE (IDD_MAPDATA2) ;
-	pspage[1].pfnDlgProc  = PrefsDefaultDlgProc ;
-	pspage[1].lParam      = (LPARAM) &dwChildStyle ;
-	pspage[1].pfnCallback = PrefsPageProc ;
-	
-	// PAGE 3 -- Map Preferences page
-	pspage[2].dwSize      = sizeof (PROPSHEETPAGE) ;
-	pspage[2].dwFlags     = PSP_USECALLBACK | PSP_USEICONID ;
-	pspage[2].hInstance   = hInst ;
-	pspage[2].pszTemplate = MAKEINTRESOURCE (IDD_MAPDATA3) ;
-	pspage[2].pfnDlgProc  = PrefsDefaultDlgProc ;
-	pspage[2].lParam      = (LPARAM) &dwChildStyle ;
-	pspage[2].pfnCallback = PrefsPageProc ;
-	
-	// PAGE 4 -- Map Preferences page
-	pspage[3].dwSize      = sizeof (PROPSHEETPAGE) ;
-	pspage[3].dwFlags     = PSP_USECALLBACK | PSP_USEICONID ;
-	pspage[3].hInstance   = hInst ;
-	pspage[3].pszTemplate = MAKEINTRESOURCE (IDD_MAPDATA4) ;
-	pspage[3].pfnDlgProc  = PrefsDefaultDlgProc ;
-	pspage[3].lParam      = (LPARAM) &dwChildStyle ;
-	pspage[3].pfnCallback = PrefsPageProc ;
-	
-	// PAGE 5 -- Map Preferences page
-	pspage[4].dwSize      = sizeof (PROPSHEETPAGE) ;
-	pspage[4].dwFlags     = PSP_USECALLBACK | PSP_USEICONID ;
-	pspage[4].hInstance   = hInst ;
-	pspage[4].pszTemplate = MAKEINTRESOURCE (IDD_MAPDATA5) ;
-	pspage[4].pfnDlgProc  = PrefsDefaultDlgProc ;
-	pspage[4].lParam      = (LPARAM) &dwChildStyle ;
-	pspage[4].pfnCallback = PrefsPageProc ;
-	
-	// PAGE 6 -- Initial Items page
-	pspage[5].dwSize      = sizeof (PROPSHEETPAGE) ;
-	pspage[5].dwFlags     = PSP_USECALLBACK | PSP_USEICONID ;
-	pspage[5].hInstance   = hInst ;
-	pspage[5].pszTemplate = MAKEINTRESOURCE (IDD_INITITEMS) ;
-	pspage[5].pfnDlgProc  = PrefsDefaultDlgProc ;
-	pspage[5].lParam      = (LPARAM) &dwChildStyle ;
-	pspage[5].pfnCallback = PrefsPageProc ;
-	
-	// PAGE 7 -- Max Items page
-	pspage[6].dwSize      = sizeof (PROPSHEETPAGE) ;
-	pspage[6].dwFlags     = PSP_USECALLBACK | PSP_USEICONID ;
-	pspage[6].hInstance   = hInst ;
-	pspage[6].pszTemplate = MAKEINTRESOURCE (IDD_MAXITEMS) ;
-	pspage[6].pfnDlgProc  = PrefsDefaultDlgProc ;
-	pspage[6].lParam      = (LPARAM) &dwChildStyle ;
-	pspage[6].pfnCallback = PrefsPageProc ;
-	
-	// PAGE 8 -- Item Probabilities page
-	pspage[7].dwSize      = sizeof (PROPSHEETPAGE) ;
-	pspage[7].dwFlags     = PSP_USECALLBACK | PSP_USEICONID ;
-	pspage[7].hInstance   = hInst ;
-	pspage[7].pszTemplate = MAKEINTRESOURCE (IDD_PROBS) ;
-	pspage[7].pfnDlgProc  = PrefsDefaultDlgProc ;
-	pspage[7].lParam      = (LPARAM) &dwChildStyle ;
-	pspage[7].pfnCallback = PrefsPageProc ;
-	
-	// PAGE 9 -- Score Multipliers page
-	pspage[8].dwSize      = sizeof (PROPSHEETPAGE) ;
-	pspage[8].dwFlags     = PSP_USECALLBACK | PSP_USEICONID ;
-	pspage[8].hInstance   = hInst ;
-	pspage[8].pszTemplate = MAKEINTRESOURCE (IDD_SCRMULT) ;
-	pspage[8].pfnDlgProc  = PrefsDefaultDlgProc ;
-	pspage[8].lParam      = (LPARAM) &dwChildStyle ;
-	pspage[8].pfnCallback = PrefsPageProc ;
-	
-	// PAGE 10 -- Comments page
-	pspage[9].dwSize      = sizeof (PROPSHEETPAGE) ;
-	pspage[9].dwFlags     = PSP_USECALLBACK | PSP_USEICONID ;
-	pspage[9].hInstance   = hInst ;
-	pspage[9].pszTemplate = MAKEINTRESOURCE (IDD_COMMENTS) ;
-	pspage[9].pfnDlgProc  = PrefsCommentsDlgProc ;
-	pspage[9].lParam      = (LPARAM) &dwChildStyle ;
-	pspage[9].pfnCallback = PrefsPageProc ;
-	// --------- Create & display property sheet --------- 
-	
+	ZeroMemory (&pspage, (numsheets+1) * sizeof (PROPSHEETPAGE)) ;
+
+	for (i = 0; i < numsheets; i++)
+	{
+		pspage[i].dwSize      = sizeof (PROPSHEETPAGE) ;
+		pspage[i].dwFlags     = PSP_USECALLBACK | PSP_USEICONID ;
+		pspage[i].hInstance   = hInst ;
+		pspage[i].pszTemplate = MAKEINTRESOURCE (a[i]);
+		pspage[i].pfnDlgProc  = PrefsDefaultDlgProc ;
+		pspage[i].lParam      = (LPARAM) &dwChildStyle ;
+		pspage[i].pfnCallback = PrefsPageProc ;
+	}
+	//Comments page
+	pspage[numsheets].dwSize      = sizeof (PROPSHEETPAGE) ;
+	pspage[numsheets].dwFlags     = PSP_USECALLBACK | PSP_USEICONID ;
+	pspage[numsheets].hInstance   = hInst ;
+	pspage[numsheets].pszTemplate = MAKEINTRESOURCE (IDD_COMMENTS) ;
+	pspage[numsheets].pfnDlgProc  = PrefsCommentsDlgProc ;
+	pspage[numsheets].lParam      = (LPARAM) &dwChildStyle ;
+	pspage[numsheets].pfnCallback = PrefsPageProc ;	
 	
 	return PropertySheet (&pshead) ;
 }
@@ -281,13 +219,16 @@ PrefsDefaultDlgProc (HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 							{
 								*lpMapDocument->PrefsArray[count].intvar = tempi;
 								lpMapDocument->PrefsArray[count].output = TRUE;
-							}
+
+						}
 						}
 						break;
 						
-					case MAPWIDTH:
+
+				case MAPWIDTH:
 						if (GetDlgItemText(hwndDlg, lpMapDocument->PrefsArray[count].id1, tempc, 255))
-							if ( strcmp(tempc, lpMapDocument->PrefsArray[count].charvar) )
+
+						if ( strcmp(tempc, lpMapDocument->PrefsArray[count].charvar) )
 							{
 								strcpy(lpMapDocument->PrefsArray[count].charvar, tempc);
 								if (atoi(lpMapDocument->PrefsArray[count].charvar) > MAX_MAP_SIZE)
@@ -298,51 +239,51 @@ PrefsDefaultDlgProc (HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 							}
 						break;
 						
-					case MAPHEIGHT:	
-						if (GetDlgItemText(hwndDlg, lpMapDocument->PrefsArray[count].id1, tempc, 255))
-							if ( strcmp(tempc, lpMapDocument->PrefsArray[count].charvar) )
-							{
-								strcpy(lpMapDocument->PrefsArray[count].charvar, tempc);
-								if (atoi(lpMapDocument->PrefsArray[count].charvar) > MAX_MAP_SIZE)
-									itoa(MAX_MAP_SIZE, lpMapDocument->PrefsArray[count].charvar, 10);
-								if (atoi(lpMapDocument->PrefsArray[count].charvar) < 1)
-									itoa(1, lpMapDocument->PrefsArray[count].charvar, 10);
-								lpMapDocument->height = atoi(lpMapDocument->PrefsArray[count].charvar);
-							}
-							break;
-							
-					case STRING:
-					case COORD:
-					case INT:
-					case POSINT:
-					case FLOAT:
-					case POSFLOAT:
-						if (GetDlgItemText(hwndDlg, lpMapDocument->PrefsArray[count].id1, tempc, 255))
-							if ( strcmp(tempc, lpMapDocument->PrefsArray[count].charvar) )
-							{
-								strcpy(lpMapDocument->PrefsArray[count].charvar, tempc);
-								lpMapDocument->PrefsArray[count].output = TRUE;
-							}
-							break;
-					case LISTINT:
-						if (GetDlgItem(hwndDlg, lpMapDocument->PrefsArray[count].id1))
+				case MAPHEIGHT:	
+					if (GetDlgItemText(hwndDlg, lpMapDocument->PrefsArray[count].id1, tempc, 255))
+						if ( strcmp(tempc, lpMapDocument->PrefsArray[count].charvar) )
 						{
-							UpdateMapPrefList(hwndDlg, lpMapDocument->PrefsArray[count].id1, tempc);
-							if (strcmp(tempc, lpMapDocument->PrefsArray[count].charvar))
-							{
-								strcpy(lpMapDocument->PrefsArray[count].charvar, tempc);
-								lpMapDocument->PrefsArray[count].output = TRUE;
-							}
+							strcpy(lpMapDocument->PrefsArray[count].charvar, tempc);
+							if (atoi(lpMapDocument->PrefsArray[count].charvar) > MAX_MAP_SIZE)
+								itoa(MAX_MAP_SIZE, lpMapDocument->PrefsArray[count].charvar, 10);
+							if (atoi(lpMapDocument->PrefsArray[count].charvar) < 1)
+								itoa(1, lpMapDocument->PrefsArray[count].charvar, 10);
+							lpMapDocument->height = atoi(lpMapDocument->PrefsArray[count].charvar);
 						}
 						break;
 						
+				case STRING:
+				case COORD:
+				case INT:
+				case POSINT:
+				case FLOAT:
+				case POSFLOAT:
+					if (GetDlgItemText(hwndDlg, lpMapDocument->PrefsArray[count].id1, tempc, 255))
+						if ( strcmp(tempc, lpMapDocument->PrefsArray[count].charvar) )
+						{
+							strcpy(lpMapDocument->PrefsArray[count].charvar, tempc);
+							lpMapDocument->PrefsArray[count].output = TRUE;
+						}
+						break;
+				case LISTINT:
+					if (GetDlgItem(hwndDlg, lpMapDocument->PrefsArray[count].id1))
+					{
+						UpdateMapPrefList(hwndDlg, lpMapDocument->PrefsArray[count].id1, tempc);
+						if (strcmp(tempc, lpMapDocument->PrefsArray[count].charvar))
+						{
+							strcpy(lpMapDocument->PrefsArray[count].charvar, tempc);
+							lpMapDocument->PrefsArray[count].output = TRUE;
+						}
+					}
+					break;
+					
 					}
 				}
 				lpMapDocument->changed = 1;
 			}
 			return TRUE ;
 		}
-		
+	
 	default :
 		return FALSE ;
     }

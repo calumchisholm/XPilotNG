@@ -27,7 +27,7 @@ This is the main entry point for the windows program.
 
 #include "win_xpstudio.h"
 
-unsigned char *xpilotmap_dir;
+unsigned char *xpilotmap_dir=NULL;
 
 HWND hwndMain = NULL;
 HWND hwndClient = NULL;
@@ -49,17 +49,16 @@ HWND hwndMapModifyToolBar = NULL;
 HWND hwndShipToolsToolBar = NULL;
 HWND hwndShipSymsToolBar = NULL;
 
-//The enterable teamnumber.
+/*The enterable teamnumber*/
 HWND hwndLabelTeam = NULL;
 HWND hwndEditTeam = NULL;
 HWND hwndUpDownTeam = NULL;
 
-//The enterable angle.
+/*The enterable angle.*/
 HWND hwndLabelDirection = NULL;
 HWND hwndEditDirection = NULL;
 HWND hwndUpDownDirection = NULL;
 
-//HWND hwndToolPallete = NULL;
 HWND hwndActive = NULL;
 HWND hwndTemp = NULL;
 
@@ -91,8 +90,6 @@ HPEN hPenHidden;
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
                     PSTR szCmdLine, int iCmdShow)
 {
-	HWND hwndLocFrame;
-	HWND hwndLocClient;
 	HACCEL  hAccel;
 	MSG		 msg ;
 	WNDCLASSEX  wndclass ;
@@ -143,35 +140,33 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	hAccel = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACCELERATOR));
 
-	hwndLocFrame = CreateWindow (szAppName,         // window class name
-		szAppName,     // window caption
+	hwndMain = CreateWindow (szAppName,	// window class name
+		szAppName,							// window caption
 		WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
-		NULL,                    // parent window handle
-		hMenuMain,                    // window menu handle
-		hInstance,               // program instance handle
-		NULL);		             // creation parameters
+		NULL,								// parent window handle
+		hMenuMain,							// window menu handle
+		hInstance,							// program instance handle
+		NULL);								// creation parameters
 
-	hwndLocClient = GetWindow(hwndLocFrame, GW_CHILD);
+	hwndClient = GetWindow(hwndMain, GW_CHILD);
 
-	hwndMain = hwndLocFrame;
-	hwndClient = hwndLocClient;
-
-    ShowWindow (hwndLocFrame, iCmdShow);
-    UpdateWindow (hwndLocFrame);
+    ShowWindow (hwndMain, iCmdShow);
+    UpdateWindow (hwndMain);
  	
+
     /* Enter main message loop */
     while (GetMessage (&msg, NULL, 0, 0)){
-	/* If a keyboard message is for the MDI , let the MDI client
-	* take care of it.  Otherwise, check to see if it's a normal
-	* accelerator key (like F3 = Zoom In).  Otherwise, just handle
-	* the message as usual.
+		/* If a keyboard message is for the MDI , let the MDI client
+		* take care of it.  Otherwise, check to see if it's a normal
+		* accelerator key (like F3 = Zoom In).  Otherwise, just handle
+		* the message as usual.
 		*/
-		if ( !TranslateMDISysAccel (hwndLocClient, &msg) &&
-			!TranslateAccelerator (hwndLocFrame, hAccel, &msg)){
+		if ( !TranslateMDISysAccel (hwndClient, &msg) &&
+			!TranslateAccelerator (hwndMain, hAccel, &msg)){
 			TranslateMessage (&msg);
 			DispatchMessage (&msg);
 		}
@@ -205,7 +200,7 @@ LRESULT CALLBACK MainWndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam
 	{
 	case WM_CREATE :
 		clientcreate.hWindowMenu  = hMenuMain;
-		clientcreate.idFirstChild = 100 ;
+		clientcreate.idFirstChild = 90000 ;
 
 		hwndLocClient = CreateWindow ("MDICLIENT", NULL,
 			WS_CHILD | WS_CLIPCHILDREN | WS_VISIBLE,
@@ -214,22 +209,11 @@ LRESULT CALLBACK MainWndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam
 
 		hWndInstance = ((LPCREATESTRUCT) lParam)->hInstance;
 		XpFileInitialize (hwnd);
-		zfilterIndex = (unsigned long *) malloc(sizeof(unsigned long));
+//		zfilterIndex = (unsigned long *) malloc(sizeof(unsigned long));
 		InitToolBars(hwnd);
-/*
-		hwndFileToolBar = InitFileToolBar(hwnd);			
-		hwndMapSymsToolBar = InitMapSymsToolBar(hwnd);
-		hwndMapToolsToolBar = InitMapToolsToolBar(hwnd);
-		hwndShapeToolBar = InitShapeToolBar(hwnd);
-		hwndWormholeToolBar = InitWormholeToolBar(hwnd);
-		hwndPolarityToolBar = InitPolarityToolBar(hwnd);
-		hwndWallTypeToolBar = InitWallTypeToolBar(hwnd);
-		hwndMapModifyToolBar = InitMapModifyToolBar(hwnd);
-//		hwndShipToolsToolBar = InitShipToolsToolBar(hwnd);
-//		hwndShipSymsToolBar = InitShipSymsToolBar(hwnd);
 
-/*Create the user friendly spin boxes for integer based team number & angle values.
-  These are defined as an updown box with an edit control as its buddy.*/
+		//Create the user friendly spin boxes for integer based team number & angle values.
+		//These are defined as an updown box with an edit control as its buddy.
 		hwndLabelTeam = CreateWindow("STATIC",
 			"Team:",
 			WS_CHILD,
@@ -291,7 +275,6 @@ LRESULT CALLBACK MainWndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam
 				hwndEditDirection,
 				127, 0, 0);
 
-		
 		hwndStatusBar = CreateStatusWindow (WS_CHILD |
 			WS_VISIBLE | WS_CLIPSIBLINGS | SBARS_SIZEGRIP |
 			CCS_BOTTOM,
@@ -392,15 +375,15 @@ LRESULT CALLBACK MainWndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam
 			iSelectionMapTools = LOWORD (wParam);
 			SendMessage(hwnd, WM_COMMAND, (WPARAM) UPDATE_COMMANDS, 0);
 			return 0;
-
 		case IDM_ADDVERTEX:
 		case IDM_PICKITEM:
 		case IDM_DELVERTEX:
+		case IDM_MOVEVERTEX:
 		case IDM_MOVEITEM:
+		case IDM_REORDERCHECKPOINT:
 			fDragging = FALSE;
 			iSelectionMapModify = LOWORD (wParam);
 			return 0;
-		
 		case IDM_NEW: 
 			if (!DialogBox (hWndInstance, MAKEINTRESOURCE(IDD_NEWDOCUMENT), hwnd, NewDocDlgProc))
 			{
@@ -421,8 +404,12 @@ LRESULT CALLBACK MainWndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam
 		case IDM_OPEN :
 			szTempFileName[0]  = '\0' ;
 			szTempTitleName[0]  = '\0' ;
+//			zfilterIndex = (unsigned long *) malloc(sizeof(unsigned long));
 			if (XpFileOpenDlg (hwnd, szTempFileName, szTempTitleName))
 			{
+				//ToDo: Change this switch! We should be
+				//Testing for the document type, not being dependant
+				//Upon the setting of the open box's type field.
 				switch (*zfilterIndex)
 				{
 				case 1: //Xpilot Map
@@ -445,6 +432,8 @@ LRESULT CALLBACK MainWndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam
 			}
 			else
 				return 1;
+			zfilterIndex = NULL;
+//			free(zfilterIndex);
 			break;
 		case IDM_SAVE :
 			hwndActive = (HWND) SendMessage (hwndLocClient, WM_MDIGETACTIVE, 0, 0);
@@ -524,13 +513,15 @@ LRESULT CALLBACK MainWndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam
 			default: //todo: add processing for other map types
 				break;
 			}
+			zfilterIndex = NULL;
 //			free(zfilterIndex);
 			return 0;
 
 		case UPDATE_COMMANDS:
 			UpdateCommands(hwndLocClient);
 			break;
-			// messages for arranging windows
+		
+		//messages for arranging windows
 		case IDM_TILE :
 			SendMessage (hwndLocClient, WM_MDITILE, 0, 0);
 			return 0;
@@ -611,8 +602,8 @@ void UpdateCommands(HWND hwndLocClient)
 	if (lpXpStudioDocument != NULL) {
 		show = TRUE;
 		ShowNoWindowPallete(hwndLocClient, show);
-		/*Switch function should turn on the correct pallete stuff, and turn
-		off the incorrect.*/
+		//Switch function should turn on the correct pallete stuff, and turn
+		//off the incorrect.
 		switch (lpXpStudioDocument->type)
 		{
 		case MAPFILE:
@@ -623,7 +614,7 @@ void UpdateCommands(HWND hwndLocClient)
 			ShowMapPallete(hwndLocClient, FALSE);
 			ShowShipPallete(hwndLocClient, TRUE);
 			break;
-			/*Add functions for other Pallete configurations*/
+			//Add functions for other Pallete configurations
 		}
 	}
 	else
@@ -823,7 +814,6 @@ void ShowShipPallete(HWND hwndLocClient, BOOL show)
 /***************************************************************************/
 BOOL CALLBACK NewDocDlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
-//	char	temp[20];
 	static int itemselect = 0;
 	int itemcommand;
 	int state;

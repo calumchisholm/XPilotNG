@@ -52,7 +52,7 @@ void XpFileInitialize (HWND hwnd)
 	ofn.Flags             = 0 ;             // Set in Open and Close functions
 	ofn.nFileOffset       = 0 ;
 	ofn.nFileExtension    = 0 ;
-	ofn.lpstrDefExt       = "xp" ;
+	ofn.lpstrDefExt       = "xp2" ;
 	ofn.lCustData         = 0L ;
 	ofn.lpfnHook          = NULL ;
 	ofn.lpTemplateName    = NULL ;
@@ -97,7 +97,7 @@ BOOL XpFileSaveDlg (HWND hwnd, PSTR pstrFileName, PSTR pstrTitleName)
 {
 	int success;
 
-	static char szSFilter[] = "Xpilot Map (*.XP2,*.MAP)\0*.xp2;*.map\0"  \
+	static char szSFilter[] = "Xpilot Map (*.XP2)\0*.xp2;\0"  \
 							/*  "Windows Bitmap (*.bmp)\0*.bmp\0" \
 							  "Jpeg Files (*.jpg)\0*.jpg\0" \
 							  "Gif Image Files (*.gif)\0*.gif\0" \

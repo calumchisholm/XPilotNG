@@ -226,7 +226,7 @@ LRESULT CALLBACK MapEditorWndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM l
 			lpMapDocument = lpXpStudioDocument->lpMapDocument;
 
 			hwndTemp = hwnd;
-			SetScrollRange (hwnd, SB_VERT, 0, 1, FALSE) ;
+//			SetScrollRange (hwnd, SB_VERT, 0, 1, FALSE) ;
 
 			lpMapDocument->view_zoom =  ((float) (ps.rcPaint.right - ps.rcPaint.left) / (float) lpMapDocument->width);
 			
@@ -245,9 +245,6 @@ LRESULT CALLBACK MapEditorWndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM l
 		return 0 ;
 
 	case WM_LBUTTONDOWN:
-//		hwndActive = (HWND) SendMessage (hwndLocClient, WM_MDIGETACTIVE, 0, 0);
-//		if (hwndActive != hwnd)
-//			return 0;
 		lpXpStudioDocument = (LPXPSTUDIODOCUMENT) GetWindowLong (hwnd, GWL_USERDATA);
 		lpMapDocument = lpXpStudioDocument->lpMapDocument;
 
@@ -337,7 +334,8 @@ LRESULT CALLBACK MapEditorWndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM l
 					}
 					break;
 
-				case IDM_DELVERTEX:
+			case IDM_MOVEVERTEX:
+			case IDM_DELVERTEX:
 					if (lpMapDocument->selectedpoly)
 					{
 						lpMapDocument->numselvert = FindClosestVertex(lpMapDocument, lpMapDocument->selectedpoly, x,  lpMapDocument->height-y);
@@ -358,13 +356,14 @@ LRESULT CALLBACK MapEditorWndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM l
 		switch (iSelectionMapTools)
 		{
 		case IDM_PEN :
-			CreateItem(lpMapDocument, 0, 0, 0, 0, iSelectionMapSyms, TRUE);
-//			fCreatingPolygon = FALSE;
-			fDrawing = FALSE;
-			InvalidateRect(hwnd, NULL, TRUE);
-			SetCursor (LoadCursor (NULL, IDC_ARROW));
+			if (!CreateItem(lpMapDocument, 0, 0, 0, 0, iSelectionMapSyms, TRUE))
+			{
+				fDrawing = FALSE;
+				InvalidateRect(hwnd, NULL, TRUE);
+				SetCursor (LoadCursor (NULL, IDC_ARROW));
 			DrawHighlightLine (hwnd, ptBeg, ptEnd);
 			ptBeg.x = ptBeg.y = ptEnd.x = ptEnd.y = 0;
+			}
 			break;
 		}
 		switch (iSelectionMapModify)
@@ -397,8 +396,8 @@ LRESULT CALLBACK MapEditorWndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM l
 			lpMapDocument->selectedbool = FALSE;
 //			DoCaption(lpMapDocument, hwnd, lpMapDocument->MapStruct.mapName);
 		}
-/*		else
-			hwndActive = NULL;*/
+//		else
+//			hwndActive = NULL;
 		return 0;
 		
 	case WM_DESTROY:

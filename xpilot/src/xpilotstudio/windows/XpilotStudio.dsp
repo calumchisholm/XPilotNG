@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /G3 /Zp1 /W3 /GX /Zi /O2 /D "STRICT" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
@@ -70,7 +70,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /GX /ZI /Od /I "../../xpilot-x/expat195" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_AFXDLL" /FR /c
+# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
@@ -95,262 +95,66 @@ LINK32=link.exe
 # Begin Source File
 
 SOURCE=..\document.c
-DEP_CPP_DOCUM=\
-	"..\const.h"\
-	"..\default_colors.h"\
-	"..\main.h"\
-	"..\map.h"\
-	"..\objects.h"\
-	"..\proto.h"\
-	{$(INCLUDE)}"expat.h"\
-	
 # End Source File
 # Begin Source File
 
 SOURCE=..\draw.c
-DEP_CPP_DRAW_=\
-	"..\const.h"\
-	"..\default_colors.h"\
-	"..\main.h"\
-	"..\map.h"\
-	"..\objects.h"\
-	"..\proto.h"\
-	".\win_mapeditor.h"\
-	".\win_proto.h"\
-	".\win_resdefines.h"\
-	".\win_xpstudio.h"\
-	{$(INCLUDE)}"expat.h"\
-	
-
-!IF  "$(CFG)" == "XpilotStudio - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "XpilotStudio - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\errors.c
-DEP_CPP_ERROR=\
-	"..\const.h"\
-	"..\default_colors.h"\
-	"..\main.h"\
-	"..\map.h"\
-	"..\objects.h"\
-	"..\proto.h"\
-	".\win_mapeditor.h"\
-	".\win_proto.h"\
-	".\win_resdefines.h"\
-	".\win_xpstudio.h"\
-	{$(INCLUDE)}"expat.h"\
-	
 # End Source File
 # Begin Source File
 
 SOURCE=..\geometry.c
-DEP_CPP_GEOME=\
-	"..\const.h"\
-	"..\default_colors.h"\
-	"..\main.h"\
-	"..\map.h"\
-	"..\objects.h"\
-	"..\proto.h"\
-	{$(INCLUDE)}"expat.h"\
-	
 # End Source File
 # Begin Source File
 
 SOURCE=..\helper.c
-DEP_CPP_HELPE=\
-	"..\const.h"\
-	"..\default_colors.h"\
-	"..\main.h"\
-	"..\map.h"\
-	"..\objects.h"\
-	"..\proto.h"\
-	".\win_mapeditor.h"\
-	".\win_proto.h"\
-	".\win_resdefines.h"\
-	".\win_xpstudio.h"\
-	{$(INCLUDE)}"expat.h"\
-	
 # End Source File
 # Begin Source File
 
 SOURCE=..\map.c
-DEP_CPP_MAP_C=\
-	"..\const.h"\
-	"..\default_colors.h"\
-	"..\default_settings.h"\
-	"..\main.h"\
-	"..\map.h"\
-	"..\objects.h"\
-	"..\proto.h"\
-	{$(INCLUDE)}"expat.h"\
-	
 # End Source File
 # Begin Source File
 
 SOURCE=..\map_file.c
-DEP_CPP_MAP_F=\
-	"..\const.h"\
-	"..\default_colors.h"\
-	"..\main.h"\
-	"..\map.h"\
-	"..\objects.h"\
-	"..\proto.h"\
-	{$(INCLUDE)}"expat.h"\
-	
 # End Source File
 # Begin Source File
 
 SOURCE=..\ship.c
-DEP_CPP_SHIP_=\
-	"..\const.h"\
-	"..\default_colors.h"\
-	"..\main.h"\
-	"..\map.h"\
-	"..\objects.h"\
-	"..\proto.h"\
-	{$(INCLUDE)}"expat.h"\
-	
 # End Source File
 # Begin Source File
 
 SOURCE=.\win_draw.c
-DEP_CPP_WIN_D=\
-	"..\const.h"\
-	"..\default_colors.h"\
-	"..\main.h"\
-	"..\map.h"\
-	"..\objects.h"\
-	"..\proto.h"\
-	".\win_mapeditor.h"\
-	".\win_proto.h"\
-	".\win_resdefines.h"\
-	".\win_xpstudio.h"\
-	{$(INCLUDE)}"expat.h"\
-	
 # End Source File
 # Begin Source File
 
 SOURCE=.\win_file.c
-DEP_CPP_WIN_F=\
-	"..\const.h"\
-	"..\default_colors.h"\
-	"..\main.h"\
-	"..\map.h"\
-	"..\objects.h"\
-	"..\proto.h"\
-	".\win_mapeditor.h"\
-	".\win_proto.h"\
-	".\win_resdefines.h"\
-	".\win_xpstudio.h"\
-	{$(INCLUDE)}"expat.h"\
-	
 # End Source File
 # Begin Source File
 
 SOURCE=.\win_helper.c
-DEP_CPP_WIN_H=\
-	"..\const.h"\
-	"..\default_colors.h"\
-	"..\main.h"\
-	"..\map.h"\
-	"..\objects.h"\
-	"..\proto.h"\
-	".\win_mapeditor.h"\
-	".\win_proto.h"\
-	".\win_resdefines.h"\
-	".\win_xpstudio.h"\
-	{$(INCLUDE)}"expat.h"\
-	
 # End Source File
 # Begin Source File
 
 SOURCE=.\win_mapeditor.c
-DEP_CPP_WIN_M=\
-	"..\const.h"\
-	"..\default_colors.h"\
-	"..\main.h"\
-	"..\map.h"\
-	"..\objects.h"\
-	"..\proto.h"\
-	".\win_mapeditor.h"\
-	".\win_proto.h"\
-	".\win_resdefines.h"\
-	".\win_xpstudio.h"\
-	{$(INCLUDE)}"expat.h"\
-	
 # End Source File
 # Begin Source File
 
 SOURCE=.\win_prefs.c
-DEP_CPP_WIN_P=\
-	"..\const.h"\
-	"..\default_colors.h"\
-	"..\main.h"\
-	"..\map.h"\
-	"..\objects.h"\
-	"..\proto.h"\
-	".\win_mapeditor.h"\
-	".\win_proto.h"\
-	".\win_resdefines.h"\
-	".\win_xpstudio.h"\
-	{$(INCLUDE)}"expat.h"\
-	
 # End Source File
 # Begin Source File
 
 SOURCE=.\win_shipeditor.c
-DEP_CPP_WIN_S=\
-	"..\const.h"\
-	"..\default_colors.h"\
-	"..\main.h"\
-	"..\map.h"\
-	"..\objects.h"\
-	"..\proto.h"\
-	".\win_mapeditor.h"\
-	".\win_proto.h"\
-	".\win_resdefines.h"\
-	".\win_xpstudio.h"\
-	{$(INCLUDE)}"expat.h"\
-	
 # End Source File
 # Begin Source File
 
 SOURCE=.\win_toolbar.c
-DEP_CPP_WIN_T=\
-	"..\const.h"\
-	"..\default_colors.h"\
-	"..\main.h"\
-	"..\map.h"\
-	"..\objects.h"\
-	"..\proto.h"\
-	".\win_mapeditor.h"\
-	".\win_proto.h"\
-	".\win_resdefines.h"\
-	".\win_xpstudio.h"\
-	{$(INCLUDE)}"expat.h"\
-	
 # End Source File
 # Begin Source File
 
 SOURCE=.\win_xpstudio.c
-DEP_CPP_WIN_X=\
-	"..\const.h"\
-	"..\default_colors.h"\
-	"..\main.h"\
-	"..\map.h"\
-	"..\objects.h"\
-	"..\proto.h"\
-	".\win_mapeditor.h"\
-	".\win_proto.h"\
-	".\win_resdefines.h"\
-	".\win_xpstudio.h"\
-	{$(INCLUDE)}"expat.h"\
-	
 # End Source File
 # End Group
 # Begin Group "Header Files"
@@ -435,6 +239,10 @@ SOURCE=.\res\shipsymsbar.bmp
 # Begin Source File
 
 SOURCE=.\res\shiptoolsbar.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\walltypesubbar.bmp
 # End Source File
 # Begin Source File
 
