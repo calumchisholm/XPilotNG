@@ -153,11 +153,11 @@ extern XColor	colors[MAX_COLORS];	/* Colors */
 extern Colormap	colormap;		/* Private colormap */
 extern int	maxColors;		/* Max. number of colors to use */
 extern int	hudColor;		/* Color index for HUD drawing */
-extern int	hrColor1;		/* Color index for hudradar-hack drawing */
-extern int	hrColor2;		/* Color index for hudradar-hack drawing */
-extern int	hrSize;			/* size for hudradar-hack drawing */
-extern DFLOAT	hrScale;		/* scale for hudradar-hack drawing */
-extern DFLOAT	hrLimit;		/* limit for hudradar-hack drawing */
+extern int	hudRadarEnemyColor;	/* Color index for enemy hudradar dots */
+extern int	hudRadarOtherColor;	/* Color index for other hudradar dots */
+extern int	hudRadarDotSize;	/* Size for hudradar dot drawing */
+extern DFLOAT	hudRadarScale;		/* Scale for hudradar drawing */
+extern DFLOAT	hudRadarLimit;		/* Limit for hudradar drawing */
 extern int	hudSize;		/* size for hud-drawing */
 extern int	dirPtrColor;		/* Color index for dirptr-hack drawing */
 extern int	shipShapesHackColor;	/* Color index for shipshapes-hack drawing */

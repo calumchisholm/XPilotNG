@@ -70,12 +70,12 @@ extern int		score_object;
 extern XGCValues	gcv;
 
 int	hudColor;		/* Color index for HUD drawing */
-int	hrColor1;		/* Color index for hudradar drawing */
-int	hrColor2;		/* Color index for hudradar drawing */
-int	hrSize;			/* Size for hudradar drawing */
-DFLOAT	hrScale;		/* Scale for hudradar drawing */
-DFLOAT	hrMapScale;		/* Scale for mapradar drawing */
-DFLOAT	hrLimit;		/* Hudradar dots are not drawn if closer to
+int	hudRadarEnemyColor;	/* Color index for enemy hudradar dots */
+int	hudRadarOtherColor;	/* Color index for other hudradar dots */
+int	hudRadarDotSize;	/* Size for hudradar dot drawing */
+DFLOAT	hudRadarScale;		/* Scale for hudradar drawing */
+DFLOAT	hudRadarMapScale;		/* Scale for mapradar drawing */
+DFLOAT	hudRadarLimit;		/* Hudradar dots are not drawn if closer to
 				   your ship than this factor of visible
 				   range */
 int	hudSize;		/* Size for HUD drawing */
@@ -343,8 +343,7 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
     }
     SET_FG(colors[hudColor].pixel);
 
-    if (!BIT(instruments, SHOW_HUD_RADAR) &&
-	lock_dist != 0 && hudLockColor != 0) {
+    if (hudRadarEnemyColor == 0 && lock_dist != 0 && hudLockColor != 0) {
 
 	if (lock_dist > WARNING_DISTANCE || warningCount++ % 2 == 0) {
 	    int size = MIN(mapdiag / lock_dist, 10);
@@ -409,11 +408,11 @@ void Paint_hudradar(DFLOAT hrscale, DFLOAT xlimit, DFLOAT ylimit, int sz)
  	    y = -y + ext_view_height / 2 - sz / 2;
 	    
 	    if (radar_ptr[i].color == WHITE) {
-		if (hrColor1 >= 1)
-		    Arc_add(hrColor1, x, y, sz, sz, 0, 64 * 360);
+		if (hudRadarEnemyColor >= 1)
+		    Arc_add(hudRadarEnemyColor, x, y, sz, sz, 0, 64 * 360);
 	    } else {
-		if (hrColor2 >= 1)
-		    Arc_add(hrColor2, x, y, sz, sz, 0, 64 * 360);
+		if (hudRadarOtherColor >= 1)
+		    Arc_add(hudRadarOtherColor, x, y, sz, sz, 0, 64 * 360);
 	    }
 	}
     }
@@ -458,16 +457,18 @@ void Paint_HUD(void)
 		    (int) (ext_view_height / 2 - 100 * tsin(heading)));
     }
 
-    hrMapScale = (DFLOAT) Setup->width / (DFLOAT) 256;
-    if (BIT(instruments, SHOW_HUD_RADAR))
+    hudRadarMapScale = (DFLOAT) Setup->width / (DFLOAT) 256;
+    if (hudRadarEnemyColor > 0 || hudRadarOtherColor > 0)
 	Paint_hudradar(
-	    hrScale,
-	    (int)(hrLimit * (active_view_width / 2) * hrScale / hrMapScale),
-	    (int)(hrLimit * (active_view_width / 2) * hrScale / hrMapScale),
-	    hrSize);
+	    hudRadarScale,
+	    (int)(hudRadarLimit * (active_view_width / 2)
+		  * hudRadarScale / hudRadarMapScale),
+	    (int)(hudRadarLimit * (active_view_width / 2)
+		  * hudRadarScale / hudRadarMapScale),
+	    hudRadarDotSize);
 
     if (BIT(hackedInstruments, MAP_RADAR))
-	Paint_hudradar(hrMapScale,
+	Paint_hudradar(hudRadarMapScale,
 		       active_view_width / 2,
 		       active_view_height / 2,
 		       SHIP_SZ);

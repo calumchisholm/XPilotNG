@@ -52,7 +52,7 @@
 #define SHOW_FUEL_GAUGE		(1L << 4)
 #define SHOW_TURNSPEED_METER	(1L << 5)
 #define SHOW_POWER_METER	(1L << 6)
-/*#define SHOW_SHIP_NAME		(1L << 7)*/
+
 #define SHOW_SLIDING_RADAR	(1L << 8)
 #define SHOW_PACKET_SIZE_METER	(1L << 10)
 #define SHOW_PACKET_LOSS_METER	(1L << 11)
@@ -60,7 +60,7 @@
 #define SHOW_CLOCK		(1L << 13)
 #define SHOW_ITEMS		(1L << 14)
 #define SHOW_MESSAGES		(1L << 15)
-/*#define SHOW_MINE_NAME		(1L << 16)*/
+
 #define SHOW_OUTLINE_WORLD	(1L << 17)
 #define SHOW_FILLED_WORLD	(1L << 18)
 #define SHOW_TEXTURED_WALLS	(1L << 19)
@@ -69,24 +69,17 @@
 #define SHOW_FILLED_DECOR	(1L << 22)
 #define SHOW_TEXTURED_DECOR	(1L << 23)
 #define SHOW_CLOCK_AMPM_FORMAT	(1L << 24)
-/*#define SHOW_TEXTURED_BALLS - not used */
+
 #define SHOW_REVERSE_SCROLL	(1L << 26)
-#define SHOW_HUD_RADAR          (1L << 27)
+
 #define SHOW_PACKET_LAG_METER	(1L << 28)
 #define SHOW_SHIP_ID            (1L << 29)
 
 /* hacked instruments */
-#define SHOW_SSH		(1L << 1)
 #define SHOW_SHIP_SHAPES	(1L << 2)
 #define SHOW_MY_SHIP_SHAPE	(1L << 3)
-
-/*#define SHOW_BASE_NAME		(1L << 5)*/
 #define BALL_MSG_SCAN		(1L << 6)
 #define CLIENT_RANKER		(1L << 7)
-/*#define BASE_WARNING		(1L << 8)
-  #define SELF_LIFE_WARNING	(1L << 9)
-  #define ENEMY_LIFE_WARNING	(1L << 10)
-  #define TEAM_LIFE_WARNING	(1L << 11) - always active */
 #define MAP_RADAR		(1L << 12)
 #define SHOW_LIVES_BY_SHIP	(1L << 13)
 #define TREAT_ZERO_SPECIAL	(1L << 14)

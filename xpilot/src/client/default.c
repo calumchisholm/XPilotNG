@@ -361,14 +361,6 @@ option options[] = {
 	KEY_DUMMY,
 	"Should the HUD be displayed or not.\n"
     },
-    {
-	"showHUDRadar",
-	NULL,
-	"Yes",
-	KEY_DUMMY,
-	"Should the HUD radar be displayed or not.\n"
-	"Old name: showHR\n"
-    },
     {   
 	"mapRadar",
 	NULL,
@@ -382,7 +374,6 @@ option options[] = {
 	"Yes",
 	KEY_DUMMY,
 	"Should others' shipshapes be displayed or not.\n"
-	"Old name: showSS\n"
     },
     {
 	"showMyShipShape",
@@ -390,7 +381,6 @@ option options[] = {
 	"Yes",
 	KEY_DUMMY,
 	"Should your own shipshape be displayed or not.\n"
-	"Old name: showMSS\n"
     },
     {   
 	"ballMsgScan",
@@ -1064,7 +1054,7 @@ option options[] = {
 	"Which color number to use for drawing the HUD.\n"
     },
     {
-	"hrColor1",
+	"hudRadarEnemyColor",
 	NULL,
 	"3",
 	KEY_DUMMY,
@@ -1072,29 +1062,29 @@ option options[] = {
 	"that represent enemy ships.\n"
     },
     {
-	"hrColor2",
+	"hudRadarOtherColor",
 	NULL,
 	"2",
 	KEY_DUMMY,
 	"Which color number to use for drawing hudradar dots\n"
-	"that represent friendly ships.\n"
+	"that represent friendly ships or other objects.\n"
     },
     {
-	"hrSize",
+	"hudRadarDotSize",
 	NULL,
 	"6",
 	KEY_DUMMY,
 	"Which size to use for drawing the hudradar dots.\n"
     },
     {
-	"hrScale",
+	"hudRadarScale",
 	NULL,
 	"2.0",
 	KEY_DUMMY,
 	"Scales radar to hud filtering out everything but enemies.\n"
     },
     {
-	"hrLimit",
+	"hudRadarLimit",
 	NULL,
 	"0.05",
 	KEY_DUMMY,
@@ -1115,7 +1105,6 @@ option options[] = {
 	"0",
 	KEY_DUMMY,
 	"Which color number to use for drawing the direction pointer hack.\n"
-	"Old name: dpColor\n"
     },
     {
 	"shipShapesHackColor",
@@ -1123,7 +1112,6 @@ option options[] = {
 	"0",
 	KEY_DUMMY,
 	"Which color number to use for drawing the shipshapes hack.\n"
-	"Old name: sshColor\n"
     },
     {
 	"hudLockColor",
@@ -1137,16 +1125,14 @@ option options[] = {
 	NULL,
 	"3",
 	KEY_DUMMY,
-	"Which color number to use for drawing ball message scan\n"
-	"warning"
+	"Which color number to use for drawing ball message scan warning.\n"
     },
     {
 	"msgScanCoverColor",
 	NULL,
 	"2",
 	KEY_DUMMY,
-	"Which color number to use for drawing cover message scan\n"
-	"warning"
+	"Which color number to use for drawing cover message scan warning.\n"
     },
     {
 	"selfLWColor",
@@ -3062,12 +3048,13 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 	}
 	strlcpy(color_names[i], resValue, MAX_COLOR_LEN);
     }
+    
     Get_int_resource(rDB, "hudColor", &hudColor);
-    Get_int_resource(rDB, "hrColor1", &hrColor1);
-    Get_int_resource(rDB, "hrColor2", &hrColor2);
-    Get_int_resource(rDB, "hrSize", &hrSize);
-    Get_float_resource(rDB, "hrScale", &hrScale);
-    Get_float_resource(rDB, "hrLimit", &hrLimit);
+    Get_int_resource(rDB, "hudRadarEnemyColor", &hudRadarEnemyColor);
+    Get_int_resource(rDB, "hudRadarOtherColor", &hudRadarOtherColor);
+    Get_int_resource(rDB, "hudRadarDotSize", &hudRadarDotSize);
+    Get_float_resource(rDB, "hudRadarScale", &hudRadarScale);
+    Get_float_resource(rDB, "hudRadarLimit", &hudRadarLimit);
     Get_int_resource(rDB, "hudSize", &hudSize);
     Get_int_resource(rDB, "dirPtrColor", &dirPtrColor);
     Get_int_resource(rDB, "shipShapesHackColor", &shipShapesHackColor);
@@ -3108,7 +3095,6 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 
     Get_bit_resource(rDB, "showMessages", &instruments, SHOW_MESSAGES);
     Get_bit_resource(rDB, "showHUD", &instruments, SHOW_HUD_INSTRUMENTS);
-    Get_bit_resource(rDB, "showHUDRadar", &instruments, SHOW_HUD_RADAR);
 
     Get_bit_resource(rDB, "mapRadar", &hackedInstruments, MAP_RADAR);
     Get_bit_resource(rDB, "clientRanker", &hackedInstruments, CLIENT_RANKER);

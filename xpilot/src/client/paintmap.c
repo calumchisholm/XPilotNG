@@ -335,13 +335,17 @@ void Paint_world(void)
     }
 
     /* kps - this should be drawn more than one frame if fps is high */
-    if (oldHRLimit != hrLimit) {
+    if (oldHRLimit != hudRadarLimit) {
 	Gui_paint_visible_border(
-	    (int)(world.x + ext_view_width/2  - hrLimit * MAX_VIEW_SIZE/2),
-	    (int)(world.y + ext_view_height/2 - hrLimit * MAX_VIEW_SIZE/2),
-	    (int)(world.x + ext_view_width/2  + hrLimit * MAX_VIEW_SIZE/2),
-	    (int)(world.y + ext_view_height/2 + hrLimit * MAX_VIEW_SIZE/2));
-	oldHRLimit = hrLimit;
+	    (int)(world.x + ext_view_width/2
+		  - hudRadarLimit * MAX_VIEW_SIZE/2),
+	    (int)(world.y + ext_view_height/2
+		  - hudRadarLimit * MAX_VIEW_SIZE/2),
+	    (int)(world.x + ext_view_width/2
+		  + hudRadarLimit * MAX_VIEW_SIZE/2),
+	    (int)(world.y + ext_view_height/2
+		  + hudRadarLimit * MAX_VIEW_SIZE/2));
+	oldHRLimit = hudRadarLimit;
     }
 
     if (!oldServer) {

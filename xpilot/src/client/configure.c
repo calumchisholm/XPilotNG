@@ -110,7 +110,6 @@ static int Config_create_altTurnSpeed(int widget_desc, int *height);
 static int Config_create_altTurnResistance(int widget_desc, int *height);
 static int Config_create_showMessages(int widget_desc, int *height);
 static int Config_create_showHUD(int widget_desc, int *height);
-static int Config_create_showHUDRadar(int widget_desc, int *height);
 static int Config_create_mapRadar(int widget_desc, int *height);
 static int Config_create_clientRanker(int widget_desc, int *height);
 static int Config_create_showShipShapes(int widget_desc, int *height);
@@ -147,11 +146,11 @@ static int Config_create_teamShotSize(int widget_desc, int *height);
 static int Config_create_teamShotColor(int widget_desc, int *height);
 static int Config_create_showNastyShots(int widget_desc, int *height);
 static int Config_create_hudColor(int widget_desc, int *height);
-static int Config_create_hrColor1(int widget_desc, int *height);
-static int Config_create_hrColor2(int widget_desc, int *height);
-static int Config_create_hrSize(int widget_desc, int *height);
-static int Config_create_hrScale(int widget_desc, int *height);
-static int Config_create_hrLimit(int widget_desc, int *height);
+static int Config_create_hudRadarEnemyColor(int widget_desc, int *height);
+static int Config_create_hudRadarOtherColor(int widget_desc, int *height);
+static int Config_create_hudRadarDotSize(int widget_desc, int *height);
+static int Config_create_hudRadarScale(int widget_desc, int *height);
+static int Config_create_hudRadarLimit(int widget_desc, int *height);
 static int Config_create_hudSize(int widget_desc, int *height);
 static int Config_create_hudLockColor(int widget_desc, int *height);
 static int Config_create_dirPtrColor(int widget_desc, int *height);
@@ -282,7 +281,6 @@ static int	(*config_creator_default[])(int widget_desc, int *height) = {
     Config_create_messagesToStdout,
     Config_create_reverseScroll,
     Config_create_showHUD,
-    Config_create_showHUDRadar,
     Config_create_mapRadar,
     Config_create_clientRanker,
     Config_create_showShipShapes,
@@ -318,9 +316,9 @@ static int	(*config_creator_default[])(int widget_desc, int *height) = {
     Config_create_showNastyShots,
     Config_create_shotSize,
     Config_create_teamShotSize,
-    Config_create_hrSize,
-    Config_create_hrScale,
-    Config_create_hrLimit,
+    Config_create_hudRadarDotSize,
+    Config_create_hudRadarScale,
+    Config_create_hudRadarLimit,
     Config_create_hudSize,
     Config_create_scoreObjectTime,
     Config_create_baseWarningType,
@@ -355,8 +353,8 @@ static int	(*config_creator_colors[])(int widget_desc, int *height) = {
     Config_create_oldMessagesColor,
     Config_create_teamShotColor,
     Config_create_hudColor,
-    Config_create_hrColor1,
-    Config_create_hrColor2,
+    Config_create_hudRadarEnemyColor,
+    Config_create_hudRadarOtherColor,
     Config_create_hudLockColor,
     Config_create_dirPtrColor,
     Config_create_shipShapesHackColor,
@@ -824,15 +822,6 @@ static int Config_create_showHUD(int widget_desc, int *height)
 			      (void *) SHOW_HUD_INSTRUMENTS);
 }
 
-static int Config_create_showHUDRadar(int widget_desc, int *height)
-{
-    return Config_create_bool(widget_desc, height, "showHUDRadar",
-			      BIT(instruments, SHOW_HUD_RADAR)
-				  ? true : false,
-			      Config_update_instruments,
-			      (void *) SHOW_HUD_RADAR);
-}
-
 static int Config_create_mapRadar(int widget_desc, int *height)
 {
     return Config_create_bool(widget_desc, height,"mapRadar",
@@ -1125,35 +1114,35 @@ static int Config_create_hudColor(int widget_desc, int *height)
     return CONFIG_CREATE_COLOR(hudColor);
 }
 
-static int Config_create_hrColor1(int widget_desc, int *height)
+static int Config_create_hudRadarEnemyColor(int widget_desc, int *height)
 {
-    return CONFIG_CREATE_COLOR(hrColor1);
+    return CONFIG_CREATE_COLOR(hudRadarEnemyColor);
 }
 
-static int Config_create_hrColor2(int widget_desc, int *height)
+static int Config_create_hudRadarOtherColor(int widget_desc, int *height)
 {
-    return CONFIG_CREATE_COLOR(hrColor2);
+    return CONFIG_CREATE_COLOR(hudRadarOtherColor);
 }
 
-static int Config_create_hrSize(int widget_desc, int *height)
+static int Config_create_hudRadarDotSize(int widget_desc, int *height)
 {
     return Config_create_int(widget_desc, height,
-			     "hrSize", &hrSize,
+			     "hudRadarDotSize", &hudRadarDotSize,
 			     1, SHIP_SZ,
 			     NULL, NULL);
 }
 
-static int Config_create_hrScale(int widget_desc, int *height)
+static int Config_create_hudRadarScale(int widget_desc, int *height)
 {
     return Config_create_float(widget_desc, height,
-			       "hrScale", &hrScale, 0.5, 4.0,
+			       "hudRadarScale", &hudRadarScale, 0.5, 4.0,
 			       NULL, NULL);
 }
 
-static int Config_create_hrLimit(int widget_desc, int *height)
+static int Config_create_hudRadarLimit(int widget_desc, int *height)
 {
     return Config_create_float(widget_desc, height,
-			       "hrLimit", &hrLimit,
+			       "hudRadarLimit", &hudRadarLimit,
 			       0.0, 5.0,
 			       NULL, NULL);
 }
@@ -1950,7 +1939,6 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_int(fp, "messagesToStdout", messagesToStdout);
     Config_save_bool(fp, "reverseScroll", BIT(instruments, SHOW_REVERSE_SCROLL));
     Config_save_bool(fp, "showHUD", BIT(instruments, SHOW_HUD_INSTRUMENTS));
-    Config_save_bool(fp, "showHUDRadar", BIT(instruments, SHOW_HUD_RADAR));
     Config_save_bool(fp, "mapRadar", BIT(hackedInstruments, MAP_RADAR));
     Config_save_bool(fp, "clientRanker", BIT(hackedInstruments, CLIENT_RANKER));
     Config_save_bool(fp, "showLivesByShip", BIT(hackedInstruments, SHOW_LIVES_BY_SHIP));
@@ -1986,9 +1974,9 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_int(fp, "shotSize", shot_size);
     Config_save_int(fp, "teamShotSize", teamshot_size);
     Config_save_bool(fp, "showNastyShots", showNastyShots);
-    Config_save_int(fp, "hrSize", hrSize);
-    Config_save_float(fp, "hrScale", hrScale);
-    Config_save_float(fp, "hrLimit", hrLimit);
+    Config_save_int(fp, "hudRadarDotSize", hudRadarDotSize);
+    Config_save_float(fp, "hudRadarScale", hudRadarScale);
+    Config_save_float(fp, "hudRadarLimit", hudRadarLimit);
     Config_save_int(fp, "hudSize", hudSize);
     Config_save_float(fp, "scoreObjectTime", scoreObjectTime);
     Config_save_int(fp, "baseWarningType", baseWarningType);
@@ -2020,8 +2008,8 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_int(fp, "oldMessagesColor", oldMessagesColor);
     Config_save_int(fp, "teamShotColor", teamShotColor);
     Config_save_int(fp, "hudColor", hudColor);
-    Config_save_int(fp, "hrColor1", hrColor1);
-    Config_save_int(fp, "hrColor2", hrColor2);
+    Config_save_int(fp, "hudRadarEnemyColor", hudRadarEnemyColor);
+    Config_save_int(fp, "hudRadarOtherColor", hudRadarOtherColor);
     Config_save_int(fp, "hudLockColor", hudLockColor);
     Config_save_int(fp, "dirPtrColor", dirPtrColor);
     Config_save_int(fp, "shipShapesHackColor", shipShapesHackColor);
