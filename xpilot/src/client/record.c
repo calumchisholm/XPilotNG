@@ -64,7 +64,10 @@ extern void paintItemSymbol(int type, Drawable drawable, GC mygc,
 			    int x, int y, int color);
 #else
 static void Dummy_paintItemSymbol(int type, Drawable drawable,
-				  GC mygc, int x, int y, int color) {}
+				  GC mygc, int x, int y, int color)
+{
+    (void)type; (void)drawable; (void)mygc; (void)x; (void)y; (void)color;
+}
 #endif
 
 
@@ -72,54 +75,54 @@ static void Dummy_paintItemSymbol(int type, Drawable drawable,
  * Miscellaneous recording functions.
  * These are only called when (recording == true).
  */
-static void RWriteByte(uint8_t value)
+static void RWriteByte(int value)
 {
     putc(value, recordFP);
 }
 
-static void RWriteShort(int16_t value)
+static void RWriteShort(int value)
 {
     putc(value, recordFP);
     value >>= 8;
     putc(value, recordFP);
 }
 
-static void RWriteUShort(uint16_t value)
+static void RWriteUShort(unsigned value)
 {
-    putc(value, recordFP);
+    putc((int)value, recordFP);
     value >>= 8;
-    putc(value, recordFP);
+    putc((int)value, recordFP);
 }
 
 static void RWriteLong(int32_t value)
 {
-    putc(value, recordFP);
+    putc((int)value, recordFP);
     value >>= 8;
-    putc(value, recordFP);
+    putc((int)value, recordFP);
     value >>= 8;
-    putc(value, recordFP);
+    putc((int)value, recordFP);
     value >>= 8;
-    putc(value, recordFP);
+    putc((int)value, recordFP);
 }
 
 static void RWriteULong(uint32_t value)
 {
-    putc(value, recordFP);
+    putc((int)value, recordFP);
     value >>= 8;
-    putc(value, recordFP);
+    putc((int)value, recordFP);
     value >>= 8;
-    putc(value, recordFP);
+    putc((int)value, recordFP);
     value >>= 8;
-    putc(value, recordFP);
+    putc((int)value, recordFP);
 }
 
 static void RWriteString(char *str)
 {
-    int				len = strlen(str);
+    size_t			len = strlen(str);
     int				i;
 
     RWriteUShort(len);
-    for (i = 0; i < len; i++)
+    for (i = 0; i < (int)len; i++)
 	putc(str[i], recordFP);
 }
 
@@ -265,8 +268,8 @@ static void RWriteTile(Pixmap tile)
     }
     RWriteByte(RC_NEW_TILE);
     RWriteByte(lptr->tile_id);
-    RWriteUShort(img->width);
-    RWriteUShort(img->height);
+    RWriteUShort((unsigned)img->width);
+    RWriteUShort((unsigned)img->height);
     for (y = 0; y < img->height; y++) {
 	for (x = 0; x < img->width; x++) {
 	    unsigned long pixel = XGetPixel(img, x, y);
@@ -511,8 +514,8 @@ static int RDrawArc(Display *display, Drawable drawable, GC gc,
 	RWriteGC(gc, RSTROKEGC | RTILEGC);
 	RWriteShort(x);
 	RWriteShort(y);
-	RWriteByte(width);
-	RWriteByte(height);
+	RWriteByte((int)width);
+	RWriteByte((int)height);
 	RWriteShort(angle1);
 	RWriteShort(angle2);
     }
@@ -529,7 +532,7 @@ static int RDrawLines(Display *display, Drawable drawable, GC gc,
 
 	putc(RC_DRAWLINES, recordFP);
 	RWriteGC(gc, RSTROKEGC | RTILEGC);
-	RWriteUShort(npoints);
+	RWriteUShort((unsigned)npoints);
 	for (i = 0; i < npoints; i++, xp++) {
 	    RWriteShort(xp->x);
 	    RWriteShort(xp->y);
@@ -564,8 +567,8 @@ static int RDrawRectangle(Display *display, Drawable drawable, GC gc,
 	RWriteGC(gc, RSTROKEGC | RTILEGC);
 	RWriteShort(x);
 	RWriteShort(y);
-	RWriteByte(width);
-	RWriteByte(height);
+	RWriteByte((int)width);
+	RWriteByte((int)height);
     }
     return 0;
 }
@@ -585,7 +588,7 @@ static int RDrawString(Display *display, Drawable drawable, GC gc,
 	RWriteShort(y);
 	XGetGCValues(display, gc, GCFont, &values);
 	RWriteByte((values.font == messageFont->fid) ? 1 : 0);
-	RWriteUShort(length);
+	RWriteUShort((unsigned)length);
 	for (i = 0; i < length; i++)
 	    putc(string[i], recordFP);
     }
@@ -603,8 +606,8 @@ static int RFillArc(Display *display, Drawable drawable, GC gc,
 	RWriteGC(gc, GCForeground | RTILEGC);
 	RWriteShort(x);
 	RWriteShort(y);
-	RWriteByte(width);
-	RWriteByte(height);
+	RWriteByte((int)width);
+	RWriteByte((int)height);
 	RWriteShort(angle1);
 	RWriteShort(angle2);
     }
@@ -622,7 +625,7 @@ static int RFillPolygon(Display *display, Drawable drawable, GC gc,
 
 	putc(RC_FILLPOLYGON, recordFP);
 	RWriteGC(gc, GCForeground | RTILEGC);
-	RWriteUShort(npoints);
+	RWriteUShort((unsigned)npoints);
 	for (i = 0; i < npoints; i++, xp++) {
 	    RWriteShort(xp->x);
 	    RWriteShort(xp->y);
@@ -638,6 +641,8 @@ static void RPaintItemSymbol(int type, Drawable drawable, GC mygc,
 {
 #ifdef _WINDOWS
     paintItemSymbol(type, drawable, mygc, x, y, color);
+#else
+    (void)mygc; (void)color;
 #endif
     if (drawable == drawPixmap) {
 	putc(RC_PAINTITEMSYMBOL, recordFP);
@@ -658,8 +663,8 @@ static int RFillRectangle(Display *display, Drawable drawable, GC gc,
 	RWriteGC(gc, GCForeground | RTILEGC);
 	RWriteShort(x);
 	RWriteShort(y);
-	RWriteByte(width);
-	RWriteByte(height);
+	RWriteByte((int)width);
+	RWriteByte((int)height);
     }
     return 0;
 }
@@ -673,7 +678,7 @@ static int RFillRectangles(Display *display, Drawable drawable, GC gc,
 
 	putc(RC_FILLRECTANGLES, recordFP);
 	RWriteGC(gc, GCForeground | RTILEGC);
-	RWriteUShort(nrectangles);
+	RWriteUShort((unsigned)nrectangles);
 	for (i = 0; i < nrectangles; i++) {
 	    RWriteShort(rectangles[i].x);
 	    RWriteShort(rectangles[i].y);
@@ -693,7 +698,7 @@ static int RDrawArcs(Display *display, Drawable drawable, GC gc,
 
 	putc(RC_DRAWARCS, recordFP);
 	RWriteGC(gc, RSTROKEGC | RTILEGC);
-	RWriteUShort(narcs);
+	RWriteUShort((unsigned)narcs);
 	for (i = 0; i < narcs; i++) {
 	    RWriteShort(arcs[i].x);
 	    RWriteShort(arcs[i].y);
@@ -715,7 +720,7 @@ static int RDrawSegments(Display *display, Drawable drawable, GC gc,
 
 	putc(RC_DRAWSEGMENTS, recordFP);
 	RWriteGC(gc, RSTROKEGC | RTILEGC);
-	RWriteUShort(nsegments);
+	RWriteUShort((unsigned)nsegments);
 	for (i = 0; i < nsegments; i++) {
 	    RWriteShort(segments[i].x1);
 	    RWriteShort(segments[i].y1);
