@@ -75,10 +75,8 @@ int GetInd(int id)
 
 void Pick_startpos(player_t *pl)
 {
-    int		ind = GetInd(pl->id);
-    int		i, num_free;
-    int		pick = 0, seen = 0;
-    static int	prev_num_bases = 0;
+    int ind = GetInd(pl->id), i, num_free, pick = 0, seen = 0;
+    static int prev_num_bases = 0;
     static char	*free_bases = NULL;
     world_t *world = &World;
 
@@ -167,10 +165,9 @@ void Pick_startpos(player_t *pl)
 
 void Go_home(player_t *pl)
 {
-    int			ind = GetInd(pl->id);
-    int			i, dir, check;
-    double		vx, vy, velo;
-    clpos_t		pos, initpos;
+    int ind = GetInd(pl->id), i, dir, check;
+    double vx, vy, velo;
+    clpos_t pos, initpos;
     world_t *world = &World;
 
     if (Player_is_tank(pl)) {
@@ -242,8 +239,8 @@ void Go_home(player_t *pl)
  */
 void Compute_sensor_range(player_t *pl)
 {
-    static int		init = 0;
-    static double	EnergyRangeFactor;
+    static int init = 0;
+    static double EnergyRangeFactor;
     world_t *world = &World;
 
     if (!init) {
@@ -278,7 +275,7 @@ void Compute_sensor_range(player_t *pl)
  */
 void Player_add_tank(player_t *pl, double tank_fuel)
 {
-    double		tank_cap, add_fuel;
+    double tank_cap, add_fuel;
 
     if (pl->fuel.num_tanks < MAX_TANKS) {
 	pl->fuel.num_tanks++;
@@ -298,8 +295,8 @@ void Player_add_tank(player_t *pl, double tank_fuel)
  */
 void Player_remove_tank(player_t *pl, int which_tank)
 {
-    int			i, tank_ind;
-    long		tank_fuel, tank_cap;
+    int i, tank_ind;
+    double tank_fuel, tank_cap;
 
     if (pl->fuel.num_tanks > 0) {
 	tank_ind = which_tank;
@@ -341,9 +338,8 @@ void Player_used_kill(player_t *pl)
  */
 void Player_set_mass(player_t *pl)
 {
-    double		sum_item_mass = 0.0;
-    double		item_mass;
-    int			item;
+    double sum_item_mass = 0.0, item_mass;
+    int item;
 
     for (item = 0; item < NUM_ITEMS; item++) {
 	switch (item) {
@@ -372,8 +368,8 @@ void Player_set_mass(player_t *pl)
  */
 static void Player_init_fuel(player_t *pl, double total_fuel)
 {
-    double		fuel = total_fuel;
-    int			i;
+    double fuel = total_fuel;
+    int i;
     world_t *world = &World;
 
     pl->fuel.num_tanks  = 0;
@@ -394,9 +390,9 @@ static void Player_init_fuel(player_t *pl, double total_fuel)
 
 int Init_player(int ind, shipshape_t *ship)
 {
-    player_t		*pl = Players(ind);
-    bool		too_late = false;
-    int			i;
+    player_t *pl = Players(ind);
+    bool too_late = false;
+    int i;
     world_t *world = &World;
 
     /*memset(pl, 0, sizeof(player));*/
@@ -623,8 +619,8 @@ void Free_players(void)
 
 void Update_score_table(void)
 {
-    int			i, j, check;
-    player_t		*pl;
+    int i, j, check;
+    player_t *pl;
     world_t *world = &World;
 
     for (j = 0; j < NumPlayers; j++) {
@@ -691,9 +687,9 @@ void Update_score_table(void)
 
 void Reset_all_players(void)
 {
-    player_t		*pl;
-    int			i, j;
-    char		msg[MSG_LEN];
+    player_t *pl;
+    int i, j;
+    char msg[MSG_LEN];
     world_t *world = &World;
 
     updateScores = true;
@@ -820,9 +816,9 @@ void Reset_all_players(void)
 
 void Check_team_members(int team)
 {
-    player_t		*pl;
-    team_t		*teamp;
-    int			members, i;
+    player_t *pl;
+    team_t *teamp;
+    int members, i;
     world_t *world = &World;
 
     if (!BIT(world->rules->mode, TEAM_PLAY))
@@ -858,8 +854,8 @@ static void Compute_end_of_round_values(double *average_score,
 					double *best_ratio,
 					int best_players[])
 {
-    int			i, n = 0;
-    double		ratio;
+    int i, n = 0;
+    double ratio;
 
     /* Initialize everything */
     *average_score = 0;
@@ -869,16 +865,16 @@ static void Compute_end_of_round_values(double *average_score,
     /* Figure out what the average score is and who has the best kill/death */
     /* ratio for this round */
     for (i = 0; i < NumPlayers; i++) {
-	player_t *pl_i = Players(i);
+	player_t *pl = Players(i);
 
-	if (Player_is_tank(pl_i)
-	    || (BIT(pl_i->status, PAUSE)
-	       && pl_i->count <= 0)) {
+	if (Player_is_tank(pl)
+	    || (BIT(pl->status, PAUSE) && pl->count <= 0)
+	    || Player_is_waiting(pl))
 	    continue;
-	}
+
 	n++;
-	*average_score += pl_i->score;
-	ratio = (double) pl_i->kills / (pl_i->deaths + 1);
+	*average_score += pl->score;
+	ratio = (double) pl->kills / (pl->deaths + 1);
 	if (ratio > *best_ratio) {
 	    *best_ratio = ratio;
 	    best_players[0] = i;
@@ -896,9 +892,9 @@ static void Give_best_player_bonus(double average_score,
 				   double best_ratio,
 				   int best_players[])
 {
-    int			i;
-    double		points;
-    char		msg[MSG_LEN];
+    int i;
+    double points;
+    char msg[MSG_LEN];
 
     if (best_ratio == 0)
 	sprintf(msg, "There is no Deadly Player.");
@@ -946,7 +942,7 @@ static void Give_best_player_bonus(double average_score,
 
 static void Give_individual_bonus(player_t *pl, double average_score)
 {
-    double		ratio, points;
+    double ratio, points;
 
     ratio = (double) pl->kills / (pl->deaths + 1);
     points = ratio * Rate(pl->score, average_score);
@@ -956,7 +952,7 @@ static void Give_individual_bonus(player_t *pl, double average_score)
 
 static void Count_rounds(void)
 {
-    char		msg[MSG_LEN];
+    char msg[MSG_LEN];
 
     if (!options.roundsToPlay)
 	return;
@@ -974,14 +970,11 @@ static void Count_rounds(void)
 
 void Team_game_over(int winning_team, const char *reason)
 {
-    int			i, j;
-    double		average_score;
-    int			num_best_players;
-    int			*best_players;
-    double		best_ratio;
-    char		msg[MSG_LEN];
+    int i, j, num_best_players, *best_players;
+    double average_score, best_ratio;
+    char msg[MSG_LEN];
 
-    if (!(best_players = (int *)malloc(NumPlayers * sizeof(int)))) {
+    if (!(best_players = malloc(NumPlayers * sizeof(int)))) {
 	warn("no mem");
 	End_game();
     }
@@ -1048,14 +1041,11 @@ void Team_game_over(int winning_team, const char *reason)
 
 void Individual_game_over(int winner)
 {
-    int			i, j;
-    double		average_score;
-    int			num_best_players;
-    int			*best_players;
-    double		best_ratio;
-    char		msg[MSG_LEN];
+    int i, j, num_best_players, *best_players;
+    double average_score, best_ratio;
+    char msg[MSG_LEN];
 
-    if (!(best_players = (int *)malloc(NumPlayers * sizeof(int)))) {
+    if (!(best_players = malloc(NumPlayers * sizeof(int)))) {
 	warn("no mem");
 	End_game();
     }
@@ -1119,16 +1109,11 @@ void Individual_game_over(int winner)
 
 void Race_game_over(void)
 {
-    player_t		*pl;
-    int			i,
-			j,
-			k,
-			bestlap = 0,
-			num_best_players = 0,
-			num_active_players = 0,
-			num_ordered_players = 0;
-    int			*order;
-    char		msg[MSG_LEN];
+    player_t *pl;
+    int i, j, k,
+	bestlap = 0, num_best_players = 0,
+	num_active_players = 0, num_ordered_players = 0, *order;
+    char msg[MSG_LEN];
     world_t *world = &World;
 
     /*
@@ -1246,9 +1231,9 @@ void Race_game_over(void)
 
 void Compute_game_status(void)
 {
-    int			i;
-    player_t		*pl;
-    char		msg[MSG_LEN];
+    int i;
+    player_t *pl;
+    char msg[MSG_LEN];
     world_t *world = &World;
 
     if (round_delay_send > 0)
@@ -1525,10 +1510,10 @@ void Compute_game_status(void)
 	    TeamEmpty,
 	    TeamDead,
 	    TeamAlive
-	}	team_state[MAX_TEAMS];
-	int	num_dead_teams = 0;
-	int	num_alive_teams = 0;
-	int	winning_team = -1;
+	} team_state[MAX_TEAMS];
+	int num_dead_teams = 0;
+	int num_alive_teams = 0;
+	int winning_team = -1;
 
 	for (i = 0; i < MAX_TEAMS; i++)
 	    team_state[i] = TeamEmpty;
@@ -1575,15 +1560,11 @@ void Compute_game_status(void)
 	}
 
 	if (num_alive_teams > 1) {
-	    char	*bp;
-	    int		teams_with_treasure = 0;
-	    int		team_win[MAX_TEAMS];
-	    double	team_score[MAX_TEAMS];
-	    int		winners;
-	    int		max_destroyed = 0;
-	    int		max_left = 0;
-	    double	max_score = 0;
-	    team_t	*team_ptr;
+	    char *bp;
+	    int teams_with_treasure = 0, team_win[MAX_TEAMS];
+	    double team_score[MAX_TEAMS], max_score = 0;
+	    int winners, max_destroyed = 0, max_left = 0;
+	    team_t *team_ptr;
 
 	    /*
 	     * Game is not over if more than one team which have treasures
@@ -1767,9 +1748,8 @@ void Compute_game_status(void)
 
 void Delete_player(player_t *pl)
 {
-    int			ind = GetInd(pl->id);
-    object_t		*obj;
-    int			i, j, id = pl->id;
+    int ind = GetInd(pl->id), i, j, id = pl->id;
+    object_t *obj;
     world_t *world = &World;
 
     /* call before important player structures are destroyed */
@@ -1826,6 +1806,7 @@ void Delete_player(player_t *pl)
 	else {
 	    if (BIT(obj->type, OBJ_MINE)) {
 		mineobject_t *mine = MINE_PTR(obj);
+
 		if (mine->owner == id) {
 		    mine->owner = NO_ID;
 		    if (!options.keepShots) {
@@ -1970,7 +1951,7 @@ void Delete_spectator(player_t *pl)
 
 void Detach_ball(player_t *pl, ballobject_t *ball)
 {
-    int			i, cnt;
+    int i, cnt;
 
     if (ball == NULL || ball == pl->ball) {
 	pl->ball = NULL;
@@ -2007,8 +1988,8 @@ void Kill_player(player_t *pl, bool add_rank_death)
 
 void Player_death_reset(player_t *pl, bool add_rank_death)
 {
-    double		minfuel;
-    int			i;
+    double minfuel;
+    int i;
     world_t *world = &World;
 
     if (Player_is_tank(pl)) {
@@ -2102,7 +2083,7 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
 /* determines if two players are immune to eachother */
 bool Team_immune(int id1, int id2)
 {
-    player_t 	*pl1, *pl2;
+    player_t *pl1, *pl2;
 
     /* owned stuff is never team immune */
     if (id1 == id2)
