@@ -193,11 +193,6 @@ AC_CHECK_FUNCS([ \
 	strtoul \
 	])
 
-AC_CHECK_FUNCS([ \
-	strcasecmp \
-	strncasecmp \
-	])
-
 AC_CONFIG_FILES([ \
 	Makefile \
 	lib/Makefile \
