@@ -1,13 +1,3 @@
-Problem :Lasers can sometimes shoot through walls. appears to be 
-	 due to the fact that the drawing of the lasers start 
-	 inside a wall.
-Found by:Colonel Blood
-Solution:
-Fixed by:
-Files 
-affected:
-
------------------------------------------------------------------
 Problem :Op command can take a + sign with no argument
 Found by:Colonel Blood
 Solution:
@@ -76,6 +66,17 @@ affected:
 
 
 FIXED:
+
+-----------------------------------------------------------------
+Problem :Lasers can sometimes shoot through walls. appears to be 
+	 due to the fact that the drawing of the lasers start 
+	 inside a wall.
+Found by:Colonel Blood
+Solution:use server is_inside() function to check if laser start point
+         is inside a wall
+Fixed by:kps, Tue Jan  6 16:13:10 EET 2004
+Files 
+affected:src/server/shot.c
 
 -----------------------------------------------------------------
 Problem : Pasting of http://groups.google.com/groups?hl=en&lr=&ie=UTF-8&oe=UTF-8&threadm=376bdecc.1091741937%40enews.newsguy.com&rnum=10&prev=/groups%3Fq%3Dslarti%2Bgroup:rec.games.computer.xpilot%26hl%3Den%26lr%3D%26ie%3DUTF-8%26oe%3DUTF-8%26group%3Drec.games.computer.xpilot%26selm%3D376bdecc.1091741937%2540enews.newsguy.com%26rnum%3D10 into the talk window causes an assertion to fail in
