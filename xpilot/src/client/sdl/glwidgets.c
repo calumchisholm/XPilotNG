@@ -331,13 +331,13 @@ void Paint_ArrowWidget(GLWidget *widget)
     GLWidget *tmp;
     SDL_Rect *b;
     ArrowWidget *wid_info;
-    
-    if (!widget) return;
+    ArrowWidget_dir_t dir;
     static int normalcolor  = 0xff0000ff;
     static int presscolor   = 0x00ff00ff;
     static int tapcolor     = 0xffffffff;
     static int lockcolor    = 0x88000088;
-     
+    
+	if (!widget) return;	
     tmp = widget;
     b = &(tmp->bounds);
     wid_info = (ArrowWidget *)(tmp->wid_info);
@@ -356,7 +356,7 @@ void Paint_ArrowWidget(GLWidget *widget)
     	set_alphacolor( normalcolor );
     }
     
-    ArrowWidget_dir_t dir = wid_info->direction;
+    dir = wid_info->direction;
     glBegin(GL_POLYGON);
     switch ( dir ) {
     	case RIGHTARROW:
@@ -451,12 +451,13 @@ void Paint_SlideWidget(GLWidget *widget)
     SDL_Rect *b;
     SlideWidget *wid_info;
 
-    if (!widget) return;
+   
     static int normalcolor  = 0xff0000ff;
     static int presscolor   = 0x00ff00ff;
     static int lockcolor  = 0x333333ff;
     int color;
-     
+
+    if (!widget) return;
     tmp = widget;
     b = &(tmp->bounds);
     wid_info = (SlideWidget *)(tmp->wid_info);
@@ -643,11 +644,11 @@ void motion_ScrollbarWidget( Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void 
 
 void release_ScrollbarWidget( void *releasedata ) {
     GLWidget *tmp;
-    
+    ScrollbarWidget *wid_info;
     if (!releasedata) return;
 
     tmp = (GLWidget *)releasedata;
-    ScrollbarWidget *wid_info = (ScrollbarWidget *)tmp->wid_info;
+    wid_info = (ScrollbarWidget *)tmp->wid_info;
     
     wid_info->oldmoves = 0;
 }
