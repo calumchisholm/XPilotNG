@@ -495,12 +495,6 @@ static void Xpmap_place_cannon(world_t *world, blpos blk, int dir, bool create)
 	World_place_cannon(world, pos, dir, TEAM_NOT_SET);
 }
 
-/*
- * The direction of the base should be so that it points
- * up with respect to the gravity in the region.  This
- * is fixed in Find_base_dir() when the gravity has
- * been computed.
- */
 static clpos Xpmap_get_clpos(blpos blk)
 {
     clpos pos;
@@ -511,6 +505,12 @@ static clpos Xpmap_get_clpos(blpos blk)
     return pos;
 }
 
+/*
+ * The direction of the base should be so that it points
+ * up with respect to the gravity in the region.  This
+ * is fixed in Find_base_dir() when the gravity has
+ * been computed.
+ */
 static void Xpmap_place_base(world_t *world, blpos blk, int team, bool create)
 {
     World_set_block(world, blk, BASE);
