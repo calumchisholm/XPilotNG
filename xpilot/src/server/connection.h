@@ -119,7 +119,7 @@ typedef struct {
     int			debris_colors;		/* Max. debris intensities */
     int			spark_rand;		/* Sparkling effect */
     int			last_mouse_pos;		/* value of last pointer pkt */
-    char		*real;			/* real login name of player */
+    char		*user;			/* user name of player */
     char		*nick;			/* nickname of player */
     char		*dpy;			/* display of player */
     shipshape_t		*ship;			/* ship shape of player */

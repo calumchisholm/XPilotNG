@@ -400,7 +400,7 @@ void Destroy_connection(connection_t *connp, const char *reason)
 	xpprintf("%s Goodbye %s=%s@%s|%s (\"%s\")\n",
 		 showtime(),
 		 connp->nick ? connp->nick : "",
-		 connp->real ? connp->real : "",
+		 connp->user ? connp->user : "",
 		 connp->host ? connp->host : "",
 		 connp->dpy ? connp->dpy : "",
 		 reason);
@@ -418,8 +418,8 @@ void Destroy_connection(connection_t *connp, const char *reason)
 	else
 	    Delete_spectator(pl);
     }
-    if (connp->real != NULL)
-	free(connp->real);
+    if (connp->user != NULL)
+	free(connp->user);
     if (connp->nick != NULL)
 	free(connp->nick);
     if (connp->dpy != NULL)
@@ -444,7 +444,7 @@ void Destroy_connection(connection_t *connp, const char *reason)
     memset(connp, 0, sizeof(*connp));
 }
 
-int Check_connection(char *real, char *nick, char *dpy, char *addr)
+int Check_connection(char *user, char *nick, char *dpy, char *addr)
 {
     int			i;
     connection_t	*connp;
@@ -453,7 +453,7 @@ int Check_connection(char *real, char *nick, char *dpy, char *addr)
 	connp = &Conn[i];
 	if (connp->state == CONN_LISTENING) {
 	    if (strcasecmp(connp->nick, nick) == 0) {
-		if (!strcmp(real, connp->real)
+		if (!strcmp(user, connp->user)
 		    && !strcmp(dpy, connp->dpy)
 		    && !strcmp(addr, connp->addr))
 		    return connp->my_port;
@@ -527,26 +527,26 @@ static void dcase(char *str)
     }
 }
 
-char *banned_reals[] = { "<", ">", "\"", "'", NULL };
+char *banned_users[] = { "<", ">", "\"", "'", NULL };
 char *banned_nicks[] = { "<", ">", "\"", "'", NULL };
 char *banned_addrs[] = { NULL };
 char *banned_hosts[] = { "<", ">", "\"", "'", NULL };
 
-int CheckBanned(char *real, char *nick, char *addr, char *host)
+int CheckBanned(char *user, char *nick, char *addr, char *host)
 {
     int ret = 0, i;
 
-    real = strdup(real);
+    user = strdup(user);
     nick = strdup(nick);
     addr = strdup(addr);
     host = strdup(host);
-    dcase(real);
+    dcase(user);
     dcase(nick);
     dcase(addr);
     dcase(host);
 
-    for (i = 0; banned_reals[i] != NULL; i++) {
-	if (strstr(real, banned_reals[i]) != NULL) {
+    for (i = 0; banned_users[i] != NULL; i++) {
+	if (strstr(user, banned_users[i]) != NULL) {
 	    ret = 1;
 	    goto out;
 	}
@@ -570,7 +570,7 @@ int CheckBanned(char *real, char *nick, char *addr, char *host)
 	}
     }
  out:
-    free(real);
+    free(user);
     free(nick);
     free(addr);
     free(host);
@@ -588,7 +588,7 @@ struct restrict restricted[] = {
     { NULL, NULL, NULL }
 };
 
-int CheckAllowed(char *real, char *nick, char *addr, char *host)
+int CheckAllowed(char *user, char *nick, char *addr, char *host)
 {
     int i, allowed = 1;
     /*char *realnick = nick;*/
@@ -632,7 +632,7 @@ int CheckAllowed(char *real, char *nick, char *addr, char *host)
 
 extern int min_fd;
 
-int Setup_connection(char *real, char *nick, char *dpy, int team,
+int Setup_connection(char *user, char *nick, char *dpy, int team,
 		     char *addr, char *host, unsigned version)
 {
     int			i,
@@ -643,7 +643,7 @@ int Setup_connection(char *real, char *nick, char *dpy, int team,
 
     if (rrecord) {
 	*playback_ei++ = main_loops;
-	strcpy(playback_es, real);
+	strcpy(playback_es, user);
 	while (*playback_es++);
 	strcpy(playback_es, nick);
 	while (*playback_es++);
@@ -672,7 +672,7 @@ int Setup_connection(char *real, char *nick, char *dpy, int team,
 	}
 	if (strcasecmp(connp->nick, nick) == 0) {
 	    if (connp->state == CONN_LISTENING
-		&& strcmp(real, connp->real) == 0
+		&& strcmp(user, connp->user) == 0
 		&& strcmp(dpy, connp->dpy) == 0
 		&& version == connp->version)
 		/*
@@ -691,7 +691,7 @@ int Setup_connection(char *real, char *nick, char *dpy, int team,
     if (free_conn_index >= max_connections) {
 	if (!options.silent)
 	    xpprintf("%s Full house for %s(%s)@%s(%s)\n",
-		     showtime(), real, nick, host, dpy);
+		     showtime(), user, nick, host, dpy);
 	return -1;
     }
     connp = &Conn[free_conn_index];
@@ -722,7 +722,7 @@ int Setup_connection(char *real, char *nick, char *dpy, int team,
 
     connp->ind = free_conn_index;
     connp->my_port = my_port;
-    connp->real = xp_strdup(real);
+    connp->user = xp_strdup(user);
     connp->nick = xp_strdup(nick);
     connp->dpy = xp_strdup(dpy);
     connp->addr = xp_strdup(addr);
@@ -758,7 +758,7 @@ int Setup_connection(char *real, char *nick, char *dpy, int team,
     if (connp->w.buf == NULL
 	|| connp->r.buf == NULL
 	|| connp->c.buf == NULL
-	|| connp->real == NULL
+	|| connp->user == NULL
 	|| connp->nick == NULL
 	|| connp->dpy == NULL
 	|| connp->addr == NULL
@@ -783,7 +783,7 @@ static int Handle_listening(connection_t *connp)
     unsigned char	type;
     int			n;
     char		nick[MAX_CHARS],
-			real[MAX_CHARS];
+			user[MAX_CHARS];
 
     if (connp->state != CONN_LISTENING) {
 	Destroy_connection(connp, "not listening");
@@ -826,7 +826,7 @@ static int Handle_listening(connection_t *connp)
     }
     if (!options.silent) {
 	xpprintf("%s Welcome %s=%s@%s|%s (%s/%d)", showtime(),
-		 connp->nick, connp->real, connp->host, connp->dpy,
+		 connp->nick, connp->user, connp->host, connp->dpy,
 		 connp->addr, connp->his_port);
 	xpprintf(" (version %04x)\n", connp->version);
     }
@@ -837,18 +837,18 @@ static int Handle_listening(connection_t *connp)
 	return -1;
     }
     if ((n = Packet_scanf(&connp->r, "%c%s%s",
-			  &type, real, nick)) <= 0) {
+			  &type, user, nick)) <= 0) {
 	Send_reply(connp, PKT_VERIFY, PKT_FAILURE);
 	Send_reliable(connp);
 	Destroy_connection(connp, "verify incomplete");
 	return -1;
     }
-    Fix_user_name(real);
+    Fix_user_name(user);
     Fix_nick_name(nick);
-    if (strcmp(real, connp->real) || strcmp(nick, connp->nick)) {
+    if (strcmp(user, connp->user) || strcmp(nick, connp->nick)) {
 	if (!options.silent)
 	    xpprintf("%s Client verified incorrectly (%s,%s)(%s,%s)\n",
-		     showtime(), real, nick, connp->real, connp->nick);
+		     showtime(), user, nick, connp->user, connp->nick);
 	Send_reply(connp, PKT_VERIFY, PKT_FAILURE);
 	Send_reliable(connp);
 	Destroy_connection(connp, "verify incorrect");
@@ -937,11 +937,11 @@ static int Handle_setup(connection_t *connp)
     if (connp->setup >= S->setup_size)
 	Conn_set_state(connp, CONN_DRAIN, CONN_LOGIN);
 #if 0
-    if (CheckBanned(connp->real, connp->nick, connp->addr, connp->host)) {
+    if (CheckBanned(connp->user, connp->nick, connp->addr, connp->host)) {
 	Destroy_connection(connp, "Banned from server, contact " LOCALGURU);
 	return -1;
     }
-    if (!CheckAllowed(connp->real, connp->nick, connp->addr, connp->host)) {
+    if (!CheckAllowed(connp->user, connp->nick, connp->addr, connp->host)) {
 	Destroy_connection(connp, "Restricted nick, contact " LOCALGURU);
 	return -1;
     }
@@ -1095,7 +1095,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 
     strlcpy(pl->name, connp->nick, MAX_CHARS);
     /*strlcpy(pl->auth_nick, old_nick, MAX_CHARS);*/
-    strlcpy(pl->username, connp->real, MAX_CHARS);
+    strlcpy(pl->username, connp->user, MAX_CHARS);
     strlcpy(pl->hostname, connp->host, MAX_CHARS);
 
     LegalizeName(pl->name, true);
