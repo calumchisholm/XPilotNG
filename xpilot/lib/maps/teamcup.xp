@@ -1,14 +1,12 @@
 oldthrust:0.5
 teamcup:true
 wreckage: false
-numberofrounds:12
 useWreckage: false
 noquit:false
 maxunshieldedwallbouncespeed:90
 maxunshieldedplayerwallbounceangle:180
 maxshieldedplayerwallbounceangle:180
 maxshieldedwallbouncespeed:100
-framespersecond:12
 robots:0
 allowplayercrashes:yes
 allowplayerkilling:yes
