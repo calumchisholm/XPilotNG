@@ -63,6 +63,15 @@ Files
 affected:
 
 -----------------------------------------------------------------
+Problem : Pasting of http://groups.google.com/groups?hl=en&lr=&ie=UTF-8&oe=UTF-8&threadm=376bdecc.1091741937%40enews.newsguy.com&rnum=10&prev=/groups%3Fq%3Dslarti%2Bgroup:rec.games.computer.xpilot%26hl%3Den%26lr%3D%26ie%3DUTF-8%26oe%3DUTF-8%26group%3Drec.games.computer.xpilot%26selm%3D376bdecc.1091741937%2540enews.newsguy.com%26rnum%3D10 into the talk window causes an assertion to fail in
+talk.c (X11 client code).
+Found by: Col. Blood
+Solution:
+Fixed by:
+Files 
+affected:
+
+-----------------------------------------------------------------
 Problem :
 Found by:
 Solution:
