@@ -872,7 +872,7 @@ def convert(options):
 	print '<Wormhole x="%d" y="%d" type="%s">' % \
 		(wormhole.x, wormhole.y, wormhole.type)
 	if wormhole.type != 'out':
-	    print '<Polygon x="%d" y="%d" style="xpblue">' % \
+	    print '<Polygon x="%d" y="%d" style="xpred">' % \
 		(wormhole.x - 1120, wormhole.y - 1120)
 	    print '<Offset x="2240" y="0"/> <Offset x="0" y="2240"/>'
 	    print '<Offset x="-2240" y="0"/> <Offset x="0" y="-2240"/>'
