@@ -71,10 +71,11 @@ void Pointer_control_set_state(bool on)
     }
     
 #ifdef HAVE_XF86MISC
-    if (0) { /* kps - causes crash on my machine */
+    {
 	SDL_SysWMinfo info;
-	SDL_GetWMInfo(&info);
-	Disable_emulate3buttons(pointerControl, info.info.x11.display);
+	SDL_VERSION(&info.version);
+	if (SDL_GetWMInfo(&info) > 0) 
+	    Disable_emulate3buttons(pointerControl, info.info.x11.display);
     }
 #endif
 
