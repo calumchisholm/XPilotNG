@@ -1225,8 +1225,13 @@ void Gui_paint_polygon(int i, int xoff, int yoff) {
 			   textured ? BM_WALL_TEXTURE : style.texture, 0);
 	    if (bmp != NULL) {
 		XSetTile(dpy, gc, bmp->bitmap);
+                /*
 		XSetTSOrigin(dpy, gc, -WINSCALE(realWorld.x), 
 			     WINSCALE(realWorld.y));
+                */
+                XSetTSOrigin(dpy, gc, WINSCALE(polygon.bounds.x) - ship.x, 
+                             ship.y - WINSCALE(polygon.bounds.y + 
+                                               polygon.bounds.h));
 		XSetFillStyle(dpy, gc, FillTiled);
 	    }
         } else {

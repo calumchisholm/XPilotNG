@@ -151,6 +151,7 @@ int Bitmap_add_std_textures (void)
 int Bitmap_add (char *filename, int count, bool scalable)
 {
     xp_pixmap_t pixmap;
+    pixmap.filename = strdup(filename);
     pixmap.count = count;
     pixmap.scalable = scalable;
     pixmap.state = BMS_UNINITIALIZED;

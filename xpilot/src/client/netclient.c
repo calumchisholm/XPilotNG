@@ -292,6 +292,34 @@ static unsigned int get_ushort(char **ptr)
     return ((unsigned char)*(*ptr - 2) << 8) + (unsigned char)*(*ptr - 1);
 }
 
+
+static void Create_polygon_styles_for_testing ()
+{
+    int i;
+
+    char *textureNames[] = {
+        "texture0.ppm",
+        "texture1.ppm",
+        "texture2.ppm",
+        "texture3.ppm",
+        "texture4.ppm",
+        "texture5.ppm",
+        "texture6.ppm",
+        "texture7.ppm",
+    };
+
+
+    /* a few polygon styles with a texture */
+    for (i = 0; i < 8; i++) {
+        polygon_styles[2 + i].visible = true;
+        polygon_styles[2 + i].visible_in_radar = true;
+        polygon_styles[2 + i].method = TEXTURED;
+        polygon_styles[2 + i].def_edge_style = (i < 6) ? 0 : 1;
+        polygon_styles[2 + i].texture = 
+            Bitmap_add(textureNames[i], 1, true);
+    }
+}
+
 /*
  * Receive the map data and some game parameters from
  * the server.  The map data may be in compressed form.
@@ -468,7 +496,7 @@ int Net_setup(void)
         /* hidden edge style */
         edge_styles[1].width = -1;
 
-        polygon_styles = malloc(2 * sizeof(polygon_style_t));
+        polygon_styles = malloc(10 * sizeof(polygon_style_t));
         if (polygon_styles == NULL) {
             error("no memory for polygon styles");
             return -1;
@@ -479,9 +507,9 @@ int Net_setup(void)
         polygon_styles[0].visible_in_radar = true;
         polygon_styles[0].method = NOFILL;
         polygon_styles[0].def_edge_style = 0;
-
+        
         /* hidden polygon style */
-        polygon_styles[1].visible = false;
+        polygon_styles[1].visible = false;        
 
 	polyc = get_ushort(&ptr);
 	for (i = 0; i < polyc; i++) {
@@ -621,9 +649,16 @@ int Net_setup(void)
 	}
 	if (0) /* commented out to avoid problems outside testing */
 	{
-	    int hack[1000]; /* number for each polygon loaded in this */
-	    for (i = 0; i < polyc; i++)
-		hack[i] = *ptr++;
+            if (Mapdata_setup(Setup->author)) {
+
+                Create_polygon_styles_for_testing();
+
+                for (i = 0; i < polyc; i++) {
+                    int sid = *ptr++;
+                    if (sid == 100 || sid < 0 || sid >= 9) sid = rand() % 9;
+                    polygons[i].style = sid;
+                }
+            }
 	}
     }
 
