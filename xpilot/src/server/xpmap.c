@@ -336,14 +336,15 @@ void Xpmap_tags_to_internal_data(bool create)
 	    case 'c':
 		Xpmap_place_cannon(x, y, DIR_DOWN, create);
 		break;
-		
+
 	    case '#':
 		Xpmap_place_fuel(x, y, create);
 		break;
-		
 	    case '*':
+		Xpmap_place_treasure(x, y, false, create);
+		break;
 	    case '^':
-		Xpmap_place_treasure(x, y, (c == '^'), create);
+		Xpmap_place_treasure(x, y, true, create);
 		break;
 	    case '!':
 		Xpmap_place_target(x, y, create);
@@ -358,6 +359,8 @@ void Xpmap_tags_to_internal_data(bool create)
 		Xpmap_place_block(x, y, BASE_ATTRACTOR);
 		break;
 	    case '_':
+		Xpmap_place_base(x, y, TEAM_NOT_SET, create);
+		break;
 	    case '0': case '1': case '2': case '3': case '4':
 	    case '5': case '6': case '7': case '8': case '9':
 		Xpmap_place_base(x, y, (int) (c - '0'), create);
