@@ -959,10 +959,10 @@ int Xpilotrc_write(const char *path)
 void Parse_options(int *argcp, char **argvp)
 {
     int arg_ind, num_remaining_args, num_servers = 0, i;
-    const char *filename;
+    char path[PATH_MAX + 1];
 
-    filename = Xpilotrc_get_filename();
-    Xpilotrc_read(filename);
+    Xpilotrc_get_filename(path, sizeof(path));
+    Xpilotrc_read(path);
 
     /*
      * Here we step trough argc - 1 arguments, leaving
@@ -1084,31 +1084,28 @@ void defaultCleanup(void)
 }
 
 #ifndef _WINDOWS
-const char *Xpilotrc_get_filename(void)
+void Xpilotrc_get_filename(char *path, size_t size)
 {
-    static char path[PATH_MAX + 1];
     const char *home = getenv("HOME");
     const char *defaultFile = ".xpilotrc";
     const char *optionalFile = getenv("XPILOTRC");
 
     if (optionalFile != NULL)
-	strlcpy(path, optionalFile, sizeof(path));
+	strlcpy(path, optionalFile, size);
     else if (home != NULL) {
-	strlcpy(path, home, sizeof(path));
-	strlcat(path, "/", sizeof(path));
-	strlcat(path, defaultFile, sizeof(path));
+	strlcpy(path, home, size);
+	strlcat(path, "/", size);
+	strlcat(path, defaultFile, size);
     } else
-	strlcpy(path, "", sizeof(path));
+	strlcpy(path, "", size);
 
     return path;
 }
 #else
-const char *Xpilotrc_get_filename(void)
+void Xpilotrc_get_filename(char *path, size_t size)
 {
-    static char path[PATH_MAX + 1];
-
     /* kps - wouldn't xpilotrc.txt be a better name ? */
-    strlcpy(path, ".xpilotrc", sizeof path);
+    strlcpy(path, ".xpilotrc", size);
     return path;
 }
 #endif /* _WINDOWS */
