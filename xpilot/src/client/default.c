@@ -1109,7 +1109,7 @@ option options[] = {
     {
 	"hudLockColor",
 	NULL,
-	"4",
+	"0",
 	KEY_DUMMY,
 	"Which color number to use for drawing the lock on the HUD.\n"
     },

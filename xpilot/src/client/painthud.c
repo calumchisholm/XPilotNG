@@ -291,20 +291,18 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
     const int	BORDER = 2;
     int		x, y;
     other_t	*target;
-    static int	warningCount;
     char	str[50];
     static int	mapdiag = 0;
 
-    if (mapdiag == 0) {
+    if (mapdiag == 0)
 	mapdiag = (int)LENGTH(Setup->width, Setup->height);
-    }
 
     /*
      * Display direction arrow and miscellaneous target information.
      */
-    if ((target = Other_by_id(lock_id)) == NULL) {
+    if ((target = Other_by_id(lock_id)) == NULL)
 	return;
-    }
+
     FIND_NAME_WIDTH(target);
     rd.drawString(dpy, p_draw, gc,
 		WINSCALE(hud_pos_x) - target->name_width / 2,
@@ -345,9 +343,9 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
     }
     SET_FG(colors[hudColor].pixel);
 
-    if (hudRadarEnemyColor == 0 && lock_dist != 0 && hudLockColor != 0) {
+    if (lock_dist != 0 && hudLockColor) {
 
-	if (lock_dist > WARNING_DISTANCE || warningCount++ % 2 == 0) {
+	if (lock_dist > WARNING_DISTANCE || (loopsSlow & 1)) {
 	    int size = MIN(mapdiag / lock_dist, 10);
 
 	    if (size == 0) {
