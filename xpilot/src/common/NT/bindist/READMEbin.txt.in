@@ -1,7 +1,7 @@
-This is the README for XPilot.exe Release 13 .
-XPilot.exe is based on 4.5.4X2 .
+This is the README for XPilot.exe Release @XP_VERSION_WINDOWS@.
+XPilot.exe is based on @VERSION@.
 
-Copyright © 1991-2003 by Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska & Uoti Urpala.
+@XP_COPYRIGHT@.
 
 The documentation for XPilot is far from complete.
 
@@ -10,6 +10,8 @@ between this release and previous releases.
 
 --------------------------------------
 SOURCES OF INFORMATION ON THE INTERNET
+
+Improved XPilot Page: http://xpilot.sf.net/
 
 XPilot Page on WWW: http://www.xpilot.org/
 
@@ -20,7 +22,7 @@ REPORTING BUGS
 
 If you're completely stuck, found a bug, or want to say Hi! e-mail us at:
 
-        xpilot@xpilot.org
+        @PACKAGE_BUGREPORT@
 
 Remember to include the version of XPilot, your platform, the symptoms
 and, if you have one, a fix when reporting bugs.
