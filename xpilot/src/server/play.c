@@ -410,8 +410,7 @@ bool Cannon_hitfunc(struct group *group, struct move *move)
     unsigned long cannon_mask;
 
     /* this should never happen if hitmasks are ok */
-    if (cannon->dead_time > 0)
-	return false;
+    assert (! (cannon->dead_time > 0));
 
     /* if cannon is phased nothing will hit it */
     if (BIT(cannon->used, HAS_PHASING_DEVICE))
