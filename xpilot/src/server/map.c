@@ -516,7 +516,7 @@ bool Grok_map_options(void)
 /*
  * Return the team that is closest to this click position.
  */
-int Find_closest_team(int cx, int cy)
+int Find_closest_team(clpos pos)
 {
     int team = TEAM_NOT_SET, i;
     double closest = FLT_MAX, l;
@@ -526,7 +526,7 @@ int Find_closest_team(int cx, int cy)
 	if (base->team == TEAM_NOT_SET)
 	    continue;
 
-	l = Wrap_length(cx - base->pos.cx, cy - base->pos.cy);
+	l = Wrap_length(pos.cx - base->pos.cx, pos.cy - base->pos.cy);
 	if (l < closest) {
 	    team = base->team;
 	    closest = l;

@@ -444,7 +444,7 @@ void Xpmap_find_map_object_teams(void)
 	for (i = 0; i < World.NumTreasures; i++) {
 	    treasure_t *treasure = Treasures(i);
 
-	    team = Find_closest_team(treasure->pos.cx, treasure->pos.cy);
+	    team = Find_closest_team(treasure->pos);
 	    treasure->team = team;
 	    if (team == TEAM_NOT_SET)
 		warn("Couldn't find a matching team for the treasure.");
@@ -460,7 +460,7 @@ void Xpmap_find_map_object_teams(void)
 	for (i = 0; i < World.NumTargets; i++) {
 	    target_t *targ = Targets(i);
 
-	    team = Find_closest_team(targ->pos.cx, targ->pos.cy);
+	    team = Find_closest_team(targ->pos);
 	    if (team == TEAM_NOT_SET)
 		warn("Couldn't find a matching team for the target.");
 	    targ->team = team;
@@ -470,7 +470,7 @@ void Xpmap_find_map_object_teams(void)
 	    for (i = 0; i < World.NumCannons; i++) {
 		cannon_t *cannon = Cannons(i);
 
-		team = Find_closest_team(cannon->pos.cx, cannon->pos.cy);
+		team = Find_closest_team(cannon->pos);
 		if (team == TEAM_NOT_SET)
 		    warn("Couldn't find a matching team for the cannon.");
 		cannon->team = team;
@@ -480,7 +480,7 @@ void Xpmap_find_map_object_teams(void)
 	for (i = 0; i < World.NumFuels; i++) {
 	    fuel_t *fs = Fuels(i);
 
-	    team = Find_closest_team(fs->pos.cx, fs->pos.cy);
+	    team = Find_closest_team(fs->pos);
 	    if (team == TEAM_NOT_SET)
 		warn("Couldn't find a matching team for fuelstation.");
 	    fs->team = team;

@@ -487,7 +487,7 @@ void Compute_gravity(void);
 double Wrap_findDir(double dx, double dy);
 double Wrap_cfindDir(int dx, int dy);
 double Wrap_length(int dx, int dy);
-int Find_closest_team(int cx, int cy);
+int Find_closest_team(clpos pos);
 
 
 /*
