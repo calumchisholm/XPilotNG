@@ -1103,7 +1103,7 @@ void Fire_general_ecm(player_t *pl, int team, clpos_t pos)
 	     * should this be FPS dependant: damage = 4.0f * FPS * range; ?
 	     * No, i think.
 	     */
-	    damage = 24.0f * range;
+	    damage = 24.0 * range;
 
 	    if (p->item[ITEM_CLOAK] <= 1)
 		p->forceVisible += damage;
@@ -1133,11 +1133,11 @@ void Fire_general_ecm(player_t *pl, int team, clpos_t pos)
 
 	    if (!Player_is_robot(p) || !options.ecmsReprogramRobots || !pl) {
 		/* player is blinded by light flashes. */
-		long duration
-		    = (long)(damage * pow(0.75, (double)p->item[ITEM_SENSOR]));
+		double duration
+		    = (damage * pow(0.75, (double)p->item[ITEM_SENSOR]));
 		p->damaged += duration;
 		if (pl)
-		    Record_shove(p, pl, frame_loops + duration);
+		    Record_shove(p, pl, frame_loops + (long)duration);
 	    } else {
 		if (BIT(pl->lock.tagged, LOCK_PLAYER)
 		    && (pl->lock.distance < pl->sensor_range
