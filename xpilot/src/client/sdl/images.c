@@ -35,11 +35,11 @@ static int Image_init(image_t *img)
     img->frame_width = img->width / img->num_frames;
     img->data_width = pow2_ceil(img->width);
     img->data_height = pow2_ceil(img->height);
-
+    /*
     printf("Loaded image %s: w=%d, h=%d, fw=%d, dw=%d, dh=%d\n",
 	   img->filename, img->width, img->height, img->frame_width,
 	   img->data_width, img->data_height);
-
+    */
     img->data = calloc(img->data_width * img->data_height, sizeof(unsigned int));
     if (img->data == NULL) {
         error("Failed to allocate memory for: %s size %dx%d",
@@ -232,9 +232,6 @@ void Images_cleanup(void)
 int Bitmap_add(char *filename, int count, bool scalable)
 {
     image_t img;
-
-    printf("adding image: %s, %d, %d @ %d\n", 
-	   filename, count, scalable, num_images);
 
     img.filename   = xp_strdup(filename);
     img.num_frames = ABS(count);
