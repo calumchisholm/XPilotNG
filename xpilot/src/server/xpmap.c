@@ -31,29 +31,6 @@ static void Xpmap_target_to_polygon(int target_ind);
 static void Xpmap_cannon_to_polygon(int cannon_ind);
 static void Xpmap_wormhole_to_polygon(int wormhole_ind);
 
-#ifdef DEBUG
-void Xpmap_print(void)			/* Debugging only. */
-{
-    int x, y;
-
-    for (y = World.y - 1; y >= 0; y--) {
-	for (x = 0; x < World.x; x++)
-	    switch (World.block[x][y]) {
-	    case SPACE:
-		putchar(' ');
-		break;
-	    case BASE:
-		putchar('_');
-		break;
-	    default:
-		putchar('X');
-		break;
-	    }
-	putchar('\n');
-    }
-}
-#endif
-
 static void Xpmap_extra_error(int line_num)
 {
 #ifndef SILENT
@@ -87,6 +64,7 @@ static void Xpmap_missing_error(int line_num)
     }
 #endif
 }
+
 
 /*
  * Grok block based map data.
@@ -151,6 +129,7 @@ void Xpmap_grok_map_data(void)
     free(mapData);
     mapData = NULL;
 }
+
 
 void Xpmap_allocate_checks(void)
 {
@@ -309,10 +288,8 @@ static void Xpmap_place_block(int x, int y, int type)
     World.block[x][y] = type;
 }
 
-
-
 /*
- * Change read tags to internal data, possibly create objects
+ * Change read tags to internal data, create objects if 'create' is true.
  */
 void Xpmap_tags_to_internal_data(bool create)
 {
@@ -455,7 +432,6 @@ void Xpmap_tags_to_internal_data(bool create)
 }
 
 
-
 void Xpmap_find_map_object_teams(void)
 {
     int i;
@@ -511,9 +487,7 @@ void Xpmap_find_map_object_teams(void)
 	    fs->team = team;
 	}
     }
-
 }
-
 
 
 /*
@@ -549,7 +523,7 @@ void Xpmap_find_base_direction(void)
 	y = CLICK_TO_BLOCK(base->pos.cy);
 
 	/* First check upwards attractor */
-        if (y == World.y - 1 && World.block[x][0] == BASE_ATTRACTOR
+	if (y == World.y - 1 && World.block[x][0] == BASE_ATTRACTOR
 	    && BIT(World.rules->mode, WRAP_PLAY)) {
 	    if (att == -1 || dir == DIR_UP)
 		att = DIR_UP;
@@ -560,7 +534,7 @@ void Xpmap_find_base_direction(void)
 	}
 
 	/* then downwards */
-        if (y == 0 && World.block[x][World.y-1] == BASE_ATTRACTOR
+	if (y == 0 && World.block[x][World.y-1] == BASE_ATTRACTOR
 	    && BIT(World.rules->mode, WRAP_PLAY)) {
 	    if (att == -1 || dir == DIR_DOWN)
 		att = DIR_DOWN;
@@ -606,8 +580,10 @@ void Xpmap_find_base_direction(void)
 }
 
 
-
-
+/*
+ * The following functions is for converting the block based map data
+ * to polygons.
+ */
 
 /* number of vertices in polygon */
 #define N (2 + 12)
@@ -826,7 +802,6 @@ static void Xpmap_wormhole_to_polygon(int wormhole_ind)
  * 3: upper right vertex
  * 4: upper left vertex, second time
  */
-
 static void Xpmap_wall_poly(int bx, int by, char startblock,
 			    char endblock, int numblocks,
 			    int polystyle, int edgestyle)
@@ -898,6 +873,7 @@ static void Xpmap_wall_poly(int bx, int by, char startblock,
 	P_vertex(pos[i], edgestyle); 
     P_end_polygon();
 }
+
 
 static void Xpmap_walls_to_polygons(void)
 {
