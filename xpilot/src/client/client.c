@@ -907,7 +907,7 @@ static int init_polymap(void)
     parse_styles(&ptr);
 
     num_polygons = get_ushort(&ptr);
-    polygons = (xp_polygon_t *)malloc(num_polygons * sizeof(xp_polygon_t));
+    polygons = malloc(num_polygons * sizeof(xp_polygon_t));
     if (polygons == NULL) {
 	error("no memory for polygons");
 	exit(1);
@@ -986,7 +986,7 @@ static int init_polymap(void)
 	poly->bounds.h = max.y - min.y;
     }
     num_bases = *ptr++;
-    bases = (homebase_t *) malloc(num_bases * sizeof(homebase_t));
+    bases = malloc(num_bases * sizeof(homebase_t));
     if (bases == NULL) {
 	error("No memory for Map bases (%d)", num_bases);
 	exit(1);
@@ -1016,7 +1016,7 @@ static int init_polymap(void)
     }
     num_fuels = get_ushort(&ptr);
     if (num_fuels != 0) {
-	fuels = (fuelstation_t *) malloc(num_fuels * sizeof(fuelstation_t));
+	fuels = malloc(num_fuels * sizeof(fuelstation_t));
 	if (fuels == NULL) {
 	    error("No memory for Map fuels (%d)", num_fuels);
 	    exit(1);
@@ -1101,7 +1101,7 @@ static int init_blockmap(void)
 	}
     }
     if (num_bases != 0) {
-	bases = (homebase_t *) malloc(num_bases * sizeof(homebase_t));
+	bases = malloc(num_bases * sizeof(homebase_t));
 	if (bases == NULL) {
 	    error("No memory for Map bases (%d)", num_bases);
 	    return -1;
@@ -1109,7 +1109,7 @@ static int init_blockmap(void)
 	num_bases = 0;
     }
     if (num_fuels != 0) {
-	fuels = (fuelstation_t *) malloc(num_fuels * sizeof(fuelstation_t));
+	fuels = malloc(num_fuels * sizeof(fuelstation_t));
 	if (fuels == NULL) {
 	    error("No memory for Map fuels (%d)", num_fuels);
 	    return -1;
@@ -1117,7 +1117,7 @@ static int init_blockmap(void)
 	num_fuels = 0;
     }
     if (num_targets != 0) {
-	targets = (target_t *) malloc(num_targets * sizeof(target_t));
+	targets = malloc(num_targets * sizeof(target_t));
 	if (targets == NULL) {
 	    error("No memory for Map targets (%d)", num_targets);
 	    return -1;
@@ -1125,7 +1125,7 @@ static int init_blockmap(void)
 	num_targets = 0;
     }
     if (num_cannons != 0) {
-	cannons = (cannontime_t *) malloc(num_cannons * sizeof(cannontime_t));
+	cannons = malloc(num_cannons * sizeof(cannontime_t));
 	if (cannons == NULL) {
 	    error("No memory for Map cannons (%d)", num_cannons);
 	    return -1;
@@ -1190,31 +1190,19 @@ static int Map_init(void)
 static int Map_cleanup(void)
 {
     if (num_bases > 0) {
-	if (bases != NULL) {
-	    free(bases);
-	    bases = NULL;
-	}
+	XFREE(bases);
 	num_bases = 0;
     }
     if (num_fuels > 0) {
-	if (fuels != NULL) {
-	    free(fuels);
-	    fuels = NULL;
-	}
+	XFREE(fuels);
 	num_fuels = 0;
     }
     if (num_targets > 0) {
-	if (targets != NULL) {
-	    free(targets);
-	    targets = NULL;
-	}
+	XFREE(targets);
 	num_targets = 0;
     }
     if (num_cannons > 0) {
-	if (cannons != NULL) {
-	    free(cannons);
-	    cannons = NULL;
-	}
+	XFREE(cannons);
 	num_cannons = 0;
     }
     return 0;
@@ -1473,7 +1461,8 @@ int Handle_war(int robot_id, int killer_id)
 	return 0;
     }
     robot->war_id = killer_id;
-    sprintf(msg, "%s declares war on %s.", robot->nick_name, killer->nick_name);
+    sprintf(msg, "%s declares war on %s.",
+	    robot->nick_name, killer->nick_name);
     Add_message(msg);
     scoresChanged = 1;
 
@@ -1644,9 +1633,8 @@ static void update_timing(void)
 	newSecond = true;
 	clientFPS = frame_counter > 1 ? frame_counter : 1;
 	frame_counter = 0;
-    } else {
+    } else
 	newSecond = false;
-    }
 }
 
 int Handle_end(long server_loops)
@@ -2104,9 +2092,8 @@ int Handle_message(char *msg)
 
 int Handle_time_left(long sec)
 {
-    if (sec >= 0 && sec < 10 && (time_left > sec || sec == 0)) {
+    if (sec >= 0 && sec < 10 && (time_left > sec || sec == 0))
 	Play_beep();
-    }
     time_left = (sec >= 0) ? sec : 0;
     return 0;
 }
@@ -2303,103 +2290,83 @@ void Client_cleanup(void)
     }
     if (max_refuel > 0 && refuel_ptr) {
 	max_refuel = 0;
-	free(refuel_ptr);
-	refuel_ptr = 0;
+	XFREE(refuel_ptr);
     }
     if (max_connector > 0 && connector_ptr) {
 	max_connector = 0;
-	free(connector_ptr);
-	connector_ptr = 0;
+	XFREE(connector_ptr);
     }
     if (max_laser > 0 && laser_ptr) {
 	max_laser = 0;
-	free(laser_ptr);
-	laser_ptr = 0;
+	XFREE(laser_ptr);
     }
     if (max_missile > 0 && missile_ptr) {
 	max_missile = 0;
-	free(missile_ptr);
-	missile_ptr = 0;
+	XFREE(missile_ptr);
     }
     if (max_ball > 0 && ball_ptr) {
 	max_ball = 0;
-	free(ball_ptr);
-	ball_ptr = 0;
+	XFREE(ball_ptr);
     }
     if (max_ship > 0 && ship_ptr) {
 	max_ship = 0;
-	free(ship_ptr);
-	ship_ptr = 0;
+	XFREE(ship_ptr);
     }
     if (max_mine > 0 && mine_ptr) {
 	max_mine = 0;
-	free(mine_ptr);
-	mine_ptr = 0;
+	XFREE(mine_ptr);
     }
     if (max_ecm > 0 && ecm_ptr) {
 	max_ecm = 0;
-	free(ecm_ptr);
-	ecm_ptr = 0;
+	XFREE(ecm_ptr);
     }
     if (max_trans > 0 && trans_ptr) {
 	max_trans = 0;
-	free(trans_ptr);
-	trans_ptr = 0;
+	XFREE(trans_ptr);
     }
     if (max_paused > 0 && paused_ptr) {
 	max_paused = 0;
-	free(paused_ptr);
-	paused_ptr = 0;
+	XFREE(paused_ptr);
     }
     if (max_appearing > 0 && appearing_ptr) {
 	max_appearing = 0;
-	free(appearing_ptr);
-	appearing_ptr = 0;
+	XFREE(appearing_ptr);
     }
     if (max_radar > 0 && radar_ptr) {
 	max_radar = 0;
-	free(radar_ptr);
-	radar_ptr = 0;
+	XFREE(radar_ptr);
     }
     if (max_vcannon > 0 && vcannon_ptr) {
 	max_vcannon = 0;
-	free(vcannon_ptr);
-	vcannon_ptr = 0;
+	XFREE(vcannon_ptr);
     }
     if (max_vfuel > 0 && vfuel_ptr) {
 	max_vfuel = 0;
-	free(vfuel_ptr);
-	vfuel_ptr = 0;
+	XFREE(vfuel_ptr);
     }
     if (max_vbase > 0 && vbase_ptr) {
 	max_vbase = 0;
-	free(vbase_ptr);
-	vbase_ptr = 0;
+	XFREE(vbase_ptr);
     }
     if (max_vdecor > 0 && vdecor_ptr) {
 	max_vdecor = 0;
-	free(vdecor_ptr);
-	vdecor_ptr = 0;
+	XFREE(vdecor_ptr);
     }
     if (max_itemtype > 0 && itemtype_ptr) {
 	max_itemtype = 0;
-	free(itemtype_ptr);
-	itemtype_ptr = 0;
+	XFREE(itemtype_ptr);
     }
     if (max_wreckage > 0 && wreckage_ptr) {
 	max_wreckage = 0;
-	free(wreckage_ptr);
-	wreckage_ptr = 0;
+	XFREE(wreckage_ptr);
     }
     if (max_asteroids > 0 && asteroid_ptr) {
 	max_asteroids = 0;
-	free(asteroid_ptr);
-	asteroid_ptr = 0;
+	XFREE(asteroid_ptr);
     }
     if (max_wormholes > 0 && wormhole_ptr) {
 	max_wormholes = 0;
-	free(wormhole_ptr);
-	wormhole_ptr = 0;
+	XFREE(wormhole_ptr);
     }
     Map_cleanup();
     Paint_cleanup();
