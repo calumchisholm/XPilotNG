@@ -471,14 +471,3 @@ void Talk_cut_from_messages(XButtonEvent * xbutton)
 {
 
 }
-
-void Talk_reverse_cut()
-{
-    /*
-     * think twice: it can't work (yet) without hacking all the
-     * c&p stuff even more. thus only unemphasize:
-     */
-    if (selectionAndHistory && selection.draw.state == SEL_EMPHASIZED) {
-	selection.draw.state = SEL_SELECTED;
-    }
-}

@@ -35,7 +35,6 @@
 #define TALK_FAST_SPECIAL_TALK_CHAR	'#'
 
 extern int Talk_macro(int ind);
-extern void Talk_reverse_cut(void);
 extern void Store_talk_macro_options(void);
 
 /* store message in history, when it is sent? */

@@ -1,15 +1,14 @@
 /*
  * XPilotNG, an XPilot-like multiplayer space war game.
  *
- * Copyright (C) 1991-2001 by
+ * Copyright (C) 1991-2004 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
  *      Bert Gijsbers        <bert@xpilot.org>
  *      Dick Balaska         <dick@xpilot.org>
- *
- * Copyright (C) TODO      Erik Andersson
- * Copyright (C) 2003-2004 Kristian Söderblom <kps@users.sourceforge.net>
+ *      Erik Andersson       <maximan@users.sourceforge.net>
+ *      Kristian Söderblom   <kps@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -767,10 +766,7 @@ void Add_message(const char *message)
     const char		*msg2;
     bool		is_drawn_talk_message	= false; /* not pending */
     int			last_msg_index;
-    bool		show_reverse_scroll	= false;
     bool		scrolling		= false; /* really moving */
-
-    show_reverse_scroll = instruments.showReverseScroll;
 
     is_game_msg = Msg_is_game_msg(message);
     if (!is_game_msg) {
@@ -811,26 +807,14 @@ void Add_message(const char *message)
         last_msg_index--; /* make it an index */
 
 	/*
-	 * if show_reverse_scroll, it will really _scroll if there were
-	 * already maxMessages (one will be added now)
-	 */
-	if (show_reverse_scroll && last_msg_index == maxMessages - 1)
-	    scrolling = true;
-
-	/*
 	 * keep the emphasizing (`jumping' from talk window to talk messages)
 	 */
 	if (selection.keep_emphasizing) {
 	    selection.keep_emphasizing = false;
 	    selection.talk.state = SEL_NONE;
 	    selection.draw.state = SEL_EMPHASIZED;
-	    if (!show_reverse_scroll) {
-		selection.draw.y1 = -1;
-		selection.draw.y2 = -1;
-	    } else if (show_reverse_scroll) {
-		selection.draw.y1 = last_msg_index + 1;
-		selection.draw.y2 = last_msg_index + 1;
-	    }
+	    selection.draw.y1 = -1;
+	    selection.draw.y2 = -1;
 	} /* talk window emphasized */
     } /* talk messages */
 
@@ -851,8 +835,7 @@ void Add_message(const char *message)
 	&& selection.draw.state == SEL_EMPHASIZED ) {
 
 	if ((scrolling && selection.draw.y2 == 0)
-	      || (!show_reverse_scroll && selection.draw.y1
-		  == maxMessages - 1)) {
+	    || (selection.draw.y1 == maxMessages - 1)) {
 	    /*
 	     * the emphasizing vanishes, as it's `last' line
 	     * is `scrolled away'
@@ -865,7 +848,7 @@ void Add_message(const char *message)
 		    selection.draw.x1 = 0;
 		else
 		    selection.draw.y1--;
-	    } else if (!show_reverse_scroll) {
+	    } else {
 		selection.draw.y1++;
 		if (selection.draw.y2 == maxMessages - 1)
 		    selection.draw.x2 = msg_set[selection.draw.y2]->len - 1;
@@ -1022,30 +1005,19 @@ void Add_roundend_messages(other_t **order)
  */
 void Print_messages_to_stdout(void)
 {
-    int i, k;
-    int direction, offset;
+    int i;
 
     if (!selectionAndHistory)
 	return;
 
-    if (instruments.showReverseScroll) {
-	direction = -1;
-	offset = maxMessages - 1;
-    } else {
-	direction = 1;
-	offset = 0;
-    }
-
     xpprintf("[talk messages]\n");
-    for (k = 0; k < maxMessages; k++) {
-	i = direction * k + offset;
+    for (i = 0; i < maxMessages; i++) {
 	if (TalkMsg[i] && TalkMsg[i]->len > 0)
 	    xpprintf("  %s\n", TalkMsg[i]->txt);
     }
 
     xpprintf("[server messages]\n");
-    for (k = maxMessages - 1; k >= 0; k--) {
-	i = direction * k + offset;
+    for (i = maxMessages - 1; i >= 0; i--) {
 	if (GameMsg[i] && GameMsg[i]->len > 0)
 	    xpprintf("  %s\n", GameMsg[i]->txt);
     }

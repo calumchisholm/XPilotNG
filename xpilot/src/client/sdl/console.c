@@ -133,9 +133,3 @@ void command_handler(ConsoleInformation *con, char *command)
     Net_talk(command);
     Console_hide();
 }
-
-/* kps hack */
-void Talk_reverse_cut(void)
-{
-    return;
-}

@@ -70,7 +70,6 @@ typedef struct {
     bool showMessages;
     bool showMapRadar;
     bool showSlidingRadar;
-    bool showReverseScroll;
     bool useBallMessageScan;
     bool useClientRanker;
     bool useAMPMFormatClock;

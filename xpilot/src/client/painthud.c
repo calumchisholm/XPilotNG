@@ -1,15 +1,14 @@
 /*
  * XPilotNG, an XPilot-like multiplayer space war game.
  *
- * Copyright (C) 1991-2001 by
+ * Copyright (C) 1991-2004 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
  *      Bert Gijsbers        <bert@xpilot.org>
  *      Dick Balaska         <dick@xpilot.org>
- *
- * Copyright (C) TODO      Erik Andersson
- * Copyright (C) 2003-2004 Kristian Söderblom <kps@users.sourceforge.net>
+ *      Erik Andersson       <maximan@users.sourceforge.net>
+ *      Kristian Söderblom   <kps@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -760,9 +759,7 @@ void Paint_messages(void)
 	last_msg_index--; /* make it an index */
     }
 
-    for (i = (instruments.showReverseScroll ? 2 * maxMessages - 1 : 0);
-	 (instruments.showReverseScroll ? i >= 0 : i < 2 * maxMessages);
-	 i += (instruments.showReverseScroll ? -1 : 1)) {
+    for (i = 0; i < 2 * maxMessages; i++) {
 	if (i < maxMessages)
 	    msg = TalkMsg[i];
 	else
@@ -836,8 +833,8 @@ void Paint_messages(void)
 	 */
 	if (selectionAndHistory && selection.draw.state == SEL_EMPHASIZED
 	    && i < maxMessages
-	    && TALK_MSG_SCREENPOS(last_msg_index,i) >= selection.draw.y1
-	    && TALK_MSG_SCREENPOS(last_msg_index,i) <= selection.draw.y2) {
+	    && i >= selection.draw.y1
+	    && i <= selection.draw.y2) {
 
 	    /*
 	     * three strings (ptr), where they begin (xoff) and their
@@ -857,15 +854,13 @@ void Paint_messages(void)
 	    char	*ptr3 = NULL;
 	    int		xoff3 = 0, l3 = 0;
 
-	    if (TALK_MSG_SCREENPOS(last_msg_index,i) > selection.draw.y1
-		 && TALK_MSG_SCREENPOS(last_msg_index,i) < selection.draw.y2) {
+	    if (i > selection.draw.y1 && i < selection.draw.y2) {
 		    /* all emphasized on this line */
 		    /*xxxxxxxxx*/
 		ptr2 = msg->txt;
 		l2 = len;
 		xoff2 = 0;
-	    } else if (TALK_MSG_SCREENPOS(last_msg_index,i)
-		       == selection.draw.y1) {
+	    } else if (i == selection.draw.y1) {
 		    /* first/only line */
 		    /*___xxx[___]*/
 		ptr = msg->txt;
@@ -881,8 +876,7 @@ void Paint_messages(void)
 		    xoff2 = XTextWidth(messageFont, msg->txt,
 				       selection.draw.x1);
 
-		    if (TALK_MSG_SCREENPOS(last_msg_index,i)
-			< selection.draw.y2) {
+		    if (i < selection.draw.y2) {
 			    /* first line */
 			    /*___xxxxxx*/
 			    /*     ^   */

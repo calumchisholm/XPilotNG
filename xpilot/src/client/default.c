@@ -31,10 +31,6 @@ char default_version[] = VERSION;
 
 static double	hudScale;	/* Scale for HUD drawing */
 
-/*
- * kps TODO:
- * make sure this does not exit if nickname is set using \set command.
- */
 static bool Set_nickName(xp_option_t *opt, const char *value)
 {
     UNUSED_PARAM(opt);
@@ -425,14 +421,6 @@ static bool Set_showSlidingRadar(xp_option_t *opt, bool val)
     UNUSED_PARAM(opt);
     instruments.showSlidingRadar = val;
     Paint_sliding_radar();
-    return true;
-}
-
-static bool Set_showReverseScroll(xp_option_t *opt, bool val)
-{
-    UNUSED_PARAM(opt);
-    instruments.showReverseScroll = val;
-    Talk_reverse_cut();
     return true;
 }
 
@@ -1054,14 +1042,6 @@ xp_option_t default_options[] = {
 	NULL,
 	XP_OPTFLAG_CONFIG_DEFAULT,
 	"The maximum number of messages to display at the same time.\n"),
-
-    XP_BOOL_OPTION(
-	"reverseScroll",
-	false,
-	&instruments.showReverseScroll,
-	Set_showReverseScroll,
-	XP_OPTFLAG_CONFIG_DEFAULT,
-	"Reverse scroll direction of messages.\n"),
 
     XP_INT_OPTION(
 	"messagesToStdout",

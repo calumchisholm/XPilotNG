@@ -50,11 +50,6 @@
 /* constants end */
 
 
-/* which index a message actually has (consider reverse scroll) */
-#define TALK_MSG_SCREENPOS(total, pos) \
-    (instruments.showReverseScroll ? (total)-(pos) : (pos))
-
-
 /*
  * Global objects.
  */

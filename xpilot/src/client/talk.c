@@ -1308,7 +1308,6 @@ void Talk_cut_from_messages(XButtonEvent* xbutton)
 	 */
 	char	cut_str[MSG_LEN]; /* for fetching the messages line by line */
 	int	cut_str_len;
-	int	next = 0;	/* how to walk through the messages */
 	int 	current_line;	/* when going through a multi line selection */
 
 
@@ -1361,7 +1360,7 @@ void Talk_cut_from_messages(XButtonEvent* xbutton)
 	    c2.x	= 0;
 	}
 	/* cut started at end of line; jump to next if possible */
-	ptr = TalkMsg[TALK_MSG_SCREENPOS(last_msg_index, c1.y)];
+	ptr = TalkMsg[c1.y];
 	if ((c1.x > XTextWidth(messageFont, ptr->txt, (int)ptr->len)
 	    || c1.x_off == 1)  &&  c1.y < c2.y) {
 	    c1.x	= 0;
@@ -1380,7 +1379,7 @@ void Talk_cut_from_messages(XButtonEvent* xbutton)
 	    c1.str_index
 		= Text_width_to_pos(messageFont, ptr->txt, ptr->len, c1.x);
 
-	ptr = TalkMsg[TALK_MSG_SCREENPOS(last_msg_index,c2.y)];
+	ptr = TalkMsg[c2.y];
 	c2.str_index = 0;
 	if (c2.x_off == 1)
 	    c2.str_index = ptr->len - 1;
@@ -1451,18 +1450,12 @@ void Talk_cut_from_messages(XButtonEvent* xbutton)
 	selection.draw.y1 = c1.y;
 	selection.draw.y2 = c2.y;
 
-	current_line = TALK_MSG_SCREENPOS(last_msg_index, selection.draw.y1);
-
-	/* how to walk through the messages */
-	if (instruments.showReverseScroll)
-	    next = -1;
-	else
-	    next = +1;
+	current_line = selection.draw.y1;
 
 	/* fetch the first line */
 	strlcpy(cut_str, TalkMsg[current_line]->txt, sizeof(cut_str));
 	cut_str_len = TalkMsg[current_line]->len;
-	current_line += next;
+	current_line++;
 
 	if (selection.draw.y1 == selection.draw.y2) {
 	/* ...it's the only line */
@@ -1483,7 +1476,7 @@ void Talk_cut_from_messages(XButtonEvent* xbutton)
 	    for (i = selection.draw.y1 + 1; i < selection.draw.y2; i++) {
 		strlcpy(cut_str, TalkMsg[current_line]->txt, sizeof(cut_str));
 		cut_str_len = TalkMsg[current_line]->len;
-		current_line += next;
+		current_line++;
 		strlcat(selection.txt, cut_str, selection.txt_size);
 		strlcat(selection.txt, "\n", selection.txt_size);
 	    }
@@ -1491,7 +1484,7 @@ void Talk_cut_from_messages(XButtonEvent* xbutton)
 	    /* the last line */
 	    strlcpy(cut_str, TalkMsg[current_line]->txt, sizeof(cut_str));
 	    cut_str_len = TalkMsg[current_line]->len;
-	    current_line += next;
+	    current_line++;
 	    strncat(selection.txt, cut_str, (size_t)selection.draw.x2 + 1);
 	    if (c2.x_off == 1)
 		strlcat(selection.txt, "\n", selection.txt_size);
@@ -1518,14 +1511,4 @@ void Talk_cut_from_messages(XButtonEvent* xbutton)
     } else {
 	return; /* neither ButtonPress nor ButtonRelease ? */
     }
-}
-
-void Talk_reverse_cut(void)
-{
-    /*
-     * think twice: it can't work (yet) without hacking all the
-     * c&p stuff even more. thus only unemphasize:
-     */
-    if (selectionAndHistory && selection.draw.state == SEL_EMPHASIZED)
-	selection.draw.state = SEL_SELECTED;
 }

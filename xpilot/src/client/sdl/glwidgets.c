@@ -3030,7 +3030,7 @@ GLWidget *Init_MainWidget( font_data *font )
     }
     if ( !AppendGLWidgetList(&(tmp->children),
     	    	(wid_info->chat_msgs = Init_ListWidget(200 + wid_info->BORDER,wid_info->BORDER,
-		&nullRGBA,&nullRGBA,&greenRGBA,LW_DOWN,LW_RIGHT,instruments.showReverseScroll)))
+		&nullRGBA,&nullRGBA,&greenRGBA,LW_DOWN,LW_RIGHT,false)))
     	) {
 	error("Failed to initialize chat msg list");
 	Close_Widget(&tmp);
@@ -3038,7 +3038,7 @@ GLWidget *Init_MainWidget( font_data *font )
     }
     if ( !AppendGLWidgetList(&(tmp->children),
     	    (wid_info->game_msgs = Init_ListWidget(wid_info->BORDER,tmp->bounds.h-wid_info->BORDER,
-	    &nullRGBA,&nullRGBA,&greenRGBA,LW_UP,LW_RIGHT,!instruments.showReverseScroll)))
+	    &nullRGBA,&nullRGBA,&greenRGBA,LW_UP,LW_RIGHT,true)))
 	) {
 	error("Failed to initialize game msg list");
 	Close_Widget(&tmp);
