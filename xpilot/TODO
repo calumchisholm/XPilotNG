@@ -132,3 +132,8 @@ Developer: kps
 
 Task: Turn the item images on the hud in sdl client the right way (upside down
 atm)
+
+Task: Add support for MinGW/MSys build environment and making console 
+server work under Windows
+Developer: marvn
+
