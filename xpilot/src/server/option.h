@@ -95,7 +95,6 @@ extern struct options {
     double	playerWallFriction;
     double	objectWallBounceBrakeFactor;
     double	objectWallBounceLifeFactor;
-    double	wallBounceFuelDrainMult;
     double	wallBounceDestroyItemProb;
     double	afterburnerPowerMult;
 

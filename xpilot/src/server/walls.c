@@ -30,7 +30,6 @@
 char walls_version[] = VERSION;
 
 struct move_parameters mp;
-double wallBounceExplosionMult;
 static char msg[MSG_LEN];
 
 /* polygon map related stuff */
@@ -140,8 +139,6 @@ void Move_init(world_t *world)
     LIMIT(options.playerWallFriction, 0, FLT_MAX);
     LIMIT(options.objectWallBounceBrakeFactor, 0, 1);
     LIMIT(options.objectWallBounceLifeFactor, 0, 1);
-    LIMIT(options.wallBounceFuelDrainMult, 0, 1000);
-    wallBounceExplosionMult = sqrt(options.wallBounceFuelDrainMult);
 
     mp.obj_bounce_mask = 0;
     if (options.sparksWallBounce)
@@ -647,7 +644,8 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 		? options.maxShieldedWallBounceSpeed
 		: options.maxUnshieldedWallBounceSpeed;
 
-	if (Player_uses_emergency_shield(pl))
+	if (Player_uses_emergency_shield(pl)
+	    && max_speed < 100.0)
 	    max_speed = 100.0;
 
 	/* only use armor if neccessary */
@@ -667,31 +665,15 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 	    return;
 	}
 
-	/*
-	 * Small explosion and fuel loss if survived a hit on a wall.
-	 * This doesn't affect the player as the explosion is sparks
-	 * which don't collide with player.
-	 */
-	cost *= 0.9; /* used to depend on bounce angle, .5 .. 1.0 */
-	if (!Player_uses_emergency_shield(pl)) {
-	    Player_add_fuel(pl, -cost * options.wallBounceFuelDrainMult);
+	if (!Player_uses_emergency_shield(pl))
 	    Item_damage(pl, options.wallBounceDestroyItemProb);
-	}
-	if (pl->fuel.sum == 0.0 && options.wallBounceFuelDrainMult != 0.0) {
-	    if (type == TARGET)
-		Player_crash(pl, CrashTarget, mapobj_ind, 1);
-	    else
-		Player_crash(pl, CrashWallNoFuel, NO_IND, 1);
-	    return;
-	}
-	if (cost) {
-	    sound_play_sensors(pl->pos, PLAYER_BOUNCED_SOUND);
-	    if (type == TARGET) {
-		cost *= options.wallBounceFuelDrainMult / 4.0;
-		Object_hits_target(OBJ_PTR(pl),
-				   Target_by_index(world, mapobj_ind), cost);
-	    }
-	}
+
+	sound_play_sensors(pl->pos, PLAYER_BOUNCED_SOUND);
+
+	if (cost && type == TARGET)
+	    Object_hits_target(OBJ_PTR(pl),
+			       Target_by_index(world, mapobj_ind),
+			       cost / 4.0);
     }
 
     /*

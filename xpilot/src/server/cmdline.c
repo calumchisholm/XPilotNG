@@ -792,7 +792,7 @@ static option_desc opts[] = {
     {
 	"maxShieldedWallBounceSpeed",
 	"maxShieldedBounceSpeed",
-	"50.0",
+	"100.0",
 	&options.maxShieldedWallBounceSpeed,
 	valReal,
 	Move_init,
@@ -802,7 +802,7 @@ static option_desc opts[] = {
     {
 	"maxUnshieldedWallBounceSpeed",
 	"maxUnshieldedBounceSpeed",
-	"20.0",
+	"90.0",
 	&options.maxUnshieldedWallBounceSpeed,
 	valReal,
 	Move_init,
@@ -838,7 +838,7 @@ static option_desc opts[] = {
     {
 	"playerWallBounceBrakeFactor",
 	"playerWallBrake",
-	"0.89",
+	"0.5",
 	&options.playerWallBounceBrakeFactor,
 	valReal,
 	Move_init,
@@ -874,16 +874,6 @@ static option_desc opts[] = {
 	valReal,
 	Move_init,
 	"Factor to reduce the life of objects after bouncing (0 to 1).\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    {
-	"wallBounceFuelDrainMult",
-	"wallBounceDrain",
-	"1.0",
-	&options.wallBounceFuelDrainMult,
-	valReal,
-	Move_init,
-	"Multiplication factor for player wall bounce fuel cost.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
