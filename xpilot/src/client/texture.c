@@ -1,5 +1,4 @@
-/* $Id$
- *
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -74,7 +73,6 @@ typedef struct texture_info {
  */
 #define static const
 #include "../../lib/textures/rock4.xpm"
-#include "../../lib/textures/ball.xpm"
 #undef static
 
 static texture_info_t wall_texture_info = {
@@ -89,14 +87,6 @@ static texture_info_t decor_texture_info = {
     "decor",
     &decorTextureFile,
     rock4_xpm,
-    None,
-    TextureUnloaded
-};
-
-static texture_info_t ball_texture_info = {
-    "ball",
-    &ballTextureFile,
-    ball_xpm,
     None,
     TextureUnloaded
 };
@@ -218,13 +208,5 @@ Pixmap Texture_decor(void)
     xp_bitmap_t *bmp;
     if (!blockBitmaps) return None;
     if ((bmp = Bitmap_get(top, BM_DECOR_TEXTURE, 0)) == NULL) return None;
-    return bmp->bitmap;
-}
-
-Pixmap Texture_ball(void)
-{
-    xp_bitmap_t *bmp;
-    if (!blockBitmaps) return None;
-    if ((bmp = Bitmap_get(top, BM_BALL_TEXTURE, 0)) == NULL) return None;
     return bmp->bitmap;
 }

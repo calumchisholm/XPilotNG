@@ -1,5 +1,4 @@
-/* $Id$
- *
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -24,11 +23,10 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
-/* 
+/*
  * Load a texture into a pixmap.
  */
 extern Pixmap Texture_wall(void);
 extern Pixmap Texture_decor(void);
-extern Pixmap Texture_ball(void);
 
 #endif

@@ -1,5 +1,4 @@
-/* $Id$
- *
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -69,7 +68,7 @@
 #define SHOW_FILLED_DECOR	(1L << 22)
 #define SHOW_TEXTURED_DECOR	(1L << 23)
 #define SHOW_CLOCK_AMPM_FORMAT	(1L << 24)
-#define SHOW_TEXTURED_BALLS	(1L << 25)
+/*			Removed SHOW_TEXTURED_BALLS */
 #define SHOW_REVERSE_SCROLL	(1L << 26)
 #define SHOW_SHIP_ID            (1L << 27)
 #define SHOW_HR	                (1L << 28)

@@ -1,5 +1,4 @@
-/* $Id$
- *
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -89,8 +88,6 @@ position *wreckageShapes[NUM_WRECKAGE_SHAPES][NUM_WRECKAGE_POINTS];
 
 u_byte	debris_colors;		/* Number of debris intensities from server */
 bool	markingLights;
-char	*ballTextureFile;	/* Filename of ball texture */
-
 
 extern XGCValues	gcv;
 extern setup_t		*Setup;

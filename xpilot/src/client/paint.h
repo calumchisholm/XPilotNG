@@ -143,7 +143,6 @@ extern char	modBankStr[][MAX_CHARS];	/* modifier banks strings */
 extern char	*texturePath;		/* Path list of texture directories */
 extern char	*wallTextureFile;	/* Filename of wall texture */
 extern char	*decorTextureFile;	/* Filename of decor texture */
-extern char	*ballTextureFile;	/* Filename of ball texture */
 
 extern int	(*radarDrawRectanglePtr)	/* Function to draw player on radar */
 		(Display *disp, Drawable d, GC gc,

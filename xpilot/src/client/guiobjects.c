@@ -50,7 +50,6 @@
 #include "keys.h"
 #include "rules.h"
 #include "setup.h"
-#include "texture.h"
 #include "paint.h"
 #include "paintdata.h"
 #include "record.h"
@@ -83,44 +82,10 @@ static int blockBitmapShips = 0; /* Turned this off because the images drawn
 void Gui_paint_ball(int x, int y)
 {
     if (!blockBitmaps) {
-	static Pixmap   ballTile = None;
-
-	if (BIT(instruments, SHOW_TEXTURED_BALLS)) {
-	    if (ballTile == None) {
-		ballTile = Texture_ball();
-		if (ballTile == None) {
-		    CLR_BIT(instruments, SHOW_TEXTURED_BALLS);
-		}
-	    }
-	    if (ballTile != None) {
-		XSetTile(dpy, gc, ballTile);
-		XSetFillStyle(dpy, gc, FillTiled);
-	    }
-	}
-	else {
-	    ballTile = None;
-	}
-
 	x = X(x);
 	y = Y(y);
-	if (ballTile != None) {
-	    XSetTSOrigin(dpy, gc, WINSCALE(x - BALL_RADIUS), WINSCALE(y - BALL_RADIUS));
-	    rd.fillArc(dpy, p_draw, gc,
-		WINSCALE(x - BALL_RADIUS), WINSCALE(y - BALL_RADIUS),
-		     WINSCALE(2*BALL_RADIUS), WINSCALE(2*BALL_RADIUS),
-		     0, 64*360);
-	    Erase_rectangle(WINSCALE(x - BALL_RADIUS),
-			    WINSCALE(y - BALL_RADIUS),
-			    WINSCALE(2*BALL_RADIUS),
-			    WINSCALE(2*BALL_RADIUS));
-	}
-	else {
-	    Arc_add(WHITE, x - BALL_RADIUS, y - BALL_RADIUS,
+	Arc_add(WHITE, x - BALL_RADIUS, y - BALL_RADIUS,
 		    2*BALL_RADIUS, 2*BALL_RADIUS, 0, 64*360);
-	}
-	if (ballTile != None) {
-	    XSetFillStyle(dpy, gc, FillSolid);
-	}
     }
     else {
 	x = SCALEX(x);

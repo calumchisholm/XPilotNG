@@ -1110,20 +1110,6 @@ struct option {
 	"Specify a XPM format pixmap file to load the decor texture from.\n"
     },
     {
-	"texturedBalls",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"Draw the balls with a texture specified by the ballTextureFile option.\n"
-    },
-    {
-	"ballTextureFile",
-	NULL,
-	"",
-	KEY_DUMMY,
-	"Specify a XPM format pixmap file to load the ball texture from.\n"
-    },
-    {
 	"targetRadarColor",
 	NULL,
 	"4",
@@ -2930,7 +2916,6 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_bit_resource(rDB, "outlineDecor", &instruments, SHOW_OUTLINE_DECOR);
     Get_bit_resource(rDB, "filledDecor", &instruments, SHOW_FILLED_DECOR);
     Get_bit_resource(rDB, "texturedDecor", &instruments, SHOW_TEXTURED_DECOR);
-    Get_bit_resource(rDB, "texturedBalls", &instruments, SHOW_TEXTURED_BALLS);
     Get_bit_resource(rDB, "reverseScroll", &instruments, SHOW_REVERSE_SCROLL);
     Get_bit_resource(rDB, "showID", &instruments, SHOW_SHIP_ID);
 
@@ -2976,8 +2961,6 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     wallTextureFile = strdup(resValue);
     Get_resource(rDB, "decorTextureFile", resValue, sizeof resValue);
     decorTextureFile = strdup(resValue);
-    Get_resource(rDB, "ballTextureFile", resValue, sizeof resValue);
-    ballTextureFile = strdup(resValue);
 
     Get_int_resource(rDB, "maxFPS", &maxFPS);
     oldMaxFPS = maxFPS;
@@ -3146,10 +3129,6 @@ void	defaultCleanup(void)
     if (decorTextureFile) {
 	free(decorTextureFile);
 	decorTextureFile = NULL;
-    }
-    if (ballTextureFile) {
-	free(ballTextureFile);
-	ballTextureFile = NULL;
     }
     if (shipShape) {
 	free(shipShape);

@@ -144,7 +144,6 @@ static int Config_create_showDecor(int widget_desc, int *height);
 static int Config_create_outlineDecor(int widget_desc, int *height);
 static int Config_create_filledDecor(int widget_desc, int *height);
 static int Config_create_texturedDecor(int widget_desc, int *height);
-static int Config_create_texturedBalls(int widget_desc, int *height);
 static int Config_create_maxFPS(int widget_desc, int *height);
 static int Config_create_maxMessages(int widget_desc, int *height);
 static int Config_create_messagesToStdout(int widget_desc, int *height);
@@ -279,7 +278,6 @@ static int		(*config_creator[])(int widget_desc, int *height) = {
     Config_create_outlineDecor,
     Config_create_filledDecor,
     Config_create_texturedDecor,
-    Config_create_texturedBalls,
     Config_create_maxFPS,
 #ifdef SOUND
     Config_create_maxVolume,
@@ -1024,15 +1022,6 @@ static int Config_create_texturedDecor(int widget_desc, int *height)
 			      (void *) SHOW_TEXTURED_DECOR);
 }
 
-static int Config_create_texturedBalls(int widget_desc, int *height)
-{
-    return Config_create_bool(widget_desc, height, "texturedBalls",
-			      BIT(instruments, SHOW_TEXTURED_BALLS)
-				  ? true : false,
-			      Config_update_instruments,
-			      (void *) SHOW_TEXTURED_BALLS);
-}
-
 #ifdef SOUND
 static int Config_create_maxVolume(int widget_desc, int *height)
 {
@@ -1614,7 +1603,6 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_bool(fp, "outlineDecor", BIT(instruments, SHOW_OUTLINE_DECOR));
     Config_save_bool(fp, "filledDecor", BIT(instruments, SHOW_FILLED_DECOR));
     Config_save_bool(fp, "texturedDecor", BIT(instruments, SHOW_TEXTURED_DECOR));
-    Config_save_bool(fp, "texturedBalls", BIT(instruments, SHOW_TEXTURED_BALLS));
     Config_save_int(fp, "receiveWindowSize", receive_window_size);
     Config_save_int(fp, "charsPerSecond", charsPerSecond);
     Config_save_bool(fp, "markingLights", markingLights);
