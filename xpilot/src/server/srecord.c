@@ -78,7 +78,7 @@ static void Convert_from_host(void *start, int len, int type)
 	return;
     case ERRNO:
 	iptr = start;
-	iend = start + len / 4;
+	iend = iptr + len / 4;
 	while (iptr < iend) {
 	    err = htonl(*iptr);
 	    switch (err) {
@@ -123,7 +123,7 @@ static void Convert_to_host(void *start, int len, int type)
 	return;
     case ERRNO:
 	iptr = start;
-	iend = start + len / 4;
+	iend = iptr + len / 4;
 	while (iptr < iend) {
 	    err = ntohl(*iptr);
 	    switch (err) {
