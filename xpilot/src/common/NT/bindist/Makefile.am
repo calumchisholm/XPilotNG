@@ -1,1 +1,1 @@
-noinst_DATA = README.txt READMEbin.txt ServerMOTD.txt
+EXTRA_DIST = XPilot.nsi xp_off.bmp  creditsUpdate.pl  xp_on.bmp makeDistribution

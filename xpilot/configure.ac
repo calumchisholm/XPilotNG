@@ -263,8 +263,8 @@ AC_CHECK_HEADERS([ \
 	X11/Xmd.h \
 	])
 
-dnl 	X11/extensions/Xdbe.h \
-dnl	X11/extensions/multibuf.h \
+dnl 	X11/extensions/Xdbe.h
+dnl	X11/extensions/multibuf.h
 
 
 dnl  Checks for typedefs, structures, and compiler characteristics.
@@ -358,9 +358,13 @@ AC_CONFIG_FILES([ \
 	src/Makefile \
 	src/common/Makefile \
 	src/common/version.h \
+	src/common/NT/Makefile \
+	src/common/NT/bindist/Makefile \
 	src/client/Makefile \
 	src/client/items/Makefile \
 	src/client/sdl/Makefile \
+	src/client/NT/Makefile \
+	src/client/NT/res/Makefile \
 	src/server/Makefile \
 	src/replay/Makefile \
 	src/replay/tools/Makefile \

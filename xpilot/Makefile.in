@@ -184,6 +184,7 @@ target_os = @target_os@
 target_vendor = @target_vendor@
 SUBDIRS = src lib doc
 dist_pkgdata_DATA = mapconvert.py
+EXTRA_DIST = XPilot.dsw
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 

@@ -13,16 +13,13 @@
 # PARTICULAR PURPOSE.
 
 @SET_MAKE@
-
-SOURCES = $(libxpcommon_a_SOURCES)
-
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
-top_builddir = ../..
+top_builddir = ../../..
 am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
 INSTALL = @INSTALL@
 install_sh_DATA = $(install_sh) -c -m 644
@@ -37,44 +34,17 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_triplet = @host@
-subdir = src/common
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/version.h.in
+subdir = src/client/NT
+DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h
-CONFIG_CLEAN_FILES = version.h
-AR = ar
-ARFLAGS = cru
-LIBRARIES = $(noinst_LIBRARIES)
-libxpcommon_a_AR = $(AR) $(ARFLAGS)
-libxpcommon_a_LIBADD =
-am_libxpcommon_a_OBJECTS = checknames.$(OBJEXT) config.$(OBJEXT) \
-	error.$(OBJEXT) list.$(OBJEXT) math.$(OBJEXT) net.$(OBJEXT) \
-	portability.$(OBJEXT) randommt.$(OBJEXT) shipshape.$(OBJEXT) \
-	socklib.$(OBJEXT) strcasecmp.$(OBJEXT) strdup.$(OBJEXT) \
-	strlcpy.$(OBJEXT) xpmemory.$(OBJEXT)
-libxpcommon_a_OBJECTS = $(am_libxpcommon_a_OBJECTS)
-DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
-depcomp = $(SHELL) $(top_srcdir)/config/depcomp
-am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/checknames.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/config.Po ./$(DEPDIR)/error.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/list.Po ./$(DEPDIR)/math.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/net.Po ./$(DEPDIR)/portability.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/randommt.Po ./$(DEPDIR)/shipshape.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/socklib.Po ./$(DEPDIR)/strcasecmp.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/strdup.Po ./$(DEPDIR)/strlcpy.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/xpmemory.Po
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-CCLD = $(CC)
-LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libxpcommon_a_SOURCES)
-DIST_SOURCES = $(libxpcommon_a_SOURCES)
+CONFIG_CLEAN_FILES =
+SOURCES =
+DIST_SOURCES =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -191,33 +161,23 @@ target_alias = @target_alias@
 target_cpu = @target_cpu@
 target_os = @target_os@
 target_vendor = @target_vendor@
-AM_CPPFLAGS = -DCONF_DATADIR=\"$(pkgdatadir)/\"
-noinst_LIBRARIES = libxpcommon.a
-libxpcommon_a_SOURCES = \
-	astershape.h audio.h \
-	bit.h \
-	checknames.c checknames.h commonproto.h config.c const.h \
-	draw.h \
-	error.c error.h \
-	item.h \
-	keys.h \
-	list.c list.h \
-	math.c metaserver.h \
-	net.c net.h \
-	pack.h packet.h portability.c portability.h \
-	randommt.c rules.h \
-	setup.h shipshape.c socklib.c socklib.h \
-	strcasecmp.c strdup.c strlcpy.c \
-	types.h \
-	version.h \
-	wreckshape.h \
-	xpcommon.h xpconfig.h xpmemory.c
+EXTRA_DIST = \
+BSString.cpp   TalkWindow.cpp  winAudio.h    wintalk.c \
+BSString.h     TalkWindow.h    winBitmap.c   xpilot.dep \
+MainFrm.cpp    XPilot.ini      winBitmap.h   xpilot.dsp \
+MainFrm.h      XPilot.shp      winClient.h   xpilot.dsw \
+XPilotNT.cpp    winColors.c   xpilot.mak \
+XPilotNT.h      winConfig.c   xpilot.rc \
+RecordDummy.c  credits.inc.h   winConfig.h   xpilotDoc.cpp \
+Splash.cpp     resource.h      winXThread.c  xpilotDoc.h \
+Splash.h       winAbout.cpp    winXThread.h  xpilotView.cpp \
+StdAfx.cpp     winAbout.h      winXXPilot.c  xpilotView.h \
+StdAfx.h       winAudio.c      winXXPilot.h
 
-SUBDIRS = NT
+SUBDIRS = res
 all: all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .c .o .obj
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -227,9 +187,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  src/common/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  src/client/NT/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  src/common/Makefile
+	  $(AUTOMAKE) --gnu  src/client/NT/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -247,52 +207,6 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
-version.h: $(top_builddir)/config.status $(srcdir)/version.h.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
-
-clean-noinstLIBRARIES:
-	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
-libxpcommon.a: $(libxpcommon_a_OBJECTS) $(libxpcommon_a_DEPENDENCIES) 
-	-rm -f libxpcommon.a
-	$(libxpcommon_a_AR) libxpcommon.a $(libxpcommon_a_OBJECTS) $(libxpcommon_a_LIBADD)
-	$(RANLIB) libxpcommon.a
-
-mostlyclean-compile:
-	-rm -f *.$(OBJEXT)
-
-distclean-compile:
-	-rm -f *.tab.c
-
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/checknames.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/error.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/list.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/math.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/net.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/portability.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/randommt.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shipshape.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/socklib.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strcasecmp.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strdup.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strlcpy.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xpmemory.Po@am__quote@
-
-.c.o:
-@am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c $<
-
-.c.obj:
-@am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ `$(CYGPATH_W) '$<'`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
 uninstall-info-am:
 
 # This directory's subdirectories are mostly independent; you can cd
@@ -453,7 +367,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(LIBRARIES)
+all-am: Makefile
 installdirs: installdirs-recursive
 installdirs-am:
 install: install-recursive
@@ -482,13 +396,11 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-recursive
 
-clean-am: clean-generic clean-noinstLIBRARIES mostlyclean-am
+clean-am: clean-generic mostlyclean-am
 
 distclean: distclean-recursive
-	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
-distclean-am: clean-am distclean-compile distclean-generic \
-	distclean-tags
+distclean-am: clean-am distclean-generic distclean-tags
 
 dvi: dvi-recursive
 
@@ -511,13 +423,12 @@ install-man:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-recursive
-	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-recursive
 
-mostlyclean-am: mostlyclean-compile mostlyclean-generic
+mostlyclean-am: mostlyclean-generic
 
 pdf: pdf-recursive
 
@@ -532,17 +443,16 @@ uninstall-am: uninstall-info-am
 uninstall-info: uninstall-info-recursive
 
 .PHONY: $(RECURSIVE_TARGETS) CTAGS GTAGS all all-am check check-am \
-	clean clean-generic clean-noinstLIBRARIES clean-recursive \
-	ctags ctags-recursive distclean distclean-compile \
-	distclean-generic distclean-recursive distclean-tags distdir \
-	dvi dvi-am html html-am info info-am install install-am \
-	install-data install-data-am install-exec install-exec-am \
-	install-info install-info-am install-man install-strip \
-	installcheck installcheck-am installdirs installdirs-am \
-	maintainer-clean maintainer-clean-generic \
-	maintainer-clean-recursive mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-recursive pdf pdf-am ps ps-am \
-	tags tags-recursive uninstall uninstall-am uninstall-info-am
+	clean clean-generic clean-recursive ctags ctags-recursive \
+	distclean distclean-generic distclean-recursive distclean-tags \
+	distdir dvi dvi-am html html-am info info-am install \
+	install-am install-data install-data-am install-exec \
+	install-exec-am install-info install-info-am install-man \
+	install-strip installcheck installcheck-am installdirs \
+	installdirs-am maintainer-clean maintainer-clean-generic \
+	maintainer-clean-recursive mostlyclean mostlyclean-generic \
+	mostlyclean-recursive pdf pdf-am ps ps-am tags tags-recursive \
+	uninstall uninstall-am uninstall-info-am
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

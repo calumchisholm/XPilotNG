@@ -48,4 +48,4 @@ endif
 
 # kps - . in SUBDIRS is needed to make sure libxpclient.a is compiled before
 # SDL client
-SUBDIRS = . items $(MAYBE_SDL)
+SUBDIRS = . items $(MAYBE_SDL) NT
