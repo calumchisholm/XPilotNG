@@ -131,7 +131,7 @@ class MainMenu(MenuPanel):
 				self.frame, 
 				xputil.Client(self, config.client), 
 				config.server,
-				'/opt2/projects/xpilot/lib/maps'))
+				config.mapdir))
 	def onChat(self, evt):
 		self.show(ircui.IrcPanel(self.frame, config.irc_server, get_nick(), 
 								 config.irc_channel))
