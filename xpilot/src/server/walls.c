@@ -281,7 +281,7 @@ static void Object_hits_target(object_t *obj, target_t *targ, double player_cost
 	    player_t *pl_j = Players(j);
 
 	    if (Player_is_tank(pl_j)
-		|| (BIT(pl_j->status, PAUSE) && pl_j->count <= 0)
+		|| (BIT(pl_j->status, PAUSE) && pl_j->pause_count <= 0)
 		|| Player_is_waiting(pl_j))
 		continue;
 
@@ -345,7 +345,7 @@ static void Object_hits_target(object_t *obj, target_t *targ, double player_cost
 	player_t *pl = Players(j);
 
 	if (Player_is_tank(pl)
-	    || (BIT(pl->status, PAUSE) && pl->count <= 0)
+	    || (BIT(pl->status, PAUSE) && pl->pause_count <= 0)
 	    || Player_is_waiting(pl))
 	    continue;
 

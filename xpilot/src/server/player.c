@@ -110,8 +110,10 @@ void Pick_startpos(player_t *pl)
     for (i = 0; i < NumPlayers; i++) {
 	player_t *pl_i = Players(i);
 
-	if (pl_i->id != pl->id && !Player_is_tank(pl_i) && pl_i->home_base
-		    && free_bases[pl_i->home_base->ind]) {
+	if (pl_i->id != pl->id
+	    && !Player_is_tank(pl_i)
+	    && pl_i->home_base
+	    && free_bases[pl_i->home_base->ind]) {
 	    free_bases[pl_i->home_base->ind] = 0;	/* occupado */
 	    num_free--;
 	}
@@ -212,7 +214,7 @@ void Go_home(player_t *pl)
     Emergency_shield(pl, false);
     Player_used_kill(pl);
 
-    if (options.playerStartsShielded != 0) {
+    if (options.playerStartsShielded) {
 	SET_BIT(pl->used, HAS_SHIELD);
 	if (options.playerShielding == 0) {
 	    pl->shield_time = SHIELD_TIME;
@@ -445,7 +447,7 @@ int Init_player(int ind, shipshape_t *ship)
     pl->last_lap_time	= 0;
     pl->last_lap	= 0;
     pl->best_lap	= 0;
-    pl->count		= -1;
+    pl->count		= 10000;
     pl->shield_time	= 0;
     pl->last_wall_touch	= 0;
 
@@ -549,8 +551,6 @@ int Init_player(int ind, shipshape_t *ship)
     pl->shove_next = 0;
     for (i = 0; i < MAX_RECORDED_SHOVES; i++)
 	pl->shove_record[i].pusher_id = NO_ID;
-
-    pl->frame_last_busy	= frame_loops;
 
     pl->isowner = 0;
     pl->isoperator = 0;
@@ -709,16 +709,21 @@ void Reset_all_players(void)
 		}
 	    }
 	}
-	CLR_BIT(pl->status, GAME_OVER);
-	CLR_BIT(pl->have, HAS_BALL);
+
 	Rank_ClearKills(pl);
 	Rank_ClearDeaths(pl);
-	/* This has already been changed to 'D' at this point*/
-	/* not always - kps */
-	/*xpprintf("%s %c \n", pl->name, pl->mychar);*/
 
-	if (!BIT(pl->status, PAUSE) && pl->mychar != 'W')
+	/* kps - can this happen ? */
+	if (pl->mychar == 'W' && !BIT(pl->status, GAME_OVER))
+	    warn("Player %s has mychar W but not GAME_OVER", pl->name);
+
+	if (!BIT(pl->status, PAUSE)
+	    && !Player_is_waiting(pl))
 	    Rank_AddRound(pl);
+
+	CLR_BIT(pl->status, GAME_OVER);
+	CLR_BIT(pl->have, HAS_BALL);
+
 	pl->round = 0;
 	pl->check = 0;
 	pl->time = 0;
@@ -727,10 +732,10 @@ void Reset_all_players(void)
 	pl->last_lap_time = 0;
 	if (!BIT(pl->status, PAUSE)) {
 	    pl->mychar = ' ';
-	    pl->frame_last_busy = frame_loops;
+	    pl->idleTime = 0;
 	    pl->life = world->rules->lives;
 	    if (BIT(world->rules->mode, TIMING))
-		pl->count = RECOVERY_DELAY;
+		pl->recovery_count = RECOVERY_DELAY;
 	}
 	if (Player_is_tank(pl))
 	    pl->mychar = 'T';
@@ -828,7 +833,9 @@ void Check_team_members(int team)
 
     for (members = i = 0; i < NumPlayers; i++) {
 	pl = Players(i);
-	if (!Player_is_tank(pl) && pl->team == team && pl->home_base != NULL)
+	if (!Player_is_tank(pl)
+	    && pl->team == team
+	    && pl->home_base != NULL)
 	    members++;
     }
     teamp = Teams(world, team);
@@ -870,7 +877,7 @@ static void Compute_end_of_round_values(double *average_score,
 	player_t *pl = Players(i);
 
 	if (Player_is_tank(pl)
-	    || (BIT(pl->status, PAUSE) && pl->count <= 0)
+	    || (BIT(pl->status, PAUSE) && pl->pause_count <= 0)
 	    || Player_is_waiting(pl))
 	    continue;
 
@@ -1014,7 +1021,7 @@ void Team_game_over(int winning_team, const char *reason)
 		continue;
 
 	    if (Player_is_tank(pl_i)
-		|| (BIT(pl_i->status, PAUSE) && pl_i->count <= 0)
+		|| (BIT(pl_i->status, PAUSE) && pl_i->pause_count <= 0)
 		|| Player_is_waiting(pl_i))
 		continue;
 
@@ -1248,11 +1255,10 @@ void Compute_game_status(void)
 	    Set_message(msg);
 	    roundtime = options.maxRoundTime * FPS;
 	    /*
-	     * Make sure players get the full 60 seconds
-	     * of allowed idle time.
+	     * Make sure players get the full amount of allowed idle time.
 	     */
 	    for (i = 0; i < NumPlayers; i++)
-		Players(i)->frame_last_busy = frame_loops;
+		Players(i)->idleTime = 0;
 	}
     }
 
@@ -2018,9 +2024,10 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
 
     pl->forceVisible	= 0;
     if (BIT(pl->status, PAUSE))
-	pl->count = MAX(RECOVERY_DELAY, pl->count);
+	/* don't allow unpause while other players haven't yet appeared */
+	pl->pause_count = MAX(RECOVERY_DELAY, pl->pause_count);
     else
-	pl->count = RECOVERY_DELAY;
+	pl->recovery_count = RECOVERY_DELAY;
     pl->ecmcount	= 0;
     pl->emergency_thrust_left = 0;
     pl->emergency_shield_left = 0;

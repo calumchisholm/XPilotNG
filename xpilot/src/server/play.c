@@ -137,7 +137,7 @@ static int Punish_team(player_t *pl, treasure_t *td, clpos_t pos)
 	    player_t *pl_i = Players(i);
 
 	    if (Player_is_tank(pl_i)
-		|| (BIT(pl_i->status, PAUSE) && pl_i->count <= 0)
+		|| (BIT(pl_i->status, PAUSE) && pl_i->pause_count <= 0)
 		|| Player_is_waiting(pl_i))
 		continue;
 	    if (pl_i->team == td->team) {
@@ -174,8 +174,7 @@ static int Punish_team(player_t *pl, treasure_t *td, clpos_t pos)
 	player_t *pl_i = Players(i);
 
 	if (Player_is_tank(pl_i)
-	    || (BIT(pl_i->status, PAUSE)
-		&& pl_i->count <= 0)
+	    || (BIT(pl_i->status, PAUSE) && pl_i->pause_count <= 0)
 	    || Player_is_waiting(pl_i))
 	    continue;
 	if (pl_i->team == td->team) {

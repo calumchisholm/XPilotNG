@@ -193,7 +193,9 @@ void Pause_player(player_t *pl, bool on)
 	if (pl->team != TEAM_NOT_SET)
 	    world->teams[pl->team].SwapperId = -1;
 	/* Minimum pause time is 10 seconds at gamespeed 12. */
-	pl->count = 10 * 12;
+	pl->pause_count = 10 * 12;
+	/* player might have paused when recovering */
+	pl->recovery_count = 0;
 	pl->updateVisibility = 1;
 	CLR_BIT(pl->status, PLAYING);
 	Player_self_destruct(pl, false);
@@ -237,7 +239,7 @@ void Pause_player(player_t *pl, bool on)
 			       "Select team to unpause. [*Server notice*]");
 	    return;
 	}
-	if (pl->count <= 0) {
+	if (pl->pause_count <= 0) {
 	    bool toolate = false;
 
 	    pl->idleCount = 0;
@@ -296,7 +298,7 @@ int Handle_keyboard(player_t *pl)
 	pressed = BITV_ISSET(pl->last_keyv, key) != 0;
 	BITV_TOGGLE(pl->prev_keyv, key);
 	if (key != KEY_SHIELD)	/* would interfere with auto-idle-pause.. */
-	    pl->frame_last_busy = frame_loops;	/* due to client auto-shield */
+	    pl->idleTime = 0;	/* due to client auto-shield */
 
 	/*
 	 * Allow these functions before a round has started.
@@ -539,6 +541,7 @@ int Handle_keyboard(player_t *pl)
 		}
 		for (i = 0; i < NumPlayers; i++) {
 		    player_t *pl_i = Players(i);
+
 		    if (pl_i->conn != NULL)
 			Send_base(pl_i->conn, pl->id, pl->home_base->ind);
 		}
@@ -811,7 +814,7 @@ int Handle_keyboard(player_t *pl)
 			/*
 			 * Turn hover pause on, together with shields.
 			 */
-			pl->count = 5 * 12;
+			pl->pause_count = 5 * 12;
 			Player_self_destruct(pl, false);
 			SET_BIT(pl->status, HOVERPAUSE);
 
@@ -836,7 +839,7 @@ int Handle_keyboard(player_t *pl)
 			Player_used_kill(pl);
 			if (BIT(pl->have, HAS_SHIELD))
 			    SET_BIT(pl->used, HAS_SHIELD);
-		    } else if (pl->count <= 0) {
+		    } else if (pl->pause_count <= 0) {
 			Autopilot(pl, false);
 			CLR_BIT(pl->status, HOVERPAUSE);
 			if (!BIT(pl->have, HAS_SHIELD))

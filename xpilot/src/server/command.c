@@ -78,6 +78,7 @@ player_t *Get_player_by_name(char *str, int *error_p, const char **errorstr_p)
      */
     for (i = 0; i < NumPlayers; i++) {
 	int j;
+
 	pl = Players(i);
 
 	for (j = 0; j < 1 + (int)strlen(pl->name) - (int)len; j++) {
@@ -114,6 +115,7 @@ static void Send_info_about_player(player_t * pl)
 
     for (i = 0; i < spectatorStart + NumSpectators; i++) {
 	player_t *pl_i;
+
 	if (i == NumPlayers) {
 	    i = spectatorStart - 1;
 	    continue;
@@ -150,7 +152,8 @@ static void Set_swapper_state(player_t * pl)
 		pl->prev_life = pl->life = 0;
 		SET_BIT(pl->status, GAME_OVER | PLAYING);
 		Player_self_destruct(pl, false);
-		pl->count = -1;
+		pl->pause_count = 0;
+		pl->recovery_count = 0;
 		break;
 	    }
 	}
@@ -464,6 +467,7 @@ static int Cmd_addr(char *arg, player_t *pl, int oper, char *msg)
     pl2 = Get_player_by_name(arg, NULL, &errorstr);
     if (pl2) {
 	const char *addr = Player_get_addr(pl2);
+
 	if (addr == NULL)
 	    sprintf(msg, "Unable to get address for %s.", pl2->name);
 	else
@@ -567,6 +571,7 @@ static int Cmd_ally(char *arg, player_t *pl, int oper, char *msg)
 	    /* a name is specified */
 	    const char *errorstr;
 	    player_t *pl2 = Get_player_by_name(arg, NULL, &errorstr);
+
 	    if (pl2) {
 		if (cmd == AllyInvite)
 		    Invite_player(pl, pl2);
@@ -633,6 +638,7 @@ static int Cmd_auth(char *arg, player_t *pl, int oper, char *msg)
     r = Check_player_password(pl->auth_nick, arg);
     if (r & (PASSWD_WRONG | PASSWD_ERROR)) {
 	char *reason = NULL, *reason_p = NULL;
+
 	if (r & PASSWD_ERROR)
 	    reason_p = "Couldn't check password";
 	else
@@ -654,6 +660,7 @@ static int Cmd_auth(char *arg, player_t *pl, int oper, char *msg)
 
     for (i = 0; i < NumPlayers; i++) {
 	player_t *pl_i = Players(i);
+
 	if (pl != pl_i &&
 	    !strcasecmp(pl_i->auth_nick, pl->auth_nick))
 	{
@@ -1206,6 +1213,7 @@ static int Cmd_team(char *arg, player_t *pl, int oper, char *msg)
 	    base_t *xbase = pl->home_base, *xbase2;
 	    int xteam = pl->team, xteam2;
 	    player_t *pl2 = pl;
+
 	    do {
 		pl2 = Player_by_id(world->teams[xteam].SwapperId);
 		world->teams[xteam].SwapperId = -1;
@@ -1299,6 +1307,7 @@ static int Cmd_set(char *arg, player_t *pl, int oper, char *msg)
 	    sprintf(msg, "Operation successful.");
 	else {
 	    char val[MAX_CHARS];
+
 	    Get_option_value(option, val, sizeof(val));
 	    sprintf(msg, " < Option %s set to %s by %s. >",
 		    option, val, pl->name);

@@ -511,8 +511,10 @@ struct player {
 
     double	emergency_thrust_left;	/* how much emergency thrust left */
     double	emergency_shield_left;	/* how much emergency shield left */
-
     double	phasing_left;		/* how much time left */
+
+    double	pause_count;		/* ticks until unpause possible */
+    double	recovery_count;		/* ticks to recovery */
     double	self_destruct_count;	/* if > 0, ticks before boom */
 
     int		item[NUM_ITEMS];	/* for each item type how many */

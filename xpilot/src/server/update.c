@@ -65,9 +65,9 @@ static void Transport_to_home(player_t *pl)
      * acceleration G, during the second part we make this a negative one -G.
      * This results in a visually pleasing take off and landing.
      */
-    clpos_t		startpos;
-    double		dx, dy, t, m;
-    const int		T = RECOVERY_DELAY;
+    clpos_t startpos;
+    double dx, dy, t, m;
+    const double T = RECOVERY_DELAY;
     world_t *world = &World;
 
     if (pl->home_base == NULL) {
@@ -89,7 +89,7 @@ static void Transport_to_home(player_t *pl)
 
     dx = WRAP_DCX(startpos.cx - pl->pos.cx);
     dy = WRAP_DCY(startpos.cy - pl->pos.cy);
-    t = pl->count + 0.5;
+    t = pl->recovery_count;
     if (2 * t <= T)
 	m = 2 / t;
     else {
@@ -500,6 +500,7 @@ static void Misc_object_update(void)
 
 	else if (BIT(obj->type, OBJ_WRECKAGE)) {
 	    wireobject_t *wireobj = WIRE_PTR(obj);
+
 	    wireobj->rotation =
 		(wireobj->rotation
 		 + (int) (wireobj->turnspeed * timeStep * RES)) % RES;
@@ -507,6 +508,7 @@ static void Misc_object_update(void)
 
 	else if (BIT(obj->type, OBJ_PULSE)) {
 	    pulseobject_t *pulse = PULSE_PTR(obj);
+
 	    pulse->len += options.pulseSpeed * timeStep;
 	    if (pulse->len > options.pulseLength)
 		pulse->len = options.pulseLength;
@@ -534,6 +536,7 @@ static void Target_update(void)
 		if (options.targetSync) {
 		    for (j = 0; j < world->NumTargets; j++) {
 			target_t *t = Targets(world, j);
+
 			if (t->team == targ->team)
 			    World_restore_target(world, t);
 		    }
@@ -709,8 +712,7 @@ static void Do_refuel(player_t *pl)
     fuel_t *fs = Fuels(world, pl->fs);
 
     if ((Wrap_length(pl->pos.cx - fs->pos.cx,
-		     pl->pos.cy - fs->pos.cy)
-	 > 90.0 * CLICK)
+		     pl->pos.cy - fs->pos.cy) > 90.0 * CLICK)
 	|| (pl->fuel.sum >= pl->fuel.max)
 	|| BIT(pl->used, HAS_PHASING_DEVICE)
 	|| (BIT(world->rules->mode, TEAM_PLAY)
@@ -1039,55 +1041,44 @@ static void Update_players(void)
 	if ((pl->damaged -= timeStep) <= 0)
 	    pl->damaged = 0;
 
-	/* kps - fix these */
 	if (pl->flooding > FPS + 1) {
 	    sprintf(msg, "%s was kicked out because of flooding.", pl->name);
 	    Destroy_connection(pl->conn, "flooding");
 	    i--;
 	    continue;
-	} else if ( pl->flooding >= 0 )
+	} else if (pl->flooding >= 0)
 	    pl->flooding--;
 
-#define IDLETHRESHOLD (FPS * options.maxIdleTime)
-
-	if (Player_is_human(pl)) {
+	/* ugly hack */
+	if (Player_is_human(pl))
 	    pl->rank->score = pl->score;
-	    if (pl->mychar == ' ') {
-		if (options.maxIdleTime > 0
-		    && pl->idleCount++ == IDLETHRESHOLD) {
-		    if (NumPlayers - 1 > NumPseudoPlayers + NumRobots) {
-			/* Kill player, he/she will be paused when returned
-			   to base, unless he/she wakes up. */
-			Kill_player(pl, false);
-		    } else
-			pl->idleCount = 0;
-		}
-	    }
+
+	if (pl->pause_count > 0) {
+	    assert(BIT(pl->status, PAUSE|HOVERPAUSE));
+
+	    pl->pause_count -= timeStep;
+	    if (pl->pause_count <= 0)
+		pl->pause_count = 0;
 	}
 
-	if (pl->count >= 0) {
-	    pl->count -= timeStep;
-	    if (pl->count > 0) {
-		if (!BIT(pl->status, PLAYING)) {
-		    Transport_to_home(pl);
-		    Move_player(pl);
-		    continue;
-		}
-	    } else {
-		pl->count = -1;
-		if (!BIT(pl->status, PLAYING)) {
+	if (pl->recovery_count > 0) {
+	    /* this shouldn't happen */
+	    if (BIT(pl->status, PLAYING))
+		warn("**** Player %s is playing, recovery count = %f",
+		     pl->name, pl->recovery_count);
 
-		    if (options.maxIdleTime
-			&& pl->idleCount >= IDLETHRESHOLD) {
-			Pause_player(pl, true);
-			sprintf(msg, "%s was paused for idling.", pl->name);
-			Set_message(msg);
-			continue;
-		    }
-
-		    SET_BIT(pl->status, PLAYING);
-		    Go_home(pl);
-		}
+	    pl->recovery_count -= timeStep;
+	    if (pl->recovery_count <= 0) {
+		/* Player has recovered. */
+		pl->recovery_count = 0;
+		SET_BIT(pl->status, PLAYING);
+		Go_home(pl); 
+	    }
+	    else {
+		/* Player didn't recover yet. */
+		Transport_to_home(pl);
+		Move_player(pl);
+		continue;
 	    }
 	}
 
@@ -1296,9 +1287,8 @@ void Update_objects(void)
 	if (BIT(pl->lock.tagged, LOCK_PLAYER)) {
 	    player_t *lpl = Player_by_id(pl->lock.pl_id);
 
-	    pl->lock.distance =
-		Wrap_length(pl->pos.cx - lpl->pos.cx,
-			    pl->pos.cy - lpl->pos.cy) / CLICK;
+	    pl->lock.distance = Wrap_length(pl->pos.cx - lpl->pos.cx,
+					    pl->pos.cy - lpl->pos.cy) / CLICK;
 	}
     }
 
@@ -1315,23 +1305,13 @@ void Update_objects(void)
 
 	if (Player_is_playing(pl))
 	    Update_tanks(&(pl->fuel));
+
 	if (BIT(pl->status, KILLED)) {
 	    Throw_items(pl);
 
 	    Detonate_items(pl);
 
 	    Kill_player(pl, true);
-
-	    if (Player_is_human(pl)) {
-		if (options.maxIdleTime > 0
-		    && frame_loops - pl->frame_last_busy > IDLETHRESHOLD) {
-		    if ((NumPlayers - NumRobots - NumPseudoPlayers) > 1) {
-			Pause_player(pl, true);
-			sprintf(msg, "%s was paused for idling.", pl->name);
-			Set_message(msg);
-		    }
-		}
-	    }
 	}
 
 	if (BIT(pl->status, PAUSE)) {
@@ -1347,6 +1327,18 @@ void Update_objects(void)
 	}
 	else
 	    pl->pauseTime = 0;
+
+	if (Player_is_playing(pl) && pl->recovery_count <= 0) {
+	    pl->idleTime += timePerFrame;
+	    if (Player_is_human(pl)
+		&& options.maxIdleTime > 0
+		&& pl->idleTime > options.maxIdleTime
+		&& (NumPlayers - NumRobots - NumPseudoPlayers) > 1) {
+		sprintf(msg, "%s was paused for idling.", pl->name);
+		Set_message(msg);
+		Pause_player(pl, true);
+	    }
+	}
     }
 
 #if 0

@@ -402,7 +402,7 @@ static int Frame_status(connection_t *conn, player_t *pl)
     }
 
     if (BIT(pl->status, HOVERPAUSE))
-	showautopilot = (pl->count <= 0 || (frame_loops_slow % 8) < 4);
+	showautopilot = (pl->pause_count <= 0 || (frame_loops_slow % 8) < 4);
     else if (BIT(pl->used, HAS_AUTOPILOT))
 	showautopilot = (frame_loops_slow % 8) < 4;
     else
@@ -926,10 +926,11 @@ static void Frame_ships(connection_t *conn, player_t *pl)
 	    if (!clpos_inview(&cv, pl_i->home_base->pos))
 		continue;
 	    if (BIT(pl_i->status, PAUSE))
-		Send_paused(conn, pl_i->home_base->pos, (int)pl_i->count);
+		Send_paused(conn, pl_i->home_base->pos,
+			    (int)pl_i->pause_count);
 	    else
-		Send_appearing(conn, pl_i->home_base->pos,
-			       pl_i->id, (int)(pl_i->count * 10));
+		Send_appearing(conn, pl_i->home_base->pos, pl_i->id,
+			       (int)(pl_i->recovery_count * 10));
 	    continue;
 	}
 	if (!clpos_inview(&cv, pl_i->pos))
