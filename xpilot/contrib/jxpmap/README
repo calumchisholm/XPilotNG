@@ -15,28 +15,18 @@ experiment with the new map format.
 2. Requirements
 
 The editor is implemented in java and it requires the Java Runtime 
-Environment (JRE) 1.3. It might also work with 1.2 but I haven't 
-tested that. In order to compile it you need also a java compiler, 
-so if you wan't to use this editor and have nothing java related 
-installed, you'd better download the whole Java2 SDK 1.3 from 
-http://java.sun.com/j2se.
+Environment (JRE) 1.4. If you want to start it directly from its
+web page (http://xpilot.sourceforge.net/jxpmap) you need to have
+Java Web Start installed. In windows Java Web Start is automatically 
+installed when you install JRE. However, on linux etc. you (usually) 
+have to manually install Java Web Start.
 
-The editor uses JAXP 1.0.1 XML parser from Sun. You can download it
-from http://java.sun.com/xml.
+3. Trying it out
 
-3. Installation
-
-Before you can use the editor you need to build it. In the current 
-directory give a command like the following:
-
-% javac -classpath .:<jaxp-dir>/parser.jar:<jaxp-dir>/jaxp.jar org/xpilot/jxpmap/*.java
-
-Substitute <jaxp-dir> with the directory you installed JAXP to.
-
-After the compilation is finished you should be able to run it with
-command like:
-
-% java -classpath .:<jaxp-dir>/parser.jar:<jaxp-dir>/jaxp.jar org.xpilot.jxpmap.MainFrame
+If you have Java Web Start installed, the easiest way to test the editor 
+is to go to http://xpilot.sourceforge.net/jxpmap and click the 
+"Start jXPMap" link. If you don't have it you can just download the
+jxpmap.jar file and run it with java -jar jxpmap.jar.
 
 4. Other issues
 
