@@ -118,6 +118,15 @@ struct blockinfo {
     unsigned short *points;
 };
 
+struct inside_block {
+    short *y;
+    short *lines;
+};
+
+struct inside_block *inside_table[10];
+
+static struct inside_block filled_block;
+
 wireobj ball_wire;
 
 #define LINEY(X, Y, BASE, ARG)  (((Y)*(ARG)+(BASE))/(X))
@@ -1378,8 +1387,7 @@ int Polys_to_client(char *ptr)
 #if 0
 struct test {
     double distance;
-    double direction;
-    int fill;
+    int inside;
 };
 
 
@@ -1398,9 +1406,84 @@ struct test array[110][110];
 
 #define POSMOD(x, y) ((x) >= 0 ? (x) % (y) : (x) % (y) + (y))
 
+
+int is_inside(int x, int y)
+{
+    int block;
+    short *ptr;
+    int inside = 0;
+    int x1, x2, y1, y2, s;
+
+    block = (x >> B_SHIFT) + mapx * (y >> B_SHIFT);
+    if (inside_table[block] == NULL)
+	return 0;
+    else if (inside_table[block] == &filled_block)
+	return 1;
+    x &= B_MASK;
+    y &= B_MASK;
+    ptr = inside_table[block]->y;
+    while (y > *ptr++)
+	inside++;
+    ptr = inside_table[block]->lines;
+    while (*ptr != -1) {
+	x1 = *ptr++ - x;
+	y1 = *ptr++ - y;
+	x2 = *ptr++ - x;
+	y2 = *ptr++ - y;
+	if (y1 < 0) {
+	    if (y2 >= 0) {
+		if (x1 > 0 && x2 >= 0)
+		    inside++;
+		else if ((x1 >= 0 || x2 >= 0) &&
+			 (s = y1 * (x1 - x2) - x1 * (y1 - y2)) >= 0) {
+		    if (s == 0)
+			return 1;
+		    else
+			inside++;
+		}
+	    }
+	}
+	else
+	    if (y2 <= 0) {
+		if (y2 == 0) {
+		    if (x2 == 0 || (y1 ==0 && ((x1 <= 0 && x2 >= 0) ||
+					       (x1 >= 0 && x2 <= 0))))
+			return 1;
+		}
+		else if (x1 > 0 && x2 >= 0)
+		    inside++;
+		else if ((x1 >= 0 || x2 >= 0) &&
+			 (s = y1 * (x1 - x2) - x1 * (y1 - y2)) <= 0) {
+		    if (s == 0)
+			return 1;
+		    else
+			inside++;
+		}
+	    }
+    }
+    return inside & 1;
+}
+
+
+static void store_inside_line(int bx, int by, double dist, int inside)
+{
+    if (dist <= array[bx][by].distance) {
+	if (dist == array[bx][by].distance) {
+	    /* dist need not be the best possible double representation of
+	     * the true distance, so this might not be detected */
+	    error("Invalid map, lines in the same group may "
+		  "meet at endpoints only.");
+	    exit(1);
+	}
+	array[bx][by].distance = dist;
+	array[bx][by].inside = inside;
+    }
+}
+
+
 static void inside_test(void)
 {
-    int dx, dy, bx, by, ox, oy, startx, starty, xsign, ysign, x1, x2, y1, y2;
+    int dx, dy, bx, by, ox, oy, startx, starty, x1, x2, y1, y2;
     int i, j, last_height, last_width, num_points, minx, miny, poly;
     int bx2, by2, maxx, maxy;
     double xdist, ydist, dist;
@@ -1408,8 +1491,8 @@ static void inside_test(void)
 
     for (i = 0; i < mapx; i++)
 	for (j = 0; j < mapy; j++) {
-	    array[i][j].distance = -1;
-	    array[i][j].fill = 2;
+	    array[i][j].distance = 1e20;
+	    array[i][j].inside = 2;
 	}
     last_width = (World.cwidth - 1) % B_CLICKS + 1;
     last_height = (World.cheight - 1) % B_CLICKS + 1;
@@ -1434,104 +1517,75 @@ static void inside_test(void)
 	    oy = starty & B_MASK;
 	    dx = *edges++;
 	    dy = *edges++;
-	    ysign = dy >= 0 ? 1 : -1;
-	    xsign = dx >= 0 ? 1 : -1;
-	    if (dy >= 0)
-		y1 = 0;
-	    else {
-		y1 = B_CLICKS;
-		if (by == mapy - 1)
-		    y1 = last_height;
-	    }
-	    if (dx >= 0)
-		x1 = 0;
-	    else {
-		x1 = B_CLICKS;
-		if (bx == mapx - 1)
-		    x1 = last_width;
-	    }
-	    if (ox >= array[bx][by].distance && (ox > array[bx][by].distance
-		|| dy && ABS(((double)dx) / dy) < array[bx][by].direction)) {
-		    array[bx][by].distance = ox;
-		    array[bx][by].direction = ABS(((double)dx) / dy);
-		    array[bx][by].fill = dy < 0;
-	    }
-	    x2 = x1 + xsign * B_CLICKS;
-	    y2 = y1 + ysign * B_CLICKS;
-	    if (bx == mapx - 1)
-		x2 = x1 + xsign * last_width;
-	    if (by == mapy - 1)
-		y2 = y1 + ysign * last_height;
-	    while (1) {
-		if (array[bx][by].fill == 2)
-		    array[bx][by].fill = 0;
-		if (ABS(dx) >= ABS(dy)) {
-		    xdist = (x2 - .5 - ox) * xsign;
-		    ydist = 32768;
-		    if (dy != 0)
-			ydist = ((double)(y2 - .5 - oy) * dx) / dy * xsign;
-		    if (xdist > dx * xsign && ydist > dx * xsign)
-			break;
+	    x1 = 0;
+	    y1 = 0;
+	    while (1) {	/* All boxes which contain a part of this line */
+		x2 = x1 + ((bx == mapx - 1) ? last_width : B_CLICKS);
+		y2 = y1 + ((by == mapy - 1) ? last_height : B_CLICKS);
+		if (dx > 0)
+		    xdist = x2 - .5 - ox;
+		else if (dx < 0)
+		    xdist = ox - x1 + .5;
+		else
+		    xdist = 1e20; /* Something big enough to be > ydist, dx */
+		if (dy > 0)
+		    ydist = y2 - .5 - oy;
+		else if (dy < 0)
+		    ydist = oy - y1 + .5;
+		else
+		    ydist = 1e20;
+		if (xdist > ABS(dx) && ydist > ABS(dy))
+		    break;	/* Stops within same box */
+		/* Calculate distance of intersection from lower right corner
+		 * of box counterclockwise along the edge. We don't care about
+		 * lastwidth here as we are only interested in finding the line
+		 * with the smallest value. */
+		if (ABS(dy) * xdist < ABS(dx) * ydist) {
+		    if (dx > 0)
+			dist = oy - y1 + dy * xdist / dx;
+		    else
+			dist = 3 * B_CLICKS - oy + y1 + dy * xdist / dx;
 		}
 		else {
-		    ydist = (y2 - .5 - oy) * ysign;
-		    xdist = 32768;
-		    if (dx != 0)
-			xdist = ((double)(x2 - .5 - ox) * dy) / dx * ysign;
-		    if (xdist > dy * ysign && ydist > dy * ysign)
-			break;
-		}
-		if (ydist <= xdist) {
-		    if (ABS(dx) > ABS(dy))
-			dist = ox + xsign * ydist - (xsign > 0 ? x1 : x2);
+		    if (dy > 0)
+			dist = 2 * B_CLICKS - ox + x1 - dx * ydist / dy;
 		    else
-			dist = ox + ydist * ysign * dx / dy -
-			    (xsign > 0 ? x1 : x2);
-		    if (dist >= array[bx][by].distance && 
-			(dist > array[bx][by].distance ||
-			 ABS(((double)dx) / dy) < array[bx][by].direction)) {
-			array[bx][by].distance = dist;
-			array[bx][by].direction = ABS(((double)dx)/dy);
-			array[bx][by].fill = dy < 0;
-		    }
+			dist = 3 * B_CLICKS + ox - x1 - dx * ydist / dy;
 		}
-		if (xdist <= ydist) {
-		    bx2 += xsign;
+		store_inside_line(bx, by, dist, 0);
+		if (ABS(dy) * xdist <= ABS(dx) * ydist) {
+		    if (dx > 0) {
+			bx2++;
+			x1 = x2;
+		    }
+		    else {
+			bx2--;
+			x1 -= (bx == 0) ? last_width : B_CLICKS;
+		    }			
 		    if (bx2 > maxx)
 			maxx = bx2;
 		    if (bx2 < minx)
 			minx = bx2;
 		    bx = POSMOD(bx2, mapx);
-		    x1 = x2;
-		    x2 = x1 + xsign * B_CLICKS;
-		    if (bx != mapx - 1) {
-			x2 = x1 + xsign * B_CLICKS;
-			dist -= xsign * B_CLICKS;
+		    dist = 3 * B_CLICKS - dist;
+		}
+		if (ABS(dy) * xdist >= ABS(dx) * ydist) {
+		    if (dy > 0) {
+			by2++;
+			y1 = y2;
 		    }
 		    else {
-			x2 = x1 + xsign * last_width;
-			dist -= xsign * last_width;
+			by2--;
+			y1 -= (by == 0) ? last_height : B_CLICKS;
 		    }
-		}
-		if (ydist <= xdist) {
-		    by2 += ysign;
 		    if (by2 > maxy)
 			maxy = by2;
 		    if (by2 < miny)
 			miny = by2;
 		    by = POSMOD(by2, mapy);
-		    y1 = y2;
-		    y2 = y1 + ysign * B_CLICKS;
-		    if (by == mapy - 1)
-			y2 = y1 + ysign * last_height;
-		    if (dist >= array[bx][by].distance &&
-			(dist >array[bx][by].distance ||
-			 ABS(((double)dx) / dy) < array[bx][by].direction)) {
-			array[bx][by].distance = dist;
-			array[bx][by].direction = ABS(((double)dx)/dy);
-			array[bx][by].fill = dy < 0;
-		    }
+		    dist = 5 * B_CLICKS - dist;
 		}
+		store_inside_line(bx, by, dist, 1);
 	    }
 	    startx = WRAP_XCLICK(startx + dx);
 	    starty = WRAP_YCLICK(starty + dy);
@@ -1550,8 +1604,9 @@ static void inside_test(void)
 	    for (j = POSMOD(minx, mapx); bx2-- > 0; j++) {
 		if (j == mapx)
 		    j = 0;
-		if (array[j][i].fill < 2) {
-		    x1 = array[j][i].fill;
+		if (array[j][i].inside < 2) {
+		    x1 = array[j][i].distance > B_CLICKS &&
+			array[j][i].inside == 1;
 		}
 		else {
 		    if (x1) {
@@ -1566,9 +1621,8 @@ static void inside_test(void)
 			STORE(fuel_t, World.fuel, World.NumFuels, max_fuels,t);
 		    }
 		}
-		array[j][i].fill = 2;
-		array[j][i].distance = -1;
-/*		array[j][i].direction = 0;*/
+		array[j][i].inside = 2;
+		array[j][i].distance = 1e20;
 	    }
 	}
     }
@@ -3458,6 +3512,7 @@ void Move_player(int ind)
     pl->velocity = VECTOR_LENGTH(pl->vel);
     return;
 }
+
 
 void Turn_player(int ind)
 {
