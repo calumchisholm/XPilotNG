@@ -42,9 +42,7 @@
 #include <GL/gl.h>
 #include "SDL.h"
 
-#ifdef HAVE_SDL_TTF
-    #include "SDL_ttf.h"
-#endif
+#include "SDL_ttf.h"
 
 #include "text.h"
 
@@ -58,9 +56,7 @@ void pushScreenCoordinateMatrix(void);
 void pop_projection_matrix(void);
 int next_p2 ( int a );
 void print(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, int length, const char *text, bool onHUD);
-#ifdef HAVE_SDL_TTF
 int FTinit(font_data *font, const char * fontname, int ptsize);
-#endif
 int next_p2 ( int a )
 {
 	int rval=1;
@@ -185,7 +181,6 @@ GLuint SDL_GL_LoadTexture(SDL_Surface *surface, texcoord_t *texcoord)
     return texture;
 }
 
-#ifdef HAVE_SDL_TTF
 int FTinit(font_data *font, const char * fontname, int ptsize)
 {
     int i;
@@ -268,7 +263,6 @@ int FTinit(font_data *font, const char * fontname, int ptsize)
     /*TTF_Quit();*/
     return 0;
 }
-#endif
 
 int fontinit(font_data *ft_font, const char * fname, unsigned int size)
 {
@@ -279,13 +273,10 @@ int fontinit(font_data *ft_font, const char * fname, unsigned int size)
     if (strlen(fname)<5) return 1; /*not long enough to be a useful name*/
     if (strcasecmp(".bmp",&fname[strlen(fname)-4]) != 0)
     /* if its not a .bmp file lets try freetype if available */
-    #ifdef HAVE_SDL_TTF
     	return FTinit(ft_font,fname,size);
-    #else
     {
     	xpprintf("fontfile has to be foo.bmp\n");
     }
-    #endif
     if(!LoadBMP(ft_font,fname))
     	return 1;
     

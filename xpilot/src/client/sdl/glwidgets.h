@@ -48,20 +48,53 @@ GLWidget *Init_ArrowWidget( widget_list_t *list, ArrowWidget_dir_t direction, in
     	    	    	    void (*action)( void *data ), void *actiondata);
 /* End:  ArrowWidget*/
 
+/* Begin:  LabeledRadiobuttonWidget*/
+#define LABELEDRADIOBUTTONWIDGET 1
+typedef struct {
+    void    	    (*action)(bool state, void *actiondata);
+    void    	    *actiondata;
+    bool    	    state;
+    string_tex_t    *ontex;
+    string_tex_t    *offtex;
+} LabeledRadiobuttonWidget;
+
+GLWidget *Init_LabeledRadiobuttonWidget(widget_list_t *list, string_tex_t *ontex, string_tex_t *offtex, void (*action)(bool state, void *actiondata), void *actiondata, bool start_state);
+/* End: LabeledRadiobuttonWidget */
+
 /* Begin: IntChooserWidget */
-#define INTCHOOSERWIDGET 1
+#define INTCHOOSERWIDGET 2
 typedef struct {
     string_tex_t    nametex;
     int     	    *value;
-    int     	    min;
-    int     	    max;
+    int     	    *min;
+    int     	    *max;
+    int     	    valuespace;
     string_tex_t    valuetex;
     font_data 	    *font;
     GLWidget	    *leftarrow;
     GLWidget	    *rightarrow;
+    int     	    direction;
 } IntChooserWidget;
 
-GLWidget *Init_IntChooserWidget(widget_list_t *list, const char *name, font_data *font, int *value, int min, int max);
+GLWidget *Init_IntChooserWidget(widget_list_t *list, const char *name, font_data *font, int *value, int *min, int *max);
+/* End: IntChooserWidget */
+
+/* Begin: DoubleChooserWidget */
+#define DOUBLECHOOSERWIDGET 3
+typedef struct {
+    string_tex_t    nametex;
+    double  	    *value;
+    double  	    *min;
+    double  	    *max;
+    int     	    valuespace;
+    string_tex_t    valuetex;
+    font_data 	    *font;
+    GLWidget	    *leftarrow;
+    GLWidget	    *rightarrow;
+    int     	    direction;
+} DoubleChooserWidget;
+
+GLWidget *Init_DoubleChooserWidget(widget_list_t *list, const char *name, font_data *font, double *value, double *min, double *max);
 /* End: IntChooserWidget */
 
 #endif

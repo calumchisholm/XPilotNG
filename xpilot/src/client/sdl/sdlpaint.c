@@ -20,7 +20,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-#include <sys/time.h>
+/*#define TIME_CODE*/
+#ifdef TIME_CODE
+    #include <sys/time.h>
+#endif
 
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -56,8 +59,13 @@ static widget_list_t *ScoreList_widgetItem;
 static guiarea_t    *window_guiarea;
 
 static widget_list_t *ConfMenu;
-static GLWidget *testWidget;
+static GLWidget *testWidget[2];
 static int testValue;
+static int testMinValue;
+static int testMaxValue;
+static double testValue2;
+static double testMinValue2;
+static double testMaxValue2;
 
 void select_button(Uint8 button,Uint8 state,Uint16 x,Uint16 y, void *data)
 {
@@ -228,12 +236,24 @@ int InitConfMenu(void)
 	return 1;
     }
     testValue = 999;
-    testWidget = Init_IntChooserWidget(ConfMenu, "testValue", &gamefont, &testValue, 0, 999);
+    testMinValue = 0;
+    testMaxValue = 998;
+    testValue2 = 9.99;
+    testMinValue2 = 0.0;
+    testMaxValue2 = 9.98;
+    testWidget[0] = Init_IntChooserWidget(ConfMenu, "testValue", &gamefont, &testValue, &testMinValue, &testMaxValue);
+    testWidget[1] = Init_DoubleChooserWidget(ConfMenu, "testValue", &gamefont, &testValue2, &testMinValue2, &testMaxValue2);
+
     bounds.x = 500;
     bounds.y = 0;
-    bounds.w = testWidget->bounds.w;
-    bounds.h = testWidget->bounds.h;
-    SetBounds_GLWidget(testWidget,&bounds);
+    bounds.w = testWidget[0]->bounds.w;
+    bounds.h = testWidget[0]->bounds.h;
+    SetBounds_GLWidget(testWidget[0],&bounds);
+    bounds.x = 500;
+    bounds.y = testWidget[0]->bounds.h+1;
+    bounds.w = testWidget[1]->bounds.w;
+    bounds.h = testWidget[1]->bounds.h;
+    SetBounds_GLWidget(testWidget[1],&bounds);
     
     AddListGuiAreas(ConfMenu);
     return 0;
@@ -244,7 +264,8 @@ void CloseConfMenu(void)
     if (!ConfMenu) return;
     DelListGuiAreas(ConfMenu);
     CleanList(ConfMenu);
-    Close_Widget(testWidget);
+    Close_Widget(testWidget[0]);
+    Close_Widget(testWidget[1]);
 }
 
 int Paint_init(void)
@@ -405,10 +426,11 @@ void setupPaint_HUD(void)
 void Paint_frame(void)
 {
     Check_view_dimensions();
+#ifdef TIME_CODE
     static struct timeval timed[17][2];
-    static bool timing = false;
     int i;
     int measuretime = 100;    
+#endif
     
     world.x = selfPos.x - (ext_view_width / 2);
     world.y = selfPos.y - (ext_view_height / 2);
@@ -454,7 +476,9 @@ void Paint_frame(void)
     }
 
     if (damaged <= 0) {
-	if (timing) gettimeofday(&timed[0][1],NULL);
+#ifdef TIME_CODE
+	gettimeofday(&timed[0][1],NULL);
+#endif
     	/*glClear(GL_COLOR_BUFFER_BIT);*/
 	/* on my machine this seems about 10 times faster
 	 * with seemingly the same result
@@ -467,7 +491,9 @@ void Paint_frame(void)
 	    glVertex2i(0,draw_height);
 	glEnd();
 
-	if (timing) gettimeofday(&timed[1][1],NULL);
+#ifdef TIME_CODE
+	gettimeofday(&timed[1][1],NULL);
+#endif
 	glEnable(GL_BLEND);
     	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -477,7 +503,9 @@ void Paint_frame(void)
     	setupPaint_stationary();
 	
     	Paint_world();
-	if (timing) gettimeofday(&timed[2][1],NULL);
+#ifdef TIME_CODE
+	gettimeofday(&timed[2][1],NULL);
+#endif
 
 	if (oldServer) {
 	    Paint_vfuel();
@@ -487,69 +515,95 @@ void Paint_frame(void)
 	} else
 	    Paint_objects();
 
-	if (timing) gettimeofday(&timed[3][1],NULL);
+#ifdef TIME_CODE
+	gettimeofday(&timed[3][1],NULL);
+#endif
 
     	Paint_score_objects();
 	
-	if (timing) gettimeofday(&timed[4][1],NULL);
+#ifdef TIME_CODE
+	gettimeofday(&timed[4][1],NULL);
+#endif
 	
 	Paint_shots();
-	if (timing) gettimeofday(&timed[5][1],NULL);
+#ifdef TIME_CODE
+	gettimeofday(&timed[5][1],NULL);
+#endif
 	setupPaint_moving();
 	Paint_ships();
-	if (timing) gettimeofday(&timed[6][1],NULL);
+#ifdef TIME_CODE
+	gettimeofday(&timed[6][1],NULL);
+#endif
 
 	setupPaint_HUD();
 
-	if (timing) gettimeofday(&timed[7][1],NULL);
+#ifdef TIME_CODE
+	gettimeofday(&timed[7][1],NULL);
+#endif
     	Paint_meters();
-	if (timing) gettimeofday(&timed[8][1],NULL);
+#ifdef TIME_CODE
+	gettimeofday(&timed[8][1],NULL);
+#endif
     	Paint_HUD();
-	if (timing) gettimeofday(&timed[9][1],NULL);
+#ifdef TIME_CODE
+	gettimeofday(&timed[9][1],NULL);
+#endif
     	Paint_client_fps();
-	if (timing) gettimeofday(&timed[10][1],NULL);
+#ifdef TIME_CODE
+	gettimeofday(&timed[10][1],NULL);
+#endif
 
 	Paint_messages();       
-	if (timing) gettimeofday(&timed[11][1],NULL);
+#ifdef TIME_CODE
+	gettimeofday(&timed[11][1],NULL);
+#endif
 	Console_paint();
-	if (timing) gettimeofday(&timed[12][1],NULL);
+#ifdef TIME_CODE
+	gettimeofday(&timed[12][1],NULL);
+#endif
 	Paint_select();
-	if (timing) gettimeofday(&timed[13][1],NULL);
+#ifdef TIME_CODE
+	gettimeofday(&timed[13][1],NULL);
+#endif
 	if (MainList)
 	    DrawWidgetList(MainList);
-	if (timing) gettimeofday(&timed[14][1],NULL);
+#ifdef TIME_CODE
+	gettimeofday(&timed[14][1],NULL);
+#endif
 	/*if (ConfMenu)
 	    DrawWidgetList(ConfMenu);
     	else if (InitConfMenu()) error("ConfMenu initialization failed");*/
     
-    	if (timing) gettimeofday(&timed[15][1],NULL);
+#ifdef TIME_CODE
+    	gettimeofday(&timed[15][1],NULL);
+#endif
 	
 	
 	glPopMatrix();
     }
     
     SDL_GL_SwapBuffers();
-    if (timing) gettimeofday(&timed[16][1],NULL);
+#ifdef TIME_CODE
+    gettimeofday(&timed[16][1],NULL);
 
-    if (timing) {
-	for (i=16;i>0;--i)
-	    timed[i][1].tv_usec = timed[i][1].tv_usec - timed[i-1][1].tv_usec
-	    	    	    	+ ((timed[i][1].tv_sec - timed[i-1][1].tv_sec)*1000000);
-	for (i=0;i<17;++i)
-	    timed[i][0].tv_usec += timed[i][1].tv_usec;
+    for (i=16;i>0;--i)
+    	timed[i][1].tv_usec = timed[i][1].tv_usec - timed[i-1][1].tv_usec
+    			    + ((timed[i][1].tv_sec - timed[i-1][1].tv_sec)*1000000);
+    for (i=0;i<17;++i)
+    	timed[i][0].tv_usec += timed[i][1].tv_usec;
+    
+    if (!(loops%measuretime)) {
+    	xpprintf("----------Paint_foo times----------\n");
+    	for (i=1;i<17;++i)
+    	    xpprintf("<%li\t%2i>\n",timed[i][0].tv_usec,i);
+    	for (i=1;i<16;++i)
+    	    timed[16][0].tv_usec += timed[i][0].tv_usec;
+    	xpprintf("**[ total %li µs over %i frames ]**\n",timed[16][0].tv_usec,measuretime);
+    for (i=0;i<17;++i)
+    	timed[i][0].tv_usec = 0;
     	
-	if (!(loops%measuretime)) {
-	    xpprintf("----------Paint_foo times----------\n");
-	    for (i=1;i<17;++i)
-	    	xpprintf("<%li	%2i>\n",timed[i][0].tv_usec,i);
-	    for (i=1;i<16;++i)
-	    	timed[16][0].tv_usec += timed[i][0].tv_usec;
-	    xpprintf("**[ total %li µs over %i frames ]**\n",timed[16][0].tv_usec,measuretime);
-	for (i=0;i<17;++i)
-	    timed[i][0].tv_usec = 0;
-	    
-	}
     }
+#endif
 }
 
 void Paint_score_start(void)
