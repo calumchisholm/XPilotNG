@@ -557,6 +557,7 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
 	glVertex2i(x, y);
     }
     glEnd();
+    glLineWidth(1);
     glPopMatrix();
 }
 
