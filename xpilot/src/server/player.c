@@ -2053,7 +2053,10 @@ void Player_death_reset(int ind)
     }
 
     pl->forceVisible	= 0;
-    pl->count		= MAX(RECOVERY_DELAY, pl->count);
+    if (BIT(pl->status, PAUSE))
+	pl->count		= MAX(RECOVERY_DELAY, pl->count);
+    else
+	pl->count = RECOVERY_DELAY;
     pl->ecmcount	= 0;
     pl->emergency_thrust_left = 0;
     pl->emergency_thrust_max = 0;
