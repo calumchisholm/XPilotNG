@@ -1306,7 +1306,7 @@ void Frame_update(void)
 	/*
 	 * Reduce frame rate to player's own rate.
 	 */
-	if (pl->player_fps < FPS) {
+	if (pl->player_fps < FPS && !ignoreMaxFPS) {
 	    int divisor = (FPS - 1) / pl->player_fps + 1;
 	    /* Even combined with above pause check gives at least every
 	     * (4 * divisor)th frame. */

@@ -349,6 +349,7 @@ bool		useOldCode;		/* Choice of new and old code */
 bool		polygonMode;		/* Run server in polygon mode even
 					   with block based (.xp) mapfile */
 bool		fastAim;		/* Turn before shooting in frame */
+bool		ignoreMaxFPS;		/* Temporary hack */
 
 /*
 ** Two functions which can be used if an option
@@ -3630,6 +3631,19 @@ static option_desc options[] = {
 	"Added this option to see how much difference changing the order\n"
 	"would make.\n"
     },
+    {
+	"ignoreMaxFPS",
+	"ignoreMaxFPS",
+	"false",
+	&ignoreMaxFPS,
+	valBool,
+	tuner_dummy,
+	"Ignore client maxFPS requests and always send all frames.\n"
+	"This is a hack for demonstration purposes to allow changing\n"
+	"the server FPS when there are old clients with broken maxFPS\n"
+	"handling. Those clients could be better dealt with separately.\n"
+	"This option will be removed in the future (hopefully).\n"
+    },
 };
 
 
@@ -3736,9 +3750,6 @@ option_desc* Find_option_by_name(const char* name)
     }
     return NULL;
 }
-
-
-
 
 
 void Timing_setup(void)

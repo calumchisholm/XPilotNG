@@ -364,6 +364,7 @@ extern DFLOAT		ecmSizeFactor;
 extern char		*playerPasswordsFileName;
 extern int		playerPasswordsFileSizeLimit;
 extern bool		fastAim;
+extern bool		ignoreMaxFPS;
 
 /* kps hack */
 extern bool		useOldCode;
