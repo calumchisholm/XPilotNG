@@ -102,18 +102,10 @@ int	shieldDrawMode = -1;	/* Either LineOnOffDash or LineSolid */
 int		maxKeyDefs;
 keydefs_t	*keyDefs = NULL;
 
-other_t		*self;		/* player info */
-
 long		loops = 0;
-
 unsigned long	loopsSlow = 0;	/* Proceeds slower than loops */
-int		clientFPS = 1;	/* How many fps we actually paint */
-static time_t	old_time = 0;	/* Previous value of time */
-time_t		currentTime;	/* Current value of time() */
-bool		newSecond = false; /* True if time() incremented this frame */
-static int	fps_estimate = 0;/* Used to estimate client fps */
-double		timePerFrame = 0.0;/* How much real time proceeds per frame */
-static double	time_counter = 0.0;
+static double   time_counter = 0.0;
+double          timePerFrame = 0.0;
 
 int	cacheShips = 0;		/* cache some ship bitmaps every frame */
 
@@ -222,34 +214,18 @@ void Paint_frame(void)
 	warn("Start neq. End (%ld,%ld,%ld)", start_loops, end_loops, loops);
     loops = end_loops;
 
-    fps_estimate++;
-
-    currentTime = time(NULL);
-    if (currentTime != old_time) {
-	old_time = currentTime;
-	newSecond = true;
-    } else
-	newSecond = false;
 
     /*
      * If time() changed from previous value, assume one second has passed.
      */
     if (newSecond) {
-	clientFPS = fps_estimate;
 	/* kps - improve */
 	recordFPS = clientFPS;
-	fps_estimate = 0;
-	/*
-	 * I've changed some places that used FPS (from setup) in client
-	 * to use clientFPS, to allow client to adapt to server changing
-	 * FPS dynamically ("/set fps 100" command on server).
-	 */
-	if (clientFPS <= 0)
-	    clientFPS = 1;
 	timePerFrame = 1.0 / clientFPS;
 
+	/* TODO: move this somewhere else */
 	/* check once per second if we are playing */
-	if (self && !strchr("PW", self->mychar))
+	if (newSecond && self && !strchr("PW", self->mychar))
 	    played_this_round = true;
     }
 

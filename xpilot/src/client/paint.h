@@ -38,7 +38,6 @@
 #define HUD_OFFSET		20	/* Hud line offset */
 #define FUEL_GAUGE_OFFSET	6
 #define HUD_FUEL_GAUGE_SIZE	(2*(MIN_HUD_SIZE-HUD_OFFSET-FUEL_GAUGE_OFFSET))
-#define CONTROL_TIME		8.0
 
 #define WARNING_DISTANCE	(VISIBILITY_DISTANCE*0.8)
 
@@ -242,9 +241,6 @@ extern int	(*radarDrawRectanglePtr)/* Function to draw player on radar */
 extern int	maxKeyDefs;
 extern long	loops;
 extern unsigned long	loopsSlow;
-extern int	clientFPS;
-extern time_t	currentTime;
-extern bool	newSecond;
 extern double	timePerFrame;
 
 extern double	scaleFactor;	/* scale the draw (main playfield) window */

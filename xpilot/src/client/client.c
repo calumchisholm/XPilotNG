@@ -75,6 +75,7 @@ other_t	*eyes;		        /* Player we get frame updates for */
 bool	snooping;               /* are we snooping on someone else? */
 int	eyeTeam = TEAM_NOT_SET;
 
+other_t	*self;		        /* player info */
 short	selfVisible;		/* Are we alive and playing? */
 short	damaged;		/* Damaged by ECM */
 short	destruct;		/* If self destructing */
@@ -148,6 +149,9 @@ char	modBankStr[NUM_MODBANKS][MAX_CHARS]; /* modifier banks */
 int	maxFPS;			/* Maximum FPS player wants from server */
 int	oldMaxFPS;
 int	FPSDivisor = 1; /* default just in case, this is calced from FPS and maxFPS */
+int	clientFPS = 1;	        /* How many fps we actually get */
+time_t	currentTime;	        /* Current value of time() */
+bool	newSecond = false;      /* True if time() incremented this frame */
 
 int	clientPortStart = 0;	/* First UDP port for clients */
 int	clientPortEnd = 0;	/* Last one (these are for firewalls) */
@@ -869,7 +873,7 @@ static void parse_styles(char **callptr)
     /* kps - why is NUM_BITMAPS used here ? */
     for (i = 0; i < num_polygon_styles; i++) {
 	polygon_styles[i].rgb = get_32bit(&ptr);
-	polygon_styles[i].texture = NUM_BITMAPS + (*ptr++);
+	polygon_styles[i].texture = (*ptr++);
 	polygon_styles[i].def_edge_style = *ptr++;
 	polygon_styles[i].flags = *ptr++;
     }
@@ -1636,10 +1640,28 @@ int Handle_start(long server_loops)
     return 0;
 }
 
+static void update_timing(void)
+{
+    static int    frame_counter = 0;
+    static time_t old_time = 0;
+    
+    frame_counter++;
+    currentTime = time(NULL);
+    if (currentTime != old_time) {
+	old_time = currentTime;
+	newSecond = true;
+	clientFPS = frame_counter > 1 ? frame_counter : 1;
+	frame_counter = 0;
+    } else {
+	newSecond = false;
+    }
+}
+
 int Handle_end(long server_loops)
 {
     end_loops = server_loops;
     snooping = (self && eyesId != self->id) ? true : false;
+    update_timing();    
     Paint_frame();
     return 0;
 }

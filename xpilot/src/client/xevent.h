@@ -24,6 +24,16 @@
 #ifndef XEVENT_H
 #define XEVENT_H
 
+typedef struct {
+    KeySym	keysym;			/* Keysym-to-action array */
+    keys_t	key;
+} keydefs_t;
+
+extern keydefs_t	*keyDefs;
+
+extern char* Get_keyHelpString(keys_t key);
+extern const char *Get_keyResourceString(keys_t key);
+
 keys_t Lookup_key(XEvent *event, KeySym ks, bool reset);
 void Pointer_control_set_state(int on);
 int Key_init(void);

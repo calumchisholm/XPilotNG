@@ -1192,7 +1192,7 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
     if ((filled || textured) && (BIT(style.flags,
 				     STYLE_TEXTURED | STYLE_FILLED))) {
         if (textured && BIT(style.flags, STYLE_TEXTURED)) {
-	    xp_bitmap_t *bmp = Bitmap_get(drawPixmap, style.texture, 0);
+	    xp_bitmap_t *bmp = Bitmap_get(drawPixmap, NUM_BITMAPS + style.texture, 0);
 	    if (bmp == NULL)
 		goto notexture; /* Print an error here? */
 	    XSetTile(dpy, gameGC, bmp->bitmap);

@@ -88,6 +88,7 @@
 #define MAX_SCALEFACTOR		8.0
 
 #define FUEL_NOTIFY_TIME	3.0
+#define CONTROL_TIME		8.0
 
 #define MAX_MSGS		15	/* Max. messages displayed ever */
 #define MAX_HIST_MSGS		128	/* Max. messages in history */
@@ -532,6 +533,9 @@ extern bool	pointerControl;		/* current state of mouse ship flying */
 extern int	maxFPS;			/* Client's own FPS */
 extern int 	oldMaxFPS;
 extern int 	FPSDivisor;
+extern int	clientFPS;	        /* How many fps we actually get */
+extern time_t	currentTime;	        /* Current value of time() */
+extern bool	newSecond;              /* True if time() incremented this frame */
 extern char	modBankStr[][MAX_CHARS];/* modifier banks strings */
 
 extern int	clientPortStart;	/* First UDP port for clients */

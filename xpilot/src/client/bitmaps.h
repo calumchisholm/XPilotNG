@@ -92,35 +92,28 @@
 
 #define RADAR_TEXTURE_SIZE 32
 
-
 typedef struct {
     Pixmap		bitmap;
-    unsigned		scale_width, scale_height;    
-
     Pixmap		mask;
     bbox_t		bbox;
 } xp_bitmap_t;
 
-#if 0
+/* xp_pixmap_t holds all data related to one "logical" image.
+ * One logical image can consists of several rectangular pixel 
+ * arrays (physical images). All physical images share the same 
+ * overall dimensions. 
+ *
+ * Note: if the count is negative it means that the other images
+ * are rotated copies of the original image.
+ */
 typedef struct {
-    char          *filename;
-    int           count, width, height, state;
-    bool          scalable;
-    xp_bitmap_t   *bitmaps;
-    xp_picture_t  picture;
-} xp_pixmap_t;
-#endif
-
-/* XXX need comment about purpose of this structure. */
-typedef struct {
-    const char		*filename;
-    int			count;
-    unsigned		width, height;
-
-    int			state;
-    bool		scalable;
-    xp_bitmap_t		*bitmaps;
-    xp_picture_t	picture;
+    const char		*filename;     /* the file containing the image */
+    int			count;         /* amount of images (see above) */
+    int			state;         /* the state of the image (BMS_*) */
+    int                 width, height; /* the (scaled) dimensions */
+    bool		scalable;      /* should this image be scaled */
+    xp_bitmap_t		*bitmaps;      /* platform dependent image data */
+    xp_picture_t	picture;       /* the image data in RGB format */
 } xp_pixmap_t;
 
 extern xp_pixmap_t *pixmaps;

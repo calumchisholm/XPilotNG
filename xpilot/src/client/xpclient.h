@@ -26,7 +26,7 @@
 
 #include "xpcommon.h"
 
-#ifdef HAVE_ZLIB_H
+#ifdef HAVE_LIBZ
 #  include <zlib.h>
 #else
 #  error "Header zlib.h missing. Please install zlib."

@@ -156,18 +156,4 @@ typedef enum {
 #endif
 } keys_t;
 
-
-#ifndef SERVER
-typedef struct {
-    KeySym	keysym;			/* Keysym-to-action array */
-    keys_t	key;
-} keydefs_t;
-
-extern keydefs_t	*keyDefs;
-
-extern char* Get_keyHelpString(keys_t key);
-extern const char *Get_keyResourceString(keys_t key);
-
-#endif
-
 #endif
