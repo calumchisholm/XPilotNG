@@ -947,7 +947,7 @@ xp_option_t default_options[] = {
     XP_BOOL_OPTION(
 	"pointerControl",
 	false,
-	&pointerControl,
+	&initialPointerControl,
 	NULL,
 	"Enable mouse control.  This allows ship direction control by\n"
 	"moving the mouse to the left for an anti-clockwise turn and\n"
