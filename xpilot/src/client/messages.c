@@ -440,7 +440,7 @@ static bool Msg_scan_for_ball_destruction(char *message)
 }
 
 /* Mara's ball message scan */
-static msg_bms_t Msg_do_bms(char *message)
+static msg_bms_t Msg_do_bms(char *message, char *bracket)
 {
     static char ball_text1[] = "BALL";
     static char ball_text2[] = "Ball";
@@ -457,19 +457,7 @@ static msg_bms_t Msg_do_bms(char *message)
     static char pop_text1[] = "POP";
     static char pop_text2[] = "Pop";
     static char pop_text3[] = "pop";
-    char *bracket = NULL;
-    int len, i, n = 0;
 
-    /* find second last '[' - always succeeds for a team message */
-    len = (int)strlen(message);
-    for (i = len; i >= 0; i--) {
-	if (message[i] == '[')
-	    n++;
-	if (n == 2) {
-	    bracket = &message[i];
-	    break;
-	}
-    }
     /* for safety */
     if (bracket == NULL)
 	return BmsNone;
@@ -518,23 +506,47 @@ static msg_bms_t Msg_do_bms(char *message)
 }
 
 
-/* checks if the message is for your team */
-static bool Msg_is_team_msg(char *message)
+/*
+ * Checks if the message is sent by someone in your team.
+ * In 'bracket' we will store info about where the
+ * player name starts so the bms does can ignore that.
+ */
+static bool Msg_is_from_our_team(char *message, char **bracket)
 {
-    char end[8];
-    size_t endlen, len;
+    other_t *other;
+    static char buf[MAX_CHARS + 8];
+    size_t bufstrlen, len;
+    int i;
 
     if (self == NULL)
 	return false;
 
-    sprintf(end, "]:[%i]", self->team);
-    endlen = strlen(end);
     len = strlen(message);
+    for (i = 0; i < num_others; i++) {
+	other = &Others[i];
+	if (other->team != self->team)
+	    continue;
 
-    if (len < endlen)
-	return false;
-    if (!strcmp(&message[len - endlen], end))
-	return true;
+	/* first check if someone in your team sent the message for all */
+	sprintf(buf, "[%s]", other->name);
+	bufstrlen = strlen(buf);
+	if (len < bufstrlen)
+	    continue;
+	if (!strcmp(&message[len - bufstrlen], buf)) {
+	    *bracket = &message[len - bufstrlen];
+	    return true;
+	}
+
+	/* if not, check if it was sent to your team only */
+	sprintf(buf, "[%s]:[%d]", other->name, other->team);
+	bufstrlen = strlen(buf);
+	if (len < bufstrlen)
+	    continue;
+	if (!strcmp(&message[len - bufstrlen], buf)) {
+	    *bracket = &message[len - bufstrlen];
+	    return true;
+	}
+    }
     return false;
 }
 
@@ -564,6 +576,7 @@ void Add_message(char *message)
     message_t		*tmp, **msg_set;
     bool		is_game_msg = false;
     msg_bms_t		bmsinfo = BmsNone;
+    char		*bracket = NULL;
 
 #ifndef _WINDOWS
     bool		is_drawn_talk_message	= false; /* not pending */
@@ -626,8 +639,8 @@ void Add_message(char *message)
     if (BIT(hackedInstruments, BALL_MSG_SCAN)
 	&& !is_game_msg
 	&& BIT(Setup->mode, TEAM_PLAY)
-	&& Msg_is_team_msg(message))
-	bmsinfo = Msg_do_bms(message);
+	&& Msg_is_from_our_team(message, &bracket))
+	bmsinfo = Msg_do_bms(message, bracket);
 
     if (Msg_is_in_angle_brackets(message)) {
 	if (Msg_scan_for_ball_destruction(message));
