@@ -278,7 +278,7 @@ static void About_create_window(void)
 				buttonWindowHeight = 2*BTN_BORDER
 				    + buttonFont->ascent + buttonFont->descent,
 				windowHeight = ABOUT_WINDOW_HEIGHT;
-    int				textWidth;
+    unsigned			textWidth;
     XSetWindowAttributes	sattr;
     unsigned long		mask;
 
@@ -313,8 +313,9 @@ static void About_create_window(void)
     textWidth = XTextWidth(buttonFont, "CLOSE", 5);
     about_close_b
 	= XCreateSimpleWindow(dpy, aboutWindow,
-			      BORDER, (windowHeight - BORDER
-				       - buttonWindowHeight - 4),
+			      BORDER,
+			      (int)(windowHeight - BORDER
+				    - buttonWindowHeight - 4),
 			      2*BTN_BORDER + textWidth,
 			      buttonWindowHeight,
 			      0, 0,
@@ -326,16 +327,20 @@ static void About_create_window(void)
     textWidth = XTextWidth(buttonFont, "NEXT", 4);
     about_next_b
 	= XCreateSimpleWindow(dpy, aboutWindow,
-			      windowWidth/2 - BTN_BORDER - textWidth/2,
-			      windowHeight - BORDER - buttonWindowHeight - 4,
+			      (int)(windowWidth / 2
+				    - BTN_BORDER - textWidth / 2),
+			      (int)(windowHeight
+				    - BORDER - buttonWindowHeight - 4),
 			      2*BTN_BORDER + textWidth, buttonWindowHeight,
 			      0, 0,
 			      colors[buttonColor].pixel);
     textWidth = XTextWidth(buttonFont, "PREV", 4);
     about_prev_b
 	= XCreateSimpleWindow(dpy, aboutWindow,
-			      windowWidth - BORDER - 2*BTN_BORDER - textWidth,
-			      windowHeight - BORDER - buttonWindowHeight - 4,
+			      (int)(windowWidth - BORDER
+				    - 2*BTN_BORDER - textWidth),
+			      (int)(windowHeight - BORDER
+				    - buttonWindowHeight - 4),
 			      2*BTN_BORDER + textWidth, buttonWindowHeight,
 			      0, 0,
 			      colors[buttonColor].pixel);
@@ -367,7 +372,8 @@ void Expose_button_window(int color, Window w)
 	XGetWindowAttributes(dpy, w, &wattr);	/* and width */
 
 	XSetForeground(dpy, buttonGC, colors[color].pixel);
-	XFillRectangle(dpy, w, buttonGC, 0, 0, wattr.width, wattr.height);
+	XFillRectangle(dpy, w, buttonGC, 0, 0,
+		       (unsigned)wattr.width, (unsigned)wattr.height);
 	XSetForeground(dpy, buttonGC, colors[WHITE].pixel);
     }
 
