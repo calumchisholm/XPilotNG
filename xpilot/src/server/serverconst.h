@@ -124,12 +124,12 @@
 #define ED_LASER_HIT		(-100.0)
 
 #define MAX_PLAYER_FUEL		2600.0
-#define ENERGY_PACK_FUEL        (500.0 + rfrac() * 511.0)
+#define ENERGY_PACK_FUEL	(500.0 + rfrac() * 511.0)
 
 #define LG2_MAX_AFTERBURNER     4
 #define ALT_SPARK_MASS_FACT     4.2
-#define ALT_FUEL_FACT           3
-#define MAX_AFTERBURNER        ((1<<LG2_MAX_AFTERBURNER)-1)
+#define ALT_FUEL_FACT	   3
+#define MAX_AFTERBURNER	((1<<LG2_MAX_AFTERBURNER)-1)
 /*#define AFTER_BURN_SPARKS(s,n)  (((s)*(n))>>LG2_MAX_AFTERBURNER)*/
 #define AFTER_BURN_POWER_FACTOR(n) \
  (1.0+(n)*((ALT_SPARK_MASS_FACT-1.0)/(MAX_AFTERBURNER+1.0)))
@@ -138,17 +138,17 @@
 #define AFTER_BURN_FUEL(f,n)    \
  (((f)*((MAX_AFTERBURNER+1)+(n)*(ALT_FUEL_FACT-1)))/(MAX_AFTERBURNER+1.0))
 
-#define THRUST_MASS             0.7
+#define THRUST_MASS	     0.7
 #define ARMOR_MASS		(options.shipMass / 14)
 
-#define MAX_TANKS               8
-#define TANK_MASS               (options.shipMass / 10)
-#define TANK_CAP(n)             (!(n)?MAX_PLAYER_FUEL:(MAX_PLAYER_FUEL/3))
-#define TANK_FUEL(n)            ((TANK_CAP(n)*(5+(randomMT()&3)))/32)
+#define MAX_TANKS	       8
+#define TANK_MASS	       (options.shipMass / 10)
+#define TANK_CAP(n)	     (!(n)?MAX_PLAYER_FUEL:(MAX_PLAYER_FUEL/3))
+#define TANK_FUEL(n)	    ((TANK_CAP(n)*(5+(randomMT()&3)))/32)
 #define TANK_REFILL_LIMIT       (350.0/8.0)
-#define TANK_THRUST_FACT        0.7
+#define TANK_THRUST_FACT	0.7
 #define TANK_NOTHRUST_TIME      (HEAT_CLOSE_TIMEOUT/2+2)
-#define TANK_THRUST_TIME        (TANK_NOTHRUST_TIME/2+1)
+#define TANK_THRUST_TIME	(TANK_NOTHRUST_TIME/2+1)
 
 #define GRAVS_POWER		2.7
 
@@ -158,25 +158,28 @@
  */
 #define TRANSPORTER_DISTANCE	(VISIBILITY_DISTANCE*0.2)
 
+#define SHOT_DEFAULT_LIFE	60.0
 #define SHOT_MULT(o) \
 	((BIT((o)->mods.nuclear, NUCLEAR) && BIT((o)->mods.warhead, CLUSTER)) \
-	 ? options.nukeClusterDamage : 1.0f)
+	 ? options.nukeClusterDamage : 1.0)
 
 #define MINE_RADIUS		8
-#define MINE_RANGE              (VISIBILITY_DISTANCE*0.1)
+#define MINE_RANGE	 	(VISIBILITY_DISTANCE*0.1)
 #define MINE_SENSE_BASE_RANGE   (MINE_RANGE*1.3)
 #define MINE_SENSE_RANGE_FACTOR (MINE_RANGE*0.3)
-#define MINE_MASS               30.0
-#define MINE_LIFETIME           (5000+(randomMT()&255))
-#define MINE_SPEED_FACT         1.3
+#define MINE_MASS		30.0
+/*#define MINE_LIFETIME           (5000+(randomMT()&255)) */
+#define MINE_DEFAULT_LIFE	7200.0				/* improved mines */
+#define MINE_SPEED_FACT		1.3
 
-#define MISSILE_LIFETIME        ((randomMT()%(64 * 12 - 1) + 128 * 12))
-#define MISSILE_MASS            5.0
-#define MISSILE_RANGE           4
+/*#define MISSILE_LIFETIME	((randomMT()%(64 * 12 - 1) + 128 * 12))*/
+#define MISSILE_DEFAULT_LIFE	2400.0				/* improved missiles */
+#define MISSILE_MASS		5.0
+#define MISSILE_RANGE		4
 #define SMART_SHOT_ACC		0.6
 #define SMART_SHOT_DECFACT	3
 #define SMART_SHOT_MIN_SPEED	(SMART_SHOT_ACC*8)
-#define SMART_TURNSPEED         2.6
+#define SMART_TURNSPEED		2.6
 #define SMART_SHOT_MAX_SPEED	22.0
 #define SMART_SHOT_LOOK_AH      4
 #define CONFUSED_TIME		3
@@ -191,17 +194,18 @@
 #define NUKE_MASS_MULT		1
 #define NUKE_MINE_EXPL_MULT	3
 #define NUKE_SMART_EXPL_MULT	4
+#define NUKE_DEFAULT_DEBRIS_LIFE	120.0
 
-#define HEAT_RANGE              (VISIBILITY_DISTANCE/2)
-#define HEAT_SPEED_FACT         1.7
+#define HEAT_RANGE		(VISIBILITY_DISTANCE/2)
+#define HEAT_SPEED_FACT		1.7
 #define HEAT_CLOSE_TIMEOUT      (2 * 12)
-#define HEAT_CLOSE_RANGE        HEAT_RANGE
-#define HEAT_CLOSE_ERROR        0
-#define HEAT_MID_TIMEOUT        (4 * 12)
-#define HEAT_MID_RANGE          (2 * HEAT_RANGE)
-#define HEAT_MID_ERROR          8
+#define HEAT_CLOSE_RANGE	HEAT_RANGE
+#define HEAT_CLOSE_ERROR	0
+#define HEAT_MID_TIMEOUT	(4 * 12)
+#define HEAT_MID_RANGE		(2 * HEAT_RANGE)
+#define HEAT_MID_ERROR		8
 #define HEAT_WIDE_TIMEOUT       (8 * 12)
-#define HEAT_WIDE_ERROR         16
+#define HEAT_WIDE_ERROR		16
 
 #define CLUSTER_MASS_SHOTS(mass) ((mass) * 0.9 / options.shotMass)
 #define CLUSTER_MASS_DRAIN(mass) (CLUSTER_MASS_SHOTS(mass)*ED_SHOT)
@@ -217,6 +221,7 @@
 #define PULSE_MIN_LIFE		(4.5)
 #define PULSE_LIFE(lasers)	(PULSE_MIN_LIFE + ((lasers) / 4))
 #endif
+#define PULSE_DEFAULT_LIFE	6.0
 #define CANNON_PULSE_LIFE	(4.75)
 
 #define TRACTOR_MAX_RANGE(items)  (200 + (items) * 50)
@@ -233,7 +238,7 @@
 #define PHASING_TIME		(4 * 12)
 #define EMERGENCY_THRUST_TIME	(4 * 12)
 
-#define FUEL_MASS(f)            ((f) * 0.005)
+#define FUEL_MASS(f)		((f) * 0.005)
 #define START_STATION_FUEL	MAX_STATION_FUEL
 #define STATION_REGENERATION	0.06
 #define REFUEL_RATE		5.0
@@ -244,7 +249,7 @@
 
 #define ALLIANCE_NOT_SET	(-1)
 
-#define DEBRIS_MASS             4.5
+#define DEBRIS_MASS		4.5
 
 #define ENERGY_RANGE_FACTOR	2.5
 

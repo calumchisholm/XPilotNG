@@ -116,7 +116,7 @@ static void Set_item_chance(int item)
  */
 void Tune_item_probs(void)
 {
-    int			i, j, excess;
+    int i, j, excess;
     world_t *world = &World;
 
     for (i = 0; i < NUM_ITEMS; i++) {
@@ -141,7 +141,7 @@ void Tune_item_probs(void)
 void Tune_asteroid_prob(void)
 {
     world_t *world = &World;
-    double	max = options.maxAsteroidDensity * world->x * world->y;
+    double max = options.maxAsteroidDensity * world->x * world->y;
 
     if (world->asteroids.prob > 0) {
 	world->asteroids.chance = (int)(1.0
@@ -161,7 +161,7 @@ void Tune_asteroid_prob(void)
     /* superfluous asteroids are handled by Asteroid_update() */
 
     /* Tune asteroid concentrator parameters */
-    LIMIT(options.asteroidConcentratorRadius, 1, world->diagonal);
+    LIMIT(options.asteroidConcentratorRadius, 1.0, world->diagonal);
     LIMIT(options.asteroidConcentratorProb, 0.0, 1.0);
 }
 
@@ -203,7 +203,7 @@ static void Init_item(int item, int minpp, int maxpp)
  */
 void Set_initial_resources(void)
 {
-    int			i;
+    int i;
     world_t *world = &World;
 
     LIMIT(world->items[ITEM_FUEL].limit, 0, MAX_FUEL);

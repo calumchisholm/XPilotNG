@@ -119,8 +119,8 @@ extern struct options {
     int		robotsTalk;
     int		robotsLeave;
     int		robotLeaveLife;
-    int		robotLeaveScore;
-    int		robotLeaveRatio;
+    double	robotLeaveScore;
+    double	robotLeaveRatio;
     int		robotTeam;
     bool	restrictRobots;
     bool	reserveRobotTeam;
@@ -227,12 +227,13 @@ extern struct options {
     int		nukeMinSmarts;
     int		nukeMinMines;
     double	nukeClusterDamage;
+    double	nukeDebrisLife;
     int		mineFuseTime;
-    int		mineLife;
+    double	mineLife;
     double	minMineSpeed;
     double	missileLife;
-    int		baseMineRange;
-    int		mineShotDetonateDistance;
+    double	baseMineRange;
+    double	mineShotDetonateDistance;
 
     double	shotKillScoreMult;
     double	torpedoKillScoreMult;
@@ -314,9 +315,9 @@ extern struct options {
     int		asteroidMaxItems;
     double	maxItemDensity;
     double	maxAsteroidDensity;
-    int		itemConcentratorRadius;
+    double	itemConcentratorRadius;
     double	itemConcentratorProb;
-    int		asteroidConcentratorRadius;
+    double	asteroidConcentratorRadius;
     double	asteroidConcentratorProb;
     double	gameDuration;
     bool	baselessPausing;
@@ -356,7 +357,7 @@ extern struct options {
 
     char	*tankUserName;
     char	*tankHostName;
-    int		tankScoreDecrement;
+    double	tankScoreDecrement;
 
     bool	selfImmunity;
 

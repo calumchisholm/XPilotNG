@@ -104,7 +104,7 @@ void Place_general_mine(player *pl, int team, long status,
     else if (BIT(status, FROMCANNON))
 	life = CANNON_SHOT_LIFE;
     else
-	life = (options.mineLife ? options.mineLife : (int)MINE_LIFETIME);
+	life = options.mineLife;
 
     if (!BIT(mods.warhead, CLUSTER))
 	mods.velocity = 0;
@@ -597,8 +597,7 @@ void Fire_general_shot(player *pl, int team, bool cannon,
 	if (pl && BIT(pl->status, KILLED))
 	    life = rfrac() * 12;
 	else if (!cannon)
-	    life = (options.missileLife
-		    ? options.missileLife : MISSILE_LIFETIME);
+	    life = options.missileLife;
 
 	switch (type) {
 	case OBJ_HEAT_SHOT:
@@ -1244,8 +1243,8 @@ void Delete_shot(int ind)
 	max_life = (intensity >> 1) * life_modv;
 
 	/* Hack - make sure nuke debris don't get insanely long life time. */
-	if (BIT(shot->mods.nuclear, NUCLEAR) && max_life > 120.0)
-	    max_life = 120.0;
+	if (BIT(shot->mods.nuclear, NUCLEAR))
+	    max_life = options.nukeDebrisLife;
 
 #if 0
 	warn("type = %16s (%c%c) inten = %-6d num = %-6d life: %.1f - %.1f",

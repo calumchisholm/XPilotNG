@@ -52,11 +52,54 @@ void tuner_none(void)  {}
 void tuner_dummy(void) {}
 
 
-static void Tune_robot_user_name(void) { Fix_user_name(options.robotUserName); }
-static void Tune_robot_host_name(void) { Fix_host_name(options.robotHostName); }
-static void Tune_tank_user_name(void)  { Fix_user_name(options.tankUserName); }
-static void Tune_tank_host_name(void)  { Fix_host_name(options.tankHostName); }
-static void Tune_tagGame(void) { if (!options.tagGame) tagItPlayerId = NO_ID; }
+static void Tune_robot_user_name(void)
+{
+    Fix_user_name(options.robotUserName);
+}
+static void Tune_robot_host_name(void)
+{
+    Fix_host_name(options.robotHostName);
+}
+static void Tune_tank_user_name(void)
+{
+    Fix_user_name(options.tankUserName);
+}
+static void Tune_tank_host_name(void)
+{
+    Fix_host_name(options.tankHostName);
+}
+static void Tune_tagGame(void)
+{
+    if (!options.tagGame)
+	tagItPlayerId = NO_ID;
+}
+static void Tune_shotLife(void)
+{
+    if (options.shotLife == 0.0)
+	options.shotLife = SHOT_DEFAULT_LIFE;
+}
+static void Tune_pulseLife(void)
+{
+    if (options.pulseLife == 0.0)
+	options.pulseLife = PULSE_DEFAULT_LIFE;
+}
+static void Tune_nukeDebrisLife(void)
+{
+    if (options.nukeDebrisLife == 0.0)
+	options.nukeDebrisLife = NUKE_DEFAULT_DEBRIS_LIFE;
+}
+static void Tune_mineLife(void)
+{
+    if (options.mineLife == 0.0)
+	options.mineLife = MINE_DEFAULT_LIFE;
+}
+static void Tune_missileLife(void)
+{
+    if (options.missileLife == 0.0)
+	options.missileLife = MISSILE_DEFAULT_LIFE;
+}
+
+
 static void Check_baseless(void);
 
 static option_desc opts[] = {
@@ -172,8 +215,8 @@ static option_desc opts[] = {
 	"60.0",
 	&options.shotLife,
 	valReal,
-	tuner_dummy,
-	"Life of bullets in ticks.\n",
+	Tune_shotLife,
+	"Life of bullets in ticks, zero means use default.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -213,8 +256,8 @@ static option_desc opts[] = {
 	"6.0",
 	&options.pulseLife,
 	valReal,
-	tuner_dummy,
-	"Life of laser pulses shot by ships, in ticks.\n",
+	Tune_pulseLife,
+	"Life of laser pulses shot by ships, in ticks, zero means use default.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -305,9 +348,9 @@ static option_desc opts[] = {
     {
 	"robotLeaveScore",
 	"robotLeaveScore",
-	"-90",
+	"-90.0",
 	&options.robotLeaveScore,
-	valInt,
+	valReal,
 	tuner_dummy,
 	"Min score for robot to play (0=off).\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
@@ -315,9 +358,9 @@ static option_desc opts[] = {
     {
 	"robotLeaveRatio",
 	"robotLeaveRatio",
-	"-5",
+	"-5.0",
 	&options.robotLeaveRatio,
-	valInt,
+	valReal,
 	tuner_dummy,
 	"Min ratio for robot to play (0=off).\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
@@ -407,9 +450,9 @@ static option_desc opts[] = {
     {
 	"tankScoreDecrement",
 	"tankDecrement",
-	"500",
+	"500.0",
 	&options.tankScoreDecrement,
-	valInt,
+	valReal,
 	tuner_dummy,
 	"How much lower is the tank's score than the player's?\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
@@ -1884,6 +1927,16 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
+	"nukeDebrisLife",
+	"nukeDebrisLife",
+	"120.0",
+	&options.nukeDebrisLife,
+	valReal,
+	Tune_nukeDebrisLife,
+	"Life of nuke debris, zero means use default.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
 	"mineFuseTime",
 	"mineFuseTime",
 	"0.0",
@@ -1896,17 +1949,17 @@ static option_desc opts[] = {
     {
 	"mineLife",
 	"mineLife",
-	"0",
+	"7200.0",
 	&options.mineLife,
-	valInt,
-	tuner_dummy,
+	valReal,
+	Tune_mineLife,
 	"Life of mines in ticks, zero means use default.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"minMineSpeed",
 	"minMineSpeed",
-	"0",
+	"0.0",
 	&options.minMineSpeed,
 	valReal,
 	tuner_dummy,
@@ -1916,19 +1969,19 @@ static option_desc opts[] = {
     {
 	"missileLife",
 	"missileLife",
-	"0",
+	"2400.0",
 	&options.missileLife,
 	valReal,
-	tuner_dummy,
+	Tune_missileLife,
 	"Life of missiles in ticks, zero means use default.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"baseMineRange",
 	"baseMineRange",
-	"0",
+	"0.0",
 	&options.baseMineRange,
-	valInt,
+	valReal,
 	tuner_dummy,
 	"Minimum distance from base mines may be used.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
@@ -1936,9 +1989,9 @@ static option_desc opts[] = {
     {
 	"mineShotDetonateDistance",
 	"mineShotDetonateDistance",
-	"0",
+	"0.0",
 	&options.mineShotDetonateDistance,
-	valInt,
+	valReal,
 	tuner_dummy,
 	"How close must a shot be to detonate a mine?\n"
 	"Set this to 0 to turn it off.",
@@ -2270,12 +2323,12 @@ static option_desc opts[] = {
     {
 	"itemConcentratorRadius",
 	"itemConcentratorRange",
-	"10",
+	"10.0",
 	&options.itemConcentratorRadius,
-	valInt,
+	valReal,
 	Set_misc_item_limits,
 	"The maximum distance from an item concentator for items to appear in.\n"
-	"Sensible values are in the range 1 to 20.\n"
+	"Sensible values are in the range 1.0 to 20.0.\n"
 	"If no item concentators are defined in a map then items can popup anywhere.\n"
 	"If any are any then items popup in the vicinity of an item concentrator\n"
 	"with probability itemConcentratorProb and anywhere the remainder of the time.\n"
@@ -2298,12 +2351,12 @@ static option_desc opts[] = {
     {
 	"asteroidConcentratorRadius",
 	"asteroidConcentratorRange",
-	"10",
+	"10.0",
 	&options.asteroidConcentratorRadius,
-	valInt,
+	valReal,
 	Tune_asteroid_prob,
 	"The maximum distance from an asteroid concentrator for asteroids to\n"
-	"appear in.  Sensible values are in the range 1 to 20.\n"
+	"appear in.  Sensible values are in the range 1.0 to 20.0.\n"
 	"If no asteroid concentrators are defined in a map then asteroids can\n"
 	"popup anywhere.  If any are then asteroids popup in the vicinity of an\n"
 	"asteroid concentrator with probability asteroidConcentratorProb and anywhere\n"
