@@ -72,7 +72,7 @@ REC_LD = 'w'
 REC_RD = 'q'
 ATTRACT = '$'
 BCLICKS = 35 * 64
-MAXLEN = 32000
+MAXLEN = 30000
 
 class Wrapcoords:
     def __init__(self, width, height, x = 0, y = 0):
