@@ -56,7 +56,6 @@
 #include "dbuff.h"
 #include "default.h"
 #include "paintdata.h"
-#include "paintmacros.h"
 #include "record.h"
 #include "texture.h"
 #include "widget.h"

@@ -16,7 +16,7 @@ xpilot_SOURCES = \
 	mapdata.c messages.c \
 	netclient.c netclient.h \
 	paint.c paint.h paintdata.c paintdata.h painthud.c \
-	paintmacros.h paintmap.c paintobjects.c paintradar.c protoclient.h \
+	paintmap.c paintobjects.c paintradar.c protoclient.h \
 	query.c \
 	record.c record.h recordfmt.h \
 	talk.c talk.h talkmacros.c textinterface.c texture.c texture.h \
