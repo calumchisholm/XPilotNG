@@ -69,7 +69,7 @@ void Place_mine(player_t *pl)
 	return;
     }
 
-    Place_general_mine(pl->world, pl, pl->team, 0, pl->pos,
+    Place_general_mine(pl->world, pl, pl->team, GRAVITY, pl->pos,
 		       zero_vel, pl->mods);
 }
 
