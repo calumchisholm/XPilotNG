@@ -1175,10 +1175,8 @@ void Delete_shot(int ind)
 
 	if (BIT(shot->mods.warhead, CLUSTER)) {
 	    type = OBJ_SHOT;
-	    if (shot->id != NO_ID) {
-		player *pl = Player_by_id(shot->id);
-		color = pl->color;
-	    }
+	    if (shot->id != NO_ID)
+		color = Player_by_id(shot->id)->color;
 	    else
 		color = WHITE;
 	    mass = ShotsMass;
@@ -1254,9 +1252,8 @@ void Delete_shot(int ind)
     case OBJ_SHOT:
 	if (shot->id == NO_ID
 	    || BIT(shot->status, FROMCANNON)
-	    || BIT(shot->mods.warhead, CLUSTER)) {
+	    || BIT(shot->mods.warhead, CLUSTER))
 	    break;
-	}
 	pl = Player_by_id(shot->id);
 	if (--pl->shots <= 0)
 	    pl->shots = 0;
@@ -1264,9 +1261,8 @@ void Delete_shot(int ind)
 
     case OBJ_PULSE:
 	if (shot->id == NO_ID
-	    || BIT(shot->status, FROMCANNON)) {
+	    || BIT(shot->status, FROMCANNON))
 	    break;
-	}
 	pl = Player_by_id(shot->id);
 	if (--pl->num_pulses <= 0)
 	    pl->num_pulses = 0;
@@ -1356,7 +1352,6 @@ void Delete_shot(int ind)
 
 void Fire_laser(player *pl)
 {
-    double	laserRepeatRate = 2;
     clpos	m_gun, pos;
 
     if (frame_time <= pl->laser_time + laserRepeatRate - timeStep + 1e-3)
@@ -1502,8 +1497,7 @@ void Update_connector_force(ballobject *ball)
     if (length > 0.0) {
 	D.x /= length;
 	D.y /= length;
-    }
-    else
+    } else
 	D.x = D.y = 0.0;
 
     /* compute the ratio for the spring action */

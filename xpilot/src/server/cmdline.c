@@ -56,7 +56,7 @@ bool		reserveRobotTeam;	/* Allow only robots in robotTeam? */
 int		ShotsMax;		/* Max shots pr. player */
 bool		ShotsGravity;		/* Shots affected by gravity */
 DFLOAT		fireRepeatRate;		/* Ticks per autorepeat fire (0=off) */
-
+double		laserRepeatRate = 2;	/* Ticks per laser fire (0=off) */
 bool		RawMode;		/* Let robots live and calculate
 					   frames even if there are n
 					   players logged in */

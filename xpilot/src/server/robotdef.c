@@ -279,7 +279,7 @@ static void Robot_default_invite(player *pl, player *inviter)
     robot_default_data_t	*my_data = Robot_default_get_data(pl);
     int				i;
     DFLOAT			limit;
-    int				accept = 1;	/* accept by default */
+    bool			we_accept = true;
 
     if (pl->alliance != ALLIANCE_NOT_SET) {
 	/* if there is a human in our alliance, they should decide
@@ -287,11 +287,11 @@ static void Robot_default_invite(player *pl, player *inviter)
 	for (i = 0; i < NumPlayers; i++) {
 	    player *pl_i = Players(i);
 	    if (IS_HUMAN_PTR(pl_i) && ALLIANCE(pl, pl_i)) {
-		accept = 0;
+		we_accept = false;
 		break;
 	    }
 	}
-	if (!accept) {
+	if (!we_accept) {
 	    Refuse_alliance(pl, inviter);
 	    return;
 	}
@@ -301,13 +301,13 @@ static void Robot_default_invite(player *pl, player *inviter)
     if (inviter->alliance == ALLIANCE_NOT_SET) {
 	/* don't accept players we are at war with */
 	if (inviter->id == war_id)
-	    accept = 0;
+	    we_accept = false;
 	/* don't accept players who are not active */
 	if (!Player_is_active(inviter))
-	    accept = 0;
+	    we_accept = false;
 	/* don't accept players with scores substantially lower than ours */
 	else if (inviter->score < (pl->score - limit))
-	    accept = 0;
+	    we_accept = false;
     }
     else {
 	DFLOAT	avg_score = 0;
@@ -317,19 +317,19 @@ static void Robot_default_invite(player *pl, player *inviter)
 	    player *pl_i = Players(i);
 	    if (pl_i->alliance == inviter->alliance) {
 		if (pl_i->id == war_id) {
-		    accept = 0;
+		    we_accept = false;
 		    break;
 		}
 		avg_score += pl_i->score;
 	    }
 	}
-	if (accept) {
+	if (we_accept) {
 	    avg_score = avg_score / member_count;
 	    if (avg_score < (pl->score - limit))
-		accept = 0;
+		we_accept = false;
 	}
     }
-    if (accept)
+    if (we_accept)
 	Accept_alliance(pl, inviter);
     else
 	Refuse_alliance(pl, inviter);
@@ -1814,7 +1814,7 @@ static void Robot_default_play(player *pl)
     int				item_i, mine_i;
     int				j, ship_i, item_imp,
 				enemy_i;
-    int				dx, dy, x, y;
+    int				x, y;
     bool			harvest_checked;
     bool			evade_checked;
     bool			navigate_checked;
@@ -1868,7 +1868,7 @@ static void Robot_default_play(player *pl)
 	return;
     }
 
-    if (pl->fuel.sum < pl->fuel.max * 0.80)
+    if (pl->fuel.sum < pl->fuel.max * 0.80) {
 	for (j = 0; j < World.NumFuels; j++) {
 	    int dx, dy;
 	    fuel_t *fs = Fuels(j);
@@ -1890,6 +1890,7 @@ static void Robot_default_play(player *pl)
 	    } else
 		CLR_BIT(pl->used, HAS_REFUEL);
 	}
+    }
 
     /* don't turn NEED_FUEL off until refueling stops */
     if (pl->fuel.sum < (BIT(World.rules->mode, TIMING) ?
@@ -1963,6 +1964,7 @@ static void Robot_default_play(player *pl)
 
 	if (Player_is_active(ship)
 	    && Detect_hunt(pl, ship)) {
+	    int dx, dy;
 
 	    if (BIT(my_data->robot_lock, LOCK_PLAYER)
 		&& my_data->robot_lock_id == ship->id) {
@@ -1992,6 +1994,8 @@ static void Robot_default_play(player *pl)
     if (ship_i == -1 || enemy_i == -1) {
 
 	for (j = 0; j < NumPlayers; j++) {
+	    int dx, dy;
+
 	    ship = Players(j);
 	    if (j == GetInd(pl->id)
 		|| !Player_is_active(ship)

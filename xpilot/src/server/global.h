@@ -103,7 +103,7 @@ extern DFLOAT		pulseLife;
 extern bool		ShotsGravity;
 extern bool		shotHitFuelDrainUsesKineticEnergy;
 extern DFLOAT		fireRepeatRate;
-extern int		laserRepeatRate;
+extern double		laserRepeatRate;
 extern long		DEF_BITS, KILL_BITS, DEF_HAVE, DEF_USED, USED_KILL;
 extern int		GetIndArray[];
 extern int		ShutdownServer, ShutdownDelay;

@@ -45,7 +45,7 @@ static const char *xpilotscorefile = NULL;
 static RankHead rank_head;
 static RankInfo scores[MAX_SCORES];
 
-static int    rankedplayer[MAX_SCORES];
+static int rankedplayer[MAX_SCORES];
 static double rankedscore[MAX_SCORES];
 static double sc_table[MAX_SCORES];
 static double kr_table[MAX_SCORES];
@@ -54,27 +54,27 @@ static double hf_table[MAX_SCORES];
 
 static void swap2(int *i1, int *i2, double *d1, double *d2)
 {
-	int i;
-	double d;
+    int i;
+    double d;
 
-	i = *i1;
-	d = *d1;
-	*i1 = *i2;
-	*d1 = *d2;
-	*i2 = i;
-	*d2 = d;
+    i = *i1;
+    d = *d1;
+    *i1 = *i2;
+    *d1 = *d2;
+    *i2 = i;
+    *d2 = d;
 }
 
 static char *rank_showtime(void)
 {
-    time_t		now;
-    struct tm		*tmp;
-    static char		month_names[13][4] = {
-			    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-			    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-			    "Bug"
-			};
-    static char		buf[80];
+    time_t now;
+    struct tm *tmp;
+    static char month_names[13][4] = {
+	"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+	"Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+	"Bug"
+    };
+    static char buf[80];
 
     time(&now);
     tmp = localtime(&now);
@@ -85,74 +85,74 @@ static char *rank_showtime(void)
 }
 
 /* Here's where we calculate the ranks. Figure it out yourselves! */
-static void
-SortRankings(void)
+static void SortRankings(void)
 {
     double lowSC = 0.0, highSC = 0.0;
     double lowKD = 0.0, highKD = 0.0;
     double lowKR = 0.0, highKR = 0.0;
     double lowHF = 0.0, highHF = 0.0;
-    bool   foundFirst = false;
-    int i;
+    bool foundFirst = false;
+    int k;
 
     /* Ok, there are two loops: the first one calculates the scores and
        records lowest and highest scores. The second loop combines the
        scores into a rank. I cannot do it in one loop since I need to
        know low- and highmarks for each score before I can calculate the
        rank. */
-    for (i = 0; i < MAX_SCORES; i++) {
-	RankInfo *score = &scores[i];
+    for (k = 0; k < MAX_SCORES; k++) {
+	RankInfo *score = &scores[k];
 	double attenuation, kills, sc, kd, kr, hf;
-	if (score->entry.nick[0] == '\0') continue;
+	if (score->entry.nick[0] == '\0')
+	    continue;
 
 	/* The attenuation affects players with less than 300 rounds. */
-	attenuation = (score->entry.rounds < 300) ? 
-	    ((double)score->entry.rounds / 300.0) : 1.0;
+	attenuation = (score->entry.rounds < 300) ?
+	    ((double) score->entry.rounds / 300.0) : 1.0;
 
 	kills = score->entry.kills;
-	sc = (double)score->score * attenuation;
-	kd = ( (score->entry.deaths != 0) ?
-			    (kills / (double)score->entry.deaths) :
-			    (kills) ) * attenuation;
-	kr = ( (score->entry.rounds != 0) ?
-			    (kills / (double)score->entry.rounds) :
-			    (kills) ) * attenuation;
-	hf = ( (score->entry.ballsLost != 0) ?
-			    ( (double)score->entry.ballsCashed /
-			      (double)score->entry.ballsLost ) :
-			    (double)score->entry.ballsCashed ) * attenuation;
+	sc = (double) score->score * attenuation;
+	kd = ((score->entry.deaths != 0) ?
+	      (kills / (double) score->entry.deaths) :
+	      (kills)) * attenuation;
+	kr = ((score->entry.rounds != 0) ?
+	      (kills / (double) score->entry.rounds) :
+	      (kills)) * attenuation;
+	hf = ((score->entry.ballsLost != 0) ?
+	      ((double) score->entry.ballsCashed /
+	       (double) score->entry.ballsLost) :
+	      (double) score->entry.ballsCashed) * attenuation;
 
-	sc_table[i] = sc;
-	kd_table[i] = kd;
-	kr_table[i] = kr;
-	hf_table[i] = hf;
+	sc_table[k] = sc;
+	kd_table[k] = kd;
+	kr_table[k] = kr;
+	hf_table[k] = hf;
 
-	if ( !foundFirst ) {
+	if (!foundFirst) {
 	    lowSC = highSC = sc;
 	    lowKD = highKD = kd;
 	    lowKR = highKR = kr;
 	    lowHF = highHF = hf;
 	    foundFirst = true;
 	} else {
-	    if ( sc > highSC )
+	    if (sc > highSC)
 		highSC = sc;
-	    else if ( sc < lowSC )
+	    else if (sc < lowSC)
 		lowSC = sc;
-	
-	    if ( kd > highKD )
+
+	    if (kd > highKD)
 		highKD = kd;
-	    else if ( kd < lowKD )
+	    else if (kd < lowKD)
 		lowKD = kd;
-	    
-	    if ( kr > highKR )
+
+	    if (kr > highKR)
 		highKR = kr;
-	    else if ( kr < lowKR )
+	    else if (kr < lowKR)
 		lowKR = kr;
-	    
-	    if ( hf > highHF )
+
+	    if (hf > highHF)
 		highHF = hf;
-	    else if ( hf < lowHF )
-		lowHF = hf;	    
+	    else if (hf < lowHF)
+		lowHF = hf;
 	}
     }
 
@@ -165,41 +165,41 @@ SortRankings(void)
     {
 	const double factorSC = (highSC != 0.0) ? (100.0 / highSC) : 0.0;
 	const double factorKD = (highKD != 0.0) ? (100.0 / highKD) : 0.0;
-	const double factorKR = (highKR != 0.0) ? (100.0 / highKR) : 0.0; 
+	const double factorKR = (highKR != 0.0) ? (100.0 / highKR) : 0.0;
 	const double factorHF = (highHF != 0.0) ? (100.0 / highHF) : 0.0;
 	int ranked_players = 0;
 	int i;
 
 	for (i = 0; i < MAX_SCORES; i++) {
-		RankInfo *score = &scores[i];
-		double sc, kd, kr, hf, rsc, rkd, rkr, rhf, rank;
-		rankedplayer[i] = i;
-		if (score->entry.nick[0] == '\0') {
-			rankedscore[i] = -1;
-			continue;
-		}
-		ranked_players++;
+	    RankInfo *score = &scores[i];
+	    double sc, kd, kr, hf, rsc, rkd, rkr, rhf, rank;
+	    rankedplayer[i] = i;
+	    if (score->entry.nick[0] == '\0') {
+		rankedscore[i] = -1;
+		continue;
+	    }
+	    ranked_players++;
 
-		sc = sc_table[i];
-		kd = kd_table[i];
-		kr = kr_table[i];
-		hf = hf_table[i];
+	    sc = sc_table[i];
+	    kd = kd_table[i];
+	    kr = kr_table[i];
+	    hf = hf_table[i];
 
-		rsc = (sc - lowSC) * factorSC;
-		rkd = (kd - lowKD) * factorKD;
-		rkr = (kr - lowKR) * factorKR;
-		rhf = (hf - lowHF) * factorHF;
+	    rsc = (sc - lowSC) * factorSC;
+	    rkd = (kd - lowKD) * factorKD;
+	    rkr = (kr - lowKR) * factorKR;
+	    rhf = (hf - lowHF) * factorHF;
 
-		rank = 0.20*rsc + 0.30*rkd + 0.30*rkr + 0.20*rhf;
-		rankedscore[i] = rank;
+	    rank = 0.20 * rsc + 0.30 * rkd + 0.30 * rkr + 0.20 * rhf;
+	    rankedscore[i] = rank;
 	}
 	rank_head.entries = ranked_players;
 
 	/* And finally we sort the ranks, using some lame N^2 sort.. wheee! */
-	for (i = 0; i < ranked_players; i++ ) {
+	for (i = 0; i < ranked_players; i++) {
 	    int j;
-	    for (j = i+1; j < ranked_players; j++) {
-		if ( rankedscore[i] < rankedscore[j] )
+	    for (j = i + 1; j < ranked_players; j++) {
+		if (rankedscore[i] < rankedscore[j])
 		    swap2(&rankedplayer[i], &rankedplayer[j],
 			  &rankedscore[i], &rankedscore[j]);
 	    }
@@ -209,37 +209,31 @@ SortRankings(void)
 
 
 /* Sort the ranks and save them to the webpage. */
-void
-Rank_write_webpage(void)
+void Rank_write_webpage(void)
 {
-    static const char HEADER[] =
-"<html><head><title>XPilot @ " RANKING_SERVER "</title>\n"
-
+    static const char header[] =
+	"<html><head><title>XPilot @ " RANKING_SERVER "</title>\n"
 /* In order to save space/bandwidth, the table is saved as one
    giant javascript file, instead of writing all the <TR>, <TD>, etc */
-"<SCRIPT language=\"Javascript\">\n<!-- Hide script\n"
-"function g(nick, score, kills, deaths, rounds, shots, ballsCashed, "
-"           ballsSaved, ballsWon, ballsLost, bestball, ratio, user, log) {\n"
-"document.write('<tr><td align=left><tt>', i, '</tt></td>');\n"
-"document.write('<td align=left><b>', nick, '</b></td>');\n"
-"document.write('<td align=right>', score, '</td>');\n"
-"document.write('<td align=right>', kills, '</td>');\n"
-"document.write('<td align=right>', deaths, '</td>');\n"
-"document.write('<td align=right>', rounds, '</td>');\n"
-"document.write('<td align=right>', shots, '</td>');\n"
-"document.write('<td align=center>', ballsCashed);\n"
-"document.write('/', ballsSaved, '/', ballsWon, '/', ballsLost);\n"
-"document.write('/', bestball);\n"
-"document.write('</td>');\n"
-"document.write('<td align=right>', ratio, '</td>');\n"
-"document.write('<td align=center>', user, '</td>');\n"
-"document.write('<td align=center>', log, '</td>');\n"
-"document.write('</tr>\\n');\n"
-"i = i + 1\n"
-"}\n// Hide script --></SCRIPT>\n"
-
-"</head><body>\n"
-
+	"<SCRIPT language=\"Javascript\">\n<!-- Hide script\n"
+	"function g(nick, score, kills, deaths, rounds, shots, ballsCashed, "
+	"           ballsSaved, ballsWon, ballsLost, bestball, ratio, user, log) {\n"
+	"document.write('<tr><td align=left><tt>', i, '</tt></td>');\n"
+	"document.write('<td align=left><b>', nick, '</b></td>');\n"
+	"document.write('<td align=right>', score, '</td>');\n"
+	"document.write('<td align=right>', kills, '</td>');\n"
+	"document.write('<td align=right>', deaths, '</td>');\n"
+	"document.write('<td align=right>', rounds, '</td>');\n"
+	"document.write('<td align=right>', shots, '</td>');\n"
+	"document.write('<td align=center>', ballsCashed);\n"
+	"document.write('/', ballsSaved, '/', ballsWon, '/', ballsLost);\n"
+	"document.write('/', bestball);\n"
+	"document.write('</td>');\n"
+	"document.write('<td align=right>', ratio, '</td>');\n"
+	"document.write('<td align=center>', user, '</td>');\n"
+	"document.write('<td align=center>', log, '</td>');\n"
+	"document.write('</tr>\\n');\n"
+	"i = i + 1\n" "}\n// Hide script --></SCRIPT>\n" "</head><body>\n"
 #define TABLEHEAD \
 "<table><tr><td></td>" /* First column is the position */ \
 "<td align=left><h1><u><b>Player</b></u></h1></td>" \
@@ -253,53 +247,31 @@ Rank_write_webpage(void)
 "<td align=center><h1><u><b>User @ Host</b></u></h1></td>" \
 "<td align=center><h1><u><b>Logout</b></u></h1></td>" \
 "</tr>\n"
+	PAGEHEAD
+	"<noscript>"
+	"<blink><h1>YOU MUST HAVE JAVASCRIPT FOR THIS PAGE</h1></blink>"
+	"Please go <A href=\"index_nojs.html\">here</A> for the non-js page"
+	"</noscript>\n"
+	TABLEHEAD "<SCRIPT language=\"Javascript\">\n" "var i = 1\n";
 
-PAGEHEAD
+    static const char headernojs[] =
+	"<html><head><title>XPilot @ " RANKING_SERVER "</title>\n"
+	"</head><body>\n" PAGEHEAD TABLEHEAD;
 
-"<noscript>"
-"<blink><h1>YOU MUST HAVE JAVASCRIPT FOR THIS PAGE</h1></blink>"
-"Please go <A href=\"index_nojs.html\">here</A> for the non-js page"
-"</noscript>\n"
-
-TABLEHEAD
-
-"<SCRIPT language=\"Javascript\">\n"
-"var i = 1\n"
-	    ;
-
-    static const char HEADERNOJS[] =
-"<html><head><title>XPilot @ " RANKING_SERVER "</title>\n"
-"</head><body>\n"
-
-PAGEHEAD
-TABLEHEAD
-	;
-
-    static const char FOOTER[] = 
-"</table>"
-"<i>Explanation for ballstats</i>:<br>"
-"The numbers are c/s/w/l/b, where<br>"
-"c = The number of enemy balls you have cashed.<br>"
-"s = The number of your own balls you have returned.<br>"
-"w = The number of enemy balls your team has cashed.<br>"
-"l = The number of your own balls you have lost.<br>"
-"b = The fastest ballrun you have made.<br>"
-"<hr>%s<BR>\n\n" /* <-- Insert time here. */
-
-"</body></html>"
-	    ;
+    static const char footer[] = "</table>" "<i>Explanation for ballstats</i>:<br>" "The numbers are c/s/w/l/b, where<br>" "c = The number of enemy balls you have cashed.<br>" "s = The number of your own balls you have returned.<br>" "w = The number of enemy balls your team has cashed.<br>" "l = The number of your own balls you have lost.<br>" "b = The fastest ballrun you have made.<br>" "<hr>%s<BR>\n\n"	/* <-- Insert time here. */
+	"</body></html>";
 
     SortRankings();
-    
+
     if (getenv(XPILOTRANKINGPAGE) != NULL) {
-	FILE * const file = fopen(getenv(XPILOTRANKINGPAGE), "w");
+	FILE *const file = fopen(getenv(XPILOTRANKINGPAGE), "w");
 	if (file != NULL) {
 	    int i;
-	    fprintf(file, "%s", HEADER);
+	    fprintf(file, "%s", header);
 	    for (i = 0; i < MAX_SCORES; i++) {
 		const int j = rankedplayer[i];
 		const RankInfo *score = &scores[j];
-		if ( score->entry.nick[0] != '\0' ) {
+		if (score->entry.nick[0] != '\0') {
 		    fprintf(file, "g(\"%s\", %.1f, %u, %u, %u, %u, "
 			    "%u, %u, %u, %u, %u, %.1f, \"%s@%s\", '%s');\n",
 			    score->entry.nick,
@@ -308,30 +280,29 @@ TABLEHEAD
 			    score->entry.deaths,
 			    score->entry.rounds,
 			    score->entry.shots,
-			    score->entry.ballsCashed, score->entry.ballsSaved,
-			    score->entry.ballsWon, score->entry.ballsLost,
-			    score->entry.bestball,
-			    rankedscore[i],
-			    score->entry.real, score->entry.host,
-			    score->entry.logout);
+			    score->entry.ballsCashed,
+			    score->entry.ballsSaved, score->entry.ballsWon,
+			    score->entry.ballsLost, score->entry.bestball,
+			    rankedscore[i], score->entry.real,
+			    score->entry.host, score->entry.logout);
 		}
 	    }
 	    fprintf(file, "</script>");
-	    fprintf(file, FOOTER, rank_showtime());
+	    fprintf(file, footer, rank_showtime());
 	    fclose(file);
 	} else
 	    error("Could not open the rank file.");
     }
     if (getenv(XPILOTNOJSRANKINGPAGE) != NULL) {
-	FILE * const file = fopen(getenv(XPILOTNOJSRANKINGPAGE), "w");
+	FILE *const file = fopen(getenv(XPILOTNOJSRANKINGPAGE), "w");
 	if (file != NULL) {
 	    int i;
-	    fprintf(file, "%s", HEADERNOJS);
+	    fprintf(file, "%s", headernojs);
 	    for (i = 0; i < MAX_SCORES; i++) {
 		const int j = rankedplayer[i];
 		const RankInfo *score = &scores[j];
-		if ( score->entry.nick[0] != '\0' ) {
-		    fprintf(file, 
+		if (score->entry.nick[0] != '\0') {
+		    fprintf(file,
 			    "<tr><td align=left><tt>%d</tt>"
 			    "<td align=left><b>%s</b>"
 			    "<td align=right>%.1f"
@@ -344,22 +315,21 @@ TABLEHEAD
 			    "<td align=center>%s@%s"
 			    "<td align=center>%s\n"
 			    "</tr>\n",
-			    i+1,
+			    i + 1,
 			    score->entry.nick,
 			    score->score,
 			    score->entry.kills,
 			    score->entry.deaths,
 			    score->entry.rounds,
 			    score->entry.shots,
-			    score->entry.ballsCashed, score->entry.ballsSaved,
-			    score->entry.ballsWon, score->entry.ballsLost,
-			    score->entry.bestball,
-			    rankedscore[i],
-			    score->entry.real, score->entry.host,
-			    score->entry.logout);
+			    score->entry.ballsCashed,
+			    score->entry.ballsSaved, score->entry.ballsWon,
+			    score->entry.ballsLost, score->entry.bestball,
+			    rankedscore[i], score->entry.real,
+			    score->entry.host, score->entry.logout);
 		}
 	    }
-	    fprintf(file, FOOTER, rank_showtime());
+	    fprintf(file, footer, rank_showtime());
 	    fclose(file);
 	} else
 	    error("Could not open the rank file.");
@@ -367,8 +337,7 @@ TABLEHEAD
 }
 
 /* Return a line with the ranking status of the specified player. */
-void
-Rank_get_stats(player *pl, char *buf)
+void Rank_get_stats(player * pl, char *buf)
 {
     RankInfo *score = pl->rank;
 
@@ -382,8 +351,7 @@ Rank_get_stats(player *pl, char *buf)
 
 
 /* Send a line with the ranks of the current players to the game. */
-void
-Rank_show_ranks(void)
+void Rank_show_ranks(void)
 {
     char buf[1000] = "";
     int i;
@@ -392,7 +360,7 @@ Rank_show_ranks(void)
 	RankInfo *score = &scores[rankedplayer[i]];
 	if (score->pl != NULL) {
 	    char msg[MSG_LEN];
-	    sprintf(msg, "%s [%d], ", score->entry.nick, i+1);
+	    sprintf(msg, "%s [%d], ", score->entry.nick, i + 1);
 	    strcat(buf, msg);
 	}
     }
@@ -403,10 +371,8 @@ Rank_show_ranks(void)
 
 
 static void
-Init_scorenode(RankInfo *node,
-	       const char  nick[],
-	       const char  real[],
-	       const char  host[])
+Init_scorenode(RankInfo * node,
+	       const char nick[], const char real[], const char host[])
 {
     strlcpy(node->entry.nick, nick, MAX_CHARS);
     strlcpy(node->entry.real, real, MAX_CHARS);
@@ -426,36 +392,34 @@ Init_scorenode(RankInfo *node,
 }
 
 
-RankInfo *
-Rank_get_by_name(char *name)
+RankInfo *Rank_get_by_name(char *name)
 {
     RankInfo *score;
     int i;
 
     for (i = 0; i < MAX_SCORES; i++) {
 	score = &scores[i];
-	if (strcmp(name, score->entry.nick) == 0) return score;
+	if (strcmp(name, score->entry.nick) == 0)
+	    return score;
     }
 
     return NULL;
 }
 
 
-void
-Rank_nuke_score(RankInfo *node)
+void Rank_nuke_score(RankInfo * node)
 {
     Init_scorenode(node, "", "", "");
     node->entry.timestamp = 0;
 }
 
 
-static int
-Import_Oldest(FILE *file)
+static int Import_Oldest(FILE * file)
 {
     struct oldScoreNode *nodes;
     int imported = 0;
 
-    nodes = malloc(sizeof(*nodes)*MAX_SCORES);
+    nodes = malloc(sizeof(*nodes) * MAX_SCORES);
     if (nodes) {
 	int i;
 
@@ -490,8 +454,7 @@ Import_Oldest(FILE *file)
 
 /* Read scores from disk, and zero-initialize the ones that are not used.
    Call this on startup. */
-void
-Rank_init_saved_scores(void)
+void Rank_init_saved_scores(void)
 {
     int i = 0;
 
@@ -539,8 +502,9 @@ Rank_init_saved_scores(void)
 		node->entry.ballsWon = ntohs(node->entry.ballsWon);
 		node->entry.ballsCashed = ntohs(node->entry.ballsCashed);
 		node->entry.bestball = ntohs(node->entry.bestball);
-		node->score = (DFLOAT)((int32_t)ntohl(node->entry.disk_score))
-			/ 65536.0;
+		node->score =
+		    (DFLOAT) ((int32_t) ntohl(node->entry.disk_score))
+		    / 65536.0;
 		/* Fix buggy first implementation... */
 		if (node->score >= 65000)
 		    node->score -= 65536;
@@ -549,8 +513,8 @@ Rank_init_saved_scores(void)
 	    fclose(file);
 	}
     }
-    
- init_tail:
+
+  init_tail:
     while (i < MAX_SCORES) {
 	Init_scorenode(&scores[i], "", "", "");
 	scores[i].entry.timestamp = 0;
@@ -560,8 +524,7 @@ Rank_init_saved_scores(void)
 
 /* A player has logged in. Find his info or create new info by kicking
    the player who hasn't played for the longest time. */
-void
-Rank_get_saved_score(player *pl)
+void Rank_get_saved_score(player * pl)
 {
     RankInfo *score;
     int oldest = 0;
@@ -583,7 +546,7 @@ Rank_get_saved_score(player *pl)
 		pl->score = 0;
 		pl->rank = NULL;
 		return;
-	    
+
 	    }
 	} else if (score->entry.timestamp < scores[oldest].entry.timestamp)
 	    oldest = i;
@@ -601,35 +564,33 @@ Rank_get_saved_score(player *pl)
 }
 
 /* A player has quit, save his info and mark him as not playing. */
-void
-Rank_save_score(const player *pl)
+void Rank_save_score(const player * pl)
 {
     RankInfo *score = pl->rank;
     score->score = pl->score;
     strlcpy(score->entry.logout, rank_showtime(), MAX_CHARS);
     score->pl = NULL;
-    score->entry.timestamp = time(0);
+    score->entry.timestamp = time(NULL);
 }
 
 /* Save the scores to disk (not the webpage). */
-void
-Rank_write_score_file(void)
+void Rank_write_score_file(void)
 {
     FILE *file = NULL;
-    char tmpfile[4096];
+    char tmp_file[4096];
     RankHead head;
     int actual;
     int i;
 
     if (!xpilotscorefile)
 	return;
-    actual = snprintf(tmpfile, sizeof(tmpfile), "%s-new", xpilotscorefile);
-    if (actual < strlen(xpilotscorefile) || actual > sizeof(tmpfile)) {
+    actual = snprintf(tmp_file, sizeof(tmp_file), "%s-new", xpilotscorefile);
+    if (actual < strlen(xpilotscorefile) || actual > sizeof(tmp_file)) {
 	/* Use a shorter path-name and be happy... */
 	return;
     }
 
-    file = fopen(tmpfile, "w");
+    file = fopen(tmp_file, "w");
     if (file == NULL)
 	return;
 
@@ -640,7 +601,7 @@ Rank_write_score_file(void)
     if (actual != 1) {
 	error("Error when writing score file head!\n");
 	fclose(file);
-	remove(tmpfile);
+	remove(tmp_file);
 	return;
     }
     for (i = 0; i < rank_head.entries; i++) {
@@ -648,8 +609,8 @@ Rank_write_score_file(void)
 	int idx = rankedplayer[i];
 
 	memcpy(&entry, &scores[idx].entry, sizeof(entry));
-	entry.disk_score = htonl(((uint32_t)(int32_t)
-				  (scores[idx].score*65536)));
+	entry.disk_score = htonl(((uint32_t) (int32_t)
+				  (scores[idx].score * 65536)));
 	entry.shots = htonl(entry.shots);
 	entry.timestamp = htonl(entry.timestamp);
 	entry.kills = htons(entry.kills);
@@ -669,20 +630,19 @@ Rank_write_score_file(void)
     fclose(file);
 
     /* Overwrite old score file. */
-    rename(tmpfile, xpilotscorefile);
-    remove(tmpfile);
+    rename(tmp_file, xpilotscorefile);
+    remove(tmp_file);
 }
 
 /* This function checks wether the strings contains certain characters
    that might be hazardous to include on a webpage (ie they screw it up). */
-bool
-Rank_IsLegalNameUserHost(const char string[])
+bool Rank_IsLegalNameUserHost(const char string[])
 {
     const int length = strlen(string);
     int i;
 
-    for (i = 0; i < length; i++ )
-	switch ( string[i] ) {
+    for (i = 0; i < length; i++)
+	switch (string[i]) {
 	case '<':
 	case '>':
 	case '\t':

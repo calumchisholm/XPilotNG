@@ -88,7 +88,7 @@ void Thrust(player *pl)
 	);
 }
 
-void Record_shove(player *pl, player *pusher, long time)
+void Record_shove(player *pl, player *pusher, long shove_time)
 {
     shove_t		*shove = &pl->shove_record[pl->shove_next];
 
@@ -96,7 +96,7 @@ void Record_shove(player *pl, player *pusher, long time)
 	pl->shove_next = 0;
 
     shove->pusher_id = pusher->id;
-    shove->time = time;
+    shove->time = shove_time;
 }
 
 /* Calculates the effect of a collision between two objects */

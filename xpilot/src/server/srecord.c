@@ -69,7 +69,7 @@ static FILE *recf1;
 static void Convert_from_host(void *start, int len, int type)
 {
     int *iptr, *iend, err;
-    short *sptr, *send;
+    short *sptr, *sendp;
 
     switch (type) {
     case CHAR:
@@ -84,8 +84,8 @@ static void Convert_from_host(void *start, int len, int type)
 	return;
     case SHORT:
 	sptr = start;
-	send = sptr + len / 2;
-	while (sptr < send) {
+	sendp = sptr + len / 2;
+	while (sptr < sendp) {
 	    *sptr = htons(*sptr);
 	    sptr++;
 	}
@@ -114,7 +114,7 @@ static void Convert_from_host(void *start, int len, int type)
 static void Convert_to_host(void *start, int len, int type)
 {
     int *iptr, *iend, err;
-    short *sptr, *send;
+    short *sptr, *sendp;
 
     switch (type) {
     case CHAR:
@@ -129,8 +129,8 @@ static void Convert_to_host(void *start, int len, int type)
 	return;
     case SHORT:
 	sptr = start;
-	send = sptr + len / 2;
-	while (sptr < send) {
+	sendp = sptr + len / 2;
+	while (sptr < sendp) {
 	    *sptr = ntohs(*sptr);
 	    sptr++;
 	}
