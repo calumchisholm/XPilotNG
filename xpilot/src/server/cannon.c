@@ -544,7 +544,7 @@ static void Cannon_fire(int ind, int weapon, int target, int dir)
 	switch ((int)(rfrac() * (1 + cannonSmartness))) {
 	default:
 	    if (allowSmartMissiles) {
-		Fire_general_shot(-1, c->team, 1, cx, cy, OBJ_SMART_SHOT,
+		Fire_general_shot(NULL, c->team, 1, cx, cy, OBJ_SMART_SHOT,
 				  dir, mods, target);
 		sound_play_sensors(cx, cy, FIRE_SMART_SHOT_SOUND);
 		played = true;
@@ -554,7 +554,7 @@ static void Cannon_fire(int ind, int weapon, int target, int dir)
 	case 1:
 	    if (allowHeatSeekers
 		&& BIT(Players(target)->status, THRUSTING)) {
-		Fire_general_shot(-1, c->team, 1, cx, cy, OBJ_HEAT_SHOT,
+		Fire_general_shot(NULL, c->team, 1, cx, cy, OBJ_HEAT_SHOT,
 				  dir, mods, target);
 		sound_play_sensors(cx, cy, FIRE_HEAT_SHOT_SOUND);
 		played = true;
@@ -562,7 +562,7 @@ static void Cannon_fire(int ind, int weapon, int target, int dir)
 	    }
 	    /* FALLTHROUGH */
 	case 0:
-	    Fire_general_shot(-1, c->team, 1, cx, cy, OBJ_TORPEDO,
+	    Fire_general_shot(NULL, c->team, 1, cx, cy, OBJ_TORPEDO,
 			      dir, mods, -1);
 	    sound_play_sensors(cx, cy, FIRE_TORPEDO_SOUND);
 	    played = true;
@@ -658,7 +658,7 @@ static void Cannon_fire(int ind, int weapon, int target, int dir)
 			+ (4 - cannonSmartness)
 			* (-c->item[ITEM_WIDEANGLE] +  i);
 	    a_dir = MOD2(a_dir, RES);
-	    Fire_general_shot(-1, c->team, 1, cx, cy, OBJ_CANNON_SHOT,
+	    Fire_general_shot(NULL, c->team, 1, cx, cy, OBJ_CANNON_SHOT,
 			      a_dir, mods, -1);
 	}
 	/* I'm not sure cannons should use rearshots.
@@ -669,7 +669,7 @@ static void Cannon_fire(int ind, int weapon, int target, int dir)
 			+ (4 - cannonSmartness)
 			* (-((c->item[ITEM_REARSHOT] - 1) * 0.5) + i));
 	    a_dir = MOD2(a_dir, RES);
-	    Fire_general_shot(-1, c->team, 1, cx, cy, OBJ_CANNON_SHOT,
+	    Fire_general_shot(NULL, c->team, 1, cx, cy, OBJ_CANNON_SHOT,
 			      a_dir, mods, -1);
 	}
     }

@@ -1118,7 +1118,7 @@ static bool Check_robot_target(int ind,
 	    if (type == OBJ_SMART_SHOT && !allowSmartMissiles)
 		type = OBJ_HEAT_SHOT;
 	    Choose_weapon_modifier(pl, type);
-	    Fire_shot(ind, type, pl->dir);
+	    Fire_shot(pl, type, pl->dir);
 	    if (type == OBJ_HEAT_SHOT)
 		CLR_BIT(pl->status, THRUSTING);
 	    my_data->last_fired_missile=my_data->robot_count;
@@ -1128,13 +1128,13 @@ static bool Check_robot_target(int ind,
 		   /*&& BIT(my_data->robot_lock, LOCK_PLAYER)*/){
 	    if ((int)(rfrac() * 64) < pl->item[ITEM_MISSILE] ) {
 		Choose_weapon_modifier(pl, OBJ_SMART_SHOT);
-		Fire_shot(ind, OBJ_SMART_SHOT, pl->dir);
+		Fire_shot(pl, OBJ_SMART_SHOT, pl->dir);
 		my_data->last_fired_missile=my_data->robot_count;
 	    } else {
 		if ((new_mode == RM_ATTACK && clear_path)
 		    || (my_data->robot_count % 50) == 0) {
 		    Choose_weapon_modifier(pl, OBJ_SHOT);
-		    Fire_normal_shots(ind);
+		    Fire_normal_shots(pl);
 		}
 	    }
 	}
@@ -1158,7 +1158,7 @@ static bool Check_robot_target(int ind,
 	    && item_dist < Visibility_distance
 	    && clear_path) {
 	    Choose_weapon_modifier(pl, OBJ_SHOT);
-	    Fire_normal_shots(ind);
+	    Fire_normal_shots(pl);
 	}
     }
     my_data->robot_mode = new_mode;

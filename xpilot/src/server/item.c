@@ -489,7 +489,7 @@ void Detonate_items(int ind)
 		&& pl->item[ITEM_MISSILE] < nukeMinSmarts) {
 		CLR_BIT(mods.nuclear, NUCLEAR);
 	    }
-	    Fire_general_shot(GetInd(owner_pl->id), 0, pl->team, pl->pos.cx, pl->pos.cy,
+	    Fire_general_shot(owner_pl, 0, pl->team, pl->pos.cx, pl->pos.cy,
 			      type, (int)(rfrac() * RES), mods, -1);
 	}
     }

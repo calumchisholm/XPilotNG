@@ -426,9 +426,8 @@ char *Describe_shot(int type, long status, modifiers mods, int hit)
     return msg;
 }
 
-void Fire_main_shot(int ind, int type, int dir)
+void Fire_main_shot(player *pl, int type, int dir)
 {
-    player *pl = Players(ind);
     int cx, cy;
     clpos m_gun;
 
@@ -439,23 +438,20 @@ void Fire_main_shot(int ind, int type, int dir)
     cx = pl->pos.cx + m_gun.cx;
     cy = pl->pos.cy + m_gun.cy;
 
-    Fire_general_shot(ind, pl->team, 0, cx, cy, type, dir, pl->mods, -1);
+    Fire_general_shot(pl, pl->team, 0, cx, cy, type, dir, pl->mods, -1);
 }
 
-void Fire_shot(int ind, int type, int dir)
+void Fire_shot(player *pl, int type, int dir)
 {
-    player *pl = Players(ind);
-
     if (pl->shots >= ShotsMax || BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
 	return;
 
-    Fire_general_shot(ind, pl->team, 0, pl->pos.cx, pl->pos.cy,
+    Fire_general_shot(pl, pl->team, 0, pl->pos.cx, pl->pos.cy,
 		      type, dir, pl->mods, -1);
 }
 
-void Fire_left_shot(int ind, int type, int dir, int gun)
+void Fire_left_shot(player *pl, int type, int dir, int gun)
 {
-    player *pl = Players(ind);
     int cx, cy;
     clpos l_gun;
 
@@ -466,13 +462,11 @@ void Fire_left_shot(int ind, int type, int dir, int gun)
     cx = pl->pos.cx + l_gun.cx;
     cy = pl->pos.cy + l_gun.cy;
 
-    Fire_general_shot(ind, pl->team, 0, cx, cy, type, dir, pl->mods, -1);
-
+    Fire_general_shot(pl, pl->team, 0, cx, cy, type, dir, pl->mods, -1);
 }
 
-void Fire_right_shot(int ind, int type, int dir, int gun)
+void Fire_right_shot(player *pl, int type, int dir, int gun)
 {
-    player *pl = Players(ind);
     int cx, cy;
     clpos r_gun;
 
@@ -483,13 +477,11 @@ void Fire_right_shot(int ind, int type, int dir, int gun)
     cx = pl->pos.cx + r_gun.cx;
     cy = pl->pos.cy + r_gun.cy;
 
-    Fire_general_shot(ind, pl->team, 0, cx, cy, type, dir, pl->mods, -1);
-
+    Fire_general_shot(pl, pl->team, 0, cx, cy, type, dir, pl->mods, -1);
 }
 
-void Fire_left_rshot(int ind, int type, int dir, int gun)
+void Fire_left_rshot(player *pl, int type, int dir, int gun)
 {
-    player *pl = Players(ind);
     int cx, cy;
     clpos l_rgun;
 
@@ -500,13 +492,11 @@ void Fire_left_rshot(int ind, int type, int dir, int gun)
     cx = pl->pos.cx + l_rgun.cx;
     cy = pl->pos.cy + l_rgun.cy;
 
-    Fire_general_shot(ind, pl->team, 0, cx, cy, type, dir, pl->mods, -1);
-
+    Fire_general_shot(pl, pl->team, 0, cx, cy, type, dir, pl->mods, -1);
 }
 
-void Fire_right_rshot(int ind, int type, int dir, int gun)
+void Fire_right_rshot(player *pl, int type, int dir, int gun)
 {
-    player *pl = Players(ind);
     int cx, cy;
     clpos r_rgun;
 
@@ -517,17 +507,15 @@ void Fire_right_rshot(int ind, int type, int dir, int gun)
     cx = pl->pos.cx + r_rgun.cx;
     cy = pl->pos.cy + r_rgun.cy;
 
-    Fire_general_shot(ind, pl->team, 0, cx, cy, type, dir, pl->mods, -1);
-
+    Fire_general_shot(pl, pl->team, 0, cx, cy, type, dir, pl->mods, -1);
 }
 
-void Fire_general_shot(int ind, unsigned short team, bool cannon,
+void Fire_general_shot(player *pl, unsigned short team, bool cannon,
 		       int cx, int cy,
 		       int type, int dir,
 		       modifiers mods, int target)
 {
     char		msg[MSG_LEN];
-    player		*pl = Players(ind);
     int			used,
 			fuse = 0,
 			lock = 0,
@@ -1067,9 +1055,8 @@ void Fire_general_shot(int ind, unsigned short team, bool cannon,
 }
 
 
-void Fire_normal_shots(int ind)
+void Fire_normal_shots(player *pl)
 {
-    player		*pl = Players(ind);
     int			i, shot_angle;
 
     /* Average non-integer repeat rates, so that smaller gap occurs first.
@@ -1080,52 +1067,52 @@ void Fire_normal_shots(int ind)
 
     shot_angle = MODS_SPREAD_MAX - pl->mods.spread;
 
-    Fire_main_shot(ind, OBJ_SHOT, pl->dir);
+    Fire_main_shot(pl, OBJ_SHOT, pl->dir);
     for (i = 0; i < pl->item[ITEM_WIDEANGLE]; i++) {
 	if (pl->ship->num_l_gun > 0) {
-	    Fire_left_shot(ind, OBJ_SHOT, MOD2(pl->dir + (1 + i) * shot_angle,
+	    Fire_left_shot(pl, OBJ_SHOT, MOD2(pl->dir + (1 + i) * shot_angle,
 			   RES), i % pl->ship->num_l_gun);
 	}
 	else {
-	    Fire_main_shot(ind, OBJ_SHOT, MOD2(pl->dir + (1 + i) * shot_angle,
+	    Fire_main_shot(pl, OBJ_SHOT, MOD2(pl->dir + (1 + i) * shot_angle,
 			   RES));
 	}
 	if (pl->ship->num_r_gun > 0) {
-	    Fire_right_shot(ind, OBJ_SHOT, MOD2(pl->dir - (1 + i) * shot_angle,
+	    Fire_right_shot(pl, OBJ_SHOT, MOD2(pl->dir - (1 + i) * shot_angle,
 			    RES), i % pl->ship->num_r_gun);
 	}
 	else {
-	    Fire_main_shot(ind, OBJ_SHOT, MOD2(pl->dir - (1 + i) * shot_angle,
+	    Fire_main_shot(pl, OBJ_SHOT, MOD2(pl->dir - (1 + i) * shot_angle,
 			   RES));
 	}
     }
     for (i = 0; i < pl->item[ITEM_REARSHOT]; i++) {
 	if ((pl->item[ITEM_REARSHOT] - 1 - 2 * i) < 0) {
 	    if (pl->ship->num_l_rgun > 0) {
-		Fire_left_rshot(ind, OBJ_SHOT, MOD2(pl->dir + RES/2
+		Fire_left_rshot(pl, OBJ_SHOT, MOD2(pl->dir + RES/2
 		    + ((pl->item[ITEM_REARSHOT] - 1 - 2 * i) * shot_angle) / 2,
 			RES), (i - (pl->item[ITEM_REARSHOT] + 1) / 2) % pl->ship->num_l_rgun);
 	    }
 	    else {
-		Fire_shot(ind, OBJ_SHOT, MOD2(pl->dir + RES/2
+		Fire_shot(pl, OBJ_SHOT, MOD2(pl->dir + RES/2
 		    + ((pl->item[ITEM_REARSHOT] - 1 - 2 * i) * shot_angle) / 2,
 			RES));
 	    }
 	}
 	if ((pl->item[ITEM_REARSHOT] - 1 - 2 * i) > 0) {
 	    if (pl->ship->num_r_rgun > 0) {
-		Fire_right_rshot(ind, OBJ_SHOT, MOD2(pl->dir + RES/2
+		Fire_right_rshot(pl, OBJ_SHOT, MOD2(pl->dir + RES/2
 		    + ((pl->item[ITEM_REARSHOT] - 1 - 2 * i) * shot_angle) / 2,
 			RES), (pl->item[ITEM_REARSHOT] / 2 - i - 1) % pl->ship->num_r_rgun);
 	    }
 	    else {
-		Fire_shot(ind, OBJ_SHOT, MOD2(pl->dir + RES/2
+		Fire_shot(pl, OBJ_SHOT, MOD2(pl->dir + RES/2
 		    + ((pl->item[ITEM_REARSHOT] - 1 - 2 * i) * shot_angle) / 2,
 			RES));
 	    }
 	}
 	if ((pl->item[ITEM_REARSHOT] - 1 - 2 * i) == 0)
-	     Fire_shot(ind, OBJ_SHOT, MOD2(pl->dir + RES/2
+	     Fire_shot(pl, OBJ_SHOT, MOD2(pl->dir + RES/2
 		+ ((pl->item[ITEM_REARSHOT] - 1 - 2 * i) * shot_angle) / 2,
 			RES));
     }
@@ -1412,7 +1399,7 @@ void Delete_shot(int ind)
 			       0.0, 0.0, mods);
 	}
 	else if (addHeat) {
-	    Fire_general_shot(-1, TEAM_NOT_SET, 0,
+	    Fire_general_shot(NULL, TEAM_NOT_SET, 0,
 			      shot->pos.cx, shot->pos.cy,
 			      OBJ_HEAT_SHOT, (int)(rfrac() * RES),
 			      mods, -1);

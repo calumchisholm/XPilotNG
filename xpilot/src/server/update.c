@@ -830,7 +830,7 @@ void Update_objects(void)
 		pl->warped = 0;
 	}
 	if (BIT(pl->used, HAS_SHOT) || pl->did_shoot)
-	    Fire_normal_shots(i);
+	    Fire_normal_shots(pl);
 	if (BIT(pl->used, HAS_LASER)) {
 	    if (pl->item[ITEM_LASER] <= 0 || BIT(pl->used, HAS_PHASING_DEVICE))
 		CLR_BIT(pl->used, HAS_LASER);
