@@ -94,8 +94,8 @@ static bool next_dimension(int *w, int *h)
     };
     int i;
 
-    for (i = 4; i >= 0; i--) {
-	if (*w > dimensions[i][0]) {
+    for (i = 0; i < NELEM(dimensions); i++) {
+	if (*w <= dimensions[i][0]) {
 	    *w = dimensions[i][0];
 	    *h = dimensions[i][1];
 	    return true;
@@ -118,7 +118,7 @@ bool Key_press_toggle_fullscreen(void)
 
     ow = draw_width;
     oh = draw_height;
-    w = ow + 1;
+    w = ow;
     h = oh;
     reset = false;
 
