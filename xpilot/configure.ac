@@ -119,7 +119,6 @@ AC_CHECK_HEADERS([ \
 	X11/keysym.h \
 	X11/Xatom.h \
 	X11/Xmd.h \
-	X11/Xresource.h \
 	X11/extensions/Xdbe.h \
 	X11/extensions/multibuf.h \
 	])

@@ -1444,104 +1444,6 @@ static void Get_shipshape_resource(XrmDatabase db, char **ship_shape)
 }
 
 
-#ifndef _WINDOWS
-void Get_xpilotrc_file(char *path, unsigned size)
-{
-    const char		*home = getenv("HOME");
-    const char		*defaultFile = ".xpilotrc";
-    const char		*optionalFile = getenv("XPILOTRC");
-
-    if (optionalFile != NULL)
-	strlcpy(path, optionalFile, size);
-    else if (home != NULL) {
-	strlcpy(path, home, size);
-	strlcat(path, "/", size);
-	strlcat(path, defaultFile, size);
-    } else
-	strlcpy(path, "", size);
-}
-#endif
-
-
-#ifndef _WINDOWS
-static void Get_file_defaults(XrmDatabase *rDBptr)
-{
-    int			len;
-    char		*ptr,
-			*lang = getenv("LANG"),
-			*home = getenv("HOME"),
-			path[PATH_MAX + 1];
-    XrmDatabase		tmpDB;
-
-    sprintf(path, "%s%s", Conf_libdir(), myClass);
-    *rDBptr = XrmGetFileDatabase(path);
-
-    if (lang != NULL) {
-	sprintf(path, "/usr/lib/X11/%s/app-defaults/%s", lang, myClass);
-	if (access(path, 0) == -1)
-	    sprintf(path, "/usr/lib/X11/app-defaults/%s", myClass);
-    } else
-	sprintf(path, "/usr/lib/X11/app-defaults/%s", myClass);
-    tmpDB = XrmGetFileDatabase(path);
-    XrmMergeDatabases(tmpDB, rDBptr);
-
-    if ((ptr = getenv("XUSERFILESEARCHPATH")) != NULL) {
-	sprintf(path, "%s/%s", ptr, myClass);
-	tmpDB = XrmGetFileDatabase(path);
-	XrmMergeDatabases(tmpDB, rDBptr);
-    }
-    else if ((ptr = getenv("XAPPLRESDIR")) != NULL) {
-	if (lang != NULL) {
-	    sprintf(path, "%s/%s/%s", ptr, lang, myClass);
-	    if (access(path, 0) == -1)
-		sprintf(path, "%s/%s", ptr, myClass);
-	} else
-	    sprintf(path, "%s/%s", ptr, myClass);
-	tmpDB = XrmGetFileDatabase(path);
-	XrmMergeDatabases(tmpDB, rDBptr);
-    }
-    else if (home != NULL) {
-	if (lang != NULL) {
-	    sprintf(path, "%s/app-defaults/%s/%s", home, lang, myClass);
-	    if (access(path, 0) == -1)
-		sprintf(path, "%s/app-defaults/%s", home, myClass);
-	} else
-	    sprintf(path, "%s/app-defaults/%s", home, myClass);
-	tmpDB = XrmGetFileDatabase(path);
-	XrmMergeDatabases(tmpDB, rDBptr);
-    }
-
-    if ((ptr = XResourceManagerString(dpy)) != NULL) {
-	tmpDB = XrmGetStringDatabase(ptr);
-	XrmMergeDatabases(tmpDB, rDBptr);
-    }
-    else if (home != NULL) {
-	sprintf(path, "%s/.Xdefaults", home);
-	tmpDB = XrmGetFileDatabase(path);
-	XrmMergeDatabases(tmpDB, rDBptr);
-    }
-
-    if ((ptr = getenv("XENVIRONMENT")) != NULL) {
-	tmpDB = XrmGetFileDatabase(ptr);
-	XrmMergeDatabases(tmpDB, rDBptr);
-    }
-    else if (home != NULL) {
-	sprintf(path, "%s/.Xdefaults-", home);
-	len = strlen(path);
-	gethostname(&path[len], sizeof path - len);
-	path[sizeof path - 1] = '\0';
-	tmpDB = XrmGetFileDatabase(path);
-	XrmMergeDatabases(tmpDB, rDBptr);
-    }
-
-    Get_xpilotrc_file(path, sizeof(path));
-    if (path[0] != '\0') {
-	tmpDB = XrmGetFileDatabase(path);
-	XrmMergeDatabases(tmpDB, rDBptr);
-    }
-}
-#endif	/* _WINDOWS*/
-
 
 void Parse_options(int *argcp, char **argvp)
 {
@@ -1553,49 +1455,8 @@ void Parse_options(int *argcp, char **argvp)
     KeySym		ks;
 
     char		resValue[MAX(2*MSG_LEN, PATH_MAX + 1)];
-    XrmDatabase		argDB = 0, rDB = 0;
 
 #ifndef _WINDOWS
-    XrmOptionDescRec	*xopt;
-    size_t		size;
-
-
-    XrmInitialize();
-
-    /*
-     * Construct a Xrm Option table from our options array.
-     */
-    size = sizeof(*xopt) * NELEM(options);
-    for (i = 0; i < NELEM(options); i++)
-	size += 2 * (strlen(options[i].name) + 2);
-
-    if ((ptr = malloc(size)) == NULL) {
-	error("No memory for options");
-	exit(1);
-    }
-    xopt = (XrmOptionDescRec *)ptr;
-    ptr += sizeof(*xopt) * NELEM(options);
-    for (i = 0; i < NELEM(options); i++) {
-	options[i].hash = String_hash(options[i].name);
-	xopt[i].option = ptr;
-	xopt[i].option[0] = '-';
-	strcpy(&xopt[i].option[1], options[i].name);
-	size = strlen(options[i].name) + 2;
-	ptr += size;
-	xopt[i].specifier = ptr;
-	xopt[i].specifier[0] = '.';
-	strcpy(&xopt[i].specifier[1], options[i].name);
-	ptr += size;
-	if (options[i].noArg) {
-	    xopt[i].argKind = XrmoptionNoArg;
-	    xopt[i].value = (char *)options[i].noArg;
-	} else {
-	    xopt[i].argKind = XrmoptionSepArg;
-	    xopt[i].value = NULL;
-	}
-    }
-
-    XrmParseCommand(&argDB, xopt, NELEM(options), myName, argcp, argvp);
 
     /*
      * Check for bad arguments.
@@ -1753,20 +1614,10 @@ void Parse_options(int *argcp, char **argvp)
     /* Key bindings - removed */
     /* Pointer button bindings - removed */
 
-#ifndef _WINDOWS
-    XrmDestroyDatabase(rDB);
-
-    free(xopt);
-#endif
 
 #ifdef SOUND
     audioInit(connectParam.disp_name);
 #endif /* SOUND */
-}
-
-void defaultCleanup(void)
-{
-    IFWINDOWS( Get_xpilotini_file(-1) );
 }
 
 

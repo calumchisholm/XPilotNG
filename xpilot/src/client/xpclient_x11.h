@@ -47,9 +47,6 @@
 #ifdef HAVE_X11_XMD_H
 #  include <X11/Xmd.h>
 #endif
-#ifdef HAVE_X11_XRESOURCE_H
-#  include <X11/Xresource.h>
-#endif
 
 #include "bitmaps.h"
 #include "dbuff.h"
