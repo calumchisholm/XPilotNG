@@ -411,11 +411,13 @@ bool Cannon_hitfunc(struct group *group, struct move *move)
     cannon_t *cannon = &World.cannon[ind];
     unsigned long cannon_mask;
 
-    /* cannon is dead ? */
-    if (cannon->dead_time > 0) {
-	warn("BUG: Cannon_hitfunc called for dead cannon.\n");
+    /* this should never happen if hitmasks are ok */
+    if (cannon->dead_time > 0)
 	return false;
-    }
+
+    /* if cannon is phased nothing will hit it */
+    if (BIT(cannon->used, HAS_PHASING_DEVICE))
+	return false;
 
     if (obj == NULL)
 	return true;
@@ -424,40 +426,16 @@ bool Cannon_hitfunc(struct group *group, struct move *move)
     if (!BIT(cannon_mask, obj->type))
 	return false;
 
-    if (BIT(cannon->used, HAS_PHASING_DEVICE))
-	return false;
-
-#if 1
-    if (BIT(obj->status, FROMCANNON)
-	&& !BIT(World.rules->mode, TEAM_PLAY))
-	return false;
-
-    /* kps - this can be removed */
-    if (BIT(World.rules->mode, TEAM_PLAY)
-	&& teamImmunity
-	&& obj->team == cannon->team) {
-	warn("BUG: Cannon_hitfunc: hitmask bug.\n");
-	return false;
-    }
-
-    if (BIT(World.rules->mode, TEAM_PLAY)
-	&& BIT(obj->status, FROMCANNON)
-	&& obj->team == cannon->team) {
-	return false;
-    }
-#else
     /*
      * kps - if no team play, both cannons have team == TEAM_NOT_SET,
-     * we could always use the following code, no matter if team play
-     * is true or not.
+     * this code should work, no matter if team play is true or not.
      */
      if (BIT(obj->status, FROMCANNON)
          && obj->team == cannon->team) {
          return false;
      }
-#endif
 
-    return true;
+     return true;
 }
 
 
@@ -466,7 +444,7 @@ bool Cannon_hitfunc(struct group *group, struct move *move)
  */
 int Target_hitmask(target_t *targ)
 {
-    if (targ->dead_time)
+    if (targ->dead_time > 0)
 	return ALL_BITS;
     if (targetTeamCollision)
 	return 0;
