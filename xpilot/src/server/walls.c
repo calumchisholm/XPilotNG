@@ -714,10 +714,10 @@ static unsigned short *Shape_lines(const shape *s, int dir)
     lastshape = s;
     lastdir = dir;
 
-    /*pts = Shape_get_points((shape *)s, dir);*/
+    pts = Shape_get_points((shape *)s, dir);
     for (i = 0; i < s->num_points; i++) {
-	/*clpos pt = pts[p].clk;*/
-	clpos pt = Ship_get_point_clpos((shipobj *)s, i, dir);
+	clpos pt = pts[i].clk;
+
 	linet[i + os].start.cx = -pt.cx;
 	linet[i + os].start.cy = -pt.cy;
     }
@@ -1294,10 +1294,10 @@ static void Shape_move(const struct move *move, const shape *s,
     minline = -1;
     minpoint = -1;
 
-    /*pts = Shape_get_points((shape *)s, dir);*/
+    pts = Shape_get_points((shape *)s, dir);
     for (i = 0; i < s->num_points; i++) {
-	clpos pt = Ship_get_point_clpos((shipobj *)s, i, dir);
-	/*clpos pt = pts[p].clk;*/
+	clpos pt = pts[i].clk;
+
 	msx = WRAP_XCLICK(move->start.cx + pt.cx);
 	msy = WRAP_YCLICK(move->start.cy + pt.cy);
 	block = (msx >> B_SHIFT) + mapx * (msy >> B_SHIFT);
@@ -1398,22 +1398,28 @@ static int Shape_morph(const shape *shape1, int dir1, const shape *shape2,
 
     mv.hitmask = hitmask;
     mv.obj = (object *)obj;
-    /*pts1 = Shape_get_points((shape *)shape1, dir1);
-      pts2 = Shape_get_points((shape *)shape2, dir2);*/
+    pts1 = Shape_get_points((shape *)shape1, dir1);
+    pts2 = Shape_get_points((shape *)shape2, dir2);
 
     /* kps - can this happen ?? */
-    if (shape1->num_points != shape2->num_points) {
+    if (shape1->num_points != shape2->num_points)
 	warn("Shape_morph: shapes have different number of points!");
-    }
+
     num_points = shape1->num_points;
 
     for (i = 0; i < num_points; i++) {
 	clpos pt1, pt2;
+	clpos ptx1, ptx2;
 
-	/*pt1 = pts1[i].clk;
-	  pt2 = pts2[i].clk;*/
+	ptx1 = pts1[i].clk;
+	ptx2 = pts2[i].clk;
 	pt1 = Ship_get_point_clpos((shipobj *)shape1, i, dir1);
 	pt2 = Ship_get_point_clpos((shipobj *)shape2, i, dir2);
+
+	/*assert(ptx1.cx == pt1.cx);
+	  assert(ptx1.cy == pt1.cy);
+	  assert(ptx2.cx == pt2.cx);
+	  assert(ptx2.cy == pt2.cy);*/
 
 	mv.start.cx = x + pt1.cx;
 	mv.start.cy = y + pt1.cy;
