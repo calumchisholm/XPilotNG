@@ -268,14 +268,18 @@ void Gui_paint_filled_slice(int bl, int tl, int tr, int br, int y)
 void Gui_paint_polygon(int i, int xoff, int yoff)
 {
     xp_polygon_t    polygon;
-    polygon_style_t style;
+    polygon_style_t p_style;
+    edge_style_t    e_style;
+    
     int             x, y, j;
 
     polygon = polygons[i];
-    style = polygon_styles[polygon.style];
+    p_style = polygon_styles[polygon.style];
+    e_style = edge_styles[p_style.def_edge_style];
 
-    if (BIT(style.flags, STYLE_INVISIBLE)) return;
-    set_color(style.rgb);
+    if (BIT(p_style.flags, STYLE_INVISIBLE)) return;
+    
+    set_color(e_style.rgb);
 
     x = xoff * Setup->width;
     y = yoff * Setup->height;
