@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -324,10 +324,9 @@ option options[] = {
 	"0",
 	KEY_DUMMY,
 	"Set the ship's turn resistance.\n"
-	"This determines the speed at which a ship stops turning\n"
-	"after a turn key has been released.\n"
+	"This determines the speed at which a ship stops turning.\n"
 	"Valid values are in the range 0.0-1.0.\n"
-	"Useful values are in the range 0.05-0.15.\n"
+	"This should always be 0, other values are for compatibility.\n"
 	"See also turnSpeed.\n"
     },
     {
@@ -361,7 +360,7 @@ option options[] = {
 	KEY_DUMMY,
 	"Should the HUD be displayed or not.\n"
     },
-    {   
+    {
 	"mapRadar",
 	NULL,
 	"Yes",
@@ -382,7 +381,7 @@ option options[] = {
 	KEY_DUMMY,
 	"Should your own shipshape be displayed or not.\n"
     },
-    {   
+    {
 	"ballMsgScan",
 	NULL,
 	"Yes",
@@ -1315,14 +1314,14 @@ option options[] = {
 	"Which color number to use for drawing decorations on the radar.\n"
 	"Valid values are all even numbers smaller than maxColors.\n"
     },
-    {   
+    {
 	"messagesColor",
 	NULL,
 	"3",
 	KEY_DUMMY,
 	"Which color number to use for drawing messages.\n"
     },
-    {   
+    {
 	"oldMessagesColor",
 	NULL,
 	"2",
@@ -2095,7 +2094,7 @@ option options[] = {
 	KEY_DUMMY,
 	"Specifies the device name of the frame buffer.\n"
     },
-#endif    
+#endif
 #ifdef DEVELOPMENT
     {
         "test",
@@ -3062,7 +3061,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 	}
 	strlcpy(color_names[i], resValue, MAX_COLOR_LEN);
     }
-    
+
     Get_int_resource(rDB, "hudColor", &hudColor);
     Get_int_resource(rDB, "hudRadarEnemyColor", &hudRadarEnemyColor);
     Get_int_resource(rDB, "hudRadarOtherColor", &hudRadarOtherColor);
@@ -3447,4 +3446,3 @@ static void Get_test_resources(XrmDatabase rDB)
 {
 }
 #endif
-
