@@ -272,7 +272,7 @@ static int Mapdata_download(const URL *url, const char *filePath)
     char buf[1024];
     int rv, header, c, len, i;
     sock_t s;
-    FILE *f;
+    FILE *f = NULL;
     size_t n;
 
     if (strncmp("http", url->protocol, 4) != 0) {
@@ -280,20 +280,13 @@ static int Mapdata_download(const URL *url, const char *filePath)
 	return false;
     }
 
-    if ((f = fopen(filePath, "wb")) == NULL) {
-	error("failed to open %s", filePath);
-	return false;
-    }
-
     if (sock_open_tcp(&s) == SOCK_IS_ERROR) {
 	error("failed to create a socket");
-	fclose(f);
 	return false;
     }
     if (sock_connect(&s, url->host, url->port) == SOCK_IS_ERROR) {
 	error("couldn't connect to download address");
 	sock_close(&s);
-	fclose(f);
 	return false;
     }
 
@@ -302,7 +295,6 @@ static int Mapdata_download(const URL *url, const char *filePath)
 	     "GET %s?%s HTTP/1.1\r\nHost: %s:%d\r\nConnection: close\r\n\r\n",
 	     url->path, url->query, url->host, url->port) == -1) {
 	    error("too long URL");
-	    fclose(f);
 	    sock_close(&s);
 	    return false;
 	}
@@ -313,7 +305,6 @@ static int Mapdata_download(const URL *url, const char *filePath)
 	     url->path, url->host, url->port) == -1) {
 
 	    error("too long URL");
-	    fclose(f);
 	    sock_close(&s);
 	    return false;
 	}
@@ -321,7 +312,6 @@ static int Mapdata_download(const URL *url, const char *filePath)
 
     if (sock_write(&s, buf, (int)strlen(buf)) == -1) {
 	error("socket write failed");
-	fclose(f);
 	sock_close(&s);
 	return false;
     }
@@ -382,6 +372,11 @@ static int Mapdata_download(const URL *url, const char *filePath)
 
 		if (c == 4) {
 		    header = 0;
+		    if ((f = fopen(filePath, "wb")) == NULL) {
+			error("failed to open %s", filePath);
+			rv = false;
+			goto done;
+		    }
 		    if (i < len - 1) {
 			n = len - i - 1;
 			memmove(buf, buf + i + 1, n);
@@ -402,7 +397,9 @@ static int Mapdata_download(const URL *url, const char *filePath)
     }
  done:
     printf("\n");
-    fclose(f);
+    if (f)
+	if (fclose(f) != 0)
+	    error("Error closing texture file %s", filePath);
     sock_close(&s);
     return rv;
 }
