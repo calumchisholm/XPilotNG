@@ -1195,17 +1195,20 @@ void Frame_update(void)
 	    Send_time_left(conn, (roundtime + FPS - 1) / FPS);
 
 	/*
-	 * If status is GAME_OVER or PAUSE'd, the user may look through the
+	 * If player is waiting, dead or paused, the user may look through the
 	 * other players 'eyes'. Option lockOtherTeam determines whether
 	 * you can watch opponents while your own team is still alive
-	 * (potentially giving information to your team).
+	 * (potentially giving information to your team). Note that
+	 * if a player got killed on last life, he will not be allowed
+	 * to change view before the view has returned to his base.
 	 *
 	 * This is done by using two indexes, one
 	 * determining which data should be used (ind, set below) and
 	 * one determining which connection to send it to (conn).
 	 */
 	if (BIT(pl->lock.tagged, LOCK_PLAYER)
-	    && (BIT(pl->pl_status, (GAME_OVER|PLAYING)) == (GAME_OVER|PLAYING)
+	    && (Player_is_waiting(pl)
+		|| (Player_is_dead(pl) && pl->recovery_count == 0.0)
 		|| Player_is_paused(pl))) {
 	    ind = GetInd(pl->lock.pl_id);
 	} else
