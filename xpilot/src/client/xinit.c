@@ -86,10 +86,6 @@ int			spark_color[MAX_COLORS];
 int			num_spark_colors;
 bool			ignoreWindowManager;
 
-static message_t	*MsgBlock = NULL;
-static message_t	*MsgBlock_pending = NULL;
-
-
 /*
  * NB!  Is dependent on the order of the items in item.h!
  */
@@ -988,73 +984,6 @@ void WinXCreateItemBitmaps(void)
 }
 #endif
 
-int Alloc_msgs(void)
-{
-    message_t		*x, *x2 = 0;
-    int			i;
-
-    if ((x = (message_t *)malloc(2 * MAX_MSGS * sizeof(message_t))) == NULL){
-	error("No memory for messages");
-	return -1;
-    }
-
-#ifndef _WINDOWS
-    if (selectionAndHistory &&
-	((x2 = (message_t *)
-	  malloc(2 * MAX_MSGS * sizeof(message_t))) == NULL)){
-	error("No memory for history messages");
-	free(x);
-	return -1;
-    }
-    if (selectionAndHistory)
-	MsgBlock_pending = x2;
-#endif
-
-    MsgBlock = x;
-
-    for (i = 0; i < 2 * MAX_MSGS; i++) {
-	if (i < MAX_MSGS) {
-	    TalkMsg[i] = x;
-	    IFNWINDOWS( if (selectionAndHistory)
-			TalkMsg_pending[i] = x2 );
-	} else {
-	    GameMsg[i - MAX_MSGS] = x;
-	    IFNWINDOWS( if (selectionAndHistory)
-			GameMsg_pending[i - MAX_MSGS] = x2 );
-	}
-	x->txt[0] = '\0';
-	x->len = 0;
-	x->lifeTime = 0.0;
-	x++;
-
-#ifndef _WINDOWS
-	if (selectionAndHistory) {
-	    x2->txt[0] = '\0';
-	    x2->len = 0;
-	    x2->lifeTime = 0.0;
-	    x2++;
-	}
-#endif
-    }
-    return 0;
-}
-
-void Free_msgs(void)
-{
-    if (MsgBlock) {
-	free(MsgBlock);
-	MsgBlock = NULL;
-    }
-
-#ifndef _WINDOWS
-    if (MsgBlock_pending) {
-	free(MsgBlock_pending);
-	MsgBlock_pending = NULL;
-    }
-#endif
-}
-
-
 static int Config_callback(int widget_desc, void *data, const char **str)
 {
     (void)widget_desc; (void)data; (void)str;
@@ -1098,6 +1027,10 @@ static int Quit_callback(int widget_desc, void *data, const char **str)
     return 0;
 }
 
+void Raise_window(void)
+{
+    XMapRaised(dpy, topWindow);
+}
 
 void Resize(Window w, unsigned width, unsigned height)
 {
@@ -1162,7 +1095,6 @@ void Quit(void)
 	button_form = 0;
     }
 #endif
-    Free_msgs();
     Widget_cleanup();
 }
 

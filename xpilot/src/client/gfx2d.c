@@ -27,7 +27,7 @@
 char gfx2d_version[] = VERSION;
 
 /* kps hack */
-extern int xpm_picture_from_file(xp_picture_t *pic, char *filename);
+/* extern int xpm_picture_from_file(xp_picture_t *pic, char *filename); */
 char	*texturePath = NULL;		/* Path list of texture directories */
 
 
@@ -193,6 +193,7 @@ int Picture_load(xp_picture_t *picture, const char *filename)
 	return -1;
     }
 
+#if 0
 #ifndef _WINDOWS
     if (strcmp("xpm", filename + strlen(filename) - 3) == 0) {
 	if (!xpm_picture_from_file(picture, path)) {
@@ -201,6 +202,7 @@ int Picture_load(xp_picture_t *picture, const char *filename)
 	}
 	return 0;
     }
+#endif
 #endif
 
     if ((f = fopen(path, "rb")) == NULL) {

@@ -44,6 +44,7 @@ typedef struct {
 /*
  * Exported variables.
  */
+char			hostname[SOCK_HOSTNAME_LENGTH];
 setup_t			*Setup;
 display_t               server_display;
 int			receive_window_size;
@@ -1488,7 +1489,6 @@ int Receive_self(void)
     if (n <= 0)
 	return n;
 
-    Game_over_action(sStat);
     Handle_self(x, y, vx, vy, sHeading,
 		(double) sPower,
 		(double) sTurnSpeed,
@@ -1496,7 +1496,8 @@ int Receive_self(void)
 		lockId, lockDist, lockDir,
 		sNextCheckPoint, sAutopilotLight,
 		num_items,
-		currentTank, (double)sFuelSum, (double)sFuelMax, rbuf.len);
+		currentTank, (double)sFuelSum, (double)sFuelMax, rbuf.len,
+		sStat);
 
 #ifdef _WINDOWS
     received_self = TRUE;

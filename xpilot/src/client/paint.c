@@ -125,21 +125,25 @@ int	manyLivesColor;		/* Color to associate with >2 lives */
 
 static void Paint_clock(bool redraw);
 
-void Game_over_action(u_byte status)
+int Paint_init(void)
 {
-    static u_byte old_status = 0;
+    Init_scale_array();
 
-    if (BIT(old_status, GAME_OVER) && !BIT(status, GAME_OVER)
-	&& !BIT(status,PAUSE))
-	XMapRaised(dpy, topWindow);
+    if (Init_wreckage() == -1)
+	return -1;
 
-    /* GAME_OVER -> PLAYING */
-    if (BIT(old_status, PLAYING|PAUSE|GAME_OVER) != PLAYING) {
-	if (BIT(status, PLAYING|PAUSE|GAME_OVER) == PLAYING)
-	    Reset_shields();
-    }
+    if (Init_asteroids() == -1)
+	return -1;
 
-    old_status = status;
+    if (Bitmaps_init() == -1)
+	return -1;
+    
+    return 0;
+}
+
+void Paint_cleanup(void)
+{
+    Bitmaps_cleanup();
 }
 
 int Check_view_dimensions(void)

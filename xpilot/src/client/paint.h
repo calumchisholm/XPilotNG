@@ -264,7 +264,8 @@ extern void	Init_scale_array(void);
  * Prototypes from the paint*.c files.
  */
 
-void Init_paint(void);
+int Paint_init(void);
+void Paint_cleanup(void);
 void Paint_item_symbol(int type, Drawable d, GC mygc,
 		       int x, int y, int color);
 void Paint_item(int type, Drawable d, GC mygc, int x, int y);

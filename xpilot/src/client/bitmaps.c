@@ -88,11 +88,10 @@ static int Bitmap_create_end(Drawable d);
 static void Bitmap_set_pixel(xp_pixmap_t *, int, int, int, RGB_COLOR);
 
 
-/**
- * Adds the standard object bitmaps (aka. block bitmaps) specified
- * in the object_pixmaps array into global pixmaps array.
+/*
+ * Adds the standard images into global pixmaps array.
  */
-int Bitmap_add_std_objects(void)
+int Bitmaps_init(void)
 {
     int i;
     xp_pixmap_t pixmap;
@@ -103,17 +102,7 @@ int Bitmap_add_std_objects(void)
 	pixmap.state = BMS_UNINITIALIZED;
 	STORE(xp_pixmap_t, pixmaps, num_pixmaps, max_pixmaps, pixmap);
     }
-    return 0;
-}
 
-
-/**
- * Defines the standard texture bitmaps specified in the standard_textures
- * array into global pixmaps array.
- */
-int Bitmap_add_std_textures(void)
-{
-    xp_pixmap_t pixmap;
     pixmap.filename = "rock4.xpm";
     pixmap.count = 1;
     pixmap.scalable = false;
@@ -129,6 +118,12 @@ int Bitmap_add_std_textures(void)
     STORE(xp_pixmap_t, pixmaps, num_pixmaps, max_pixmaps, pixmap);
 
     return 0;
+}
+
+void Bitmaps_cleanup(void)
+{
+    if (pixmaps) free(pixmaps);
+    pixmaps = 0;
 }
 
 

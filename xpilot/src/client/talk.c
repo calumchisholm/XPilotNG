@@ -55,8 +55,6 @@ static struct {
     int			point;
 } talk_cursor;
 
-char	*talk_fast_msgs[TALK_FAST_NR_OF_MSGS];	/* talk macros */
-
 /* position in history when browsing in the talk window */
 static int		history_pos = 0;
 

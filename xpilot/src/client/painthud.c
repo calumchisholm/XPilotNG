@@ -50,7 +50,6 @@ int	msgScanCoverColor;	/* Color index for cover msg */
 int	msgScanPopColor;	/* Color index for pop msg */
 int	messagesColor;		/* Color index for messages */
 int	oldMessagesColor;	/* Color index for old messages */
-double	scoreObjectTime;	/* How long to flash score objects */
 int	baseWarningType;	/* Which type of base warning you prefer */
 
 radar_t	*old_radar_ptr;

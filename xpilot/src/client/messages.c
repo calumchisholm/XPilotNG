@@ -49,6 +49,9 @@ int ballstats_lostballs = 0;
 bool played_this_round = false;
 int rounds_played = 0;
 
+static message_t	*MsgBlock = NULL;
+static message_t	*MsgBlock_pending = NULL;
+
 static void Delete_pending_messages(void);
 
 /*
@@ -644,6 +647,72 @@ static bool Msg_is_from_our_team(char *message, char **bracket)
 	}
     }
     return false;
+}
+
+int Alloc_msgs(void)
+{
+    message_t		*x, *x2 = 0;
+    int			i;
+
+    if ((x = (message_t *)malloc(2 * MAX_MSGS * sizeof(message_t))) == NULL){
+	error("No memory for messages");
+	return -1;
+    }
+
+#ifndef _WINDOWS
+    if (selectionAndHistory &&
+	((x2 = (message_t *)
+	  malloc(2 * MAX_MSGS * sizeof(message_t))) == NULL)){
+	error("No memory for history messages");
+	free(x);
+	return -1;
+    }
+    if (selectionAndHistory)
+	MsgBlock_pending = x2;
+#endif
+
+    MsgBlock = x;
+
+    for (i = 0; i < 2 * MAX_MSGS; i++) {
+	if (i < MAX_MSGS) {
+	    TalkMsg[i] = x;
+	    IFNWINDOWS( if (selectionAndHistory)
+			TalkMsg_pending[i] = x2 );
+	} else {
+	    GameMsg[i - MAX_MSGS] = x;
+	    IFNWINDOWS( if (selectionAndHistory)
+			GameMsg_pending[i - MAX_MSGS] = x2 );
+	}
+	x->txt[0] = '\0';
+	x->len = 0;
+	x->lifeTime = 0.0;
+	x++;
+
+#ifndef _WINDOWS
+	if (selectionAndHistory) {
+	    x2->txt[0] = '\0';
+	    x2->len = 0;
+	    x2->lifeTime = 0.0;
+	    x2++;
+	}
+#endif
+    }
+    return 0;
+}
+
+void Free_msgs(void)
+{
+    if (MsgBlock) {
+	free(MsgBlock);
+	MsgBlock = NULL;
+    }
+
+#ifndef _WINDOWS
+    if (MsgBlock_pending) {
+	free(MsgBlock_pending);
+	MsgBlock_pending = NULL;
+    }
+#endif
 }
 
 

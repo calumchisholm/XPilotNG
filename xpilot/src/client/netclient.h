@@ -39,6 +39,7 @@ typedef struct {
     int num_spark_colors;
 } display_t;
 
+extern char	 hostname[SOCK_HOSTNAME_LENGTH];
 extern int	 simulating;
 extern int	 receive_window_size;
 extern long	 last_loops;

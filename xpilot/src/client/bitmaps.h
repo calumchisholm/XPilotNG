@@ -120,8 +120,8 @@ extern xp_pixmap_t *pixmaps;
 extern int num_pixmaps, max_pixmaps;
 extern xp_pixmap_t xp_pixmaps[];
 
-int Bitmap_add_std_objects (void);
-int Bitmap_add_std_textures (void);
+int Bitmaps_init(void);
+void Bitmaps_cleanup(void);
 int Bitmap_add (char *filename, int count, bool scalable);
 int Bitmap_create (Drawable d, int img);
 void Bitmap_update_scale (void);

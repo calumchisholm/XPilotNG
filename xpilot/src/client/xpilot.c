@@ -29,9 +29,6 @@ char xpilot_version[] = VERSION;
 char xpilot_versionid[] = "@(#)$" TITLE " $";
 #endif
 
-
-char			hostname[SOCK_HOSTNAME_LENGTH];
-
 char			**Argv;
 int			Argc;
 

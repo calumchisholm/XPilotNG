@@ -73,8 +73,6 @@ extern bool		quitting;
 extern const char* Item_get_text(int i);
 extern int Init_top(void);
 extern int Init_playing_windows(void);
-extern int Alloc_msgs(void);
-extern void Free_msgs(void);
 extern void Expose_info_window(void);
 extern void Expose_button_window(int color, Window w);
 extern void Info(Window w);

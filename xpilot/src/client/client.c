@@ -25,22 +25,18 @@
 #include "xpclient.h"
 
 /* kps - hack */
+extern void Raise_window(void);
 extern void Radar_show_target(int x, int y);
 extern void Radar_hide_target(int x, int y);
-extern int Bitmap_add_std_textures(void);
 extern void Play_beep(void);
-extern void Quit(void);
 extern int Key_init(void);
-extern int Alloc_msgs(void);
 extern int Bitmap_add(char *filename, int count, bool scalable);
+extern int Paint_init(void);
+extern void Paint_cleanup(void);
 extern void Paint_frame(void);
 extern int Init_playing_windows(void);
-extern void Init_scale_array(void);
-extern int Bitmap_add_std_objects(void);
 extern int Startup_server_motd(void);
 extern int Check_view_dimensions(void);
-/* kps ugly hack - we should rather include bitmap.h here */
-#define NUM_BITMAPS	47
 
 char client_version[] = VERSION;
 
@@ -61,6 +57,7 @@ u_byte	numItems[NUM_ITEMS];	/* Count of currently owned items */
 u_byte	lastNumItems[NUM_ITEMS];/* Last item count shown */
 int	numItemsTime[NUM_ITEMS];/* Number of frames to show this item count */
 double	showItemsTime;		/* How long to show changed item count for */
+double	scoreObjectTime;	/* How long to flash score objects */
 
 short	autopilotLight;
 
@@ -870,7 +867,6 @@ static void parse_styles(char **callptr)
 	exit(1);
     }
 
-    /* kps - why is NUM_BITMAPS used here ? */
     for (i = 0; i < num_polygon_styles; i++) {
 	polygon_styles[i].rgb = get_32bit(&ptr);
 	polygon_styles[i].texture = (*ptr++);
@@ -1672,12 +1668,30 @@ int Handle_self_items(u_byte *newNumItems)
     return 0;
 }
 
+static void update_status(u_byte status)
+{
+    static u_byte old_status = 0;
+
+    if (BIT(old_status, GAME_OVER) && !BIT(status, GAME_OVER)
+	&& !BIT(status,PAUSE))
+	Raise_window();
+
+    /* GAME_OVER -> PLAYING */
+    if (BIT(old_status, PLAYING|PAUSE|GAME_OVER) != PLAYING) {
+	if (BIT(status, PLAYING|PAUSE|GAME_OVER) == PLAYING)
+	    Reset_shields();
+    }
+
+    old_status = status;
+}
+
 int Handle_self(int x, int y, int vx, int vy, int newHeading,
 		double newPower, double newTurnspeed, double newTurnresistance,
 		int newLockId, int newLockDist, int newLockBearing,
 		int newNextCheckPoint, int newAutopilotLight,
 		u_byte *newNumItems, int newCurrentTank,
-		double newFuelSum, double newFuelMax, int newPacketSize)
+		double newFuelSum, double newFuelMax, int newPacketSize,
+		u_byte status)
 {
     FOOpos.x = x;
     FOOpos.y = y;
@@ -1703,6 +1717,7 @@ int Handle_self(int x, int y, int vx, int vy, int newHeading,
 	packet_size -= 16;
     else
 	packet_size = newPacketSize;
+    update_status(status);
     return 0;
 }
 
@@ -2208,18 +2223,8 @@ int Client_init(char *server, unsigned server_version)
 	oldServer = 0;
 
     Make_table();
-    Init_scale_array();
 
-    if (Init_wreckage() == -1)
-	return -1;
-
-    if (Init_asteroids() == -1)
-	return -1;
-
-    if (Bitmap_add_std_objects() == -1)
-	return -1;
-
-    if (Bitmap_add_std_textures() == -1)
+    if (Paint_init() == -1) 
 	return -1;
 
     strlcpy(servername, server, sizeof(servername));
@@ -2303,8 +2308,8 @@ void Client_cleanup(void)
 {
     int		i;
 
-    Quit();
     Free_selectionAndHistory();
+    Free_msgs();
     if (max_others > 0) {
 	for (i = 0; i < num_others; i++) {
 	    other_t* other = &Others[i];
@@ -2415,6 +2420,7 @@ void Client_cleanup(void)
 	wormhole_ptr = 0;
     }
     Map_cleanup();
+    Paint_cleanup();
 }
 
 int Client_wrap_mode(void)

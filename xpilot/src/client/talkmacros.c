@@ -25,6 +25,9 @@
 
 char talkmacros_version[] = VERSION;
 
+
+char *talk_fast_msgs[TALK_FAST_NR_OF_MSGS];	/* talk macros */
+
 /*
  * Abandon your hope, all you enter here
  */

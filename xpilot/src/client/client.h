@@ -522,7 +522,6 @@ extern bool	showRealName;		/* Show realname instead of nickname */
 extern char	nickname[MAX_CHARS];	/* Nick-name of player */
 extern char	realname[MAX_CHARS];	/* Real name of player */
 extern char	servername[MAX_CHARS];	/* Name of server connecting to */
-extern char	hostname[];		/* Local hostname */
 extern unsigned	version;		/* Version of the server */
 extern bool	scoresChanged;
 extern bool	toggle_shield;		/* Are shields toggled by a press? */
@@ -625,6 +624,8 @@ extern long		start_loops, end_loops;
 extern long		time_left;
 
 
+int Alloc_msgs(void);
+void Free_msgs(void);
 void Add_message(char *message);
 void Add_pending_messages(void);
 double Fuel_by_pos(int x, int y);
@@ -660,7 +661,8 @@ int Handle_self(int x, int y, int vx, int vy, int newHeading,
 		int newLockId, int newLockDist, int newLockBearing,
 		int newNextCheckPoint, int newAutopilotLight,
 		u_byte *newNumItems, int newCurrentTank,
-		double newFuelSum, double newFuelMax, int newPacketSize);
+		double newFuelSum, double newFuelMax, int newPacketSize, 
+		u_byte status);
 int Handle_self_items(u_byte *newNumItems);
 int Handle_modifiers(char *m);
 int Handle_damaged(int dam);
