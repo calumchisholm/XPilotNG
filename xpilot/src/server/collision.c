@@ -247,8 +247,52 @@ static int in_range_partial(double dx, double dy, double dvx, double dvy,
        yet. It's supposed that they move in a straight line from
        prevpos to pos. This can lead to some erroneous hits.
 */
-bool in_range(object *obj1, object *obj2, double range)
+static bool in_range(object *obj1, object *obj2, double range)
 {
+    int hit;
+
+    if (is_polygon_map || !useOldCode) {
+	switch (obj2->collmode) {
+	case 0:
+	    hit = in_range_simple(obj1->pos.cx, obj1->pos.cy,
+				  obj2->pos.cx, obj2->pos.cy,
+				  range);
+	    break;
+	case 1:
+	    hit = in_range_acd(obj1->prevpos.cx - obj2->prevpos.cx,
+			       obj1->prevpos.cy - obj2->prevpos.cy,
+			       obj1->extmove.cx - obj2->extmove.cx,
+			       obj1->extmove.cy - obj2->extmove.cy,
+			       range);
+	    break;
+	case 2:
+	    hit = in_range_partial(obj1->prevpos.cx - obj2->prevpos.cx,
+				   obj1->prevpos.cy - obj2->prevpos.cy,
+				   obj1->extmove.cx - obj2->extmove.cx,
+				   obj1->extmove.cy - obj2->extmove.cy,
+				   range, obj2->wall_time);
+	    break;
+	case 3:
+	default:
+#if 0
+	    warn("Unimplemented collision mode %d", obj2->collmode);
+#endif
+	    return false;
+	}
+	if (!hit)
+	    return false;
+    } else {
+	if (obj2->life <= 0)
+	    return false;
+	
+	if (!in_range_acd_old(obj1->prevpos.cx, obj1->prevpos.cy,
+			      obj1->pos.cx, obj1->pos.cy,
+			      obj2->prevpos.cx, obj2->prevpos.cy,
+			      obj2->pos.cx, obj2->pos.cy, range)) {
+	    return false;
+	}
+    }
+
     return true;
 }
 
@@ -1949,6 +1993,10 @@ static void MineCollision(void)
 
 	    r = PIXEL_TO_CLICK(mineShotDetonateDistance + obj->pl_radius);
 
+#if 1
+	    if (!in_range(OBJ_PTR(mine), obj, r))
+		continue;
+#else
 	    if (is_polygon_map || !useOldCode) {
 		switch (obj->collmode) {
 		case 0:
@@ -1990,7 +2038,7 @@ static void MineCollision(void)
 		    continue;
 		}
 	    }
-
+#endif
 	    /* bang! */
 	    obj->life = 0;
 	    mine->life = 0;
