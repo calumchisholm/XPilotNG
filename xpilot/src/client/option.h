@@ -231,7 +231,7 @@ void Store_option(xp_option_t *);
 	Store_option(& (option_array) [ii]); \
 } \
 
-static const char *Get_option_name(xp_option_t *opt)
+static inline const char *Get_option_name(xp_option_t *opt)
 {
     assert(opt);
     return opt->name;
