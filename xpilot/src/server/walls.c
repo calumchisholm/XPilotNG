@@ -2680,8 +2680,8 @@ static void Poly_to_lines(void)
 	    dy += *edges++;
 	}
 	if (dx || dy) {
-	    warn("Polygon %d (%d points) doesn't start and end at the "
-		 "same place", i + 1, np);
+	    warn("Broken map: Polygon %d (%d points) doesn't form a "
+		 "closed loop", i + 1, np);
 	    exit(1);
 	}
     }

@@ -182,9 +182,14 @@ void P_start_polygon(int cx, int cy, int style)
 
 void P_offset(int offcx, int offcy, int edgestyle)
 {
-    /* don't add duplicates */
-    if (offcx == 0 && offcy == 0)
+    if (offcx == 0 && offcy == 0) {
+	warn("Edge with zero length");
+	if (edgestyle != -1 && edgestyle != current_estyle) {
+	    warn("Refusing to change edgestyle with zero-length edge");
+	    exit(1);
+	}
 	return;
+    }
 
     if (ABS(offcx) > POLYGON_MAX_OFFSET || ABS(offcy) > POLYGON_MAX_OFFSET) {
 	warn("Offset component absolute value exceeds %d (x=%d, y=%d)",
@@ -348,8 +353,8 @@ int P_get_bmp_id(const char *s)
     for (i = 0; i < num_bstyles; i++)
 	if (!strcmp(bstyles[i].id, s))
 	    return i;
-    warn("Undeclared bmpstyle %s", s);
-    return -1;
+    warn("Broken map: Undeclared bmpstyle %s", s);
+    exit(-1);
 }
 
 
@@ -360,8 +365,8 @@ int P_get_edge_id(const char *s)
     for (i = 0; i < num_estyles; i++)
 	if (!strcmp(estyles[i].id, s))
 	    return i;
-    warn("Undeclared edgestyle %s", s);
-    return -1;
+    warn("Broken map: Undeclared edgestyle %s", s);
+    exit(-1);
 }
 
 
@@ -372,8 +377,8 @@ int P_get_poly_id(const char *s)
     for (i = 0; i < num_pstyles; i++)
 	if (!strcmp(pstyles[i].id, s))
 	    return i;
-    warn("Undeclared polystyle %s", s);
-    return -1;
+    warn("Broken map: Undeclared polystyle %s", s);
+    exit(-1);
 }
 
 /*
