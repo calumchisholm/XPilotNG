@@ -952,17 +952,13 @@ public class MapCanvas extends JComponent {
         private void transformEvent(MouseEvent evt) {
             int x = evt.getX();
             int y = evt.getY();
-            if (grid > 1) {
-                /*
-                double gs = grid * scale * 64;
-                x = (int)(gs * Math.round(x / gs));
-                y = (int)(gs * Math.round(y / gs));
-                */
-                x = (x / grid) * grid;
-                y = (y / grid) * grid;
-            }
+            int g = grid * 64;
             Point mapp = new Point(x, y);
             getInverse().transform(mapp, mapp);
+            if (g > 0) {
+                mapp.x = (mapp.x / g) * g;
+                mapp.y = (mapp.y / g) * g;
+            }
             evt.translatePoint(mapp.x - evt.getX(), mapp.y - evt.getY());
         }        
     }
