@@ -181,6 +181,7 @@ def convert(options):
     bases = []
     balls = []
     fuels = []
+    checks = [None] * 27  # 1 extra so it always ends with None
     polys = []
     for loc in [map.coords(x, y) for x in range(width) for y in range(height)]:
 	if map[loc] in '_0123456789':
@@ -206,6 +207,11 @@ def convert(options):
 	    fuel.y = (height - loc.y - 1) % height * BCLICKS + BCLICKS / 2
 	    fuel.loc = loc.copy()
 	    fuels.append(fuel)
+	if map[loc] in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+	    check = Struct()
+	    check.x = loc.x * BCLICKS + BCLICKS / 2
+	    check.y = (height - loc.y - 1) % height * BCLICKS + BCLICKS / 2
+	    checks[ord(map[loc]) - ord('A')] = check
 	if done[loc]:
 	    continue
 	if map[loc] in FILLED and map[loc.l()] not in FILLED + REC_RD + REC_RU:
@@ -342,8 +348,8 @@ def convert(options):
 
     print "<XPilotMap>"
 
-    print '<Featurecount bases="%d" balls="%d" fuels="%d"/>' % (
-	len(bases), len(balls), len(fuels))
+    print '<Featurecount bases="%d" balls="%d" fuels="%d" checks="%d"/>' % (
+	len(bases), len(balls), len(fuels), checks.index(None))
     mapd = options['mapdata']
     del options['mapdata']
     print '<GeneralOptions>'
@@ -379,6 +385,10 @@ def convert(options):
 	if fuel.team != -1:
 	    print (' team="%d"' % fuel.team),
 	print '/>'
+    for check in checks:
+	if not check:
+	    break
+	print '<Check x="%d" y="%d"/>' % (check.x, check.y)
     print "</XPilotMap>"
 
 if __name__ == '__main__':
