@@ -1334,7 +1334,7 @@ option options[] = {
 	NULL,
 	"No",
 	KEY_DUMMY,
-	"Scan messages killmsgs and make personal kill/death ranking.\n"
+	"Scan messages and make personal kill/death ranking.\n"
     },
     {
 	"outlineDecor",
