@@ -1489,35 +1489,36 @@ void Move_ball(int ind)
      * by Mark Boyns.  Here is a an excerpt from a post in
      * rec.games.computer.xpilot by Bretton Wade dated 27 Jun 1995:
      *
-     *     If I'm not mistaken (not having looked very closely at the code
-     *     because I wasn't sure what it was trying to do), the original move_ball
-     *     routine was trying to model a Hook's law spring, but squared the
-     *     deformation term, which would lead to exagerated behavior as the spring
-     *     stretched too far. Not really a divide by zero, but effectively producing
-     *     large numbers.
+     * If I'm not mistaken (not having looked very closely at the code
+     * because I wasn't sure what it was trying to do), the original move_ball
+     * routine was trying to model a Hook's law spring, but squared the
+     * deformation term, which would lead to exagerated behavior as the spring
+     * stretched too far. Not really a divide by zero, but effectively
+     * producing large numbers.
      *
-     *     When I coded up the spring myself, I found that I could recreate the
-     *     effect by using a VERY strong spring. This can be defeated, however, by
-     *     damping. Specifically, If you compute the critical damping factor, then
-     *     you could have the cable always be the correct length. This makes me
-     *     wonder how to decide when the cable snaps.
+     * When I coded up the spring myself, I found that I could recreate the
+     * effect by using a VERY strong spring. This can be defeated, however, by
+     * damping. Specifically, If you compute the critical damping factor, then
+     * you could have the cable always be the correct length. This makes me
+     * wonder how to decide when the cable snaps.
      *
-     *     I chose a relatively strong spring, and a small damping factor, to make
-     *     for a nice realistic bounce when you grab at the treasure. It also gives a
-     *     fairley close approximation to the "normal" feel of the treasure.
+     * I chose a relatively strong spring, and a small damping factor, to make
+     * for a nice realistic bounce when you grab at the treasure. It also
+     * gives a fairley close approximation to the "normal" feel of the
+     * treasure.
      *
-     *     I modeled the cable as having zero mass, or at least insignificant mass as
-     *     compared to the ship and ball. This greatly simplifies the math, and leads
-     *     to the conclusion that there will be no change in velocity when the cable
-     *     breaks. You can check this by integrating the momentum along the cable,
-     *     and the ship or ball.
+     * I modeled the cable as having zero mass, or at least insignificant mass
+     * as compared to the ship and ball. This greatly simplifies the math, and
+     * leads to the conclusion that there will be no change in velocity when
+     * the cable breaks. You can check this by integrating the momentum along
+     * the cable, and the ship or ball.
      *
-     *     If you assume that the cable snaps in the middle, then half of the
-     *     potential energy goes to each object attached. However, as you said, the
-     *     total momentum of the system cannot change. Because the weight of the
-     *     cable is small, the vast majority of the potential energy will become
-     *     heat. I've had two physicists verify this for me, and they both worked
-     *     really hard on the problem because they found it interesting.
+     * If you assume that the cable snaps in the middle, then half of the
+     * potential energy goes to each object attached. However, as you said, the
+     * total momentum of the system cannot change. Because the weight of the
+     * cable is small, the vast majority of the potential energy will become
+     * heat. I've had two physicists verify this for me, and they both worked
+     * really hard on the problem because they found it interesting.
      *
      * End of post.
      *
