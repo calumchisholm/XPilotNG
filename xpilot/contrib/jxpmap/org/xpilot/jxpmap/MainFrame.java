@@ -134,7 +134,7 @@ public class MainFrame extends JFrame implements ActionListener {
         toolBar.add(btnNewBall);
 
         btnNewCannon = createToggle
-            ("newCannon", "/images/ballicon.gif", "New cannon");
+            ("newCannon", "/images/cannonicon.gif", "New cannon");
         toolBar.add(btnNewCannon);
 
         btnNewCheckPoint = createToggle
