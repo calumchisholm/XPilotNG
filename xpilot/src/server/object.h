@@ -543,12 +543,10 @@ struct player {
 
     int		num_pulses;		/* Number of laser pulses in the air. */
 
-    int		emergency_thrust_left;	/* how much emergency thrust left */
-    int		emergency_thrust_max;	/* maximum time left */
+    DFLOAT	emergency_thrust_left;	/* how much emergency thrust left */
     int		emergency_shield_left;	/* how much emergency shield left */
 
-    int		phasing_left;		/* how much time left */
-    int		phasing_max;		/* maximum time left */
+    DFLOAT	phasing_left;		/* how much time left */
 
     int		item[NUM_ITEMS];	/* for each item type how many */
     int		lose_item;		/* which item to drop */

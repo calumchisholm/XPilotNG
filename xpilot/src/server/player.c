@@ -443,10 +443,8 @@ int Init_player(int ind, shipobj *ship)
     pl->auth_nick[0]	= 0;
     pl->num_pulses	= 0;
     pl->emergency_thrust_left = 0;
-    pl->emergency_thrust_max = 0;
     pl->emergency_shield_left = 0;
     pl->phasing_left	= 0;
-    pl->phasing_max	= 0;
     pl->ecmcount	= 0;
     pl->damaged 	= 0;
     pl->stunned		= 0;
@@ -2044,10 +2042,8 @@ void Player_death_reset(int ind)
 	pl->count = RECOVERY_DELAY;
     pl->ecmcount	= 0;
     pl->emergency_thrust_left = 0;
-    pl->emergency_thrust_max = 0;
     pl->emergency_shield_left = 0;
     pl->phasing_left	= 0;
-    pl->phasing_max	= 0;
     pl->damaged 	= 0;
     pl->stunned		= 0;
     pl->lock.distance	= 0;

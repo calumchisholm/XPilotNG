@@ -503,8 +503,8 @@ static int Frame_status(int conn, int ind)
 
     if (BIT(pl->used, HAS_EMERGENCY_THRUST))
 	Send_thrusttime(conn,
-			pl->emergency_thrust_left >> TIME_BITS,
-			pl->emergency_thrust_max >> TIME_BITS);
+			pl->emergency_thrust_left,
+			EMERGENCY_THRUST_TIME);
     if (BIT(pl->used, HAS_EMERGENCY_SHIELD))
 	Send_shieldtime(conn,
 			pl->emergency_shield_left >> TIME_BITS,
@@ -514,8 +514,8 @@ static int Frame_status(int conn, int ind)
     }
     if (BIT(pl->used, HAS_PHASING_DEVICE))
 	Send_phasingtime(conn,
-			 pl->phasing_left >> TIME_BITS,
-			 pl->phasing_max >> TIME_BITS);
+			 (int)pl->phasing_left,
+			 PHASING_TIME);
     if (ShutdownServer != -1) {
 	Send_shutdown(conn, ShutdownServer, ShutdownDelay);
     }

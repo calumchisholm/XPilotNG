@@ -124,12 +124,10 @@ static void Transport_to_home(int ind)
 void Phasing(int ind, int on)
 {
     player	*pl = Players[ind];
-    const int	phasing_time = 4 * 12 * TIME_FACT;
 
     if (on) {
 	if (pl->phasing_left <= 0) {
-	    pl->phasing_left = phasing_time;
-	    pl->phasing_max += phasing_time;
+	    pl->phasing_left = PHASING_TIME;
 	    pl->item[ITEM_PHASING]--;
 	}
 	SET_BIT(pl->used, HAS_PHASING_DEVICE);
@@ -223,12 +221,10 @@ void Deflector(int ind, int on)
 void Emergency_thrust (int ind, int on)
 {
     player	*pl = Players[ind];
-    const int	emergency_thrust_time = 4 * 12 * TIME_FACT;
 
     if (on) {
 	if (pl->emergency_thrust_left <= 0) {
-	    pl->emergency_thrust_left = emergency_thrust_time;
-	    pl->emergency_thrust_max += emergency_thrust_time;
+	    pl->emergency_thrust_left = EMERGENCY_THRUST_TIME;
 	    pl->item[ITEM_EMERGENCY_THRUST]--;
 	}
 	if (!BIT(pl->used, HAS_EMERGENCY_THRUST)) {
@@ -724,7 +720,7 @@ static void Use_items(int i)
     }
 
     if (BIT(pl->used, HAS_PHASING_DEVICE)) {
-	if ((pl->phasing_left -= timeStep) <= 0) {
+	if ((pl->phasing_left -= timeStep2) <= 0) {
 	    if (pl->item[ITEM_PHASING])
 		Phasing(i, 1);
 	    else
@@ -735,7 +731,7 @@ static void Use_items(int i)
     if (BIT(pl->used, HAS_EMERGENCY_THRUST)) {
 	if (pl->fuel.sum > 0
 	    && BIT(pl->status, THRUSTING)
-	    && (pl->emergency_thrust_left -= timeStep) <= 0) {
+	    && (pl->emergency_thrust_left -= timeStep2) <= 0) {
 	    if (pl->item[ITEM_EMERGENCY_THRUST])
 		Emergency_thrust(i, true);
 	    else
