@@ -33,10 +33,6 @@ Developer: ?
 Task: Support "internal" edges in SDL client.
 Developer: baron ?
 
-Task: Make hidden walls visible in SDL client if texturedwalls
-(and filledworld?) are off.
-Developer: baron ?
-
 Task: Remove X client radar bug (this appears e.g. on polygon version of
 newdarkhell).
 Developer: ?

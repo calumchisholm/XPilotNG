@@ -799,15 +799,18 @@ void Gui_paint_filled_slice(int bl, int tl, int tr, int br, int y)
 
 void Gui_paint_polygon(int i, int xoff, int yoff)
 {
-    xp_polygon_t    polygon;
+    xp_polygon_t polygon;
     polygon_style_t p_style;
-    edge_style_t    e_style;
+    edge_style_t e_style;
+    int width;
+    bool did_fill = false;
 
     polygon = polygons[i];
     p_style = polygon_styles[polygon.style];
     e_style = edge_styles[p_style.def_edge_style];
 
-    if (BIT(p_style.flags, STYLE_INVISIBLE)) return;
+    if (BIT(p_style.flags, STYLE_INVISIBLE))
+	return;
 
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
@@ -819,6 +822,7 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
 		 rint((yoff * Setup->height - world.y) * clData.scale), 0);
     glScalef(clData.scale, clData.scale, 0);
 
+    /* possibly paint the polygon as filled or textured */
     if ((instruments.texturedWalls || instruments.filledWorld) &&
 	    BIT(p_style.flags, STYLE_TEXTURED | STYLE_FILLED)) {
 	if (BIT(p_style.flags, STYLE_TEXTURED)
@@ -826,15 +830,22 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
 	    Image_use_texture(p_style.texture);
 	    glCallList(polyListBase + i);
 	    Image_no_texture();
-	} else {
+	}
+	else {
 	    set_alphacolor((p_style.rgb << 8) | 0xff);
 	    glCallList(polyListBase + i);
 	}
+	did_fill = true;
     }
 
-    if (e_style.width != -1) {
+    width = e_style.width;
+    if (!did_fill && width == -1)
+	width = 1;
+
+    /* possibly paint the edges around the polygon */
+    if (width != -1) {
 	set_alphacolor((e_style.rgb << 8) | 0xff);
-	glLineWidth(e_style.width * clData.scale);
+	glLineWidth(width * clData.scale);
 	if (smoothLines) {
 	    glEnable(GL_BLEND);
 	    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
