@@ -185,6 +185,7 @@ void setupPaint_HUD(void)
 
 void Paint_frame(void)
 {
+    /*Uint32 now = SDL_GetTicks();*/
     Check_view_dimensions();
 
     world.x = selfPos.x - (ext_view_width / 2);
@@ -271,6 +272,7 @@ void Paint_frame(void)
     }
 
     SDL_GL_SwapBuffers();
+    /*xpprintf("time for Paint_frame() = %i\n",SDL_GetTicks()-now);*/
 }
 
 void Paint_score_start(void)

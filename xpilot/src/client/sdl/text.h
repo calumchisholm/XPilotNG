@@ -53,17 +53,17 @@ typedef struct {
 /* Calcs the bounding width,height for the text if it were printed
  * to screen with given font
  */
-fontbounds printsize(font_data *ft_font, const char *fmt, ...);
+fontbounds printsize(font_data *ft_font, int length, const char *fmt, ...);
 
-/* prints text immediately, set color outside */
-void oldfontprint(font_data *ft_font, int XALIGN, int YALIGN, int x, int y, const char *fmt, ...) ;
 /* 
  * NOTE: passing color 0x00000000 causes the painting to *not* set color,
  * it does *not* mean the text will be drawn with color 0x00000000, you
  * should check for that before calling this function.
  */
-void HUDprint(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, const char *fmt, ...);
-void mapprint(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, const char *fmt,...);
+/* length = 0 means that the whole text will be painted.
+ */ 
+void HUDnprint(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, int length, const char *fmt, ...);
+void mapnprint(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, int length, const char *fmt,...);
 
 font_data gamefont;
 font_data messagefont;

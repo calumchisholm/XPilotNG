@@ -353,16 +353,16 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
     color |= 0x000000ff;
     switch (type) {
     case SETUP_BASE_UP:
-	mapprint(&mapfont,color,CENTER,DOWN	  ,(x)  	      ,(y - BLOCK_SZ / 2),other->name);
+	mapnprint(&mapfont,color,CENTER,DOWN	  ,(x)  	      ,(y - BLOCK_SZ / 2),0,other->name);
         break;
     case SETUP_BASE_DOWN:
-	mapprint(&mapfont,color,CENTER,UP	  ,(x)  	      ,(y + BLOCK_SZ / 1.5),other->name);
+	mapnprint(&mapfont,color,CENTER,UP	  ,(x)  	      ,(y + BLOCK_SZ / 1.5),0,other->name);
         break;
     case SETUP_BASE_LEFT:
-	mapprint(&mapfont,color,RIGHT,UP    ,(x + BLOCK_SZ / 2) ,(y),other->name);
+	mapnprint(&mapfont,color,RIGHT,UP    ,(x + BLOCK_SZ / 2) ,(y),0,other->name);
         break;
     case SETUP_BASE_RIGHT:
-	mapprint(&mapfont,color,LEFT,UP   ,(x - BLOCK_SZ / 2) ,(y),other->name);
+	mapnprint(&mapfont,color,LEFT,UP   ,(x - BLOCK_SZ / 2) ,(y),0,other->name);
         break;
     default:
         errno = 0;
@@ -908,7 +908,7 @@ static void Gui_paint_ship_name(int x, int y, other_t *other)
 	if (!color)
 	    color = shipNameColor;
 
-	mapprint(&mapfont, color, CENTER, DOWN,x,y - SHIP_SZ,"%s",other->id_string);
+	mapnprint(&mapfont, color, CENTER, DOWN,x,y - SHIP_SZ,0,"%s",other->id_string);
     } else
 	color = blueRGBA;
 
@@ -917,7 +917,7 @@ static void Gui_paint_ship_name(int x, int y, other_t *other)
 	if (other->life < 1)
 	    color = whiteRGBA;
 
-	mapprint(&mapfont, color, LEFT, CENTER,x + SHIP_SZ,y,"%d", other->life);
+	mapnprint(&mapfont, color, LEFT, CENTER,x + SHIP_SZ,y,0,"%d", other->life);
     }
 }
 
@@ -980,7 +980,7 @@ void Paint_score_objects(void)
 		x = sobj->x * BLOCK_SZ + BLOCK_SZ/2;
 		y = sobj->y * BLOCK_SZ + BLOCK_SZ/2;
   		if (wrap(&x, &y)) {
-		    mapprint(&mapfont,scoreObjectColor,CENTER,CENTER,x,y,sobj->msg);
+		    mapnprint(&mapfont,scoreObjectColor,CENTER,CENTER,x,y,0,sobj->msg);
 		}
 	    }
 	    sobj->life_time -= timePerFrame;
@@ -995,19 +995,15 @@ void Paint_score_objects(void)
 void Paint_client_fps(void)
 {
     int			x, y;
-    char		buf[32];
-    int			len;
 
     if (!hudColor)
 	return;
 
-    sprintf(buf, "FPS: %d", clientFPS);
-    len = strlen(buf);
     x = draw_width - 20;
     /* Better make sure it's below the meters */
     y = draw_height - 9*((20>gamefont.h)?20:gamefont.h);
 ;
-    HUDprint(&gamefont,hudColor,RIGHT,DOWN,x,y,buf);
+    HUDnprint(&gamefont,hudColor,RIGHT,DOWN,x,y,0,"FPS: %d",clientFPS);
 }
 
 static void Paint_meter(int xoff, int y, const char *title, int val, int max,
@@ -1066,7 +1062,7 @@ static void Paint_meter(int xoff, int y, const char *title, int val, int max,
     if (!meterBorderColor)
 	color = meter_color;
 
-    HUDprint(&gamefont,color,x_alignment,UP,xstr,draw_height - y - meterHeight,title);
+    HUDnprint(&gamefont,color,x_alignment,UP,xstr,draw_height - y - meterHeight,0,title);
 }
 
 void Paint_meters(void)
@@ -1314,21 +1310,20 @@ void Paint_HUD(void)
     /* Fuel notify, HUD meter on */
     if (hudColor && (fuelTime > 0.0 || fuelSum < fuelLevel3)) {
 	did_fuel = 1;
-	sprintf(str, "%04d", (int)fuelSum);
 	/* TODO fix this */
-	HUDprint(&gamefont,hudColor,LEFT,DOWN,
+	HUDnprint(&gamefont,hudColor,LEFT,DOWN,
 	    	hud_pos_x + hudSize-HUD_OFFSET+BORDER,
-		hud_pos_y - (hudSize-HUD_OFFSET+BORDER),
-		str);
+		hud_pos_y - (hudSize-HUD_OFFSET+BORDER),0,
+		"%04d", (int)fuelSum);
 	if (numItems[ITEM_TANK]) {
 	    if (fuelCurrent == 0)
 		strcpy(str,"M ");
 	    else
 		sprintf(str, "T%d", fuelCurrent);
 	    /* TODO fix this */
-	    HUDprint(&gamefont,hudColor,LEFT,DOWN,
+	    HUDnprint(&gamefont,hudColor,LEFT,DOWN,
 	    	    hud_pos_x + hudSize-HUD_OFFSET + BORDER,
-		    hud_pos_y - hudSize-HUD_OFFSET + BORDER,
+		    hud_pos_y - hudSize-HUD_OFFSET + BORDER,0,
 		    str);
 	}
     }
@@ -1338,48 +1333,47 @@ void Paint_HUD(void)
 
     /* Draw last score on hud if it is an message attached to it */
     if (hudColor) {
-    	/* TODO: rewrite this to exploit the fact HUDprint handles newlines */
+    	/* TODO: rewrite this to exploit the fact HUDnprint handles newlines */
 	for (i = 0, j = 0; i < MAX_SCORE_OBJECTS; i++) {
 	    score_object_t*	sobj = &score_objects[(i+score_object)%MAX_SCORE_OBJECTS];
 	    if (sobj->hud_msg_len > 0) {
-	    	dummy = printsize(&gamefont,sobj->hud_msg);
+	    	dummy = printsize(&gamefont,0,sobj->hud_msg);
 		if (sobj->hud_msg_width == -1)
 		    sobj->hud_msg_width = dummy.width;
 		if (j == 0 &&
 		    sobj->hud_msg_width > 2*hudSize-HUD_OFFSET*2 &&
 		    (did_fuel || hudVLineColor))
 		    ++j;
-		HUDprint(&gamefont,hudColor,CENTER,DOWN,
+		HUDnprint(&gamefont,hudColor,CENTER,DOWN,
 		    	hud_pos_x,
 			hud_pos_y - (hudSize-HUD_OFFSET + BORDER + j * dummy.height),
-			sobj->hud_msg);
+			0,sobj->hud_msg);
 		j++;
 	    }
 	}
 
 	if (time_left > 0) {
-	    sprintf(str, "%3d:%02d",
-		    (int)(time_left / 60), (int)(time_left % 60));
-	    HUDprint(&gamefont,hudColor,RIGHT,DOWN,
+	    HUDnprint(&gamefont,hudColor,RIGHT,DOWN,
 		    hud_pos_x - hudSize+HUD_OFFSET - BORDER,
 		    hud_pos_y + hudSize+HUD_OFFSET + BORDER,
-		    str);
+		    0,"%3d:%02d",
+		    (int)(time_left / 60), (int)(time_left % 60));
 	}
 
 	/* Update the modifiers */
 	modlen = strlen(mods);
-	HUDprint(&gamefont,hudColor,RIGHT,UP,
+	HUDnprint(&gamefont,hudColor,RIGHT,UP,
 		hud_pos_x - hudSize+HUD_OFFSET-BORDER,
 		hud_pos_y - hudSize+HUD_OFFSET-BORDER,
-		mods);
+		0,mods);
 
 	if (autopilotLight) {
-	    dummy = printsize(&gamefont,autopilot);
-	    HUDprint(&gamefont,hudColor,CENTER,DOWN,
+	    dummy = printsize(&gamefont,9,autopilot);
+	    HUDnprint(&gamefont,hudColor,CENTER,DOWN,
 			  hud_pos_x,
 			  hud_pos_y + hudSize+HUD_OFFSET + BORDER
 			  + dummy.height*2,
-			  autopilot);
+			  0,autopilot);
 	}
     }
 
@@ -1506,7 +1500,7 @@ void Paint_messages(void)
 	}
 	len = (int)(charsPerSecond * (MSG_LIFE_TIME - msg->lifeTime));
 	len = MIN(msg->len, len);
-
+	xpprintf("%s %i\n",msg->txt,len);
 	/*
 	 * it's an emphasized talk message
 	 */
@@ -1554,10 +1548,8 @@ void Paint_messages(void)
 			/*    ^      */
 		    l = selection.draw.x1;
 		    ptr2 = &(msg->txt[selection.draw.x1]);
-		    /*xoff2 = XTextWidth(messageFont, msg->txt,
-				          glBlendFunc(GL_SRC_ALPHA, GL_ONE);
- selection.draw.x1);*/
-		    xoff2 = printsize(&messagefont,msg->txt).width*len;/*this is not accurate*/
+		    /*xoff2 = XTextWidth(messageFont, msg->txt, selection.draw.x1);*/
+		    xoff2 = printsize(&messagefont,l,msg->txt).width;/*this is not accurate*/
 
 		    if (TALK_MSG_SCREENPOS(last_msg_index,i)
 			< selection.draw.y2) {
@@ -1579,7 +1571,7 @@ void Paint_messages(void)
 			    ptr3 = &(msg->txt[selection.draw.x2 + 1]);
 			    /*xoff3 = XTextWidth(messageFont, msg->txt,
 					       selection.draw.x2 + 1);*/
-			    xoff3 = printsize(&messagefont,msg->txt).width*len;/*this is not accurate*/
+			    xoff3 = printsize(&messagefont,selection.draw.x2 + 1,msg->txt).width;/*this is not accurate*/
 			    l3 = len - selection.draw.x2 - 1;
 			}
 		    } /* only line */
@@ -1601,29 +1593,29 @@ void Paint_messages(void)
 		    ptr3 = &(msg->txt[selection.draw.x2 + 1]);
 		    /*xoff3 = XTextWidth(messageFont, msg->txt,
 				       selection.draw.x2 + 1);*/
-		    xoff3 = printsize(&messagefont,msg->txt).width*len;/*this is not accurate*/
+		    xoff3 = printsize(&messagefont,selection.draw.x2 + 1,msg->txt).width*len;/*this is not accurate*/
 		    l3 = len - selection.draw.x2 - 1;
 		}
 	    } /* last line */
 
 
 	    if (ptr) {
-		HUDprint(&gamefont,msg_color,LEFT,CENTER,x,y,ptr);
+		HUDnprint(&gamefont,msg_color,LEFT,CENTER,x,y,l,ptr);
 	    }
 	    if (ptr2) {
-		HUDprint(&gamefont,whiteRGBA,LEFT,CENTER,x,y,ptr2);
+		HUDnprint(&gamefont,whiteRGBA,LEFT,CENTER,x,y,l2,ptr2);
 	    }
 	    if (ptr3) {
-		HUDprint(&gamefont,msg_color,LEFT,CENTER,x,y,ptr2);
+		HUDnprint(&gamefont,msg_color,LEFT,CENTER,x,y,l3,ptr2);
 	    }
 
 	} else /* not emphasized */
 
 	{
-	    HUDprint(&gamefont,msg_color,LEFT,CENTER,x,y,msg->txt);
+	    HUDnprint(&gamefont,msg_color,LEFT,CENTER,x,y,(int)len,msg->txt);
 	}
 
-	width = printsize(&messagefont,"e").width*MIN(len, msg->len); /*this is not accurate*/
+	width = printsize(&messagefont,MIN(len, msg->len),msg->txt).width; /*this is not accurate*/
     }
 }
 
