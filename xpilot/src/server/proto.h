@@ -304,6 +304,13 @@ static inline void Player_add_fuel(player *pl, double amount)
 {
     Add_fuel(&(pl->fuel), amount);
 }
+static inline bool Player_used_emergency_shield(player *pl)
+{
+    if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) ==
+	(HAS_SHIELD|HAS_EMERGENCY_SHIELD))
+	return true;
+    return false;
+}
 void Player_hit_armor(player *pl);
 void Player_used_kill(player *pl);
 int Init_player(int ind, shipshape_t *ship);

@@ -61,8 +61,7 @@ void Laser_pulse_hits_player(player *pl, pulseobject *pulse)
     }
 
     sound_play_sensors(pl->pos, PLAYER_EAT_LASER_SOUND);
-    if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
-	== (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
+    if (Player_used_emergency_shield(pl))
 	return;
     if (pulse->type != OBJ_PULSE) {
 	/* kps -remove */

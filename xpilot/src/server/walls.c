@@ -485,16 +485,14 @@ void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt)
     case CrashCannon:
         {
 	    cannon_t *cannon = Cannons(mapobj_ind);
-	    if (BIT(pl->used, HAS_SHIELD|HAS_EMERGENCY_SHIELD)
-		!= (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
+	    if (!Player_used_emergency_shield(pl)) {
 		howfmt = "%s smashed%s against a cannon";
 		hudmsg = "[Cannon]";
 		sound_play_sensors(pl->pos, PLAYER_HIT_CANNON_SOUND);
 	    }
 	    if (!BIT(cannon->used, HAS_EMERGENCY_SHIELD)) {
 		/* pl gets points if the cannon is rammed with shields up */
-		if (BIT(pl->used, HAS_SHIELD|HAS_EMERGENCY_SHIELD)
-		    == (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
+		if (Player_used_emergency_shield(pl))
 		    Cannon_dies(cannon, pl);
 		else
 		    Cannon_dies(cannon, NULL);
@@ -818,8 +816,7 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
 		? maxShieldedWallBounceSpeed
 		: maxUnshieldedWallBounceSpeed;
 
-	if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
-	    == (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
+	if (Player_used_emergency_shield(pl))
 	    max_speed = 100.0;
 
 	/* only use armor if neccessary */
@@ -845,8 +842,7 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
 	 * which don't collide with player.
 	 */
 	cost *= 0.9; /* used to depend on bounce angle, .5 .. 1.0 */
-	if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
-	    != (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
+	if (!Player_used_emergency_shield(pl)) {
 	    Player_add_fuel(pl, -cost * wallBounceFuelDrainMult);
 	    Item_damage(pl, wallBounceDestroyItemProb);
 	}

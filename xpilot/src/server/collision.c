@@ -247,13 +247,11 @@ static void PlayerCollision(void)
 
 		sound_play_sensors(pl->pos, PLAYER_HIT_PLAYER_SOUND);
 		if (BIT(World.rules->mode, BOUNCE_WITH_PLAYER)) {
-		    if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) !=
-			(HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
+		    if (!Player_used_emergency_shield(pl)) {
 			Player_add_fuel(pl, ED_PL_CRASH);
 			Item_damage(pl, destroyItemInCollisionProb);
 		    }
-		    if (BIT(pl_j->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) !=
-			(HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
+		    if (!Player_used_emergency_shield(pl_j)) {
 			Player_add_fuel(pl_j, ED_PL_CRASH);
 			Item_damage(pl_j, destroyItemInCollisionProb);
 		    }
@@ -700,8 +698,7 @@ static void Player_collides_with_ball(player *pl, object *obj)
      * be destroyed.
      */
     Delta_mv((object *)pl, obj);
-    if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
-	!= (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
+    if (!Player_used_emergency_shield(pl)) {
 	Player_add_fuel(pl, ED_BALL_HIT);
 	if (treasureCollisionDestroys)
 	    ball->life = 0;
@@ -990,8 +987,7 @@ static void Player_collides_with_debris(player *pl, object *obj)
 
     cost = collision_cost(obj->mass, VECTOR_LENGTH(obj->vel));
 
-    if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
-	!= (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
+    if (!Player_used_emergency_shield(pl))
 	Player_add_fuel(pl, -cost);
     if (pl->fuel.sum == 0.0
 	|| (obj->type == OBJ_WRECKAGE
@@ -1040,8 +1036,7 @@ static void Player_collides_with_asteroid(player *pl, wireobject *ast)
 	&& pl->score <= asteroidMaxScore)
 	Score(pl, asteroidPoints, ast->pos, "");
 
-    if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
-	!= (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
+    if (!Player_used_emergency_shield(pl))
 	Player_add_fuel(pl, -cost);
 
     if (asteroidCollisionMayKill
@@ -1123,8 +1118,7 @@ static void Player_collides_with_killing_shot(player *pl, object *obj)
 	    }
 	    drain = (ED_SMART_SHOT_HIT /
 		((obj->mods.mini + 1) * (obj->mods.power + 1)));
-	    if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
-		!= (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
+	    if (!Player_used_emergency_shield(pl))
 		Player_add_fuel(pl, drain);
 	    pl->forceVisible += 2;
 	    Set_message(msg);
@@ -1133,8 +1127,7 @@ static void Player_collides_with_killing_shot(player *pl, object *obj)
 	case OBJ_SHOT:
 	case OBJ_CANNON_SHOT:
 	    sound_play_sensors(pl->pos, PLAYER_EAT_SHOT_SOUND);
-	    if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
-		!= (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
+	    if (!Player_used_emergency_shield(pl)) {
 		if (shotHitFuelDrainUsesKineticEnergy) {
 		    double rel_velocity = LENGTH(pl->vel.x - obj->vel.x,
 						 pl->vel.y - obj->vel.y);
