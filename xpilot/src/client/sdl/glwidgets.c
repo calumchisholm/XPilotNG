@@ -440,6 +440,8 @@ void load_textscrap(char *text)
     char *cp;
     int   i;
     
+    if (!text) return;
+    
     scraptarget = NULL;
     scrap = realloc(scrap, strlen(text)+1);
     strcpy(scrap, text);
@@ -3232,13 +3234,6 @@ GLWidget *Init_MainWidget( font_data *font )
     b.y = tmp->bounds.h - b.h - 16;
     SetBounds_GLWidget(wid_info->confmenu,&b);
     
-    /* Set up the clipboard */
-    if ( init_scrap() < 0 ) {
-    	error("Couldn't init clipboard: %s\n");
-	Close_Widget(&tmp);
-    	return NULL;
-    }
-
     return tmp;
 }
 /*******************/

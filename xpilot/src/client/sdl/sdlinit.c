@@ -28,6 +28,7 @@
 #include "glwidgets.h"
 #include "sdlpaint.h"
 #include "sdlinit.h"
+#include "scrap.h"
 
 /* These are only needed for the polygon tessellation */
 /* I'd like to move them to Paint_init/cleanup but because it */
@@ -128,7 +129,7 @@ int Init_window(void)
 
     Conf_print();
 
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE) < 0) {
         error("failed to initialize SDL: %s", SDL_GetError());
         return -1;
     }
@@ -245,6 +246,11 @@ int Init_window(void)
     if (!mf_init) {
     	error("Failed to initialize any map font! (quitting)");
 	return -1;
+    }
+
+    /* Set up the clipboard */
+    if ( init_scrap() < 0 ) {
+    	error("Couldn't init clipboard: %s\n");
     }
 
     return 0;
