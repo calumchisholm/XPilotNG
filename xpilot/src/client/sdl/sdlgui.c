@@ -103,13 +103,9 @@ Uint32 scoreEnemyTeamColorRGBA;
 
 Uint32 selectionColorRGBA;
 
-int hudSize 	    	= 250;
 static int meterWidth	= 60;
 static int meterHeight	= 10;
-double hudRadarScale = 2.0;
 float hudRadarMapScale;
-int hudRadarDotSize = 6;
-int baseWarningType = 1;
 
 static double shipLineWidth;
 static bool smoothLines;

@@ -240,11 +240,6 @@ int                 num_playing_teams = 0;
 long		    time_left = -1;
 long		    start_loops, end_loops;
 
-/* provide cut&paste and message history */
-static	char		*HistoryBlock = NULL;
-bool			selectionAndHistory = false;
-int			maxLinesInHistory;
-
 static fuelstation_t *Fuelstation_by_pos(int x, int y)
 {
     int			i, lo, hi, pos;
@@ -2156,38 +2151,6 @@ int Handle_vdecor(int x, int y, int xi, int yi, int type)
     t.type = type;
     STORE(vdecor_t, vdecor_ptr, num_vdecor, max_vdecor, t);
     return 0;
-}
-
-static int Alloc_history(void)
-{
-    char	*hist_ptr;
-    int		i;
-
-    /* maxLinesInHistory is a runtime constant */
-    if ((hist_ptr = malloc((size_t)maxLinesInHistory * MAX_CHARS)) == NULL) {
-	error("No memory for history");
-	return -1;
-    }
-    HistoryBlock = hist_ptr;
-
-    for (i = 0; i < maxLinesInHistory; i++) {
-	HistoryMsg[i] = hist_ptr;
-	hist_ptr[0] = '\0';
-	hist_ptr += MAX_CHARS;
-    }
-    return 0;
-}
-
-static void Free_selectionAndHistory(void)
-{
-    if (HistoryBlock) {
-	free(HistoryBlock);
-	HistoryBlock = NULL;
-    }
-    if (selection.txt) {
-	free(selection.txt);
-	selection.txt = NULL;
-    }
 }
 
 bool Using_score_decimals(void)

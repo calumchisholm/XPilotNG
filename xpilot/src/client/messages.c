@@ -35,6 +35,9 @@ message_t	*TalkMsg[MAX_MSGS], *GameMsg[MAX_MSGS];
 message_t	*TalkMsg_pending[MAX_MSGS], *GameMsg_pending[MAX_MSGS];
 char		*HistoryMsg[MAX_HIST_MSGS];
 
+/* provide cut&paste and message history */
+static	char		*HistoryBlock = NULL;
+int			maxLinesInHistory;
 int	maxMessages;		/* Max. number of messages to display */
 int	messagesToStdout;	/* Send messages to standard output */
 bool	selectionAndHistory;
@@ -718,15 +721,36 @@ int Alloc_msgs(void)
 
 void Free_msgs(void)
 {
-    if (MsgBlock) {
-	free(MsgBlock);
-	MsgBlock = NULL;
-    }
-    if (MsgBlock_pending) {
-	free(MsgBlock_pending);
-	MsgBlock_pending = NULL;
-    }
+    XFREE(MsgBlock);
+    XFREE(MsgBlock_pending);
 }
+
+int Alloc_history(void)
+{
+    char	*hist_ptr;
+    int		i;
+
+    /* maxLinesInHistory is a runtime constant */
+    if ((hist_ptr = malloc((size_t)maxLinesInHistory * MAX_CHARS)) == NULL) {
+	error("No memory for history");
+	return -1;
+    }
+    HistoryBlock = hist_ptr;
+
+    for (i = 0; i < maxLinesInHistory; i++) {
+	HistoryMsg[i] = hist_ptr;
+	hist_ptr[0] = '\0';
+	hist_ptr += MAX_CHARS;
+    }
+    return 0;
+}
+
+void Free_selectionAndHistory(void)
+{
+    XFREE(HistoryBlock);
+    XFREE(selection.txt);
+}
+
 
 
 /*

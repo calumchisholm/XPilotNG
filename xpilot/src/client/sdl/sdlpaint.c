@@ -47,8 +47,6 @@ char sdlpaint_version[] = VERSION;
 /*
  * Globals.
  */
-double	        hudRadarLimit;		/* Limit for hudradar drawing */
-
 static double       time_counter = 0.0;
 static TTF_Font     *scoreListFont;
 static char         *scoreListFontName = CONF_FONTDIR "VeraMoBd.ttf";

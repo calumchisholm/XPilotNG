@@ -690,6 +690,8 @@ void Talk_set_state(bool on);
  */
 int Alloc_msgs(void);
 void Free_msgs(void);
+int Alloc_history(void);
+void Free_selectionAndHistory(void);
 void Add_message(const char *message);
 void Add_pending_messages(void);
 void Add_roundend_messages(other_t **order);
