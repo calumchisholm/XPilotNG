@@ -599,15 +599,14 @@ xp_option_t default_options[] = {
 
     XP_DOUBLE_OPTION(
 	"turnSpeed",
-	35.0,
+	10.0,
 	MIN_PLAYER_TURNSPEED,
 	MAX_PLAYER_TURNSPEED,
 	&turnspeed,
 	Set_turnSpeed,
 	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Set the ship's turn speed.\n"
-	"Valid values are in the range 4-64.\n"
-	"See also turnResistance.\n"),
+	"Valid values are in the range 4-64.\n"),
 
     XP_DOUBLE_OPTION(
 	"turnResistance",
