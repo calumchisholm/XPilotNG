@@ -1,0 +1,250 @@
+addScript(name, tooltip, method) {
+    if (tooltip == null) tooltip = name;
+    menuItem = new JMenuItem(name);
+    menuItem.addActionListener(this);
+    menuItem.setToolTipText(tooltip);
+    global.scriptMenu.add(menuItem);
+    actionPerformed(ae) {
+        this.invokeMethod(method, null);
+    }
+}
+
+addScript("Randomize", "Randomize the selected wall polygon", "randomize");
+addScript("Randomize all", "Randomize all walls", "randomizeAll");
+addScript("Shadow", "Adds a shadow to the selected wall polygon", "shadow");
+addScript("Shadow all", "Adds a shadow to all wall polygons", "shadowAll");
+addScript("Round", "Rounds the corners of the selected wall polygon", "round");
+addScript("Round all", "Rounds the corners of all wall polygons", "roundAll");
+
+import org.xpilot.jxpmap.*;
+
+
+/************************ Misc Utils ******************************/
+
+
+/**
+ * Utility to check if a map objects is a regular wall polygon
+ */
+isWall(p) {
+    return (p instanceof MapPolygon) 
+	&& !(p instanceof BallArea)
+	&& !(p instanceof BallTarget)
+	&& !(p instanceof Decoration)
+	&& !(p instanceof Cannon)
+	&& !(p instanceof Target);
+}
+
+/**
+ * Finds a style with the matching id from the list
+ */
+findStyle(id, list) {
+    for (style:list) 
+        if (style.getId().equals(id))
+            return style;
+    return null;
+}
+
+/**
+ * Shows a message box.
+ */
+alert(msg) {
+    JOptionPane.showMessageDialog(null, msg);
+}
+
+/**
+ * Prompts the user for input.
+ */
+prompt(msg) {
+    return JOptionPane.showInputDialog(null, msg);
+}
+
+
+/************************ Randomize script ******************************/
+
+
+/**
+ * Randomizes a wall polygon with the given amount of pixels.
+ */
+doRandomize(pixels, o) {
+    if (isWall(o)) {    
+        for (i = 0; i < o.getNumPoints(); i++) {
+            p = o.getPoint(i);
+            p.translate((int)((Math.random() - 0.5) * pixels * 64),
+            (int)((Math.random() - 0.5) * pixels * 64));
+            o.setPoint(i, p.x, p.y);
+        }
+    }
+}
+
+/**
+ * Randomizes all wall polygons with the given amount of pixels.
+ */
+doRandomizeAll(pixels) {
+    for(o:editor.getModel().getObjects())
+        doRandomize(pixels, o);
+}
+
+randomize() {
+    if (editor.getSelectedObject() == null) {
+        alert("First select a polygon");
+        return;
+    }
+    value = prompt("How many pixels to randomize");
+    if (value == null) return;
+    doRandomize(Integer.parseInt(value), 
+        editor.getSelectedObject());
+    editor.repaint();        
+}
+
+randomizeAll() {
+    value = prompt("How many pixels to randomize");
+    if (value == null) return;
+    doRandomizeAll(Integer.parseInt(value));
+    editor.repaint();
+}
+
+
+/************************ Shadow script ******************************/
+
+
+/**
+ * Adds a drop shadow to a wall polygon by creating
+ * a dark gray decoration polygon below it.
+ */
+addShadow(polygon, style) {
+    p = polygon.getPolygon();
+    sp = new Polygon(p.xpoints, p.ypoints, p.npoints);
+    for(i = 0; i < sp.npoints; i++) {
+        sp.xpoints[i] += 240;
+        sp.ypoints[i] -= 640;
+    }
+    sp.invalidate();
+    editor.getModel().addToBack(new Decoration(sp, style, null));   
+}
+
+/**
+ * Finds or creates the edge style and polygon style required
+ * for a drop shadow.
+ */
+getShadowStyle() {
+    model = editor.getModel();
+    es = findStyle("hidden", model.getEdgeStyles());
+    if (es == null) {
+        es = new LineStyle("hidden", 1, Color.darkGray, LineStyle.STYLE_HIDDEN);
+        model.getEdgeStyles().add(es);
+    }
+    ps = findStyle("shadow", model.getPolyStyles());
+    if (ps == null) {
+        ps = new PolygonStyle();
+        ps.setColor(new Color(50,50,50));
+        ps.setFillStyle(PolygonStyle.FILL_COLOR);
+        ps.setId("shadow");
+        ps.setVisibleInRadar(false);
+        ps.setDefaultEdgeStyle(es);
+        model.getPolyStyles().add(ps);
+    }
+    return ps;    
+}
+
+doShadow(polygon) {
+    style = getShadowStyle();
+    if (isWall(polygon)) 
+        addShadow(polygon, style);
+}
+
+shadow() {
+    if (editor.getSelectedObject() == null) {
+        alert("First select a polygon");
+        return;
+    }
+    doShadow(editor.getSelectedObject());
+    editor.repaint();            
+}
+
+shadowAll() {
+    style = getShadowStyle();
+    for(o:new ArrayList(editor.getModel().getObjects()))
+        if (isWall(o)) addShadow(o, style);
+}
+
+
+/************************ Round script ******************************/
+
+/**
+ * Moves a point to the specified direction the specified length.
+ */
+movePoint(p, dir, len) {
+    a = len * Math.pow(p.distanceSq(dir), -0.5);
+    p.translate((int)(a * (dir.x - p.x)), (int)(a * (dir.y - p.y)));
+}    
+
+/**
+ * Rounds the corners of a wall polygon by adding one additional
+ * vertex to each corner and moving the original vertex. The max parameter 
+ * controls the maximum amount of pixels a vertex gets moved.
+ */
+doRound(mp, max) {
+    if (mp.getNumPoints() < 3) return;
+    minDist = 1 * 64;
+    maxMove = max * 64;
+    p2 = mp.getPoint(mp.getNumPoints() - 1);
+    p3 = mp.getPoint(0);
+    for (i = 1; i <= mp.getNumPoints(); i++) {
+        p1 = p2;
+        p2 = p3;
+        p3 = mp.getPoint(i % mp.getNumPoints());
+        d12 = p1.distance(p2);
+        if (d12 <= minDist) continue;
+        d23 = p2.distance(p3);
+        if (d23 <= minDist) continue;
+        pn = new Point(p2);
+        movePoint(pn, p1, Math.min(maxMove, (int)(d12 / 2)));
+        movePoint(p2, p3, Math.min(maxMove, (int)(d23 / 2)));
+        mp.insertPoint(i - 1, pn);
+        mp.setPoint(i, p2.x, p2.y);
+        i++;
+    }
+}
+
+doRoundAll(max) {
+    for(o:new ArrayList(editor.getModel().getObjects()))
+        if (isWall(o)) doRound(o, max);
+}
+
+round() {
+    if (editor.getSelectedObject() == null) {
+        alert("First select a polygon");
+        return;
+    }
+    value = prompt("How many pixels to round");
+    if (value == null) return;
+    max = Integer.parseInt(value);
+    value = prompt("How many times to run");
+    if (value == null) return;
+    times = Integer.parseInt(value);
+    for (i = 0; i < times; i++) doRound(editor.getSelectedObject(), max);
+    editor.repaint();
+}
+
+roundAll() {
+    value = prompt("How many pixels to round");
+    if (value == null) return;
+    max = Integer.parseInt(value);
+    value = prompt("How many times to run");
+    if (value == null) return;
+    times = Integer.parseInt(value);
+    for (i = 0; i < times; i++) doRoundAll(max);
+    editor.repaint();            
+}
+
+
+/************************ User scripts ******************************/
+
+
+loadUserScripts() {
+    String home = System.getProperty("user.home");
+    f = new File(home + "/.jxpmaprc");
+    if (!f.exists()) f = new File(home + "/jxpmaprc.bsh");
+    if (f.exists()) source(f.getAbsolutePath());
+}
+loadUserScripts();

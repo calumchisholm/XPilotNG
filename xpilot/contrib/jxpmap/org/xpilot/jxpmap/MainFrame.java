@@ -9,6 +9,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -43,8 +45,10 @@ public class MainFrame extends JFrame implements ActionListener {
     private JLabel lblZoom;
     private File mapFile;
     private BshConsole bshConsole;
+    private JMenu scriptMenu;
+    private bsh.Interpreter interpreter;
 
-    public MainFrame () {
+    public MainFrame () throws Exception {
         super("jXPMap Editor");
         canvas = new MapCanvas();
         getContentPane().add(canvas, BorderLayout.CENTER);
@@ -56,6 +60,18 @@ public class MainFrame extends JFrame implements ActionListener {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         Dimension ss = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(ss.width / 2 - 400, ss.height / 2 - 300);
+        interpreter = new bsh.Interpreter();
+        interpreter.set("app", this);
+        interpreter.set("editor", canvas);
+        interpreter.set("scriptMenu", scriptMenu);
+        InputStream in = getClass().getResourceAsStream("init.bsh");
+        if (in != null) {
+            try {
+                interpreter.eval(new InputStreamReader(in));
+            } finally {
+                in.close();
+            }
+        }        
     }
 
 
@@ -145,6 +161,9 @@ public class MainFrame extends JFrame implements ActionListener {
         menu.add(menuItem);
         menuItem.setActionCommand("showBeanShellConsole");
         menuItem.addActionListener(this);
+        
+        scriptMenu = new JMenu("Scripts");
+        menuBar.add(scriptMenu);
     }
 
 
@@ -636,12 +655,12 @@ class BshConsole extends JFrame {
         for (Iterator i = variables.keySet().iterator(); i.hasNext();) {
             String key = (String)i.next();
             interpreter.set(key, variables.get(key));
-        }
+        }        
         int w = 600; int h = 500;
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setBounds((d.width - w) / 2, (d.height - h) / 2, w, h);
         getContentPane().add(jc);
         setDefaultCloseOperation(HIDE_ON_CLOSE);
-        new Thread(interpreter).start();
+        new Thread(interpreter).start();        
     }
 }
