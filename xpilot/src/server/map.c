@@ -396,32 +396,32 @@ int World_init(world_t *world)
     memset(world, 0, sizeof(world_t));
 
     if ((world->asteroidConcs
-	 = Arraylist_create(sizeof(asteroid_concentrator_t))) == NULL)
+	 = Arraylist_alloc(sizeof(asteroid_concentrator_t))) == NULL)
 	return -1;
-    if ((world->bases = Arraylist_create(sizeof(base_t))) == NULL)
+    if ((world->bases = Arraylist_alloc(sizeof(base_t))) == NULL)
 	return -1;
-    if ((world->cannons = Arraylist_create(sizeof(cannon_t))) == NULL)
+    if ((world->cannons = Arraylist_alloc(sizeof(cannon_t))) == NULL)
 	return -1;
-    if ((world->ecms = Arraylist_create(sizeof(ecm_t))) == NULL)
+    if ((world->ecms = Arraylist_alloc(sizeof(ecm_t))) == NULL)
 	return -1;
     if ((world->frictionAreas
-	 = Arraylist_create(sizeof(friction_area_t))) == NULL)
+	 = Arraylist_alloc(sizeof(friction_area_t))) == NULL)
 	return -1;
-    if ((world->fuels = Arraylist_create(sizeof(fuel_t))) == NULL)
+    if ((world->fuels = Arraylist_alloc(sizeof(fuel_t))) == NULL)
 	return -1;
     if ((world->itemConcs
-	 = Arraylist_create(sizeof(item_concentrator_t))) == NULL)
+	 = Arraylist_alloc(sizeof(item_concentrator_t))) == NULL)
 	return -1;
-    if ((world->gravs = Arraylist_create(sizeof(grav_t))) == NULL)
+    if ((world->gravs = Arraylist_alloc(sizeof(grav_t))) == NULL)
 	return -1;
-    if ((world->targets = Arraylist_create(sizeof(target_t))) == NULL)
+    if ((world->targets = Arraylist_alloc(sizeof(target_t))) == NULL)
 	return -1;
-    if ((world->treasures = Arraylist_create(sizeof(treasure_t))) == NULL)
+    if ((world->treasures = Arraylist_alloc(sizeof(treasure_t))) == NULL)
 	return -1;
     if ((world->transporters
-	 = Arraylist_create(sizeof(transporter_t))) == NULL)
+	 = Arraylist_alloc(sizeof(transporter_t))) == NULL)
 	return -1;
-    if ((world->wormholes = Arraylist_create(sizeof(wormhole_t))) == NULL)
+    if ((world->wormholes = Arraylist_alloc(sizeof(wormhole_t))) == NULL)
 	return -1;
 
     for (i = 0; i < MAX_TEAMS; i++)

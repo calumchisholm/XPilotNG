@@ -80,7 +80,7 @@ void Arraylist_remove(arraylist_t *alp, int ind)
 #define ARRAYLIST_INITIAL_NUM_ELEMENTS 16
 #define ARRAYLIST_ELEMENT_ALIGNMENT sizeof(double)
 
-arraylist_t *Arraylist_create(size_t element_size)
+arraylist_t *Arraylist_alloc(size_t element_size)
 {
     arraylist_t *alp = XCALLOC(arraylist_t, 1);
     size_t padded_size = element_size;
