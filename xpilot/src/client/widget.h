@@ -228,7 +228,6 @@ int Widget_map(int widget_desc);
 int Widget_raise(int widget_desc);
 int Widget_get_dimensions(int widget_desc, int *width, int *height);
 int Widget_unmap(int widget_desc);
-int Widget_resize(int widget_desc, int width, int height);
 int Widget_create_viewer(const char *buf, int len,
 			 int width, int height, int border,
 			 const char *window_name, const char *icon_name,

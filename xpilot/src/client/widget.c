@@ -26,6 +26,7 @@
 char widget_version[] = VERSION;
 
 static void Widget_resize_viewer(XEvent *event, int ind);
+static int Widget_resize(int widget_desc, int width, int height);
 
 static widget_t		*widgets;
 static int		num_widgets, max_widgets;
@@ -176,11 +177,10 @@ static widget_t *Widget_new(int *descp)
     if (widgets == NULL || max_widgets <= 0) {
 	num_widgets = 0;
 	max_widgets = 10;
-	widgets = (widget_t *) malloc(max_widgets * sizeof(widget_t));
+	widgets = malloc(max_widgets * sizeof(widget_t));
     } else {
 	max_widgets = 10 + (12 * max_widgets) / 8;
-	widgets = (widget_t *) realloc(widgets,
-				       max_widgets * sizeof(widget_t));
+	widgets = realloc(widgets, max_widgets * sizeof(widget_t));
     }
     if (widgets == NULL) {
 	num_widgets = max_widgets = 0;
@@ -258,13 +258,13 @@ static int Widget_add_child(int parent_desc, int child_desc)
     }
     if (form->num_children == 0) {
 	incr = 4;
-	form->children = (int *) malloc((form->num_children + incr)
-					* sizeof(*form->children));
+	form->children = malloc((form->num_children + incr)
+				* sizeof(*form->children));
     } else {
 	incr = 4 + form->num_children / 2;
-	form->children = (int *) realloc(form->children,
-					 (form->num_children + incr)
-					 * sizeof(*form->children));
+	form->children = realloc(form->children,
+				 (form->num_children + incr)
+				 * sizeof(*form->children));
     }
     if (form->children == NULL) {
 	form->num_children = 0;
@@ -280,7 +280,7 @@ static int Widget_add_child(int parent_desc, int child_desc)
     return child_desc;
 }
 
-int Widget_resize(int widget_desc, int width, int height)
+static int Widget_resize(int widget_desc, int width, int height)
 {
     widget_t			*widget;
 
@@ -1245,7 +1245,7 @@ static int Widget_form_window(Window window, int parent_desc,
 	    return NO_WIDGET;
 	}
     }
-    if ((formw = (widget_form_t *) malloc(sizeof(*formw))) == NULL) {
+    if ((formw = malloc(sizeof(*formw))) == NULL) {
 	error("No memory for form widget");
 	XDestroyWindow(dpy, window);
 	return NO_WIDGET;
@@ -1306,7 +1306,7 @@ int Widget_create_activate(int parent_desc,
 	warn("Widget_create_activate: Invalid parent widget");
 	return NO_WIDGET;
     }
-    if ((activw = (widget_activate_t *) malloc(sizeof(*activw))) == NULL) {
+    if ((activw = malloc(sizeof(*activw))) == NULL) {
 	error("No memory for activate widget");
 	return NO_WIDGET;
     }
@@ -1351,7 +1351,7 @@ int Widget_create_bool(int parent_desc,
 	warn("Widget_create_bool: Invalid parent widget");
 	return NO_WIDGET;
     }
-    if ((boolw = (widget_bool_t *) malloc(sizeof(*boolw))) == NULL) {
+    if ((boolw = malloc(sizeof(*boolw))) == NULL) {
 	error("No memory for bool widget");
 	return NO_WIDGET;
     }
@@ -1448,7 +1448,7 @@ int Widget_add_pulldown_entry(int menu_desc, const char *str,
     }
     pullw = (widget_form_t *) pulldown_widget->sub;
 
-    if ((entryw = (widget_entry_t *) malloc(sizeof(*entryw))) == NULL) {
+    if ((entryw = malloc(sizeof(*entryw))) == NULL) {
 	error("No memory for entry widget");
 	return NO_WIDGET;
     }
@@ -1503,7 +1503,7 @@ int Widget_create_menu(int parent_desc,
 	warn("Widget_create_menu: Invalid parent widget");
 	return NO_WIDGET;
     }
-    if ((menuw = (widget_menu_t *) malloc(sizeof(*menuw))) == NULL) {
+    if ((menuw = malloc(sizeof(*menuw))) == NULL) {
 	error("No memory for menu widget");
 	return NO_WIDGET;
     }
@@ -1545,7 +1545,7 @@ int Widget_create_int(int parent_desc,
 	warn("Widget_create_int: Invalid parent widget");
 	return NO_WIDGET;
     }
-    if ((intw = (widget_int_t *) malloc(sizeof(*intw))) == NULL) {
+    if ((intw = malloc(sizeof(*intw))) == NULL) {
 	error("No memory for int widget");
 	return NO_WIDGET;
     }
@@ -1588,7 +1588,7 @@ int Widget_create_color(int parent_desc, int color,
 	warn("Widget_create_int: Invalid parent widget");
 	return NO_WIDGET;
     }
-    if ((colorw = (widget_color_t *) malloc(sizeof(*colorw))) == NULL) {
+    if ((colorw = malloc(sizeof(*colorw))) == NULL) {
 	error("No memory for int widget");
 	return NO_WIDGET;
     }
@@ -1633,7 +1633,7 @@ int Widget_create_float(int parent_desc,
 	warn("Widget_create_float: Invalid parent widget");
 	return NO_WIDGET;
     }
-    if ((floatw = (widget_float_t *) malloc(sizeof(*floatw))) == NULL) {
+    if ((floatw = malloc(sizeof(*floatw))) == NULL) {
 	error("No memory for float widget");
 	return NO_WIDGET;
     }
@@ -1674,7 +1674,7 @@ int Widget_create_label(int parent_desc,
 	warn("Widget_create_label: Invalid parent widget");
 	return NO_WIDGET;
     }
-    if ((labelw = (widget_label_t *) malloc(sizeof(*labelw))) == NULL) {
+    if ((labelw = malloc(sizeof(*labelw))) == NULL) {
 	error("No memory for label widget");
 	return NO_WIDGET;
     }
@@ -1718,7 +1718,7 @@ int Widget_create_colored_label(int parent_desc,
 	warn("Widget_create_label: Invalid parent widget");
 	return NO_WIDGET;
     }
-    if ((labelw = (widget_label_t *) malloc(sizeof(*labelw))) == NULL) {
+    if ((labelw = malloc(sizeof(*labelw))) == NULL) {
 	error("No memory for label widget");
 	return NO_WIDGET;
     }
@@ -1762,7 +1762,7 @@ static int Widget_create_arrow(widget_type_t type, int parent_desc,
 	warn("Widget_create_arrow: Invalid parent widget");
 	return NO_WIDGET;
     }
-    if ((arroww = (widget_arrow_t *) malloc(sizeof(*arroww))) == NULL) {
+    if ((arroww = malloc(sizeof(*arroww))) == NULL) {
 	error("No memory for arrow widget");
 	return NO_WIDGET;
     }
@@ -2011,7 +2011,7 @@ static int Widget_create_slider(int parent_desc, widget_type_t slider_type,
 	warn("Widget_create_slider: Invalid parent widget");
 	return NO_WIDGET;
     }
-    if ((sliderw = (widget_slider_t *) malloc(sizeof(*sliderw))) == NULL) {
+    if ((sliderw = malloc(sizeof(*sliderw))) == NULL) {
 	error("No memory for slider widget");
 	return NO_WIDGET;
     }
@@ -2130,7 +2130,7 @@ static int Widget_viewer_calculate_text(int viewer_desc)
     if (!count)
 	return 0;
 
-    viewerw->line = (viewer_line_t *) malloc(count * sizeof(viewer_line_t));
+    viewerw->line = malloc(count * sizeof(viewer_line_t));
     if (!viewerw->line) {
 	error("No mem for viewer text");
 	return -1;
@@ -2256,7 +2256,7 @@ int Widget_create_viewer(const char *buf, int len,
     }
     popup_widget->name = "popup_viewer";
 
-    if ((viewerw = (widget_viewer_t *) malloc(sizeof(*viewerw))) == NULL) {
+    if ((viewerw = malloc(sizeof(*viewerw))) == NULL) {
 	error("No mem for viewer");
 	Widget_destroy(popup_desc);
 	return NO_WIDGET;
