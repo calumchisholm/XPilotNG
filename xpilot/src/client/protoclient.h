@@ -54,8 +54,8 @@ void Colors_debug(void);
  * default.c
  */
 extern void Parse_options(int *argcp, char **argvp, char *realName, int *port,
-			  int *my_team, int *text, int *list,
-			  int *join, int *noLocalMotd,
+			  int *my_team, bool *text, bool *list,
+			  bool *join, bool *noLocalMotd,
 			  char *nickName, char *dispName, char *hostName,
 			  char *shut_msg);
 extern void defaultCleanup(void);				/* memory cleanup */

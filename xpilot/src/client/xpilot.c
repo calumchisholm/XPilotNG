@@ -45,9 +45,8 @@ static void printfile(const char *filename)
     int			c;
 
 
-    if ((fp = fopen(filename, "r")) == NULL) {
+    if ((fp = fopen(filename, "r")) == NULL)
 	return;
-    }
 
     while ((c = fgetc(fp)) != EOF)
 	putchar(c);
@@ -62,7 +61,7 @@ static void printfile(const char *filename)
 int main(int argc, char *argv[])
 {
     int				result, retval = 1;
-    int				auto_connect = false,
+    bool			auto_connect = false,
 				text = false,
 				list_servers = false,
 				auto_shutdown = false,

@@ -214,8 +214,6 @@ void Bitmap_update_scale (void)
  */
 xp_bitmap_t *Bitmap_get (Drawable d, int img, int bmp)
 {
-    extern bool fullColor; /* i don't like this variable at all :( */
-
     if (!fullColor || img < 0 || img >= num_pixmaps)
 	return NULL;
 
@@ -371,7 +369,6 @@ void Bitmap_paint(Drawable d, int img, int x, int y, int bmp)
  * Maybe move this part to a sperate file.
  */
 
-extern int		dispDepth;
 extern unsigned long	(*RGB)(unsigned char r, unsigned char g, unsigned char b);
 static GC maskGC;
 
@@ -435,8 +432,8 @@ int Bitmap_create_end (Drawable d)
  * Purpose: set 1 pixel in the device/OS dependent bitmap.
  */
 void Bitmap_set_pixel(xp_pixmap_t * xp_pixmap,
-			    int bmp, int x, int y,
-			    RGB_COLOR color)
+		      int bmp, int x, int y,
+		      RGB_COLOR color)
 {
     unsigned long	pixel;
     unsigned char	r, g, b;

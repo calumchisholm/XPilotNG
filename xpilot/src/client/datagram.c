@@ -23,9 +23,6 @@
 
 #include "xpclient.h"
 
-extern int	clientPortStart;	/* First UDP port for clients */
-extern int	clientPortEnd;		/* Last one (these are for firewalls) */
-
 char datagram_version[] = VERSION;
 
 
@@ -40,12 +37,10 @@ int create_dgram_addr_socket(sock_t *sock, char *dotaddr, int port)
     int			i;
 
     if (saved == 0) {
-	if (clientPortStart && (!clientPortEnd || clientPortEnd > 65535)) {
+	if (clientPortStart && (!clientPortEnd || clientPortEnd > 65535))
 	    clientPortEnd = 65535;
-	}
-	if (clientPortEnd && (!clientPortStart || clientPortStart < 1024)) {
+	if (clientPortEnd && (!clientPortStart || clientPortStart < 1024))
 	    clientPortStart = 1024;
-	}
 
 	if (port || !clientPortStart || (clientPortStart > clientPortEnd)) {
 	    status = sock_open_udp(sock, dotaddr, port);
@@ -71,9 +66,8 @@ int create_dgram_addr_socket(sock_t *sock, char *dotaddr, int port)
 	}
 
 	if (status == SOCK_IS_OK) {
-	    if (dgram_one_socket) {
+	    if (dgram_one_socket)
 		save_sock = *sock;
-	    }
 	}
     } else {
 	*sock = save_sock;
@@ -92,8 +86,7 @@ int create_dgram_socket(sock_t *sock, int port)
 
 void close_dgram_socket(sock_t *sock)
 {
-    if (!dgram_one_socket) {
+    if (!dgram_one_socket)
 	sock_close(sock);
-    }
 }
 

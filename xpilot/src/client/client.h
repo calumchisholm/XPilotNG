@@ -323,11 +323,11 @@ extern char	name[MAX_CHARS];	/* Nick-name of player */
 extern char	realname[MAX_CHARS];	/* Real name of player */
 extern char	servername[MAX_CHARS];	/* Name of server connecting to */
 extern unsigned	version;		/* Version of the server */
-extern int	scoresChanged;
-extern int	toggle_shield;		/* Are shields toggled by a press? */
-extern int	shields;		/* When shields are considered up */
-extern int	auto_shield;            /* drops shield for fire */
-extern int	initialPointerControl;	/* Start by using mouse for control? */
+extern bool	scoresChanged;
+extern bool	toggle_shield;		/* Are shields toggled by a press? */
+extern bool	shields;		/* When shields are considered up */
+extern bool	auto_shield;            /* drops shield for fire */
+extern bool	initialPointerControl;	/* Start by using mouse for control? */
 extern bool	pointerControl;		/* current state of mouse ship flying */
 extern bool	useErase;		/* use the Erase hack for slow X */
 
@@ -348,6 +348,12 @@ extern int 	maxVolume;		/* maximum volume (in percent) */
 
 extern int	maxLinesInHistory;	/* number of lines to save in history */
 #define MAX_HIST_MSGS	128		/* maximum */
+
+#ifndef  _WINDOWS
+/* provide cut&paste and message history */
+extern	selection_t	selection;
+extern	char		*HistoryMsg[MAX_HIST_MSGS];
+#endif
 
 /* mapdata accessible to outside world */
 

@@ -130,7 +130,7 @@ option options[] = {
 	"autoServerMotdPopup",
 	NULL,
 #ifdef _WINDOWS
-	"No",			/* temporary till i straighten out the motd woes. */
+	"No",	/* temporary till i straighten out the motd woes. */
 #else
 	"Yes",
 #endif
@@ -2817,8 +2817,8 @@ static void Get_file_defaults(XrmDatabase *rDBptr)
 
 
 void Parse_options(int *argcp, char **argvp, char *realName, int *port,
-		   int *my_team, int *text, int *list,
-		   int *join, int *noLocalMotd,
+		   int *my_team, bool *text, bool *list,
+		   bool *join, bool *noLocalMotd,
 		   char *nickName, char *dispName, char *hostName,
 		   char *shut_msg)
 {

@@ -73,8 +73,8 @@ XGCValues	gcv;
 Window	top;			/* Top-level window (topshell) */
 Window	draw;			/* Main play window */
 Window	keyboard;		/* Keyboard window */
-#ifdef _WINDOWS		/* Windows needs some dummy windows (size 0,0) */
-				/* so we can store the active fonts.  Windows only */
+#ifdef _WINDOWS	/* Windows needs some dummy windows (size 0,0) */
+		/* so we can store the active fonts.  Windows only */
 				/* supports 1 active font per window */
 Window	textWindow;		/* for the GC into the config window */
 Window	msgWindow;		/* for meesages into the playfield */
@@ -105,7 +105,7 @@ int	active_view_height;	/* Height of active map area displayed. */
 int	ext_view_x_offset;	/* Offset ext_view_width */
 int	ext_view_y_offset;	/* Offset ext_view_height */
 
-int	titleFlip;		/* Do special title bar flipping? */
+bool	titleFlip;		/* Do special title bar flipping? */
 int	shieldDrawMode = -1;	/* Either LineOnOffDash or LineSolid */
 char	modBankStr[NUM_MODBANKS][MAX_CHARS];	/* modifier banks */
 char	*texturePath = NULL;		/* Path list of texture directories */

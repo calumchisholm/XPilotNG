@@ -25,13 +25,15 @@
 
 char xevent_version[] = VERSION;
 
-extern char *talk_fast_msgs[];	/* talk macros */
 
+extern char *talk_fast_msgs[];	/* talk macros */
+#if 0
 extern setup_t		*Setup;
+#endif
 
 static BITV_DECL(keyv, NUM_KEYS);
 
-int		initialPointerControl = false;
+bool		initialPointerControl = false;
 bool		pointerControl = false;
 extern Cursor	pointerControlCursor;
 

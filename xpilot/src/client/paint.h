@@ -239,15 +239,15 @@ extern int	ext_view_y_offset;	/* Offset of ext_view_height */
 extern u_byte	debris_colors;		/* Number of debris intensities */
 extern DFLOAT	charsPerTick;		/* Output speed of messages */
 extern bool	markingLights;		/* Marking lights on ships */
-extern int	titleFlip;		/* Do special titlebar flipping? */
+extern bool	titleFlip;		/* Do special titlebar flipping? */
 extern int	shieldDrawMode;		/* How to draw players shield */
-extern char	modBankStr[][MAX_CHARS];	/* modifier banks strings */
+extern char	modBankStr[][MAX_CHARS];/* modifier banks strings */
 extern char	*texturePath;		/* Path list of texture directories */
 extern char	*wallTextureFile;	/* Filename of wall texture */
 extern char	*decorTextureFile;	/* Filename of decor texture */
 extern char	*ballTextureFile;	/* Filename of ball texture */
 
-extern int	(*radarDrawRectanglePtr)	/* Function to draw player on radar */
+extern int	(*radarDrawRectanglePtr)/* Function to draw player on radar */
 		(Display *disp, Drawable d, GC gc,
 		 int x, int y, unsigned width, unsigned height);
 

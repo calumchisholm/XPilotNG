@@ -29,7 +29,7 @@ char client_version[] = VERSION;
 bool	is_server = false;	/* used in common code */
 char	*talk_fast_msgs[TALK_FAST_NR_OF_MSGS];	/* talk macros */
 
-int	scoresChanged = 0;
+bool	scoresChanged = false;
 int	RadarHeight = 0;
 int	RadarWidth = 256;	/* must always be 256! */
 
@@ -119,12 +119,11 @@ char	name[MAX_CHARS];	/* Nick-name of player */
 char	realname[MAX_CHARS];	/* Real name of player */
 char	servername[MAX_CHARS];	/* Name of server connecting to */
 unsigned	version;	/* Version of the server */
-int     toggle_shield;          /* Are shields toggled by a press? */
-int     shields = 1;            /* When shields are considered up */
+bool	toggle_shield;		/* Are shields toggled by a press? */
+bool	shields = true;		/* When shields are considered up */
+bool	auto_shield = true;	/* shield drops for fire */
 
-int     auto_shield = 1;        /* shield drops for fire */
-
-int	maxFPS;			/* Client's own FPS */
+int	maxFPS;			/* Maximum FPS player wants from server */
 int	oldMaxFPS;
 
 int	clientPortStart = 0;	/* First UDP port for clients */
@@ -179,9 +178,7 @@ int		num_playing_teams = 0;
 
 #ifndef  _WINDOWS
 /* provide cut&paste and message history */
-extern	selection_t	selection;
 static	char		*HistoryBlock = NULL;
-extern	char		*HistoryMsg[MAX_HIST_MSGS];
 #endif
 bool			selectionAndHistory = false;
 int			maxLinesInHistory;
