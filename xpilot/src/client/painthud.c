@@ -1041,7 +1041,7 @@ xp_option_t hud_options[] = {
 
     COLOR_INDEX_OPTION(
 	"hudHLineColor",
-	2,
+	0,
 	&hudHLineColor,
 	"Which color number to use for drawing the horizontal lines\n"),
 
