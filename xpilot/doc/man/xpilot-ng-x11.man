@@ -603,9 +603,14 @@ Use the new Nasty Looking Shots or the original rectangle shots,
 You will probably want to increase your shotSize if you use this.
 The default value is: False.
 .HP
+\fB\-mouseAccelInClient\fR <value>
+.IP
+Set to true if you want to set the mouse turn rates to be linear
+The default value is: False.
+.HP
 \fB\-mouseAccelNum\fR <value>
 .IP
-Set the mouse acceleration
+Fine tune the mouse acceleration
 The default value is: 0.
 .HP
 \fB\-mouseAccelDenom\fR <value>
@@ -1685,9 +1690,8 @@ Most of these options can also be set in the .xpilotrc file
 in your home directory.
 Each key option may have multiple keys bound to it and
 one key may be used by multiple key options.
-If no server is specified then xpilot will search
-for servers on your local network.
-For a listing of remote servers try: telnet meta.xpilot.org 4400
+If no server is specified on the command line, xpilot will
+display a welcome screen where you can select a server.
 .IP
 XPilotNG 4.6.0 comes with ABSOLUTELY NO WARRANTY; for details see the
 provided COPYING file.

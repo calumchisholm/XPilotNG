@@ -1403,9 +1403,8 @@ Most of these options can also be set in the .xpilotrc file
 in your home directory.
 Each key option may have multiple keys bound to it and
 one key may be used by multiple key options.
-If no server is specified then xpilot will search
-for servers on your local network.
-For a listing of remote servers try: telnet meta.xpilot.org 4400
+If no server is specified on the command line, xpilot will
+display a welcome screen where you can select a server.
 .SH "SEE ALSO"
 The full documentation for
 .B xpilot-ng-sdl
