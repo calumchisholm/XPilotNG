@@ -156,7 +156,9 @@ static int Config_create_fuelGaugeColor(int widget_desc, int *height);
 static int Config_create_dirPtrColor(int widget_desc, int *height);
 static int Config_create_shipShapesHackColor(int widget_desc, int *height);
 static int Config_create_msgScanBallColor(int widget_desc, int *height);
+static int Config_create_msgScanSafeColor(int widget_desc, int *height);
 static int Config_create_msgScanCoverColor(int widget_desc, int *height);
+static int Config_create_msgScanPopColor(int widget_desc, int *height);
 static int Config_create_selfLWColor(int widget_desc, int *height);
 static int Config_create_enemyLWColor(int widget_desc, int *height);
 static int Config_create_teamLWColor(int widget_desc, int *height);
@@ -355,7 +357,9 @@ static int	(*config_creator_colors[])(int widget_desc, int *height) = {
     Config_create_dirPtrColor,
     Config_create_shipShapesHackColor,
     Config_create_msgScanBallColor,
+    Config_create_msgScanSafeColor,
     Config_create_msgScanCoverColor,
+    Config_create_msgScanPopColor,
     Config_create_selfLWColor,
     Config_create_enemyLWColor,
     Config_create_teamLWColor,
@@ -1162,9 +1166,19 @@ static int Config_create_msgScanBallColor(int widget_desc, int *height)
     return CONFIG_CREATE_COLOR(msgScanBallColor);
 }
 
+static int Config_create_msgScanSafeColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(msgScanSafeColor);
+}
+
 static int Config_create_msgScanCoverColor(int widget_desc, int *height)
 {
     return CONFIG_CREATE_COLOR(msgScanCoverColor);
+}
+
+static int Config_create_msgScanPopColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(msgScanPopColor);
 }
 
 static int Config_create_selfLWColor(int widget_desc, int *height)
@@ -1994,7 +2008,9 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_int(fp, "dirPtrColor", dirPtrColor);
     Config_save_int(fp, "shipShapesHackColor", shipShapesHackColor);
     Config_save_int(fp, "msgScanBallColor", msgScanBallColor);
+    Config_save_int(fp, "msgScanSafeColor", msgScanSafeColor);
     Config_save_int(fp, "msgScanCoverColor", msgScanCoverColor);
+    Config_save_int(fp, "msgScanPopColor", msgScanPopColor);
     Config_save_int(fp, "selfLWColor", selfLWColor);
     Config_save_int(fp, "enemyLWColor", enemyLWColor);
     Config_save_int(fp, "teamLWColor", teamLWColor);

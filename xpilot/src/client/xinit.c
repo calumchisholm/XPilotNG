@@ -525,20 +525,24 @@ int Init_top(void)
     COLORCHECK(backgroundPointColor, 2);
 
     if (maxColors > 4) {
+	COLORCHECK(msgScanSafeColor, 4);
 	COLORCHECK(decorColor, 6);
 	COLORCHECK(teamLWColor, 4);
 	COLORCHECK(scoreZeroColor, 4);
     } else {
+	COLORCHECK(msgScanSafeColor, 2);
 	COLORCHECK(decorColor, 3);
 	COLORCHECK(teamLWColor, 2);
 	COLORCHECK(scoreZeroColor, 1);
     }
 
     if (maxColors > 8) {
+	COLORCHECK(msgScanPopColor, 11);
 	COLORCHECK(windowColor, 8);
 	COLORCHECK(scoreInactiveColor, 12);
 	COLORCHECK(scoreInactiveSelfColor, 12);
     } else {
+	COLORCHECK(msgScanPopColor, 1);
 	COLORCHECK(windowColor, 2);
 	COLORCHECK(scoreInactiveColor, 1);
 	COLORCHECK(scoreInactiveSelfColor, 1);

@@ -58,7 +58,7 @@
 #define WARNING_DISTANCE	(VISIBILITY_DISTANCE*0.8)
 
 #define MSG_LIFE_TIME		120.0	/* Seconds */
-#define MSG_FLASH_TIME		100.0	/* Old messages have life time less
+#define MSG_FLASH_TIME		110.0	/* Old messages have life time less
 					   than this */
 
 #define TITLE_DELAY		500	/* Should probably change to seconds */
@@ -66,11 +66,20 @@
 
 
 /* typedefs begin */
+typedef enum {
+    BmsNone = 0,
+    BmsBall,
+    BmsSafe,
+    BmsCover,
+    BmsPop
+} msg_bms_t;
+
 typedef struct {
     char		txt[MSG_LEN];
     short		len;
     short		pixelLen;
     DFLOAT		lifeTime;
+    msg_bms_t		bmsinfo;
 } message_t;
 /* typedefs end */
 
@@ -173,8 +182,10 @@ extern int	hudLockColor;		/* Color index for lock on HUD drawing */
 extern int	fuelGaugeColor;		/* Color index for fuel gauge drawing */
 extern int	dirPtrColor;		/* Color index for dirptr-hack drawing */
 extern int	shipShapesHackColor;	/* Color index for shipshapes-hack drawing */
-extern int	msgScanBallColor;	/* Color index for ball msg scan */
-extern int	msgScanCoverColor;	/* Color index for cover msg scan */
+extern int	msgScanBallColor;	/* Color index for ball msg */
+extern int	msgScanSafeColor;	/* Color index for safe msg */
+extern int	msgScanCoverColor;	/* Color index for cover msg */
+extern int	msgScanPopColor;	/* Color index for pop msg */
 extern int	selfLWColor;		/* Color index for selfLifeWarning */
 extern int	enemyLWColor;		/* Color index for enemyLifeWarning */
 extern int	teamLWColor;		/* Color index for teamLifeWarning */

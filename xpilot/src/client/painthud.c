@@ -85,8 +85,10 @@ int	hudSize;		/* Size for HUD drawing */
 int	hudLockColor;		/* Color index for lock on HUD drawing */
 int	fuelGaugeColor;		/* Color index for fuel gauge drawing */
 int	dirPtrColor;		/* Color index for dirptr drawing */
-int	msgScanBallColor;	/* Color index for ball message scan drawing */
-int	msgScanCoverColor;	/* Color index for ball message scan drawing */
+int	msgScanBallColor;	/* Color index for ball msg */
+int	msgScanSafeColor = 4;	/* Color index for safe msg */
+int	msgScanCoverColor;	/* Color index for cover msg */
+int	msgScanPopColor = 11;	/* Color index for pop msg */
 int	messagesColor;		/* Color index for messages */
 int	oldMessagesColor;	/* Color index for old messages */
 DFLOAT	scoreObjectTime;	/* How long to flash score objects */
@@ -858,8 +860,7 @@ void Paint_messages(void)
     const int	BORDER = 10,
 		SPACING = messageFont->ascent+messageFont->descent+1;
     message_t	*msg;
-    int		msg_color;
-    int		last_msg_index = 0;
+    int		last_msg_index = 0, msg_color;
 
     top_y = BORDER + messageFont->ascent;
     bot_y = WINSCALE(ext_view_height) - messageFont->descent - BORDER;
@@ -912,11 +913,20 @@ void Paint_messages(void)
 		continue;
 	    }
 #endif
-	if (msg->lifeTime > MSG_FLASH_TIME)
-	    msg_color = messagesColor;
-	else
+
+	if (msg->lifeTime <= MSG_FLASH_TIME) {
 	    msg_color = oldMessagesColor;
-	if (!msg_color)
+	} else {
+	    switch (msg->bmsinfo) {
+	    case BmsBall:	msg_color = msgScanBallColor;	break;
+	    case BmsSafe:	msg_color = msgScanSafeColor;	break;
+	    case BmsCover:	msg_color = msgScanCoverColor;	break;
+	    case BmsPop:	msg_color = msgScanPopColor;	break;
+	    default:		msg_color = messagesColor;	break;
+	    }
+	}
+
+	if (msg_color == 0)
 	    continue;
 
 	if (i < maxMessages) {

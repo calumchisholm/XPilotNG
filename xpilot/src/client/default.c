@@ -1065,14 +1065,28 @@ option options[] = {
 	NULL,
 	"3",
 	KEY_DUMMY,
-	"Which color number to use for drawing ball message scan warning.\n"
+	"Which color number to use for drawing ball message warning.\n"
+    },
+    {
+	"msgScanSafeColor",
+	NULL,
+	"4",
+	KEY_DUMMY,
+	"Which color number to use for drawing safe message.\n"
     },
     {
 	"msgScanCoverColor",
 	NULL,
 	"2",
 	KEY_DUMMY,
-	"Which color number to use for drawing cover message scan warning.\n"
+	"Which color number to use for drawing cover message.\n"
+    },
+    {
+	"msgScanPopColor",
+	NULL,
+	"11",
+	KEY_DUMMY,
+	"Which color number to use for drawing pop message.\n"
     },
     {
 	"selfLWColor",
@@ -3101,7 +3115,9 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_int_resource(rDB, "visibilityBorderColor", &visibilityBorderColor);
     Get_int_resource(rDB, "fuelGaugeColor", &fuelGaugeColor);
     Get_int_resource(rDB, "msgScanBallColor", &msgScanBallColor);
+    Get_int_resource(rDB, "msgScanSafeColor", &msgScanSafeColor);
     Get_int_resource(rDB, "msgScanCoverColor", &msgScanCoverColor);
+    Get_int_resource(rDB, "msgScanPopColor", &msgScanPopColor);
     Get_int_resource(rDB, "selfLWColor", &selfLWColor);
     Get_int_resource(rDB, "enemyLWColor", &enemyLWColor);
     Get_int_resource(rDB, "teamLWColor", &teamLWColor);

@@ -455,7 +455,7 @@ static bool Msg_scan_for_ball_destruction(char *message)
 }
 
 /* Mara's ball message scan */
-static void Msg_do_bms(char *message)
+static msg_bms_t Msg_do_bms(char *message)
 {
     static char ball_text1[] = "BALL";
     static char ball_text2[] = "Ball";
@@ -476,8 +476,6 @@ static void Msg_do_bms(char *message)
     char *bracket = NULL;
     int len, i, n = 0;
 
-    /*xpprintf("Msg_do_bms: message = \"%s\"\n", message);*/
-
     /* find second last '[' - always succeeds for a team message */
     len = (int)strlen(message);
     for (i = len; i >= 0; i--) {
@@ -490,44 +488,49 @@ static void Msg_do_bms(char *message)
     }
     /* for safety */
     if (bracket == NULL)
-	return;
+	return BmsNone;
 
-    /* ugly hack */
+    /* We don't want to scan the player name */
     *bracket = '\0';
 
     /*check safe b4 ball */
     if (strstr(message, safe_text1) ||
 	strstr(message, safe_text2) ||
 	strstr(message, safe_text3) ||
-	strstr(message, safe_text4))
-	safe = true;
+	strstr(message, safe_text4)) {
+	ball_shout = false;
+	*bracket = '[';
+	return BmsSafe;
+    }
 
     if (strstr(message, cover_text1) ||
 	strstr(message, cover_text2) ||
-	strstr(message, cover_text3))
-	cover = true;
+	strstr(message, cover_text3)) {
+	need_cover = true;
+	*bracket = '[';
+	return BmsCover;
+    }
 
-    if (!safe
-	&& (strstr(message, pop_text1) ||
-	    strstr(message, pop_text2) ||
-	    strstr(message, pop_text3)))
-	pop = true;
+    if (strstr(message, pop_text1) ||
+	strstr(message, pop_text2) ||
+	strstr(message, pop_text3)) {
+	need_cover = false;
+	*bracket = '[';
+	return BmsPop;
+    }
 
-    if (!safe && !cover && !pop
-	&& (strstr(message, ball_text1) ||
-	    strstr(message, ball_text2) ||
-	    strstr(message, ball_text3) ||
-	    strstr(message, ball_text4) ||
-	    strstr(message, ball_text5)))
-	ball = true;
+    if (strstr(message, ball_text1) ||
+	strstr(message, ball_text2) ||
+	strstr(message, ball_text3) ||
+	strstr(message, ball_text4) ||
+	strstr(message, ball_text5)) {
+	ball_shout = true;
+	*bracket = '[';
+	return BmsBall;
+    }
 
     *bracket = '[';
-
-    /*check first 'ball popped' etc. */
-    if (cover || pop)
-	need_cover = cover;
-    else if (safe || ball)
-	ball_shout = !safe;
+    return BmsNone;
 }
 
 
@@ -576,6 +579,7 @@ void Add_message(char *message)
     int			i, len;
     message_t		*tmp, **msg_set;
     bool		is_game_msg = false;
+    msg_bms_t		bmsinfo = BmsNone;
 
 #ifndef _WINDOWS
     bool		is_drawn_talk_message	= false; /* not pending */
@@ -639,7 +643,7 @@ void Add_message(char *message)
 	&& !is_game_msg
 	&& BIT(Setup->mode, TEAM_PLAY)
 	&& Msg_is_team_msg(message))
-	Msg_do_bms(message);
+	bmsinfo = Msg_do_bms(message);
 
     if (Msg_is_in_angle_brackets(message)) {
 	if (Msg_scan_for_ball_destruction(message));
@@ -692,6 +696,7 @@ void Add_message(char *message)
     msg_set[0]->lifeTime = MSG_LIFE_TIME;
     strlcpy(msg_set[0]->txt, message, MSG_LEN);
     msg_set[0]->len = len;
+    msg_set[0]->bmsinfo = bmsinfo;
 
 #ifndef _WINDOWS
     /*
