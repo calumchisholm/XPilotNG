@@ -160,6 +160,7 @@ static char msg[MSG_LEN];
 
 static void PlayerCollision(void);
 static void PlayerObjectCollision(player *pl);
+static void PlayerCheckpointCollision(player *pl);
 static void AsteroidCollision(void);
 static void BallCollision(void);
 static void MineCollision(void);
@@ -241,10 +242,9 @@ static void PlayerCollision(void)
 		 * The choosing of the first line may not be easy however.
 		 */
 
-		if (Team_immune(pl->id, pl_j->id)
-		    || PSEUDO_TEAM(pl, pl_j)) {
+		if (Team_immune(pl->id, pl_j->id) || PSEUDO_TEAM(pl, pl_j))
 		    continue;
-		}
+
 		sound_play_sensors(pl->pos, PLAYER_HIT_PLAYER_SOUND);
 		if (BIT(World.rules->mode, BOUNCE_WITH_PLAYER)) {
 		    if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) !=
@@ -461,20 +461,7 @@ static void PlayerCollision(void)
 	}
 
 	PlayerObjectCollision(pl);
-
-	/* Player checkpoint */
-	if (BIT(World.rules->mode, TIMING)
-	    && BIT(pl->status, PAUSE|GAME_OVER) == 0) {
-	    if (pl->round != 0)
-		pl->time++;
-	    if (BIT(pl->status, PLAYING|KILLED) == PLAYING
-		&& Wrap_length(pl->pos.cx - Checks(pl->check)->pos.cx,
-			       pl->pos.cy - Checks(pl->check)->pos.cy)
-		    < checkpointRadius * BLOCK_CLICKS
-		&& !IS_TANK_PTR(pl)
-		&& !ballrace)
-		Player_pass_checkpoint(pl);
-	}
+	PlayerCheckpointCollision(pl);
     }
 }
 
@@ -1314,6 +1301,21 @@ static void Player_pass_checkpoint(player *pl)
     updateScores = true;
 }
 
+static void PlayerCheckpointCollision(player *pl)
+{
+    if (BIT(World.rules->mode, TIMING)
+	&& BIT(pl->status, PAUSE|GAME_OVER) == 0) {
+	if (pl->round != 0)
+	    pl->time++;
+	if (BIT(pl->status, PLAYING|KILLED) == PLAYING
+	    && Wrap_length(pl->pos.cx - Checks(pl->check)->pos.cx,
+			   pl->pos.cy - Checks(pl->check)->pos.cy)
+	    < checkpointRadius * BLOCK_CLICKS
+	    && !IS_TANK_PTR(pl)
+	    && !ballrace)
+	    Player_pass_checkpoint(pl);
+    }
+}
 
 static void AsteroidCollision(void)
 {
