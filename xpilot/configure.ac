@@ -28,7 +28,37 @@ dnl  Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_TIME
 dnl AC_HEADER_STDBOOL
-AC_CHECK_HEADERS([arpa/inet.h arpa/nameser.h bstring.h fcntl.h float.h in.h limits.h memory.h net/if.h netdb.h netinet/in.h netinet/tcp.h pwd.h resolv.h setjmp.h socket.h stdint.h stdlib.h string.h sys/file.h sys/filio.h sys/fcntl.h sys/ioctl.h sys/param.h sys/socket.h sys/sockio.h sys/time.h unistd.h values.h])
+AC_CHECK_HEADERS([arpa/inet.h \
+	arpa/nameser.h \
+	bstring.h \
+	fcntl.h \
+	float.h \
+	in.h \
+	limits.h \
+	memory.h \
+	net/if.h \
+	netdb.h \
+	netinet/in.h \
+	netinet/tcp.h \
+	pwd.h \
+	resolv.h \
+	setjmp.h \
+	socket.h \
+	stdint.h \
+	stdlib.h \
+	string.h \
+	sys/file.h \
+	sys/filio.h \
+	sys/fcntl.h \
+	sys/inttypes.h \
+	sys/ioctl.h \
+	sys/param.h \
+	sys/socket.h \
+	sys/sockio.h \
+	sys/time.h \
+	unistd.h \
+	values.h \
+	])
 
 dnl  Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -49,7 +79,35 @@ AC_FUNC_STAT
 AC_FUNC_STRFTIME
 AC_FUNC_STRTOD
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([alarm floor gethostbyaddr gethostbyname gethostname gettimeofday inet_ntoa isascii memchr memmove memset mkdir pow rint select socket sqrt strcasecmp strchr strdup strerror strncasecmp strpbrk strrchr strspn strstr strtol strtoul])
+AC_CHECK_FUNCS([alarm \
+	floor \
+	gethostbyaddr \
+	gethostbyname \
+	gethostname \
+	gettimeofday \
+	inet_ntoa \
+	isascii \
+	memchr \
+	memmove \
+	memset \
+	mkdir \
+	pow \
+	rint \
+	select \
+	socket \
+	sqrt \
+	strcasecmp \
+	strchr \
+	strdup \
+	strerror \
+	strncasecmp \
+	strpbrk \
+	strrchr \
+	strspn \
+	strstr \
+	strtol \
+	strtoul \
+	])
 
 AC_CONFIG_FILES([Makefile \
 	lib/Makefile \

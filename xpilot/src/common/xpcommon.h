@@ -57,6 +57,12 @@
 #   define HAVE_SYS_TIME_H 1
 #   define TIME_WITH_SYS_TIME 1
 #  endif
+#  ifdef __linux__
+#   define HAVE_INTTYPES_H 1
+#  endif
+#  ifdef __FreeBSD__
+#   define HAVE_SYS_INTTYPES_H 1    
+#  endif
 #  ifndef _SEQUENT_
 #   define HAVE_FCNTL_H 1
 #  else
@@ -148,6 +154,18 @@
 
 #ifdef HAVE_SYS_TYPES_H
 # include <sys/types.h>
+#endif
+
+#ifdef HAVE_STDINT_H
+# include <stdint.h>
+#endif
+
+#ifdef HAVE_INTTYPES_H
+# include <inttypes.h>
+#endif
+
+#ifdef HAVE_SYS_INTTYPES_H
+# include <sys/inttypes.h>
 #endif
 
 #ifdef HAVE_ARPA_INET_H

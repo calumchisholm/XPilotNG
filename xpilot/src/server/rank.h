@@ -1,13 +1,7 @@
 #ifndef RANK_H
 #define RANK_H
 
-#ifdef __linux__
-# include <stdint.h>
-#else
-/*# include <sys/bitypes.h>*//*non-freebsd*/
-# include <sys/inttypes.h>/*freebsd*/
-#endif
-
+#include "xpcommon.h"
 
 struct oldScoreNode {
     char nick[MAX_CHARS];
