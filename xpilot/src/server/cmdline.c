@@ -363,21 +363,21 @@ static optionDesc options[] = {
     {
 	"mapWidth",
 	"mapWidth",
-	"100",
+	"3500",
 	&mapWidth,
 	valInt,
 	tuner_none,
-	"Width of the world in blocks.\n",
+	"Width of the world in pixels.\n",
 	MAP(NULL)
     },
     {
 	"mapHeight",
 	"mapHeight",
-	"100",
+	"3500",
 	&mapHeight,
 	valInt,
 	tuner_none,
-	"Height of the world in blocks.\n",
+	"Height of the world in pixels.\n",
 	MAP(NULL)
     },
     {

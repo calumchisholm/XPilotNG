@@ -197,9 +197,10 @@ def convert(options):
 	width += 2
 	map = [' ' + line + ' ' for line in map]
 	map = [' ' * width] + map + [' ' * width]
-	options['mapwidth'] = `width`
-	options['mapheight'] = `height`
+    
 	options['mapdata'] = "\n".join(map)+'\n'
+    options['mapwidth'] = `width * 35`
+    options['mapheight'] = `height * 35`
     map = Map(map, width, height)
     done = Map([[0] * width for i in range(height)], width, height)
     bases = []

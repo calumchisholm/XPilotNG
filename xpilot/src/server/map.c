@@ -169,6 +169,8 @@ void Grok_map(void)
 {
     Init_map();
 
+#if 0
+    /* !@# */
     if (mapWidth > MAX_MAP_SIZE || mapHeight > MAX_MAP_SIZE) {
 	errno = 0;
 	error("mapWidth or mapHeight exceeds map size limit %d", MAX_MAP_SIZE);
@@ -176,9 +178,12 @@ void Grok_map(void)
 	World.x = mapWidth;
 	World.y = mapHeight;
     }
+#endif
+    World.width = mapWidth;
+    World.height = mapHeight;
+    World.x = mapWidth / BLOCK_SZ; /* !@# */
+    World.y = mapHeight / BLOCK_SZ;
     World.diagonal = (int) LENGTH(World.x, World.y);
-    World.width = World.x * BLOCK_SZ;
-    World.height = World.y * BLOCK_SZ;
     World.cwidth = World.width * CLICK;
     World.cheight = World.height * CLICK;
     World.hypotenuse = (int) LENGTH(World.width, World.height);
