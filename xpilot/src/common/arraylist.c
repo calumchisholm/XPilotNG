@@ -23,6 +23,11 @@
 #define ARRAYLIST_INITIAL_NUM_ELEMENTS 16
 #define ARRAYLIST_ELEMENT_ALIGNMENT sizeof(double)
 
+void Arraylist_clear(arraylist_t *alp)
+{
+    alp->num_elements = 0;
+}
+
 void *Arraylist_get(arraylist_t *alp, int ind)
 {
     if (ind < 0 || ind >= alp->num_elements)

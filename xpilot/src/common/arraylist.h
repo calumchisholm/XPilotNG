@@ -53,7 +53,10 @@ static inline int Arraylist_get_max_elements(arraylist_t *alp)
 arraylist_t *Arraylist_alloc(size_t element_size);
 void Arraylist_free(arraylist_t *alp, int ind);
 
-/* Removes all of the elements from this list. */
+/*
+ * Removes all of the elements from this list by setting number
+ * of elements to 0.
+ */
 void Arraylist_clear(arraylist_t *alp);
 
 /* Get element at index 'ind'. */
@@ -68,10 +71,17 @@ int Arraylist_add(arraylist_t *alp, void *element);
 /* Insert element at position 'ind', return its 'ind' or -1 if failed. */
 int Arraylist_insert(arraylist_t *alp, int ind, void *element);
 
-/* Remove element at 'ind', require preservation of element order. */
+/*
+ * Remove element at 'ind', require preservation of element order.
+ * Slower than Arraylist_fast_remove, because this function might
+ * move other elements. Doesn't free any memory.
+ */
 void Arraylist_remove(arraylist_t *alp, int ind);
 
-/* Remove element at 'ind', don't require preservation of element order. */
+/*
+ * Remove element at 'ind', don't require preservation of element order.
+ * Doesn't free any memory.
+ */
 void Arraylist_fast_remove(arraylist_t *alp, int ind);
 
 /* Make max elements equal num elements. */
