@@ -830,8 +830,6 @@ static void PlayerObjectCollision(player *pl)
 	 * Objects actually only hit the player if they are really close.
 	 */
 	radius = (SHIP_SZ + obj->pl_radius) * CLICK;
-	if (radius != range)
-	    warn("(radius (%d) != range (%d))", radius, range);
 
 	if (radius >= range) {
 	    hit = true;
@@ -2016,7 +2014,6 @@ static void MineCollision(void)
 
 	for (j = 0; j < obj_count; j++) {
 	    int radius;
-	    bool hit;
 
 	    obj = obj_list[j];
 
@@ -2024,52 +2021,10 @@ static void MineCollision(void)
 		continue;
 
 	    radius = (mineShotDetonateDistance + obj->pl_radius) * CLICK;
-#if 1
+
 	    if (!in_range(OBJ_PTR(mine), obj, radius))
 		continue;
-#else
-	    if (is_polygon_map || !useOldCode) {
-		switch (obj->collmode) {
-		case 0:
-		    hit = in_range_simple(mine->pos.cx, mine->pos.cy,
-					  obj->pos.cx, obj->pos.cy,
-					  radius);
-		    break;
-		case 1:
-		    hit = in_range_acd(mine->prevpos.cx - obj->prevpos.cx,
-				       mine->prevpos.cy - obj->prevpos.cy,
-				       mine->extmove.cx - obj->extmove.cx,
-				       mine->extmove.cy - obj->extmove.cy,
-				       radius);
-		    break;
-		case 2:
-		    hit = in_range_partial(mine->prevpos.cx - obj->prevpos.cx,
-					   mine->prevpos.cy - obj->prevpos.cy,
-					   mine->extmove.cx - obj->extmove.cx,
-					   mine->extmove.cy - obj->extmove.cy,
-					   radius, obj->wall_time);
-		    break;
-		case 3:
-		default:
-#if 0
-		    warn("Unimplemented collision mode %d", obj->collmode);
-#endif
-		    continue;
-		}
-		if (!hit)
-		    continue;
-	    } else {
-		if (obj->life <= 0)
-		    continue;
 
-		if (!in_range_acd_old(mine->prevpos.cx, mine->prevpos.cy,
-				      mine->pos.cx, mine->pos.cy,
-				      obj->prevpos.cx, obj->prevpos.cy,
-				      obj->pos.cx, obj->pos.cy, radius)) {
-		    continue;
-		}
-	    }
-#endif
 	    /* bang! */
 	    obj->life = 0;
 	    mine->life = 0;
