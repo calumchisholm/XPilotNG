@@ -38,7 +38,7 @@ Print version information.
 .HP
 \fB\-dump\fR
 .IP
-Print all options with their default values in defaultsfile format.
+Print all options and their default values in defaultsfile format.
 .HP
 \fB\-expand\fR <list>
 .IP
@@ -280,25 +280,6 @@ Can balls collide with other objects?
 \-/+ballSparkCollisions
 .IP
 Can balls be blown around by exhaust? (Needs ballCollisions too)
-.HP
-\fB\-turnPush\fR <real>
-.IP
-Speed at which only pushMin will be applied
-.HP
-\fB\-pushMin\fR or pmin <real>
-.IP
-Effect of turnPush on fast bounces
-.HP
-\fB\-pushMax\fR or pMax <real>
-.IP
-Effect of turnPush on very slow bounces
-.HP
-\fB\-pushType\fR <integer>
-.IP
-What kind of dependency of turnpush to perpendicular bounce speed?
-0 = no turnPush, 1 = linear relation, 2 = tanh relation,
-3 = sinoid relation 4 = sinesqr 5 = sine to the power of 4
-at zero\-speed pushMax is applied, at speeds over turnPush pushMin
 .HP
 \-/+minesWallBounce
 .IP
@@ -556,7 +537,7 @@ minCannonShotLife will be set to that same value.
 .HP
 \fB\-cannonInitialFuel\fR <integer>
 .IP
-How much fuel cannons start with, or the minimum after being killed.
+How much fuel cannons start with.
 .HP
 \fB\-cannonInitialTanks\fR <integer>
 .IP
@@ -1119,36 +1100,29 @@ Maximum density [0.0\-1.0] for asteroids (max asteroids per block.
 .HP
 \fB\-itemConcentratorRadius\fR or itemConcentratorRange <real>
 .IP
-The maximum distance from an item concentator for items to appear in.
-Sensible values are in the range 1.0 to 20.0.
-If no item concentators are defined in a map then items can popup anywhere.
-If any are any then items popup in the vicinity of an item concentrator
-with probability itemConcentratorProb and anywhere the remainder of the time.
-An item concentrator is drawn on screen as three rotating triangles.
-The map symbol is the percentage symbol '%'.
+Range within which an item concentrator can create an item.
+Sensible values are in the range 1.0 to 20.0 (unit is 35 pixels).
+If there are no item concentrators, items might popup anywhere.
+Some clients draw item concentrators as three rotating triangles.
 .HP
 \fB\-itemConcentratorProb\fR <real>
 .IP
-The probability, if any item concentrators are present, that they will be
-used.  This proportion of items will be placed near item concentrators,
-within itemConcentratorRadius.
+The chance for an item to appear near an item concentrator.
+If this is less than 1.0 or there are no item concentrators,
+items may also popup where there is no concentrator nearby.
 .HP
 \fB\-asteroidConcentratorRadius\fR or asteroidConcentratorRange <real>
 .IP
-The maximum distance from an asteroid concentrator for asteroids to
-appear in.  Sensible values are in the range 1.0 to 20.0.
-If no asteroid concentrators are defined in a map then asteroids can
-popup anywhere.  If any are then asteroids popup in the vicinity of an
-asteroid concentrator with probability asteroidConcentratorProb and anywhere
-the remainder of the time.  An asteroid concentrator is drawn on the
-screen as three rotating squares.  The map symbol is the ampersand
-\&'&'.
+Range within which an asteroid concentrator can create an asteroid.
+Sensible values are in the range 1.0 to 20.0 (unit is 35 pixels).
+If there are no such concentrators, asteroids can popup anywhere.
+Some clients draw these concentrators as three rotating squares.
 .HP
 \fB\-asteroidConcentratorProb\fR <real>
 .IP
-The probability, if any asteroid concentrators are present, that they will
-be used.  This proportion of asteroids will be placed near asteroid
-concentrators, within asteroidConcentratorRadius.
+The chance for an asteroid to appear near an asteroid concentrator.
+If this is less than 1.0 or there are no asteroid concentrators,
+asteroids may also appear where there is no concentrator nearby.
 .HP
 \fB\-rogueHeatProb\fR <real>
 .IP
@@ -1244,7 +1218,7 @@ Probability for an Emergency Shield item to appear.
 .HP
 \fB\-initialFuel\fR <integer>
 .IP
-How much fuel players start with, or the minimum after being killed.
+How much fuel players start with.
 .HP
 \fB\-initialTanks\fR <integer>
 .IP
@@ -1577,6 +1551,11 @@ while it is still being played. There is a small overhead
 \-/+constantScoring
 .IP
 Whether the scores given from various things are fixed.
+.HP
+\-/+zeroSumScoring or zeroSum
+.IP
+Use Zero sum scoring?
+[ Flags: command ]
 .HP
 \-/+elimination
 .IP
