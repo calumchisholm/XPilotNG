@@ -73,7 +73,7 @@ tank_detach 			launch1.18.wav
 tank_pickup 			waiting.wav
 #team_draw				gong.au
 #team_win				whistle.au
-thrust					zap.wav,0.3
+thrust					zap.wav,0.01
 #tractor_beam			beep_robotic.au
 tractor_beam_pickup 	waiting.wav
 transporter_fail		buzzer.wav
