@@ -698,7 +698,7 @@ void Game_Over(void)
     for (i = 0; i < NumPlayers; i++) {
 	player_t *pl_i = Player_by_index(i);
 
-	SET_BIT(pl_i->pl_status, GAME_OVER);
+	Player_set_state(pl_i, PL_STATE_DEAD);
 	if (Player_is_human(pl_i)) {
 	    if (pl_i->score > maxsc) {
 		maxsc = pl_i->score;

@@ -91,7 +91,7 @@ extern bool		updateScores;
 /* pl_status = {PAUSE},                   mychar = 'P' */
 #define PL_STATE_PAUSED 	6
 /* pl_status = {GAME_OVER, [PLAYING]},    mychar = ' ' */
-#define PL_STATE_GAME_OVER	7
+/*#define PL_STATE_GAME_OVER	7*/
 
 /*
  * Different types of attributes a player can have.
