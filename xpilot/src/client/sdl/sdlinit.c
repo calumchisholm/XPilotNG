@@ -298,7 +298,7 @@ static xp_option_t sdlinit_options[] = {
 	&mapFontSize,
 	NULL,
 	XP_OPTFLAG_DEFAULT,
-	"Height of font used for message strings.\n"),
+	"Height of font used for strings painted on the map.\n"),
 
     XP_STRING_OPTION(
 	"TTFont",
