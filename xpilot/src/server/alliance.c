@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -67,8 +66,8 @@ static void Merge_alliances(int id1, int id2);
 
 int Invite_player(int ind, int ally_ind)
 {
-    player	*pl = Players[ind],
-		*ally = Players[ally_ind];
+    player	*pl = Players(ind),
+		*ally = Players(ally_ind);
 
     if (ind == ally_ind) {
 	/* we can never form an alliance with ourselves */
@@ -110,14 +109,14 @@ int Invite_player(int ind, int ally_ind)
 
 int Cancel_invitation(int ind)
 {
-    player	*pl = Players[ind],
+    player	*pl = Players(ind),
 		*ally;
 
     if (pl->invite == NO_ID) {
 	/* we have not invited anyone */
 	return 0;
     }
-    ally = Players[GetInd[pl->invite]];
+    ally = Players(GetInd[pl->invite]);
     pl->invite = NO_ID;
     if (IS_HUMAN_PTR(ally)) {
 	char msg[MSG_LEN];
@@ -131,8 +130,8 @@ int Cancel_invitation(int ind)
 /* refuses invitation from a specific player */
 int Refuse_alliance(int ind, int ally_ind)
 {
-    player	*pl = Players[ind],
-		*ally = Players[ally_ind];
+    player	*pl = Players(ind),
+		*ally = Players(ally_ind);
 
     if (ally->invite != pl->id) {
 	/* we were not invited anyway */
@@ -151,11 +150,11 @@ int Refuse_alliance(int ind, int ally_ind)
 /* refuses invitations from any player */
 int Refuse_all_alliances(int ind)
 {
-    player	*pl = Players[ind];
+    player	*pl = Players(ind);
     int		i, j = 0;
 
     for (i = 0; i < NumPlayers; i++) {
-	if (Players[i]->invite == pl->id) {
+	if (Players(i)->invite == pl->id) {
 	    Refuse_alliance(ind, i);
 	    j++;
 	}
@@ -176,8 +175,8 @@ int Refuse_all_alliances(int ind)
 /* accepts an invitation from a specific player */
 int Accept_alliance(int ind, int ally_ind)
 {
-    player	*pl = Players[ind],
-		*ally = Players[ally_ind];
+    player	*pl = Players(ind),
+		*ally = Players(ally_ind);
     int		success = 1;
 
     if (ally->invite != pl->id) {
@@ -208,11 +207,11 @@ int Accept_alliance(int ind, int ally_ind)
 /* accepts invitations from any player */
 int Accept_all_alliances(int ind)
 {
-    player	*pl = Players[ind];
+    player	*pl = Players(ind);
     int		i, j = 0;
 
     for (i = 0; i < NumPlayers; i++) {
-	if (Players[i]->invite == pl->id) {
+	if (Players(i)->invite == pl->id) {
 	    Accept_alliance(ind, i);
 	    j++;
 	}
@@ -267,8 +266,8 @@ static void Set_alliance_message(alliance_t *alliance, const char *msg)
 
     for (i = 0; i < NumPlayers; i++) {
 	if (IS_HUMAN_IND(i)) {
-	    if (Players[i]->alliance == alliance->id) {
-		Set_player_message(Players[i], msg);
+	    if (Players(i)->alliance == alliance->id) {
+		Set_player_message(Players(i), msg);
 	    }
 	}
     }
@@ -298,8 +297,8 @@ static int New_alliance_ID(void)
 /* creates an alliance between two players */
 static int Create_alliance(int ind1, int ind2)
 {
-    player	*pl1 = Players[ind1],
-		*pl2 = Players[ind2];
+    player	*pl1 = Players(ind1),
+		*pl2 = Players(ind2);
     alliance_t	*alliance = (alliance_t *)malloc(sizeof(alliance_t));
     char	msg[MSG_LEN];
 
@@ -336,8 +335,8 @@ static int Create_alliance(int ind1, int ind2)
 /* adds a player to an existing alliance */
 void Player_join_alliance(int ind, int ally_ind)
 {
-    player	*pl = Players[ind],
-		*ally = Players[ally_ind];
+    player	*pl = Players(ind),
+		*ally = Players(ally_ind);
     alliance_t	*alliance = Find_alliance(ally->alliance);
     char	msg[MSG_LEN];
 
@@ -368,7 +367,7 @@ static void Alliance_add_player(alliance_t *alliance, player *pl)
 
     /* drop invitations for this player from other members */
     for (i = 0; i < NumPlayers; i++) {
-	if (Players[i]->invite == pl->id) {
+	if (Players(i)->invite == pl->id) {
 	    Cancel_invitation(i);
 	}
     }
@@ -380,7 +379,7 @@ static void Alliance_add_player(alliance_t *alliance, player *pl)
 /* removes a player from an alliance and dissolves the alliance if necessary */
 int Leave_alliance(int ind)
 {
-    player	*pl = Players[ind];
+    player	*pl = Players(ind);
     alliance_t	*alliance;
     char	msg[MSG_LEN];
 
@@ -429,10 +428,10 @@ static void Dissolve_alliance(int id)
 
     /* remove all remaining members from the alliance */
     for (i = 0; i < NumPlayers; i++) {
-	if (Players[i]->alliance == id) {
-	    Alliance_remove_player(alliance, Players[i]);
+	if (Players(i)->alliance == id) {
+	    Alliance_remove_player(alliance, Players(i));
 	    if (!announceAlliances && IS_HUMAN_IND(i)) {
-		Set_player_message(Players[i],
+		Set_player_message(Players(i),
 				   " < Your alliance has been dissolved >");
 	    }
 	}
@@ -482,8 +481,8 @@ static void Merge_alliances(int ind, int id2)
 
     /* move each member of alliance2 to alliance1 */
     for (i = 0; i < NumPlayers; i++) {
-	if (Players[i]->alliance == id2) {
-	    Alliance_remove_player(alliance2, Players[i]);
+	if (Players(i)->alliance == id2) {
+	    Alliance_remove_player(alliance2, Players(i));
 	    Player_join_alliance(i, ind);
 	}
     }
@@ -492,7 +491,7 @@ static void Merge_alliances(int ind, int id2)
 
 void Alliance_player_list(int ind)
 {
-    player	*pl = Players[ind];
+    player	*pl = Players(ind);
     int		i;
     char	msg[MSG_LEN];
 
@@ -506,27 +505,27 @@ void Alliance_player_list(int ind)
 	    sprintf(msg, " < Your alliance: ");
 	}
 	for (i = 0; i < NumPlayers; i++) {
-	    if (Players[i]->alliance == pl->alliance) {
+	    if (Players(i)->alliance == pl->alliance) {
 		if (IS_HUMAN_IND(i)) {
 		    if (strlen(msg) > 80) {
 			strlcat(msg, ">", sizeof(msg));
 			Set_player_message(pl, msg);
 			strlcpy(msg, " <            ", sizeof(msg));
 		    }
-		    strlcat(msg, Players[i]->name, sizeof(msg));
+		    strlcat(msg, Players(i)->name, sizeof(msg));
 		    strlcat(msg, ", ", sizeof(msg));
 		}
 	    }
 	}
 	for (i = 0; i < NumPlayers; i++) {
-	    if (Players[i]->alliance == pl->alliance) {
+	    if (Players(i)->alliance == pl->alliance) {
 		if (IS_ROBOT_IND(i)) {
 		    if (strlen(msg) > 80) {
 			strlcat(msg, ">", sizeof(msg));
 			Set_player_message(pl, msg);
 			strlcpy(msg, " <            ", sizeof(msg));
 		    }
-		    strlcat(msg, Players[i]->name, sizeof(msg));
+		    strlcat(msg, Players(i)->name, sizeof(msg));
 		    strlcat(msg, ", ", sizeof(msg));
 		}
 	    }

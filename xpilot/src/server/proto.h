@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -324,6 +323,8 @@ int Get_player_index_by_name(char *name);
 /*
  * Prototypes for player.c
  */
+/*player *Players(int ind);*/
+player *Players1(int ind, char *file, int line);
 void Pick_startpos(int ind);
 void Go_home(int ind);
 void Compute_sensor_range(player *);

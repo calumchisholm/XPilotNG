@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -66,7 +65,10 @@ extern DFLOAT		tbl_cos[];
 #define FPS		framesPerSecond
 #define NumObjs		(ObjCount + 0)
 
-extern player		**Players;
+/*extern player		**Players;*/
+#define Players(ind) Players1(ind, __FILE__, __LINE__)
+
+extern player		**PlayersArray;
 extern object		*Obj[];
 extern ecm_t		*Ecms[];
 extern trans_t		*Transporters[];

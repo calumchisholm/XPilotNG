@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -199,7 +198,7 @@ void Meta_update(int change)
     num_active_players = 0;
     memset(active_per_team, 0, sizeof active_per_team);
     for (i = 0; i < NumPlayers; i++) {
-	if (IS_HUMAN_IND(i) && !BIT(Players[i]->status, PAUSE)) {
+	if (IS_HUMAN_IND(i) && !BIT(Players(i)->status, PAUSE)) {
 	    num_active_players++;
 	    if (BIT(World.rules->mode, TEAM_PLAY)) {
 		active_per_team[i]++;
@@ -269,18 +268,18 @@ void Meta_update(int change)
     len = strlen(string);
 
     for (i = 0; i < NumPlayers; i++) {
-	if (IS_HUMAN_IND(i) && !BIT(Players[i]->status, PAUSE)) {
+	if (IS_HUMAN_IND(i) && !BIT(Players(i)->status, PAUSE)) {
 	    if ((len + (4 * MAX_CHARS)) < sizeof(string)) {
 		sprintf(string + len,
 			"%s%s=%s@%s",
 			(first) ? "add players " : ",",
-			Players[i]->name,
-			Players[i]->realname,
-			Players[i]->hostname);
+			Players(i)->name,
+			Players(i)->realname,
+			Players(i)->hostname);
 		len += strlen(&string[len]);
 
 		if (BIT(World.rules->mode, TEAM_PLAY)) {
-		    sprintf(string + len,"{%d}",Players[i]->team);
+		    sprintf(string + len,"{%d}", Players(i)->team);
 		    len += strlen(&string[len]);
 		}
 

@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -952,7 +951,7 @@ static void Move_segment(move_state_t *ms)
 		    player	*pl = NULL;
 
 		    if (ball->owner != NO_ID)
-			pl = Players[GetInd[ball->owner]];
+			pl = Players(GetInd[ball->owner]);
 
 		    if (!BIT(World.rules->mode, TEAM_PLAY)
 			|| !pl
@@ -972,14 +971,14 @@ static void Move_segment(move_state_t *ms)
 		}
 		if (BIT(World.rules->mode, TEAM_PLAY)
 		    && World.treasures[ms->treasure].team ==
-		       Players[GetInd[ball->owner]]->team) {
+		       Players(GetInd[ball->owner])->team) {
 		    Ball_is_destroyed(ball);
 		    if (captureTheFlag
 			&& !World.treasures[ms->treasure].have
 			&& !World.treasures[ms->treasure].empty) {
 			strcpy(msg, "Your treasure must be safe before you "
 			       "can cash an opponent's!");
-			Set_player_message(Players[GetInd[ball->owner]], msg);
+			Set_player_message(Players(GetInd[ball->owner]), msg);
 		    } else if (Punish_team(GetInd[ball->owner],
 					   ball->treasure,
 					   ball->pos.cx, ball->pos.cy))
@@ -1004,7 +1003,7 @@ static void Move_segment(move_state_t *ms)
 		    else if (BIT(mi->obj->type, OBJ_BALL)) {
 			ballobject *ball = BALL_PTR(mi->obj);
 			if (ball->owner != NO_ID) {
-			    team = Players[GetInd[ball->owner]]->team;
+			    team = Players(GetInd[ball->owner])->team;
 			} else {
 			    team = TEAM_NOT_SET;
 			}
@@ -1504,7 +1503,7 @@ static void Cannon_dies_old(move_state_t *ms)
 	 * look if it was something fired by a player.
 	 */
 	if (ms->mip->obj->id != NO_ID) {
-	    pl = Players[GetInd[ms->mip->obj->id]];
+	    pl = Players(GetInd[ms->mip->obj->id]);
 	}
     } else if (BIT(ms->mip->pl->used, HAS_SHIELD|HAS_EMERGENCY_SHIELD)
 	       == (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
@@ -1587,7 +1586,7 @@ void Move_object_old(object *obj)
     mi.treasure_crashes = BIT(mp.obj_treasure_mask, obj->type);
     mi.wormhole_warps = true;
     if (BIT(obj->type, OBJ_BALL) && obj->id != NO_ID) {
-	mi.phased = BIT(Players[GetInd[obj->id]]->used, HAS_PHASING_DEVICE);
+	mi.phased = BIT(Players(GetInd[obj->id])->used, HAS_PHASING_DEVICE);
     } else {
 	mi.phased = 0;
     }
@@ -1705,7 +1704,7 @@ static void Player_crash_old(move_state_t *ms, int pt)
 
 void Move_player_old(int ind)
 {
-    player		*pl = Players[ind];
+    player		*pl = Players(ind);
     int			nothing_done = 0;
     int			i;
     int			dist;
@@ -2099,7 +2098,7 @@ void Move_player_old(int ind)
 
 void Turn_player_old(int ind)
 {
-    player		*pl = Players[ind];
+    player		*pl = Players(ind);
     int			i;
     move_info_t		mi;
     move_state_t	ms[RES];

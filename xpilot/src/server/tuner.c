@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -45,7 +44,7 @@ void tuner_shipmass(void)
     int i;
 
     for (i = 0; i < NumPlayers; i++) {
-	Players[i]->emptymass = ShipMass;
+	Players(i)->emptymass = ShipMass;
     }
 }
 
@@ -96,12 +95,12 @@ void tuner_playershielding(void)
 	SET_BIT(DEF_HAVE, HAS_SHIELD);
 
 	for (i = 0; i < NumPlayers; i++) {
-	    if (!IS_TANK_PTR(Players[i])) {
-		if (!BIT(Players[i]->used, HAS_SHOT))
-		    SET_BIT(Players[i]->used, HAS_SHIELD);
+	    if (!IS_TANK_PTR(Players(i))) {
+		if (!BIT(Players(i)->used, HAS_SHOT))
+		    SET_BIT(Players(i)->used, HAS_SHIELD);
 
-		SET_BIT(Players[i]->have, HAS_SHIELD);
-		Players[i]->shield_time = 0;
+		SET_BIT(Players(i)->have, HAS_SHIELD);
+		Players(i)->shield_time = 0;
 	    }
 	}
     }
@@ -109,7 +108,7 @@ void tuner_playershielding(void)
 	CLR_BIT(DEF_HAVE, HAS_SHIELD);
 
 	for (i = 0; i < NumPlayers; i++) {
-	    Players[i]->shield_time = SHIELD_TIME;
+	    Players(i)->shield_time = SHIELD_TIME;
 	    /* approx 2 seconds to get to safety */
 	}
     }
@@ -212,7 +211,7 @@ void tuner_modifiers(void)
     Set_world_rules();
 
     for (i = 0; i < NumPlayers; i++) {
-	filter_mods(&Players[i]->mods);
+	filter_mods(&Players(i)->mods);
     }
 }
 

@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -292,7 +291,7 @@ static void PlayerCollision(void)
 
     /* Player - player, checkpoint, treasure, object and wall */
     for (i=0; i<NumPlayers; i++) {
-	pl = Players[i];
+	pl = Players(i);
 	if (BIT(pl->status, PLAYING|PAUSE|GAME_OVER|KILLED) != PLAYING)
 	    continue;
 
@@ -311,27 +310,27 @@ static void PlayerCollision(void)
 	/* Player - player */
 	if (BIT(World.rules->mode, CRASH_WITH_PLAYER | BOUNCE_WITH_PLAYER)) {
 	    for (j=i+1; j<NumPlayers; j++) {
-		if (BIT(Players[j]->status, PLAYING|PAUSE|GAME_OVER|KILLED)
+		if (BIT(Players(j)->status, PLAYING|PAUSE|GAME_OVER|KILLED)
 		    != PLAYING) {
 		    continue;
 		}
-		if (BIT(Players[j]->used, HAS_PHASING_DEVICE))
+		if (BIT(Players(j)->used, HAS_PHASING_DEVICE))
 		    continue;
 		if (is_polygon_map || !useOldCode) {
-		    if (!in_range_acd(pl->prevpos.cx - Players[j]->prevpos.cx,
-				      pl->prevpos.cy - Players[j]->prevpos.cy,
-				      pl->extmove.cx - Players[j]->extmove.cx,
-				      pl->extmove.cy - Players[j]->extmove.cy,
+		    if (!in_range_acd(pl->prevpos.cx - Players(j)->prevpos.cx,
+				      pl->prevpos.cy - Players(j)->prevpos.cy,
+				      pl->extmove.cx - Players(j)->extmove.cx,
+				      pl->extmove.cy - Players(j)->extmove.cy,
 				      (2*SHIP_SZ-6) * CLICK)) {
  			continue;
 		    }
 		} else {
 		    if (!in_range_acd_old(pl->prevpos.cx, pl->prevpos.cy,
 					  pl->pos.cx, pl->pos.cy,
-					  Players[j]->prevpos.cx,
-					  Players[j]->prevpos.cy,
-					  Players[j]->pos.cx,
-					  Players[j]->pos.cy,
+					  Players(j)->prevpos.cx,
+					  Players(j)->prevpos.cy,
+					  Players(j)->pos.cx,
+					  Players(j)->pos.cy,
 					  PIXEL_TO_CLICK(2*SHIP_SZ-6))) {
 			continue;
 		    }
@@ -353,7 +352,7 @@ static void PlayerCollision(void)
 		 * The choosing of the first line may not be easy however.
 		 */
 
-		if (Team_immune(pl->id, Players[j]->id)
+		if (Team_immune(pl->id, Players(j)->id)
 		    || PSEUDO_TEAM(i, j)) {
 		    continue;
 		}
@@ -364,15 +363,15 @@ static void PlayerCollision(void)
 			Add_fuel(&(pl->fuel), (long)ED_PL_CRASH);
 			Item_damage(i, destroyItemInCollisionProb);
 		    }
-		    if (BIT(Players[j]->used, (HAS_SHIELD|
+		    if (BIT(Players(j)->used, (HAS_SHIELD|
 					       HAS_EMERGENCY_SHIELD)) !=
 			(HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
-			Add_fuel(&(Players[j]->fuel), (long)ED_PL_CRASH);
+			Add_fuel(&(Players(j)->fuel), (long)ED_PL_CRASH);
 			Item_damage(j, destroyItemInCollisionProb);
 		    }
 		    pl->forceVisible = 20;
-		    Players[j]->forceVisible = 20;
-		    Obj_repel((object *)pl, (object *)Players[j],
+		    Players(j)->forceVisible = 20;
+		    Obj_repel((object *)pl, (object *)Players(j),
 			      PIXEL_TO_CLICK(2*SHIP_SZ));
 		}
 		if (!BIT(World.rules->mode, CRASH_WITH_PLAYER)) {
@@ -384,72 +383,72 @@ static void PlayerCollision(void)
 			&& !BIT(pl->have, HAS_ARMOR))) {
 		    SET_BIT(pl->status, KILLED);
 		}
-		if (Players[j]->fuel.sum <= 0
-		    || (!BIT(Players[j]->used, HAS_SHIELD)
-			&& !BIT(Players[j]->have, HAS_ARMOR))) {
-		    SET_BIT(Players[j]->status, KILLED);
+		if (Players(j)->fuel.sum <= 0
+		    || (!BIT(Players(j)->used, HAS_SHIELD)
+			&& !BIT(Players(j)->have, HAS_ARMOR))) {
+		    SET_BIT(Players(j)->status, KILLED);
 		}
 
 		if (!BIT(pl->used, HAS_SHIELD)
 		    && BIT(pl->have, HAS_ARMOR)) {
 		    Player_hit_armor(i);
 		}
-		if (!BIT(Players[j]->used, HAS_SHIELD)
-		    && BIT(Players[j]->have, HAS_ARMOR)) {
+		if (!BIT(Players(j)->used, HAS_SHIELD)
+		    && BIT(Players(j)->have, HAS_ARMOR)) {
 		    Player_hit_armor(j);
 		}
 
-		if (BIT(Players[j]->status, KILLED)) {
+		if (BIT(Players(j)->status, KILLED)) {
 		    if (BIT(pl->status, KILLED)) {
 			sprintf(msg, "%s and %s crashed.",
-				pl->name, Players[j]->name);
+				pl->name, Players(j)->name);
 			Set_message(msg);
 			if (!IS_TANK_IND(i) && !IS_TANK_IND(j)) {
-			    sc = Rate(Players[j]->score, pl->score)
+			    sc = Rate(Players(j)->score, pl->score)
 			 		    * crashScoreMult;
-			    sc2 = Rate(pl->score, Players[j]->score)
+			    sc2 = Rate(pl->score, Players(j)->score)
 					     * crashScoreMult;
-			    Score_players(i, -sc, Players[j]->name,
+			    Score_players(i, -sc, Players(j)->name,
 					  j, -sc2, pl->name);
 			} else if (IS_TANK_IND(i)) {
-			    int i_tank_owner = GetInd[Players[i]->lock.pl_id];
-			    sc = Rate(Players[i_tank_owner]->score,
-						 Players[j]->score)
+			    int i_tank_owner = GetInd[Players(i)->lock.pl_id];
+			    sc = Rate(Players(i_tank_owner)->score,
+				      Players(j)->score)
 					    * tankKillScoreMult;
-			    Score_players(i_tank_owner, sc, Players[j]->name,
+			    Score_players(i_tank_owner, sc, Players(j)->name,
 					  j, -sc, pl->name);
 			} else if (IS_TANK_IND(j)) {
-			    int j_tank_owner = GetInd[Players[j]->lock.pl_id];
-			    sc = Rate(Players[j_tank_owner]->score,
+			    int j_tank_owner = GetInd[Players(j)->lock.pl_id];
+			    sc = Rate(Players(j_tank_owner)->score,
 						 pl->score)
 					    * tankKillScoreMult;
 			    Score_players(j_tank_owner, sc, pl->name,
-					  i, -sc, Players[j]->name);
+					  i, -sc, Players(j)->name);
 			} /* don't bother scoring two tanks */
 		    } else {
 			int i_tank_owner = i;
 			if (IS_TANK_IND(i)) {
-			    i_tank_owner = GetInd[Players[i]->lock.pl_id];
+			    i_tank_owner = GetInd[Players(i)->lock.pl_id];
 			    if (i_tank_owner == j) {
 				i_tank_owner = i;
 			    }
 			}
 			sprintf(msg, "%s ran over %s.",
-				pl->name, Players[j]->name);
+				pl->name, Players(j)->name);
 			Set_message(msg);
-			sound_play_sensors(Players[j]->pos.cx,
-					   Players[j]->pos.cy,
+			sound_play_sensors(Players(j)->pos.cx,
+					   Players(j)->pos.cy,
 					   PLAYER_RAN_OVER_PLAYER_SOUND);
 			Rank_AddKill(pl);
 			if (IS_TANK_IND(i)) {
-			    sc = Rate(Players[i_tank_owner]->score,
-						 Players[j]->score)
+			    sc = Rate(Players(i_tank_owner)->score,
+						 Players(j)->score)
 					    * tankKillScoreMult;
 			} else {
-			    sc = Rate(pl->score, Players[j]->score)
+			    sc = Rate(pl->score, Players(j)->score)
 					    * runoverKillScoreMult;
 			}
-			Score_players(i_tank_owner, sc, Players[j]->name,
+			Score_players(i_tank_owner, sc, Players(j)->name,
 				      j, -sc, pl->name);
 		    }
 
@@ -457,30 +456,30 @@ static void PlayerCollision(void)
 		    if (BIT(pl->status, KILLED)) {
 			int j_tank_owner = j;
 			if (IS_TANK_IND(j)) {
-			    j_tank_owner = GetInd[Players[j]->lock.pl_id];
+			    j_tank_owner = GetInd[Players(j)->lock.pl_id];
 			    if (j_tank_owner == i) {
 				j_tank_owner = j;
 			    }
 			}
 			sprintf(msg, "%s ran over %s.",
-				Players[j]->name, pl->name);
+				Players(j)->name, pl->name);
 			Set_message(msg);
 			sound_play_sensors(pl->pos.cx, pl->pos.cy,
 					   PLAYER_RAN_OVER_PLAYER_SOUND);
-			Rank_AddKill(Players[j]);
+			Rank_AddKill(Players(j));
 			if (IS_TANK_IND(j)) {
-			    sc = Rate(Players[j_tank_owner]->score, pl->score)
+			    sc = Rate(Players(j_tank_owner)->score, pl->score)
 				   * tankKillScoreMult;
 			} else {
-			    sc = Rate(Players[j]->score, pl->score)
+			    sc = Rate(Players(j)->score, pl->score)
 				   * runoverKillScoreMult;
 			}
 			Score_players(j_tank_owner, sc, pl->name,
-				      i, -sc, Players[j]->name);
+				      i, -sc, Players(j)->name);
 		    }
 		}
 
-		if (BIT(Players[j]->status, KILLED)) {
+		if (BIT(Players(j)->status, KILLED)) {
 		    if (IS_ROBOT_IND(j)
 			&& Robot_war_on_player(j) == pl->id) {
 			Robot_reset_war(j);
@@ -489,7 +488,7 @@ static void PlayerCollision(void)
 
 		if (BIT(pl->status, KILLED)) {
 		    if (IS_ROBOT_PTR(pl)
-			&& Robot_war_on_player(i) == Players[j]->id) {
+			&& Robot_war_on_player(i) == Players(j)->id) {
 			Robot_reset_war(i);
 		    }
 		    /* cannot crash with more than one player at the same time? */
@@ -685,7 +684,7 @@ int CountDefensiveItems(player *pl)
 static void PlayerObjectCollision(int ind)
 {
     int		j, range, radius, hit, obj_count;
-    player	*pl = Players[ind];
+    player	*pl = Players(ind);
     object	*obj, **obj_list;
 
 
@@ -761,7 +760,7 @@ static void PlayerObjectCollision(int ind)
 		continue;
 	    } else if (Team_immune(obj->id, pl->id))
 		continue;
-	    else if (BIT(Players[GetInd[obj->id]]->status, PAUSE))
+	    else if (BIT(Players(GetInd[obj->id])->status, PAUSE))
 		continue;
 	} else if (BIT(World.rules->mode, TEAM_PLAY)
 		   && teamImmunity
@@ -788,7 +787,7 @@ static void PlayerObjectCollision(int ind)
 		continue;
 	}
 	else if (BIT(obj->type, OBJ_BALL) && obj->id != NO_ID) {
-	    if (BIT(Players[GetInd[obj->id]]->used, HAS_PHASING_DEVICE))
+	    if (BIT(Players(GetInd[obj->id])->used, HAS_PHASING_DEVICE))
 		continue;
 	}
 	else if (BIT(obj->type, OBJ_PULSE)) {
@@ -926,7 +925,7 @@ static void PlayerObjectCollision(int ind)
 
 static void Player_collides_with_ball(int ind, object *obj, int radius)
 {
-    player	*pl = Players[ind];
+    player	*pl = Players(ind);
     DFLOAT	sc;
     int		killer;
     ballobject	*ball = BALL_PTR(obj);
@@ -962,20 +961,20 @@ static void Player_collides_with_ball(int ind, object *obj, int radius)
 	killer = GetInd[ball->owner];
 
 	sprintf(msg, "%s was killed by a ball owned by %s.",
-		pl->name, Players[killer]->name);
+		pl->name, Players(killer)->name);
 
 	if (killer == ind) {
 	    strcat(msg, "  How strange!");
 	    sc = Rate(0, pl->score)
 		   * ballKillScoreMult
 		   * selfKillScoreMult;
-	    SCORE(ind, -sc, pl->pos.cx, pl->pos.cy, Players[killer]->name);
+	    SCORE(ind, -sc, pl->pos.cx, pl->pos.cy, Players(killer)->name);
 	} else {
-	    Rank_AddKill(Players[killer]);
-	    sc = Rate(Players[killer]->score, pl->score)
+	    Rank_AddKill(Players(killer));
+	    sc = Rate(Players(killer)->score, pl->score)
 		       * ballKillScoreMult;
 	    Score_players(killer, sc, pl->name,
-			  ind, -sc, Players[killer]->name);
+			  ind, -sc, Players(killer)->name);
 	    Robot_war(ind, killer);
 	}
     }
@@ -986,7 +985,7 @@ static void Player_collides_with_ball(int ind, object *obj, int radius)
 
 static void Player_collides_with_item(int ind, object *obj)
 {
-    player	*pl = Players[ind];
+    player	*pl = Players(ind);
     int		old_have;
     enum Item	item_index;
 
@@ -1174,7 +1173,7 @@ static void Player_collides_with_item(int ind, object *obj)
 
 static void Player_collides_with_mine(int ind, object *obj)
 {
-    player	*pl = Players[ind];
+    player	*pl = Players(ind);
     DFLOAT	sc;
     int		killer;
     mineobject	*mine = MINE_PTR(obj);
@@ -1191,13 +1190,13 @@ static void Player_collides_with_mine(int ind, object *obj)
 	sprintf(msg, "%s hit %s %s by %s.", pl->name,
 		Describe_shot(mine->type, mine->status, mine->mods,1),
 		BIT(mine->status, GRAVITY) ? "thrown " : "dropped ",
-		Players[killer]->name);
+		Players(killer)->name);
     }
     else if (mine->owner == NO_ID) {
 	const char *reprogrammer_name = "some jerk";
 	if (mine->id != NO_ID) {
 	    killer = GetInd[mine->id];
-	    reprogrammer_name = Players[killer]->name;
+	    reprogrammer_name = Players(killer)->name;
 	}
 	sprintf(msg, "%s hit %s reprogrammed by %s.",
 		pl->name,
@@ -1208,13 +1207,13 @@ static void Player_collides_with_mine(int ind, object *obj)
 	const char *reprogrammer_name = "some jerk";
 	if (mine->id != NO_ID) {
 	    killer = GetInd[mine->id];
-	    reprogrammer_name = Players[killer]->name;
+	    reprogrammer_name = Players(killer)->name;
 	}
 	sprintf(msg, "%s hit %s %s by %s and reprogrammed by %s.",
 		pl->name,
 		Describe_shot(mine->type, mine->status, mine->mods,1),
 		BIT(mine->status, GRAVITY) ? "thrown " : "dropped ",
-		Players[GetInd[mine->owner]]->name,
+		Players(GetInd[mine->owner])->name,
 		reprogrammer_name);
     }
     if (killer != -1) {
@@ -1224,10 +1223,10 @@ static void Player_collides_with_mine(int ind, object *obj)
 	 * for a low-scored-player hitting a high-scored-player's mine.
 	 * Maybe not.
 	 */
-	sc = Rate(Players[killer]->score, pl->score)
+	sc = Rate(Players(killer)->score, pl->score)
 		   * mineScoreMult;
 	Score_players(killer, sc, pl->name,
-		      ind, -sc, Players[killer]->name);
+		      ind, -sc, Players(killer)->name);
     }
     Set_message(msg);
 }
@@ -1235,7 +1234,7 @@ static void Player_collides_with_mine(int ind, object *obj)
 
 static void Player_collides_with_debris(int ind, object *obj)
 {
-    player		*pl = Players[ind];
+    player		*pl = Players(ind);
     DFLOAT		v = VECTOR_LENGTH(obj->vel);
     long		tmp = (long) (2 * obj->mass * v);
     long		cost = ABS(tmp);
@@ -1256,7 +1255,7 @@ static void Player_collides_with_debris(int ind, object *obj)
 	if (obj->id != NO_ID) {
 	    killer = GetInd[obj->id];
 	    sprintf(msg + strlen(msg) - 1, " from %s.",
-		    Players[killer]->name);
+		    Players(killer)->name);
 	    if (obj->id == pl->id) {
 		sprintf(msg + strlen(msg), "  How strange!");
 	    }
@@ -1269,11 +1268,11 @@ static void Player_collides_with_debris(int ind, object *obj)
 	    SCORE(ind, -sc, pl->pos.cx, pl->pos.cy,
 		  (killer == -1) ? "[Explosion]" : pl->name);
 	} else {
-	    Rank_AddKill(Players[killer]);
-	    sc = Rate(Players[killer]->score, pl->score)
+	    Rank_AddKill(Players(killer));
+	    sc = Rate(Players(killer)->score, pl->score)
 		       * explosionKillScoreMult;
 	    Score_players(killer, sc, pl->name,
-			  ind, -sc, Players[killer]->name);
+			  ind, -sc, Players(killer)->name);
 	}
 	obj->life = 0;
 	return;
@@ -1289,7 +1288,7 @@ static void Player_collides_with_debris(int ind, object *obj)
 
 static void Player_collides_with_asteroid(int ind, wireobject *ast)
 {
-    player	*pl = Players[ind];
+    player	*pl = Players(ind);
     DFLOAT	v = VECTOR_LENGTH(ast->vel);
     long	tmp = (long) (2 * ast->mass * v);
     long	cost = ABS(tmp);
@@ -1323,7 +1322,7 @@ static void Player_collides_with_asteroid(int ind, wireobject *ast)
 	SCORE(ind, -sc, pl->pos.cx, pl->pos.cy, "[Asteroid]");
 	if (IS_TANK_PTR(pl) && asteroidPoints > 0) {
 	    int owner = GetInd[pl->lock.pl_id];
-	    if (Players[owner]->score <= asteroidMaxScore) {
+	    if (Players(owner)->score <= asteroidMaxScore) {
 		SCORE(owner, asteroidPoints, ast->pos.cx, ast->pos.cy, "");
 	    }
 	}
@@ -1339,7 +1338,7 @@ static void Player_collides_with_asteroid(int ind, wireobject *ast)
 
 static void Player_collides_with_killing_shot(int ind, object *obj)
 {
-    player	*pl = Players[ind];
+    player	*pl = Players(ind);
     DFLOAT	sc;
     DFLOAT   	drainfactor;
     long	drain;
@@ -1388,7 +1387,7 @@ static void Player_collides_with_killing_shot(int ind, object *obj)
 		sprintf(msg, "%s ate %s from %s.", pl->name,
 			Describe_shot(obj->type, obj->status,
 				      obj->mods, 1),
-			Players[ killer=GetInd[obj->id] ]->name);
+			Players( killer=GetInd[obj->id] )->name);
 	    drain = (long)(ED_SMART_SHOT_HIT /
 		((obj->mods.mini + 1) * (obj->mods.power + 1)));
 	    if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
@@ -1450,15 +1449,15 @@ static void Player_collides_with_killing_shot(int ind, object *obj)
 		sprintf(msg, "%s was killed by %s from %s.", pl->name,
 			Describe_shot(obj->type, obj->status,
 				      obj->mods, 1),
-			Players[killer=GetInd[obj->id]]->name);
+			Players( killer=GetInd[obj->id] )->name);
 		if (killer == ind) {
 		    sound_play_sensors(pl->pos.cx, pl->pos.cy,
 				       PLAYER_SHOT_THEMSELF_SOUND);
 		    strcat(msg, "  How strange!");
 		    sc = Rate(0, pl->score) * selfKillScoreMult;
 		} else {
-		    Rank_AddKill(Players[killer]);
-		    sc = Rate(Players[killer]->score, pl->score);
+		    Rank_AddKill(Players(killer));
+		    sc = Rate(Players(killer)->score, pl->score);
 		}
 	    }
 	    switch (obj->type) {
@@ -1493,7 +1492,7 @@ static void Player_collides_with_killing_shot(int ind, object *obj)
 		      (obj->id == NO_ID ? "" : pl->name));
 	    } else {
 		Score_players(killer, sc, pl->name,
-			      ind, -sc, Players[killer]->name);
+			      ind, -sc, Players(killer)->name);
 		Robot_war(ind, killer);
 	    }
 	    Set_message(msg);
@@ -1508,7 +1507,7 @@ static void Player_collides_with_killing_shot(int ind, object *obj)
 
 static void Player_pass_checkpoint(int ind)
 {
-    player	*pl = Players[ind];
+    player	*pl = Players(ind);
     int		j;
 
     if (pl->check == 0) {
@@ -1628,7 +1627,7 @@ static void AsteroidCollision(void)
 	    /* don't collide with phased balls */
 	    if (BIT(obj->type, OBJ_BALL)
 		&& obj->id != NO_ID
-		&& BIT(Players[GetInd[obj->id]]->used, HAS_PHASING_DEVICE))
+		&& BIT(Players(GetInd[obj->id])->used, HAS_PHASING_DEVICE))
 		continue;
 
 	    radius = ast->pl_radius + obj->pl_radius;
@@ -1753,7 +1752,7 @@ static void AsteroidCollision(void)
 					? BALL_PTR(obj)->owner
 					: obj->id);
 			int ind = GetInd[owner_id];
-			if (Players[ind]->score <= asteroidMaxScore) {
+			if (Players(ind)->score <= asteroidMaxScore) {
 			    SCORE(ind, asteroidPoints,
 				  ast->pos.cx, ast->pos.cy, "");
 			}
@@ -1793,7 +1792,7 @@ static void BallCollision(void)
 	if (ball->type != OBJ_BALL ||	/* not a ball */
 	    ball->life <= 0 ||		/* dying ball */
 	    (ball->id != NO_ID
-	     && BIT(Players[GetInd[ball->id]]->used, HAS_PHASING_DEVICE)) ||
+	     && BIT(Players(GetInd[ball->id])->used, HAS_PHASING_DEVICE)) ||
 					/* phased ball */
 	    World.treasures[ball->treasure].have) {
 					/* safe in a treasure */
@@ -1805,7 +1804,7 @@ static void BallCollision(void)
 	    && ballrace
 	    && ball->owner != NO_ID) {
 	    int owner_ind = GetInd[ball->owner];
-	    player *owner = Players[owner_ind];
+	    player *owner = Players(owner_ind);
 
 	    if (!ballrace_connect || ball->id == owner->id) {
 		if (Wrap_length(ball->pos.cx - World.check[owner->check].cx,
@@ -1894,7 +1893,8 @@ static void BallCollision(void)
 			break;
 		    }
 		    if (b2->id != NO_ID
-			&& BIT(Players[GetInd[b2->id]]->used, HAS_PHASING_DEVICE)) {
+			&& BIT(Players(GetInd[b2->id])->used,
+			       HAS_PHASING_DEVICE)) {
 			break;
 		    }
 		}

@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -48,7 +47,7 @@ char score_version[] = VERSION;
 
 void SCORE(int ind, DFLOAT points, int cx, int cy, const char *msg)
 {
-    player	*pl = Players[ind];
+    player	*pl = Players(ind);
 
     if (BIT(World.rules->mode, TEAM_PLAY)) {
 	if (!teamShareScore) {
@@ -79,8 +78,8 @@ void TEAM_SCORE(int team, DFLOAT points)
 	int i;
 	DFLOAT share = World.teams[team].score / World.teams[team].NumMembers;
 	for (i = 0; i < NumPlayers; i++) {
-	    if (Players[i]->team == team) {
-		Rank_SetScore(Players[i], share);
+	    if (Players(i)->team == team) {
+		Rank_SetScore(Players(i), share);
 	    }
 	}
     }
@@ -95,8 +94,8 @@ void Alliance_score(int id, DFLOAT points)
     DFLOAT	share = points / member_count;
 
     for (i = 0; i < NumPlayers; i++) {
-	if (Players[i]->alliance == id) {
-	    Rank_AddScore(Players[i], share);
+	if (Players(i)->alliance == id) {
+	    Rank_AddScore(Players(i), share);
 	}
     }
 }
@@ -132,18 +131,18 @@ void Score_players(int winner, DFLOAT winner_score, char *winner_msg,
 		   int loser, DFLOAT loser_score, char *loser_msg)
 {
     if (TEAM(winner, loser)
-	|| (Players[winner]->alliance != ALLIANCE_NOT_SET
-	    && Players[winner]->alliance == Players[loser]->alliance)
+	|| (Players(winner)->alliance != ALLIANCE_NOT_SET
+	    && Players(winner)->alliance == Players(loser)->alliance)
 	|| (IS_TANK_IND(loser)
-	    && GetInd[Players[loser]->lock.pl_id] == winner)) {
+	    && GetInd[Players(loser)->lock.pl_id] == winner)) {
 	if (winner_score > 0)
 	    winner_score = -winner_score;
 	if (loser_score > 0)
 	    loser_score = -loser_score;
     }
-    SCORE(winner, winner_score, Players[loser]->pos.cx, Players[loser]->pos.cy,
+    SCORE(winner, winner_score, Players(loser)->pos.cx, Players(loser)->pos.cy,
 	  winner_msg);
-    SCORE(loser, loser_score, Players[loser]->pos.cx, Players[loser]->pos.cy,
+    SCORE(loser, loser_score, Players(loser)->pos.cx, Players(loser)->pos.cy,
 	  loser_msg);
 }
 

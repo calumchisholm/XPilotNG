@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -58,7 +57,7 @@ char ship_version[] = VERSION;
 
 void Thrust(int ind)
 {
-    player		*pl = Players[ind];
+    player		*pl = Players(ind);
     const int		min_dir = (int)(pl->dir + RES/2 - RES*0.2 - 1);
     const int		max_dir = (int)(pl->dir + RES/2 + RES*0.2 + 1);
     const DFLOAT	max_speed = 1 + (pl->power * 0.14);
@@ -139,7 +138,7 @@ void Delta_mv(object *ship, object *obj)
 	&& obj->id != NO_ID
 	&& BIT(obj->status, COLLISIONSHOVE)) {
 	player *pl = (player *)ship;
-	player *pusher = Players[GetInd[obj->id]];
+	player *pusher = Players(GetInd[obj->id]);
 	if (pusher != pl) {
 	    Record_shove(pl, pusher, frame_loops);
 	}
@@ -176,7 +175,7 @@ void Delta_mv_elastic(object *obj1, object *obj2)
 	&& obj2->id != NO_ID
 	&& BIT(obj2->status, COLLISIONSHOVE)) {
 	player *pl = (player *)obj1;
-	player *pusher = Players[GetInd[obj2->id]];
+	player *pusher = Players(GetInd[obj2->id]);
 	if (pusher != pl) {
 	    Record_shove(pl, pusher, frame_loops);
 	}
@@ -212,7 +211,7 @@ void Obj_repel(object *obj1, object *obj2, int repel_dist)
 
     if (obj1->type == OBJ_PLAYER && obj2->id != NO_ID) {
 	player *pl = (player *)obj1;
-	player *pusher = Players[GetInd[obj2->id]];
+	player *pusher = Players(GetInd[obj2->id]);
 	if (pusher != pl) {
 	    Record_shove(pl, pusher, frame_loops);
 	}
@@ -220,7 +219,7 @@ void Obj_repel(object *obj1, object *obj2, int repel_dist)
 
     if (obj2->type == OBJ_PLAYER && obj1->id != NO_ID) {
 	player *pl = (player *)obj2;
-	player *pusher = Players[GetInd[obj1->id]];
+	player *pusher = Players(GetInd[obj1->id]);
 	if (pusher != pl) {
 	    Record_shove(pl, pusher, frame_loops);
 	}
@@ -361,7 +360,7 @@ void Tank_handle_detach(player *pl)
 
     Update_tanks(&(pl->fuel));
     /* Fork the current player */
-    dummy               = Players[NumPlayers];
+    dummy               = Players(NumPlayers);
     /*
      * MWAAH: this was ... naieve at least:
      * *dummy              = *pl;
@@ -417,7 +416,7 @@ void Tank_handle_detach(player *pl)
     dummy->updateVisibility = 1;
     for (i = 0; i <= NumPlayers; i++) {
 	dummy->visibility[i].lastChange = 0;
-	Players[i]->visibility[NumPlayers].lastChange = 0;
+	Players(i)->visibility[NumPlayers].lastChange = 0;
     }
 
     /* Remember whose tank this is */
@@ -448,7 +447,7 @@ void Tank_handle_detach(player *pl)
     for (i=0; i < NumObjs; i++) {
 	if (Obj[i]->type == OBJ_HEAT_SHOT
 	    && Obj[i]->info > 0
-	    && Players[ GetInd[Obj[i]->info] ] == pl) {
+	    && Players( GetInd[Obj[i]->info] ) == pl) {
 	    Obj[i]->info = NumPlayers - 1;
 	}
     }
@@ -457,17 +456,17 @@ void Tank_handle_detach(player *pl)
     Player_remove_tank(GetInd[pl->id], ct);
 
     for (i = 0; i < NumPlayers - 1; i++) {
-	if (Players[i]->conn != NOT_CONNECTED) {
-	    Send_player(Players[i]->conn, dummy->id);
-	    Send_score(Players[i]->conn, dummy->id,
+	if (Players(i)->conn != NOT_CONNECTED) {
+	    Send_player(Players(i)->conn, dummy->id);
+	    Send_score(Players(i)->conn, dummy->id,
 		       dummy->score, dummy->life,
 		       dummy->mychar, dummy->alliance);
 	}
     }
 
     for (i = 0; i < NumObservers - 1; i++) {
-	Send_player(Players[i + observerStart]->conn, dummy->id);
-	Send_score(Players[i + observerStart]->conn, dummy->id, dummy->score,
+	Send_player(Players(i + observerStart)->conn, dummy->id);
+	Send_score(Players(i + observerStart)->conn, dummy->id, dummy->score,
 		   dummy->life, dummy->mychar, dummy->alliance);
     }
 }
@@ -586,7 +585,7 @@ void Make_wreckage(
 /* Explode a fighter */
 void Explode_fighter(int ind)
 {
-    player *pl = Players[ind];
+    player *pl = Players(ind);
     int min_debris;
     DFLOAT debris_range;
 

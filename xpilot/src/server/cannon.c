@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -383,7 +382,7 @@ static void Cannon_aim(int ind, int weapon, int *target, int *dir)
     }
 
     for (i = 0; i < NumPlayers && !ready; i++) {
-	player *pl = Players[i];
+	player *pl = Players(i);
 	int tdist, tdx, tdy;
 
 	tdx = WRAP_DCX(pl->pos.cx - cx) / CLICK;
@@ -487,7 +486,7 @@ static void Cannon_aim(int ind, int weapon, int *target, int *dir)
 static void Cannon_fire(int ind, int weapon, int target, int dir)
 {
     cannon_t	*c = World.cannon + ind;
-    player	*pl = Players[target];
+    player	*pl = Players(target);
     int		cx = c->pos.cx;
     int		cy = c->pos.cy;
     modifiers	mods;
@@ -554,7 +553,7 @@ static void Cannon_fire(int ind, int weapon, int target, int dir)
 	    /* FALLTHROUGH */
 	case 1:
 	    if (allowHeatSeekers
-		&& BIT(Players[target]->status, THRUSTING)) {
+		&& BIT(Players(target)->status, THRUSTING)) {
 		Fire_general_shot(-1, c->team, 1, cx, cy, OBJ_HEAT_SHOT,
 				  dir, mods, target);
 		sound_play_sensors(cx, cy, FIRE_HEAT_SHOT_SOUND);

@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -108,7 +107,7 @@ static void Item_update_flags(player *pl)
 void Item_damage(int ind, DFLOAT prob)
 {
     if (prob < 1.0f) {
-	player		*pl = Players[ind];
+	player		*pl = Players(ind);
 	int		i;
 	DFLOAT		loss;
 
@@ -167,7 +166,7 @@ void Place_item(int item, int ind)
     int			cx, cy;
     DFLOAT		vx, vy;
     item_concentrator_t	*con;
-    player		*pl = (ind == -1 ? NULL : Players[ind]);
+    player		*pl = Players(ind);
 
     if (NumObjs >= MAX_TOTAL_SHOTS) {
 	if (pl && !BIT(pl->status, KILLED)) {
@@ -389,7 +388,7 @@ void Make_item(int cx, int cy,
 void Throw_items(int ind)
 {
     int			num_items_to_throw, remain, item;
-    player		*pl = (ind == -1 ? NULL : Players[ind]);
+    player		*pl = Players(ind);
 
     if (!dropItemOnKillProb || !pl)
 	return;
@@ -417,7 +416,7 @@ void Throw_items(int ind)
  */
 void Detonate_items(int ind)
 {
-    player		*pl = Players[ind];
+    player		*pl = Players(ind);
     int			i;
     modifiers		mods;
     int			owner_ind;
@@ -478,7 +477,7 @@ void Detonate_items(int ind)
 	     * mean a misfire.
 	     */
 	    SET_BIT(pl->lock.tagged, LOCK_PLAYER);
-	    pl->lock.pl_id = Players[(int)(rfrac() * NumPlayers)]->id;
+	    pl->lock.pl_id = Players((int)(rfrac() * NumPlayers))->id;
 
 	    switch ((int)(rfrac() * 3)) {
 	    case 0:	type = OBJ_TORPEDO;	break;
@@ -499,18 +498,18 @@ void Detonate_items(int ind)
 
 void Tractor_beam(int ind)
 {
-    player	*pl = Players[ind];
+    player	*pl = Players(ind);
     DFLOAT	maxdist, percent;
     long	cost;
 
     maxdist = TRACTOR_MAX_RANGE(pl->item[ITEM_TRACTOR_BEAM]);
     if (BIT(pl->lock.tagged, LOCK_PLAYER|LOCK_VISIBLE)
 	!= (LOCK_PLAYER|LOCK_VISIBLE)
-	|| BIT(Players[GetInd[pl->lock.pl_id]]->status,
+	|| BIT(Players(GetInd[pl->lock.pl_id])->status,
 	       PLAYING|PAUSE|KILLED|GAME_OVER) != PLAYING
 	|| pl->lock.distance >= maxdist
 	|| BIT(pl->used, HAS_PHASING_DEVICE)
-	|| BIT(Players[GetInd[pl->lock.pl_id]]->used, HAS_PHASING_DEVICE)) {
+	|| BIT(Players(GetInd[pl->lock.pl_id])->used, HAS_PHASING_DEVICE)) {
 	CLR_BIT(pl->used, HAS_TRACTOR_BEAM);
 	return;
     }
@@ -528,8 +527,8 @@ void Tractor_beam(int ind)
 void General_tractor_beam(int ind, int cx, int cy,
 			  int items, int target, bool pressor)
 {
-    player	*pl = (ind == -1 ? NULL : Players[ind]),
-		*victim = Players[target];
+    player	*pl = Players(ind),
+		*victim = Players(target);
     DFLOAT	maxdist = TRACTOR_MAX_RANGE(items),
 		maxforce = TRACTOR_MAX_FORCE(items),
 		percent, force, dist;
@@ -564,7 +563,7 @@ void General_tractor_beam(int ind, int cx, int cy,
 
 void Do_deflector(int ind)
 {
-    player	*pl = Players[ind];
+    player	*pl = Players(ind);
     DFLOAT	range = (pl->item[ITEM_DEFLECTOR] * 0.5 + 1) * BLOCK_CLICKS;
     DFLOAT	maxforce = pl->item[ITEM_DEFLECTOR] * 0.2;
     object	*obj, **obj_list;
@@ -633,7 +632,7 @@ void Do_deflector(int ind)
 
 void Do_transporter(int ind)
 {
-    player	*pl = Players[ind], *p;
+    player	*pl = Players(ind), *p;
     int		i, target = -1;
     DFLOAT	dist, closest = TRANSPORTER_DISTANCE * CLICK;
 
@@ -645,7 +644,7 @@ void Do_transporter(int ind)
 
     /* find victim */
     for (i = 0; i < NumPlayers; i++) {
-	p = Players[i];
+	p = Players(i);
 	if (p == pl
 	    || BIT(p->status, PLAYING|PAUSE|GAME_OVER) != PLAYING
 	    || Team_immune(pl->id, p->id)
@@ -674,8 +673,8 @@ void Do_transporter(int ind)
 void Do_general_transporter(int ind, int cx, int cy, int target,
 			    int *itemp, long *amountp)
 {
-    player		*pl = (ind == -1 ? NULL : Players[ind]),
-			*victim = Players[target];
+    player		*pl = Players(ind),
+			*victim = Players(target);
     char		msg[MSG_LEN];
     const char		*what = NULL;
     int			i;
@@ -934,7 +933,7 @@ void do_hyperjump(player *pl)
 void do_lose_item(int ind)
 {
     int		item;
-    player	*pl = (ind == -1 ? NULL : Players[ind]);
+    player	*pl = Players(ind);
 
     if (!pl)
 	return;
@@ -970,7 +969,7 @@ void Fire_general_ecm(int ind, unsigned short team, int cx, int cy)
     DFLOAT		closest_mine_range = World.hypotenuse;
     int			i, j, owner;
     DFLOAT		range, perim, damage;
-    player		*pl = (ind == -1 ? NULL : Players[ind]), *p;
+    player		*pl = Players(ind), *p;
     ecm_t		*ecm;
 
     if (NumEcms >= MAX_TOTAL_ECMS) {
@@ -1047,7 +1046,7 @@ void Fire_general_ecm(int ind, unsigned short team, int cx, int cy)
 		&& pl->visibility[GetInd[pl->lock.pl_id]].canSee)
 		smart->new_info = pl->lock.pl_id;
 	    else
-		smart->new_info = Players[(int)(rfrac() * NumPlayers)]->id;
+		smart->new_info = Players((int)(rfrac() * NumPlayers))->id;
 	    /* Can't redirect missiles to team mates. */
 	    /* So let the missile keep on following this unlucky player. */
 	    /*-BA Why not redirect missiles to team mates?
@@ -1134,7 +1133,7 @@ void Fire_general_ecm(int ind, unsigned short team, int cx, int cy)
 	if (i == ind)
 	    continue;
 
-	p = Players[i];
+	p = Players(i);
 	/*
 	 * Team members are always immune from ECM effects from other
 	 * team members.  Its too nasty otherwise.
@@ -1214,8 +1213,8 @@ void Fire_general_ecm(int ind, unsigned short team, int cx, int cy)
 		     */
 		    Robot_program(i, pl->lock.pl_id);
 		    for (j = 0; j < NumPlayers; j++) {
-			if (Players[j]->conn != NOT_CONNECTED) {
-			    Send_seek(Players[j]->conn, pl->id,
+			if (Players(j)->conn != NOT_CONNECTED) {
+			    Send_seek(Players(j)->conn, pl->id,
 				      p->id, pl->lock.pl_id);
 			}
 		    }
@@ -1227,7 +1226,7 @@ void Fire_general_ecm(int ind, unsigned short team, int cx, int cy)
 
 void Fire_ecm(int ind)
 {
-    player		*pl = Players[ind];
+    player		*pl = Players(ind);
 
     if (pl->item[ITEM_ECM] == 0
 	|| pl->fuel.sum <= -ED_ECM

@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -737,7 +736,7 @@ static void Robot_create(void)
     }
     for (i = 0; i < NumPlayers; i++) {
 	if (IS_ROBOT_IND(i)) {
-	    data = (robot_data_t *)Players[i]->robot_data_ptr;
+	    data = (robot_data_t *)Players(i)->robot_data_ptr;
 	    if (Robots[data->robots_ind].used < Robots[most_used].used) {
 		Robots[data->robots_ind].used = Robots[most_used].used;
 	    }
@@ -769,7 +768,7 @@ static void Robot_create(void)
     Init_player(NumPlayers, (allowShipShapes)
 			    ? Parse_shape_str(rob->shape)
 			    : (shipobj *)NULL);
-    robot = Players[NumPlayers];
+    robot = Players(NumPlayers);
     SET_BIT(robot->type_ext, OBJ_EXT_ROBOT);
     robot->robot_data_ptr = new_data;
 
@@ -816,9 +815,9 @@ static void Robot_create(void)
     }
 
     for (i = 0; i < NumPlayers - 1; i++) {
-	if (Players[i]->conn != NOT_CONNECTED) {
-	    Send_player(Players[i]->conn, robot->id);
-	    Send_base(Players[i]->conn, robot->id, robot->home_base);
+	if (Players(i)->conn != NOT_CONNECTED) {
+	    Send_player(Players(i)->conn, robot->id);
+	    Send_base(Players(i)->conn, robot->id, robot->home_base);
 	}
     }
 
@@ -850,11 +849,11 @@ static void Robot_create(void)
 
 void Robot_destroy(int ind)
 {
-    player		*pl = Players[ind];
+    player		*pl = Players(ind);
 
     (*robot_types[pl->robot_data_ptr->robot_types_ind].destroy)(ind);
-    free(Players[ind]->robot_data_ptr);
-    Players[ind]->robot_data_ptr = NULL;
+    free(Players(ind)->robot_data_ptr);
+    Players(ind)->robot_data_ptr = NULL;
 }
 
 
@@ -874,9 +873,9 @@ void Robot_delete(int ind, int kicked)
 	    if (!IS_ROBOT_IND(i))
 		continue;
 
-	    if (Players[i]->score < low_score) {
+	    if (Players(i)->score < low_score) {
 		low_i = i;
-		low_score = Players[i]->score;
+		low_score = Players(i)->score;
 	    }
 	}
 	if (low_i >= 0) {
@@ -887,7 +886,7 @@ void Robot_delete(int ind, int kicked)
     if (ind >= 0) {
 	if (kicked) {
 	    sprintf(msg, "\"%s\" upset the gods and was kicked out "
-		    "of the game.", Players[ind]->name);
+		    "of the game.", Players(ind)->name);
 	    Set_message(msg);
 	}
 	Delete_player(ind);
@@ -899,7 +898,7 @@ void Robot_delete(int ind, int kicked)
  */
 void Robot_invite(int ind, int inv_ind)
 {
-    player	*pl = Players[ind];
+    player	*pl = Players(ind);
 
     (*robot_types[pl->robot_data_ptr->robot_types_ind].invite)(ind, inv_ind);
 }
@@ -909,7 +908,7 @@ void Robot_invite(int ind, int inv_ind)
  */
 static void Robot_set_war(int ind, int victim_id)
 {
-    player		*pl = Players[ind];
+    player		*pl = Players(ind);
 
     (*robot_types[pl->robot_data_ptr->robot_types_ind].set_war)(ind, victim_id);
 }
@@ -941,7 +940,7 @@ void Robot_program(int ind, int victim_id)
  */
 int Robot_war_on_player(int ind)
 {
-    player		*pl = Players[ind];
+    player		*pl = Players(ind);
     robot_type_t	*rob_type =
 			    &robot_types[pl->robot_data_ptr->robot_types_ind];
 
@@ -957,8 +956,8 @@ int Robot_war_on_player(int ind)
  */
 void Robot_war(int ind, int killer)
 {
-    player		*pl = Players[ind],
-			*kp = Players[killer];
+    player		*pl = Players(ind),
+			*kp = Players(killer);
     int			i;
 
     if (killer == ind) {
@@ -970,8 +969,8 @@ void Robot_war(int ind, int killer)
 
 	if (Robot_war_on_player(killer) == pl->id)
 	    for (i = 0; i < NumPlayers; i++) {
-		if (Players[i]->conn != NOT_CONNECTED) {
-		    Send_war(Players[i]->conn, kp->id, NO_ID);
+		if (Players(i)->conn != NOT_CONNECTED) {
+		    Send_war(Players(i)->conn, kp->id, NO_ID);
 		}
 	    }
 	Robot_set_war(killer, -1);
@@ -992,8 +991,8 @@ void Robot_war(int ind, int killer)
 
 	if (Robot_war_on_player(ind) != kp->id) {
 	    for (i = 0; i < NumPlayers; i++) {
-		if (Players[i]->conn != NOT_CONNECTED) {
-		    Send_war(Players[i]->conn, pl->id, kp->id);
+		if (Players(i)->conn != NOT_CONNECTED) {
+		    Send_war(Players(i)->conn, pl->id, kp->id);
 		}
 	    }
 	    sound_play_all(DECLARE_WAR_SOUND);
@@ -1008,7 +1007,7 @@ void Robot_war(int ind, int killer)
  */
 void Robot_go_home(int ind)
 {
-    (*robot_types[Players[ind]->robot_data_ptr->robot_types_ind].go_home)(ind);
+    (*robot_types[Players(ind)->robot_data_ptr->robot_types_ind].go_home)(ind);
 }
 
 
@@ -1018,7 +1017,7 @@ void Robot_go_home(int ind)
  */
 void Robot_message(int ind, const char *message)
 {
-    player		*pl = Players[ind];
+    player		*pl = Players(ind);
     robot_type_t	*rob_type =
 			    &robot_types[pl->robot_data_ptr->robot_types_ind];
 
@@ -1031,7 +1030,7 @@ void Robot_message(int ind, const char *message)
  */
 static void Robot_play(int ind)
 {
-    (*robot_types[Players[ind]->robot_data_ptr->robot_types_ind].play)(ind);
+    (*robot_types[Players(ind)->robot_data_ptr->robot_types_ind].play)(ind);
 }
 
 
@@ -1042,7 +1041,7 @@ static void Robot_play(int ind)
  */
 static int Robot_check_leave(int ind)
 {
-    player		*pl = Players[ind];
+    player		*pl = Players(ind);
     char		msg[MSG_LEN];
 
     if (robotsLeave
@@ -1090,7 +1089,7 @@ static void Robot_round_tick(void)
  */
 static void Tank_play(int ind)
 {
-    player		*pl = Players[ind];
+    player		*pl = Players(ind);
     int			t = frame_loops % (TANK_NOTHRUST_TIME + TANK_THRUST_TIME);
 
     if (t == 0) {
@@ -1144,7 +1143,7 @@ void Robot_update(void)
     Robot_round_tick();
 
     for (i = 0; i < NumPlayers; i++) {
-	pl = Players[i];
+	pl = Players(i);
 
 	if (IS_TANK_PTR(pl)) {
 	    Tank_play(i);

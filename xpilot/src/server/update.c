@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -85,7 +84,7 @@ static void Transport_to_home(int ind)
      * acceleration G, during the second part we make this a negative one -G.
      * This results in a visually pleasing take off and landing.
      */
-    player		*pl = Players[ind];
+    player		*pl = Players(ind);
     int			cx, cy;
     DFLOAT		dx, dy, t, m;
     const int		T = RECOVERY_DELAY;
@@ -121,7 +120,7 @@ static void Transport_to_home(int ind)
  */
 void Phasing(int ind, int on)
 {
-    player	*pl = Players[ind];
+    player	*pl = Players(ind);
 
     if (on) {
 	if (pl->phasing_left <= 0) {
@@ -160,7 +159,7 @@ void Phasing(int ind, int on)
  */
 void Cloak(int ind, int on)
 {
-    player	*pl = Players[ind];
+    player	*pl = Players(ind);
 
     if (on) {
 	if (!BIT(pl->used, HAS_CLOAKING_DEVICE) && pl->item[ITEM_CLOAK] > 0) {
@@ -202,7 +201,7 @@ void Cloak(int ind, int on)
  */
 void Deflector(int ind, int on)
 {
-    player	*pl = Players[ind];
+    player	*pl = Players(ind);
 
     if (on) {
 	if (!BIT(pl->used, HAS_DEFLECTOR) && pl->item[ITEM_DEFLECTOR] > 0) {
@@ -226,7 +225,7 @@ void Deflector(int ind, int on)
  */
 void Emergency_thrust (int ind, int on)
 {
-    player	*pl = Players[ind];
+    player	*pl = Players(ind);
 
     if (on) {
 	if (pl->emergency_thrust_left <= 0) {
@@ -254,7 +253,7 @@ void Emergency_thrust (int ind, int on)
  */
 void Emergency_shield (int ind, int on)
 {
-    player	*pl = Players[ind];
+    player	*pl = Players(ind);
 
     if (on) {
 	if (BIT(pl->have, HAS_EMERGENCY_SHIELD)) {
@@ -295,7 +294,7 @@ void Emergency_shield (int ind, int on)
  */
 void Autopilot (int ind, int on)
 {
-    player	*pl = Players[ind];
+    player	*pl = Players(ind);
 
     CLR_BIT(pl->status, THRUSTING);
     if (on) {
@@ -595,10 +594,10 @@ static void Cannon_update(void)
 	if (cannon->tractor_count > 0) {
 	    int ind = GetInd[cannon->tractor_target];
 
-	    if ((Wrap_length(Players[ind]->pos.cx - cannon->pos.cx,
-			    Players[ind]->pos.cy - cannon->pos.cy)
+	    if ((Wrap_length(Players(ind)->pos.cx - cannon->pos.cx,
+			    Players(ind)->pos.cy - cannon->pos.cy)
 		 < TRACTOR_MAX_RANGE(cannon->item[ITEM_TRACTOR_BEAM]) * CLICK)
-		&& BIT(Players[ind]->status, PLAYING|GAME_OVER|KILLED|PAUSE)
+		&& BIT(Players(ind)->status, PLAYING|GAME_OVER|KILLED|PAUSE)
 		   == PLAYING) {
 		General_tractor_beam(-1, cannon->pos.cx, cannon->pos.cy,
 				     cannon->item[ITEM_TRACTOR_BEAM], ind,
@@ -675,7 +674,7 @@ static void Player_turns(void)
     player *pl;
 
     for (i = 0; i < NumPlayers; i++) {
-	pl = Players[i];
+	pl = Players(i);
 
 	if (BIT(pl->status, PLAYING|GAME_OVER|PAUSE) != PLAYING)
 	    continue;
@@ -711,7 +710,7 @@ static void Player_turns(void)
 
 static void Use_items(int i)
 {
-    player *pl = Players[i];
+    player *pl = Players(i);
 
     if (pl->shield_time > 0) {
 	if ((pl->shield_time -= timeStep) <= 0) {
@@ -815,7 +814,7 @@ void Update_objects(void)
 	Player_turns();
 
     for (i = 0; i < NumPlayers; i++) {
-	pl = Players[i];
+	pl = Players(i);
 
 	if (pl->stunned > 0) {
 	    pl->stunned -= timeStep;
@@ -862,7 +861,7 @@ void Update_objects(void)
     for (i = 0; i < NumEcms; i++) {
 	if ((Ecms[i]->size *= ecmSizeFactor) < 1.0) {
 	    if (Ecms[i]->id != NO_ID)
-		Players[GetInd[Ecms[i]->id]]->ecmcount--;
+		Players(GetInd[Ecms[i]->id])->ecmcount--;
 	    free(Ecms[i]);
 	    --NumEcms;
 	    Ecms[i] = Ecms[NumEcms];
@@ -894,7 +893,7 @@ void Update_objects(void)
      *
      */
     for (i = 0; i < NumPlayers; i++) {
-	pl = Players[i];
+	pl = Players(i);
 
 	if ((pl->damaged -= timeStep) <= 0)
 	    pl->damaged = 0;
@@ -940,12 +939,12 @@ void Update_objects(void)
 			if (!game_lock && Team_zero_pausing_available()) {
 			    sprintf(msg,
 				    "%s was pause-swapped because of idling.",
-				    Players[i]->name);
-			    Handle_player_command(Players[i], "team 0");
+				    Players(i)->name);
+			    Handle_player_command(Players(i), "team 0");
 			} else {
 			    Pause_player(i, 1);
 			    sprintf(msg, "%s was paused for idling.",
-				    Players[i]->name);
+				    Players(i)->name);
 			}
 			Set_message(msg);
 			continue;
@@ -982,19 +981,19 @@ void Update_objects(void)
 
 	for (j = 0; j < NumPlayers; j++) {
 	    if (pl->forceVisible > 0)
-		Players[j]->visibility[i].canSee = 1;
+		Players(j)->visibility[i].canSee = 1;
 
-	    if (i == j || !BIT(Players[j]->used, HAS_CLOAKING_DEVICE))
+	    if (i == j || !BIT(Players(j)->used, HAS_CLOAKING_DEVICE))
 		pl->visibility[j].canSee = 1;
 	    else if (pl->updateVisibility
-		     || Players[j]->updateVisibility
+		     || Players(j)->updateVisibility
 		     || (int)(rfrac() * UPDATE_RATE)
 		     < ABS(frame_loops - pl->visibility[j].lastChange)) {
 
 		pl->visibility[j].lastChange = frame_loops;
 		pl->visibility[j].canSee
 		    = (rfrac() * (pl->item[ITEM_SENSOR] + 1))
-		    > (rfrac() * (Players[j]->item[ITEM_CLOAK] + 1));
+		    > (rfrac() * (Players(j)->item[ITEM_CLOAK] + 1));
 	    }
 	}
 
@@ -1315,7 +1314,7 @@ void Update_objects(void)
 
 
     for (i = 0; i < NumPlayers; i++) {
-	player *pl = Players[i];
+	player *pl = Players(i);
 
 	pl->updateVisibility = 0;
 
@@ -1333,9 +1332,9 @@ void Update_objects(void)
 	if (BIT(pl->lock.tagged, LOCK_PLAYER)) {
 	    pl->lock.distance =
 		Wrap_length(pl->pos.cx
-			    - Players[GetInd[pl->lock.pl_id]]->pos.cx,
+			    - Players(GetInd[pl->lock.pl_id])->pos.cx,
 			    pl->pos.cy
-			    - Players[GetInd[pl->lock.pl_id]]->pos.cy) / CLICK;
+			    - Players(GetInd[pl->lock.pl_id])->pos.cy) / CLICK;
 	}
     }
 
@@ -1349,7 +1348,7 @@ void Update_objects(void)
      * Update tanks, Kill players that ought to be killed.
      */
     for (i = NumPlayers - 1; i >= 0; i--) {
-	player *pl = Players[i];
+	player *pl = Players(i);
 
 	if (BIT(pl->status, PLAYING|PAUSE|GAME_OVER|KILLED) == PLAYING)
 	    Update_tanks(&(pl->fuel));
@@ -1365,12 +1364,12 @@ void Update_objects(void)
 		    if ((NumPlayers - NumRobots - NumPseudoPlayers) > 1) {
 			if (!game_lock && Team_zero_pausing_available()) {
 			    sprintf(msg, "%s was pause-swapped because of "
-				    "idling.", Players[i]->name);
-			    Handle_player_command(Players[i], "team 0");
+				    "idling.", Players(i)->name);
+			    Handle_player_command(Players(i), "team 0");
 			} else {
 			    Pause_player(i, 1);
 			    sprintf(msg, "%s was paused for idling.",
-				    Players[i]->name);
+				    Players(i)->name);
 	    		}
 			Set_message(msg);
 		    }
@@ -1387,7 +1386,7 @@ void Update_objects(void)
 		    "%s was auto-kicked for pausing too long [*Server notice*]",
 		    pl->name);
 	    Set_message(msg);
-	    Destroy_connection(Players[i]->conn,
+	    Destroy_connection(Players(i)->conn,
 			       "auto-kicked: paused too long");
 	}
     }

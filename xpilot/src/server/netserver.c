@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -678,25 +677,25 @@ void Destroy_connection(int ind, const char *reason)
     if (connp->id != NO_ID) {
 	id = connp->id;
 	connp->id = NO_ID;
-	Players[GetInd[id]]->conn = NOT_CONNECTED;
-	if (Players[GetInd[id]]->rectype != 2)
+	Players(GetInd[id])->conn = NOT_CONNECTED;
+	if (Players(GetInd[id])->rectype != 2)
 	    Delete_player(GetInd[id]);
 	else {
 	    int i, ind = GetInd[id];
 	    player *pl;
 
 	    NumObservers--;
-	    pl = Players[observerStart + NumObservers]; /* Swap leaver last */
-	    Players[observerStart + NumObservers] = Players[ind];
-	    Players[ind] = pl;
-	    pl = Players[observerStart + NumObservers];
+	    pl = Players(observerStart + NumObservers); /* Swap leaver last */
+	    PlayersArray[observerStart + NumObservers] = Players(ind);
+	    PlayersArray[ind] = pl;
+	    pl = Players(observerStart + NumObservers);
 
-	    GetInd[Players[ind]->id] = ind;
+	    GetInd[Players(ind)->id] = ind;
 	    GetInd[pl->id] = observerStart + NumObservers;
 
 	    Free_ship_shape(pl->ship);
 	    for (i = NumObservers - 1; i >= 0; i--)
-		Send_leave(Players[i + observerStart]->conn, id);
+		Send_leave(Players(i + observerStart)->conn, id);
 	}
     }
     if (connp->real != NULL) {
@@ -1323,7 +1322,7 @@ static int Handle_login(int ind, char *errmsg, int errsize)
 	connp->team = TEAM_NOT_SET;
     }
     for (i = 0; i < NumPlayers; i++) {
-	if (strcasecmp(Players[i]->name, connp->nick) == 0) {
+	if (strcasecmp(Players(i)->name, connp->nick) == 0) {
 	    errno = 0;
 	    error("Name already in use %s", connp->nick);
 	    strlcpy(errmsg, "Name already in use", errsize);
@@ -1335,7 +1334,7 @@ static int Handle_login(int ind, char *errmsg, int errsize)
 	strlcpy(errmsg, "Init_player failed: no free ID", errsize);
 	return -1;
     }
-    pl = Players[NumPlayers];
+    pl = Players(NumPlayers);
 #else
     r = PASSWD_OK;
     if (allowPlayerPasswords)
@@ -1364,7 +1363,7 @@ static int Handle_login(int ind, char *errmsg, int errsize)
 		return -1;
 	    }
 	    for (i = NumPlayers; i--;)
-		if (!strcasecmp(Players[i]->name, connp->nick))
+		if (!strcasecmp(Players(i)->name, connp->nick))
 		    break;
 	    if (i == -1)
 		break;
@@ -1375,11 +1374,11 @@ static int Handle_login(int ind, char *errmsg, int errsize)
 	    strlcpy(errmsg, "Init_player failed: no free ID", errsize);
 	    return -1;
 	}
-	pl = Players[NumPlayers];
+	pl = Players(NumPlayers);
     } else {
 	if (!Init_player(observerStart + NumObservers, connp->ship))
 	    return -1;
-	pl = Players[observerStart + NumObservers];
+	pl = Players(observerStart + NumObservers);
     }
     pl->rectype = connp->rectype;
 #endif
@@ -1467,11 +1466,11 @@ static int Handle_login(int ind, char *errmsg, int errsize)
 	    else
 		i = observerStart;
 	}
-	Send_player(pl->conn, Players[i]->id);
-	Send_score(pl->conn, Players[i]->id, Players[i]->score,
-		   Players[i]->life, Players[i]->mychar, Players[i]->alliance);
+	Send_player(pl->conn, Players(i)->id);
+	Send_score(pl->conn, Players(i)->id, Players(i)->score,
+		   Players(i)->life, Players(i)->mychar, Players(i)->alliance);
 	if (!IS_TANK_IND(i)) {
-	    Send_base(pl->conn, Players[i]->id, Players[i]->home_base);
+	    Send_base(pl->conn, Players(i)->id, Players(i)->home_base);
 	}
     }
     /*
@@ -1496,20 +1495,20 @@ static int Handle_login(int ind, char *errmsg, int errsize)
 		i = observerStart;
 	    }
 	}
-	if (Players[i]->rectype == 1 && pl->rectype == 2)
+	if (Players(i)->rectype == 1 && pl->rectype == 2)
 	    continue;
-	if (Players[i]->conn != NOT_CONNECTED) {
-	    Send_player(Players[i]->conn, pl->id);
-	    Send_score(Players[i]->conn, pl->id, pl->score,
+	if (Players(i)->conn != NOT_CONNECTED) {
+	    Send_player(Players(i)->conn, pl->id);
+	    Send_score(Players(i)->conn, pl->id, pl->score,
 		       pl->life, pl->mychar, pl->alliance);
-	    Send_base(Players[i]->conn, pl->id, pl->home_base);
+	    Send_base(Players(i)->conn, pl->id, pl->home_base);
 	}
 	/*
 	 * And tell him about the relationships others have with eachother.
 	 */
 	else if (IS_ROBOT_IND(i)) {
 	    if ((war_on_id = Robot_war_on_player(i)) != NO_ID) {
-		Send_war(pl->conn, Players[i]->id, war_on_id);
+		Send_war(pl->conn, Players(i)->id, war_on_id);
 	    }
 	}
     }
@@ -1651,8 +1650,8 @@ static int Handle_login(int ind, char *errmsg, int errsize)
 
     /* idle */
     for (i = 0; i < NumPlayers; i++)
-	if (Players[i]->mychar == ' ')
-	    Players[i]->idleCount = 0;
+	if (Players(i)->mychar == ' ')
+	    Players(i)->idleCount = 0;
 
     return 0;
 }
@@ -2033,7 +2032,7 @@ int Send_seek(int ind, int programmer_id, int robot_id, int sought_id)
 int Send_player(int ind, int id)
 {
     connection_t	*connp = &Conn[ind];
-    player		*pl = Players[GetInd[id]];
+    player		*pl = Players(GetInd[id]);
     int			n;
     char		buf[MSG_LEN], ext[MSG_LEN];
     int			sbuf_len = connp->c.len;
@@ -2096,7 +2095,7 @@ int Send_score(int ind, int id, DFLOAT score,
 	    if (announceAlliances) {
 		allchar = alliance + '0';
 	    } else {
-		if (Players[GetInd[connp->id]]->alliance == alliance)
+		if (Players(GetInd[connp->id])->alliance == alliance)
 		    allchar = '+';
 	    }
 	}
@@ -2616,10 +2615,10 @@ static int Receive_keyboard(int ind)
     }
     else {
 	connp->last_key_change = change;
-	pl = Players[GetInd[connp->id]];
+	pl = Players(GetInd[connp->id]);
 	memcpy(pl->last_keyv, connp->r.ptr, size);
 	connp->r.ptr += size;
-	Players[GetInd[connp->id]]->idleCount = 0; /* idle */
+	Players(GetInd[connp->id])->idleCount = 0; /* idle */
 	Handle_keyboard(GetInd[connp->id]);
     }
     if (connp->num_keyboard_updates++ && (connp->state & CONN_PLAYING)) {
@@ -2699,7 +2698,7 @@ static int Receive_power(int ind)
 	return n;
     }
     power = (DFLOAT) tmp / 256.0F;
-    pl = Players[GetInd[connp->id]];
+    pl = Players(GetInd[connp->id]);
     autopilot = BIT(pl->used, HAS_AUTOPILOT);
 
     switch (ch) {
@@ -3108,7 +3107,7 @@ static int Receive_ack_target(int ind)
 static void Handle_talk(int ind, char *str)
 {
     connection_t	*connp = &Conn[ind];
-    player		*pl = Players[GetInd[connp->id]];
+    player		*pl = Players(GetInd[connp->id]);
     int			i, sent, team;
     unsigned int	len;
     char		*cp,
@@ -3126,8 +3125,8 @@ static void Handle_talk(int ind, char *str)
 	} else {
 	    sprintf(msg + strlen(msg), ":[zero]");
 	    for (sent = i = 0; i < NumPlayers; i++) {
-		if (Players[i]->team == 0)
-		    Set_player_message (Players[i], msg);
+		if (Players(i)->team == 0)
+		    Set_player_message (Players(i), msg);
 	    }
 	}
 	return;
@@ -3142,9 +3141,9 @@ static void Handle_talk(int ind, char *str)
 	sent = 0;
 	if (!(teamZeroPausing && mute_zero && pl->team == 0 && team != 0)) {
 	    for (i = 0; i < NumPlayers; i++) {
-		if (Players[i]->team == team) {
+		if (Players(i)->team == team) {
 		    sent++;
-		    Set_player_message (Players[i], msg);
+		    Set_player_message (Players(i), msg);
 		}
 	    }
 	}
@@ -3169,7 +3168,7 @@ static void Handle_talk(int ind, char *str)
 #if 0
 	/* first look for an exact match on player nickname. */
 	for (i = 0; i < NumPlayers; i++) {
-	    if (strcasecmp(Players[i]->name, str) == 0) {
+	    if (strcasecmp(Players(i)->name, str) == 0) {
 		sent = i;
 		break;
 	    }
@@ -3177,8 +3176,8 @@ static void Handle_talk(int ind, char *str)
 	if (sent == -1) {
 	    /* now look for a partial match on both nick and realname. */
 	    for (sent = -1, i = 0; i < NumPlayers; i++) {
-		if (strncasecmp(Players[i]->name, str, len) == 0
-		    || strncasecmp(Players[i]->realname, str, len) == 0)
+		if (strncasecmp(Players(i)->name, str, len) == 0
+		    || strncasecmp(Players(i)->realname, str, len) == 0)
 		    sent = (sent == -1) ? i : -2;
 	    }
 	}
@@ -3198,11 +3197,11 @@ static void Handle_talk(int ind, char *str)
 	    Set_player_message(pl, msg);
 	    break;
 	default:
-	    if (Players[sent] != pl) {
+	    if (Players(sent) != pl) {
 		if (!(teamZeroPausing && mute_zero
-		      && pl->team == 0 && Players[sent]->team != 0)) {
-		    sprintf(msg + strlen(msg), ":[%s]", Players[sent]->name);
-		    Set_player_message(Players[sent], msg);
+		      && pl->team == 0 && Players(sent)->team != 0)) {
+		    sprintf(msg + strlen(msg), ":[%s]", Players(sent)->name);
+		    Set_player_message(Players(sent), msg);
 		} else {
 		    sprintf(msg,
 			    "You may not send messages to active players!");
@@ -3237,7 +3236,7 @@ static int Receive_talk(int ind)
 	}
 	connp->talk_sequence_num = seq;
 	if (*str == '/') {
-	    Handle_player_command(Players[GetInd[connp->id]], str + 1);
+	    Handle_player_command(Players(GetInd[connp->id]), str + 1);
 	}
 	else {
 	    Handle_talk(ind, str);
@@ -3312,7 +3311,7 @@ static int Receive_modifier_bank(int ind)
 	}
 	return n;
     }
-    pl = Players[GetInd[connp->id]];
+    pl = Players(GetInd[connp->id]);
     if (bank < NUM_MODBANKS) {
 	CLEAR_MODS(mods);
 	if (BIT(World.rules->mode, ALLOW_MODIFIERS)) {
@@ -3398,7 +3397,7 @@ int Get_conn_version(int ind)
 const char *Get_player_addr(int ind)
 {
     /*connection_t	*connp = &Conn[ind];*/
-    connection_t	*connp = &Conn[Players[ind]->conn];
+    connection_t	*connp = &Conn[Players(ind)->conn];
 
     return connp->addr;
 }
@@ -3605,7 +3604,7 @@ static int Receive_pointer_move(int ind)
 	}
 	return n;
     }
-    pl = Players[GetInd[connp->id]];
+    pl = Players(GetInd[connp->id]);
     if (BIT(pl->status, HOVERPAUSE))
 	return 1;
 
@@ -3654,7 +3653,7 @@ static int Receive_fps_request(int ind)
 	return n;
     }
     if (connp->id != NO_ID) {
-	pl = Players[GetInd[connp->id]];
+	pl = Players(GetInd[connp->id]);
 	if (fps == 0)
 	    fps = 1;
 	if ((fps == 20) && ignore20MaxFPS)
@@ -3680,7 +3679,7 @@ static int Receive_audio_request(int ind)
 	return n;
     }
     if (connp->id != NO_ID) {
-	pl = Players[GetInd[connp->id]];
+	pl = Players(GetInd[connp->id]);
 	sound_player_onoff(pl, onoff);
     }
 

@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -60,14 +59,14 @@ char laser_version[] = VERSION;
 void Laser_pulse_hits_player(int ind, pulseobject *pulse)
 {
     player		*pl;
-    player		*vicpl = Players[ind];
+    player		*vicpl = Players(ind);
     int			killer;
     DFLOAT		sc;
     char		msg[MSG_LEN];
 
     if (pulse->id != NO_ID) {
 	killer = GetInd[pulse->id];
-	pl = Players[killer];
+	pl = Players(killer);
     } else {
 	killer = -1;
 	pl = NULL;

@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -89,7 +88,7 @@ int			NumAlliances = 0;
 int			NumObservers = 0;
 int			NumOperators = 0;
 int			observerStart;
-player			**Players;
+player			**PlayersArray;
 int			GetInd[NUM_IDS + MAX_OBSERVERS + 1];
 server			Server;
 char			*serverAddr;
@@ -364,7 +363,7 @@ int End_game(void)
     }
 
     while (NumPlayers > 0) {	/* Kick out all remaining players */
-	pl = Players[NumPlayers - 1];
+	pl = Players(NumPlayers - 1);
 	if (pl->conn == NOT_CONNECTED) {
 	    Delete_player(NumPlayers - 1);
 	} else {
@@ -374,7 +373,7 @@ int End_game(void)
 
     record = playback = 0;
     while (NumObservers > 0) {
-	pl = Players[observerStart + NumObservers - 1];
+	pl = Players(observerStart + NumObservers - 1);
 	Destroy_connection(pl->conn, msg);
     }
     record = rrecord;
@@ -466,7 +465,7 @@ int Pick_team(int pick_for_type)
      * And calculate the score for each team.
      */
     for (i = 0; i < NumPlayers; i++) {
-	pl = Players[i];
+	pl = Players(i);
 	if (IS_TANK_PTR(pl)) {
 	    continue;
 	}
@@ -600,7 +599,7 @@ void Server_info(char *str, unsigned max_size)
 	return;
     }
     for (i = 0; i < NumPlayers; i++) {
-	pl = Players[i];
+	pl = Players(i);
 	if (BIT(World.rules->mode, LIMITED_LIVES)) {
 	    ratio = (DFLOAT) pl->score;
 	} else {
@@ -627,7 +626,8 @@ void Server_info(char *str, unsigned max_size)
 	strlcpy(name, pl->name, MAX_CHARS);
 	if (IS_ROBOT_PTR(pl)) {
 	    if ((k = Robot_war_on_player(GetInd[pl->id])) != NO_ID) {
-		sprintf(name + strlen(name), " (%s)", Players[GetInd[k]]->name);
+		sprintf(name + strlen(name), " (%s)",
+			Players(GetInd[k])->name);
 		if (strlen(name) >= 19) {
 		    strcpy(&name[17], ")");
 		}
@@ -742,11 +742,11 @@ void Game_Over(void)
 	for (i=0; i < NumPlayers; i++) {
 	    int team;
 	    if (IS_HUMAN_IND(i)) {
-		team = Players[i]->team;
+		team = Players(i)->team;
 		if (teamscore[team] == 1234567) {
 		    teamscore[team] = 0;
 		}
-		teamscore[team] += Players[i]->score;
+		teamscore[team] += Players(i)->score;
 	    }
 	}
 
@@ -781,25 +781,25 @@ void Game_Over(void)
     win = lose = -1;
 
     for (i = 0; i < NumPlayers; i++) {
-	SET_BIT(Players[i]->status, GAME_OVER);
+	SET_BIT(Players(i)->status, GAME_OVER);
 	if (IS_HUMAN_IND(i)) {
-	    if (Players[i]->score > maxsc) {
-		maxsc = Players[i]->score;
+	    if (Players(i)->score > maxsc) {
+		maxsc = Players(i)->score;
 		win = i;
 	    }
-	    if (Players[i]->score < minsc) {
-		minsc = Players[i]->score;
+	    if (Players(i)->score < minsc) {
+		minsc = Players(i)->score;
 		lose = i;
 	    }
 	}
     }
     if (win != -1) {
-	sprintf(msg,"Best human player: %s", Players[win]->name);
+	sprintf(msg,"Best human player: %s", Players(win)->name);
 	Set_message(msg);
 	xpprintf("%s\n", msg);
     }
     if (lose != -1 && lose != win) {
-	sprintf(msg,"Worst human player: %s", Players[lose]->name);
+	sprintf(msg,"Worst human player: %s", Players(lose)->name);
 	Set_message(msg);
 	xpprintf("%s\n", msg);
     }
@@ -816,7 +816,7 @@ void Server_log_admin_message(int ind, const char *str)
     const int		logfile_size_limit = adminMessageFileSizeLimit;
     FILE		*fp;
     struct stat		st;
-    player		*pl = Players[ind];
+    player		*pl = Players(ind);
     char		msg[MSG_LEN * 2];
 
     if ((logfilename != NULL) &&

@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -70,7 +69,7 @@ int Get_player_index_by_name(char *name)
 	if ((i > 0 && i <= NUM_IDS)
 	    && (j = GetInd[i]) >= 0
 	    && j < NumPlayers
-	    && Players[j]->id == i) {
+	    && Players(j)->id == i) {
 	    return j;
 	}
 	else {
@@ -80,7 +79,7 @@ int Get_player_index_by_name(char *name)
 
     /* look for an exact match on player nickname. */
     for (i = 0; i < NumPlayers; i++) {
-	if (strcasecmp(Players[i]->name, name) == 0) {
+	if (strcasecmp(Players(i)->name, name) == 0) {
 	    return i;
 	}
     }
@@ -88,8 +87,8 @@ int Get_player_index_by_name(char *name)
     /* now look for a partial match on both nick and realname. */
     len = strlen(name);
     for (j = -1, i = 0; i < NumPlayers; i++) {
-	if (strncasecmp(Players[i]->name, name, len) == 0
-	    || strncasecmp(Players[i]->realname, name, len) == 0) {
+	if (strncasecmp(Players(i)->name, name, len) == 0
+	    || strncasecmp(Players(i)->realname, name, len) == 0) {
 	    j = (j == -1) ? i : -2;
 	}
     }
@@ -111,11 +110,11 @@ static void Send_info_about_player(player * pl)
 		i = observerStart;
 	    }
 	}
-	if (Players[i]->conn != NOT_CONNECTED) {
-	    Send_player(Players[i]->conn, pl->id);
-	    Send_score(Players[i]->conn, pl->id, pl->score, pl->life,
+	if (Players(i)->conn != NOT_CONNECTED) {
+	    Send_player(Players(i)->conn, pl->id);
+	    Send_score(Players(i)->conn, pl->id, pl->score, pl->life,
 		       pl->mychar, pl->alliance);
-	    Send_base(Players[i]->conn, pl->id, pl->home_base);
+	    Send_base(Players(i)->conn, pl->id, pl->home_base);
 	}
     }
 }
@@ -131,7 +130,7 @@ static void Set_swapper_state(player * pl)
 	int i;
 
 	for (i = 0; i < NumPlayers; i++) {
-	    if (!TEAM(ind, i) && !BIT(Players[i]->status, PAUSE)) {
+	    if (!TEAM(ind, i) && !BIT(Players(i)->status, PAUSE)) {
 		/* put team swapping player waiting mode. */
 		if (pl->mychar == ' ')
 		    pl->mychar = 'W';
@@ -475,7 +474,7 @@ static int Cmd_addr(char *arg, player *pl, int oper, char *msg)
 	if (addr == NULL) {
 	    sprintf(msg, "Unable to get address for %s.", arg);
 	} else {
-	    sprintf(msg, "%s plays from: %s.", Players[ind]->name, addr);
+	    sprintf(msg, "%s plays from: %s.", Players(ind)->name, addr);
 	}
     } else {
 	if (ind == -1) {
@@ -681,15 +680,15 @@ static int Cmd_auth(char *arg, player *pl, int oper, char *msg)
     Queue_kick(pl->auth_nick);
 
     for (i = 0; i < NumPlayers; i++) {
-	if (pl != Players[i] &&
-	    !strcasecmp(Players[i]->auth_nick, pl->auth_nick))
+	if (pl != Players(i) &&
+	    !strcasecmp(Players(i)->auth_nick, pl->auth_nick))
 	{
 	    sprintf(msg, "%s has been kicked out (nick collision).",
-		    Players[i]->name);
-	    if (Players[i]->conn == NOT_CONNECTED)
+		    Players(i)->name);
+	    if (Players(i)->conn == NOT_CONNECTED)
 		Delete_player(i);
 	    else
-		Destroy_connection(Players[i]->conn,
+		Destroy_connection(Players(i)->conn,
 				   "kicked out (someone else authenticated "
 				   "for the same nick)");
 	    warn(msg);
@@ -790,12 +789,12 @@ static int Cmd_kick(char *arg, player *pl, int oper, char *msg)
     i = Get_player_index_by_name(arg);
     if (i >= 0) {
 	sprintf(msg, "%s kicked %s out! [*Server notice*]",
-		pl->name, Players[i]->name);
-	if (Players[i]->conn == NOT_CONNECTED) {
+		pl->name, Players(i)->name);
+	if (Players(i)->conn == NOT_CONNECTED) {
 	    Delete_player(i);
 	}
 	else {
-	    Destroy_connection(Players[i]->conn, "kicked out");
+	    Destroy_connection(Players(i)->conn, "kicked out");
 	}
 	Set_message(msg);
 	strcpy(msg, "");
@@ -921,7 +920,7 @@ static int Cmd_nuke(char *arg, player *pl, int oper, char *msg)
 
     /* hopefully this will help some weird issues */
     if (ind >= 0)
-	rank = Rank_get_by_name(Players[ind]->name);
+	rank = Rank_get_by_name(Players(ind)->name);
     else
 	rank = Rank_get_by_name(arg);
 
@@ -931,7 +930,7 @@ static int Cmd_nuke(char *arg, player *pl, int oper, char *msg)
     }
 
     if (ind >= 0) {
-	Players[ind]->score = 0;
+	Players(ind)->score = 0;
     }
 
     sprintf(msg, "Nuked %s.", rank->entry.nick);
@@ -974,7 +973,7 @@ static int Cmd_op(char *arg, player *pl, int oper, char *msg)
 	    sprintf(msg, "Name matches several players.");
 	    return CMD_RESULT_ERROR;
 	}
-	pl = Players[ind];
+	pl = Players(ind);
     }
 
     priv = 0;
@@ -1050,20 +1049,20 @@ static int Cmd_pause(char *arg, player *pl, int oper, char *msg)
 
     i = Get_player_index_by_name(arg);
     if (i >= 0) {
-	if (Players[i]->conn != NOT_CONNECTED) {
-	    if (BIT(Players[i]->status, PLAYING | PAUSE | GAME_OVER | KILLED)
+	if (Players(i)->conn != NOT_CONNECTED) {
+	    if (BIT(Players(i)->status, PLAYING | PAUSE | GAME_OVER | KILLED)
 		== PLAYING) {
 		Kill_player(i, false);
 	    }
 	    if (Team_zero_pausing_available()) {
 		sprintf(msg, "%s was pause-swapped by %s.",
-			Players[i]->name, pl->name);
+			Players(i)->name, pl->name);
 		/* apparently Handle_player_command busts it */
-		Handle_player_command(Players[i], "team 0");
+		Handle_player_command(Players(i), "team 0");
 	    } else {
 		Pause_player(i, 1);
 		sprintf(msg, "%s was paused by %s.",
-			Players[i]->name, pl->name);
+			Players(i)->name, pl->name);
 	    }
 	    Set_message(msg);
 	    strcpy(msg, "");
@@ -1107,7 +1106,7 @@ static int Cmd_reset(char *arg, player *pl, int oper, char *msg)
 
     if (arg && !strcasecmp(arg, "all")) {
 	for (i = NumPlayers - 1; i >= 0; i--) {
-	    Rank_SetScore(Players[i], 0);
+	    Rank_SetScore(Players(i), 0);
 	}
 	for (i = 0; i < MAX_TEAMS; i++)
 	    World.teams[i].score = 0;
@@ -1149,7 +1148,7 @@ static int Cmd_stats(char *arg, player *pl, int oper, char *msg)
 	    sprintf(msg, "Name matches several players.");
 	    return CMD_RESULT_ERROR;
 	}
-	pl = Players[ind];
+	pl = Players(ind);
     }
 
     Rank_get_stats(pl, msg);
@@ -1199,7 +1198,7 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
 		sprintf(msg, "Name matches several players.");
 		return CMD_RESULT_ERROR;
 	    }
-	    pl = Players[ind];
+	    pl = Players(ind);
 	}
 
 	for (i = 0; i < MAX_TEAMS ; i++) {
@@ -1247,14 +1246,14 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
 
     i = World.teams[pl->team].SwapperId;
     while (i != -1) {
-	if ((i = Players[GetInd[i]]->team) != team)
+	if ((i = Players(GetInd[i])->team) != team)
 	    i = World.teams[i].SwapperId;
 	else {
 	    /* Found a cycle, now change the teams */
 	    int xbase = pl->home_base, xteam = pl->team, xbase2, xteam2;
 	    player *pl2 = pl;
 	    do {
-		pl2 = Players[GetInd[World.teams[xteam].SwapperId]];
+		pl2 = Players(GetInd[World.teams[xteam].SwapperId]);
 		World.teams[xteam].SwapperId = -1;
 		xbase2 = pl2->home_base;
 		xteam2 = pl2->team;
@@ -1292,7 +1291,7 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
     /* Swap a paused player away from the full team */
     if (!teamZeroPausing || team != 0) {
 	for (i = NumPlayers - 1; i >= 0; i--) {
-	    player *pl2 = Players[i];
+	    player *pl2 = Players(i);
 	    if (pl2->conn != NOT_CONNECTED && BIT(pl2->status, PAUSE)
 		&& (pl2->team == team)) {
 		pl2->team = pl->team;

@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -54,7 +53,7 @@ int Punish_team(int ind, int t_destroyed, int cx, int cy)
 {
     static char		msg[MSG_LEN];
     treasure_t		*td = &World.treasures[t_destroyed];
-    player		*pl = Players[ind];
+    player		*pl = Players(ind);
     int			i;
     int			win_score = 0,lose_score = 0;
     int			win_team_members = 0, lose_team_members = 0;
@@ -68,19 +67,19 @@ int Punish_team(int ind, int t_destroyed, int cx, int cy)
     if (BIT(World.rules->mode, TEAM_PLAY)) {
 	for (i = 0; i < NumPlayers; i++) {
 	    if (IS_TANK_IND(i)
-		|| (BIT(Players[i]->status, PAUSE) && Players[i]->count <= 0)
-		|| (BIT(Players[i]->status, GAME_OVER)
-		    && Players[i]->mychar == 'W'))
+		|| (BIT(Players(i)->status, PAUSE) && Players(i)->count <= 0)
+		|| (BIT(Players(i)->status, GAME_OVER)
+		    && Players(i)->mychar == 'W'))
 		continue;
-	    if (Players[i]->team == td->team) {
-		lose_score += Players[i]->score;
+	    if (Players(i)->team == td->team) {
+		lose_score += Players(i)->score;
 		lose_team_members++;
-		if (BIT(Players[i]->status, GAME_OVER) == 0) {
+		if (BIT(Players(i)->status, GAME_OVER) == 0) {
 		    somebody_flag = 1;
 		}
 	    }
-	    else if (Players[i]->team == pl->team) {
-		win_score += Players[i]->score;
+	    else if (Players(i)->team == pl->team) {
+		win_score += Players(i)->score;
 		win_team_members++;
 	    }
 	}
@@ -106,31 +105,31 @@ int Punish_team(int ind, int t_destroyed, int cx, int cy)
 
     for (i = 0; i < NumPlayers; i++) {
 	if (IS_TANK_IND(i)
-	    || (BIT(Players[i]->status, PAUSE)
-		&& Players[i]->count <= 0)
-	    || (BIT(Players[i]->status, GAME_OVER)
-		&& Players[i]->mychar == 'W'))
+	    || (BIT(Players(i)->status, PAUSE)
+		&& Players(i)->count <= 0)
+	    || (BIT(Players(i)->status, GAME_OVER)
+		&& Players(i)->mychar == 'W'))
 	    continue;
-	if (Players[i]->team == td->team) {
+	if (Players(i)->team == td->team) {
 	    SCORE(i, -sc, cx, cy, "Treasure: ");
-	    Rank_LostBall(Players[i]);
+	    Rank_LostBall(Players(i));
 	    if (treasureKillTeam)
-		SET_BIT(Players[i]->status, KILLED);
+		SET_BIT(Players(i)->status, KILLED);
 	}
-	else if (Players[i]->team == pl->team &&
-		 (Players[i]->team != TEAM_NOT_SET || i == ind)) {
+	else if (Players(i)->team == pl->team &&
+		 (Players(i)->team != TEAM_NOT_SET || i == ind)) {
 	    if (lose_team_members > 0) {
 		if (i == ind) {
-		    Rank_CashedBall(Players[i]);
+		    Rank_CashedBall(Players(i));
 		}
-		Rank_WonBall(Players[i]);
+		Rank_WonBall(Players(i));
 	    }
 	    SCORE(i, (i == ind ? 3*por : 2*por), cx, cy, "Treasure: ");
 	}
     }
 
     if (treasureKillTeam) {
-	Rank_AddKill(Players[ind]);
+	Rank_AddKill(Players(ind));
     }
 
     updateScores = true;
@@ -241,7 +240,7 @@ void Make_debris(
 void Ball_is_replaced(ballobject *ball)
 {
     char msg[MSG_LEN];
-    player *pl = Players[GetInd[ball->owner]];
+    player *pl = Players(GetInd[ball->owner]);
 
     ball->life = 0;
     SET_BIT(ball->status, (NOEXPLOSION|RECREATE));
@@ -270,13 +269,13 @@ void Ball_is_destroyed(ballobject *ball)
 
 	sprintf(msg," < The ball was loose for %d frames (best %d) "
 		"/ %.2f frames @ 12fps / %.2fs >",
-		frames, Rank_GetBestBall(Players[ind]), frames12, seconds);
+		frames, Rank_GetBestBall(Players(ind)), frames12, seconds);
     } else {
 	sprintf(msg," < The ball was loose for %d frames (best %d) / %.2fs >",
-		frames, Rank_GetBestBall(Players[ind]), seconds);
+		frames, Rank_GetBestBall(Players(ind)), seconds);
     }
     Set_message(msg);
-    Rank_BallRun(Players[ind], frames);
+    Rank_BallRun(Players(ind), frames);
 }
 
 
@@ -291,7 +290,7 @@ void Ball_hits_goal(ballobject *ball, int group)
 	Ball_is_replaced(ball);
 	return;
     }
-    if (groups[group].team == Players[GetInd[ball->owner]]->team) {
+    if (groups[group].team == Players(GetInd[ball->owner])->team) {
 	Ball_is_destroyed(ball);
 	if (Punish_team(GetInd[ball->owner], ball->treasure,
 			ball->pos.cx, ball->pos.cy))
@@ -333,7 +332,7 @@ bool Balltarget_hitfunc(struct group *group, struct move *move)
 	 * owner is not.
 	 */
 	if (World.treasures[ball->treasure].team == group->team
-	    && Players[GetInd[ball->owner]]->team != group->team)
+	    && Players(GetInd[ball->owner])->team != group->team)
 	    return false;
 	return true;
     }

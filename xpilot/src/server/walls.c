@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -385,22 +384,22 @@ void Object_hits_target(int ind, object *obj, long player_cost)
     if (BIT(World.rules->mode, TEAM_PLAY)) {
 	for (j = 0; j < NumPlayers; j++) {
 	    if (IS_TANK_IND(j)
-		|| (BIT(Players[j]->status, PAUSE)
-		    && Players[j]->count <= 0)
-		|| (BIT(Players[j]->status, GAME_OVER)
-		    && Players[j]->mychar == 'W'
-		    && Players[j]->score == 0)) {
+		|| (BIT(Players(j)->status, PAUSE)
+		    && Players(j)->count <= 0)
+		|| (BIT(Players(j)->status, GAME_OVER)
+		    && Players(j)->mychar == 'W'
+		    && Players(j)->score == 0)) {
 		continue;
 	    }
-	    if (Players[j]->team == targ->team) {
-		lose_score += Players[j]->score;
+	    if (Players(j)->team == targ->team) {
+		lose_score += Players(j)->score;
 		lose_team_members++;
-		if (BIT(Players[j]->status, GAME_OVER) == 0) {
+		if (BIT(Players(j)->status, GAME_OVER) == 0) {
 		    somebody_flag = 1;
 		}
 	    }
-	    else if (Players[j]->team == Players[killer]->team) {
-		win_score += Players[j]->score;
+	    else if (Players(j)->team == Players(killer)->team) {
+		win_score += Players(j)->score;
 		win_team_members++;
 	    }
 	}
@@ -420,7 +419,7 @@ void Object_hits_target(int ind, object *obj, long player_cost)
     sound_play_sensors(targ->pos.cx, targ->pos.cy, DESTROY_TARGET_SOUND);
 
     if (targets_remaining > 0) {
-	sc = Rate(Players[killer]->score, CANNON_SCORE)/4;
+	sc = Rate(Players(killer)->score, CANNON_SCORE)/4;
 	sc = sc * (targets_total - targets_remaining) / (targets_total + 1);
 	if (sc >= 0.01) {
 	    SCORE(killer, sc, targ->pos.cx, targ->pos.cy, "Target: ");
@@ -432,42 +431,42 @@ void Object_hits_target(int ind, object *obj, long player_cost)
 	 */
 	if (targetTeamCollision && targets_total < 10) {
 	    sprintf(msg, "%s blew up one of team %d's targets.",
-		    Players[killer]->name, (int) targ->team);
+		    Players(killer)->name, (int) targ->team);
 	    Set_message(msg);
 	}
 	return;
     }
 
     sprintf(msg, "%s blew up team %d's %starget.",
-	    Players[killer]->name,
+	    Players(killer)->name,
 	    (int) targ->team,
 	    (targets_total > 1) ? "last " : "");
     Set_message(msg);
 
     if (targetKillTeam)
-	Rank_AddTargetKill(Players[killer]);
+	Rank_AddTargetKill(Players(killer));
 
     sc  = Rate(win_score, lose_score);
     por = (sc*lose_team_members)/win_team_members;
 
     for (j = 0; j < NumPlayers; j++) {
 	if (IS_TANK_IND(j)
-	    || (BIT(Players[j]->status, PAUSE)
-		&& Players[j]->count <= 0)
-	    || (BIT(Players[j]->status, GAME_OVER)
-		&& Players[j]->mychar == 'W'
-		&& Players[j]->score == 0)) {
+	    || (BIT(Players(j)->status, PAUSE)
+		&& Players(j)->count <= 0)
+	    || (BIT(Players(j)->status, GAME_OVER)
+		&& Players(j)->mychar == 'W'
+		&& Players(j)->score == 0)) {
 	    continue;
 	}
-	if (Players[j]->team == targ->team) {
+	if (Players(j)->team == targ->team) {
 	    if (targetKillTeam
 		&& targets_remaining == 0
-		&& !BIT(Players[j]->status, KILLED|PAUSE|GAME_OVER))
-		SET_BIT(Players[j]->status, KILLED);
+		&& !BIT(Players(j)->status, KILLED|PAUSE|GAME_OVER))
+		SET_BIT(Players(j)->status, KILLED);
 	    SCORE(j, -sc, targ->pos.cx, targ->pos.cy, "Target: ");
 	}
-	else if (Players[j]->team == Players[killer]->team &&
-		 (Players[j]->team != TEAM_NOT_SET || j == killer)) {
+	else if (Players(j)->team == Players(killer)->team &&
+		 (Players(j)->team != TEAM_NOT_SET || j == killer)) {
 	    SCORE(j, por, targ->pos.cx, targ->pos.cy, "Target: ");
 	}
     }
@@ -515,7 +514,7 @@ void Object_crash(object *obj, struct move *move, int crashtype, int item_id)
 	    player *pl = NULL;
 
 	    if (obj->id != NO_ID)
-		pl = Players[GetInd[obj->id]];
+		pl = Players(GetInd[obj->id]);
 
 	    if (!BIT(World.cannon[item_id].used, HAS_EMERGENCY_SHIELD)) {
 		if (World.cannon[item_id].item[ITEM_ARMOR] > 0)
@@ -651,7 +650,7 @@ void Player_crash(player *pl, struct move *move, int crashtype,
 		}
 	    }
 	    if (j == num_pushers) {
-		pushers[num_pushers++] = Players[GetInd[shove->pusher_id]];
+		pushers[num_pushers++] = Players(GetInd[shove->pusher_id]);
 		cnt[j] = 1;
 	    }
 	    total_pusher_count++;
@@ -2645,7 +2644,7 @@ static void Move_ball(object *obj)
     obj->extmove.cy = mv.delta.cy;
 
     if (obj->id != NO_ID
-	&& BIT(Players[GetInd[obj->id]]->used, HAS_PHASING_DEVICE)) {
+	&& BIT(Players(GetInd[obj->id])->used, HAS_PHASING_DEVICE)) {
 
 	int cx = obj->pos.cx + mv.delta.cx;
 	int cy = obj->pos.cy + mv.delta.cy;
@@ -2665,7 +2664,7 @@ static void Move_ball(object *obj)
     if (owner == NO_ID)
 	mv.hitmask = BALL_BIT | NOTEAM_BIT;
     else
-	mv.hitmask = BALL_BIT | HITMASK(Players[GetInd[owner]]->team);
+	mv.hitmask = BALL_BIT | HITMASK(Players(GetInd[owner])->team);
     mv.start.cx = obj->pos.cx;
     mv.start.cy = obj->pos.cy;
     while (mv.delta.cx || mv.delta.cy) {
@@ -2726,7 +2725,7 @@ static void Move_object_new(object *obj)
 #else
     if (obj->type == OBJ_BALL) {
 	if (obj->owner != NO_ID)
-	    team =  Players[GetInd[obj->owner]].team;
+	    team =  Players(GetInd[obj->owner]).team;
 	else
 	    team = TEAM_NOT_SET;
 	mv.hitmask = BALL_BIT;
@@ -2778,7 +2777,7 @@ static void Move_object_new(object *obj)
 
 static void Move_player_new(int ind)
 {
-    player *pl = Players[ind];
+    player *pl = Players(ind);
     clpos  pos;
     struct move mv;
     struct collans ans;
@@ -2886,7 +2885,7 @@ static void Move_player_new(int ind)
 
 static void Turn_player_new(int ind)
 {
-    player	*pl = Players[ind];
+    player	*pl = Players(ind);
     int		new_dir = MOD2((int)(pl->float_dir + 0.5f), RES);
     int		next_dir, sign, hitmask;
 

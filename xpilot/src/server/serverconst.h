@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -99,7 +98,7 @@
 
 
 #define PSEUDO_TEAM(i,j)\
-	(Players[(i)]->pseudo_team == Players[(j)]->pseudo_team)
+	(Players((i))->pseudo_team == Players((j))->pseudo_team)
 
 /*
  * Used where we wish to know if a player is simply on the same team.
@@ -111,8 +110,8 @@
 	   && (Players[i]->team != TEAM_NOT_SET))) */
 #define TEAM(i, j) \
 	(BIT(World.rules->mode, TEAM_PLAY) \
-	&& (Players[i]->team == Players[j]->team) \
-	&& (Players[i]->team != TEAM_NOT_SET))
+	&& (Players(i)->team == Players(j)->team) \
+	&& (Players(i)->team != TEAM_NOT_SET))
 
 /*
  * Used where we wish to know if a player is on the same team
@@ -124,16 +123,16 @@
  * Used where we wish to know if two players are members of the same alliance.
  */
 #define ALLIANCE(i, j)	\
-	((Players[i]->alliance != ALLIANCE_NOT_SET) \
-	&& (Players[j]->alliance == Players[i]->alliance))
+	((Players(i)->alliance != ALLIANCE_NOT_SET) \
+	&& (Players(j)->alliance == Players(i)->alliance))
 
 /*
  * Used where we wish to know if a player (i) owns a tank (j).
  */
 #define OWNS_TANK(i, j) \
 	(IS_TANK_IND(j) \
-	&& (Players[j]->lock.pl_id != -1) \
-	&& (GetInd[Players[j]->lock.pl_id] == (i)))
+	&& (Players(j)->lock.pl_id != -1) \
+	&& (GetInd[Players(j)->lock.pl_id] == (i)))
 
 
 #define RECOVERY_DELAY		(12 * 3)

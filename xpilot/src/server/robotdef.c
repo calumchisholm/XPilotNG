@@ -168,7 +168,7 @@ static robot_default_data_t *Robot_default_get_data(player *pl)
  */
 static void Robot_default_create(int ind, char *str)
 {
-    player			*pl = Players[ind];
+    player			*pl = Players(ind);
     robot_default_data_t	*my_data;
 
     if (!(my_data = (robot_default_data_t *)malloc(sizeof(*my_data)))) {
@@ -226,7 +226,7 @@ static void Robot_default_create(int ind, char *str)
  */
 static void Robot_default_go_home(int ind)
 {
-    player			*pl = Players[ind];
+    player			*pl = Players(ind);
     robot_default_data_t	*my_data = Robot_default_get_data(pl);
 
     my_data->robot_mode      = RM_TAKE_OFF;
@@ -238,7 +238,7 @@ static void Robot_default_go_home(int ind)
  */
 static void Robot_default_set_war(int ind, int victim_id)
 {
-    player			*pl = Players[ind];
+    player			*pl = Players(ind);
     robot_default_data_t	*my_data = Robot_default_get_data(pl);
 
     if (victim_id == NO_ID) {
@@ -254,7 +254,7 @@ static void Robot_default_set_war(int ind, int victim_id)
  */
 static int Robot_default_war_on_player(int ind)
 {
-    player			*pl = Players[ind];
+    player			*pl = Players(ind);
     robot_default_data_t	*my_data = Robot_default_get_data(pl);
 
     if (BIT(my_data->robot_lock, LOCK_PLAYER)) {
@@ -270,7 +270,7 @@ static int Robot_default_war_on_player(int ind)
 static void Robot_default_message(int ind, const char *message)
 {
 #if 0
-    player			*pl = Players[ind];
+    player			*pl = Players(ind);
     robot_default_data_t	*my_data = Robot_default_get_data(pl);
     int				len;
     char			*ptr;
@@ -305,7 +305,7 @@ static void Robot_default_message(int ind, const char *message)
  */
 static void Robot_default_destroy(int ind)
 {
-    player			*pl = Players[ind];
+    player			*pl = Players(ind);
 
     free(pl->robot_data_ptr->private_data);
     pl->robot_data_ptr->private_data = NULL;
@@ -316,8 +316,8 @@ static void Robot_default_destroy(int ind)
  */
 static void Robot_default_invite(int ind, int inv_ind)
 {
-    player			*pl = Players[ind],
-				*inviter = Players[inv_ind];
+    player			*pl = Players(ind),
+				*inviter = Players(inv_ind);
     int				war_id = Robot_default_war_on_player(ind);
     robot_default_data_t	*my_data = Robot_default_get_data(pl);
     int				i;
@@ -356,12 +356,12 @@ static void Robot_default_invite(int ind, int inv_ind)
 	int	member_count = Get_alliance_member_count(inviter->alliance);
 
 	for (i = 0; i < NumPlayers; i++) {
-	    if (Players[i]->alliance == inviter->alliance) {
-		if (Players[i]->id == war_id) {
+	    if (Players(i)->alliance == inviter->alliance) {
+		if (Players(i)->id == war_id) {
 		    accept = 0;
 		    break;
 		}
-		avg_score += Players[i]->score;
+		avg_score += Players(i)->score;
 	    }
 	}
 	if (accept) {
@@ -387,7 +387,7 @@ static bool Really_empty_space(int ind, int x, int y)
     int delta = BLOCK_CLICKS / 4;
     int inside = 0, outside = 0;
     int hitmask = NONBALL_BIT; /* kps - ok ? */
-    player *pl = Players[ind];
+    player *pl = Players(ind);
     int	type = World.block[x][y];
 
     if (!is_polygon_map && useOldCode)
@@ -464,7 +464,7 @@ static bool Really_empty_space(int ind, int x, int y)
 static bool Check_robot_evade(int ind, int mine_i, int ship_i)
 {
     int				i;
-    player			*pl = Players[ind];
+    player			*pl = Players(ind);
     object			*shot;
     player			*ship;
     long			stop_dist;
@@ -579,7 +579,7 @@ static bool Check_robot_evade(int ind, int mine_i, int ship_i)
 	}
     }
     if (ship_i >= 0) {
-	ship = Players[ship_i];
+	ship = Players(ship_i);
 	aux_dir = (int)Wrap_cfindDir(ship->pos.cx - pl->pos.cx
 				     + PIXEL_TO_CLICK(ship->vel.x * 2),
 				     ship->pos.cy - pl->pos.cy
@@ -814,7 +814,7 @@ static bool Check_robot_target(int ind,
 			       int item_cx, int item_cy,
 			       int new_mode)
 {
-    player			*pl = Players[ind],
+    player			*pl = Players(ind),
 				*ship;
     long			item_dist;
     int				item_dir;
@@ -1009,12 +1009,12 @@ static bool Check_robot_target(int ind,
 		 && pl->fuel.sum + ED_LASER > pl->fuel.l3
 		 && new_mode == RM_ATTACK) {
 	    if (BIT(my_data->robot_lock, LOCK_PLAYER)
-		&& BIT(Players[GetInd[my_data->robot_lock_id]]->status,
+		&& BIT(Players(GetInd[my_data->robot_lock_id])->status,
 		       PLAYING|PAUSE|GAME_OVER) == PLAYING) {
-		ship = Players[GetInd[my_data->robot_lock_id]];
+		ship = Players(GetInd[my_data->robot_lock_id]);
 	    }
 	    else if (BIT(pl->lock.tagged, LOCK_PLAYER)) {
-		ship = Players[GetInd[pl->lock.pl_id]];
+		ship = Players(GetInd[pl->lock.pl_id]);
 	    }
 	    else {
 		ship = NULL;
@@ -1068,7 +1068,7 @@ static bool Check_robot_target(int ind,
 		long dir;
 		int away;
 
-		ship = Players[GetInd[pl->lock.pl_id]];
+		ship = Players(GetInd[pl->lock.pl_id]);
 		xvd = ship->vel.x - pl->vel.x;
 		yvd = ship->vel.y - pl->vel.y;
 		vel = LENGTH(xvd, yvd);
@@ -1169,7 +1169,7 @@ static bool Check_robot_target(int ind,
 
 static bool Check_robot_hunt(int ind)
 {
-    player			*pl = Players[ind];
+    player			*pl = Players(ind);
     player			*ship;
     int				ship_dir;
     int				travel_dir;
@@ -1186,7 +1186,7 @@ static bool Check_robot_hunt(int ind)
     if (!Detect_hunt(ind, GetInd[my_data->robot_lock_id]))
 	return false;
 
-    ship = Players[GetInd[my_data->robot_lock_id]];
+    ship = Players(GetInd[my_data->robot_lock_id]);
 
     ship_dir = (int)Wrap_cfindDir(ship->pos.cx - pl->pos.cx,
 				  ship->pos.cy - pl->pos.cy);
@@ -1237,8 +1237,8 @@ static bool Check_robot_hunt(int ind)
 
 static bool Detect_hunt(int ind, int j)
 {
-    player	*pl = Players[ind],
-		*ship = Players[j];
+    player	*pl = Players(ind),
+		*ship = Players(j);
     int		dx, dy;
 
     if (BIT(ship->status, PLAYING|PAUSE|GAME_OVER|KILLED) != PLAYING) {
@@ -1287,7 +1287,7 @@ static bool Detect_hunt(int ind, int j)
  */
 static int Rank_item_value(int ind, long itemtype)
 {
-    player	*pl = Players[ind];
+    player	*pl = Players(ind);
 
     if (itemtype == ITEM_AUTOPILOT)
 	return ROBOT_IGNORE_ITEM;		/* never useful for robots */
@@ -1384,7 +1384,7 @@ static int Rank_item_value(int ind, long itemtype)
 
 static bool Ball_handler(int ind)
 {
-    player	*pl = Players[ind];
+    player	*pl = Players(ind);
     int		i,
 		closest_t = -1,
 		closest_nt = -1,
@@ -1438,10 +1438,10 @@ static bool Ball_handler(int ind)
 	    }
 	}
 	for (i = 0; i < NumPlayers; i++) {
-	    dist = (int)(LENGTH(ball->pos.cx - Players[i]->pos.cx,
-				ball->pos.cy - Players[i]->pos.cy) / CLICK);
-	    if (Players[i]->id != pl->id
-		&& (BIT(Players[i]->status, PLAYING|PAUSE|GAME_OVER) == PLAYING)
+	    dist = (int)(LENGTH(ball->pos.cx - Players(i)->pos.cx,
+				ball->pos.cy - Players(i)->pos.cy) / CLICK);
+	    if (Players(i)->id != pl->id
+		&& (BIT(Players(i)->status, PLAYING|PAUSE|GAME_OVER) == PLAYING)
 		&& dist < dist_np)
 		dist_np = dist;
 	}
@@ -1496,7 +1496,7 @@ static bool Ball_handler(int ind)
 		ballobject *ball = BALL_IND(i);
 		if ((ball->id == NO_ID)
 		    ? (ball->owner != NO_ID)
-		    : (Players[GetInd[ball->id]]->team != pl->team)) {
+		    : (Players(GetInd[ball->id])->team != pl->team)) {
 		    ball_dist = (int)LENGTH(pl->pos.cx - ball->pos.cx,
 					    pl->pos.cy - ball->pos.cy) / CLICK;
 		    if (ball_dist < closest_ball_dist) {
@@ -1527,7 +1527,7 @@ static bool Ball_handler(int ind)
 
 static int Robot_default_play_check_map(int ind)
 {
-    player			*pl = Players[ind];
+    player			*pl = Players(ind);
     int				j;
     int				cannon_i, fuel_i, target_i;
     int				dx, dy;
@@ -1671,7 +1671,7 @@ static void Robot_default_play_check_objects(int ind,
 					     int *item_imp,
 					     int *mine_i, int *mine_dist)
 {
-    player			*pl = Players[ind];
+    player			*pl = Players(ind);
     int				j;
     object			*shot, **obj_list;
     int				distance, obj_count;
@@ -1919,7 +1919,7 @@ static void Robot_default_play_check_objects(int ind,
 
 static void Robot_default_play(int ind)
 {
-    player			*pl = Players[ind],
+    player			*pl = Players(ind),
 				*ship;
     DFLOAT			distance, ship_dist,
 				enemy_dist,
@@ -2081,9 +2081,9 @@ static void Robot_default_play(int ind)
 
     if (BIT(my_data->robot_lock, LOCK_PLAYER)) {
 	j = GetInd[my_data->robot_lock_id];
-	ship = Players[j];
+	ship = Players(j);
 
-	if (BIT(Players[GetInd[my_data->robot_lock_id]]->status,
+	if (BIT(Players(GetInd[my_data->robot_lock_id])->status,
 		PLAYING|GAME_OVER|PAUSE) == PLAYING) {
 
 	    if (Detect_hunt(ind, j)) {
@@ -2117,7 +2117,7 @@ static void Robot_default_play(int ind)
     if (ship_i == -1 || enemy_i == -1) {
 
 	for (j = 0; j < NumPlayers; j++) {
-	    ship = Players[j];
+	    ship = Players(j);
 	    if (j == ind
 		|| BIT(ship->status, PLAYING|GAME_OVER|PAUSE) != PLAYING
 		|| Team_immune(pl->id, ship->id))
@@ -2165,12 +2165,12 @@ static void Robot_default_play(int ind)
 
     if (ship_i != -1
 	&& BIT(my_data->robot_lock, LOCK_PLAYER)
-	&& my_data->robot_lock_id == Players[ship_i]->id) {
+	&& my_data->robot_lock_id == Players(ship_i)->id) {
 	ship_i = -1; /* don't avoid target */
     }
 
     if (enemy_i >= 0) {
-	ship = Players[enemy_i];
+	ship = Players(enemy_i);
 	if (!BIT(pl->lock.tagged, LOCK_PLAYER)
 	    || (enemy_dist < pl->lock.distance/2
 		&& (BIT(World.rules->mode, TIMING) ?
@@ -2179,7 +2179,7 @@ static void Robot_default_play(int ind)
 	    || (enemy_dist < pl->lock.distance*2
 		&& BIT(World.rules->mode, TEAM_PLAY)
 		&& BIT(ship->have, HAS_BALL))
-	    || ship->score > Players[GetInd[pl->lock.pl_id]]->score) {
+	    || ship->score > Players(GetInd[pl->lock.pl_id])->score) {
 	    pl->lock.pl_id = ship->id;
 	    SET_BIT(pl->lock.tagged, LOCK_PLAYER);
 	    pl->lock.distance = enemy_dist;
@@ -2189,14 +2189,14 @@ static void Robot_default_play(int ind)
 
     if (BIT(pl->lock.tagged, LOCK_PLAYER)) {
 	int delta_dir;
-	ship = Players[GetInd[pl->lock.pl_id]];
+	ship = Players(GetInd[pl->lock.pl_id]);
 	delta_dir = (int)(pl->dir - Wrap_cfindDir(ship->pos.cx - pl->pos.cx,
 						  ship->pos.cy - pl->pos.cy));
 	delta_dir = MOD2(delta_dir, RES);
 	if (BIT(ship->status, PLAYING|PAUSE|GAME_OVER) != PLAYING
 	    || (BIT(my_data->robot_lock, LOCK_PLAYER)
 		&& my_data->robot_lock_id != pl->lock.pl_id
-		&& BIT(Players[GetInd[my_data->robot_lock_id]]->status,
+		&& BIT(Players(GetInd[my_data->robot_lock_id])->status,
 		       PLAYING|PAUSE|GAME_OVER) == PLAYING)
 	    || !Detect_hunt(ind, GetInd[ship->id])
 	    || (pl->fuel.sum <= pl->fuel.l3
@@ -2283,7 +2283,7 @@ static void Robot_default_play(int ind)
     if (BIT(pl->lock.tagged, LOCK_PLAYER) &&
 	Detect_hunt(ind, GetInd[pl->lock.pl_id])) {
 
-	ship = Players[GetInd[pl->lock.pl_id]];
+	ship = Players(GetInd[pl->lock.pl_id]);
 	shoot_time = (int)(pl->lock.distance / (ShotsSpeed + 1));
 	dx = (long)(ship->pos.cx + ship->vel.x * shoot_time * CLICK);
 	dy = (long)(ship->pos.cy + ship->vel.y * shoot_time * CLICK);

@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -403,8 +402,8 @@ static void Place_asteroid(void)
 
 	    for (i = 0; i < NumPlayers; i++) {
 		if (IS_HUMAN_IND(i)) {
-		    ox = Players[i]->pos.cx;
-		    oy = Players[i]->pos.cy;
+		    ox = Players(i)->pos.cx;
+		    oy = Players(i)->pos.cy;
 		    dpx = WRAP_DCX(cx - ox);
 		    dpy = WRAP_DCY(cy - oy);
 		    if (QUICK_LENGTH(dpx, dpy) < 2 * ASTEROID_MIN_DIST

@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -58,7 +57,7 @@ static char		msg[MSG_LEN];
 
 static void Refuel(int ind)
 {
-    player *pl = Players[ind];
+    player *pl = Players(ind);
     int i;
     DFLOAT l, dist = 1e9;
 
@@ -82,7 +81,7 @@ static void Refuel(int ind)
 
 static void Repair(int ind)
 {
-    player *pl = Players[ind];
+    player *pl = Players(ind);
     int i;
     DFLOAT l, dist = 1e19;
     int cx, cy;
@@ -112,8 +111,8 @@ bool team_dead(int team)
     int i;
 
     for (i = 0; i < NumPlayers; i++) {
-	if (Players[i]->team == team &&
-	    BIT(Players[i]->status, PLAYING|GAME_OVER|PAUSE) == PLAYING) {
+	if (Players(i)->team == team &&
+	    BIT(Players(i)->status, PLAYING|GAME_OVER|PAUSE) == PLAYING) {
 	    return false;
 	}
     }
@@ -125,7 +124,7 @@ bool team_dead(int team)
  */
 static bool Player_lock_allowed(int ind, int lock)
 {
-    player		*pl = Players[ind];
+    player		*pl = Players(ind);
 
     /* we can never lock on ourselves, nor on -1. */
     if (ind == lock || lock == -1) {
@@ -174,7 +173,7 @@ static bool Player_lock_allowed(int ind, int lock)
  */
 int Player_lock_closest(int ind, int next)
 {
-    player *pl = Players[ind];
+    player *pl = Players(ind);
     int lock, i, newpl;
     DFLOAT dist, best, l;
 
@@ -184,8 +183,8 @@ int Player_lock_closest(int ind, int next)
 
     if (BIT(pl->lock.tagged, LOCK_PLAYER)) {
 	lock = GetInd[pl->lock.pl_id];
-	dist = Wrap_length(Players[lock]->pos.cx - pl->pos.cx,
-			   Players[lock]->pos.cy - pl->pos.cy);
+	dist = Wrap_length(Players(lock)->pos.cx - pl->pos.cx,
+			   Players(lock)->pos.cy - pl->pos.cy);
     } else {
 	lock = -1;
 	dist = 0.0;
@@ -194,15 +193,15 @@ int Player_lock_closest(int ind, int next)
     best = FLT_MAX;
     for (i = 0; i < NumPlayers; i++) {
 	if (i == lock
-	    || (BIT(Players[i]->status, PLAYING|PAUSE|GAME_OVER) != PLAYING)
+	    || (BIT(Players(i)->status, PLAYING|PAUSE|GAME_OVER) != PLAYING)
 	    || !Player_lock_allowed(ind, i)
 	    || OWNS_TANK(ind, i)
 	    || TEAM(ind,i)
 	    || ALLIANCE(ind, i)) {
 	    continue;
 	}
-	l = Wrap_length(Players[i]->pos.cx - pl->pos.cx,
-			Players[i]->pos.cy - pl->pos.cy);
+	l = Wrap_length(Players(i)->pos.cx - pl->pos.cx,
+			Players(i)->pos.cy - pl->pos.cy);
 	if (l >= dist && l < best) {
 	    best = l;
 	    newpl = i;
@@ -213,7 +212,7 @@ int Player_lock_closest(int ind, int next)
     }
 
     SET_BIT(pl->lock.tagged, LOCK_PLAYER);
-    pl->lock.pl_id = Players[newpl]->id;
+    pl->lock.pl_id = Players(newpl)->id;
 
     return 1;
 }
@@ -228,7 +227,7 @@ bool Team_zero_pausing_available(void)
 
 void Pause_player(int ind, int onoff)
 {
-    player		*pl = Players[ind];
+    player		*pl = Players(ind);
 
     if (onoff != 0 && !BIT(pl->status, PAUSE)) { /* Turn pause mode on */
 	if (pl->team != TEAM_NOT_SET)
@@ -258,9 +257,9 @@ void Pause_player(int ind, int onoff)
 		    if (i == ind) {
 			continue;
 		    }
-		    if (Players[i]->life < World.rules->lives
+		    if (Players(i)->life < World.rules->lives
 			&& !TEAM(ind, i)
-			&& !BIT(Players[i]->status, PAUSE)) {
+			&& !BIT(Players(i)->status, PAUSE)) {
 			toolate = true;
 			break;
 		    }
@@ -297,7 +296,7 @@ void Pause_player(int ind, int onoff)
 
 int Handle_keyboard(int ind)
 {
-    player  	*pl = Players[ind];
+    player  	*pl = Players(ind);
     int	    	i, j, k, key, pressed, cx, cy, dx, dy, xi, yi;
     DFLOAT  	minv;
 
@@ -490,13 +489,13 @@ int Handle_keyboard(int ind)
 		    if (i == j)
 			break;
 		} while (i == ind
-			 || BIT(Players[i]->status, GAME_OVER|PAUSE)
+			 || BIT(Players(i)->status, GAME_OVER|PAUSE)
 			 || !Player_lock_allowed(ind, i));
 		if (i == ind) {
 		    CLR_BIT(pl->lock.tagged, LOCK_PLAYER);
 		}
 		else {
-		    pl->lock.pl_id = Players[i]->id;
+		    pl->lock.pl_id = Players(i)->id;
 		    SET_BIT(pl->lock.tagged, LOCK_PLAYER);
 		}
 		break;
@@ -517,7 +516,7 @@ int Handle_keyboard(int ind)
 		    && (k = pl->lock.pl_id) > 0
 		    && (i = GetInd[k]) > 0
 		    && i < NumPlayers
-		    && Players[i]->id == k
+		    && Players(i)->id == k
 		    && i != ind) {
 		    break;
 		}
@@ -558,24 +557,24 @@ int Handle_keyboard(int ind)
 		for (i=0; i<NumPlayers; i++)
 		    if (i != ind
 			&& !IS_TANK_IND(i)
-			&& pl->home_base == Players[i]->home_base) {
+			&& pl->home_base == Players(i)->home_base) {
 			Pick_startpos(i);
 			sprintf(msg, "%s has taken over %s's home base.",
-				pl->name, Players[i]->name);
+				pl->name, Players(i)->name);
 		    }
 		if (msg[0]) {
 		    sound_play_all(CHANGE_HOME_SOUND);
 		    Set_message(msg);
 		}
 		for (i = 0; i < NumPlayers; i++) {
-		    if (Players[i]->conn != NOT_CONNECTED) {
-			Send_base(Players[i]->conn,
+		    if (Players(i)->conn != NOT_CONNECTED) {
+			Send_base(Players(i)->conn,
 				  pl->id,
 				  pl->home_base);
 		    }
 		}
 		for (i = 0; i < NumObservers; i++) {
-		    Send_base(Players[i + observerStart]->conn,
+		    Send_base(Players(i + observerStart)->conn,
 			      pl->id, pl->home_base);
  		}
 		break;

@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -393,7 +392,7 @@ static int num2str(int num, char *str, int i)
 static int Frame_status(int conn, int ind)
 {
     static char		mods[MAX_CHARS];
-    player		*pl = Players[ind];
+    player		*pl = Players(ind);
     int			n,
 			lock_ind,
 			lock_id = NO_ID,
@@ -422,16 +421,16 @@ static int Frame_status(int conn, int ind)
 #ifndef SHOW_CLOAKERS_RANGE
 	    && (pl->visibility[lock_ind].canSee || OWNS_TANK(ind, lock_ind) || TEAM(ind, lock_ind) || ALLIANCE(ind, lock_ind))
 #endif
-	    && BIT(Players[lock_ind]->status, PLAYING|GAME_OVER) == PLAYING
+	    && BIT(Players(lock_ind)->status, PLAYING|GAME_OVER) == PLAYING
 	    && (playersOnRadar
 		|| click_inview(&cv,
-				Players[lock_ind]->pos.cx,
-				Players[lock_ind]->pos.cy))
+				Players(lock_ind)->pos.cx,
+				Players(lock_ind)->pos.cy))
 	    && pl->lock.distance != 0) {
 	    SET_BIT(pl->lock.tagged, LOCK_VISIBLE);
 	    lock_dir
-		= (int)Wrap_cfindDir(Players[lock_ind]->pos.cx - pl->pos.cx,
-				     Players[lock_ind]->pos.cy - pl->pos.cy);
+		= (int)Wrap_cfindDir(Players(lock_ind)->pos.cx - pl->pos.cx,
+				     Players(lock_ind)->pos.cy - pl->pos.cy);
 	    lock_dist = (int)pl->lock.distance;
 	}
     }
@@ -487,7 +486,7 @@ static int Frame_status(int conn, int ind)
 		  lock_dist,
 		  lock_dir,
 		  showautopilot,
-		  Players[GetInd[Get_player_id(conn)]]->status,
+		  Players(GetInd[Get_player_id(conn)])->status,
 		  mods);
     if (n <= 0) {
 	return 0;
@@ -521,7 +520,7 @@ static int Frame_status(int conn, int ind)
 
 static void Frame_map(int conn, int ind)
 {
-    player		*pl = Players[ind];
+    player		*pl = Players(ind);
     int			i,
 			k,
 			conn_bit = (1 << conn);
@@ -729,7 +728,7 @@ static void Frame_shuffle(void)
 
 static void Frame_shots(int conn, int ind)
 {
-    player			*pl = Players[ind];
+    player			*pl = Players(ind);
     int				cx, cy;
     int				lcx = -1, lcy = -1, ldir = 0;
     int				i, k, color;
@@ -844,7 +843,7 @@ static void Frame_shots(int conn, int ind)
 	case OBJ_CANNON_SHOT:
 	    if (Team_immune(shot->id, pl->id)
 		|| (shot->id != NO_ID
-		    && BIT(Players[GetInd[shot->id]]->status, PAUSE))
+		    && BIT(Players(GetInd[shot->id])->status, PAUSE))
 		|| (shot->id == NO_ID
 		    && BIT(World.rules->mode, TEAM_PLAY)
 		    && shot->team == pl->team)) {
@@ -901,7 +900,7 @@ static void Frame_shots(int conn, int ind)
 			confused = 1;
 		}
 		if (mine->id != NO_ID
-		    && BIT(Players[GetInd[mine->id]]->status, PAUSE)) {
+		    && BIT(Players(GetInd[mine->id])->status, PAUSE)) {
 		    laid_by_team = 1;
 		} else {
 		    laid_by_team = (Team_immune(mine->id, pl->id)
@@ -952,7 +951,7 @@ static void Frame_shots(int conn, int ind)
 
 static void Frame_ships(int conn, int ind)
 {
-    player			*pl = Players[ind],
+    player			*pl = Players(ind),
 				*pl_i;
     int				i, k;
 
@@ -962,8 +961,8 @@ static void Frame_ships(int conn, int ind)
     }
     for (i = 0; i < NumTransporters; i++) {
 	trans_t *trans = Transporters[i];
-	player 	*victim = Players[GetInd[trans->target]],
-		*pl = (trans->id == NO_ID ? NULL : Players[GetInd[trans->id]]);
+	player 	*victim = Players(GetInd[trans->target]),
+		*pl = (trans->id == NO_ID ? NULL : Players(GetInd[trans->id]));
 	int 	cx = (pl ? pl->pos.cx : trans->pos.cx),
 		cy = (pl ? pl->pos.cy : trans->pos.cy);
 	Send_trans(conn, victim->pos.cx, victim->pos.cy, cx, cy);
@@ -971,7 +970,7 @@ static void Frame_ships(int conn, int ind)
     for (i = 0; i < World.NumCannons; i++) {
 	cannon_t *cannon = World.cannon + i;
 	if (cannon->tractor_count > 0) {
-	    player *t = Players[GetInd[cannon->tractor_target]];
+	    player *t = Players(GetInd[cannon->tractor_target]);
 	    if (click_inview(&cv, t->pos.cx, t->pos.cy)) {
 		int j;
 		for (j = 0; j < 3; j++) {
@@ -988,7 +987,7 @@ static void Frame_ships(int conn, int ind)
 
     for (k = 0; k < num_player_shuffle; k++) {
 	i = player_shuffle_ptr[k];
-	pl_i = Players[i];
+	pl_i = Players(i);
 	if (!BIT(pl_i->status, PLAYING|PAUSE))
 	    continue;
 	if (BIT(pl_i->status, GAME_OVER))
@@ -1045,7 +1044,7 @@ static void Frame_ships(int conn, int ind)
 	    }
 	}
 	if (BIT(pl_i->used, HAS_TRACTOR_BEAM)) {
-	    player *t = Players[GetInd[pl_i->lock.pl_id]];
+	    player *t = Players(GetInd[pl_i->lock.pl_id]);
 	    if (click_inview(&cv, t->pos.cx, t->pos.cy)) {
 		int j;
 
@@ -1074,7 +1073,7 @@ static void Frame_ships(int conn, int ind)
 static void Frame_radar(int conn, int ind)
 {
     int			i, k, mask, shownuke, size;
-    player		*pl = Players[ind];
+    player		*pl = Players(ind);
     object		*shot;
     int			cx, cy;
 
@@ -1146,16 +1145,16 @@ static void Frame_radar(int conn, int ind)
 	     *		People in other teams or alliances if;
 	     *			no playersOnRadar or if not visible
 	     */
-	    if (Players[i]->conn == conn
-		|| BIT(Players[i]->status, PLAYING|PAUSE|GAME_OVER) != PLAYING
+	    if (Players(i)->conn == conn
+		|| BIT(Players(i)->status, PLAYING|PAUSE|GAME_OVER) != PLAYING
 		|| (!TEAM(i, ind)
 		    && !ALLIANCE(ind, i)
 		    && !OWNS_TANK(ind, i)
 		    && (!playersOnRadar || !pl->visibility[i].canSee))) {
 		continue;
 	    }
-	    cx = Players[i]->pos.cx;
-	    cy = Players[i]->pos.cy;
+	    cx = Players(i)->pos.cx;
+	    cy = Players(i)->pos.cy;
 	    if (BIT(World.rules->mode, LIMITED_VISIBILITY)
 		&& Wrap_length(pl->pos.cx - cx,
 			       pl->pos.cy - cy) > pl->sensor_range * CLICK) {
@@ -1180,7 +1179,7 @@ static void Frame_radar(int conn, int ind)
 
 static void Frame_lose_item_state(int ind)
 {
-    player		*pl = Players[ind];
+    player		*pl = Players(ind);
 
     if (pl->lose_item_state != 0) {
 	Send_loseitem(pl->lose_item, pl->conn);
@@ -1193,7 +1192,7 @@ static void Frame_lose_item_state(int ind)
 
 static void Frame_parameters(int conn, int ind)
 {
-    player		*pl = Players[ind];
+    player		*pl = Players(ind);
 
     Get_display_parameters(conn, &view_width, &view_height,
 			   &debris_colors, &spark_rand);
@@ -1261,7 +1260,7 @@ void Frame_update(void)
     for (i = 0; i < observerStart + NumObservers; i++) {
 	if (i >= num_player_shuffle && i < observerStart)
 	    continue;
-	pl = Players[i];
+	pl = Players(i);
 	conn = pl->conn;
 	if (conn == NOT_CONNECTED) {
 	    continue;
@@ -1332,8 +1331,8 @@ void Frame_update(void)
 		ind = 0;
 	}
 
-	if (Players[ind]->damaged > 0)
-	    Send_damaged(conn, (int)Players[ind]->damaged);
+	if (Players(ind)->damaged > 0)
+	    Send_damaged(conn, (int)Players(ind)->damaged);
 	else {
 	    Frame_parameters(conn, ind);
 	    if (Frame_status(conn, ind) <= 0) {
@@ -1347,7 +1346,7 @@ void Frame_update(void)
 	    debris_end(conn);
 	    fastshot_end(conn);
 	}
-	sound_play_queued(Players[ind]);
+	sound_play_queued(Players(ind));
 	Send_end_of_frame(conn);
     }
     playback = rplayback;
@@ -1374,13 +1373,13 @@ void Set_message(const char *message)
     }
     if (!rplayback || playback)
 	for (i = 0; i < NumPlayers; i++) {
-	    pl = Players[i];
+	    pl = Players(i);
 	    if (pl->conn != NOT_CONNECTED) {
 		Send_message(pl->conn, msg);
 	    }
 	}
     for (i = 0; i < NumObservers; i++) {
-	pl = Players[i + observerStart];
+	pl = Players(i + observerStart);
 	Send_message(pl->conn, msg);
     }
 }

@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -71,7 +70,7 @@ char shot_version[] = VERSION;
 
 void Place_mine(int ind)
 {
-    player *pl = Players[ind];
+    player *pl = Players(ind);
 
     if (pl->item[ITEM_MINE] <= 0
 	|| (BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE) && !shieldedMining)) {
@@ -90,7 +89,7 @@ void Place_mine(int ind)
 
 void Place_moving_mine(int ind)
 {
-    player	*pl = Players[ind];
+    player	*pl = Players(ind);
     DFLOAT	vx = pl->vel.x;
     DFLOAT	vy = pl->vel.y;
 
@@ -121,7 +120,7 @@ void Place_general_mine(int ind, unsigned short team, long status,
 			DFLOAT vx, DFLOAT vy, modifiers mods)
 {
     char		msg[MSG_LEN];
-    player		*pl = (ind == -1 ? NULL : Players[ind]);
+    player		*pl = Players(ind);
     int			used;
     DFLOAT		life;
     long		drain;
@@ -187,10 +186,10 @@ void Place_general_mine(int ind, unsigned short team, long status,
 	if (baseMineRange) {
 	    for (i = 0; i < NumPlayers; i++) {
 		if (i != ind
-		    && !Team_immune(Players[i]->id, pl->id)
+		    && !Team_immune(Players(i)->id, pl->id)
 		    && !IS_TANK_IND(i)) {
-		    int dx = cx - World.base[Players[i]->home_base].pos.cx;
-		    int dy = cy - World.base[Players[i]->home_base].pos.cy;
+		    int dx = cx - World.base[Players(i)->home_base].pos.cx;
+		    int dy = cy - World.base[Players(i)->home_base].pos.cy;
 		    if (Wrap_length(dx, dy) <= baseMineRange * BLOCK_CLICKS) {
 			Set_player_message(pl, "No base mining!");
 			return;
@@ -283,7 +282,7 @@ void Place_general_mine(int ind, unsigned short team, long status,
  */
 void Detonate_mines(int ind)
 {
-    player		*pl = Players[ind];
+    player		*pl = Players(ind);
     int			i;
     int			closest = -1;
     DFLOAT		dist;
@@ -433,7 +432,7 @@ char *Describe_shot(int type, long status, modifiers mods, int hit)
 
 void Fire_main_shot(int ind, int type, int dir)
 {
-    player *pl = Players[ind];
+    player *pl = Players(ind);
     int cx, cy;
     clpos m_gun;
 
@@ -449,7 +448,7 @@ void Fire_main_shot(int ind, int type, int dir)
 
 void Fire_shot(int ind, int type, int dir)
 {
-    player *pl = Players[ind];
+    player *pl = Players(ind);
 
     if (pl->shots >= ShotsMax || BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
 	return;
@@ -460,7 +459,7 @@ void Fire_shot(int ind, int type, int dir)
 
 void Fire_left_shot(int ind, int type, int dir, int gun)
 {
-    player *pl = Players[ind];
+    player *pl = Players(ind);
     int cx, cy;
     clpos l_gun;
 
@@ -477,7 +476,7 @@ void Fire_left_shot(int ind, int type, int dir, int gun)
 
 void Fire_right_shot(int ind, int type, int dir, int gun)
 {
-    player *pl = Players[ind];
+    player *pl = Players(ind);
     int cx, cy;
     clpos r_gun;
 
@@ -494,7 +493,7 @@ void Fire_right_shot(int ind, int type, int dir, int gun)
 
 void Fire_left_rshot(int ind, int type, int dir, int gun)
 {
-    player *pl = Players[ind];
+    player *pl = Players(ind);
     int cx, cy;
     clpos l_rgun;
 
@@ -511,7 +510,7 @@ void Fire_left_rshot(int ind, int type, int dir, int gun)
 
 void Fire_right_rshot(int ind, int type, int dir, int gun)
 {
-    player *pl = Players[ind];
+    player *pl = Players(ind);
     int cx, cy;
     clpos r_rgun;
 
@@ -532,7 +531,7 @@ void Fire_general_shot(int ind, unsigned short team, bool cannon,
 		       modifiers mods, int target)
 {
     char		msg[MSG_LEN];
-    player		*pl = (ind == -1 ? NULL : Players[ind]);
+    player		*pl = Players(ind);
     int			used,
 			fuse = 0,
 			lock = 0,
@@ -1074,7 +1073,7 @@ void Fire_general_shot(int ind, unsigned short team, bool cannon,
 
 void Fire_normal_shots(int ind)
 {
-    player		*pl = Players[ind];
+    player		*pl = Players(ind);
     int			i, shot_angle;
 
     /* Average non-integer repeat rates, so that smaller gap occurs first.
@@ -1174,8 +1173,8 @@ void Delete_shot(int ind)
 	     * Maybe some player is still busy trying to connect to this ball.
 	     */
 	    for (i = 0; i < NumPlayers; i++) {
-		if (Players[i]->ball == ball) {
-		    Players[i]->ball = NULL;
+		if (Players(i)->ball == ball) {
+		    Players(i)->ball = NULL;
 		}
 	    }
 	}
@@ -1248,7 +1247,7 @@ void Delete_shot(int ind)
 	if (BIT(shot->mods.warhead, CLUSTER)) {
 	    type = OBJ_SHOT;
 	    if (shot->id != NO_ID) {
-		player *pl = Players[GetInd[shot->id]];
+		player *pl = Players(GetInd[shot->id]);
 		color = pl->color;
 	    }
 	    else
@@ -1329,7 +1328,7 @@ void Delete_shot(int ind)
 	    || BIT(shot->mods.warhead, CLUSTER)) {
 	    break;
 	}
-	pl = Players[GetInd[shot->id]];
+	pl = Players(GetInd[shot->id]);
 	if (--pl->shots <= 0)
 	    pl->shots = 0;
 	break;
@@ -1339,7 +1338,7 @@ void Delete_shot(int ind)
 	    || BIT(shot->status, FROMCANNON)) {
 	    break;
 	}
-	pl = Players[GetInd[shot->id]];
+	pl = Players(GetInd[shot->id]);
 	if (--pl->num_pulses <= 0)
 	    pl->num_pulses = 0;
 	break;
@@ -1430,7 +1429,7 @@ void Delete_shot(int ind)
 
 void Fire_laser(int ind)
 {
-    player	*pl = Players[ind];
+    player	*pl = Players(ind);
     int		cx, cy;
     double	laserRepeatRate = 2;
     clpos	m_gun;
@@ -1457,7 +1456,7 @@ void Fire_laser(int ind)
 void Fire_general_laser(int ind, unsigned short team, int cx, int cy,
 			int dir, modifiers mods)
 {
-    player		*pl = ((ind == -1) ? NULL : Players[ind]);
+    player		*pl = Players(ind);
     int			life;
     pulseobject		*pulse;
 
@@ -1562,7 +1561,7 @@ void Connector_force(int ind)
      */
 
     ballobject		*ball = BALL_IND(ind);
-    player		*pl = Players[ GetInd[ball->id] ];
+    player		*pl = Players( GetInd[ball->id] );
     vector		D;
     DFLOAT		length, force, ratio, accell, damping;
     /* const DFLOAT		k = 1500.0, b = 2.0; */
@@ -1647,7 +1646,7 @@ void Move_smart_shot(int ind)
 	if (shot->info >= 0) {
 	    clpos engine;
 	    /* Get player and set min to distance */
-	    pl = Players[ GetInd[shot->info] ];
+	    pl = Players( GetInd[shot->info] );
 	    engine = Ship_get_engine_clpos(pl->ship, pl->dir);
 	    range = Wrap_length(pl->pos.cx + engine.cx - shot->pos.cx,
 				pl->pos.cy + engine.cy - shot->pos.cy)
@@ -1682,7 +1681,7 @@ void Move_smart_shot(int ind)
 
 		range = HEAT_RANGE * (shot->count / HEAT_CLOSE_TIMEOUT);
 		for (i=0; i<NumPlayers; i++) {
-		    player *p = Players[i];
+		    player *p = Players(i);
 		    clpos engine;
 
 		    if (!BIT(p->status, THRUSTING))
@@ -1701,7 +1700,7 @@ void Move_smart_shot(int ind)
 		    if (BIT(p->have, HAS_AFTERBURNER))
 			l *= 16 - p->item[ITEM_AFTERBURNER];
 		    if (l < range) {
-			shot->info = Players[i]->id;
+			shot->info = Players(i)->id;
 			range = l;
 			shot->count =
 			    l < HEAT_CLOSE_RANGE ?
@@ -1730,7 +1729,7 @@ void Move_smart_shot(int ind)
 		|| smart->count == CONFUSED_TIME))) {
 
 	    if (smart->count > 0) {
-		smart->info = Players[(int)(rfrac() * NumPlayers)]->id;
+		smart->info = Players((int)(rfrac() * NumPlayers))->id;
 		smart->count -= timeStep;
 	    } else {
 		smart->count = 0;
@@ -1751,7 +1750,7 @@ void Move_smart_shot(int ind)
 		}
 	    }
 	}
-	pl = Players[GetInd[shot->info]];
+	pl = Players(GetInd[shot->info]);
     }
     else
 	/*NOTREACHED*/
