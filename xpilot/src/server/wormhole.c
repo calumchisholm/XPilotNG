@@ -105,8 +105,8 @@ static int Find_wormhole_dest(world_t *world, wormhole_t *wh_hit, player_t *pl)
 
     if (rfrac() < 0.1) {
 	do
-	    wh_dest = (int)(rfrac() * world->NumWormholes);
-	while (world->wormholes[wh_dest].type == WORM_IN
+	    wh_dest = (int)(rfrac() * Num_wormholes(world));
+	while (Wormhole_by_index(world, wh_dest)->type == WORM_IN
 	       || pl->wormHoleHit == wh_dest);
 	return wh_dest;
     }
@@ -114,7 +114,7 @@ static int Find_wormhole_dest(world_t *world, wormhole_t *wh_hit, player_t *pl)
     nearestFront = nearestRear = -1;
     proxFront = proxRear = 1e20;
 
-    for (wh_dest = 0; wh_dest < world->NumWormholes; wh_dest++) {
+    for (wh_dest = 0; wh_dest < Num_wormholes(world); wh_dest++) {
 	wormhole_t *wh = Wormhole_by_index(world, wh_dest);
 
 	if (wh_dest == pl->wormHoleHit
@@ -147,8 +147,8 @@ static int Find_wormhole_dest(world_t *world, wormhole_t *wh_hit, player_t *pl)
 	    wh_dest = nearestFront;
 	else {
 	    do
-		wh_dest = (int)(rfrac() * world->NumWormholes);
-	    while (world->wormholes[wh_dest].type == WORM_IN
+		wh_dest = (int)(rfrac() * Num_wormholes(world));
+	    while (Wormhole_by_index(world, wh_dest)->type == WORM_IN
 		   || wh_dest == pl->wormHoleHit);
 	}
     }
@@ -174,7 +174,7 @@ void Traverse_wormhole(player_t *pl)
     wh_dest = Find_wormhole_dest(world, wh_hit, pl);
 
     sound_play_sensors(pl->pos, WORM_HOLE_SOUND);
-    dest = world->wormholes[wh_dest].pos;
+    dest = Wormhole_by_index(world, wh_dest)->pos;
 
     Warp_balls(pl, dest);
 
@@ -315,16 +315,14 @@ void World_remove_wormhole(world_t *world, wormhole_t *wormhole)
     World_set_block(world, blk, wormhole->lastblock);
 }
 
-void Verify_wormhole_consistency(world_t *world)
+bool Verify_wormhole_consistency(world_t *world)
 {
-    int i;
-    int	worm_in = 0,
-	worm_out = 0,
-	worm_norm = 0;
+    int i, worm_in = 0, worm_out = 0, worm_norm = 0;
 
     /* count wormhole types */
-    for (i = 0; i < world->NumWormholes; i++) {
-	int type = world->wormholes[i].type;
+    for (i = 0; i < Num_wormholes(world); i++) {
+	int type = Wormhole_by_index(world, i)->type;
+
 	if (type == WORM_NORMAL)
 	    worm_norm++;
 	else if (type == WORM_IN)
@@ -339,22 +337,40 @@ void Verify_wormhole_consistency(world_t *world)
      * any 'in' wormholes, and (less critical) if we have no 'in'
      * wormholes, make sure that we don't have any 'out' wormholes.
      */
-    if ((worm_norm) ? (worm_norm + worm_out < 2)
-	: (worm_in) ? (worm_out < 1)
-	: (worm_out > 0)) {
-
-	xpprintf("Inconsistent use of wormholes, removing them.\n");
-	for (i = 0; i < world->NumWormholes; i++)
-	    World_remove_wormhole(world, Wormhole_by_index(world, i));
-	world->NumWormholes = 0;
+    if (worm_norm > 0) {
+	if (worm_norm + worm_out < 2) {
+	    warn("Map has only one 'normal' wormhole.");
+	    warn("Add at least one 'normal' or 'out' wormhole.");
+	    return false;
+	}
+    } else if (worm_in > 0) {
+	if (worm_out < 1) {
+	    warn("Map has %d 'in' wormholes, "
+		 "but no 'normal' or 'out' wormholes.", worm_in);
+	    warn("Add at least one 'normal' or 'out' wormhole.");
+	    return false;
+	}
+    } else if (worm_out > 0) {
+	warn("Map has %d 'out' wormholes, but no 'normal' or 'in' wormholes.",
+	     worm_out);
+	warn("Add at least one 'normal' or 'in' wormhole.");
+	return false;
     }
 
+    return true;
+}
+
+/* kps - remove this */
+void Set_wormhole_initial_destinations(world_t *world)
+{
+    int i;
+
     if (!options.wormholeStableTicks) {
-	for (i = 0; i < world->NumWormholes; i++) {
-	    int j = (int)(rfrac() * world->NumWormholes);
+	for (i = 0; i < Num_wormholes(world); i++) {
+	    int j = (int)(rfrac() * Num_wormholes(world));
 
 	    while (Wormhole_by_index(world, j)->type == WORM_IN)
-		j = (int)(rfrac() * world->NumWormholes);
+		j = (int)(rfrac() * Num_wormholes(world));
 	    Wormhole_by_index(world, i)->lastdest = j;
 	}
     }

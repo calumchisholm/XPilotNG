@@ -558,6 +558,7 @@ void Object_hits_wormhole(object_t *obj, int ind);
 hitmask_t Wormhole_hitmask(wormhole_t *wormhole);
 bool Wormhole_hitfunc(group_t *groupptr, move_t *move);
 void World_remove_wormhole(world_t *world, wormhole_t *wormhole);
-void Verify_wormhole_consistency(world_t *world);
+bool Verify_wormhole_consistency(world_t *world);
+void Set_wormhole_initial_destinations(world_t *world);
 
 #endif

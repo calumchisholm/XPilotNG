@@ -259,7 +259,7 @@ void Create_blockmap_from_polygons(world_t *world)
 	World_set_block(world, blk, ITEM_CONCENTRATOR);
     }
 
-    for (i = 0; i < world->NumWormholes; i++) {
+    for (i = 0; i < Num_wormholes(world); i++) {
 	wormhole_t *wh = Wormhole_by_index(world, i);
 
 	blk = Clpos_to_blkpos(wh->pos);
@@ -440,7 +440,7 @@ setup_t *Xpmap_init_setup(world_t *world)
 	    case DECOR_LD:	*mapptr = SETUP_DECOR_LD; break;
 
 	    case WORMHOLE:
-		if (wormhole_i >= world->NumWormholes) {
+		if (wormhole_i >= Num_wormholes(world)) {
 		    /*
 		     * This can happen on an xp2 map if the block mapdata
 		     * contains more wormholes than is specified in the
@@ -450,7 +450,8 @@ setup_t *Xpmap_init_setup(world_t *world)
 		    *mapptr = SETUP_SPACE;
 		    break;
 		}
-		wtype = world->wormholes[wormhole_i++].type;
+		wtype = Wormhole_by_index(world, wormhole_i)->type;
+		wormhole_i++;
 		switch (wtype) {
 		case WORM_NORMAL:
 		case WORM_FIXED:
@@ -470,24 +471,26 @@ setup_t *Xpmap_init_setup(world_t *world)
 		break;
 
 	    case TREASURE:
-		if (treasure_i >= world->NumTreasures) {
+		if (treasure_i >= Num_treasures(world)) {
 		    warn("Too many treasures in block mapdata.");
 		    *mapptr = SETUP_SPACE;
 		    break;
 		}
-		team = world->treasures[treasure_i++].team;
+		team = Treasure_by_index(world, treasure_i)->team;
+		treasure_i++;
 		if (team == TEAM_NOT_SET)
 		    team = 0;
 		*mapptr = SETUP_TREASURE + team;
 		break;
 
 	    case TARGET:
-		if (target_i >= world->NumTargets) {
+		if (target_i >= Num_targets(world)) {
 		    warn("Too many targets in block mapdata.");
 		    *mapptr = SETUP_SPACE;
 		    break;
 		}
-		team = world->targets[target_i++].team;
+		team = Target_by_index(world, target_i)->team;
+		target_i++;
 		if (team == TEAM_NOT_SET)
 		    team = 0;
 		*mapptr = SETUP_TARGET + team;
@@ -983,7 +986,7 @@ void Xpmap_find_map_object_teams(world_t *world)
     /*
      * Determine which team a stuff belongs to.
      */
-    for (i = 0; i < world->NumTreasures; i++) {
+    for (i = 0; i < Num_treasures(world); i++) {
 	treasure_t *treasure = Treasure_by_index(world, i);
 	team_t *teamp;
 
@@ -998,7 +1001,7 @@ void Xpmap_find_map_object_teams(world_t *world)
 	    teamp->TreasuresLeft++;
     }
 
-    for (i = 0; i < world->NumTargets; i++) {
+    for (i = 0; i < Num_targets(world); i++) {
 	target_t *targ = Target_by_index(world, i);
 
 	targ->team = Find_closest_team(world, targ->pos);
@@ -1554,16 +1557,16 @@ void Xpmap_blocks_to_polygons(world_t *world)
     if (options.polygonMode)
 	is_polygon_map = true;
 
-    for (i = 0; i < world->NumTreasures; i++)
+    for (i = 0; i < Num_treasures(world); i++)
 	Xpmap_treasure_to_polygon(world, i);
 
-    for (i = 0; i < world->NumTargets; i++)
+    for (i = 0; i < Num_targets(world); i++)
 	Xpmap_target_to_polygon(world, i);
 
     for (i = 0; i < Num_cannons(world); i++)
 	Xpmap_cannon_to_polygon(world, i);
 
-    for (i = 0; i < world->NumWormholes; i++)
+    for (i = 0; i < Num_wormholes(world); i++)
 	Xpmap_wormhole_to_polygon(world, i);
 
     for (i = 0; i < world->NumFrictionAreas; i++)

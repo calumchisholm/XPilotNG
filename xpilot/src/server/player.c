@@ -718,7 +718,7 @@ void Reset_all_players(world_t *world)
 	}
 
 	/* Reset the treasures */
-	for (i = 0; i < world->NumTreasures; i++) {
+	for (i = 0; i < Num_treasures(world); i++) {
 	    treasure_t *treasure = Treasure_by_index(world, i);
 
 	    treasure->destroyed = 0;
@@ -737,7 +737,7 @@ void Reset_all_players(world_t *world)
 
 	if (options.endOfRoundReset) {
 	    /* Reset the targets */
-	    for (i = 0; i < world->NumTargets; i++) {
+	    for (i = 0; i < Num_targets(world); i++) {
 		target_t *targ = Target_by_index(world, i);
 
 		if (targ->damage != TARGET_DAMAGE || targ->dead_ticks > 0)

@@ -48,9 +48,9 @@ static void Check_map_object_counters(world_t *world)
     /*assert(world->NumCannons == 0);*/
 
     /*assert(world->NumGravs == 0);*/
-    assert(world->NumWormholes == 0);
-    assert(world->NumTreasures == 0);
-    assert(world->NumTargets == 0);
+    /*assert(world->NumWormholes == 0);*/
+    /*assert(world->NumTreasures == 0);*/
+    /*assert(world->NumTargets == 0);*/
     /*assert(world->NumBases == 0);*/
     assert(world->NumItemConcs == 0);
     assert(world->NumAsteroidConcs == 0);
@@ -94,11 +94,11 @@ static void Realloc_map_objects(world_t *world)
     /*SHRINK(cannon_t, world->cannons, world->NumCannons, world->MaxCannons);*/
     /*SHRINK(fuel_t, world->fuels, world->NumFuels, world->MaxFuels);*/
     /*SHRINK(grav_t, world->gravs, world->NumGravs, world->MaxGravs);*/
-    SHRINK(wormhole_t, world->wormholes,
-	   world->NumWormholes, world->MaxWormholes);
-    SHRINK(treasure_t, world->treasures,
-	   world->NumTreasures, world->MaxTreasures);
-    SHRINK(target_t, world->targets, world->NumTargets, world->MaxTargets);
+    /*SHRINK(wormhole_t, world->wormholes,
+      world->NumWormholes, world->MaxWormholes);*/
+    /*SHRINK(treasure_t, world->treasures,
+      world->NumTreasures, world->MaxTreasures);*/
+    /*SHRINK(target_t, world->targets, world->NumTargets, world->MaxTargets);*/
     /*SHRINK(base_t, world->bases, world->NumBases, world->MaxBases);*/
     SHRINK(item_concentrator_t, world->itemConcs,
 	   world->NumItemConcs, world->MaxItemConcs);
@@ -131,10 +131,10 @@ int World_place_cannon(world_t *world, clpos_t pos, int dir, int team)
 	t.initial_items[i] = -1;
     t.shot_speed = -1;
     t.smartness = -1;
-    /*STORE(cannon_t, world->cannons, world->NumCannons, world->MaxCannons, t);*/
     Arraylist_add(world->cannons, &t);
     cannon = Cannon_by_index(world, ind);
     assert(Cannon_by_id(world, t.id) == cannon);
+
     return ind;
 }
 
@@ -148,8 +148,8 @@ int World_place_fuel(world_t *world, clpos_t pos, int team)
     t.conn_mask = (unsigned)-1;
     t.last_change = frame_loops;
     t.team = team;
-    /*STORE(fuel_t, world->fuels, world->NumFuels, world->MaxFuels, t);*/
     Arraylist_add(world->fuels, &t);
+
     return ind;
 }
 
@@ -189,9 +189,8 @@ int World_place_base(world_t *world, clpos_t pos, int dir, int team)
 
     for (i = 0; i < NUM_ITEMS; i++)
 	t.initial_items[i] = -1;
-
-    /*STORE(base_t, world->bases, world->NumBases, world->MaxBases, t);*/
     Arraylist_add(world->bases, &t);
+
     return ind;
 }
 
@@ -199,7 +198,7 @@ int World_place_treasure(world_t *world, clpos_t pos, int team, bool empty,
 			 int ball_style)
 {
     treasure_t t;
-    int ind = world->NumTreasures;
+    int ind = Num_treasures(world);
 
     t.pos = pos;
     t.have = false;
@@ -211,15 +210,15 @@ int World_place_treasure(world_t *world, clpos_t pos, int team, bool empty,
 	world->teams[team].NumTreasures++;
 	world->teams[team].TreasuresLeft++;
     }
-    STORE(treasure_t, world->treasures, world->NumTreasures,
-	  world->MaxTreasures, t);
+    Arraylist_add(world->treasures, &t);
+
     return ind;
 }
 
 int World_place_target(world_t *world, clpos_t pos, int team)
 {
     target_t t;
-    int ind = world->NumTargets;
+    int ind = Num_targets(world);
 
     t.pos = pos;
     /*
@@ -233,14 +232,15 @@ int World_place_target(world_t *world, clpos_t pos, int team)
     t.update_mask = 0;
     t.last_change = frame_loops;
     t.group = NO_GROUP;
-    STORE(target_t, world->targets, world->NumTargets, world->MaxTargets, t);
+    Arraylist_add(world->targets, &t);
+
     return ind;
 }
 
 int World_place_wormhole(world_t *world, clpos_t pos, wormtype_t type)
 {
     wormhole_t t;
-    int ind = world->NumWormholes;
+    int ind = Num_wormholes(world);
 
     t.pos = pos;
     t.countdown = 0;
@@ -249,8 +249,8 @@ int World_place_wormhole(world_t *world, clpos_t pos, wormtype_t type)
     t.lastblock = SPACE;
     t.lastID = NO_ID;
     t.group = NO_GROUP;
-    STORE(wormhole_t, world->wormholes,
-	  world->NumWormholes, world->MaxWormholes, t);
+    Arraylist_add(world->wormholes, &t);
+
     return ind;
 }
 
@@ -348,8 +348,8 @@ int World_place_grav(world_t *world, clpos_t pos, double force, int type)
     t.pos = pos;
     t.force = force;
     t.type = type;
-    /*STORE(grav_t, world->gravs, world->NumGravs, world->MaxGravs, t);*/
     Arraylist_add(world->gravs, &t);
+
     return ind;
 }
 
@@ -397,17 +397,19 @@ int World_init(world_t *world)
 
     memset(world, 0, sizeof(world_t));
 
-    world->bases = Arraylist_create(sizeof(base_t));
-    if (world->bases == NULL)
+    if ((world->bases = Arraylist_create(sizeof(base_t))) == NULL)
 	return -1;
-    world->cannons = Arraylist_create(sizeof(cannon_t));
-    if (world->cannons == NULL)
+    if ((world->cannons = Arraylist_create(sizeof(cannon_t))) == NULL)
 	return -1;
-    world->fuels = Arraylist_create(sizeof(fuel_t));
-    if (world->fuels == NULL)
+    if ((world->fuels = Arraylist_create(sizeof(fuel_t))) == NULL)
 	return -1;
-    world->gravs = Arraylist_create(sizeof(grav_t));
-    if (world->gravs == NULL)
+    if ((world->gravs = Arraylist_create(sizeof(grav_t))) == NULL)
+	return -1;
+    if ((world->targets = Arraylist_create(sizeof(target_t))) == NULL)
+	return -1;
+    if ((world->treasures = Arraylist_create(sizeof(treasure_t))) == NULL)
+	return -1;
+    if ((world->wormholes = Arraylist_create(sizeof(wormhole_t))) == NULL)
 	return -1;
 
     for (i = 0; i < MAX_TEAMS; i++)
@@ -427,7 +429,7 @@ void World_free(world_t *world)
     /*XFREE(world->cannons);*/
     XFREE(world->checks);
     /*XFREE(world->fuels);*/
-    XFREE(world->wormholes);
+    /*XFREE(world->wormholes);*/
     XFREE(world->itemConcs);
     XFREE(world->asteroidConcs);
     XFREE(world->frictionAreas);
@@ -456,7 +458,7 @@ static bool World_alloc(world_t *world)
     /*assert(world->fuels == NULL);*/
     /*assert(world->cannons == NULL);*/
     assert(world->checks == NULL);
-    assert(world->wormholes == NULL);
+    /*assert(world->wormholes == NULL);*/
     assert(world->itemConcs == NULL);
     assert(world->asteroidConcs == NULL);
 
@@ -584,11 +586,13 @@ bool Grok_map(world_t *world)
 	Xpmap_find_map_object_teams(world);
     }
 
-    Verify_wormhole_consistency(world);
+    if (!Verify_wormhole_consistency(world))
+	return false;
+    Set_wormhole_initial_destinations(world);
 
     if (BIT(world->rules->mode, TIMING) && world->NumChecks == 0) {
-	xpprintf("No checkpoints found while race mode (timing) was set.\n");
-	xpprintf("Turning off race mode.\n");
+	warn("No checkpoints found while race mode (timing) was set.");
+	warn("Turning off race mode.");
 	CLR_BIT(world->rules->mode, TIMING);
     }
 

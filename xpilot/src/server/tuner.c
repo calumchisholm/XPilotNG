@@ -181,7 +181,7 @@ void tuner_wormhole_stable_ticks(world_t *world)
     if (options.wormholeStableTicks < 0.0)
 	options.wormholeStableTicks = 0.0;
 
-    for (i = 0; i < world->NumWormholes; i++)
+    for (i = 0; i < Num_wormholes(world); i++)
 	Wormhole_by_index(world, i)->countdown = options.wormholeStableTicks;
 }
 

@@ -1334,7 +1334,7 @@ static bool Ball_handler(player_t *pl)
     robot_default_data_t *my_data = Robot_default_get_data(pl);
     world_t *world = pl->world;
 
-    for (i = 0; i < world->NumTreasures; i++) {
+    for (i = 0; i < Num_treasures(world); i++) {
 	treasure_t *treasure = Treasure_by_index(world, i);
 
 	if ((BIT(pl->have, HAS_BALL) || pl->ball)
@@ -1425,7 +1425,8 @@ static bool Ball_handler(player_t *pl)
 	} else {
 	    SET_BIT(my_data->longterm_mode, FETCH_TREASURE);
 	    return Check_robot_target(pl,
-				      world->treasures[closest_tr].pos,
+				      Treasure_by_index(world,
+							closest_tr)->pos,
 				      RM_NAVIGATE);
 	}
     } else {
@@ -1452,7 +1453,8 @@ static bool Ball_handler(player_t *pl)
 	    && closest_ntr_dist < (my_data->robot_count / 10) * BLOCK_SZ) {
 	    SET_BIT(my_data->longterm_mode, FETCH_TREASURE);
 	    return Check_robot_target(pl,
-				      world->treasures[closest_ntr].pos,
+				      Treasure_by_index(world,
+							closest_ntr)->pos,
 				      RM_NAVIGATE);
 	} else if (closest_ball_dist < (my_data->robot_count / 10) * BLOCK_SZ
 		   && closest_ball_dist > options.ballConnectorLength) {
@@ -1496,7 +1498,7 @@ static int Robot_default_play_check_map(player_t *pl)
 	}
     }
 
-    for (j = 0; j < world->NumTargets; j++) {
+    for (j = 0; j < Num_targets(world); j++) {
 	target_t *targ = Target_by_index(world, j);
 
 	/* Ignore dead or owned targets */
@@ -1905,7 +1907,7 @@ static void Robot_default_play(player_t *pl)
 	CLR_BIT(my_data->longterm_mode, NEED_FUEL);
 
     if (BIT(world->rules->mode, TEAM_PLAY)) {
-	for (j = 0; j < world->NumTargets; j++) {
+	for (j = 0; j < Num_targets(world); j++) {
 	    target_t *targ = Target_by_index(world, j);
 
 	    if (targ->team == pl->team
@@ -2130,7 +2132,7 @@ static void Robot_default_play(player_t *pl)
 	    return;
     }
     if (BIT(world->rules->mode, TEAM_PLAY)
-	&& world->NumTreasures > 0
+	&& Num_treasures(world) > 0
 	&& world->teams[pl->team].NumTreasures > 0
 	&& !navigate_checked
 	&& !BIT(my_data->longterm_mode, TARGET_KILL|NEED_FUEL)) {

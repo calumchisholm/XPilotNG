@@ -295,7 +295,7 @@ static void Player_repair(player_t *pl)
 	return;
 
     CLR_BIT(pl->used, USES_REPAIR);
-    for (i = 0; i < world->NumTargets; i++) {
+    for (i = 0; i < Num_targets(world); i++) {
 	target_t *targ = Target_by_index(world, i);
 
 	if (targ->team == pl->team

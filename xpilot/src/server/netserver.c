@@ -1203,7 +1203,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	else
 	    CLR_BIT(fs->conn_mask, conn_bit);
     }
-    for (i = 0; i < world->NumTargets; i++) {
+    for (i = 0; i < Num_targets(world); i++) {
 	target_t *targ = Target_by_index(world, i);
 	/*
 	 * The client assumes at startup that all targets are not damaged.
@@ -2525,6 +2525,7 @@ static int Receive_ack_target(connection_t *connp)
     int n;
     unsigned short num;
     world_t *world = &World;
+    target_t *targ;
 
     if ((n = Packet_scanf(&connp->r, "%c%ld%hu",
 			  &ch, &loops_ack, &num)) <= 0) {
@@ -2532,7 +2533,7 @@ static int Receive_ack_target(connection_t *connp)
 	    Destroy_connection(connp, "read error");
 	return n;
     }
-    if (num >= world->NumTargets) {
+    if (num >= Num_targets(world)) {
 	Destroy_connection(connp, "bad target ack");
 	return -1;
     }
@@ -2548,9 +2549,10 @@ static int Receive_ack_target(connection_t *connp)
      * destroyed targets could have been displayed with
      * a diagonal cross through them.
      */
-    if (loops_ack > world->targets[num].last_change) {
-	SET_BIT(world->targets[num].conn_mask, 1 << connp->ind);
-	CLR_BIT(world->targets[num].update_mask, 1 << connp->ind);
+    targ = Target_by_index(world, num);
+    if (loops_ack > targ->last_change) {
+	SET_BIT(targ->conn_mask, 1 << connp->ind);
+	CLR_BIT(targ->update_mask, 1 << connp->ind);
     }
     return 1;
 }

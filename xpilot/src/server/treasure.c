@@ -74,7 +74,7 @@ void Treasure_init(world_t *world)
 {
     int i;
 
-    for (i = 0; i < world->NumTreasures; i++)
+    for (i = 0; i < Num_treasures(world); i++)
 	Make_treasure_ball(world, Treasure_by_index(world, i));
 }
 

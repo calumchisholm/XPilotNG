@@ -251,18 +251,15 @@ struct world {
     int		NumTeamBases;	/* How many 'different' teams are allowed */
 
     arraylist_t	*bases;
+    arraylist_t	*cannons;
     arraylist_t	*fuels;
     arraylist_t	*gravs;    
-    arraylist_t	*cannons;
+    arraylist_t	*targets;
+    arraylist_t	*treasures;
+    arraylist_t	*wormholes;
 
     int		NumChecks, MaxChecks;
     check_t	*checks;
-    int		NumWormholes, MaxWormholes;
-    wormhole_t	*wormholes;
-    int		NumTreasures, MaxTreasures;
-    treasure_t	*treasures;
-    int		NumTargets, MaxTargets;
-    target_t	*targets;
     int		NumItemConcs, MaxItemConcs;
     item_concentrator_t		*itemConcs;
     int		NumAsteroidConcs, MaxAsteroidConcs;
@@ -351,34 +348,18 @@ static inline clpos_t World_wrap_clpos(world_t *world, clpos_t pos)
 #define Fuel_by_index(w, i)	((fuel_t *)Arraylist_get((w)->fuels, (i)))
 #define Num_gravs(w)		Arraylist_get_num_elements((w)->gravs)
 #define Grav_by_index(w, i)	((grav_t *)Arraylist_get((w)->gravs, (i)))
-
+#define Num_targets(w)		Arraylist_get_num_elements((w)->targets)
+#define Target_by_index(w, i)	((target_t *)Arraylist_get((w)->targets, (i)))
+#define Num_treasures(w)	Arraylist_get_num_elements((w)->treasures)
+#define Treasure_by_index(w, i)	((treasure_t *)Arraylist_get((w)->treasures, (i)))
+#define Num_wormholes(w)	Arraylist_get_num_elements((w)->wormholes)
+#define Wormhole_by_index(w, i)	((wormhole_t *)Arraylist_get((w)->wormholes, (i)))
 
 
 static inline check_t *Check_by_index(world_t *world, int ind)
 {
     if (ind >= 0 && ind < world->NumChecks)
 	return &world->checks[ind];
-    return NULL;
-}
-
-static inline target_t *Target_by_index(world_t *world, int ind)
-{
-    if (ind >= 0 && ind < world->NumTargets)
-	return &world->targets[ind];
-    return NULL;
-}
-
-static inline treasure_t *Treasure_by_index(world_t *world, int ind)
-{
-    if (ind >= 0 && ind < world->NumTreasures)
-	return &world->treasures[ind];
-    return NULL;
-}
-
-static inline wormhole_t *Wormhole_by_index(world_t *world, int ind)
-{
-    if (ind >= 0 && ind < world->NumWormholes)
-	return &world->wormholes[ind];
     return NULL;
 }
 

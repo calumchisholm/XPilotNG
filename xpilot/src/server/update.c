@@ -1200,7 +1200,7 @@ void Update_objects(world_t *world)
 	Transporter_update(world);
     if (Num_cannons(world) > 0)
 	Cannon_update(world, tick);
-    if (world->NumTargets > 0)
+    if (Num_targets(world) > 0)
 	Target_update(world);
     if (!options.fastAim)
 	Players_turn();
@@ -1213,7 +1213,7 @@ void Update_objects(world_t *world)
 	}
     }
 
-    for (i = world->NumWormholes - 1; i >= 0; i--) {
+    for (i = Num_wormholes(world) - 1; i >= 0; i--) {
 	wormhole_t *wh = Wormhole_by_index(world, i);
 
 	if ((wh->countdown -= timeStep) <= 0)

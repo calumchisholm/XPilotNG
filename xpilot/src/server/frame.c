@@ -416,10 +416,10 @@ static void Frame_map(connection_t *conn, player_t *pl)
     packet_count = 0;
     max_packet = MAX(5, bytes_left / target_packet_size);
     i = MAX(0, pl->last_target_update);
-    for (k = 0; k < world->NumTargets; k++) {
+    for (k = 0; k < Num_targets(world); k++) {
 	target_t *targ;
 
-	if (++i >= world->NumTargets)
+	if (++i >= Num_targets(world))
 	    i = 0;
 	targ = Target_by_index(world, i);
 	if (BIT(targ->update_mask, conn_bit)

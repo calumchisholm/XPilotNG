@@ -29,7 +29,7 @@ void Target_update(world_t *world)
 {
     int i, j;
 
-    for (i = 0; i < world->NumTargets; i++) {
+    for (i = 0; i < Num_targets(world); i++) {
 	target_t *targ = Target_by_index(world, i);
 
 	if (targ->dead_ticks > 0) {
@@ -37,7 +37,7 @@ void Target_update(world_t *world)
 		World_restore_target(world, targ);
 
 		if (options.targetSync) {
-		    for (j = 0; j < world->NumTargets; j++) {
+		    for (j = 0; j < Num_targets(world); j++) {
 			target_t *t = Target_by_index(world, j);
 
 			if (t->team == targ->team)
@@ -179,7 +179,7 @@ void Object_hits_target(object_t *obj, target_t *targ, double player_cost)
 	}
     }
     if (somebody) {
-	for (j = 0; j < world->NumTargets; j++) {
+	for (j = 0; j < Num_targets(world); j++) {
 	    target_t *t = Target_by_index(world, j);
 
 	    if (t->team == targ->team) {
