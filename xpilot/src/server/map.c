@@ -116,7 +116,7 @@ int World_place_cannon(world_t *world, clpos_t pos, int dir, int team)
     t.dir = dir;
     t.team = team;
     t.dead_ticks = 0;
-    t.conn_mask = (unsigned)-1;
+    t.conn_mask = ~0;
     t.group = NO_GROUP;
     t.score = CANNON_SCORE;
     t.id = ind + MIN_CANNON_ID;
@@ -143,7 +143,7 @@ int World_place_fuel(world_t *world, clpos_t pos, int team)
 
     t.pos = pos;
     t.fuel = START_STATION_FUEL;
-    t.conn_mask = (unsigned)-1;
+    t.conn_mask = ~0;
     t.last_change = frame_loops;
     t.team = team;
     Arraylist_add(world->fuels, &t);
@@ -227,7 +227,7 @@ int World_place_target(world_t *world, clpos_t pos, int team)
     t.team = team;
     t.dead_ticks = 0;
     t.damage = TARGET_DAMAGE;
-    t.conn_mask = (unsigned)-1;
+    t.conn_mask = ~0;
     t.update_mask = 0;
     t.last_change = frame_loops;
     t.group = NO_GROUP;

@@ -871,7 +871,7 @@ void World_restore_cannon(world_t *world, cannon_t *cannon)
 
 	if (poly->group == cannon->group) {
 	    poly->current_style = poly->style;
-	    poly->update_mask = (unsigned)-1;
+	    poly->update_mask = ~0;
 	    poly->last_change = frame_loops;
 	}
     }
@@ -898,7 +898,7 @@ void World_remove_cannon(world_t *world, cannon_t *cannon)
 
 	if (poly->group == cannon->group) {
 	    poly->current_style = poly->destroyed_style;
-	    poly->update_mask = (unsigned)-1;
+	    poly->update_mask = ~0;
 	    poly->last_change = frame_loops;
 	}
     }

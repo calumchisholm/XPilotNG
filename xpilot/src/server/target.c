@@ -277,13 +277,13 @@ void World_restore_target(world_t *world, target_t *targ)
 
 	if (poly->group == targ->group) {
 	    poly->current_style = poly->style;
-	    poly->update_mask = (unsigned)-1;
+	    poly->update_mask = ~0;
 	    poly->last_change = frame_loops;
 	}
     }
 
     targ->conn_mask = 0;
-    targ->update_mask = (unsigned)-1;
+    targ->update_mask = ~0;
     targ->last_change = frame_loops;
     targ->dead_ticks = 0;
     targ->damage = TARGET_DAMAGE;
@@ -312,7 +312,7 @@ void World_remove_target(world_t *world, target_t *targ)
 
 	if (poly->group == targ->group) {
 	    poly->current_style = poly->destroyed_style;
-	    poly->update_mask = (unsigned)-1;
+	    poly->update_mask = ~0;
 	    poly->last_change = frame_loops;
 	}
     }
