@@ -1894,7 +1894,7 @@ static void Config_save_resource(FILE *fp, const char *resource, char *value)
 
 static void Config_save_comment(FILE *fp, const char *comment)
 {
-    fprintf(fp, "%s", comment);
+    IFNWINDOWS(fprintf(fp, "%s", comment));
 }
 
 static void Config_save_float(FILE *fp, const char *resource, DFLOAT value)
