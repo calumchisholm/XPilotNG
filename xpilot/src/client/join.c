@@ -74,6 +74,15 @@ static void Input_loop(void)
 	tv.tv_usec = 0;
 
 	if (maxMouseTurnsPS > 0) {
+	    int t = Client_check_pointer_move_interval();
+
+	    assert(t > 0);
+	    tv.tv_sec = t / 1000000;
+	    tv.tv_usec = t % 1000000;
+	}
+
+#if 0
+	{
 	    struct timeval now;
 	    static int last_send_interval_num = -1;
 	    int interval_num; /* 0 ... maxMouseTurnsPS - 1 */
@@ -107,6 +116,7 @@ static void Input_loop(void)
 		tv.tv_usec = 0;
 	    }
 	}
+#endif
 
 	if ((n = select(max + 1, &rfds, NULL, NULL, &tv)) == -1) {
 	    if (errno == EINTR)

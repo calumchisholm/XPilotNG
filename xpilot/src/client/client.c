@@ -2370,3 +2370,33 @@ int Client_pointer_move(int movement)
 
     return 0;
 }
+
+int Client_check_pointer_move_interval(void)
+{
+    struct timeval now;
+    static int last_send_interval_num = -1;
+    int interval_num; /* 0 ... maxMouseTurnsPS - 1 */
+    int next_interval_start;
+    /*
+     * Let's see if we've sent any pointer move this interval,
+     * if not and there is something to send, do that now.
+     */
+    gettimeofday(&now, NULL);
+    interval_num = ((int)now.tv_usec) / mouseMovementInterval;
+
+    /* if we didn't send mouse movement yet, send now */
+    if (interval_num != last_send_interval_num
+	&& cumulativeMouseMovement != 0) {
+	Send_pointer_move(cumulativeMouseMovement);
+	cumulativeMouseMovement = 0;
+	last_send_interval_num = interval_num;
+    }
+
+    if (cumulativeMouseMovement != 0) {
+	/* calculate how long to wait to next interval */
+	next_interval_start = (interval_num + 1) * mouseMovementInterval;
+	return next_interval_start - (int)now.tv_usec;
+    }
+
+    return 1000000;
+}

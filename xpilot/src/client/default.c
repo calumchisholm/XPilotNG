@@ -385,9 +385,11 @@ static bool Set_maxMouseTurnsPS(xp_option_t *opt, int val)
 {
     UNUSED_PARAM(opt);
     maxMouseTurnsPS = val;
-    if (maxMouseTurnsPS > 0)
-	/* +1 microsecond to make sure it is not too short */
-	mouseMovementInterval = (1000000 / maxMouseTurnsPS) + 1;
+    if (maxMouseTurnsPS > 0) {
+	mouseMovementInterval = 1000000 / maxMouseTurnsPS;
+	if (mouseMovementInterval * maxMouseTurnsPS < 1000000)
+	    mouseMovementInterval++;
+    }
     /*warn("mouseMovementInterval = %d", mouseMovementInterval);*/
     return true;
 }

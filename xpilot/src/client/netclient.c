@@ -2531,7 +2531,7 @@ int Send_pointer_move(int movement)
     t = s + u * 1e-6;
 
     if (tv.tv_sec != old_tv.tv_sec) {
-	warn("numpackets = %d", num);
+	warn("Send_pointer_moves = %d", num);
 	num = 1;
     } else
 	num ++;
