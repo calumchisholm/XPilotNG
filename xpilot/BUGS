@@ -8,6 +8,19 @@ affected:
 
 
 -------------------------------------------------------------------
+Problem : textures and map are downloaded more than once
+          and put into deeper levels of .xpilot_data by the client.
+          I.e. you will see a directory structure like:
+          .xpilot_data/polybloods/polybloods/polybloods/polybloods
+          or similar
+Found by: Throat
+Solution:
+Fixed by:
+Files 
+affected:
+
+
+-------------------------------------------------------------------
 Problem : Very thin walls are not displayed on radar. More of those
           walls seem to be displayed in SDL client than in X11 client
           but not all of them either 
