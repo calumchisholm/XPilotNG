@@ -21,14 +21,14 @@
 <Option name="gravity" value="0"/>
 <Option name="initialafterburners" value="2"/>
 <Option name="initialautopilots" value="1"/>
-<Option name="initialfuel" value="1000"/>
+<Option name="initialfuel" value="500"/>
 <Option name="itemprobmult" value="0.0"/>
 <Option name="kineticenergyfueldrain" value="no"/>
 <Option name="limitedlives" value="yes"/>
 <Option name="limitedvisibility" value="no"/>
 <Option name="mapauthor" value="Blood, Samaseon and Throat"/>
 <Option name="mapheight" value="3500"/>
-<Option name="mapname" value="Polygon Blood's Music v8.3"/>
+<Option name="mapname" value="Polygon Blood's Music v8.4"/>
 <Option name="mapwidth" value="3500"/>
 <Option name="maxplayershots" value="12"/>
 <Option name="maxshieldedwallbouncespeed" value="100"/>
@@ -37,7 +37,7 @@
 <Option name="playersonradar" value="yes"/>
 <Option name="playerstartsshielded" value="yes"/>
 <Option name="playerwallbouncebrakefactor" value="0.5"/>
-<Option name="playerwallfriction" value="0.8"/>
+<Option name="playerwallfriction" value="1.0"/>
 <Option name="reserverobotteam" value="no"/>
 <Option name="robots" value="0"/>
 <Option name="robotteam" value="0"/>
@@ -49,7 +49,7 @@
 <Option name="treasuresonradar" value="no"/>
 <Option name="usewreckage" value="no"/>
 <Option name="waitingfps" value="0"/>
-<Option name="wallbouncefueldrainmult" value="0.1"/>
+<Option name="wallbouncefueldrainmult" value="0"/>
 <Option name="worldlives" value="3"/>
 </GeneralOptions>
 <BmpStyle id="tx3.ppm" filename="tx3.ppm" flags="1"/>
