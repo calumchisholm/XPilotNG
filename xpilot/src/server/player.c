@@ -371,7 +371,7 @@ static void Player_init_fuel(player_t *pl, double total_fuel)
     }
 }
 
-int Init_player(world_t *world, int ind, shipshape_t *ship)
+int Init_player(world_t *world, int ind, shipshape_t *ship, int type)
 {
     player_t *pl = Player_by_index(ind);
     visibility_t *v = pl->visibility;
@@ -418,12 +418,13 @@ int Init_player(world_t *world, int ind, shipshape_t *ship)
     pl->use_turnqueue = true;
 
     pl->type = OBJ_PLAYER;
-    /*
-     * Assume human (client) for now.
-     * Robots and tanks will change this field.
-     */
-    pl->pl_type = PL_TYPE_HUMAN;
-    pl->pl_type_mychar = ' ';
+    pl->pl_type = type;
+    if (type == PL_TYPE_HUMAN)
+	pl->pl_type_mychar = ' ';
+    else if (type == PL_TYPE_ROBOT)
+	pl->pl_type_mychar = 'R';
+    else if (type == PL_TYPE_TANK)
+	pl->pl_type_mychar = 'T';
 
     Compute_sensor_range(pl);
 

@@ -730,12 +730,10 @@ static void Robot_create(world_t *world)
     rob_type = &robot_types[new_data->robot_types_ind];
 
     Init_player(world, NumPlayers,
-		options.allowShipShapes ? Parse_shape_str(rob->shape) : NULL);
+		options.allowShipShapes ? Parse_shape_str(rob->shape) : NULL,
+		PL_TYPE_ROBOT);
 
     robot = Player_by_index(NumPlayers);
-    robot->pl_type = PL_TYPE_ROBOT;
-    robot->pl_type_mychar = 'R';
-    Player_set_state(robot, PL_STATE_ALIVE);
     robot->robot_data_ptr = new_data;
 
     strlcpy(robot->name, rob->name, MAX_CHARS);

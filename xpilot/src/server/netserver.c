@@ -1034,13 +1034,14 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	}
     }
     if (connp->rectype < 2) {
-	if (!Init_player(world, NumPlayers, connp->ship)) {
+	if (!Init_player(world, NumPlayers, connp->ship, PL_TYPE_HUMAN)) {
 	    strlcpy(errmsg, "Init_player failed: no free ID", errsize);
 	    return -1;
 	}
 	pl = Player_by_index(NumPlayers);
     } else {
-	if (!Init_player(world, spectatorStart + NumSpectators, connp->ship))
+	if (!Init_player(world, spectatorStart + NumSpectators,
+			 connp->ship, PL_TYPE_HUMAN))
 	    return -1;
 	pl = Player_by_index(spectatorStart + NumSpectators);
     }

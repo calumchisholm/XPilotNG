@@ -344,14 +344,13 @@ void Tank_handle_detach(player_t *pl)
 
     Init_player(world, NumPlayers,
 		options.allowShipShapes
-		? Parse_shape_str(options.tankShipShape) : NULL);
+		? Parse_shape_str(options.tankShipShape) : NULL,
+		PL_TYPE_TANK);
 
     /* Released tanks don't have tanks... */
     while (tank->fuel.num_tanks > 0)
 	Player_remove_tank(tank, tank->fuel.num_tanks);
 
-    tank->pl_type = PL_TYPE_TANK;
-    tank->pl_type_mychar = 'T';
     Player_position_init_clpos(tank, pl->pos);
     tank->vel = pl->vel;
     tank->acc = pl->acc;
@@ -412,7 +411,6 @@ void Tank_handle_detach(player_t *pl)
     /* The tank uses shield and thrust */
     tank->obj_status = GRAVITY;
     Player_thrust(tank, true);
-    Player_set_state(tank, PL_STATE_ALIVE);
     tank->have = DEF_HAVE;
     tank->used = (DEF_USED & ~USED_KILL & pl->have) | HAS_SHIELD;
 
