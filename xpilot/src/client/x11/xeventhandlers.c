@@ -343,39 +343,33 @@ int ButtonRelease_event(XEvent *event)
     }
 
     if (xbutton->window == drawWindow) {
-	if (!talk_mapped && xbutton->button == 1)
-	    /*
-	     * finish a cut from the talk messages
-	     */
-	    Talk_cut_from_messages(xbutton);
-	else if (talk_mapped && xbutton->button == 1) {
-	    /*
-	     * finish a cut from ...
-	     */
-	    if (xbutton->window == drawWindow
-		&& selection.draw.state == SEL_PENDING)
+	if (xbutton->button == Button1) {
+	    if (!talk_mapped)
+		/*
+		 * finish a cut from the talk messages
+		 */
 		Talk_cut_from_messages(xbutton);
-	    else if (selection.talk.state == SEL_PENDING)
-		Talk_window_cut(xbutton);
+	    else {
+		/*
+		 * finish a cut from ...
+		 */
+		if (selection.draw.state == SEL_PENDING)
+		    Talk_cut_from_messages(xbutton);
+		else if (selection.talk.state == SEL_PENDING)
+		    Talk_window_cut(xbutton);
+	    }
 	}
 
 	return 0;
     }
 
     if (xbutton->window == talkWindow) {
-	if (!talk_mapped && xbutton->button == 1)
+	assert(talk_mapped);
+	if (xbutton->button == Button1) {
 	    /*
-	     * finish a cut from the talk messages
+	     * finish a cut from the talk window
 	     */
-	    Talk_cut_from_messages(xbutton);
-	else if (talk_mapped && xbutton->button == 1) {
-	    /*
-	     * finish a cut from ...
-	     */
-	    if (xbutton->window == drawWindow
-		&& selection.draw.state == SEL_PENDING)
-		Talk_cut_from_messages(xbutton);
-	    else if (selection.talk.state == SEL_PENDING)
+	    if (selection.talk.state == SEL_PENDING)
 		Talk_window_cut(xbutton);
 	}
 
