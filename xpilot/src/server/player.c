@@ -1411,10 +1411,8 @@ void Compute_game_status(void)
 	    if (num_alive_players > 1) {
 		return;
 	    }
-	    if (num_alive_players == 1) {
-		if (num_finished_players + num_race_over_players == 0) {
-		    return;
-		}
+	    if (num_alive_players == 1 && num_active_players == 1) {
+		return;
 	    }
 	}
 	/* !@# fix
