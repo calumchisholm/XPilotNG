@@ -59,11 +59,12 @@ static widget_list_t *ScoreList_widgetItem;
 static guiarea_t    *window_guiarea;
 
 static widget_list_t *ConfMenu;
-static GLWidget *testWidget[2];
+static GLWidget *testWidget[3];
 static int testValue;
 static int testMinValue;
 static int testMaxValue;
 static double testValue2;
+static bool testValue3;
 static double testMinValue2;
 static double testMaxValue2;
 
@@ -164,12 +165,12 @@ static void Scorelist_cleanup(void)
     unregister_guiarea(scoreListArea);
 }
 
-static void Scorelist_reg(void *LI)
+static void Scorelist_reg(widget_list_t *LI)
 {
-    scoreListArea = register_guiarea(*(SDL_Rect *)(((widget_list_t *)LI)->GuiRegData), Scorelist_button, NULL, Scorelist_move, NULL, NULL, NULL);
+    scoreListArea = register_guiarea(*(SDL_Rect *)(LI->GuiRegData), Scorelist_button, NULL, Scorelist_move, NULL, NULL, NULL);
 }
 
-static void Scorelist_paint(void *data)
+static void Scorelist_paint(widget_list_t *LI)
 {
     if (scoresChanged) {
 	/* This is the easiest way to track if
@@ -241,20 +242,26 @@ int InitConfMenu(void)
     testValue2 = 9.99;
     testMinValue2 = 0.0;
     testMaxValue2 = 9.98;
-    testWidget[0] = Init_IntChooserWidget(ConfMenu, "testValue", &gamefont, &testValue, &testMinValue, &testMaxValue);
-    testWidget[1] = Init_DoubleChooserWidget(ConfMenu, "testValue", &gamefont, &testValue2, &testMinValue2, &testMaxValue2);
+    testWidget[0] = Init_IntChooserWidget(ConfMenu, &gamefont, "testValue1", &testValue, &testMinValue, &testMaxValue, NULL, NULL);
+    testWidget[1] = Init_DoubleChooserWidget(ConfMenu, &gamefont, "testValue2", &testValue2, &testMinValue2, &testMaxValue2, NULL, NULL);
+    testWidget[2] = Init_BoolChooserWidget(ConfMenu, &gamefont, "showTexturedWalls", &(instruments.showTexturedWalls), NULL, NULL);
 
     bounds.x = 500;
     bounds.y = 0;
     bounds.w = testWidget[0]->bounds.w;
-    bounds.h = testWidget[0]->bounds.h;
+    bounds.h = testWidget[0]->bounds.h+10;
     SetBounds_GLWidget(testWidget[0],&bounds);
     bounds.x = 500;
     bounds.y = testWidget[0]->bounds.h+1;
     bounds.w = testWidget[1]->bounds.w;
     bounds.h = testWidget[1]->bounds.h;
     SetBounds_GLWidget(testWidget[1],&bounds);
-    
+    bounds.x = 500;
+    bounds.y = testWidget[1]->bounds.y+testWidget[1]->bounds.h+1;
+    bounds.w = testWidget[2]->bounds.w;
+    bounds.h = testWidget[2]->bounds.h;
+    SetBounds_GLWidget(testWidget[2],&bounds);
+   
     AddListGuiAreas(ConfMenu);
     return 0;
 }

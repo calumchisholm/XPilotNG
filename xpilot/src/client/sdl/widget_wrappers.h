@@ -47,7 +47,7 @@ void clean_guiarea_list(void);
  * grouped is preferable) message windows, console etc.
  * should be drag&drop-able, if possible resizable, and
  * rightclick should spawn a config menu with (for that item)
- * iteresting variables to change.
+ * interesting variables to change.
  * Basically I hope someday we don't _always_ have to read 4
  * pages of options to set the client up right.
  */
@@ -64,7 +64,7 @@ struct widget_list_struct {
 };
 
 /* Now you might wonder why it is not infact *DrawData that
- * is infact sent to the (*Draw)(void *LI) function. Infact
+ * is sent to the (*Draw)(void *LI) function. Indeed
  * that was the original idea, but in order to gain some
  * flexibility I changed it to send the entire widget_list_t
  * item. Basically so that the functions may change the
