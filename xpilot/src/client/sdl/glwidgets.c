@@ -33,6 +33,8 @@ static void option_callback( void *opt, const char *value );
 static void confmenu_callback( void );
 static void hover_optionWidget( int over, Uint16 x , Uint16 y , void *data );
 
+static char copybuffer[256];
+
 GLWidget *Init_EmptyBaseGLWidget( void )
 {
     GLWidget *tmp = XMALLOC(GLWidget, 1);
@@ -429,6 +431,12 @@ GLWidget *FindGLWidget( GLWidget *list, Uint16 x, Uint16 y )
     return FindGLWidgeti( list, x, y );
 }
 
+void copytext(const char *text)
+{
+    int len = strlen(text);
+    snprintf(&copybuffer[0],MIN(255,len+1),"%s",text);
+    copybuffer[MIN(255,len+1)] = '\0';
+}
 /****************************************************/
 /* END: Main GLWidget stuff 	    	    	    */
 /****************************************************/
@@ -935,6 +943,20 @@ GLWidget *Init_ScrollbarWidget( bool locked, GLfloat pos, GLfloat size, ScrollWi
 /***********************/
 static void Paint_LabelWidget( GLWidget *widget );
 static void Close_LabelWidget ( GLWidget *widget );
+static void Paint_LabelWidget( GLWidget *widget );
+
+static void button_LabelWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
+{
+    LabelWidget *tmp;
+    
+    if (!data) return;
+    tmp = (LabelWidget *)(((GLWidget *)data)->wid_info);
+    if (state == SDL_PRESSED) {
+	if (button == 1) {
+	    copytext((tmp->tex).text);
+	}
+    }
+}
 
 static void Close_LabelWidget( GLWidget *widget )
 {
@@ -1050,6 +1072,8 @@ GLWidget *Init_LabelWidget( const char *text , Uint32 *fgcolor, Uint32 *bgcolor,
     ((LabelWidget *)tmp->wid_info)->valign   = valign;
     tmp->Draw	    	= Paint_LabelWidget;
     tmp->Close     	= Close_LabelWidget;
+    tmp->button     	= button_LabelWidget;
+    tmp->buttondata 	= tmp; 
     return tmp;
 }
 /********************/
@@ -3074,6 +3098,9 @@ static void SetBounds_MainWidget( GLWidget *widget, SDL_Rect *b )
 static void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
 {
     WrapperWidget *tmp;
+    SDL_Event event;
+    int i = 0;
+    char c[2];
     
     if (!data) return;
     tmp = (WrapperWidget *)(((GLWidget *)data)->wid_info);
@@ -3084,6 +3111,18 @@ static void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, 
 	}
 	if (button == 2) {
     	    if (Console_isVisible()) {
+	    	event.type = SDL_KEYDOWN;
+		event.key.type = SDL_KEYDOWN;
+		event.key.state = SDL_PRESSED;
+		event.key.keysym.mod = KMOD_NONE;
+    	    	c[0] = '\0';
+	    	while (copybuffer[i] != '\0') {
+		    c[0] = copybuffer[i];
+		    event.key.keysym.sym = SDLK_a;
+		    event.key.keysym.unicode = (Uint16)c[0];
+		    Console_process(&event);
+		    ++i;
+		}
 	    }
 	}
     }
@@ -3163,6 +3202,8 @@ GLWidget *Init_MainWidget( font_data *font )
 	Close_Widget(&tmp);
 	return NULL;
     }
+    
+    copybuffer[0] = '\0';
 
     return tmp;
 }
