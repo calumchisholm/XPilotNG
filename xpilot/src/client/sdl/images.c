@@ -53,6 +53,8 @@ static int Image_init(image_t *img)
 		     * of the used OpenGL projection */
 		    = Picture_get_pixel(&pic, i, x, img->height - y)
 		    | 0xff000000; /* alpha */
+		if (!(img->data[(x + img->frame_width * i) + (y * img->data_width)] & 0x00ffffff))
+		    img->data[(x + img->frame_width * i) + (y * img->data_width)] = 0x00000000;
 	    }
 	}
     }
