@@ -823,27 +823,6 @@ option options[] = {
 	"automatically for your particular display system.\n"
     },
     {
-	"showShipName",
-	NULL,
-	"Yes",
-	KEY_DUMMY,
-	"Should all ships have the name of the player drawn below them.\n"
-    },
-    {
-	"showBaseName",
-	NULL,
-	"Yes",
-	KEY_DUMMY,
-	"Should all bases have the name of the player drawn below them.\n"
-    },
-    {
-	"showMineName",
-	NULL,
-	"Yes",
-	KEY_DUMMY,
-	"Should the name of the owner of the mine be drawn below the mine.\n"
-    },
-    {
 	"showMessages",
 	NULL,
 	"Yes",
