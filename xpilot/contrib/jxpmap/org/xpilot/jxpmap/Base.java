@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JSpinner;
 
 public class Base extends MapObject {
 
@@ -19,17 +20,18 @@ public class Base extends MapObject {
 
     private int dir;
     private int team;
-
+    private int order;
 
     public Base () {
-        this(0, 0, 32, 0);
+        this(0, 0, 32, 0, 0);
     }
 
 
-    public Base (int x, int y, int dir, int team) {
+    public Base (int x, int y, int dir, int team, int order) {
         super(null, x, y, 35 * 64, 35 * 64);
         setDir(dir);
         setTeam(team);
+        setOrder(order);
     }
 
 
@@ -58,6 +60,14 @@ public class Base extends MapObject {
                 ("illegal team: " + team);
         this.team = team;
     }
+    
+    public int getOrder() {
+        return order;
+    }
+    
+    public void setOrder(int order) {
+        this.order = order;
+    }
 
     
     public void printXml (PrintWriter out) throws IOException {
@@ -69,6 +79,8 @@ public class Base extends MapObject {
         out.print(getTeam());
         out.print("\" dir=\"");
         out.print(getDir());
+        out.print("\" order=\"");
+        out.print(getOrder());
         out.println("\"/>");
     }
 
@@ -91,6 +103,7 @@ public class Base extends MapObject {
 
         private JComboBox cmbTeam;
         private JComboBox cmbDir;
+        private JSpinner spnOrder;
         private MapCanvas canvas;
 
 
@@ -110,13 +123,16 @@ public class Base extends MapObject {
             cmbDir.addItem("UP");
             cmbDir.setSelectedIndex(getOrientationByDir(getDir()));
             
+            spnOrder = new JSpinner();
+            spnOrder.setValue(new Integer(getOrder()));
             
-            setLayout(new GridLayout(2,2));
+            setLayout(new GridLayout(3,2));
             add(new JLabel("Team:"));
             add(cmbTeam);
             add(new JLabel("Direction:"));
             add(cmbDir);
-
+            add(new JLabel("Order:"));
+            add(spnOrder);
             this.canvas = canvas;
         }
         
@@ -124,8 +140,12 @@ public class Base extends MapObject {
         public boolean apply () {
             int newTeam = cmbTeam.getSelectedIndex() - 1;
             int newDir = cmbDir.getSelectedIndex() * 32;
-            if (newTeam != getTeam() || newDir != getDir())
-                canvas.setBaseProperties(Base.this, newTeam, newDir);
+            int newOrder = ((Integer)spnOrder.getValue()).intValue();
+            if (newTeam != getTeam() 
+                || newDir != getDir() 
+                || newOrder != getOrder())
+                canvas.setBaseProperties(
+                    Base.this, newTeam, newDir, newOrder);
             return true;
         }
     }

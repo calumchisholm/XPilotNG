@@ -458,17 +458,21 @@ public class MapCanvas extends JComponent {
     public void setBaseProperties(
         final Base b,
         final int newTeam,
-        final int newDir) {
+        final int newDir,
+        final int newOrder) {
         final int oldTeam = b.getTeam();
         final int oldDir = b.getDir();
+        final int oldOrder = b.getOrder();
         doEdit(new AbstractMapEdit() {
             public void unedit() {
                 b.setTeam(oldTeam);
                 b.setDir(oldDir);
+                b.setOrder(oldOrder);
             }
             public void edit() {
                 b.setTeam(newTeam);
                 b.setDir(newDir);
+                b.setOrder(newOrder);
             }
         });
     }

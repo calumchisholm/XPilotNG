@@ -216,7 +216,7 @@ public class MapModel extends ModelObject {
                     return new Object[] {
                     o, "Polygon is located outside map bounds." };
                 }                
-            } else {
+            } else if (!(o instanceof Group)) {
                 Rectangle b = o.getBounds();
                 if (b.x < 0 || b.x >= options.getSize().width
                 || b.y < 0 || b.y >= options.getSize().height) {
@@ -610,7 +610,8 @@ public class MapModel extends ModelObject {
                     atti(n, "x"),
                     atti(n, "y"),
                     atti(n, "dir"),
-                    atti(n, "team", -1));
+                    atti(n, "team", -1),
+                    atti(n, "order", 0));
                 Rectangle r = o.getBounds();
                 o.moveTo(r.x - r.width / 2, r.y - r.height / 2);
                 parent.addToFront(o);
