@@ -27,8 +27,8 @@
 
 typedef unsigned int color_t;
 
-extern int              draw_depth;
-double           scale;              /* The opengl scale factor */
+extern int draw_depth;
+extern double scale;              /* The opengl scale factor */
 
 /* code to set the viewport size */
 int Resize_Window( int width, int height );
@@ -37,7 +37,9 @@ int Resize_Window( int width, int height );
 #define STATIONARY_MODE 1
 #define MOVING_MODE 	2
 #define HUD_MODE    	4
-int paintSetupMode;
+
+extern int paintSetupMode;
+
 void setupPaint_stationary(void);
 void setupPaint_moving(void);
 void setupPaint_HUD(void);
@@ -63,7 +65,7 @@ extern void Segment_add(int color, int x_1, int y_1, int x_2, int y_2);
 extern void Circle(int color, int x, int y, int radius, int filled);
 extern void set_alphacolor(int color);
 
-irec_t *select_bounds; /* kps - maybe extern this ? */
+extern irec_t *select_bounds;
 extern void Paint_select(void);
 
 extern SDL_Surface  *MainSDLSurface;

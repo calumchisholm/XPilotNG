@@ -25,7 +25,12 @@
 
 #include "xpclient_sdl.h"
 
-#include "begin_code.h"
+#ifdef USUAL_SDL_INCLUDE_CONVENTION
+# include "begin_code.h"
+#endif
+#ifdef MACOSX_FRAMEWORKS
+# include <SDL/begin_code.h>
+#endif
 
 /*! Number of visible characters in a line. Lines in the history, the commandline, or CON_Out strings cannot be longer
 	than this. Remark that this number does NOT include the '/0' character at the end of a string. So if we create
@@ -218,9 +223,14 @@ extern "C" {
 #ifdef __cplusplus
 };
 #endif
-#include "close_code.h"
+
+#ifdef USUAL_SDL_INCLUDE_CONVENTION
+# include "close_code.h"
+#endif
+#ifdef MACOSX_FRAMEWORKS
+# include <SDL/close_code.h>
+#endif
 
 #endif /* SDL_CONSOLE_H */
 
 /* end of SDL_console.h ... */
-

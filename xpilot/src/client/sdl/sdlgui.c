@@ -115,6 +115,13 @@ static bool smoothLines;
 static GLuint polyListBase = 0;
 static GLuint polyEdgeListBase = 0;
 
+irec_t *select_bounds;
+
+string_tex_t score_object_texs[MAX_SCORE_OBJECTS];
+string_tex_t meter_texs[MAX_METERS];
+string_tex_t message_texs[2*MAX_MSGS];
+string_tex_t HUD_texs[MAX_HUD_TEXS+MAX_SCORE_OBJECTS];
+
 int Gui_init(void);
 void Gui_cleanup(void);
 

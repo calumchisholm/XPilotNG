@@ -56,6 +56,9 @@ static sdl_window_t scoreListWin;
 static SDL_Rect     scoreEntryRect; /* Bounds for the last painted score entry */
 static bool         scoreListMoving;
 
+double scale;              /* The opengl scale factor */
+int paintSetupMode;
+
 GLWidget *MainWidget = NULL;
 
 /* function to reset our viewport after a window resize */

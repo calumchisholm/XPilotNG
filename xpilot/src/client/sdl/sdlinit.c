@@ -44,6 +44,10 @@ const SDL_VideoInfo *videoInfo;
 int videoFlags;
 SDL_Surface  *MainSDLSurface = NULL;
 
+font_data gamefont;
+font_data messagefont;
+font_data mapfont;
+
 int Init_playing_windows(void)
 {
     /*

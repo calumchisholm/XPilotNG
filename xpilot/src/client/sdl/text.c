@@ -73,7 +73,9 @@
 #define BUFSIZE 1024
 
 float modelview_matrix[16];
-	
+int renderstyle;
+enum rendertype rendertype;
+
 int LoadBMP(font_data *ft_font, const char * fname);
 void pushScreenCoordinateMatrix(void);
 void pop_projection_matrix(void);

@@ -58,8 +58,8 @@ typedef struct {
     int font_height;
 } string_tex_t;
 
-int renderstyle;
-enum {
+extern int renderstyle;
+extern enum rendertype {
 	RENDER_LATIN1,
 	RENDER_UTF8,
 	RENDER_UNICODE
@@ -114,11 +114,11 @@ void disp_text_fraq(string_tex_t *string_tex, int color, int XALIGN, int YALIGN,
 		    , bool onHUD);
 void free_string_texture(string_tex_t *string_tex);
 
-font_data gamefont;
-font_data messagefont;
-font_data mapfont;
+extern font_data gamefont;
+extern font_data messagefont;
+extern font_data mapfont;
 
-string_tex_t score_object_texs[MAX_SCORE_OBJECTS];
+extern string_tex_t score_object_texs[];
 
 /*typedef struct {
     int id;
@@ -129,8 +129,8 @@ string_tex_t score_object_texs[MAX_SCORE_OBJECTS];
 name_tex_t *others_name_texs;*/
 
 #define MAX_METERS 12
-string_tex_t meter_texs[MAX_METERS];
-string_tex_t message_texs[2*MAX_MSGS];
+extern string_tex_t meter_texs[];
+extern string_tex_t message_texs[];
 #define MAX_HUD_TEXS 10 
-string_tex_t HUD_texs[MAX_HUD_TEXS+MAX_SCORE_OBJECTS];
+extern string_tex_t HUD_texs[];
 #endif

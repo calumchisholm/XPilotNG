@@ -32,10 +32,18 @@ extern int Startup_server_motd(void);
 
 char client_version[] = VERSION;
 
-bool	newbie;
 char	*geometry;
 xp_args_t xpArgs;
 Connect_param_t connectParam;
+
+bool	newbie;
+int	baseWarningType;	/* Which type of base warning you prefer */
+int	hudRadarDotSize;	/* Size for hudradar dot drawing */
+double	hudRadarScale;		/* Scale for hudradar drawing */
+double	hudRadarLimit;		/* Hudradar dots are not drawn if closer to
+				   your ship than this factor of visible
+				   range */
+int	hudSize;		/* Size for HUD drawing, depends on hudScale */
 
 bool	is_server = false;	/* used in common code */
 
