@@ -1138,7 +1138,9 @@ static int Cmd_password(char *arg, player *pl, int oper, char *msg)
 
 static int Cmd_pause(char *arg, player *pl, int oper, char *msg)
 {
-    int			i;
+    /*int			i;*/
+    char *errorstr;
+    player *pl2;
 
     if (!oper)
 	return CMD_RESULT_NOT_OPERATOR;
@@ -1146,6 +1148,32 @@ static int Cmd_pause(char *arg, player *pl, int oper, char *msg)
     if (!arg || !*arg)
 	return CMD_RESULT_NO_NAME;
 
+#if 1
+    pl2 = Get_player_by_name(arg, NULL, &errorstr);
+    if (!pl2) {
+	strcpy(msg, errorstr);
+	return CMD_RESULT_ERROR;
+    }
+
+    if (pl2->conn != NOT_CONNECTED) {
+	if (Player_is_playing(pl2))
+	    Kill_player(pl2, false);
+	if (Team_zero_pausing_available()) {
+	    sprintf(msg, "%s was pause-swapped by %s.", pl2->name, pl->name);
+	    Handle_player_command(pl2, "team 0");
+	} else {
+	    Pause_player(pl2, true);
+	    sprintf(msg, "%s was paused by %s.", pl2->name, pl->name);
+	}
+	Set_message(msg);
+	strcpy(msg, "");
+    } else {
+	sprintf(msg, "Robots can't be paused.");
+	return CMD_RESULT_ERROR;
+    }
+
+    return CMD_RESULT_SUCCESS;
+#else
     i = Get_player_index_by_name(arg);
     if (i >= 0) {
 	player *pl_i = Players(i);
@@ -1172,6 +1200,7 @@ static int Cmd_pause(char *arg, player *pl, int oper, char *msg)
     sprintf(msg, "Invalid player id.");
 
     return CMD_RESULT_ERROR;
+#endif
 }
 
 
@@ -1232,21 +1261,24 @@ static int Cmd_reset(char *arg, player *pl, int oper, char *msg)
 
 static int Cmd_stats(char *arg, player *pl, int oper, char *msg)
 {
-    if (arg && *arg) {
-	int ind = Get_player_index_by_name(arg);
+    char *errorstr;
+    player *pl2;
 
-	switch (ind) {
-	case -1:
-	    sprintf(msg, "Name does not match any playing player.");
-	    return CMD_RESULT_ERROR;
-	case -2:
-	    sprintf(msg, "Name matches several players.");
-	    return CMD_RESULT_ERROR;
-	}
-	pl = Players(ind);
+    if (!arg || !*arg)
+	return CMD_RESULT_NO_NAME;
+
+    pl2 = Get_player_by_name(arg, NULL, &errorstr);
+    if (!pl2) {
+	strcpy(msg, errorstr);
+	return CMD_RESULT_ERROR;
     }
 
-    Rank_get_stats(pl, msg);
+    if (pl2->conn == NOT_CONNECTED) {
+	sprintf(msg, "Robots don't have ranking stats.");
+	return CMD_RESULT_ERROR;
+    }
+	
+    Rank_get_stats(pl2, msg);
 
     return CMD_RESULT_SUCCESS;
 }
