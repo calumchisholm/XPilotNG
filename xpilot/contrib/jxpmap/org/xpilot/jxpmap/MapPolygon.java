@@ -89,6 +89,19 @@ public class MapPolygon extends MapObject {
         polygon.translate(x - r.x, y - r.y);
     }
 
+
+    public boolean isCounterClockwise () {
+
+        long area = 0;
+        int i, j;
+
+        for (i = polygon.npoints - 1, j = 0; j < polygon.npoints; i = j, j++)
+            area += polygon.xpoints[i] * polygon.ypoints[j] -
+                polygon.xpoints[j] * polygon.ypoints[i];
+
+        return (area > 0);
+    }
+
     
     public void printXml (PrintWriter out) throws IOException {
 
@@ -112,13 +125,26 @@ public class MapPolygon extends MapObject {
         out.print(getStyle().getId());
         out.println("\">");
 
-        for (int i = 1; i < polygon.npoints; i++) {
-            out.print("<Offset x=\"");
-            out.print(polygon.xpoints[i] - polygon.xpoints[i - 1]);
-            out.print("\" y=\"");
-            out.print(polygon.ypoints[i] - polygon.ypoints[i - 1]);
-            out.println("\"/>");
+        if (isCounterClockwise()) {
+            System.out.println("counter clockwise");
+            for (int i = 1; i < polygon.npoints; i++) {
+                out.print("<Offset x=\"");
+                out.print(polygon.xpoints[i] - polygon.xpoints[i - 1]);
+                out.print("\" y=\"");
+                out.print(polygon.ypoints[i] - polygon.ypoints[i - 1]);
+                out.println("\"/>");
+            }
+        } else {
+            System.out.println("clockwise");
+            for (int i = polygon.npoints - 1; i > 0; i--) {
+                out.print("<Offset x=\"");
+                out.print(polygon.xpoints[i - 1] - polygon.xpoints[i]);
+                out.print("\" y=\"");
+                out.print(polygon.ypoints[i - 1] - polygon.ypoints[i]);
+                out.println("\"/>");
+            }
         }
+
 
         out.println("</Polygon>");
 
