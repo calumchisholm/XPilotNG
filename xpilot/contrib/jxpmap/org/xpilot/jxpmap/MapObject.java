@@ -50,6 +50,11 @@ public abstract class MapObject {
     }
 
 
+    public int getZOrder () {
+        return 10;
+    }
+
+
     protected Image getImage () {
         return img;
     }
@@ -106,7 +111,7 @@ public abstract class MapObject {
             if (contains(me.getPoint())) {
                 if ((me.getModifiers() & InputEvent.BUTTON1_MASK) != 0) {
                     if (canvas.isErase()) {
-                        canvas.getModel().objects.remove(this);
+                        canvas.getModel().removeObject(this);
                         canvas.repaint();
                     } else {
                         canvas.setCanvasEventHandler(new MoveHandler(me));
@@ -196,7 +201,7 @@ public abstract class MapObject {
         public void mousePressed (MouseEvent evt) {
 
             MapCanvas c = (MapCanvas)evt.getSource();
-            c.getModel().objects.add(MapObject.this);
+            c.getModel().addObject(MapObject.this);
             MapObject.this.moveTo(evt.getX() - offset.x, 
                                   evt.getY() - offset.y);
             c.setCanvasEventHandler(null);

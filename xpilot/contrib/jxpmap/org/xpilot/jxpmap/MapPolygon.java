@@ -79,6 +79,11 @@ public class MapPolygon extends MapObject {
     }
 
 
+    public int getZOrder () {
+        return 20;
+    }
+
+
     public Shape getPreviewShape () {
         return polygon;
     }
@@ -215,7 +220,7 @@ public class MapPolygon extends MapObject {
                 for (int i = 0; i < pl.npoints; i++) {
                     if (Point.distanceSq
                         (p.x, p.y, pl.xpoints[i], 
-                         pl.ypoints[i]) < 100 * 64 * 64) {
+                         pl.ypoints[i]) < 25 * 64 * 64) {
                         
                         if (canvas.isErase()) {
                             int pc = pl.npoints - 1;
@@ -243,7 +248,7 @@ public class MapPolygon extends MapObject {
                                                pl.ypoints[i],
                                                pl.xpoints[ni],
                                                pl.ypoints[ni],
-                                               p.x, p.y) < 100 * 64 * 64) {
+                                               p.x, p.y) < 25 * 64 * 64) {
                             
                             int pc = pl.npoints + 1;
                             int xps[] = insert(p.x, pl.xpoints, i + 1);
@@ -338,7 +343,7 @@ public class MapPolygon extends MapObject {
                     MapPolygon.this.style = 
                         c.getModel().getDefaultPolygonStyle();
                     
-                    c.getModel().objects.add(MapPolygon.this);
+                    c.getModel().addObject(MapPolygon.this);
                     c.setCanvasEventHandler(null);
                     if (cmd != null) cmd.run();
                     c.repaint();

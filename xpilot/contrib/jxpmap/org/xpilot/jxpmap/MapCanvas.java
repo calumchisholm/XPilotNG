@@ -118,9 +118,8 @@ public class MapCanvas extends JComponent {
         Point min = new Point();
         Point max = new Point();
 
-        for (Iterator iter = model.objects.iterator(); iter.hasNext();) {
-
-            MapObject o = (MapObject)iter.next();
+        for (int i = model.objects.size() - 1; i >= 0; i--) {
+            MapObject o = (MapObject)model.objects.get(i);
             computeBounds(min, max, view, o.getBounds(), mapSize);
             
             for (int xoff = min.x; xoff <= max.x; xoff++) {

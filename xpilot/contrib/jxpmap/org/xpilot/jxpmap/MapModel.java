@@ -66,6 +66,24 @@ public class MapModel {
     }
 
 
+    public void addObject (MapObject moNew) {
+        for (ListIterator iter = objects.listIterator(); iter.hasNext();) {
+            MapObject moOld = (MapObject)iter.next();
+            if (moNew.getZOrder() <= moOld.getZOrder()) {
+                iter.previous();
+                iter.add(moNew);
+                return;
+            }
+        }
+        objects.add(moNew);
+    }
+
+    
+    public void removeObject (MapObject mo) {
+        objects.remove(mo);
+    }
+
+
     public void load (String fileName) 
         throws IOException, SAXException, ParserConfigurationException {
 
@@ -266,7 +284,7 @@ public class MapModel {
                     MapFuel o = new MapFuel(x, y);
                     Rectangle r = o.getBounds();
                     o.moveTo(r.x - r.width / 2, r.y - r.height / 2);
-                    objects.add(o);
+                    addObject(o);
 
                 } else if (name.equalsIgnoreCase("ball")) {
 
@@ -276,7 +294,7 @@ public class MapModel {
                     MapBall o = new MapBall(x, y, team);
                     Rectangle r = o.getBounds();
                     o.moveTo(r.x - r.width / 2, r.y - r.height / 2);
-                    objects.add(o);
+                    addObject(o);
 
                 } else if (name.equalsIgnoreCase("base")) {
 
@@ -287,7 +305,7 @@ public class MapModel {
                     MapBase o = new MapBase(x, y, dir, team);
                     Rectangle r = o.getBounds();
                     o.moveTo(r.x - r.width / 2, r.y - r.height / 2);
-                    objects.add(o);
+                    addObject(o);
 
                 } else if (name.equalsIgnoreCase("check")) {
 
@@ -296,7 +314,7 @@ public class MapModel {
                     MapCheckPoint o = new MapCheckPoint(x, y);
                     Rectangle r = o.getBounds();
                     o.moveTo(r.x - r.width / 2, r.y - r.height / 2);
-                    objects.add(o);
+                    addObject(o);
 
                 } else if (name.equalsIgnoreCase("ballarea")) {
 
@@ -404,7 +422,7 @@ public class MapModel {
                     mp.setType(p.type);
                     mp.setTeam(p.team);
                     
-                    objects.add(mp);
+                    addObject(mp);
                 }
                 
 
