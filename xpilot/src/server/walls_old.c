@@ -901,6 +901,7 @@ static void Move_segment(move_state_t *ms)
 
     case TREASURE:
 	if (block_type == TREASURE) {
+	    player *owner = NULL;
 	    if (mi->treasure_crashes) {
 		/*
 		 * Test if the movement is within the upper half of
@@ -940,6 +941,8 @@ static void Move_segment(move_state_t *ms)
 		}
 
 		ball = BALL_PTR(mi->obj);
+		if (ball->owner != NO_ID)
+		    owner = Player_by_id(ball->owner);
 		if (ms->treasure == ball->treasure) {
 		    /*
 		     * Ball has been replaced back in the hoop from whence
@@ -948,14 +951,9 @@ static void Move_segment(move_state_t *ms)
 		     * exploding and gets the player some points.  Otherwise
 		     * nothing interesting happens.
 		     */
-		    player	*pl = NULL;
-
-		    if (ball->owner != NO_ID)
-			pl = Player_by_id(ball->owner);
-
 		    if (!BIT(World.rules->mode, TEAM_PLAY)
-			|| !pl
-			|| (pl->team !=
+			|| !owner
+			|| (owner->team !=
 			    World.treasures[ball->treasure].team)) {
 			ball->life = LONG_MAX;
 			ms->crash = NotACrash;
@@ -965,22 +963,20 @@ static void Move_segment(move_state_t *ms)
 		    Ball_is_replaced(ball);
 		    break;
 		}
-		if (ball->owner == NO_ID) {
+		if (owner == NULL) {
 		    ball->life = 0;
 		    return;
 		}
 		if (BIT(World.rules->mode, TEAM_PLAY)
-		    && World.treasures[ms->treasure].team ==
-		       Player_by_id(ball->owner)->team) {
+		    && World.treasures[ms->treasure].team == owner->team) {
 		    Ball_is_destroyed(ball);
 		    if (captureTheFlag
 			&& !World.treasures[ms->treasure].have
 			&& !World.treasures[ms->treasure].empty) {
 			strcpy(msg, "Your treasure must be safe before you "
 			       "can cash an opponent's!");
-			Set_player_message(Player_by_id(ball->owner), msg);
-		    } else if (Punish_team(GetInd(ball->owner),
-					   ball->treasure,
+			Set_player_message(owner, msg);
+		    } else if (Punish_team(owner, ball->treasure,
 					   ball->pos.cx, ball->pos.cy))
 			CLR_BIT(ball->status, RECREATE);
 		}

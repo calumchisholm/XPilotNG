@@ -217,7 +217,7 @@ void Fire_right_shot(player *pl, int type, int dir, int gun);
 void Fire_left_rshot(player *pl, int type, int dir, int gun);
 void Fire_right_rshot(player *pl, int type, int dir, int gun);
 void Make_treasure_ball(int treasure);
-int Punish_team(int ind, int t_destroyed, int cx, int cy);
+int Punish_team(player *pl, int t_destroyed, int cx, int cy);
 
 void Ball_hits_goal(ballobject *ball, int group);
 void Ball_is_replaced(ballobject *ball);

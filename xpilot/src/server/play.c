@@ -49,11 +49,10 @@
 char play_version[] = VERSION;
 
 
-int Punish_team(int ind, int t_destroyed, int cx, int cy)
+int Punish_team(player *pl, int t_destroyed, int cx, int cy)
 {
     static char		msg[MSG_LEN];
     treasure_t		*td = &World.treasures[t_destroyed];
-    player		*pl = Players(ind);
     int			i;
     int			win_score = 0,lose_score = 0;
     int			win_team_members = 0, lose_team_members = 0;
@@ -121,14 +120,15 @@ int Punish_team(int ind, int t_destroyed, int cx, int cy)
 		SET_BIT(pl_i->status, KILLED);
 	}
 	else if (pl_i->team == pl->team &&
-		 (pl_i->team != TEAM_NOT_SET || i == ind)) {
+		 (pl_i->team != TEAM_NOT_SET || pl_i->id == pl->id)) {
 	    if (lose_team_members > 0) {
-		if (i == ind) {
+		if (pl_i->id == pl->id) {
 		    Rank_CashedBall(pl_i);
 		}
 		Rank_WonBall(pl_i);
 	    }
-	    Score(pl_i, (i == ind ? 3*por : 2*por), cx, cy, "Treasure: ");
+	    Score(pl_i, (pl_i->id == pl->id ? 3*por : 2*por),
+		  cx, cy, "Treasure: ");
 	}
     }
 
@@ -286,6 +286,8 @@ void Ball_is_destroyed(ballobject *ball)
 
 void Ball_hits_goal(ballobject *ball, int group)
 {
+    player *owner;
+
     if (ball->owner == NO_ID) {	/* Probably the player quit */
 	SET_BIT(ball->status, (NOEXPLOSION|RECREATE));
 	return;
@@ -294,10 +296,10 @@ void Ball_hits_goal(ballobject *ball, int group)
 	Ball_is_replaced(ball);
 	return;
     }
-    if (groups[group].team == Player_by_id(ball->owner)->team) {
+    owner = Player_by_id(ball->owner);
+    if (groups[group].team == owner->team) {
 	Ball_is_destroyed(ball);
-	if (Punish_team(GetInd(ball->owner), ball->treasure,
-			ball->pos.cx, ball->pos.cy))
+	if (Punish_team(owner, ball->treasure,ball->pos.cx, ball->pos.cy))
 	    CLR_BIT(ball->status, RECREATE);
 	return;
     }
@@ -574,7 +576,7 @@ bool Wormhole_hitfunc(struct group *group, struct move *move)
 	    return false;
 
     } else {
-	int last = wormhole->lastdest;
+	    /*int last = wormhole->lastdest;*/
 
 	return false;
     }
