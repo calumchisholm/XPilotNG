@@ -2842,8 +2842,8 @@ void Move_player(player_t *pl)
 
 void Turn_player(player_t *pl)
 {
-    int		new_dir = MOD2((int)(pl->float_dir + 0.5), RES);
-    int		next_dir, sign;
+    int	new_dir = MOD2((int)(pl->float_dir + 0.5), RES);
+    int next_dir, sign;
     hitmask_t hitmask;
     struct collans ans;
     double length;
@@ -2861,6 +2861,7 @@ void Turn_player(player_t *pl)
     if (!Player_is_playing(pl)) {
 	/* kps - what is the point of this ??? */
 	/* virus - it prevents you from turning ship while ur dead ;) */
+	/* kps - why is pl->dir set to new_dir then ? */
 	pl->dir = new_dir;
 	return;
     }
@@ -2878,34 +2879,40 @@ void Turn_player(player_t *pl)
 			next_dir, hitmask, OBJ_PTR(pl),
 			pl->pos.cx, pl->pos.cy, &ans) != NO_GROUP) {
 
+	    /* velocity to push player away from wall */
+	    length = 0;
 
-	      /* velocity to push player away from wall */
-	   length = 0;
-
-	   if ( ans.line != -1 ) {
-	     length = Wrap_length(linet[ans.line].delta.cx,linet[ans.line].delta.cy);
-	     /*ans.moved.cx, ans.moved.cy);*/
-	     
-	     
-	     if( length != 0){
-	       pl->vel.x += linet[ans.line].delta.cy/length * options.turnPush;
-	       pl->vel.y -= linet[ans.line].delta.cx/length * options.turnPush;
-	     }
-	     /* khs code for handling corners could go here  for ans.line == -1*/
-	   }
+	    if (ans.line != -1) {
+		length = Wrap_length(linet[ans.line].delta.cx,
+				     linet[ans.line].delta.cy);
+		/*ans.moved.cx, ans.moved.cy);*/
+		if (length != 0) {
+		    pl->vel.x += linet[ans.line].delta.cy / length
+			* options.turnPush;
+		    pl->vel.y -= linet[ans.line].delta.cx / length
+			* options.turnPush;
+		}
+		/*
+		 * khs
+		 * code for handling corners could go here for ans.line == -1
+		 */
+	    }
 	    Player_set_float_dir(pl, (double)pl->dir);
 
+	    /* kps - why is this done again ??? (was done above) */
 
-	      /* velocity to push player away from wall */
-
-       double length = Wrap_length(linet[ans.line].delta.cx,linet[ans.line].delta.cy);
-					 /*ans.moved.cx, ans.moved.cy);*/
-	   if( length != 0){
-	     pl->vel.x += linet[ans.line].delta.cy/length * options.turnPush;
-	     pl->vel.y -= linet[ans.line].delta.cx/length * options.turnPush;
-	   }
-	      break;
+	    /* velocity to push player away from wall */
+	    length = Wrap_length(linet[ans.line].delta.cx,
+				 linet[ans.line].delta.cy);
+	    /*ans.moved.cx, ans.moved.cy);*/
+	    if (length != 0) {
+		pl->vel.x += linet[ans.line].delta.cy / length
+		    * options.turnPush;
+		pl->vel.y -= linet[ans.line].delta.cx / length
+		    * options.turnPush;
 	    }
+	    break;
+	}
 	pl->dir = next_dir;
     }
 
