@@ -573,6 +573,9 @@ static msg_bms_t Msg_do_bms(const char *message)
     static char cover_text1[] = "COVER";
     static char cover_text2[] = "Cover";
     static char cover_text3[] = "cover";
+    static char cover_text4[] = "INCOMING";
+    static char cover_text5[] = "Incoming";
+    static char cover_text6[] = "incoming";
     static char pop_text1[] = "POP";
     static char pop_text2[] = "Pop";
     static char pop_text3[] = "pop";
@@ -588,7 +591,10 @@ static msg_bms_t Msg_do_bms(const char *message)
 
     if (strstr(message, cover_text1) ||
 	strstr(message, cover_text2) ||
-	strstr(message, cover_text3)) {
+	strstr(message, cover_text3) ||
+	strstr(message, cover_text4) ||
+	strstr(message, cover_text5) ||
+	strstr(message, cover_text6)) {
 	need_cover = true;
 	return BmsCover;
     }
