@@ -153,7 +153,7 @@ extern "C" {
 		sent with CON_Events() ***Will disappear in the next major release. There is no need for such a focus model *** */
 	extern DECLSPEC void SDLCALL CON_Topmost(ConsoleInformation *console);
 	/*! Modify the prompt of the console. If you want a backslash you will have to escape it. */
-	extern DECLSPEC void SDLCALL CON_SetPrompt(ConsoleInformation *console, char* newprompt);
+	extern DECLSPEC void SDLCALL CON_SetPrompt(ConsoleInformation *console, const char* newprompt);
 	/*! Set the key, that invokes a CON_Hide() after press. default is ESCAPE and you can always hide using
 		ESCAPE and the HideKey (2 keys for hiding). compared against event->key.keysym.sym !! */
 	extern DECLSPEC void SDLCALL CON_SetHideKey(ConsoleInformation *console, int key);

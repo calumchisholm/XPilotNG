@@ -264,9 +264,9 @@ hitmask_t Wormhole_hitmask(wormhole_t *wormhole)
     return 0;
 }
 
-bool Wormhole_hitfunc(group_t *gp, move_t *move)
+bool Wormhole_hitfunc(group_t *gp, const move_t *move)
 {
-    object_t *obj = move->obj;
+    const object_t *obj = move->obj;
     wormhole_t *wormhole = Wormhole_by_index(gp->mapobj_ind);
 
     if (wormhole->type == WORM_OUT)
@@ -285,7 +285,7 @@ bool Wormhole_hitfunc(group_t *gp, move_t *move)
 	 wormhole, Object_typename(move->obj));
 #endif
     if (obj->type == OBJ_PLAYER) {
-	player_t *pl = (player_t *)obj;
+	const player_t *pl = (const player_t *)obj;
 	if (pl->wormHoleHit == gp->mapobj_ind)
 	    return false;
     }

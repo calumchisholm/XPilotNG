@@ -29,6 +29,9 @@
  * client audio
  */
 
+#ifndef CAUDIO_H
+#define CAUDIO_H
+
 #ifdef SOUND
 
 int  Handle_audio(int type, int volume);
@@ -37,15 +40,11 @@ void audioCleanup(void);
 void audioEvents(void);
 void audioUpdate(void);
 int  audioDeviceInit(char *display);
-void audioDevicePlay(char *filename, int type, int volume, void **private);
+void audioDevicePlay(char *filename, int type, int volume, void **priv);
 void audioDeviceEvents(void);
 void audioDeviceUpdate(void);
-void audioDeviceFree(void *private);
+void audioDeviceFree(void *priv);
 void audioDeviceClose(void);
 
 #endif
-
-
-
-
-
+#endif

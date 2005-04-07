@@ -825,7 +825,7 @@ int plock_server(bool on)
 /* kps - this is really ugly */
 extern bool in_move_player;
 
-bool Friction_area_hitfunc(group_t *groupptr, move_t *move)
+bool Friction_area_hitfunc(group_t *groupptr, const move_t *move)
 {
     UNUSED_PARAM(groupptr); UNUSED_PARAM(move);
 

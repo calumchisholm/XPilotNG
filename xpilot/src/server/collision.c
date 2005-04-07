@@ -32,7 +32,7 @@
 
 /* new acd functions */
 /* doubles because the multiplies might overflow ints */
-static inline bool in_range_acd(double dx, double dy, double dvx, double dvy,
+static bool in_range_acd(double dx, double dy, double dvx, double dvy,
 				double r)
 {
     double tmin, fminx, fminy;
@@ -56,7 +56,7 @@ static inline bool in_range_acd(double dx, double dy, double dvx, double dvy,
 	return false;
 }
 
-static inline bool in_range_simple(int px, int py, int qx, int qy, double r)
+static bool in_range_simple(int px, int py, int qx, int qy, double r)
 {
     int dx = px - qx, dy = py - qy;
 
@@ -69,7 +69,7 @@ static inline bool in_range_simple(int px, int py, int qx, int qy, double r)
 	return false;
 }
 
-static inline bool in_range_partial(double dx, double dy,
+static bool in_range_partial(double dx, double dy,
 				    double dvx, double dvy,
 				    double r, double wall_time)
 {
@@ -125,7 +125,7 @@ static inline bool in_range_partial(double dx, double dy,
        yet. It's supposed that they move in a straight line from
        prevpos to pos. This can lead to some erroneous hits.
 */
-static bool in_range(object_t *obj1, object_t *obj2, double range)
+static inline bool in_range(object_t *obj1, object_t *obj2, double range)
 {
     bool hit;
 
@@ -195,7 +195,7 @@ static void PlayerCollision(void)
 	if (!World_contains_clpos(pl->pos)) {
 	    Player_set_state(pl, PL_STATE_KILLED);
 	    Set_message_f("%s left the known universe.", pl->name);
-	    Handle_Scoring(SCORE_WALL_DEATH,NULL,pl,NULL);
+	    Handle_Scoring(SCORE_WALL_DEATH,NULL,pl,NULL,NULL);
 	    continue;
 	}
 
@@ -277,18 +277,18 @@ static void PlayerCollision(void)
 		    if (Player_is_killed(pl)) {
 			Set_message_f("%s and %s crashed.",
 				      pl->name, pl_j->name);
-			Handle_Scoring(SCORE_COLLISION,pl,pl_j,NULL);
+			Handle_Scoring(SCORE_COLLISION,pl,pl_j,NULL,NULL);
 		    } else {
 			Set_message_f("%s ran over %s.", pl->name, pl_j->name);
 			sound_play_sensors(pl_j->pos, PLAYER_RAN_OVER_PLAYER_SOUND);
-			Handle_Scoring(SCORE_ROADKILL,pl,pl_j,NULL);
+			Handle_Scoring(SCORE_ROADKILL,pl,pl_j,NULL,NULL);
 		    }
 
 		} else {
 		    if (Player_is_killed(pl)) {
 			Set_message_f("%s ran over %s.", pl_j->name, pl->name);
 			sound_play_sensors(pl->pos, PLAYER_RAN_OVER_PLAYER_SOUND);
-			Handle_Scoring(SCORE_ROADKILL,pl_j,pl,NULL);
+			Handle_Scoring(SCORE_ROADKILL,pl_j,pl,NULL,NULL);
 		    }
 		}
 
@@ -671,7 +671,7 @@ static void Player_collides_with_ball(player_t *pl, ballobject_t *ball)
     }
     if (ball->ball_owner == NO_ID) {
 	Set_message_f("%s was killed by a ball.", pl->name);
-	Handle_Scoring(SCORE_BALL_KILL,NULL,pl,NULL);
+	Handle_Scoring(SCORE_BALL_KILL,NULL,pl,NULL,NULL);
     } else {
 	player_t *kp = Player_by_id(ball->ball_owner);
 
@@ -679,7 +679,7 @@ static void Player_collides_with_ball(player_t *pl, ballobject_t *ball)
 		      pl->name, kp->name,
 		      kp->id == pl->id ? "  How strange!" : "");
 	
-	Handle_Scoring(SCORE_BALL_KILL,kp,pl,NULL);
+	Handle_Scoring(SCORE_BALL_KILL,kp,pl,NULL,NULL);
 
 	if (kp->id != pl->id) {
 	    Robot_war(pl, kp);
@@ -923,7 +923,7 @@ static void Player_collides_with_mine(player_t *pl, mineobject_t *mine)
 	 * for a low-scored-player hitting a high-scored-player's mine.
 	 * Maybe not.
 	 */
-	Handle_Scoring(SCORE_HIT_MINE,kp,pl,NULL);
+	Handle_Scoring(SCORE_HIT_MINE,kp,pl,NULL,NULL);
     }
 }
 
@@ -952,7 +952,7 @@ static void Player_collides_with_debris(player_t *pl, object_t *obj)
 		sprintf(msg + strlen(msg), "  How strange!");
 	}
 	Set_message(msg);
-	Handle_Scoring(SCORE_EXPLOSION,kp,pl,NULL);
+	Handle_Scoring(SCORE_EXPLOSION,kp,pl,NULL,NULL);
 	obj->life = 0.0;
 	return;
     }
@@ -973,7 +973,7 @@ static void Player_collides_with_asteroid(player_t *pl, wireobject_t *ast)
     if (ast->life < 0.0)
 	ast->life = 0.0;
     if (ast->life == 0.0) {
-    	Handle_Scoring(SCORE_ASTEROID_KILL,pl,NULL,(void *)ast);
+    	Handle_Scoring(SCORE_ASTEROID_KILL,pl,NULL,ast,NULL);
     }
 
     if (!Player_uses_emergency_shield(pl))
@@ -989,10 +989,10 @@ static void Player_collides_with_asteroid(player_t *pl, wireobject_t *ast)
 	    Set_message_f("%s smashed into an asteroid.", pl->name);
 	else
 	    Set_message_f("%s was hit by an asteroid.", pl->name);
-	Handle_Scoring(SCORE_ASTEROID_DEATH,NULL,pl,NULL);
+	Handle_Scoring(SCORE_ASTEROID_DEATH,NULL,pl,NULL,NULL);
 	if (Player_is_tank(pl)) {
 	    player_t *owner_pl = Player_by_id(pl->lock.pl_id);
-	    Handle_Scoring(SCORE_ASTEROID_KILL,owner_pl,NULL,(void *)ast);
+	    Handle_Scoring(SCORE_ASTEROID_KILL,owner_pl,NULL,ast,NULL);
 	}
 	return;
     }
@@ -1124,7 +1124,7 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 		}
 	    }
     	    
-	    Handle_Scoring(SCORE_SHOT_DEATH,kp,pl,(void *)obj);
+	    Handle_Scoring(SCORE_SHOT_DEATH,kp,pl,obj,NULL);
 
 	    if ((!BIT(obj->obj_status, FROMCANNON)) && (!(obj->id == NO_ID || kp->id == pl->id))) {
 		Robot_war(pl, kp);
@@ -1299,7 +1299,7 @@ static void AsteroidCollision(void)
 					? BALL_PTR(obj)->ball_owner
 					: obj->id);
 			player_t *pl = Player_by_id(owner_id);
-			Handle_Scoring(SCORE_ASTEROID_KILL,pl,NULL,(void *)ast);
+			Handle_Scoring(SCORE_ASTEROID_KILL,pl,NULL,ast,NULL);
 		    }
 
 		    /* break; */

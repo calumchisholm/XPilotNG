@@ -70,5 +70,5 @@ typedef enum {
     ,SCORE_SHOVE_DEATH
 } scoretype_t;
 
-void Handle_Scoring(scoretype_t st, player_t *killer, player_t *victim, void *extra);
+void Handle_Scoring(scoretype_t st, player_t *killer, player_t *victim, void *extra, const char *somemsg);
 #endif

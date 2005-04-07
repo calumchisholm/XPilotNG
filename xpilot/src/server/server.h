@@ -156,7 +156,7 @@ void Move_player(player_t *pl);
 void Turn_player(player_t *pl, bool push);
 int is_inside(int x, int y, hitmask_t hitmask, const object_t *obj);
 int shape_is_inside(int cx, int cy, hitmask_t hitmask, const object_t *obj,
-		    const shape_t *s, int dir);
+		    shape_t *s, int dir);
 int Polys_to_client(unsigned char **);
 void Ball_line_init(void);
 void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt);
@@ -273,7 +273,7 @@ void Fire_right_shot(player_t *pl, int type, int dir, int gun);
 void Fire_left_rshot(player_t *pl, int type, int dir, int gun);
 void Fire_right_rshot(player_t *pl, int type, int dir, int gun);
 
-bool Friction_area_hitfunc(group_t *groupptr, move_t *move);
+bool Friction_area_hitfunc(group_t *groupptr, const move_t *move);
 
 void Team_immunity_init(void);
 void Hitmasks_init(void);
@@ -535,7 +535,7 @@ void Make_treasure_ball(treasure_t *t);
 void Ball_hits_goal(ballobject_t *ball, group_t *groupptr);
 void Ball_is_replaced(ballobject_t *ball);
 void Ball_is_destroyed(ballobject_t *ball);
-bool Balltarget_hitfunc(group_t *groupptr, move_t *move);
+bool Balltarget_hitfunc(group_t *groupptr, const move_t *move);
 
 /*
  * Prototypes for wormhole.c
@@ -544,7 +544,7 @@ void Traverse_wormhole(player_t *pl);
 void Hyperjump(player_t *pl);
 void Object_hits_wormhole(object_t *obj, int ind);
 hitmask_t Wormhole_hitmask(wormhole_t *wormhole);
-bool Wormhole_hitfunc(group_t *groupptr, move_t *move);
+bool Wormhole_hitfunc(group_t *groupptr, const move_t *move);
 void World_remove_wormhole(wormhole_t *wormhole);
 bool Verify_wormhole_consistency(void);
 void Set_wormhole_initial_destinations(void);

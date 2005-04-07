@@ -43,7 +43,6 @@ typedef struct {
     int num_spark_colors;
 } display_t;
 
-extern int	 simulating;
 extern int	 receive_window_size;
 extern long	 last_loops;
 extern bool      packetMeasurement;
@@ -51,7 +50,7 @@ extern display_t server_display; /* the servers idea about our display */
 
 typedef struct {
     int movement;
-    int turnspeed;
+    double turnspeed;
     int id;
 } pointer_move_t;
 

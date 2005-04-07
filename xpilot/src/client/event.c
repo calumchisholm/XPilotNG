@@ -406,7 +406,7 @@ void Key_clear_counts(void)
     	if (keyv_new[i] > 0) {
 	    /* set to one so that Key_release(i) will trigger */
     	    keyv_new[i] = 1;
-	    change |= Key_release(i);
+	    change |= Key_release((keys_t)i);
 	}
     }
     

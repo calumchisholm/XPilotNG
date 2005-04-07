@@ -36,7 +36,7 @@ static int	audioEnabled = 0;
 
 static struct {
     char	**filenames;
-    void	**private;
+    void	**priv;
     int		nsounds;
 } table[MAX_SOUNDS];
 
@@ -69,8 +69,8 @@ void audioInit(char *display)
 		size_t filename_ptrs_size = sizeof(char *) * MAX_RANDOM_SOUNDS;
 		size_t private_ptrs_size = sizeof(void *) * MAX_RANDOM_SOUNDS;
 		table[i].filenames = (char **)malloc(filename_ptrs_size);
-		table[i].private = (void **)malloc(private_ptrs_size);
-		memset(table[i].private, 0, private_ptrs_size);
+		table[i].priv = (void **)malloc(private_ptrs_size);
+		memset(table[i].priv, 0, private_ptrs_size);
 		ifile = strtok(file, " \t\n|");
 		j = 0;
 		while (ifile && j < MAX_RANDOM_SOUNDS) {
@@ -109,9 +109,9 @@ void audioCleanup(void)
 
     for (i = 0; i < MAX_SOUNDS; i++) {
 	for (j = 0; j < table[i].nsounds; j++)
-	    audioDeviceFree(table[i].private[j]);
+	    audioDeviceFree(table[i].priv[j]);
 	XFREE(table[i].filenames);
-	XFREE(table[i].private);
+	XFREE(table[i].priv);
     }
     audioDeviceClose();
 }
@@ -143,23 +143,23 @@ int Handle_audio(int type, int volume)
 	pick = randomMT() % table[type].nsounds;
     }
 
-    if (!table[type].private[pick]) {
+    if (!table[type].priv[pick]) {
 	int i;
 
 	/* eliminate duplicate sounds */
 	for (i = 0; i < MAX_SOUNDS; i++)
 	    if (i != type
 		&& table[i].filenames
-		&& table[i].private[pick]
+		&& table[i].priv[pick]
 		&& !strcmp(table[type].filenames[0], table[i].filenames[0]))
 	    {
-		table[type].private[0] = table[i].private[0];
+		table[type].priv[0] = table[i].priv[0];
 		break;
 	    }
     }
 
     audioDevicePlay(table[type].filenames[pick], type, MIN(volume, maxVolume),
-		    &table[type].private[pick]);
+		    &table[type].priv[pick]);
 
     return 0;
 }

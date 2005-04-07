@@ -190,7 +190,7 @@ void Object_hits_target(object_t *obj, target_t *targ, double player_cost)
     if (!somebody)
 	return;
 	
-    Handle_Scoring(SCORE_TARGET,kp,NULL,targ);
+    Handle_Scoring(SCORE_TARGET,kp,NULL,targ,NULL);
 
     sound_play_sensors(targ->pos, DESTROY_TARGET_SOUND);
 

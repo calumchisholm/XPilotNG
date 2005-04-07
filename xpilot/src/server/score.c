@@ -111,7 +111,8 @@ void Add_Score(player_t *pl, double score)
     pl->score += score;
 }
 
-void Handle_Scoring(scoretype_t st, player_t *killer, player_t *victim, void *extra)
+void Handle_Scoring(scoretype_t st, player_t *killer, player_t *victim,
+		    void *extra, const char *somemsg)
 {
     double sc = 0.0,sc2 = 0.0,factor = 0.0;
     int i_tank_owner = 0,j = 0;
@@ -133,8 +134,8 @@ void Handle_Scoring(scoretype_t st, player_t *killer, player_t *victim, void *ex
 	    break;
     	case SCORE_WALL_DEATH:
 	    sc = Rate(WALL_SCORE, Get_Score(victim));
-	    if (extra) {
-	    	if (!options.zeroSumScoring) Score(victim, -sc, victim->pos, (char *)extra);
+	    if (somemsg) {
+	    	if (!options.zeroSumScoring) Score(victim, -sc, victim->pos, somemsg);
 	    } else {
 	    	if (!options.zeroSumScoring) Score(victim, -sc, victim->pos, victim->name);
 	    }

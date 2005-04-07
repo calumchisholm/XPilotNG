@@ -267,7 +267,6 @@ void setupPaint_HUD(void)
 
 void Paint_frame(void)
 {
-    static int oldt = 0;
     struct timeval tv1, tv2;
 
     gettimeofday(&tv1, NULL);

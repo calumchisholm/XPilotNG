@@ -118,7 +118,7 @@ void Ball_is_destroyed(ballobject_t *ball)
 
 static int Punish_team(player_t *pl, treasure_t *td, clpos_t pos)
 {
-    double win_score = 0.0, lose_score = 0.0, por;
+    double win_score = 0.0, lose_score = 0.0;
     int i, win_team_members = 0, lose_team_members = 0;
     bool somebody = false;
 
@@ -126,7 +126,7 @@ static int Punish_team(player_t *pl, treasure_t *td, clpos_t pos)
     if (td->team == pl->team)
 	return 0;
 	
-    Handle_Scoring(SCORE_TREASURE,pl,NULL,td);
+    Handle_Scoring(SCORE_TREASURE,pl,NULL,td,NULL);
 
     if (BIT(world->rules->mode, TEAM_PLAY)) {
     	for (i = 0; i < NumPlayers; i++) {
@@ -277,9 +277,9 @@ extern bool in_legacy_mode_ball_hack;
  * This function is called when something would hit a balltarget.
  * The function determines if it hits or not.
  */
-bool Balltarget_hitfunc(group_t *gp, move_t *move)
+bool Balltarget_hitfunc(group_t *gp, const move_t *move)
 {
-    ballobject_t *ball = NULL;
+    const ballobject_t *ball = NULL;
 
     /* this can happen if is_inside is called for a balltarget with
        a NULL obj */
@@ -288,7 +288,7 @@ bool Balltarget_hitfunc(group_t *gp, move_t *move)
 
     assert(move->obj->type == OBJ_BALL);
 
-    ball = BALL_PTR(move->obj);
+    ball = (const ballobject_t *)move->obj;
 
     if (ball->ball_owner == NO_ID)
 	return true;

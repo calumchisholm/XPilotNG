@@ -812,10 +812,6 @@ void MarkPlayersForRedraw(void);
 
 int Check_client_fps(void);
 
-#ifdef	SOUND
-extern	void audioEvents(void);
-#endif
-
 /*
  * about.c
  */

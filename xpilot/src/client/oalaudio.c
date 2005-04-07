@@ -73,7 +73,7 @@ static void sample_parse_info(char *filename, sample_t *sample)
 static sample_t *sample_load(char *filename)
 {
     ALenum    err;
-    ALsizei   size, freq, bits;
+    ALsizei   size, freq;
     ALboolean loop;
     ALenum    format;
     ALvoid    *data;
@@ -156,11 +156,10 @@ int audioDeviceInit(char *display)
     return 0;
 }
 
-void audioDevicePlay(char *filename, int type, int volume, void **private)
+void audioDevicePlay(char *filename, int type, int volume, void **priv)
 {
-    int      i, free;
     sound_t  *iter, *next;
-    sample_t *sample = (sample_t *)(*private);
+    sample_t *sample = (sample_t *)(*priv);
 
     if (!sample) {
 	sample = sample_load(filename);
@@ -168,7 +167,7 @@ void audioDevicePlay(char *filename, int type, int volume, void **private)
 	    error("failed to load sample %s\n", filename);
 	    return;
 	}
-	*private = sample;
+	*priv = sample;
     }
 
     /* if the sample is a looping one, first try to find a matching
@@ -238,10 +237,10 @@ void audioDeviceUpdate(void)
     }
 }
 
-void audioDeviceFree(void *private) 
+void audioDeviceFree(void *priv) 
 {
-    if (private)
-	sample_free((sample_t *)private);
+    if (priv)
+	sample_free((sample_t *)priv);
 }
 
 void audioDeviceClose() 

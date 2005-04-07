@@ -467,8 +467,7 @@ static void legacy_mode_ball_hack(ballobject_t *ball)
 	return;
 
     in_legacy_mode_ball_hack = true;
-    group = is_inside(ball->pos.cx, ball->pos.cy, BALL_BIT,
-		      (const object_t *)ball);
+    group = is_inside(ball->pos.cx, ball->pos.cy, BALL_BIT, OBJ_PTR(ball));
     in_legacy_mode_ball_hack = false;
 
     if (group == NO_GROUP)
@@ -796,7 +795,7 @@ static void Do_repair(player_t *pl)
 
 /* kps - UPDATE_RATE should depend on gamespeed */
 #define UPDATE_RATE 100
-static inline void Update_visibility(player_t *pl, int ind)
+static void Update_visibility(player_t *pl, int ind)
 {
     int j;
 
@@ -925,7 +924,7 @@ static void Update_players(void)
 	if (Player_is_self_destructing(pl)) {
 	    pl->self_destruct_count -= timeStep;
 	    if (pl->self_destruct_count <= 0) {
-	    	Handle_Scoring(SCORE_SELF_DESTRUCT,pl,NULL,NULL);
+	    	Handle_Scoring(SCORE_SELF_DESTRUCT,pl,NULL,NULL,NULL);
 		Player_set_state(pl, PL_STATE_KILLED);
 		Set_message_f("%s has committed suicide.", pl->name);
 		Throw_items(pl);
@@ -964,12 +963,16 @@ static void Update_players(void)
 	 */
 	if (Player_is_thrusting(pl)) {
 	    double power = pl->power;
+#if 0
+	    /* kps - ISO C89 forbids mixed declarations and code */
+	    /* this should be implemented properly */
 	    if (pl->fuel.sum <= 0) 
 		power=MIN_PLAYER_POWER * 0.6; 
 	    /* fly with lowest power with "no fuel" KHS */
 	    /* shall emulate flying with last energy  reserves - */
 	    /* this is to not render players completely helpless */
 	    /* until self destruct when alone on a map */
+#endif
 	     
 	    double f = pl->power * 0.0008;	/* 1/(FUEL_SCALE*MIN_POWER) */
 	    int a = (Player_uses_emergency_thrust(pl)

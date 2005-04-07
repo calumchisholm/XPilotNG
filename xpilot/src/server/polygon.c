@@ -41,7 +41,7 @@ int max_bases, max_balls, max_polys,max_echanges; /* !@# make static after testi
 static int current_estyle, current_group, is_decor;
 
 static int Create_group(int type, int team, hitmask_t hitmask,
-			bool (*hitfunc)(group_t *gp, move_t *move),
+			bool (*hitfunc)(group_t *gp, const move_t *move),
 			int mapobj_ind)
 {
     group_t gp;

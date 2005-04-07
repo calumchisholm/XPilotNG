@@ -118,7 +118,7 @@ int num_lines = 0;
 int num_polys = 0;
 int mapx, mapy;
 
-static inline bool can_hit(group_t *gp, move_t *move)
+static inline bool can_hit(group_t *gp, const move_t *move)
 {
     if (gp->hitmask & move->hitmask)
 	return false;
@@ -217,7 +217,7 @@ void Object_crash(object_t *obj, int crashtype, int mapobj_ind)
 
 void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
 {
-    const char *howfmt = NULL;
+    const char *howfmt = NULL; /* kps - change back to const */
     const char *hudmsg = NULL;
 
     msg[0] = '\0';
@@ -337,7 +337,7 @@ void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
 	    total_pusher_score += Get_Score(pushers[j]);
 	}
 	if (num_pushers == 0) {
-	    Handle_Scoring(SCORE_WALL_DEATH,NULL,pl,hudmsg);
+	    Handle_Scoring(SCORE_WALL_DEATH,NULL,pl,NULL,hudmsg);
 	    strcat(msg, ".");
 	    Set_message(msg);
 	} else {
@@ -376,7 +376,7 @@ void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
  		    }
  		}
 
-		Handle_Scoring(SCORE_SHOVE_KILL,pusher,pl,&mult);
+		Handle_Scoring(SCORE_SHOVE_KILL,pusher,pl,&mult,NULL);
 		if (i >= num_pushers - 1)
 		    Rank_add_shove_kill(pusher);
 	    }
@@ -388,7 +388,7 @@ void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
  		    mult = options.tagItKillScoreMult;
  	    }
     	    dummy.score = average_pusher_score;
-	    Handle_Scoring(SCORE_SHOVE_DEATH,&dummy,pl,&mult);
+	    Handle_Scoring(SCORE_SHOVE_DEATH,&dummy,pl,&mult,NULL);
 
 	    strcpy(msg_ptr, ".");
 	    Set_message(msg);
@@ -419,11 +419,11 @@ static void *ralloc(void *ptr, size_t size)
     return ptr;
 }
 
-static unsigned short *Shape_lines(const shape_t *s, int dir)
+static unsigned short *Shape_lines(shape_t *s, int dir)
 {
     int i;
     static unsigned short foo[100];
-    static const shape_t *lastshape;
+    static shape_t *lastshape;
     static int lastdir;
     const int os = num_lines;
     clpos_t *pts;
@@ -787,7 +787,7 @@ static int Lines_check(int msx, int msy, int mdx, int mdy, int *mindone,
 
     while ( (i = *lines++) != 65535) {
 	if (linet[i].group
-	    && (!can_hit(&groups[linet[i].group], (move_t *)move)))
+	    && (!can_hit(&groups[linet[i].group], move)))
 	    continue;
 	lsx = linet[i].start.cx;
 	lsy = linet[i].start.cy;
@@ -1033,7 +1033,7 @@ static void Move_point(const move_t *move, struct collans *answer)
  * For example, there's no need to consider all the points
  * separately if the shape is not close to a wall.
  */
-static void Shape_move(const move_t *move, const shape_t *s,
+static void Shape_move(const move_t *move, shape_t *s,
 		       int dir, struct collans *answer)
 {
     int minline, mindone, minheight, minpoint;
@@ -1125,7 +1125,7 @@ static void Shape_move(const move_t *move, const shape_t *s,
     x = -1;
     while ( ( i = *points++) != 65535) {
 	if (linet[i].group
-	    && (!can_hit(&groups[linet[i].group], (move_t *)move)))
+	    && (!can_hit(&groups[linet[i].group], move)))
 	    continue;
 	msx = move->start.cx - linet[i].start.cx;
 	msy = move->start.cy - linet[i].start.cy;
@@ -1170,11 +1170,11 @@ static void Shape_move(const move_t *move, const shape_t *s,
  * not explicitly constructed in the algorithm). Return the number of a group
  * that would be hit during morphing or NO_GROUP if there is enough room. */
 /* This might be useful elsewhere in the code, need not be kept static */
-static int Shape_morph(const shape_t *shape1, int dir1,
-		       const shape_t *shape2, int dir2,
-		      hitmask_t hitmask, const object_t *obj, 
-		      int x, int y,
-		      struct collans *myanswer)
+static int Shape_morph(shape_t *shape1, int dir1,
+		       shape_t *shape2, int dir2,
+		       hitmask_t hitmask, const object_t *obj, 
+		       int x, int y,
+		       struct collans *myanswer)
 {
     struct collans answer;
     int i, p, xo1, xo2, yo1, yo2, xn1, xn2, yn1, yn2, xp, yp, s, t;
@@ -1184,7 +1184,7 @@ static int Shape_morph(const shape_t *shape1, int dir1,
     int num_points;
 
     mv.hitmask = hitmask;
-    mv.obj = OBJ_PTR(obj);
+    mv.obj = obj;
     /*pts1 = Shape_get_points((shape_t *)shape1, dir1);
       pts2 = Shape_get_points((shape_t *)shape2, dir2);*/
 
@@ -1493,7 +1493,7 @@ static int Clear_corner(move_t *move, object_t *obj, int l1, int l2)
 
 /* Move a shape away from a line after a collision. Needed for the same
  * reason as Away(). */
-static int Shape_away(move_t *move, const shape_t *s,
+static int Shape_away(move_t *move, shape_t *s,
 		      int dir, int line, struct collans *ans)
 {
     int dx, dy;
@@ -1667,7 +1667,7 @@ int is_inside(int cx, int cy, hitmask_t hitmask, const object_t *obj)
 #endif
 
     mv.hitmask = hitmask;
-    mv.obj = OBJ_PTR(obj);
+    mv.obj = obj;
     gblock = &inside_table[(cx >> B_SHIFT) + mapx * (cy >> B_SHIFT)];
     if (gblock->group == NO_GROUP)
 	return NO_GROUP;
@@ -1739,7 +1739,7 @@ int is_inside(int cx, int cy, hitmask_t hitmask, const object_t *obj)
 /* Similar to the above, except check whether any part of the shape
  * (edge or inside) would hit the group. */
 int shape_is_inside(int cx, int cy, hitmask_t hitmask, const object_t *obj,
-		    const shape_t *s, int dir)
+		    shape_t *s, int dir)
 {
     static clpos_t zeropos;
     static shape_t zeroshape;

@@ -69,6 +69,9 @@ extern bool threadedDraw; /* default.c */
 #include "paint.h"
 #include "recordfmt.h"
 #include "talk.h"
+#ifdef SOUND
+# include "caudio.h"
+#endif
 
 #endif /* XPCLIENT_H */
 

@@ -98,7 +98,7 @@ void Object_hits_cannon(object_t *obj, cannon_t *c);
 void Cannon_dies(cannon_t *cannon, player_t *pl);
 hitmask_t Cannon_hitmask(cannon_t *cannon);
 void Cannon_set_hitmask(int group, cannon_t *cannon);
-bool Cannon_hitfunc(group_t *groupptr, move_t *move);
+bool Cannon_hitfunc(group_t *groupptr, const move_t *move);
 void World_restore_cannon(cannon_t *cannon);
 void World_remove_cannon(cannon_t *cannon);
 void Cannon_set_option(cannon_t *cannon, const char *name, const char *value);
@@ -110,12 +110,12 @@ static inline int Cannon_get_smartness(cannon_t *c)
     return options.cannonSmartness;
 }
 
-static inline int Cannon_get_min_shot_life(cannon_t *c)
+static inline double Cannon_get_min_shot_life(cannon_t *c)
 {
     return options.minCannonShotLife;
 }
 
-static inline int Cannon_get_max_shot_life(cannon_t *c)
+static inline double Cannon_get_max_shot_life(cannon_t *c)
 {
     return options.maxCannonShotLife;
 }

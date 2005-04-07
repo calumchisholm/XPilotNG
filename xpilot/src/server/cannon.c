@@ -824,7 +824,7 @@ void Cannon_dies(cannon_t *c, player_t *pl)
 		  8.0, 68.0);
 
     if (pl) {
-    	Handle_Scoring(SCORE_CANNON_KILL,pl,NULL,c);
+    	Handle_Scoring(SCORE_CANNON_KILL,pl,NULL,c,NULL);
     }
 }
 
@@ -900,9 +900,9 @@ extern struct move_parameters mp;
  *
  * Ideas stolen from Move_segment in walls_old.c
  */
-bool Cannon_hitfunc(group_t *gp, move_t *move)
+bool Cannon_hitfunc(group_t *gp, const move_t *move)
 {
-    object_t *obj = move->obj;
+    const object_t *obj = move->obj;
     cannon_t *cannon = Cannon_by_index(gp->mapobj_ind);
     unsigned long cannon_mask;
 

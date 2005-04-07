@@ -42,7 +42,7 @@ static bool setup_done = false;
 int Mapdata_setup(const char *urlstr)
 {
     URL url;
-    const char *name, *dir;
+    const char *name, *dir = NULL;
     char path[1024], buf[1024], *ptr;
     int rv = false;
 

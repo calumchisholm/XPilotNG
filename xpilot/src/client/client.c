@@ -1759,7 +1759,7 @@ int Handle_ball(int x, int y, int id, int style)
 
 static int predict_self_dir(int received_dir)
 {
-    int pointer_delta = 0, dir_delta, new_dir;
+    double pointer_delta = 0, dir_delta, new_dir;
     int ind = pointer_move_next - 1;
     int count = 0;
 
@@ -1782,7 +1782,7 @@ static int predict_self_dir(int received_dir)
     while (new_dir >= RES)
 	new_dir -= RES;
 
-    return new_dir;
+    return (int)(new_dir + 0.5);
 }
 
 int Handle_ship(int x, int y, int id, int dir, int shield, int cloak,

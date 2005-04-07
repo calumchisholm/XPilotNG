@@ -889,7 +889,7 @@ void CON_Topmost(ConsoleInformation * console)
 }
 
 /* Sets the Prompt for console */
-void CON_SetPrompt(ConsoleInformation * console, char *newprompt)
+void CON_SetPrompt(ConsoleInformation * console, const char *newprompt)
 {
     if (!console)
 	return;

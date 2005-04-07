@@ -156,7 +156,7 @@ typedef struct move {
     clvec_t start;
     clvec_t delta;
     hitmask_t hitmask;
-    object_t *obj;
+    const object_t *obj;
 } move_t;
 
 typedef struct group group_t;
@@ -165,7 +165,7 @@ struct group {
     int type;
     int team;
     hitmask_t hitmask;
-    bool (*hitfunc)(group_t *groupptr, move_t *move);
+    bool (*hitfunc)(group_t *groupptr, const move_t *move);
     int mapobj_ind;
 };
 

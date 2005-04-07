@@ -177,7 +177,7 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 	if (!BIT(pl->used, HAS_SHIELD)
 	    && !Player_has_armor(pl)) {
 	    Player_set_state(pl, PL_STATE_KILLED);
-    	    Handle_Scoring(SCORE_LASER,kp,pl,cannon);
+    	    Handle_Scoring(SCORE_LASER,kp,pl,cannon,NULL);
 	    if (kp) {
 		Set_message_f("%s got roasted alive by %s's laser.%s",
 			      pl->name, kp->name,
