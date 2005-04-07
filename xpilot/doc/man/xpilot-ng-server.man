@@ -8,7 +8,7 @@ xpilot-ng-server \- server for multiplayer space war game.
 .SH DESCRIPTION
 .IP
 Copyright © 1991\-2005 by Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska, Uoti Urpala, Juha Lindström, Kristian Söderblom and Erik Andersson.
-XPilot NG 4.6.6ng47a1 comes with ABSOLUTELY NO WARRANTY; for details see the
+XPilot NG 4.7.0 comes with ABSOLUTELY NO WARRANTY; for details see the
 provided COPYING file.
 .PP
 Option flags specify where an option can be used and whether it
@@ -796,8 +796,7 @@ Are asteroidconcentrator mapsymbols visible to players?
 .HP
 \fB\-wormholeStableTicks\fR <real>
 .IP
-Number of ticks wormholes will remain stable.
-Replaces option wormTime.
+Number of ticks wormholes will keep the same destination.
 .HP
 \fB\-defaultsFileName\fR or defaults <string>
 .IP
@@ -850,11 +849,9 @@ The number of frames per second the server should strive for.
 .HP
 \fB\-gameSpeed\fR <real>
 .IP
-Rate at which game events happen. Allows using higher
-FPS without making the game too fast.
-A game speed of X means the game proceeds as fast as on an old
-server running at X FPS. A value of 0 means the value of game
-speed is the same as that of FPS.
+Rate at which game events happen. The gameSpeed specifies how
+many ticks of game time elapse each second. A value of 0 means
+that the value of gameSpeed should be equal to the value of FPS.
 .HP
 \-/+allowSmartMissiles or allowSmarts
 .IP
@@ -1705,7 +1702,7 @@ Boolean options are turned off by using +<option>.
 Please refer to the manual pages, xpilot\-ng\-server(6),
 xpilot\-ng\-x11(6) and xpilot\-ng\-sdl(6) for more specific help.
 .IP
-XPilot NG 4.6.6ng47a1 comes with ABSOLUTELY NO WARRANTY; for details see the
+XPilot NG 4.7.0 comes with ABSOLUTELY NO WARRANTY; for details see the
 provided COPYING file.
 .PP
-XPilot NG 4.6.6ng47a1
+XPilot NG 4.7.0

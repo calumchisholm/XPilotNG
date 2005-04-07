@@ -21,29 +21,14 @@ Developer: ?
 
 Clients:
 
-Task: Add a team menuto SDL client (maybe X client too) which allows a
-player to select/swap team. Keep only those teams in the menu that
-have bases on the map.
-Developer: virus / kps ?
-
 Task: Create a useful set of newbie messages that are shown to players
 using the Add_newbie_message() function if client option 'newbie' is on.
 Examples: message that 'm' is used to talk, message when you pick up an
 item, what key one can use to use it e.g.
 Developer: kps
 
-Task: Add support for Add_alert_message() in X client.
-(that is infrastructure for the newbie message stuff and for other messages
-like the "really quit (y/n)?" message.
-Developer: kps
 
 Server:
-
-Task: Make the new ndh.xp2 work ok.
-Developer: throat / baron / kps
-
-Task: Make wormholes warp other objects than players.
-Developer: kps
 
 Task: Make pause key unpause players also when baselesspausing option is on.
 Developer: kps

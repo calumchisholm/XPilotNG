@@ -201,21 +201,21 @@ static void Traverse_wormhole(player_t *pl)
     wormhole_t *wh_hit = Wormhole_by_index(pl->wormHoleHit);
 
     wh_dest = Find_wormhole_dest(pl->wormHoleHit);
-    assert(wh_dest != pl->wormHoleHit);
+    /*assert(wh_dest != pl->wormHoleHit);*/
     sound_play_sensors(pl->pos, WORM_HOLE_SOUND);
     dest = Wormhole_by_index(wh_dest)->pos;
     Warp_balls(pl, dest);
     pl->wormHoleDest = wh_dest;
     Object_position_init_clpos(OBJ_PTR(pl), dest);
     pl->forceVisible += 15;
-    assert(pl->wormHoleHit != -1);
+    /*assert(pl->wormHoleHit != NO_IND);*/
 
     if (wh_dest != pl->wormHoleHit) {
 	wh_hit->lastdest = wh_dest;
 	wh_hit->countdown = options.wormholeStableTicks;
     }
-    else
-	assert(0);
+    /*else
+      assert(0);*/
 
     CLR_BIT(pl->obj_status, WARPING);
     SET_BIT(pl->obj_status, WARPED);
@@ -305,10 +305,43 @@ void Player_finish_warp(player_t *pl)
 
 void Object_warp(object_t *obj)
 {
-    /*warn("%s %p is warping", Object_typename(obj), obj);*/
+    clpos_t dest;
+    int wh_dest;
+    wormhole_t *wh_hit = Wormhole_by_index(obj->wormHoleHit);
+
+    wh_dest = Find_wormhole_dest(obj->wormHoleHit);
+    /*assert(wh_dest != obj->wormHoleHit);*/
+    dest = Wormhole_by_index(wh_dest)->pos;
+    obj->wormHoleDest = wh_dest;
+    Object_position_init_clpos(obj, dest);
+    /*assert(obj->wormHoleHit != NO_IND);*/
+
+    if (wh_dest != obj->wormHoleHit) {
+	wh_hit->lastdest = wh_dest;
+	wh_hit->countdown = options.wormholeStableTicks;
+    }
+    /*else
+      assert(0);*/
+
+    CLR_BIT(obj->obj_status, WARPING);
+    SET_BIT(obj->obj_status, WARPED);
 }
 
 void Object_finish_warp(object_t *obj)
 {
-    /*warn("%s %p warped", Object_typename(obj), obj);*/
+    int group;
+    hitmask_t hitmask = NONBALL_BIT | HITMASK(obj->team);
+    /*
+     * clear warped, so we can use shape_is inside,
+     * Wormhole_hitfunc check for WARPED bit.
+     */
+    CLR_BIT(obj->obj_status, WARPED);
+    group = is_inside(obj->pos.cx, obj->pos.cy, hitmask, obj);
+
+    /*
+     * kps - we might possibly have entered another polygon, e.g.
+     * a wormhole ?
+     */
+    if (group != NO_GROUP)
+	SET_BIT(obj->obj_status, WARPED);
 }
