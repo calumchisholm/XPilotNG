@@ -236,21 +236,13 @@ static void Traverse_wormhole(player_t *pl)
     int wh_dest;
     wormhole_t *wh_hit = Wormhole_by_index(pl->wormHoleHit);
 
-#if 0
-    warn("player %s is in Traverse_wormhole", pl->name);
-#endif
-
     wh_dest = Find_wormhole_dest(wh_hit, pl);
-
     sound_play_sensors(pl->pos, WORM_HOLE_SOUND);
     dest = Wormhole_by_index(wh_dest)->pos;
-
     Warp_balls(pl, dest);
-
     pl->wormHoleDest = wh_dest;
     Object_position_init_clpos(OBJ_PTR(pl), dest);
     pl->forceVisible += 15;
-
     assert(pl->wormHoleHit != -1);
 
     if (wh_dest != pl->wormHoleHit) {
