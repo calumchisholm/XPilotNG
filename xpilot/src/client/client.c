@@ -1761,7 +1761,7 @@ static int predict_self_dir(int received_dir)
 {
     double pointer_delta = 0, dir_delta, new_dir;
     int ind = pointer_move_next - 1;
-    int count = 0;
+    int count = 0, int_new_dir;
 
     if (ind < 0)
 	ind = MAX_POINTER_MOVES - 1;
@@ -1781,8 +1781,12 @@ static int predict_self_dir(int received_dir)
 	new_dir += RES;
     while (new_dir >= RES)
 	new_dir -= RES;
+    int_new_dir = (int)(new_dir + 0.5);
+    while (int_new_dir >= RES)
+	/* might be == RES */
+	int_new_dir -= RES;
 
-    return (int)(new_dir + 0.5);
+    return int_new_dir;
 }
 
 int Handle_ship(int x, int y, int id, int dir, int shield, int cloak,
