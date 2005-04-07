@@ -490,6 +490,15 @@ static void Misc_object_update(void)
     for (i = 0; i < NumObjs; i++) {
 	obj = Obj[i];
 
+#if 0
+	if (BIT(obj->obj_status, WARPING)) {
+	    warn("%s [%d] is warping", Object_typename(obj), i);
+	}
+	if (BIT(obj->obj_status, WARPED)) {
+	    warn("%s [%d] is warped", Object_typename(obj), i);
+	}
+#endif
+
 	if (obj->fuse > 0) {
 	    obj->fuse -= timeStep;
 	    if (obj->fuse <= 0)
@@ -1002,39 +1011,15 @@ static void Update_players(void)
 	/*
 	 * Handle hyperjumps and wormholes.
 	 */
-#if 0
-	warn("Player %s update, warping = %d",
-	     pl->name, BIT(pl->obj_status, WARPING));
-#endif
-	if (BIT(pl->obj_status, WARPING)) {
-	    if (pl->wormHoleHit == -1)
-		Hyperjump(pl);
-	    else
-		Traverse_wormhole(pl);
-	}
+	if (BIT(pl->obj_status, WARPING))
+	    Player_warp(pl);
 
 	/*
 	 * Reset WARPED status, when player is outside a wormhole
 	 */
-	if (BIT(pl->obj_status, WARPED)) {
-	    int group;
-	    hitmask_t hitmask = NONBALL_BIT | HITMASK(pl->team);
-	    /*
-	     * clear warped, so we can use shape_is inside,
-	     * Wormhole_hitfunc check for WARPED bit.
-	     */
-	    CLR_BIT(pl->obj_status, WARPED);
-	    group = shape_is_inside(pl->pos.cx, pl->pos.cy, hitmask,
-				    OBJ_PTR(pl), (shape_t *)pl->ship,
-				    pl->dir);
-	    /*
-	     * kps - we might possibly have entered another polygon, e.g.
-	     * a wormhole ?
-	     */
-	    if (group != NO_GROUP)
-		SET_BIT(pl->obj_status, WARPED);
-	}
-	
+	if (BIT(pl->obj_status, WARPED))
+	    Player_finish_warp(pl);
+
 	if (options.legacyMode) {
 	    update_object_speed(OBJ_PTR(pl));
 	    Move_player(pl);

@@ -158,7 +158,7 @@ static int Find_wormhole_dest(wormhole_t *wh_hit, player_t *pl)
 /*
  * Move player trough wormhole.
  */
-void Traverse_wormhole(player_t *pl)
+static void Traverse_wormhole(player_t *pl)
 {
     clpos_t dest;
     int wh_dest;
@@ -195,7 +195,7 @@ void Traverse_wormhole(player_t *pl)
 /*
  * Player has used hyperjump item.
  */
-void Hyperjump(player_t *pl)
+static void Hyperjump(player_t *pl)
 {
     clpos_t dest;
     int counter;
@@ -307,4 +307,32 @@ bool Verify_wormhole_consistency(void)
     }
 
     return true;
+}
+
+void Player_warp(player_t *pl)
+{
+    if (pl->wormHoleHit == NO_IND)
+	Hyperjump(pl);
+    else
+	Traverse_wormhole(pl);
+}
+
+void Player_finish_warp(player_t *pl)
+{
+    int group;
+    hitmask_t hitmask = NONBALL_BIT | HITMASK(pl->team);
+    /*
+     * clear warped, so we can use shape_is inside,
+     * Wormhole_hitfunc check for WARPED bit.
+     */
+    CLR_BIT(pl->obj_status, WARPED);
+    group = shape_is_inside(pl->pos.cx, pl->pos.cy, hitmask,
+			    OBJ_PTR(pl), (shape_t *)pl->ship,
+			    pl->dir);
+    /*
+     * kps - we might possibly have entered another polygon, e.g.
+     * a wormhole ?
+     */
+    if (group != NO_GROUP)
+	SET_BIT(pl->obj_status, WARPED);
 }

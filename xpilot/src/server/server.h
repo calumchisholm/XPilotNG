@@ -540,8 +540,8 @@ bool Balltarget_hitfunc(group_t *groupptr, const move_t *move);
 /*
  * Prototypes for wormhole.c
  */
-void Traverse_wormhole(player_t *pl);
-void Hyperjump(player_t *pl);
+void Player_warp(player_t *pl);
+void Player_finish_warp(player_t *pl);
 void Object_hits_wormhole(object_t *obj, int ind);
 hitmask_t Wormhole_hitmask(wormhole_t *wormhole);
 bool Wormhole_hitfunc(group_t *groupptr, const move_t *move);
