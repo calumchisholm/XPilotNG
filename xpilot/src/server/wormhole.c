@@ -169,26 +169,26 @@ static void Warp_balls(player_t *pl, clpos_t dest)
     }
 }
 
-static int Find_wormhole_dest(wormhole_t *wh_hit, player_t *pl)
+static int Find_wormhole_dest(int wh_hit_ind)
 {
-    int wh_dest_ind;
-    wormhole_t *wh;
+    int wh_ind;
+    wormhole_t *wh, *wh_hit = Wormhole_by_index(wh_hit_ind);
 
     if (wh_hit->type == WORM_FIXED)
-	return pl->wormHoleHit;
+	return wh_hit_ind;
 
     if (wh_hit->countdown > 0)
 	return wh_hit->lastdest;
 
     do {
-	wh_dest_ind = (int)(rfrac() * Num_wormholes());
-	wh = Wormhole_by_index(wh_dest_ind);
+	wh_ind = (int)(rfrac() * Num_wormholes());
+	wh = Wormhole_by_index(wh_ind);
     }
     while (wh->type == WORM_IN
 	   || wh->type == WORM_FIXED
-	   || pl->wormHoleHit == wh_dest_ind);
+	   || wh_hit_ind == wh_ind);
 
-    return wh_dest_ind;
+    return wh_ind;
 }
 
 /*
@@ -200,7 +200,8 @@ static void Traverse_wormhole(player_t *pl)
     int wh_dest;
     wormhole_t *wh_hit = Wormhole_by_index(pl->wormHoleHit);
 
-    wh_dest = Find_wormhole_dest(wh_hit, pl);
+    wh_dest = Find_wormhole_dest(pl->wormHoleHit);
+    assert(wh_dest != pl->wormHoleHit);
     sound_play_sensors(pl->pos, WORM_HOLE_SOUND);
     dest = Wormhole_by_index(wh_dest)->pos;
     Warp_balls(pl, dest);
@@ -213,6 +214,8 @@ static void Traverse_wormhole(player_t *pl)
 	wh_hit->lastdest = wh_dest;
 	wh_hit->countdown = options.wormholeStableTicks;
     }
+    else
+	assert(0);
 
     CLR_BIT(pl->obj_status, WARPING);
     SET_BIT(pl->obj_status, WARPED);
