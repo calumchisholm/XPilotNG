@@ -283,13 +283,6 @@ bool Wormhole_hitfunc(group_t *gp, const move_t *move)
     return true;
 }
 
-void World_remove_wormhole(wormhole_t *wormhole)
-{
-    blkpos_t blk = Clpos_to_blkpos(wormhole->pos);
-
-    World_set_block(blk, wormhole->lastblock);
-}
-
 bool Verify_wormhole_consistency(void)
 {
     int i, worm_in = 0, worm_out = 0, worm_norm = 0;

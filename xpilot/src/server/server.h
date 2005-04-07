@@ -545,7 +545,6 @@ void Hyperjump(player_t *pl);
 void Object_hits_wormhole(object_t *obj, int ind);
 hitmask_t Wormhole_hitmask(wormhole_t *wormhole);
 bool Wormhole_hitfunc(group_t *groupptr, const move_t *move);
-void World_remove_wormhole(wormhole_t *wormhole);
 bool Verify_wormhole_consistency(void);
 void Set_wormhole_initial_destinations(void);
 
