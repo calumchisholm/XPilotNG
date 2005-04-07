@@ -160,7 +160,7 @@ static void hover_optionWidget( int over, Uint16 x , Uint16 y , void *data )
     
     if (over) {
     	if ((help = Option_get_help(opt))) {
-    	    if (!(hoverWidget = Init_ListWidget( x, y, &nullRGBA, &nullRGBA, &nullRGBA, DOWN, LEFT ,false ))) {
+    	    if (!(hoverWidget = Init_ListWidget( x, y, &nullRGBA, &nullRGBA, &nullRGBA, DOWN, LEFT, VERTICAL, false ))) {
 	    	error("hover_optionWidget: Failed to create ListWidget\n");
 		return;
 	    }
@@ -2600,7 +2600,7 @@ bool ListWidget_Remove( GLWidget *list, GLWidget *item )
     	error("ListWidget_Remove: *item is NULL");
 	return false;
     }
-
+    
     curr = &(list->children);
     while (*curr) {
 	if (*curr == item) {
@@ -2614,7 +2614,8 @@ bool ListWidget_Remove( GLWidget *list, GLWidget *item )
 	    return false;
     }
     
-    *curr = item->next;
+    *curr = (*curr)->next;
+    item->next = NULL;
     
     --wid_info->num_elements;
     
@@ -2773,8 +2774,13 @@ static void SetBounds_ListWidget( GLWidget *widget, SDL_Rect *b )
     bounds.h = 0;
     curr = widget->children;
     while(curr) {
-    	bounds.w = MAX(bounds.w,curr->bounds.w);
-	bounds.h += curr->bounds.h;
+    	if (tmp->direction == VERTICAL) {
+    	    bounds.w = MAX(bounds.w,curr->bounds.w);
+	    bounds.h += curr->bounds.h;
+	} else {
+    	    bounds.w += curr->bounds.w;
+	    bounds.h = MAX(bounds.h,curr->bounds.h);
+	}
 	curr = curr->next;
     }
 
@@ -2798,33 +2804,53 @@ static void SetBounds_ListWidget( GLWidget *widget, SDL_Rect *b )
     
     curr = widget->children;
     while(curr) {
-    	bounds.h -= curr->bounds.h;
+    	if (tmp->direction == VERTICAL) {
+    	    bounds.h -= curr->bounds.h;
 
-	b2.y = bounds.y;
-	if (tmp->reverse_scroll) {
-    	    b2.y += bounds.h;
-    	} else {
-	    bounds.y += curr->bounds.h;
-	}
+	    b2.y = bounds.y;
+	    if (tmp->reverse_scroll) {
+    	    	b2.y += bounds.h;
+    	    } else {
+	    	bounds.y += curr->bounds.h;
+	    }
 
-    	b2.x = bounds.x;
-	if (tmp->h_dir == LW_LEFT) {
-	    b2.x += bounds.w - curr->bounds.w;
-	}
+    	    b2.x = bounds.x;
+	    if (tmp->h_dir == LW_LEFT) {
+	    	b2.x += bounds.w - curr->bounds.w;
+	    }
 	
-	b2.h = curr->bounds.h;
-	b2.w = widget->bounds.w;
-	/*b2.w = curr->bounds.w;*/ /*TODO: make this optional*/
+	    b2.h = curr->bounds.h;
+	    b2.w = widget->bounds.w;
+	    /*b2.w = curr->bounds.w;*/ /*TODO: make this optional*/
+	} else {
+    	    bounds.w -= curr->bounds.w;
+
+	    b2.x = bounds.x;
+	    if (tmp->reverse_scroll) {
+    	    	b2.x += bounds.w;
+    	    } else {
+	    	bounds.x += curr->bounds.w;
+	    }
+
+    	    b2.y = bounds.y;
+	    if (tmp->v_dir == LW_UP) {
+	    	b2.y += bounds.h - curr->bounds.h;
+	    }
+	
+	    b2.w = curr->bounds.w;
+	    b2.h = widget->bounds.h;
+	    /*b2.w = curr->bounds.w;*/ /*TODO: make this optional*/
+	}
 	
 	SetBounds_GLWidget( curr, &b2 );
 
-	curr = curr->next;
+    	curr = curr->next;
     }
 }
 
 GLWidget *Init_ListWidget( Uint16 x, Uint16 y, Uint32 *bg1, Uint32 *bg2, Uint32 *highlight_color
     	    	    	    ,ListWidget_ver_dir_t v_dir, ListWidget_hor_dir_t h_dir
-			    ,bool reverse_scroll )
+			    ,ListWidget_direction direction, bool reverse_scroll )
 {
     GLWidget *tmp;
     ListWidget *wid_info;
@@ -2846,6 +2872,7 @@ GLWidget *Init_ListWidget( Uint16 x, Uint16 y, Uint32 *bg1, Uint32 *bg2, Uint32 
     wid_info->bg2	= bg2;
     wid_info->highlight_color	= highlight_color;
     wid_info->reverse_scroll	= reverse_scroll;
+    wid_info->direction	= direction;
     wid_info->v_dir	= v_dir;
     wid_info->h_dir	= h_dir;
     
@@ -2873,8 +2900,11 @@ static void SetBounds_ScrollPaneWidget(GLWidget *widget, SDL_Rect *b );
 static void ScrollPaneWidget_poschange( GLfloat pos , void *data )
 {
     GLWidget *widget;
+    GLWidget *masque;
     ScrollPaneWidget *wid_info;
     SDL_Rect bounds;
+    GLWidget *vert_scroller;
+    GLWidget *hori_scroller;
     /*GLWidget *curr;*/
     
     if ( !data ) {
@@ -2883,11 +2913,32 @@ static void ScrollPaneWidget_poschange( GLfloat pos , void *data )
     }
     widget = (GLWidget *)data;
     wid_info = ((ScrollPaneWidget *)(widget->wid_info));
+    masque = wid_info->masque;
+    if (!masque) {
+    	error("ScrollPaneWidget_poschange: masque missing!");
+	return;
+    }
+    vert_scroller = wid_info->vert_scroller;
+    hori_scroller = wid_info->hori_scroller;
 
     if (wid_info->content) {
-    	bounds.y = (Sint16)(widget->bounds.y - pos*(wid_info->content->bounds.h));
-    	bounds.x = wid_info->content->bounds.x;
+    	bounds.x = masque->bounds.x;
+    	if (hori_scroller) {
+	    if (!hori_scroller->wid_info) {
+    	    	error("ScrollPaneWidget_poschange: hori_scroller wid_info missing!");
+	    	return;
+	    }
+    	    bounds.x -= (Sint16)((((ScrollbarWidget *)(hori_scroller->wid_info))->pos)*(wid_info->content->bounds.w));
+	}
     	bounds.w = wid_info->content->bounds.w;
+    	bounds.y = masque->bounds.y;
+    	if (vert_scroller) {
+	    if (!vert_scroller->wid_info) {
+    	    	error("ScrollPaneWidget_poschange: vert_scroller wid_info missing!");
+	    	return;
+	    }
+    	    bounds.y -= (Sint16)((((ScrollbarWidget *)(vert_scroller->wid_info))->pos)*(wid_info->content->bounds.h));
+	}
     	bounds.h = wid_info->content->bounds.h;
     	SetBounds_GLWidget(wid_info->content,&bounds);
     }    
@@ -2898,6 +2949,7 @@ static void SetBounds_ScrollPaneWidget(GLWidget *widget, SDL_Rect *b )
     ScrollPaneWidget *wid_info;
     SDL_Rect bounds;
     GLfloat pos;
+    int i;
     
     if (!widget) return;
     if (!b) return;
@@ -2915,41 +2967,126 @@ static void SetBounds_ScrollPaneWidget(GLWidget *widget, SDL_Rect *b )
     widget->bounds.w = b->w;
     widget->bounds.y = b->y;
     widget->bounds.h = b->h;
-    
-    if (wid_info->scroller) {
-    	bounds.y = widget->bounds.y;
-    	bounds.h = widget->bounds.h;
-    	bounds.w = wid_info->scroller->bounds.w;
-    	bounds.x = widget->bounds.x + widget->bounds.w - wid_info->scroller->bounds.w;
-    
-    	SetBounds_GLWidget(wid_info->scroller,&bounds);
-    } else {
-    	error("SetBounds_ScrollPaneWidget: scroller missing!");
-	return;
-    }
-    
-    if (wid_info->masque) {
-    	bounds.y = widget->bounds.y;
-    	bounds.h = widget->bounds.h;
-    	bounds.w = widget->bounds.w - wid_info->scroller->bounds.w;
-    	bounds.x = widget->bounds.x;
-    
-    	SetBounds_GLWidget(wid_info->masque,&bounds);
-    } else {
+
+    if (!wid_info->masque) {
     	error("SetBounds_ScrollPaneWidget: masque missing!");
 	return;
     }
+
+    if (!wid_info->content) {
+    	if (wid_info->vert_scroller) {
+    	    Close_Widget(&(wid_info->vert_scroller));
+    	}
+    	if (wid_info->hori_scroller) {
+    	    Close_Widget(&(wid_info->hori_scroller));
+    	}
+    	return;
+    }
+    
+    for ( i = 0 ; i < 2 ; ++i ) {
+    	if  (
+	    (	(wid_info->vert_scroller) &&
+	    	(widget->bounds.w - wid_info->vert_scroller->bounds.w < wid_info->content->bounds.w))
+	    || (widget->bounds.w < wid_info->content->bounds.w)
+	    ) {
+    	    if (!wid_info->hori_scroller) {
+    	    	if  ( !AppendGLWidgetList(&(widget->children),
+    	    	    	(wid_info->hori_scroller = Init_ScrollbarWidget(false,0.0f,1.0f,SB_HORISONTAL
+	    	    	    	    	    	    ,ScrollPaneWidget_poschange,widget)))
+		    ) {
+	    	    error("SetBounds_ScrollPaneWidget: Failed to init horisontal scroller!");
+    	    	    return;
+    	    	}
+	    }
+    	} else {
+    	    if (wid_info->hori_scroller) {
+	    	Close_Widget(&(wid_info->hori_scroller));
+	    }
+    	}
+
+    	if  (
+	    (	(wid_info->hori_scroller) &&
+	    	(widget->bounds.h - wid_info->hori_scroller->bounds.h < wid_info->content->bounds.h))
+	    || (widget->bounds.h < wid_info->content->bounds.h)
+	    ) {
+    	    if (!wid_info->vert_scroller) {
+    	    	if  ( !AppendGLWidgetList(&(widget->children),
+    	    	    	(wid_info->vert_scroller = Init_ScrollbarWidget(false,0.0f,1.0f,SB_VERTICAL
+	    	    	    	    	    	    ,ScrollPaneWidget_poschange,widget)))
+		    ) {
+	    	    error("SetBounds_ScrollPaneWidget: Failed to init vertical scroller!");
+    	    	    return;
+    	    	}
+	    }
+    	} else {
+    	    if (wid_info->vert_scroller) {
+	    	Close_Widget(&(wid_info->vert_scroller));
+	    }
+    	}
+    }
+    
+    if (wid_info->vert_scroller) {
+    	bounds.x = widget->bounds.x + widget->bounds.w - wid_info->vert_scroller->bounds.w;
+    	bounds.w = wid_info->vert_scroller->bounds.w;
+    	bounds.y = widget->bounds.y;
+    	bounds.h = widget->bounds.h;
+    	if (wid_info->hori_scroller)
+    	    bounds.h -= wid_info->hori_scroller->bounds.h;
+    
+    	SetBounds_GLWidget(wid_info->vert_scroller,&bounds);
+    }
+
+    if (wid_info->hori_scroller) {
+     	bounds.x = widget->bounds.x;
+    	bounds.w = widget->bounds.w;
+    	if (wid_info->vert_scroller)
+    	    bounds.w -= wid_info->vert_scroller->bounds.w;
+    	bounds.y = widget->bounds.y + widget->bounds.h - wid_info->hori_scroller->bounds.h;
+    	bounds.h = wid_info->hori_scroller->bounds.h;
+    
+    	SetBounds_GLWidget(wid_info->hori_scroller,&bounds);
+    }
+    
+    /* we already made sure masque exists! */
+    bounds.x = widget->bounds.x;
+    bounds.w = widget->bounds.w;
+    if (wid_info->vert_scroller)
+    	bounds.w -= wid_info->vert_scroller->bounds.w;
+    bounds.y = widget->bounds.y;
+    bounds.h = widget->bounds.h;
+    if (wid_info->hori_scroller)
+    	bounds.h -= wid_info->hori_scroller->bounds.h;
+    
+    SetBounds_GLWidget(wid_info->masque,&bounds);
     
     if (wid_info->content) {
-    	bounds.h = wid_info->content->bounds.h;
-    	bounds.w = widget->bounds.w - wid_info->scroller->bounds.w;
-    	bounds.x = widget->bounds.x;
+    	if (wid_info->hori_scroller) {
+	    bounds.w = wid_info->content->bounds.w;
+	} else {
+	    bounds.w = wid_info->masque->bounds.w;
+	}
+    	if (wid_info->vert_scroller) {
+	    bounds.h = wid_info->content->bounds.h;
+	} else {
+	    bounds.h = wid_info->masque->bounds.h;
+	}
     
-	ScrollbarWidget_SetSlideSize(wid_info->scroller,MIN(((GLfloat)widget->bounds.h)/((GLfloat)bounds.h),1.0f));
-
-    	pos = MIN( ((ScrollbarWidget *)(wid_info->scroller->wid_info))->pos, 1.0f - ((ScrollbarWidget *)(wid_info->scroller->wid_info))->size);
-    	bounds.y = (Sint16)(widget->bounds.y - pos*(wid_info->content->bounds.h));
+	if (wid_info->hori_scroller) {
+	    ScrollbarWidget_SetSlideSize(wid_info->hori_scroller,MIN(((GLfloat)wid_info->masque->bounds.w)/((GLfloat)bounds.w),1.0f));
+    	    pos = MIN( ((ScrollbarWidget *)(wid_info->hori_scroller->wid_info))->pos, 1.0f - ((ScrollbarWidget *)(wid_info->hori_scroller->wid_info))->size);
+    	    bounds.x = (Sint16)(wid_info->masque->bounds.x - pos*(wid_info->content->bounds.x));
+	} else {
+	    bounds.x = wid_info->masque->bounds.x;
+	}
 	
+	if (wid_info->vert_scroller) {
+	    ScrollbarWidget_SetSlideSize(wid_info->vert_scroller,MIN(((GLfloat)wid_info->masque->bounds.h)/((GLfloat)bounds.h),1.0f));
+    	    pos = MIN( ((ScrollbarWidget *)(wid_info->vert_scroller->wid_info))->pos, 1.0f - ((ScrollbarWidget *)(wid_info->vert_scroller->wid_info))->size);
+    	    bounds.y = (Sint16)(wid_info->masque->bounds.y - pos*(wid_info->content->bounds.h));
+	} else {
+	    bounds.y = wid_info->masque->bounds.y;
+	}
+    
     	SetBounds_GLWidget(wid_info->content,&bounds);
     }
 }
@@ -2973,6 +3110,8 @@ GLWidget *Init_ScrollPaneWidget( GLWidget *content )
     }
     wid_info = ((ScrollPaneWidget *)tmp->wid_info);
     wid_info->content	= content;
+    wid_info->hori_scroller = NULL;
+    wid_info->vert_scroller = NULL;
     
     tmp->WIDGET     	= SCROLLPANEWIDGET;
     tmp->bounds.x   	= 0;
@@ -2984,16 +3123,6 @@ GLWidget *Init_ScrollPaneWidget( GLWidget *content )
     if ( !AppendGLWidgetList(&(tmp->children),(wid_info->masque = Init_EmptyBaseGLWidget()))
     	) {
 	error("Init_ScrollPaneWidget: Failed to init masque!");
-	Close_Widget(&(wid_info->scroller));
-	Close_Widget(&tmp);
-    	return NULL;
-    }
-    
-    if ( !AppendGLWidgetList(&(tmp->children),
-    	    (wid_info->scroller = Init_ScrollbarWidget(false,0.0f,1.0f,SB_VERTICAL
-	    	    	    	    ,ScrollPaneWidget_poschange,tmp)))
-	) {
-	error("Init_ScrollPaneWidget: Failed to init scroller!");
 	Close_Widget(&tmp);
     	return NULL;
     }
@@ -3001,6 +3130,7 @@ GLWidget *Init_ScrollPaneWidget( GLWidget *content )
     if (wid_info->content) {
     	if ( !AppendGLWidgetList(&(wid_info->masque->children),wid_info->content) ) {
 	    error("Init_ScrollPaneWidget: Failed to adopt the content to the masque!");
+    	    /*Close_Widget(&(wid_info->scroller));*/
 	    Close_Widget(&tmp);
     	    return NULL;
     	}
@@ -3009,7 +3139,7 @@ GLWidget *Init_ScrollPaneWidget( GLWidget *content )
         tmp->bounds.h = wid_info->content->bounds.h;
     }
     
-    tmp->bounds.w += wid_info->scroller->bounds.w;
+    /*tmp->bounds.w += wid_info->scroller->bounds.w;*/
     
     return tmp;
 }
@@ -3185,7 +3315,7 @@ GLWidget *Init_MainWidget( font_data *font )
     
     if ( !AppendGLWidgetList(&(tmp->children),
     	    (wid_info->game_msgs = Init_ListWidget(wid_info->BORDER,tmp->bounds.h-wid_info->BORDER,
-	    &nullRGBA,&nullRGBA,&greenRGBA,LW_UP,LW_RIGHT,true)))
+	    &nullRGBA,&nullRGBA,&greenRGBA,LW_UP,LW_RIGHT,VERTICAL,true)))
 	) {
 	error("Failed to initialize game msg list");
 	Close_Widget(&tmp);
@@ -3194,7 +3324,7 @@ GLWidget *Init_MainWidget( font_data *font )
     
     if ( !AppendGLWidgetList(&(tmp->children),
     	    (wid_info->alert_msgs = Init_ListWidget(tmp->bounds.w/2,tmp->bounds.h/2-50,
-	    &nullRGBA,&nullRGBA,&greenRGBA,LW_UP,LW_HCENTER,false)))
+	    &nullRGBA,&nullRGBA,&greenRGBA,LW_UP,LW_HCENTER,VERTICAL,false)))
 	) {
 	error("Failed to initialize alert msg list");
 	Close_Widget(&tmp);
@@ -3221,7 +3351,7 @@ GLWidget *Init_MainWidget( font_data *font )
     
     if ( !AppendGLWidgetList(&(tmp->children),
     	    	(wid_info->chat_msgs = Init_ListWidget(wid_info->radar->bounds.w + 2*wid_info->BORDER,wid_info->BORDER,
-		&nullRGBA,&nullRGBA,&greenRGBA,LW_DOWN,LW_RIGHT,false)))
+		&nullRGBA,&nullRGBA,&greenRGBA,LW_DOWN,LW_RIGHT,VERTICAL,false)))
     	) {
 	error("Failed to initialize chat msg list");
 	Close_Widget(&tmp);
@@ -3243,11 +3373,17 @@ GLWidget *Init_MainWidget( font_data *font )
 /**************************/
 /* Begin: ConfMenuWidget  */
 /**************************/
+static Uint32 cm_name_color    = 0xffff66ff;
+static Uint32 cm_bg1_color     = 0x00000022;
+static Uint32 cm_bg2_color     = 0xffffff22;
+static Uint32 cm_but1_color    = 0xff000044;
+
 static void Paint_ConfMenuWidget( GLWidget *widget );
-static void ConfMenuWidget_Quit( void *data );
-static void ConfMenuWidget_Join( void *data );
-static void ConfMenuWidget_Save( void *data );
-static void ConfMenuWidget_Config( void *data );
+static void ConfMenuWidget_Quit( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );
+static void ConfMenuWidget_Save( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );
+static void ConfMenuWidget_Join( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );
+static void ConfMenuWidget_Join_Team( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );
+static void ConfMenuWidget_Config( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );
 
 static void confmenu_callback( void )
 {
@@ -3278,23 +3414,14 @@ static void confmenu_callback( void )
     SetBounds_GLWidget(mw->confmenu,&(mw->confmenu->bounds));
 }
 
-static void ConfMenuWidget_Quit( void *data )
+static void ConfMenuWidget_Quit( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
 {
     SDL_Event quit;
     quit.type = SDL_QUIT;
     SDL_PushEvent(&quit);
 }
 
-static void ConfMenuWidget_Join( void *data )
-{
-    int t = (int) data;
-    char msg[16];
-    snprintf(msg, 16, "/team %d", t);
-    Net_talk(msg);
-    Pointer_control_set_state(true);
-}
-
-static void ConfMenuWidget_Save( void *data )
+static void ConfMenuWidget_Save( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
 {
     char path[PATH_MAX + 1];
 
@@ -3302,11 +3429,102 @@ static void ConfMenuWidget_Save( void *data )
     Xpilotrc_write(path);
 }
 
-static void ConfMenuWidget_Config( void *data )
+static void ConfMenuWidget_Join_Team( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
 {
-    int t;
+    int t = (int) data;
+    char msg[16];
+    snprintf(msg, sizeof(msg), "/team %d", t);
+    Net_talk(msg);
+    
+    Pointer_control_set_state(true);
+}
+
+static void ConfMenuWidget_Join( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
+{
     GLWidget *widget;
     ConfMenuWidget *wid_info;
+    if ( (state != SDL_PRESSED) || (button != 1) ) return;
+    
+    if (!(widget = (GLWidget *)data)) {
+	error("ConfMenuWidget_Close: widget missing!");
+	return;
+    }
+    if ( widget->WIDGET != CONFMENUWIDGET ) {
+	error("ConfMenuWidget_Close: Wrong widget type! [%i]",widget->WIDGET);
+	return;
+    }
+    if ( !(wid_info = (ConfMenuWidget *)(widget->wid_info)) ) {
+	error("ConfMenuWidget_Close: wid_info missing!");
+	return;
+    }
+    
+    if ((Setup->mode & TEAM_PLAY) == 0) {
+    	bool change = false;
+	change |= Key_press(KEY_PAUSE);
+	if (change) Net_key_change();
+    } else {
+    	int i, t;
+    	char tstr[12];
+    	bool has_base[MAX_TEAMS];
+	GLWidget *tmp;
+	
+	if (wid_info->join_list) {
+	    ListWidget_Remove(wid_info->main_list,wid_info->join_list);
+	    Close_Widget(&(wid_info->join_list));
+
+    	    widget->bounds.x = wid_info->main_list->bounds.x - 1;
+    	    widget->bounds.y = wid_info->main_list->bounds.y - 1;
+    	    widget->bounds.w = wid_info->main_list->bounds.w + 2;
+    	    widget->bounds.h = wid_info->main_list->bounds.h + 2;
+    	    SetBounds_GLWidget(widget,&(widget->bounds));
+
+	    return;
+	}
+    	
+    	memset(has_base, 0, sizeof(has_base));
+    	if ((Setup->mode & TEAM_PLAY) != 0) {
+    	    for (i = 0; i < num_bases; i++) {
+    	    	t = bases[i].team;
+	    	    if (t >= 0 && t < MAX_TEAMS)
+	            	has_base[t] = true;
+            }
+    	}
+    
+    	if (!(wid_info->join_list = Init_ListWidget(0,0,&cm_bg1_color,&cm_bg2_color,&nullRGBA,LW_DOWN,LW_RIGHT,VERTICAL,false))) {
+    	    error("ConfMenuWidget_Join: Couldn't make the join teams list widget!");
+    	    return;
+    	}
+    	
+	for (i = 0; i < MAX_TEAMS; i++) {
+    	    if (has_base[i]) {
+	    	snprintf(tstr, sizeof(tstr), "Join Team %i", i);
+    	    	if ( !(tmp = Init_LabelWidget(tstr,&greenRGBA,&nullRGBA,CENTER,CENTER)) ) {
+    	    	    error("ConfMenuWidget_Join: Couldn't make the join team label!");
+	    	    return;
+    	    	}
+    	    	tmp->button = ConfMenuWidget_Join_Team;
+    	    	tmp->buttondata = (void *)i;
+		
+		tmp->bounds.w = widget->bounds.w - 2;
+		
+		ListWidget_Append(wid_info->join_list,tmp);
+	    }
+    	}
+	ListWidget_Append(wid_info->main_list,wid_info->join_list);
+	
+    	widget->bounds.x = wid_info->main_list->bounds.x - 1;
+    	widget->bounds.y = wid_info->main_list->bounds.y - 1;
+    	widget->bounds.w = wid_info->main_list->bounds.w + 2;
+    	widget->bounds.h = wid_info->main_list->bounds.h + 2;
+    	SetBounds_GLWidget(widget,&(widget->bounds));
+    }
+}
+
+static void ConfMenuWidget_Config( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
+{
+    GLWidget *widget;
+    ConfMenuWidget *wid_info;
+    if ( (state != SDL_PRESSED) || (button != 1) ) return;
     
     if (!(widget = (GLWidget *)data)) {
 	error("ConfMenuWidget_Close: widget missing!");
@@ -3322,41 +3540,30 @@ static void ConfMenuWidget_Config( void *data )
     }
     
     if ((wid_info->showconf = !wid_info->showconf)) {
-	AppendGLWidgetList(&(widget->children), wid_info->scrollpane);
-	AppendGLWidgetList(&(widget->children), wid_info->sl);
-	AppendGLWidgetList(&(widget->children), wid_info->sb);
-	for (t = 0; t < MAX_TEAMS; t++) {
-	    if (wid_info->teamLabels[t])
-		DelGLWidgetListItem(&(widget->children), wid_info->teamLabels[t]);
-	    if (wid_info->teamButtons[t])
-		DelGLWidgetListItem(&(widget->children), wid_info->teamButtons[t]);
+    	if (wid_info->join_list) {
+	    ListWidget_Remove(wid_info->main_list,wid_info->join_list);
+	    Close_Widget(&(wid_info->join_list));
 	}
-	widget->bounds.y -= 512 - widget->bounds.h;
-	widget->bounds.h = 512;
-	widget->bounds.w -= wid_info->widthTeams - wid_info->widthConfig;
-	widget->bounds.x += wid_info->widthTeams - wid_info->widthConfig;
-    	SetBounds_GLWidget(widget,&(widget->bounds));
+    	ListWidget_Remove(wid_info->button_list,wid_info->jl);
+    	ListWidget_Append(wid_info->button_list,wid_info->sl);
+    	ListWidget_Append(wid_info->main_list,wid_info->scrollpane);
     } else {
-	DelGLWidgetListItem(&(widget->children), wid_info->scrollpane);
-	DelGLWidgetListItem(&(widget->children), wid_info->sl);
-	DelGLWidgetListItem(&(widget->children), wid_info->sb);
-	for (t = 0; t < MAX_TEAMS; t++) {
-	    if (wid_info->teamLabels[t])
-		AppendGLWidgetList(&(widget->children), wid_info->teamLabels[t]);
-	    if (wid_info->teamButtons[t])
-		AppendGLWidgetList(&(widget->children), wid_info->teamButtons[t]);
-	}
-	widget->bounds.h = wid_info->ql->bounds.h + 2;
-	widget->bounds.y += 512 - widget->bounds.h;
-	widget->bounds.x -= wid_info->widthTeams - wid_info->widthConfig;
-	widget->bounds.w += wid_info->widthTeams - wid_info->widthConfig;
-    	SetBounds_GLWidget(widget,&(widget->bounds));
+     	ListWidget_Append(wid_info->button_list,wid_info->jl);
+    	ListWidget_Remove(wid_info->button_list,wid_info->sl);
+   	ListWidget_Remove(wid_info->main_list,wid_info->scrollpane);
     }
+    
+    SetBounds_GLWidget(wid_info->main_list,&(wid_info->main_list->bounds));
+    
+    widget->bounds.x = wid_info->main_list->bounds.x - 1;
+    widget->bounds.y = wid_info->main_list->bounds.y - 1;
+    widget->bounds.w = wid_info->main_list->bounds.w + 2;
+    widget->bounds.h = wid_info->main_list->bounds.h + 2;
+    SetBounds_GLWidget(widget,&(widget->bounds));
 }
 
 static void SetBounds_ConfMenuWidget( GLWidget *widget, SDL_Rect *b )
 {
-    int t;
     ConfMenuWidget *wid_info;
     SDL_Rect bounds = {0,0,0,0};
     
@@ -3381,45 +3588,18 @@ static void SetBounds_ConfMenuWidget( GLWidget *widget, SDL_Rect *b )
     widget->bounds.y = b->y;
     widget->bounds.w = b->w;
     widget->bounds.h = b->h;
-    
+
     bounds.x += b->x + 1;
     bounds.y += b->y + 1;
-
-    if (wid_info->showconf) {
-	bounds.w += b->w - 2;
-	bounds.h += b->h - 2 - wid_info->ql->bounds.h - 3;
-
-	SetBounds_GLWidget(wid_info->scrollpane,&bounds);
-	bounds.h += 3;
-	bounds.w = (b->w - 2) / 3;
-	bounds.y += bounds.h;
-	bounds.h = wid_info->ql->bounds.h;
-	SetBounds_GLWidget(wid_info->sl,&bounds);
-	SetBounds_GLWidget(wid_info->sb,&bounds);
-	bounds.x += bounds.w + 1;
-    } else {
-	bounds.y += bounds.h;
-	bounds.h = wid_info->ql->bounds.h;
-	bounds.w = wid_info->widthTeamButton - 1;
-	
-	for (t = 0; t < MAX_TEAMS; t++) {
-	    if (wid_info->teamLabels[t])
-		SetBounds_GLWidget(wid_info->teamLabels[t], &bounds);
-	    if (wid_info->teamButtons[t]) {
-		SetBounds_GLWidget(wid_info->teamButtons[t], &bounds);
-		bounds.x += bounds.w + 1;
-	    }
-	}
-	bounds.w = (b->w - 2 - wid_info->widthTeamButton * wid_info->numTeams)/2;
-    }   
     
-    SetBounds_GLWidget(wid_info->cl,&bounds);
-    SetBounds_GLWidget(wid_info->cb,&bounds);
-
-    bounds.x += bounds.w + 1;
-
-    SetBounds_GLWidget(wid_info->ql,&bounds);
-    SetBounds_GLWidget(wid_info->qb,&bounds);
+    if (!wid_info->main_list) {
+	error("SetBounds_ConfMenuWidget: main_list missing!");
+	return;
+    }
+    bounds.w = wid_info->main_list->bounds.w;
+    bounds.h = wid_info->main_list->bounds.h;
+    
+    SetBounds_GLWidget(wid_info->main_list,&bounds);
 }
 
 static void Paint_ConfMenuWidget( GLWidget *widget )
@@ -3455,14 +3635,8 @@ GLWidget *Init_ConfMenuWidget( Uint16 x, Uint16 y )
 {
     GLWidget *tmp, *item, *dummy, *list;
     ConfMenuWidget *wid_info;
-    int i, t;
-    char tstr[10];
+    int i;
     xp_option_t *opt;
-    static Uint32 name_color	= 0xffff66ff;
-    static Uint32 bg1_color 	= 0x00000022;
-    static Uint32 bg2_color 	= 0xffffff22;
-    static Uint32 but1_color 	= 0xff000044;
-    bool has_base[MAX_TEAMS];
     
     tmp	= Init_EmptyBaseGLWidget();
     if ( !tmp ) {
@@ -3481,6 +3655,7 @@ GLWidget *Init_ConfMenuWidget( Uint16 x, Uint16 y )
     tmp->Draw	    	= Paint_ConfMenuWidget;
     tmp->SetBounds  	= SetBounds_ConfMenuWidget;
     wid_info->showconf	= false;
+    wid_info->join_list	= NULL;
         
     dummy = Init_EmptyBaseGLWidget();
     if ( !dummy ) {
@@ -3490,13 +3665,13 @@ GLWidget *Init_ConfMenuWidget( Uint16 x, Uint16 y )
     
     for ( i=0 ; i < num_options; ++i ) {
     	opt = Option_by_index(i);
-	item = Init_OptionWidget(opt,&name_color, &nullRGBA);
+	item = Init_OptionWidget(opt,&cm_name_color, &nullRGBA);
 	if (item) {
 	    AppendGLWidgetList( &(dummy->next), item );
 	}
     }
 
-    if (!(list = Init_ListWidget(0,0,&bg1_color,&bg2_color,&nullRGBA,LW_DOWN,LW_RIGHT,false))) {
+    if (!(list = Init_ListWidget(0,0,&cm_bg1_color,&cm_bg2_color,&nullRGBA,LW_DOWN,LW_RIGHT,VERTICAL,false))) {
     	error("Init_ConfMenuWidget: Couldn't make the list widget!");
 	Close_WidgetTree(&dummy);
 	Close_Widget(&tmp);
@@ -3506,13 +3681,6 @@ GLWidget *Init_ConfMenuWidget( Uint16 x, Uint16 y )
     ListWidget_Append(list,dummy->next);
     Close_Widget(&dummy);
     
-    /*if ( !AppendGLWidgetList(&(tmp->children),(wid_info->scrollpane = Init_ScrollPaneWidget(list))) ) {
-    	error("Init_ConfMenuWidget: Couldn't make the scrollpane!");
-	Close_Widget(&list);
-	Close_Widget(&tmp);
-	return NULL;
-    }*/
-    
     if ( !(wid_info->scrollpane = Init_ScrollPaneWidget(list)) ) {
     	error("Init_ConfMenuWidget: Couldn't make the scrollpane!");
 	Close_Widget(&list);
@@ -3520,81 +3688,80 @@ GLWidget *Init_ConfMenuWidget( Uint16 x, Uint16 y )
 	return NULL;
     }
     
-    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->ql = Init_LabelWidget("Quit",&redRGBA,&but1_color,CENTER,CENTER))) ) {
-    	error("Init_ConfMenuWidget: Couldn't make the quit label!");
-	Close_Widget(&tmp);
-	return NULL;
-    }
-    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->qb = Init_ButtonWidget(&nullRGBA,&but1_color,ConfMenuWidget_Quit,tmp))) ) {
-    	error("Init_ConfMenuWidget: Couldn't make the quit button!");
-	Close_Widget(&tmp);
-	return NULL;
-    }
+    wid_info->scrollpane->bounds.h = 512;
     
-    if ( !(wid_info->sl = Init_LabelWidget("Save",&greenRGBA,&but1_color,CENTER,CENTER)) ) {
+    if ( !(wid_info->sl = Init_LabelWidget("Save",&greenRGBA,&cm_but1_color,CENTER,CENTER)) ) {
     	error("Init_ConfMenuWidget: Couldn't make the save label!");
 	Close_Widget(&tmp);
 	return NULL;
     }
-    if ( !(wid_info->sb = Init_ButtonWidget(&nullRGBA,&but1_color,ConfMenuWidget_Save,tmp)) ) {
-    	error("Init_ConfMenuWidget: Couldn't make the save button!");
-	Close_Widget(&tmp);
-	return NULL;
-    }
+    wid_info->sl->button = ConfMenuWidget_Save;
+    wid_info->sl->buttondata = tmp;
     
-    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->cl = Init_LabelWidget("Config",&yellowRGBA,&but1_color,CENTER,CENTER))) ) {
+    if (Setup->mode & TEAM_PLAY) {
+    	if ( !(wid_info->jl = Init_LabelWidget("Join",&greenRGBA,&cm_but1_color,CENTER,CENTER)) ) {
+    	    error("Init_ConfMenuWidget: Couldn't make the join label!");
+	    Close_Widget(&tmp);
+	    return NULL;
+    	}
+    } else {
+    	if ( !(wid_info->jl = Init_LabelWidget("(un)Pause",&greenRGBA,&cm_but1_color,CENTER,CENTER)) ) {
+    	    error("Init_ConfMenuWidget: Couldn't make the (un)Pause label!");
+	    Close_Widget(&tmp);
+	    return NULL;
+    	}
+    }
+    wid_info->jl->button = ConfMenuWidget_Join;
+    wid_info->jl->buttondata = tmp;
+    
+    if ( !(wid_info->cl = Init_LabelWidget("Config",&yellowRGBA,&cm_but1_color,CENTER,CENTER)) ) {
     	error("Init_ConfMenuWidget: Couldn't make the config label!");
 	Close_Widget(&tmp);
 	return NULL;
     }
-    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->cb = Init_ButtonWidget(&nullRGBA,&but1_color,ConfMenuWidget_Config,tmp))) ) {
-    	error("Init_ConfMenuWidget: Couldn't make the config button!");
+    wid_info->cl->button = ConfMenuWidget_Config;
+    wid_info->cl->buttondata = tmp;
+    
+    if ( !(wid_info->ql = Init_LabelWidget("Quit",&redRGBA,&cm_but1_color,CENTER,CENTER)) ) {
+    	error("Init_ConfMenuWidget: Couldn't make the quit label!");
 	Close_Widget(&tmp);
 	return NULL;
     }
-
-    memset(has_base, 0, sizeof(has_base));
-    if ((Setup->mode & TEAM_PLAY) != 0) {
-	for (i = 0; i < num_bases; i++) {
-	    t = bases[i].team;
-	    if (t >= 0 && t < MAX_TEAMS)
-		has_base[t] = true;
-	}
+    wid_info->ql->button = ConfMenuWidget_Quit;
+    wid_info->ql->buttondata = tmp;
+    
+    if (!(wid_info->button_list = Init_ListWidget(0,0,&nullRGBA,&nullRGBA,&nullRGBA,LW_DOWN,LW_RIGHT,HORISONTAL,true))) {
+    	error("Init_ConfMenuWidget: Couldn't make the button_list widget!");
+	Close_Widget(&tmp);
+	return NULL;
     }
     
-    wid_info->numTeams = 0;
-    for (i = 0; i < MAX_TEAMS; i++) {
-	if (has_base[i]) {
-	    wid_info->numTeams++;
-	    snprintf(tstr, 10, "%d", i);
-	    if (!AppendGLWidgetList(&(tmp->children),(wid_info->teamLabels[i] =
-		    Init_LabelWidget(tstr,&yellowRGBA,&but1_color,CENTER,CENTER)))) {
-		error("Init_ConfMenuWidget: Couldn't make a team label!");
-		Close_Widget(&tmp);
-		return NULL;
-		}
-	    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->teamButtons[i] =
-		    Init_ButtonWidget(&nullRGBA,&but1_color,ConfMenuWidget_Join,(void*)i))) ) {
-		error("Init_ConfMenuWidget: Couldn't make a team button!");
-		Close_Widget(&tmp);
-		return NULL;
-	    }
-	} else {
-	    wid_info->teamLabels[i] = NULL;
-	    wid_info->teamButtons[i] = NULL;
-	}
+    wid_info->ql->bounds.w = wid_info->sl->bounds.w  = wid_info->jl->bounds.w = wid_info->cl->bounds.w
+    	= ( wid_info->scrollpane->bounds.w + 10 )/3 + 1;
+    
+    
+    ListWidget_Append(wid_info->button_list,wid_info->ql);
+    ListWidget_Append(wid_info->button_list,wid_info->cl);
+    ListWidget_Append(wid_info->button_list,wid_info->jl);
+    
+    if (!(wid_info->main_list = Init_ListWidget(0,0,&nullRGBA,&nullRGBA,&nullRGBA,LW_UP,LW_LEFT,VERTICAL,true))) {
+    	error("Init_ConfMenuWidget: Couldn't make the main_list widget!");
+	Close_Widget(&tmp);
+	return NULL;
     }
+    
+    ListWidget_Append(wid_info->main_list,wid_info->button_list);
 
-    wid_info->ql->bounds.h = wid_info->sl->bounds.h = wid_info->cl->bounds.h =
-		    wid_info->cl->bounds.h + 2;
-    wid_info->widthTeamButton = wid_info->ql->bounds.h + 2;
-    wid_info->widthConfig = wid_info->scrollpane->bounds.w + 2;
-    wid_info->widthTeams = wid_info->scrollpane->bounds.w * 2/3 + 
-	wid_info->widthTeamButton * wid_info->numTeams + 2;
+    if (!AppendGLWidgetList( &(tmp->children), wid_info->main_list )) {
+    	error("Init_ConfMenuWidget: failed to append main_list to children");
+	Close_Widget(&tmp);
+	return NULL;
+    }
+    
     tmp->bounds.x = x;
     tmp->bounds.y = y;
-    tmp->bounds.h = wid_info->ql->bounds.h + 2;
-    tmp->bounds.w = wid_info->widthTeams;
+    tmp->bounds.w = wid_info->main_list->bounds.w + 2;
+    tmp->bounds.h = wid_info->main_list->bounds.h + 2;
     
     SetBounds_GLWidget(tmp,&(tmp->bounds));
        
