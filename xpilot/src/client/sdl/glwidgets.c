@@ -151,14 +151,14 @@ static void hover_optionWidget( int over, Uint16 x , Uint16 y , void *data )
     bool eternalLoop = true;
     static Uint32 bgColor = 0x0000ff88;
     
-    if (!data) {
-    	error("NULL option passed to hover_optionWidget\n");
-	return;
-    }
-    
-    opt = (xp_option_t *)data;
-    
     if (over) {
+    	if (!data) {
+    	    error("NULL option passed to hover_optionWidget\n");
+	    return;
+    	}
+    
+    	opt = (xp_option_t *)data;
+    
     	if ((help = Option_get_help(opt))) {
     	    if (!(hoverWidget = Init_ListWidget( x, y, &nullRGBA, &nullRGBA, &nullRGBA, DOWN, LEFT, VERTICAL, false ))) {
 	    	error("hover_optionWidget: Failed to create ListWidget\n");
@@ -3179,6 +3179,8 @@ void MainWidget_ShowMenu( GLWidget *widget, bool show )
     	AppendGLWidgetList(&(widget->children), wid_info->confmenu);
     } else {
     	DelGLWidgetListItem(&(widget->children), wid_info->confmenu);
+	if (hovertarget)
+	    hover_optionWidget( 0, 0 , 0 , NULL );
     }
 }
 
