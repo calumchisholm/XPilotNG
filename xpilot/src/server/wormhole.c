@@ -46,18 +46,8 @@ void Wormhole_line_init(void)
 
 void Object_hits_wormhole(object_t *obj, int ind)
 {
-    /*wormhole_t *wormhole = Wormhole_by_index(ind);*/
-
     SET_BIT(obj->obj_status, WARPING);
     obj->wormHoleHit = ind;
-
-#if 0
-    if (obj->type == OBJ_PLAYER) {
-	player_t *pl = (player_t *)obj;
-
-	warn("Player %s hits wormhole %d.", pl->name, ind);
-    }
-#endif
 }
 
 
@@ -291,34 +281,6 @@ bool Wormhole_hitfunc(group_t *gp, const move_t *move)
     }
 
     return true;
-
-#if 0
-
-    if (obj->type == OBJ_PLAYER) {
-	player_t *pl = (player_t *)obj;
-
-	if (BIT(pl->obj_status, WARPING))
-	    return false;
-#if 0
-	/*
-	 * Don't warp again if we are still on the
-	 * same wormhole we have just been warped to.
-	 */
-	if (pl->warped > 0
-	    && wormhole->type == WORM_NORMAL
-	    && wormhole == Wormhole_by_index(pl->wormHoleDest)
-	    /* kps - wormHoleDest is now pointer */
-	    /*&& pl->wormHoleDest == ind */)
-	    return false;
-#endif
-    } else {
-	    /*int last = wormhole->lastdest;*/
-
-	return false;
-    }
-
-    return true;
-#endif
 }
 
 void World_remove_wormhole(wormhole_t *wormhole)
