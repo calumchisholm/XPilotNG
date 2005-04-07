@@ -193,6 +193,22 @@ static void Traverse_wormhole(player_t *pl)
 }
 
 /*
+ * Returns true if warp status was achieved.
+ */
+bool Initiate_hyperjump(player_t *pl)
+{
+    if (pl->item[ITEM_HYPERJUMP] <= 0)
+	return false;
+    if (pl->fuel.sum < -ED_HYPERJUMP)
+	return false;
+    pl->item[ITEM_HYPERJUMP]--;
+    Player_add_fuel(pl, ED_HYPERJUMP);
+    SET_BIT(pl->obj_status, WARPING);
+    pl->wormHoleHit = -1;
+    return true;
+}
+
+/*
  * Player has used hyperjump item.
  */
 static void Hyperjump(player_t *pl)
@@ -335,4 +351,14 @@ void Player_finish_warp(player_t *pl)
      */
     if (group != NO_GROUP)
 	SET_BIT(pl->obj_status, WARPED);
+}
+
+void Object_warp(object_t *obj)
+{
+    /*warn("%s %p is warping", Object_typename(obj), obj);*/
+}
+
+void Object_finish_warp(object_t *obj)
+{
+    /*warn("%s %p warped", Object_typename(obj), obj);*/
 }

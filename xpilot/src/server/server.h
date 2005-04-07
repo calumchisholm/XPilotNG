@@ -283,7 +283,6 @@ void Do_deflector(player_t *pl);
 void Do_transporter(player_t *pl);
 void Do_general_transporter(int id, clpos_t pos,
 			    player_t *victim, int *item, double *amount);
-bool Initiate_hyperjump(player_t *pl);
 void do_lose_item(player_t *pl);
 void Update_torpedo(torpobject_t *torp);
 void Update_missile(missileobject_t *shot);
@@ -540,8 +539,11 @@ bool Balltarget_hitfunc(group_t *groupptr, const move_t *move);
 /*
  * Prototypes for wormhole.c
  */
+bool Initiate_hyperjump(player_t *pl);
 void Player_warp(player_t *pl);
 void Player_finish_warp(player_t *pl);
+void Object_warp(object_t *obj);
+void Object_finish_warp(object_t *obj);
 void Object_hits_wormhole(object_t *obj, int ind);
 hitmask_t Wormhole_hitmask(wormhole_t *wormhole);
 bool Wormhole_hitfunc(group_t *groupptr, const move_t *move);

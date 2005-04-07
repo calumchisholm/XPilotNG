@@ -490,14 +490,11 @@ static void Misc_object_update(void)
     for (i = 0; i < NumObjs; i++) {
 	obj = Obj[i];
 
-#if 0
-	if (BIT(obj->obj_status, WARPING)) {
-	    warn("%s [%d] is warping", Object_typename(obj), i);
-	}
-	if (BIT(obj->obj_status, WARPED)) {
-	    warn("%s [%d] is warped", Object_typename(obj), i);
-	}
-#endif
+	if (BIT(obj->obj_status, WARPING))
+	    Object_warp(obj);
+
+	if (BIT(obj->obj_status, WARPED))
+	    Object_finish_warp(obj);
 
 	if (obj->fuse > 0) {
 	    obj->fuse -= timeStep;
