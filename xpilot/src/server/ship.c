@@ -32,27 +32,35 @@
 void Make_thrust_sparks(player_t *pl)
 {
     static int min_dir, max_dir;
-    static double max_speed;
-    const double max_life = 3 + pl->power * 0.35;
-    clpos_t engine = Ship_get_engine_clpos(pl->ship, pl->dir);
-    clpos_t pos;
+    static double max_speed; /* kps - why are these static ? */
+    clpos_t engine = Ship_get_engine_clpos(pl->ship, pl->dir), pos;
     int afterburners;
-    double tot_sparks = (pl->power * 0.15 + 2.5) * timeStep;
-    double alt_sparks;
+    double max_life, tot_sparks, alt_sparks, power;
+
+    if (pl->fuel.sum > 0.0) {
+	power = pl->power;
+	afterburners = (Player_uses_emergency_thrust(pl)
+			? MAX_AFTERBURNER
+			: pl->item[ITEM_AFTERBURNER]);
+    }
+    else {
+	/* read comment about this in update.c */
+	power = MIN_PLAYER_POWER * 0.6;
+	afterburners = 0;
+    }
+
+    max_life = 3 + power * 0.35;
+    tot_sparks = (power * 0.15 + 2.5) * timeStep;
 
     min_dir = (int)(pl->dir + RES/2 - (RES*0.2 + 1) * options.thrustWidth);
     max_dir = (int)(pl->dir + RES/2 + (RES*0.2 + 1) * options.thrustWidth);
-    max_speed = (1 + (pl->power * 0.14)) * options.sparkSpeed;
+    max_speed = (1 + (power * 0.14)) * options.sparkSpeed;
+    alt_sparks = tot_sparks * afterburners * (1. / (MAX_AFTERBURNER + 1));
 
     pos.cx = pl->pos.cx + engine.cx;
     pos.cy = pl->pos.cy + engine.cy;
 
     sound_play_sensors(pl->pos, THRUST_SOUND);
-
-    afterburners = (Player_uses_emergency_thrust(pl)
-		    ? MAX_AFTERBURNER
-		    : pl->item[ITEM_AFTERBURNER]);
-    alt_sparks = tot_sparks * afterburners * (1. / (MAX_AFTERBURNER + 1));
 
     /* floor(tot_sparks + rfrac()) randomly rounds up or down to an integer,
      * so that the expectation value of the result is tot_sparks */

@@ -963,24 +963,22 @@ static void Update_players(void)
 	 */
 	if (Player_is_thrusting(pl)) {
 	    double power = pl->power;
-#if 0
-	    /* kps - ISO C89 forbids mixed declarations and code */
-	    /* this should be implemented properly */
-	    if (pl->fuel.sum <= 0) 
-		power=MIN_PLAYER_POWER * 0.6; 
-	    /* fly with lowest power with "no fuel" KHS */
-	    /* shall emulate flying with last energy  reserves - */
-	    /* this is to not render players completely helpless */
-	    /* until self destruct when alone on a map */
-#endif
-	     
 	    double f = pl->power * 0.0008;	/* 1/(FUEL_SCALE*MIN_POWER) */
 	    int a = (Player_uses_emergency_thrust(pl)
 		     ? MAX_AFTERBURNER
 		     : pl->item[ITEM_AFTERBURNER]);
 	    double inert = pl->mass;
 
-	    if (a) {
+	    if (pl->fuel.sum <= 0.0) {
+		/* fly with lowest power with "no fuel" KHS */
+		/* shall emulate flying with last energy  reserves - */
+		/* this is to not render players completely helpless */
+		/* until self destruct when alone on a map */
+		/* kps - this affects Make_thrust_sparks() also */
+		power = MIN_PLAYER_POWER * 0.6;
+		f = 0.0;
+	    }
+	    else if (a) {
 		power = AFTER_BURN_POWER(power, a);
 		f = AFTER_BURN_FUEL(f, a);
 	    }
