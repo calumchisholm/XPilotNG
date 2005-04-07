@@ -171,8 +171,8 @@ static void Warp_balls(player_t *pl, clpos_t dest)
 
 static int Find_wormhole_dest(wormhole_t *wh_hit, player_t *pl)
 {
-    int wh_dest, wcx, wcy, nearestFront, nearestRear;
-    double proximity, proxFront, proxRear;
+    int wh_dest_ind;
+    wormhole_t *wh;
 
     if (wh_hit->type == WORM_FIXED)
 	return pl->wormHoleHit;
@@ -180,51 +180,15 @@ static int Find_wormhole_dest(wormhole_t *wh_hit, player_t *pl)
     if (wh_hit->countdown > 0)
 	return wh_hit->lastdest;
 
-    if (rfrac() < 0.1) {
-	do
-	    wh_dest = (int)(rfrac() * Num_wormholes());
-	while (Wormhole_by_index(wh_dest)->type == WORM_IN
-	       || pl->wormHoleHit == wh_dest);
-	return wh_dest;
+    do {
+	wh_dest_ind = (int)(rfrac() * Num_wormholes());
+	wh = Wormhole_by_index(wh_dest_ind);
     }
+    while (wh->type == WORM_IN
+	   || wh->type == WORM_FIXED
+	   || pl->wormHoleHit == wh_dest_ind);
 
-    nearestFront = nearestRear = -1;
-    proxFront = proxRear = 1e20;
-
-    for (wh_dest = 0; wh_dest < Num_wormholes(); wh_dest++) {
-	wormhole_t *wh = Wormhole_by_index(wh_dest);
-
-	if (wh_dest == pl->wormHoleHit
-	    || wh->type == WORM_IN)
-	    continue;
-
-	wcx = WRAP_DCX(wh->pos.cx - wh_hit->pos.cx);
-	wcy = WRAP_DCY(wh->pos.cy - wh_hit->pos.cy);
-
-	proximity = (pl->vel.y * wcx + pl->vel.x * wcy);
-	proximity = ABS(proximity);
-
-	if (pl->vel.x * wcx + pl->vel.y * wcy < 0) {
-	    if (proximity < proxRear) {
-		nearestRear = wh_dest;
-		proxRear = proximity;
-	    }
-	} else if (proximity < proxFront) {
-	    nearestFront = wh_dest;
-	    proxFront = proximity;
-	}
-    }
-
-    if (nearestFront >= 0)
-	wh_dest = nearestFront;
-    else {
-	do
-	    wh_dest = (int)(rfrac() * Num_wormholes());
-	while (Wormhole_by_index(wh_dest)->type == WORM_IN
-	       || wh_dest == pl->wormHoleHit);
-    }
-
-    return wh_dest;
+    return wh_dest_ind;
 }
 
 /*

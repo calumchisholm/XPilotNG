@@ -166,8 +166,9 @@ void tuner_wormhole_stable_ticks(void)
     if (options.wormholeStableTicks < 1.0)
 	options.wormholeStableTicks = 1.0;
 
+    /* Make sure all wormholes get a new destination */
     for (i = 0; i < Num_wormholes(); i++)
-	Wormhole_by_index(i)->countdown = options.wormholeStableTicks;
+	Wormhole_by_index(i)->countdown = 0.0;
 }
 
 void tuner_modifiers(void)
