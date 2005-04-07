@@ -198,7 +198,7 @@ void Go_home(player_t *pl)
     pl->wanted_float_dir = pl->float_dir;/*TURNQUEUE*/
     initpos.cx = (click_t)(pos.cx + CLICK * vx);
     initpos.cy = (click_t)(pos.cy + CLICK * vy);
-    Player_position_init_clpos(pl, initpos);
+    Object_position_init_clpos(OBJ_PTR(pl), initpos);
     pl->vel.x = vx;
     pl->vel.y = vy;
     pl->velocity = velo;

@@ -2711,8 +2711,8 @@ void Move_player(player_t *pl)
 	pos.cx = WRAP_XCLICK(pos.cx);
 	pos.cy = WRAP_YCLICK(pos.cy);
 	if (pos.cx != pl->pos.cx || pos.cy != pl->pos.cy) {
-	    Player_position_remember(pl);
-	    Player_position_set_clpos(pl, pos);
+	    Object_position_remember(OBJ_PTR(pl));
+	    Object_position_set_clpos(OBJ_PTR(pl), pos);
 	}
 	pl->velocity = VECTOR_LENGTH(pl->vel);
 	return;
@@ -2754,7 +2754,7 @@ void Move_player(player_t *pl)
 	pl->vel.y *= (1.0 - fric);
     }
 
-    Player_position_remember(pl);
+    Object_position_remember(OBJ_PTR(pl));
 
     pl->collmode = 1;
 
@@ -2770,7 +2770,7 @@ void Move_player(player_t *pl)
 	pos.cx = pl->pos.cx + mv.delta.cx;
 	pos.cy = pl->pos.cy + mv.delta.cy;
 	pos = World_wrap_clpos(pos);
-	Player_position_set_clpos(pl, pos);
+	Object_position_set_clpos(OBJ_PTR(pl), pos);
     } else {
 	mv.hitmask = NONBALL_BIT | HITMASK(pl->team);
 	mv.start.cx = pl->pos.cx;
@@ -2809,7 +2809,7 @@ void Move_player(player_t *pl)
 		}
 	    }
 	}
-	Player_position_set_clvec(pl, mv.start);
+	Object_position_set_clvec(OBJ_PTR(pl), mv.start);
     }
     pl->velocity = VECTOR_LENGTH(pl->vel);
     /* !@# Better than ignoring collisions after wall touch for players,

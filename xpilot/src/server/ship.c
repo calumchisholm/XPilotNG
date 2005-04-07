@@ -353,7 +353,7 @@ void Tank_handle_detach(player_t *pl)
     while (tank->fuel.num_tanks > 0)
 	Player_remove_tank(tank, tank->fuel.num_tanks);
 
-    Player_position_init_clpos(tank, pl->pos);
+    Object_position_init_clpos(OBJ_PTR(tank), pl->pos);
     tank->vel = pl->vel;
     tank->acc = pl->acc;
     tank->dir = pl->dir;

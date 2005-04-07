@@ -178,7 +178,7 @@ void Traverse_wormhole(player_t *pl)
     Warp_balls(pl, dest);
 
     pl->wormHoleDest = wh_dest;
-    Player_position_init_clpos(pl, dest);
+    Object_position_init_clpos(OBJ_PTR(pl), dest);
     pl->vel.x *= WORM_BRAKE_FACTOR;
     pl->vel.y *= WORM_BRAKE_FACTOR;
     pl->forceVisible += 15;
@@ -228,7 +228,7 @@ void Hyperjump(player_t *pl)
 
     Warp_balls(pl, dest);
 
-    Player_position_init_clpos(pl, dest);
+    Object_position_init_clpos(OBJ_PTR(pl), dest);
     pl->vel.x *= WORM_BRAKE_FACTOR;
     pl->vel.y *= WORM_BRAKE_FACTOR;
     pl->forceVisible += 15;
