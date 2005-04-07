@@ -89,8 +89,6 @@ static void Warp_balls(player_t *pl, clpos_t dest)
 		}
 		Object_position_set_clpos(b, ballpos);
 		Object_position_remember(b);
-		b->vel.x *= WORM_BRAKE_FACTOR;
-		b->vel.y *= WORM_BRAKE_FACTOR;
 		Cell_add_object(b);
 	    }
 	}
@@ -179,8 +177,6 @@ void Traverse_wormhole(player_t *pl)
 
     pl->wormHoleDest = wh_dest;
     Object_position_init_clpos(OBJ_PTR(pl), dest);
-    pl->vel.x *= WORM_BRAKE_FACTOR;
-    pl->vel.y *= WORM_BRAKE_FACTOR;
     pl->forceVisible += 15;
 
     assert(pl->wormHoleHit != -1);
@@ -206,12 +202,10 @@ void Hyperjump(player_t *pl)
     hitmask_t hitmask = NONBALL_BIT | HITMASK(pl->team); /* kps - ok ? */
 
     /* Try to find empty space to hyperjump to. */
-    for (counter = 20; counter > 0; counter--) {
+    for (counter = 100; counter > 0; counter--) {
 	dest = World_get_random_clpos();
-	if (shape_is_inside(dest.cx, dest.cy, hitmask,
-			    (object_t *)pl, (shape_t *)pl->ship,
-			    pl->dir)
-	    == NO_GROUP)
+	if (shape_is_inside(dest.cx, dest.cy, hitmask, OBJ_PTR(pl),
+			    (shape_t *)pl->ship, pl->dir) == NO_GROUP)
 	    break;
     }
 
@@ -229,18 +223,11 @@ void Hyperjump(player_t *pl)
     Warp_balls(pl, dest);
 
     Object_position_init_clpos(OBJ_PTR(pl), dest);
-    pl->vel.x *= WORM_BRAKE_FACTOR;
-    pl->vel.y *= WORM_BRAKE_FACTOR;
     pl->forceVisible += 15;
 
     CLR_BIT(pl->obj_status, WARPING);
 }
 
-
-
-/*
- * Wormhole specific functions
- */
 hitmask_t Wormhole_hitmask(wormhole_t *wormhole)
 {
     if (wormhole->type == WORM_OUT)

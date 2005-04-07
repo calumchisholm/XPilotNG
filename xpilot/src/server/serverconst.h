@@ -246,8 +246,6 @@
 /* Where does 1280 come from? uau */
 #define MAX_MAP_SIZE		31500
 
-#define WORM_BRAKE_FACTOR	1
-
 #define POLYGON_MAX_OFFSET	30000
 #define NO_GROUP		(-1)
 
