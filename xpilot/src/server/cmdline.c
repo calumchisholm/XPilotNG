@@ -1831,8 +1831,7 @@ static option_desc opts[] = {
 	&options.wormholeStableTicks,
 	valReal,
 	tuner_wormhole_stable_ticks,
-	"Number of ticks wormholes will remain stable.\n"
-	"Replaces option wormTime.\n",
+	"Number of ticks wormholes will keep the same destination.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -1937,11 +1936,9 @@ static option_desc opts[] = {
 	&options.gameSpeed,
 	valReal,
 	Timing_setup,
-	"Rate at which game events happen. Allows using higher\n"
-	"FPS without making the game too fast.\n"
-	"A game speed of X means the game proceeds as fast as on an old\n"
-	"server running at X FPS. A value of 0 means the value of game\n"
-	"speed is the same as that of FPS.\n",
+	"Rate at which game events happen. The gameSpeed specifies how\n"
+	"many ticks of game time elapse each second. A value of 0 means\n"
+	"that the value of gameSpeed should be equal to the value of FPS.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {

@@ -308,19 +308,3 @@ bool Verify_wormhole_consistency(void)
 
     return true;
 }
-
-/* kps - remove this */
-void Set_wormhole_initial_destinations(void)
-{
-    int i;
-
-    if (!options.wormholeStableTicks) {
-	for (i = 0; i < Num_wormholes(); i++) {
-	    int j = (int)(rfrac() * Num_wormholes());
-
-	    while (Wormhole_by_index(j)->type == WORM_IN)
-		j = (int)(rfrac() * Num_wormholes());
-	    Wormhole_by_index(i)->lastdest = j;
-	}
-    }
-}

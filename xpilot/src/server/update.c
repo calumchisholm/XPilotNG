@@ -1240,7 +1240,7 @@ void Update_objects(void)
 	}
     }
 
-    for (i = Num_wormholes() - 1; i >= 0; i--) {
+    for (i = 0; i < Num_wormholes(); i++) {
 	wormhole_t *wh = Wormhole_by_index(i);
 
 	if ((wh->countdown -= timeStep) <= 0)

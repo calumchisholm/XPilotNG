@@ -163,8 +163,8 @@ void tuner_wormhole_stable_ticks(void)
 {
     int i;
 
-    if (options.wormholeStableTicks < 0.0)
-	options.wormholeStableTicks = 0.0;
+    if (options.wormholeStableTicks < 1.0)
+	options.wormholeStableTicks = 1.0;
 
     for (i = 0; i < Num_wormholes(); i++)
 	Wormhole_by_index(i)->countdown = options.wormholeStableTicks;

@@ -602,7 +602,6 @@ bool Grok_map(void)
 
     if (!Verify_wormhole_consistency())
 	return false;
-    Set_wormhole_initial_destinations();
 
     if (BIT(world->rules->mode, TIMING) && world->NumChecks == 0) {
 	warn("No checkpoints found while race mode (timing) was set.");
