@@ -117,18 +117,6 @@ bool Wormhole_hitfunc(group_t *gp, const move_t *move)
 	return false;
 
     return true;
-
-#if 0
-    warn("Wormhole_hitfunc: wormhole %p hit by a %s",
-	 wormhole, Object_typename(move->obj));
-#endif
-    if (obj->type == OBJ_PLAYER) {
-	const player_t *pl = (const player_t *)obj;
-	if (pl->wormHoleHit == gp->mapobj_ind)
-	    return false;
-    }
-
-    return true;
 }
 
 void Object_hits_wormhole(object_t *obj, int ind)
