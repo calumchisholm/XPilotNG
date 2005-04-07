@@ -217,7 +217,7 @@ void Object_crash(object_t *obj, int crashtype, int mapobj_ind)
 
 void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
 {
-    const char *howfmt = NULL; /* kps - change back to const */
+    const char *howfmt = NULL;
     const char *hudmsg = NULL;
 
     msg[0] = '\0';

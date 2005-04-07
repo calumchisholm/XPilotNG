@@ -144,19 +144,13 @@ static int Find_wormhole_dest(wormhole_t *wh_hit, player_t *pl)
 	}
     }
 
-#define RANDOM_REAR_WORM 1
-
-    if (! RANDOM_REAR_WORM)
-	wh_dest = nearestFront < 0 ? nearestRear : nearestFront;
+    if (nearestFront >= 0)
+	wh_dest = nearestFront;
     else {
-	if (nearestFront >= 0)
-	    wh_dest = nearestFront;
-	else {
-	    do
-		wh_dest = (int)(rfrac() * Num_wormholes());
-	    while (Wormhole_by_index(wh_dest)->type == WORM_IN
-		   || wh_dest == pl->wormHoleHit);
-	}
+	do
+	    wh_dest = (int)(rfrac() * Num_wormholes());
+	while (Wormhole_by_index(wh_dest)->type == WORM_IN
+	       || wh_dest == pl->wormHoleHit);
     }
 
     return wh_dest;
