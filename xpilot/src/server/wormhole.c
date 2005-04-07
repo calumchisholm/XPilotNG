@@ -25,6 +25,112 @@
 
 #include "xpserver.h"
 
+shape_t wormhole_wire;
+
+/*
+ * Initialization functions.
+ */
+
+void Wormhole_line_init(void)
+{
+    int i;
+    static clpos_t coords[MAX_SHIP_PTS];
+
+    wormhole_wire.num_points = MAX_SHIP_PTS;
+    for (i = 0; i < MAX_SHIP_PTS; i++) {
+	wormhole_wire.pts[i] = coords + i;
+	coords[i].cx = (int)(cos(i * 2 * PI / MAX_SHIP_PTS) * WORMHOLE_RADIUS);
+	coords[i].cy = (int)(sin(i * 2 * PI / MAX_SHIP_PTS) * WORMHOLE_RADIUS);
+    }
+
+    return;
+}
+
+bool Verify_wormhole_consistency(void)
+{
+    int i, worm_in = 0, worm_out = 0, worm_norm = 0;
+
+    /* count wormhole types */
+    for (i = 0; i < Num_wormholes(); i++) {
+	int type = Wormhole_by_index(i)->type;
+
+	if (type == WORM_NORMAL)
+	    worm_norm++;
+	else if (type == WORM_IN)
+	    worm_in++;
+	else if (type == WORM_OUT)
+	    worm_out++;
+    }
+
+    /*
+     * Verify that the wormholes are consistent, i.e. that if
+     * we have no 'out' wormholes, make sure that we don't have
+     * any 'in' wormholes, and (less critical) if we have no 'in'
+     * wormholes, make sure that we don't have any 'out' wormholes.
+     */
+    if (worm_norm > 0) {
+	if (worm_norm + worm_out < 2) {
+	    warn("Map has only one 'normal' wormhole.");
+	    warn("Add at least one 'normal' or 'out' wormhole.");
+	    return false;
+	}
+    } else if (worm_in > 0) {
+	if (worm_out < 1) {
+	    warn("Map has %d 'in' wormholes, "
+		 "but no 'normal' or 'out' wormholes.", worm_in);
+	    warn("Add at least one 'normal' or 'out' wormhole.");
+	    return false;
+	}
+    } else if (worm_out > 0) {
+	warn("Map has %d 'out' wormholes, but no 'normal' or 'in' wormholes.",
+	     worm_out);
+	warn("Add at least one 'normal' or 'in' wormhole.");
+	return false;
+    }
+
+    return true;
+}
+
+/*
+ * Functions used in game.
+ */
+
+hitmask_t Wormhole_hitmask(wormhole_t *wormhole)
+{
+    if (wormhole->type == WORM_OUT)
+	return ALL_BITS;
+    return 0;
+}
+
+bool Wormhole_hitfunc(group_t *gp, const move_t *move)
+{
+    const object_t *obj = move->obj;
+    wormhole_t *wormhole = Wormhole_by_index(gp->mapobj_ind);
+
+    if (wormhole->type == WORM_OUT)
+	return false;
+
+    if (obj == NULL)
+	return true;
+
+    if (BIT(obj->obj_status, WARPED|WARPING))
+	return false;
+
+    return true;
+
+#if 0
+    warn("Wormhole_hitfunc: wormhole %p hit by a %s",
+	 wormhole, Object_typename(move->obj));
+#endif
+    if (obj->type == OBJ_PLAYER) {
+	const player_t *pl = (const player_t *)obj;
+	if (pl->wormHoleHit == gp->mapobj_ind)
+	    return false;
+    }
+
+    return true;
+}
+
 void Object_hits_wormhole(object_t *obj, int ind)
 {
     SET_BIT(obj->obj_status, WARPING);
@@ -222,42 +328,6 @@ static void Hyperjump(player_t *pl)
     CLR_BIT(pl->obj_status, WARPING);
 }
 
-hitmask_t Wormhole_hitmask(wormhole_t *wormhole)
-{
-    if (wormhole->type == WORM_OUT)
-	return ALL_BITS;
-    return 0;
-}
-
-bool Wormhole_hitfunc(group_t *gp, const move_t *move)
-{
-    const object_t *obj = move->obj;
-    wormhole_t *wormhole = Wormhole_by_index(gp->mapobj_ind);
-
-    if (wormhole->type == WORM_OUT)
-	return false;
-
-    if (obj == NULL)
-	return true;
-
-    if (BIT(obj->obj_status, WARPED|WARPING))
-	return false;
-
-    return true;
-
-#if 0
-    warn("Wormhole_hitfunc: wormhole %p hit by a %s",
-	 wormhole, Object_typename(move->obj));
-#endif
-    if (obj->type == OBJ_PLAYER) {
-	const player_t *pl = (const player_t *)obj;
-	if (pl->wormHoleHit == gp->mapobj_ind)
-	    return false;
-    }
-
-    return true;
-}
-
 void Player_warp(player_t *pl)
 {
     if (pl->wormHoleHit == NO_IND)
@@ -294,69 +364,4 @@ void Object_warp(object_t *obj)
 void Object_finish_warp(object_t *obj)
 {
     /*warn("%s %p warped", Object_typename(obj), obj);*/
-}
-
-/*
- * Initialization functions follow.
- */
-shape_t		wormhole_wire;
-
-void Wormhole_line_init(void)
-{
-    int i;
-    static clpos_t coords[MAX_SHIP_PTS];
-
-    wormhole_wire.num_points = MAX_SHIP_PTS;
-    for (i = 0; i < MAX_SHIP_PTS; i++) {
-	wormhole_wire.pts[i] = coords + i;
-	coords[i].cx = (int)(cos(i * 2 * PI / MAX_SHIP_PTS) * WORMHOLE_RADIUS);
-	coords[i].cy = (int)(sin(i * 2 * PI / MAX_SHIP_PTS) * WORMHOLE_RADIUS);
-    }
-
-    return;
-}
-
-bool Verify_wormhole_consistency(void)
-{
-    int i, worm_in = 0, worm_out = 0, worm_norm = 0;
-
-    /* count wormhole types */
-    for (i = 0; i < Num_wormholes(); i++) {
-	int type = Wormhole_by_index(i)->type;
-
-	if (type == WORM_NORMAL)
-	    worm_norm++;
-	else if (type == WORM_IN)
-	    worm_in++;
-	else if (type == WORM_OUT)
-	    worm_out++;
-    }
-
-    /*
-     * Verify that the wormholes are consistent, i.e. that if
-     * we have no 'out' wormholes, make sure that we don't have
-     * any 'in' wormholes, and (less critical) if we have no 'in'
-     * wormholes, make sure that we don't have any 'out' wormholes.
-     */
-    if (worm_norm > 0) {
-	if (worm_norm + worm_out < 2) {
-	    warn("Map has only one 'normal' wormhole.");
-	    warn("Add at least one 'normal' or 'out' wormhole.");
-	    return false;
-	}
-    } else if (worm_in > 0) {
-	if (worm_out < 1) {
-	    warn("Map has %d 'in' wormholes, "
-		 "but no 'normal' or 'out' wormholes.", worm_in);
-	    warn("Add at least one 'normal' or 'out' wormhole.");
-	    return false;
-	}
-    } else if (worm_out > 0) {
-	warn("Map has %d 'out' wormholes, but no 'normal' or 'in' wormholes.",
-	     worm_out);
-	warn("Add at least one 'normal' or 'in' wormhole.");
-	return false;
-    }
-
-    return true;
 }
