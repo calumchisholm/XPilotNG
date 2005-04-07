@@ -25,31 +25,11 @@
 
 #include "xpserver.h"
 
-
-shape_t		wormhole_wire;
-
-void Wormhole_line_init(void)
-{
-    int i;
-    static clpos_t coords[MAX_SHIP_PTS];
-
-    wormhole_wire.num_points = MAX_SHIP_PTS;
-    for (i = 0; i < MAX_SHIP_PTS; i++) {
-	wormhole_wire.pts[i] = coords + i;
-	coords[i].cx = (int)(cos(i * 2 * PI / MAX_SHIP_PTS) * WORMHOLE_RADIUS);
-	coords[i].cy = (int)(sin(i * 2 * PI / MAX_SHIP_PTS) * WORMHOLE_RADIUS);
-    }
-
-    return;
-}
-
-
 void Object_hits_wormhole(object_t *obj, int ind)
 {
     SET_BIT(obj->obj_status, WARPING);
     obj->wormHoleHit = ind;
 }
-
 
 /*
  * Warp balls connected to warped player.
@@ -94,7 +74,6 @@ static void Warp_balls(player_t *pl, clpos_t dest)
 	}
     }
 }
-
 
 static int Find_wormhole_dest(wormhole_t *wh_hit, player_t *pl)
 {
@@ -153,7 +132,6 @@ static int Find_wormhole_dest(wormhole_t *wh_hit, player_t *pl)
 
     return wh_dest;
 }
-
 
 /*
  * Move player trough wormhole.
@@ -280,6 +258,64 @@ bool Wormhole_hitfunc(group_t *gp, const move_t *move)
     return true;
 }
 
+void Player_warp(player_t *pl)
+{
+    if (pl->wormHoleHit == NO_IND)
+	Hyperjump(pl);
+    else
+	Traverse_wormhole(pl);
+}
+
+void Player_finish_warp(player_t *pl)
+{
+    int group;
+    hitmask_t hitmask = NONBALL_BIT | HITMASK(pl->team);
+    /*
+     * clear warped, so we can use shape_is inside,
+     * Wormhole_hitfunc check for WARPED bit.
+     */
+    CLR_BIT(pl->obj_status, WARPED);
+    group = shape_is_inside(pl->pos.cx, pl->pos.cy, hitmask,
+			    OBJ_PTR(pl), (shape_t *)pl->ship,
+			    pl->dir);
+    /*
+     * kps - we might possibly have entered another polygon, e.g.
+     * a wormhole ?
+     */
+    if (group != NO_GROUP)
+	SET_BIT(pl->obj_status, WARPED);
+}
+
+void Object_warp(object_t *obj)
+{
+    /*warn("%s %p is warping", Object_typename(obj), obj);*/
+}
+
+void Object_finish_warp(object_t *obj)
+{
+    /*warn("%s %p warped", Object_typename(obj), obj);*/
+}
+
+/*
+ * Initialization functions follow.
+ */
+shape_t		wormhole_wire;
+
+void Wormhole_line_init(void)
+{
+    int i;
+    static clpos_t coords[MAX_SHIP_PTS];
+
+    wormhole_wire.num_points = MAX_SHIP_PTS;
+    for (i = 0; i < MAX_SHIP_PTS; i++) {
+	wormhole_wire.pts[i] = coords + i;
+	coords[i].cx = (int)(cos(i * 2 * PI / MAX_SHIP_PTS) * WORMHOLE_RADIUS);
+	coords[i].cy = (int)(sin(i * 2 * PI / MAX_SHIP_PTS) * WORMHOLE_RADIUS);
+    }
+
+    return;
+}
+
 bool Verify_wormhole_consistency(void)
 {
     int i, worm_in = 0, worm_out = 0, worm_norm = 0;
@@ -323,42 +359,4 @@ bool Verify_wormhole_consistency(void)
     }
 
     return true;
-}
-
-void Player_warp(player_t *pl)
-{
-    if (pl->wormHoleHit == NO_IND)
-	Hyperjump(pl);
-    else
-	Traverse_wormhole(pl);
-}
-
-void Player_finish_warp(player_t *pl)
-{
-    int group;
-    hitmask_t hitmask = NONBALL_BIT | HITMASK(pl->team);
-    /*
-     * clear warped, so we can use shape_is inside,
-     * Wormhole_hitfunc check for WARPED bit.
-     */
-    CLR_BIT(pl->obj_status, WARPED);
-    group = shape_is_inside(pl->pos.cx, pl->pos.cy, hitmask,
-			    OBJ_PTR(pl), (shape_t *)pl->ship,
-			    pl->dir);
-    /*
-     * kps - we might possibly have entered another polygon, e.g.
-     * a wormhole ?
-     */
-    if (group != NO_GROUP)
-	SET_BIT(pl->obj_status, WARPED);
-}
-
-void Object_warp(object_t *obj)
-{
-    /*warn("%s %p is warping", Object_typename(obj), obj);*/
-}
-
-void Object_finish_warp(object_t *obj)
-{
-    /*warn("%s %p warped", Object_typename(obj), obj);*/
 }
