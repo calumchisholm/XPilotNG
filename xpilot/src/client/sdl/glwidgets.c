@@ -3463,6 +3463,9 @@ static void ConfMenuWidget_Join( void *data )
     	bool change = false;
 	change |= Key_press(KEY_PAUSE);
 	if (change) Net_key_change();
+	change = false;
+	change |= Key_release(KEY_PAUSE);
+	if (change) Net_key_change();
     } else {
     	int i, t;
     	char tstr[12];
