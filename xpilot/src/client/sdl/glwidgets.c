@@ -3381,11 +3381,11 @@ static Uint32 cm_bg2_color     = 0xffffff22;
 static Uint32 cm_but1_color    = 0xff000044;
 
 static void Paint_ConfMenuWidget( GLWidget *widget );
-static void ConfMenuWidget_Quit( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );
-static void ConfMenuWidget_Save( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );
-static void ConfMenuWidget_Join( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );
-static void ConfMenuWidget_Join_Team( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );
-static void ConfMenuWidget_Config( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );
+static void ConfMenuWidget_Quit( void *data );
+static void ConfMenuWidget_Save( void *data );
+static void ConfMenuWidget_Join( void *data );
+static void ConfMenuWidget_Join_Team( void *data );
+static void ConfMenuWidget_Config( void *data );
 
 static void confmenu_callback( void )
 {
@@ -3416,14 +3416,14 @@ static void confmenu_callback( void )
     SetBounds_GLWidget(mw->confmenu,&(mw->confmenu->bounds));
 }
 
-static void ConfMenuWidget_Quit( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
+static void ConfMenuWidget_Quit( void *data )
 {
     SDL_Event quit;
     quit.type = SDL_QUIT;
     SDL_PushEvent(&quit);
 }
 
-static void ConfMenuWidget_Save( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
+static void ConfMenuWidget_Save( void *data )
 {
     char path[PATH_MAX + 1];
 
@@ -3431,7 +3431,7 @@ static void ConfMenuWidget_Save( Uint8 button, Uint8 state , Uint16 x , Uint16 y
     Xpilotrc_write(path);
 }
 
-static void ConfMenuWidget_Join_Team( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
+static void ConfMenuWidget_Join_Team( void *data )
 {
     int t = (int) data;
     char msg[16];
@@ -3441,11 +3441,10 @@ static void ConfMenuWidget_Join_Team( Uint8 button, Uint8 state , Uint16 x , Uin
     Pointer_control_set_state(true);
 }
 
-static void ConfMenuWidget_Join( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
+static void ConfMenuWidget_Join( void *data )
 {
     GLWidget *widget;
     ConfMenuWidget *wid_info;
-    if ( (state != SDL_PRESSED) || (button != 1) ) return;
     
     if (!(widget = (GLWidget *)data)) {
 	error("ConfMenuWidget_Close: widget missing!");
@@ -3500,14 +3499,14 @@ static void ConfMenuWidget_Join( Uint8 button, Uint8 state , Uint16 x , Uint16 y
 	for (i = 0; i < MAX_TEAMS; i++) {
     	    if (has_base[i]) {
 	    	snprintf(tstr, sizeof(tstr), "Join Team %i", i);
-    	    	if ( !(tmp = Init_LabelWidget(tstr,&greenRGBA,&nullRGBA,CENTER,CENTER)) ) {
-    	    	    error("ConfMenuWidget_Join: Couldn't make the join team label!");
+    	    	if ( !(tmp = Init_LabelButtonWidget(tstr,&greenRGBA,&cm_bg2_color,&cm_but1_color,ConfMenuWidget_Join_Team,(void *)i)) ) {
+    	    	    error("ConfMenuWidget_Join: Couldn't make the join team labelButton!");
 	    	    return;
     	    	}
-    	    	tmp->button = ConfMenuWidget_Join_Team;
-    	    	tmp->buttondata = (void *)i;
 		
 		tmp->bounds.w = widget->bounds.w - 2;
+		
+		SetBounds_GLWidget(tmp,&(tmp->bounds));
 		
 		ListWidget_Append(wid_info->join_list,tmp);
 	    }
@@ -3522,11 +3521,10 @@ static void ConfMenuWidget_Join( Uint8 button, Uint8 state , Uint16 x , Uint16 y
     }
 }
 
-static void ConfMenuWidget_Config( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
+static void ConfMenuWidget_Config( void *data )
 {
     GLWidget *widget;
     ConfMenuWidget *wid_info;
-    if ( (state != SDL_PRESSED) || (button != 1) ) return;
     
     if (!(widget = (GLWidget *)data)) {
 	error("ConfMenuWidget_Close: widget missing!");
@@ -3546,12 +3544,12 @@ static void ConfMenuWidget_Config( Uint8 button, Uint8 state , Uint16 x , Uint16
 	    ListWidget_Remove(wid_info->main_list,wid_info->join_list);
 	    Close_Widget(&(wid_info->join_list));
 	}
-    	ListWidget_Remove(wid_info->button_list,wid_info->jl);
-    	ListWidget_Append(wid_info->button_list,wid_info->sl);
+    	ListWidget_Remove(wid_info->button_list,wid_info->jlb);
+    	ListWidget_Append(wid_info->button_list,wid_info->slb);
     	ListWidget_Append(wid_info->main_list,wid_info->scrollpane);
     } else {
-     	ListWidget_Append(wid_info->button_list,wid_info->jl);
-    	ListWidget_Remove(wid_info->button_list,wid_info->sl);
+     	ListWidget_Append(wid_info->button_list,wid_info->jlb);
+    	ListWidget_Remove(wid_info->button_list,wid_info->slb);
    	ListWidget_Remove(wid_info->main_list,wid_info->scrollpane);
     }
     
@@ -3692,45 +3690,37 @@ GLWidget *Init_ConfMenuWidget( Uint16 x, Uint16 y )
     
     wid_info->scrollpane->bounds.h = 512;
     
-    if ( !(wid_info->sl = Init_LabelWidget("Save",&greenRGBA,&cm_but1_color,CENTER,CENTER)) ) {
-    	error("Init_ConfMenuWidget: Couldn't make the save label!");
+    if ( !(wid_info->slb = Init_LabelButtonWidget("Save",&greenRGBA,&cm_bg2_color,&cm_but1_color,ConfMenuWidget_Save,tmp)) ) {
+    	error("Init_ConfMenuWidget: Couldn't make the save labelButton!");
 	Close_Widget(&tmp);
 	return NULL;
     }
-    wid_info->sl->button = ConfMenuWidget_Save;
-    wid_info->sl->buttondata = tmp;
     
     if (Setup->mode & TEAM_PLAY) {
-    	if ( !(wid_info->jl = Init_LabelWidget("Join",&greenRGBA,&cm_but1_color,CENTER,CENTER)) ) {
-    	    error("Init_ConfMenuWidget: Couldn't make the join label!");
+    	if ( !(wid_info->jlb = Init_LabelButtonWidget("Join",&greenRGBA,&cm_bg2_color,&cm_but1_color,ConfMenuWidget_Join,tmp)) ) {
+    	    error("Init_ConfMenuWidget: Couldn't make the join labelButton!");
 	    Close_Widget(&tmp);
 	    return NULL;
     	}
     } else {
-    	if ( !(wid_info->jl = Init_LabelWidget("(un)Pause",&greenRGBA,&cm_but1_color,CENTER,CENTER)) ) {
-    	    error("Init_ConfMenuWidget: Couldn't make the (un)Pause label!");
+    	if ( !(wid_info->jlb = Init_LabelButtonWidget("(un)Pause",&greenRGBA,&cm_bg2_color,&cm_but1_color,ConfMenuWidget_Join,tmp)) ) {
+    	    error("Init_ConfMenuWidget: Couldn't make the (un)Pause labelButton!");
 	    Close_Widget(&tmp);
 	    return NULL;
     	}
     }
-    wid_info->jl->button = ConfMenuWidget_Join;
-    wid_info->jl->buttondata = tmp;
     
-    if ( !(wid_info->cl = Init_LabelWidget("Config",&yellowRGBA,&cm_but1_color,CENTER,CENTER)) ) {
-    	error("Init_ConfMenuWidget: Couldn't make the config label!");
+    if ( !(wid_info->clb = Init_LabelButtonWidget("Config",&yellowRGBA,&cm_bg2_color,&cm_but1_color,ConfMenuWidget_Config,tmp)) ) {
+    	error("Init_ConfMenuWidget: Couldn't make the config labelButton!");
 	Close_Widget(&tmp);
 	return NULL;
     }
-    wid_info->cl->button = ConfMenuWidget_Config;
-    wid_info->cl->buttondata = tmp;
     
-    if ( !(wid_info->ql = Init_LabelWidget("Quit",&redRGBA,&cm_but1_color,CENTER,CENTER)) ) {
+    if ( !(wid_info->qlb = Init_LabelButtonWidget("Quit",&redRGBA,&cm_bg2_color,&cm_but1_color,ConfMenuWidget_Quit,tmp)) ) {
     	error("Init_ConfMenuWidget: Couldn't make the quit label!");
 	Close_Widget(&tmp);
 	return NULL;
     }
-    wid_info->ql->button = ConfMenuWidget_Quit;
-    wid_info->ql->buttondata = tmp;
     
     if (!(wid_info->button_list = Init_ListWidget(0,0,&nullRGBA,&nullRGBA,&nullRGBA,LW_DOWN,LW_RIGHT,HORISONTAL,true))) {
     	error("Init_ConfMenuWidget: Couldn't make the button_list widget!");
@@ -3738,13 +3728,16 @@ GLWidget *Init_ConfMenuWidget( Uint16 x, Uint16 y )
 	return NULL;
     }
     
-    wid_info->ql->bounds.w = wid_info->sl->bounds.w  = wid_info->jl->bounds.w = wid_info->cl->bounds.w
-    	= ( wid_info->scrollpane->bounds.w + 10 )/3 + 1;
+    wid_info->clb->bounds.w = ( wid_info->scrollpane->bounds.w + 10 )/3 + 1;
+    SetBounds_GLWidget(wid_info->clb, &(wid_info->clb->bounds));
+    SetBounds_GLWidget(wid_info->slb, &(wid_info->clb->bounds));
+    SetBounds_GLWidget(wid_info->jlb, &(wid_info->clb->bounds));
+    SetBounds_GLWidget(wid_info->qlb, &(wid_info->clb->bounds));
     
     
-    ListWidget_Append(wid_info->button_list,wid_info->ql);
-    ListWidget_Append(wid_info->button_list,wid_info->cl);
-    ListWidget_Append(wid_info->button_list,wid_info->jl);
+    ListWidget_Append(wid_info->button_list,wid_info->qlb);
+    ListWidget_Append(wid_info->button_list,wid_info->clb);
+    ListWidget_Append(wid_info->button_list,wid_info->jlb);
     
     if (!(wid_info->main_list = Init_ListWidget(0,0,&nullRGBA,&nullRGBA,&nullRGBA,LW_UP,LW_LEFT,VERTICAL,true))) {
     	error("Init_ConfMenuWidget: Couldn't make the main_list widget!");
@@ -3954,4 +3947,89 @@ GLWidget *Init_ImageButtonWidget(const char *text,
 }
 /**************************/
 /* End: ImageButtonWidget */
+/**************************/
+
+/*****************************/
+/* Begin: LabelButtonWidget  */
+/*****************************/
+static void SetBounds_LabelButtonWidget( GLWidget *widget, SDL_Rect *b );
+
+static void SetBounds_LabelButtonWidget( GLWidget *widget, SDL_Rect *b )
+{
+    LabelButtonWidget *wid_info;
+    
+    if (!widget ) {
+	error("SetBounds_LabelButtonWidget: tried to change bounds on NULL ImageButtonWidget!");
+	return;
+    }
+    if ( widget->WIDGET != LABELBUTTONWIDGET ) {
+	error("SetBounds_LabelButtonWidget: Wrong widget type! [%i]",widget->WIDGET);
+	return;
+    }
+    if (!(wid_info = (LabelButtonWidget *)(widget->wid_info))) {
+	error("SetBounds_LabelButtonWidget: wid_info missing!");
+	return;
+    }
+    if (!b ) {
+	error("SetBounds_LabelButtonWidget: tried to set NULL bounds on LabelButtonWidget!");
+	return;
+    }
+        
+    widget->bounds.x = b->x;
+    widget->bounds.w = b->w;
+    widget->bounds.y = b->y;
+    widget->bounds.h = b->h;
+    
+    SetBounds_GLWidget(wid_info->label,&(widget->bounds));
+    SetBounds_GLWidget(wid_info->button,&(widget->bounds));
+}
+
+GLWidget *Init_LabelButtonWidget(   const char *text,
+				    Uint32 *text_color,
+    	    	    	    	    Uint32 *bg_color,
+    	    	    	    	    Uint32 *active_color,
+    	    	    	    	    void (*action)(void *data),
+				    void *actiondata)
+{
+    GLWidget *widget;
+    LabelButtonWidget *wid_info;
+    
+    widget	= Init_EmptyBaseGLWidget();
+    if ( !widget ) {
+        error("Failed to malloc in Init_LabelButtonWidget");
+	return NULL;
+    }
+    widget->wid_info   	= malloc(sizeof(LabelButtonWidget));
+    if ( !(widget->wid_info) ) {
+    	free(widget);
+        error("Failed to malloc in Init_LabelButtonWidget");
+	return NULL;
+    }
+    wid_info = ((LabelButtonWidget *)(widget->wid_info));
+
+    widget->WIDGET     	= LABELBUTTONWIDGET;
+    widget->SetBounds  	= SetBounds_LabelButtonWidget;
+    
+    wid_info->label = Init_LabelWidget( text , text_color, &nullRGBA, CENTER, CENTER );
+    
+    if (!AppendGLWidgetList(&(widget->children),wid_info->label)) {
+    	error("Init_LabelButtonWidget: Could not initialize label widget!");
+	Close_Widget(&widget);
+	return NULL;
+    } 
+
+    wid_info->button = Init_ButtonWidget( bg_color, active_color, action, actiondata);
+    
+    if (!AppendGLWidgetList(&(widget->children),wid_info->button)) {
+    	error("Init_LabelButtonWidget: Could not initialize button widget!");
+	Close_Widget(&widget);
+	return NULL;
+    }
+
+    SetBounds_GLWidget(widget,&(wid_info->label->bounds));
+    
+    return widget;
+}
+/**************************/
+/* End: LabelButtonWidget */
 /**************************/

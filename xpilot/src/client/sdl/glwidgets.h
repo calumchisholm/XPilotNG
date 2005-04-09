@@ -458,10 +458,10 @@ typedef struct {
     GLWidget	*main_list;
     GLWidget	*button_list;
     GLWidget	*join_list;
-    GLWidget	*ql;
-    GLWidget	*cl;
-    GLWidget	*sl;
-    GLWidget	*jl;
+    GLWidget	*qlb;
+    GLWidget	*clb;
+    GLWidget	*slb;
+    GLWidget	*jlb;
 } ConfMenuWidget;
 
 GLWidget *Init_ConfMenuWidget( Uint16 x, Uint16 y );
@@ -493,6 +493,25 @@ GLWidget *Init_ImageButtonWidget(const char *text,
 				 void (*onClick)(GLWidget *widget));
 /**************************/
 /* End: ImageButtonWidget */
+/**************************/
+
+/*****************************/
+/* Begin: LabelButtonWidget  */
+/*****************************/
+#define LABELBUTTONWIDGET 18
+typedef struct {
+    GLWidget *button;
+    GLWidget *label;
+} LabelButtonWidget;
+
+GLWidget *Init_LabelButtonWidget(   const char *text,
+				    Uint32 *text_color,
+    	    	    	    	    Uint32 *bg_color,
+    	    	    	    	    Uint32 *active_color,
+    	    	    	    	    void (*action)(void *data),
+				    void *actiondata);
+/**************************/
+/* End: LabelButtonWidget */
 /**************************/
 
 #endif
