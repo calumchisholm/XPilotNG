@@ -25,7 +25,7 @@
 
 #include "xpserver.h"
 
-#define META_VERSION	VERSION
+#define META_VERSION	VERSION "ng"
 
 struct MetaServer {
     char name[64];
