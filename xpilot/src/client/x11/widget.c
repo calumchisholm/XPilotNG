@@ -761,9 +761,9 @@ static void Widget_draw_expose(int widget_desc, XExposeEvent *expose)
 	if (expose && expose->count > 0)
 	    break;
 	doublew = (widget_double_t *) widget->sub;
-	if (doublew->max <= 1.0)
+	if (*doublew->val < 10.0)
 	    sprintf(buf, "%.2f", *doublew->val);
-	else if (doublew->max <= 10.0)
+	else if (*doublew->val < 100.0)
 	    sprintf(buf, "%.1f", *doublew->val);
 	else
 	    sprintf(buf, "%d", (int) *doublew->val);
