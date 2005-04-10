@@ -543,6 +543,8 @@ void Pause_player(player_t *pl, bool on)
 		Go_home(pl);
 	    }
 	    Player_reset_timing(pl);
+	} else {
+	    Set_player_message(pl, "You can't unpause so soon after pausing. [*Server notice*]");
 	}
     }
 }
