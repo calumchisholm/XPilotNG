@@ -8,7 +8,7 @@ affected:
 
 
 -------------------------------------------------------------------
-Problem : ships get a turnpush even if they are phased
+Problem : scalefactor is displayed as an int in x11 client config menu
 Found by: 
 Solution:
 Fixed by:
