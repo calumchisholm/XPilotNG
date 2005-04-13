@@ -1442,11 +1442,12 @@ void Paint_score_objects(void)
 		y = sobj->y * BLOCK_SZ + BLOCK_SZ/2;
   		if (wrap(&x, &y)) {
 		    /*mapprint(&mapfont,scoreObjectColorRGBA,CENTER,CENTER,x,y,"%s",sobj->msg);*/
-		    if (!score_object_texs[i].texture)
+		    if (!score_object_texs[i].texture || strcmp(sobj->msg,score_object_texs[i].text)) {
+		    	free_string_texture(&score_object_texs[i]);
 		    	draw_text(&mapfont, scoreObjectColorRGBA
 			    	    ,CENTER,CENTER, x, y, sobj->msg, true
 				    , &score_object_texs[i],false);
-		    else disp_text(&score_object_texs[i],scoreObjectColorRGBA,CENTER,CENTER,x,y,false);
+		    } else disp_text(&score_object_texs[i],scoreObjectColorRGBA,CENTER,CENTER,x,y,false);
 		}
 	    }
 	    sobj->life_time -= timePerFrame;
