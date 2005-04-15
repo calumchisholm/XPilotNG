@@ -6,6 +6,14 @@ Fixed by:
 Files 
 affected:
 
+-------------------------------------------------------------------
+Problem : base is painted as white when basenamecolor is 0
+Found by:
+Solution:
+Fixed by:
+Files 
+affected:
+
 
 -------------------------------------------------------------------
 Problem : scalefactor is displayed as an int in x11 client config menu
