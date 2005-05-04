@@ -7,6 +7,25 @@ Files
 affected:
 
 -------------------------------------------------------------------
+Problem : Tooltips in sdl client config menu are broken for Red,
+	  Green, Blue and Alpha (that is when you expand a color option)
+Found by:
+Solution:
+Fixed by:
+Files 
+affected:
+
+-------------------------------------------------------------------
+Problem : client wants to quit if keypad 0 is pressed
+	  (does item selection and release work) ?
+Found by: xswift
+Solution:
+Fixed by:
+Files 
+affected:
+
+
+-------------------------------------------------------------------
 Problem : base is painted as white when basenamecolor is 0
 Found by:
 Solution:
