@@ -7,6 +7,7 @@ TASKS FOR XPILOT NG 4.7.0
 
 Common:
 
+
 Task: Rewrite INSTALL.txt for ng. Especially describe SDL client compiling.
 Maybe append INSTALL file to INSTALL.txt and rename the current INSTALL.txt
 to INSTALL.
@@ -27,6 +28,7 @@ Examples: message that 'm' is used to talk, message when you pick up an
 item, what key one can use to use it e.g.
 Developer: kps
 
+Task: implement drawling lists in the SDL client so that the windows client can support drawing in a resizable window.
 
 Server:
 
