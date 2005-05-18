@@ -502,10 +502,10 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 
     switch (type) {
     case SETUP_BASE_UP:
-	mapnprint(&mapfont,color,CENTER,DOWN ,(x)    	    	,(y - BLOCK_SZ / 2),maxCharsInNames,"%s",other->nick_name);
+	mapnprint(&mapfont,color,CENTER,DOWN ,(x) ,(y - BLOCK_SZ / 2),maxCharsInNames,"%s",other->nick_name);
         break;
     case SETUP_BASE_DOWN:
-	mapnprint(&mapfont,color,CENTER,UP   ,(x)    	    	,(int)(y + BLOCK_SZ / 1.5),maxCharsInNames,"%s",other->nick_name);
+	mapnprint(&mapfont,color,CENTER,UP   ,(x) ,(int)(y + BLOCK_SZ / 1.5),maxCharsInNames,"%s",other->nick_name);
         break;
     case SETUP_BASE_LEFT:
 	mapnprint(&mapfont,color,RIGHT,UP    ,(x + BLOCK_SZ / 2) ,(y),maxCharsInNames,"%s",other->nick_name);
@@ -714,17 +714,17 @@ void Gui_paint_setup_left_grav(int x, int y)
 
 void Gui_paint_setup_worm(int x, int y)
 {
-    Image_paint(IMG_WORMHOLE, x, y, loopsSlow % 8, whiteRGBA);
+    Image_paint_rotated(IMG_WORMHOLE, x, y, (loopsSlow << 3) % TABLE_SIZE, whiteRGBA);
 }
 
 void Gui_paint_setup_item_concentrator(int x, int y)
 {
-    Image_paint(IMG_CONCENTRATOR, x, y, loopsSlow % 32, whiteRGBA);
+    Image_paint_rotated(IMG_CONCENTRATOR, x, y, (loopsSlow << 3) % TABLE_SIZE, whiteRGBA);
 }
 
 void Gui_paint_setup_asteroid_concentrator(int x, int y)
 {
-    Image_paint(IMG_ASTEROIDCONC, x, y, loopsSlow % 32, whiteRGBA);
+    Image_paint_rotated(IMG_ASTEROIDCONC, x, y, (loopsSlow << 4) % TABLE_SIZE, whiteRGBA);
 }
 
 void Gui_paint_decor_dot(int x, int y, int size)
@@ -1027,7 +1027,7 @@ void Gui_paint_asteroid(int x, int y, int type, int rot, int size)
     glPushMatrix();
     glTranslatef((GLfloat)x, (GLfloat)y, 0.0);
     glScalef(real_size, real_size, 1.0);
-    glRotatef(360.0 * rot / 128,
+    glRotatef(360.0 * rot / TABLE_SIZE,
 	   (type & 1) - 0.5,
 	   (type & 2) - 1,
 	   (type & 4) - 2);
@@ -1071,7 +1071,7 @@ void Gui_paint_missiles_end(void)
 
 void Gui_paint_missile(int x, int y, int len, int dir)
 {
-    Image_paint(IMG_MISSILE, x - 16, y - 16, dir/4, whiteRGBA);
+    Image_paint_rotated(IMG_MISSILE, x - 16, y - 16, dir, whiteRGBA);
 }
 
 void Gui_paint_lasers_begin(void)
@@ -1393,10 +1393,8 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
     	    } else {
 			img = IMG_SHIP_SELF;
     	    }
-    	    if (cloak || phased ) {
-	    	color = (color & 0xffffff00) + ((color & 0x000000ff)/2);
-	    }
-	    Image_paint(img, x - 16, y - 16, dir>>1, color);
+    	    if (cloak || phased) Image_paint_rotated(img, x, y, dir, (color & 0xffffff00) + ((color & 0x000000ff)/2));
+	    else Image_paint_rotated(img, x, y, dir, color);
 	} else {
     	    glEnable(GL_BLEND);
     	    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1404,7 +1402,7 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
     	    glLineWidth(shipLineWidth);
     	    set_alphacolor(color);
 		
-    	    if (cloak || phased ) {
+    	    if (cloak || phased) {
     	    	glEnable(GL_LINE_STIPPLE);
     	    	glLineStipple( 3, 0xAAAA );
 	    }
@@ -1416,7 +1414,7 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
     	    	}
     	    glEnd();
 	    
-    	    if (cloak || phased ) glDisable(GL_LINE_STIPPLE);
+    	    if (cloak || phased) glDisable(GL_LINE_STIPPLE);
 	
     	    glLineWidth(1);
     	    glDisable(GL_LINE_SMOOTH);
@@ -1444,7 +1442,7 @@ void Paint_score_objects(void)
 		y = sobj->y * BLOCK_SZ + BLOCK_SZ/2;
   		if (wrap(&x, &y)) {
 		    /*mapprint(&mapfont,scoreObjectColorRGBA,CENTER,CENTER,x,y,"%s",sobj->msg);*/
-		    if (!score_object_texs[i].tex_list || strcmp(sobj->msg,score_object_texs[i].text)) {
+		    if (!score_object_texs[i].texture || strcmp(sobj->msg,score_object_texs[i].text)) {
 		    	free_string_texture(&score_object_texs[i]);
 		    	draw_text(&mapfont, scoreObjectColorRGBA
 			    	    ,CENTER,CENTER, x, y, sobj->msg, true
@@ -1458,7 +1456,7 @@ void Paint_score_objects(void)
 		sobj->hud_msg_len = 0;
 	    }
 	} else {
-	    if (score_object_texs[i].tex_list) free_string_texture(&score_object_texs[i]);
+	    if (score_object_texs[i].texture) free_string_texture(&score_object_texs[i]);
 	}
     }
 }
@@ -1468,8 +1466,8 @@ void Paint_select(void)
     if(!select_bounds) return;
     set_alphacolor(selectionColorRGBA);
     glBegin(GL_LINE_LOOP);
-    	glVertex2i(select_bounds->x 	    	    	,select_bounds->y);
-    	glVertex2i(select_bounds->x + select_bounds->w	,select_bounds->y);
+    	glVertex2i(select_bounds->x 	    	    	,select_bounds->y   	    	    );
+    	glVertex2i(select_bounds->x + select_bounds->w	,select_bounds->y   	    	    );
     	glVertex2i(select_bounds->x + select_bounds->w	,select_bounds->y + select_bounds->h);
     	glVertex2i(select_bounds->x 	    	    	,select_bounds->y + select_bounds->h);
     glEnd();
@@ -1546,7 +1544,6 @@ static void Paint_meter(int xoff, int y, string_tex_t *tex, int val, int max,
     if (!meterBorderColorRGBA)
 	color = meter_color;
 
-    /*HUDprint(&gamefont,color,x_alignment,UP,xstr,draw_height - y - meterHeight,"%s",title);*/
     disp_text(tex,color,x_alignment,CENTER,xstr,draw_height - y - meterHeight/2,true);
 }
 
@@ -1976,11 +1973,11 @@ void Paint_HUD(void)
 	sprintf(str, "%04d", (int)fuelSum);
 	tex_index=0;
 	if (strcmp(str,hud_texts[tex_index])!=0) {
-    	    if (HUD_texs[tex_index].tex_list)
+    	    if (HUD_texs[tex_index].texture)
 	    	free_string_texture(&HUD_texs[tex_index]);
 	    strlcpy(hud_texts[tex_index],str,50);
 	}
-	if (!HUD_texs[tex_index].tex_list)
+	if (!HUD_texs[tex_index].texture)
 	    render_text(&gamefont, str, &HUD_texs[tex_index]);
 	disp_text(  &HUD_texs[tex_index],hudColorRGBA,LEFT,DOWN
 	    	    ,hud_pos_x + hudSize-HUD_OFFSET+BORDER
@@ -1995,11 +1992,11 @@ void Paint_HUD(void)
 
 	    tex_index=1;
 	    if (strcmp(str,hud_texts[tex_index])!=0) {
-    	    	if (HUD_texs[tex_index].tex_list)
+    	    	if (HUD_texs[tex_index].texture)
 		    free_string_texture(&HUD_texs[tex_index]);
     	    	strlcpy(hud_texts[tex_index],str,50);
 	    }
-	    if (!HUD_texs[tex_index].tex_list)
+	    if (!HUD_texs[tex_index].texture)
 	    	render_text(&gamefont, str, &HUD_texs[tex_index]);
 	    disp_text(  &HUD_texs[tex_index],hudColorRGBA,LEFT,DOWN
 	    	    ,hud_pos_x + hudSize-HUD_OFFSET + BORDER
@@ -2027,11 +2024,11 @@ void Paint_HUD(void)
 
 		tex_index=MAX_HUD_TEXS+i;
 		if (strcmp(sobj->hud_msg,hud_texts[tex_index])!=0) {
-    	    	    if (HUD_texs[tex_index].tex_list)
+    	    	    if (HUD_texs[tex_index].texture)
 		    	free_string_texture(&HUD_texs[tex_index]);
     	    	    strlcpy(hud_texts[tex_index],sobj->hud_msg,50);
 	    	}
-	    	if (!HUD_texs[tex_index].tex_list)
+	    	if (!HUD_texs[tex_index].texture)
 	    	    render_text(&gamefont, sobj->hud_msg, &HUD_texs[tex_index]);
 
 		disp_text(  &HUD_texs[tex_index],hudColorRGBA,CENTER,DOWN
@@ -2046,11 +2043,11 @@ void Paint_HUD(void)
 	    sprintf(str, "%3d:%02d", (int)(time_left / 60), (int)(time_left % 60));
 	    tex_index=3;
 	    if (strcmp(str,hud_texts[tex_index])!=0) {
-    	    	if (HUD_texs[tex_index].tex_list)
+    	    	if (HUD_texs[tex_index].texture)
 		    free_string_texture(&HUD_texs[tex_index]);
     	    	strlcpy(hud_texts[tex_index],str,50);
 	    }
-	    if (!HUD_texs[tex_index].tex_list)
+	    if (!HUD_texs[tex_index].texture)
 	    	render_text(&gamefont, str, &HUD_texs[tex_index]);
 	    disp_text(  &HUD_texs[tex_index],hudColorRGBA,RIGHT,DOWN
 	    	    ,hud_pos_x - hudSize+HUD_OFFSET - BORDER
@@ -2062,12 +2059,12 @@ void Paint_HUD(void)
 	modlen = strlen(mods);
 	tex_index=4;
 	if (strcmp(mods,hud_texts[tex_index])!=0) {
-    	    if (HUD_texs[tex_index].tex_list)
+    	    if (HUD_texs[tex_index].texture)
 	    	free_string_texture(&HUD_texs[tex_index]);
     	    strlcpy(hud_texts[tex_index],mods,50);
 	}
 	if(strlen(mods)) {
-	    if (!HUD_texs[tex_index].tex_list)
+	    if (!HUD_texs[tex_index].texture)
 	    	render_text(&gamefont, mods, &HUD_texs[tex_index]);
 	    disp_text(  &HUD_texs[tex_index],hudColorRGBA,RIGHT,UP
 		    	,hud_pos_x - hudSize+HUD_OFFSET-BORDER
@@ -2078,11 +2075,11 @@ void Paint_HUD(void)
 	if (autopilotLight) {
 	    tex_index=5;
 	    if (strcmp(autopilot,hud_texts[tex_index])!=0) {
-    	    	if (HUD_texs[tex_index].tex_list)
+    	    	if (HUD_texs[tex_index].texture)
 		    free_string_texture(&HUD_texs[tex_index]);
     	    	strlcpy(hud_texts[tex_index],autopilot,50);
 	    }
-	    if (!HUD_texs[tex_index].tex_list)
+	    if (!HUD_texs[tex_index].texture)
 	    	render_text(&gamefont, autopilot, &HUD_texs[tex_index]);
 	    disp_text(  &HUD_texs[tex_index],hudColorRGBA,RIGHT,DOWN
 	    	    ,hud_pos_x

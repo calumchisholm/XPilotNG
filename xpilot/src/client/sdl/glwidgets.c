@@ -33,6 +33,7 @@
 static void option_callback( void *opt, const char *value );
 static void confmenu_callback( void );
 static void hover_optionWidget( int over, Uint16 x , Uint16 y , void *data );
+static void clear_eventTarget( GLWidget *widget );
 
 static char *scrap = NULL;
 static GLWidget *scraptarget = NULL;
@@ -62,14 +63,27 @@ GLWidget *Init_EmptyBaseGLWidget( void )
     return tmp;
 }
 
+static void clear_eventTarget( GLWidget *widget )
+{
+    int i;
+    
+    if (!widget) {
+    	error("NULL passed to clear_eventTarget!");
+    	return;
+    }
+    
+    for (i=0;i<NUM_MOUSE_BUTTONS;++i)
+    	if (widget == clicktarget[i]) clicktarget[i]=NULL;
+    if (widget == hovertarget) hovertarget=NULL;
+    if (widget == scraptarget) scraptarget=NULL;
+    
+}
 
 /* only supposed to take care of mallocs done on behalf of the
  * appropriate Init_<foo> function
  */
 static void Close_WidgetTree ( GLWidget **widget )
 {
-    int i;
-    
     if (!widget) return;
     if (!(*widget)) return;
     
@@ -78,10 +92,7 @@ static void Close_WidgetTree ( GLWidget **widget )
         
     if ((*widget)->Close) (*widget)->Close(*widget);
 
-    for (i=0;i<NUM_MOUSE_BUTTONS;++i)
-    	if (*widget == clicktarget[i]) clicktarget[i]=NULL;
-    if (*widget == hovertarget) hovertarget=NULL;
-    if (*widget == scraptarget) scraptarget=NULL;
+    clear_eventTarget(*widget);
 
     if ((*widget)->wid_info) free((*widget)->wid_info);
     free(*widget);
@@ -90,7 +101,6 @@ static void Close_WidgetTree ( GLWidget **widget )
 
 void Close_Widget ( GLWidget **widget )
 {
-    int i;
     GLWidget *tmp;
 
     if (!widget) {
@@ -106,12 +116,7 @@ void Close_Widget ( GLWidget **widget )
 
     if ((*widget)->Close) (*widget)->Close(*widget);
 
-    for (i=0;i<NUM_MOUSE_BUTTONS;++i)
-    	if (*widget == clicktarget[i]) clicktarget[i]=NULL;
-    if (*widget == hovertarget) hovertarget=NULL;
-    if (*widget == scraptarget) scraptarget=NULL;
-
-    if ((*widget)->wid_info) free((*widget)->wid_info);
+    clear_eventTarget(*widget);
 
     tmp = *widget;
     *widget = (*widget)->next;
@@ -129,7 +134,6 @@ void SetBounds_GLWidget( GLWidget *widget, SDL_Rect *b )
     	error("NULL bounds passed to SetBounds_GLWidget!");
     	return;
     }
-    
     
     if (widget->SetBounds) widget->SetBounds(widget,b);
     else {
@@ -458,10 +462,10 @@ void load_textscrap(char *text)
 /**********************/
 /* Begin:  ArrowWidget*/
 /**********************/
-static void button_ArrowWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );
+static void button_ArrowWidget( Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *data );
 static void Paint_ArrowWidget( GLWidget *widget );
 
-static void button_ArrowWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
+static void button_ArrowWidget( Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *data )
 {
     ArrowWidget *tmp;
     
@@ -518,24 +522,24 @@ static void Paint_ArrowWidget( GLWidget *widget )
     glBegin(GL_POLYGON);
     switch ( dir ) {
     	case RIGHTARROW:
-	    glVertex2i(b->x 	    ,b->y);
-	    glVertex2i(b->x 	    ,b->y+b->h);
+	    glVertex2i(b->x 	    ,b->y   	);
+	    glVertex2i(b->x 	    ,b->y+b->h	);
 	    glVertex2i(b->x + b->w  ,b->y+b->h/2);
 	    break;
     	case UPARROW:
-	    glVertex2i(b->x + b->w/2,b->y);
-	    glVertex2i(b->x 	    ,b->y+b->h);
-	    glVertex2i(b->x + b->w  ,b->y+b->h);
+	    glVertex2i(b->x + b->w/2,b->y   	);
+	    glVertex2i(b->x 	    ,b->y+b->h	);
+	    glVertex2i(b->x + b->w  ,b->y+b->h	);
 	    break;
     	case LEFTARROW:
-	    glVertex2i(b->x + b->w  ,b->y);
+	    glVertex2i(b->x + b->w  ,b->y   	);
 	    glVertex2i(b->x 	    ,b->y+b->h/2);
-	    glVertex2i(b->x + b->w  ,b->y+b->h);
+	    glVertex2i(b->x + b->w  ,b->y+b->h	);
 	    break;
     	case DOWNARROW:
-	    glVertex2i(b->x 	    ,b->y);
-	    glVertex2i(b->x + b->w/2,b->y+b->h);
-	    glVertex2i(b->x + b->w  ,b->y);
+	    glVertex2i(b->x 	    ,b->y   	);
+	    glVertex2i(b->x + b->w/2,b->y+b->h	);
+	    glVertex2i(b->x + b->w  ,b->y   	);
 	    break;
 	default:
 	    error("Weird direction for ArrowWidget! (direction:%i)\n",dir);
@@ -546,7 +550,9 @@ static void Paint_ArrowWidget( GLWidget *widget )
 GLWidget *Init_ArrowWidget( ArrowWidget_dir_t direction,int width, int height,
     	     void (*action)( void *data), void *actiondata )
 {
-    GLWidget *tmp	= Init_EmptyBaseGLWidget();
+    ArrowWidget *wid_info;
+    GLWidget	*tmp	= Init_EmptyBaseGLWidget();
+    
     if ( !tmp ) {
         error("Failed to malloc in Init_ArrowWidget");
 	return NULL;
@@ -557,18 +563,21 @@ GLWidget *Init_ArrowWidget( ArrowWidget_dir_t direction,int width, int height,
         error("Failed to malloc in Init_ArrowWidget");
 	return NULL;
     }
+    wid_info = (ArrowWidget *)tmp->wid_info;
+    
     tmp->WIDGET     	= ARROWWIDGET;
-    ((ArrowWidget *)tmp->wid_info)->direction  = direction;
+    wid_info->direction  = direction;
     tmp->bounds.w   	= width;
     tmp->bounds.h   	= height;
-    ((ArrowWidget *)tmp->wid_info)->press = false;
-    ((ArrowWidget *)tmp->wid_info)->tap = false;
-    ((ArrowWidget *)tmp->wid_info)->locked = false;
-    ((ArrowWidget *)tmp->wid_info)->action = action;
-    ((ArrowWidget *)tmp->wid_info)->actiondata = actiondata;
+    wid_info->press 	= false;
+    wid_info->tap   	= false;
+    wid_info->locked	= false;
+    wid_info->action	= action;
+    wid_info->actiondata= actiondata;
     tmp->Draw	    	= Paint_ArrowWidget;
     tmp->button     	= button_ArrowWidget;
     tmp->buttondata 	= tmp;
+    
     return tmp;
 }
 
@@ -579,10 +588,10 @@ GLWidget *Init_ArrowWidget( ArrowWidget_dir_t direction,int width, int height,
 /**********************/
 /* Begin:  ButtonWidget*/
 /**********************/
-static void button_ButtonWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );
+static void button_ButtonWidget( Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *data );
 static void Paint_ButtonWidget( GLWidget *widget );
 
-static void button_ButtonWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
+static void button_ButtonWidget( Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *data )
 {
     ButtonWidget *tmp;
     
@@ -629,7 +638,9 @@ static void Paint_ButtonWidget( GLWidget *widget )
 
 GLWidget *Init_ButtonWidget( Uint32 *normal_color, Uint32 *pressed_color, Uint8 depress_time, void (*action)(void *data), void *actiondata)
 {
-    GLWidget *tmp	= Init_EmptyBaseGLWidget();
+    ButtonWidget    *wid_info;
+    GLWidget	    *tmp    = Init_EmptyBaseGLWidget();
+   
     if ( !tmp ) {
         error("Failed to malloc in Init_ButtonWidget");
 	return NULL;
@@ -640,16 +651,19 @@ GLWidget *Init_ButtonWidget( Uint32 *normal_color, Uint32 *pressed_color, Uint8 
         error("Failed to malloc in Init_ButtonWidget");
 	return NULL;
     }
+    wid_info = (ButtonWidget *)tmp->wid_info;
+    
     tmp->WIDGET     	= BUTTONWIDGET;
-    ((ButtonWidget *)tmp->wid_info)->pressed = false;
-    ((ButtonWidget *)tmp->wid_info)->normal_color = normal_color;
-    ((ButtonWidget *)tmp->wid_info)->pressed_color = pressed_color;
-    ((ButtonWidget *)tmp->wid_info)->depress_time = depress_time;
-    ((ButtonWidget *)tmp->wid_info)->action = action;
-    ((ButtonWidget *)tmp->wid_info)->actiondata = actiondata;
+    wid_info->pressed	    = false;
+    wid_info->normal_color  = normal_color;
+    wid_info->pressed_color = pressed_color;
+    wid_info->depress_time  = depress_time;
+    wid_info->action	    = action;
+    wid_info->actiondata    = actiondata;
     tmp->Draw	    	= Paint_ButtonWidget;
     tmp->button     	= button_ButtonWidget;
     tmp->buttondata 	= tmp;
+    
     return tmp;
 }
 
@@ -690,9 +704,9 @@ static void Paint_SlideWidget( GLWidget *widget )
     SlideWidget *wid_info;
 
    
-    static Uint32 normalcolor  = 0xff0000ff;
-    static Uint32 presscolor   = 0x00ff00ff;
-    static Uint32 lockcolor  = 0x333333ff;
+    static Uint32 normalcolor	= 0xff0000ff;
+    static Uint32 presscolor	= 0x00ff00ff;
+    static Uint32 lockcolor 	= 0x333333ff;
     Uint32 color;
 
     if (!widget) return;
@@ -709,14 +723,14 @@ static void Paint_SlideWidget( GLWidget *widget )
     }
 
     glBegin(GL_QUADS);
-    	set_alphacolor(color);
-	glVertex2i(b->x     	, b->y);
-    	set_alphacolor(color);
-    	glVertex2i(b->x + b->w	, b->y);
-    	set_alphacolor(color & 0xffffff77);
-    	glVertex2i(b->x + b->w	, b->y + b->h);
-    	set_alphacolor(color & 0xffffff77);
-    	glVertex2i(b->x     	, b->y + b->h);
+    	set_alphacolor(color	    	    	);
+	glVertex2i(b->x     	, b->y	    	);
+    	set_alphacolor(color	    	    	);
+    	glVertex2i(b->x + b->w	, b->y	    	);
+    	set_alphacolor(color & 0xffffff77   	);
+    	glVertex2i(b->x + b->w	, b->y + b->h	);
+    	set_alphacolor(color & 0xffffff77   	);
+    	glVertex2i(b->x     	, b->y + b->h	);
     glEnd();
 }
 
@@ -724,7 +738,9 @@ GLWidget *Init_SlideWidget( bool locked,
     	     void (*motion)( Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void *data ), void *motiondata,
 	     void (*release)(void *releasedata),void *releasedata )
 {
+    SlideWidget *wid_info;
     GLWidget *tmp	= Init_EmptyBaseGLWidget();
+    
     if ( !tmp ) {
         error("Failed to malloc in Init_SlideWidget");
 	return NULL;
@@ -735,20 +751,23 @@ GLWidget *Init_SlideWidget( bool locked,
         error("Failed to malloc in Init_SlideWidget");
 	return NULL;
     }
+    wid_info = (SlideWidget *)tmp->wid_info;
+    
     tmp->WIDGET     	= SLIDEWIDGET;
     tmp->bounds.x   	= 0;
     tmp->bounds.y   	= 0;
     tmp->bounds.w   	= 10;
     tmp->bounds.h   	= 10;
-    ((SlideWidget *)tmp->wid_info)->sliding = false;
-    ((SlideWidget *)tmp->wid_info)->locked = locked;
-    ((SlideWidget *)tmp->wid_info)->release = release;
-    ((SlideWidget *)tmp->wid_info)->releasedata = releasedata;
+    wid_info->sliding	    = false;
+    wid_info->locked	    = locked;
+    wid_info->release	    = release;
+    wid_info->releasedata   = releasedata;
     tmp->Draw	    	= Paint_SlideWidget;
     tmp->button     	= button_SlideWidget;
     tmp->buttondata 	= tmp;
     tmp->motion     	= motion;
     tmp->motiondata 	= motiondata;
+    
     return tmp;
 }
 
@@ -918,7 +937,9 @@ GLWidget *Init_ScrollbarWidget( bool locked, GLfloat pos, GLfloat size, ScrollWi
     	    	    	    	void (*poschange)( GLfloat pos , void *poschangedata),
 				void *poschangedata )
 {
+    ScrollbarWidget *wid_info;
     GLWidget *tmp	= Init_EmptyBaseGLWidget();
+    
     if ( !tmp ) {
         error("Failed to malloc in Init_ScrollbarWidget");
 	return NULL;
@@ -929,6 +950,8 @@ GLWidget *Init_ScrollbarWidget( bool locked, GLfloat pos, GLfloat size, ScrollWi
         error("Failed to malloc in Init_ScrollbarWidget");
 	return NULL;
     }
+    wid_info = (ScrollbarWidget *)tmp->wid_info;
+    
     tmp->WIDGET     	= SCROLLBARWIDGET;
     tmp->bounds.w   	= 10;
     tmp->bounds.h   	= 10;
@@ -936,19 +959,21 @@ GLWidget *Init_ScrollbarWidget( bool locked, GLfloat pos, GLfloat size, ScrollWi
     tmp->Close	    	= Close_ScrollbarWidget;
     tmp->SetBounds  	= SetBounds_ScrollbarWidget;
     /*add pgUp, pgDown here later with button*/
-    ((ScrollbarWidget *)tmp->wid_info)->pos = MAX(0.0f,MIN(1.0f,pos));
-    ((ScrollbarWidget *)tmp->wid_info)->size = MAX(0.0f,MIN(1.0f,size));
-    ((ScrollbarWidget *)tmp->wid_info)->dir = dir;
-    ((ScrollbarWidget *)tmp->wid_info)->oldmoves = 0;
-    ((ScrollbarWidget *)tmp->wid_info)->poschange = poschange;
-    ((ScrollbarWidget *)tmp->wid_info)->poschangedata = poschangedata;
-    ((ScrollbarWidget *)tmp->wid_info)->slide = Init_SlideWidget(locked,motion_ScrollbarWidget, tmp, release_ScrollbarWidget, tmp);
+    wid_info->pos   	= MAX(0.0f,MIN(1.0f,pos));
+    wid_info->size  	= MAX(0.0f,MIN(1.0f,size));
+    wid_info->dir   	= dir;
+    wid_info->oldmoves	= 0;
+    wid_info->poschange = poschange;
+    wid_info->poschangedata = poschangedata;
+    wid_info->slide 	= Init_SlideWidget(locked,motion_ScrollbarWidget, tmp, release_ScrollbarWidget, tmp);
+    
     if ( !(((ScrollbarWidget *)tmp->wid_info)->slide) ) {
     	error("Failed to make a SlideWidget for Init_ScrollbarWidget");
 	free(tmp->wid_info);
 	free(tmp);
 	return NULL;
     }
+    
     AppendGLWidgetList(&(tmp->children), ((ScrollbarWidget *)tmp->wid_info)->slide);
     return tmp;
 }
@@ -962,7 +987,7 @@ GLWidget *Init_ScrollbarWidget( bool locked, GLfloat pos, GLfloat size, ScrollWi
 static void Paint_LabelWidget( GLWidget *widget );
 static void Close_LabelWidget ( GLWidget *widget );
 
-static void button_LabelWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
+static void button_LabelWidget( Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *data )
 {
     LabelWidget *tmp;
     
@@ -1066,6 +1091,7 @@ static void Paint_LabelWidget( GLWidget *widget )
 GLWidget *Init_LabelWidget( const char *text , Uint32 *fgcolor, Uint32 *bgcolor, int align, int valign  )
 {
     GLWidget *tmp;
+    LabelWidget *wid_info;
 
     if (!text) {
     	error("text missing for Init_LabelWidget.");
@@ -1082,6 +1108,7 @@ GLWidget *Init_LabelWidget( const char *text , Uint32 *fgcolor, Uint32 *bgcolor,
         error("Failed to malloc in Init_LabelWidget");
 	return NULL;
     }
+    wid_info = (LabelWidget *)tmp->wid_info;
 
     if ( !render_text(&gamefont, text, &(((LabelWidget *)tmp->wid_info)->tex)) ) {
     	free(tmp->wid_info);
@@ -1093,14 +1120,15 @@ GLWidget *Init_LabelWidget( const char *text , Uint32 *fgcolor, Uint32 *bgcolor,
     tmp->WIDGET     	= LABELWIDGET;
     tmp->bounds.w   	= (((LabelWidget *)tmp->wid_info)->tex).width;
     tmp->bounds.h   	= (((LabelWidget *)tmp->wid_info)->tex).height;
-    ((LabelWidget *)tmp->wid_info)->fgcolor  = fgcolor;
-    ((LabelWidget *)tmp->wid_info)->bgcolor  = bgcolor;
-    ((LabelWidget *)tmp->wid_info)->align    = align;
-    ((LabelWidget *)tmp->wid_info)->valign   = valign;
+    wid_info->fgcolor	= fgcolor;
+    wid_info->bgcolor	= bgcolor;
+    wid_info->align 	= align;
+    wid_info->valign	= valign;
     tmp->Draw	    	= Paint_LabelWidget;
     tmp->Close     	= Close_LabelWidget;
     tmp->button     	= button_LabelWidget;
     tmp->buttondata 	= tmp; 
+    
     return tmp;
 }
 /********************/
@@ -1110,10 +1138,10 @@ GLWidget *Init_LabelWidget( const char *text , Uint32 *fgcolor, Uint32 *bgcolor,
 /***********************************/
 /* Begin:  LabeledRadiobuttonWidget*/
 /***********************************/
-static void button_LabeledRadiobuttonWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );
+static void button_LabeledRadiobuttonWidget( Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *data );
 static void Paint_LabeledRadiobuttonWidget( GLWidget *widget );
 
-static void button_LabeledRadiobuttonWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
+static void button_LabeledRadiobuttonWidget( Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *data )
 {
     LabeledRadiobuttonWidget *tmp;
     if (!data) return;
@@ -1158,7 +1186,7 @@ static void Paint_LabeledRadiobuttonWidget( GLWidget *widget )
      glEnd();
     
     if (wid_info->state) {
-    	disp_text(wid_info->ontex, true_text_color, CENTER, CENTER, tmp->bounds.x+tmp->bounds.w/2, draw_height - tmp->bounds.y-tmp->bounds.h/2, true);
+    	disp_text(wid_info->ontex, true_text_color, CENTER, CENTER,tmp->bounds.x+tmp->bounds.w/2, draw_height - tmp->bounds.y-tmp->bounds.h/2, true);
     } else {
     	disp_text(wid_info->offtex, false_text_color, CENTER, CENTER, tmp->bounds.x+tmp->bounds.w/2, draw_height - tmp->bounds.y-tmp->bounds.h/2, true);
     }
@@ -1168,9 +1196,10 @@ GLWidget *Init_LabeledRadiobuttonWidget( string_tex_t *ontex, string_tex_t *offt
     	    	    	    	    	void (*action)(bool state, void *actiondata),
 					void *actiondata, bool start_state )
 {
-    GLWidget *tmp;
+    GLWidget	    	    	*tmp;
+    LabeledRadiobuttonWidget	*wid_info;
 
-    if (!ontex || !(ontex->tex_list) || !offtex || !(offtex->tex_list) ) {
+    if (!ontex || !(ontex->texture) || !offtex || !(offtex->texture) ) {
     	error("texure(s) missing for Init_LabeledRadiobuttonWidget.");
 	return NULL;
     }
@@ -1185,18 +1214,20 @@ GLWidget *Init_LabeledRadiobuttonWidget( string_tex_t *ontex, string_tex_t *offt
         error("Failed to malloc in Init_LabeledRadiobuttonWidget");
 	return NULL;
     }
+    wid_info = (LabeledRadiobuttonWidget *)tmp->wid_info;
+    
     tmp->WIDGET     	= LABELEDRADIOBUTTONWIDGET;
     tmp->bounds.w   	= MAX(ontex->width,offtex->width)+5;
     tmp->bounds.h   	= MAX(ontex->height,offtex->height);
-    ((LabeledRadiobuttonWidget *)tmp->wid_info)->state  = start_state;
-    ((LabeledRadiobuttonWidget *)tmp->wid_info)->ontex  = ontex;
-    ((LabeledRadiobuttonWidget *)tmp->wid_info)->offtex  = offtex;
-    ((LabeledRadiobuttonWidget *)tmp->wid_info)->action  = action;
-    ((LabeledRadiobuttonWidget *)tmp->wid_info)->actiondata  = actiondata;
-
+    wid_info->state 	= start_state;
+    wid_info->ontex 	= ontex;
+    wid_info->offtex	= offtex;
+    wid_info->action	= action;
+    wid_info->actiondata= actiondata;
     tmp->Draw	    	= Paint_LabeledRadiobuttonWidget;
     tmp->button     	= button_LabeledRadiobuttonWidget;
     tmp->buttondata 	= tmp;
+    
     return tmp;
 }
 /*********************************/
@@ -1651,7 +1682,7 @@ GLWidget *Init_IntChooserWidget( const char *name, int *value, int minval, int m
     wid_info->value   	= value;
     wid_info->minval   	= minval;
     wid_info->maxval   	= maxval;
-    wid_info->valuespace = valuespace;
+    wid_info->valuespace= valuespace;
     wid_info->direction = 0;
     wid_info->fgcolor 	= fgcolor;
     wid_info->bgcolor 	= bgcolor;
@@ -2277,13 +2308,13 @@ static void Paint_ColorModWidget( GLWidget *widget )
     
     glBegin(GL_POLYGON);
     	set_alphacolor(whiteRGBA);
-    	glVertex2i(b.x + (GLint)(0.9*b.w)    ,b.y + b.h	    );
-    	glVertex2i(b.x + b.w	    ,b.y + b.h      );
-    	glVertex2i(b.x + b.w	    ,b.y + (GLint)(0.9*b.h)  );
+    	glVertex2i(b.x + (GLint)(0.9*b.w)   ,b.y + b.h	    	    );
+    	glVertex2i(b.x + b.w	    	    ,b.y + b.h	    	    );
+    	glVertex2i(b.x + b.w	    	    ,b.y + (GLint)(0.9*b.h) );
     	set_alphacolor(blackRGBA);
-    	glVertex2i(b.x + (GLint)(0.1*b.w)    ,b.y    	    );
-    	glVertex2i(b.x	    	    ,b.y    	    );
-    	glVertex2i(b.x	    	    ,b.y + (GLint)(0.1*b.h)  );
+    	glVertex2i(b.x + (GLint)(0.1*b.w)   ,b.y    	    	    );
+    	glVertex2i(b.x	    	    	    ,b.y    	    	    );
+    	glVertex2i(b.x	    	    	    ,b.y + (GLint)(0.1*b.h) );
     glEnd();
     
     glBegin(GL_QUADS);
@@ -2899,7 +2930,7 @@ GLWidget *Init_ListWidget( Uint16 x, Uint16 y, Uint32 *bg1, Uint32 *bg2, Uint32 
 /* Begin: ScrollPaneWidget  */
 /****************************/
 static void ScrollPaneWidget_poschange( GLfloat pos , void *data );
-static void SetBounds_ScrollPaneWidget(GLWidget *widget, SDL_Rect *b );
+static void SetBounds_ScrollPaneWidget( GLWidget *widget, SDL_Rect *b );
 
 static void ScrollPaneWidget_poschange( GLfloat pos , void *data )
 {

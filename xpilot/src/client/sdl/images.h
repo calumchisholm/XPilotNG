@@ -97,6 +97,7 @@ int Images_init(void);
 void Images_cleanup(void);
 void Image_paint(int ind, int x, int y, int frame, int c);
 void Image_paint_area(int ind, int x, int y, int frame, irec_t *r, int c);
+void Image_paint_rotated(int ind, int center_x, int center_y, int dir, int color);
 image_t *Image_get(int ind);
 image_t *Image_get_texture(int ind);
 void Image_use_texture(int ind);

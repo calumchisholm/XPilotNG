@@ -156,7 +156,6 @@ void Image_paint(int ind, int x, int y, int frame, int c)
     Image_paint_area(ind, x, y, frame, NULL, c);
 }
 
-
 void Image_paint_area(int ind, int x, int y, int frame, irec_t *r, int c)
 {
     image_t *img;
@@ -179,8 +178,6 @@ void Image_paint_area(int ind, int x, int y, int frame, irec_t *r, int c)
     ty1 = ((float)r->y) / img->data_height;
     tx2 = ((float)frame * img->frame_width + r->x + r->w) / img->data_width;
     ty2 = ((float)r->y + r->h) / (img->data_height);
-    /* this above -1 seems to keep individual stationary textures from changing */
-    /* for fixing moving textures... dunno except going to window choords =( */
     
     glBindTexture(GL_TEXTURE_2D, img->name);
     glEnable(GL_TEXTURE_2D);
@@ -199,6 +196,52 @@ void Image_paint_area(int ind, int x, int y, int frame, irec_t *r, int c)
     glDisable(GL_TEXTURE_2D);
 }
 
+void Image_paint_rotated(int ind, int x, int y, int dir, int color)
+{
+    image_t *img;
+    irec_t whole;
+    float tx1, ty1, tx2, ty2;
+
+    img = Image_get(ind);
+    if (img == NULL)
+	return;
+
+    whole.x = 0;
+    whole.y = 0;
+    whole.w = img->frame_width;
+    whole.h = img->height;
+
+    tx1 = 0.0;
+    ty1 = 0.0;
+    tx2 = img->frame_width / (double)img->data_width;
+    ty2 = img->height / (double)img->data_height;
+
+    glPushMatrix();
+    glTranslatef((GLfloat)(x), (GLfloat)(y), 0.0);
+    glRotatef(360.0 * dir / (double)TABLE_SIZE, 0.0, 0.0, 1.0);
+    
+    glBindTexture(GL_TEXTURE_2D, img->name);
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    /* Linear Filtering */
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    set_alphacolor(color);
+
+    glBegin(GL_QUADS);
+    glTexCoord2f(tx1, ty1); glVertex2f( -whole.w / 2.0 ,    -whole.h / 2.0  );
+    glTexCoord2f(tx2, ty1); glVertex2f( whole.w / 2.0  ,    -whole.h / 2.0  );
+    glTexCoord2f(tx2, ty2); glVertex2f( whole.w / 2.0  ,    whole.h / 2.0   );
+    glTexCoord2f(tx1, ty2); glVertex2f( -whole.w / 2.0 ,    whole.h / 2.0   );
+    glEnd();    
+
+    glDisable(GL_BLEND);
+    glDisable(GL_TEXTURE_2D);
+
+    glPopMatrix();
+}
+
 
 int Images_init(void)
 {
@@ -207,9 +250,9 @@ int Images_init(void)
     DEF_IMG("holder1.ppm", 1);
     DEF_IMG("holder2.ppm", 1);
     DEF_IMG("ball_gray.ppm", 1);
-    DEF_IMG("ship_friend.ppm", 64); /* 128 fails in some OpenGL drivers */
-    DEF_IMG("ship_friend.ppm", 64); /* I guess texture gets too wide (4096) */
-    DEF_IMG("ship_enemy.ppm", 64);
+    DEF_IMG("ship_friend.ppm", 1); /* 128 fails in some OpenGL drivers */
+    DEF_IMG("ship_friend.ppm", 1); /* I guess texture gets too wide (4096) */
+    DEF_IMG("ship_enemy.ppm", 1);
     DEF_IMG("bullet.ppm", -16);
     DEF_IMG("bullet_blue.ppm", -16);
     DEF_IMG("base_down.ppm", 1);
@@ -226,19 +269,19 @@ int Images_init(void)
     DEF_IMG("sparks.ppm", -8);
     DEF_IMG("paused.ppm", -2);
     DEF_IMG("refuel.ppm", -4);
-    DEF_IMG("wormhole.ppm", 8);
+    DEF_IMG("wormhole.ppm", 1);
     DEF_IMG("mine_team.ppm", 1);
     DEF_IMG("mine_other.ppm", 1);
-    DEF_IMG("concentrator.ppm", 32);
+    DEF_IMG("concentrator.ppm", 1);
     DEF_IMG("plus.ppm", 1);
     DEF_IMG("minus.ppm", 1);
     DEF_IMG("checkpoint.ppm", -2);
     DEF_IMG("meter.ppm", -2);
-    DEF_IMG("asteroidconcentrator.ppm", 32);
+    DEF_IMG("asteroidconcentrator.ppm", 1);
     DEF_IMG("shield.ppm", 1);
     DEF_IMG("acwise_grav.ppm", -6);
     DEF_IMG("cwise_grav.ppm", -6);
-    DEF_IMG("missile.ppm", 32);
+    DEF_IMG("missile.ppm", 1);
     DEF_IMG("asteroid.ppm", 1);
     DEF_IMG("target.ppm", 1);
     DEF_IMG("huditems.ppm", -30);

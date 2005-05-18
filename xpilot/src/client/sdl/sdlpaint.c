@@ -198,6 +198,11 @@ int Paint_init(void)
     if (Images_init() == -1) 
 	return -1;
 
+    for (i=0;i<MAX_SCORE_OBJECTS;++i)
+    	score_object_texs[i].texture = 0;
+    for (i=0;i<MAX_METERS;++i)
+    	meter_texs[i].texture = 0;
+    
     scoresChanged = true;
     players_exposed = true;
     
@@ -210,9 +215,9 @@ void Paint_cleanup(void)
     Images_cleanup();
 
     for (i=0;i<MAX_SCORE_OBJECTS;++i)
-    	if (score_object_texs[i].tex_list) free_string_texture(&score_object_texs[i]);
+    	if (score_object_texs[i].texture) free_string_texture(&score_object_texs[i]);
     for (i=0;i<MAX_METERS;++i)
-    	if (meter_texs[i].tex_list) free_string_texture(&meter_texs[i]);
+    	if (meter_texs[i].texture) free_string_texture(&meter_texs[i]);
 }
 
 /* This one works best for things that are fixed in position
