@@ -1199,7 +1199,7 @@ GLWidget *Init_LabeledRadiobuttonWidget( string_tex_t *ontex, string_tex_t *offt
     GLWidget	    	    	*tmp;
     LabeledRadiobuttonWidget	*wid_info;
 
-    if (!ontex || !(ontex->texture) || !offtex || !(offtex->texture) ) {
+    if (!ontex || !(ontex->tex_list) || !offtex || !(offtex->tex_list) ) {
     	error("texure(s) missing for Init_LabeledRadiobuttonWidget.");
 	return NULL;
     }
