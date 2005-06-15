@@ -681,6 +681,18 @@ static void Player_collides_with_ball(player_t *pl, ballobject_t *ball)
 	}
 	/* KHS </evil hack> */
 	ball->fuse = timeStep;
+	/* ball was "touched", so set owner, and mark it as loose */
+
+		    /* this is only the team of the owner of the ball,
+		     * not the team the ball belongs to. the latter is
+		     * found through the ball's treasure */
+		    ball->team = pl->team;
+		    if (ball->ball_treasure->have)
+			ball->ball_loose_ticks = 0;
+		    ball->ball_owner = pl->id;
+		    SET_BIT(ball->obj_status, GRAVITY);
+		    ball->ball_treasure->have = false;
+		    sound_play_sensors(pl->pos, ASTEROID_HIT_SOUND);
 	return;
     }
 
