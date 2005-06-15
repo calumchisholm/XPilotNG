@@ -863,6 +863,17 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
+	"playerBallBounceBrakeFactor",
+	"playerBallBrake",
+	"0.7",
+	&options.playerBallBounceBrakeFactor,
+	valReal,
+	Move_init,
+	"Elastic or inelastic properties of the player-ball collision\n"
+	"1 means fully elastic, 0 fully inelastic.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
 	"playerWallFriction",
 	"wallFriction",
 	"0.5",

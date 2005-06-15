@@ -641,7 +641,7 @@ static void Player_collides_with_ball(player_t *pl, ballobject_t *ball)
      * shields up, or die with shields down.  The treasure may
      * be destroyed.
      */
-    Delta_mv(OBJ_PTR(pl), OBJ_PTR(ball));
+    
     if (!Player_uses_emergency_shield(pl))
 	Player_add_fuel(pl, ED_BALL_HIT);
 
@@ -649,26 +649,42 @@ static void Player_collides_with_ball(player_t *pl, ballobject_t *ball)
 	if (BIT(world->rules->mode, TEAM_PLAY)
 	    && pl->team == ball->ball_treasure->team)
 	    Rank_saved_ball(pl);
+	Delta_mv(OBJ_PTR(pl), OBJ_PTR(ball));
 	ball->life = 0;
+    }
+    
+    if (options.treasureCollisionMayKill && !BIT(pl->used, HAS_SHIELD) ){
+	if(Player_has_armor(pl))
+	    Player_hit_armor(pl);
+	else{
+	    Delta_mv(OBJ_PTR(pl), OBJ_PTR(ball));
+	    pl->fuel.sum=0;
+		}
     }
 
     if (pl->fuel.sum > 0) {
-	if (!options.treasureCollisionMayKill
-	    || BIT(pl->used, HAS_SHIELD)){
-	    if(!options.treasureCollisionDestroys)
-		Obj_repel(OBJ_PTR(ball), OBJ_PTR(pl), 
-			  ( ball->pl_radius + SHIP_SZ) * 1.3 *CLICK);
+	if(ball->fuse > 0){
+	    ball->fuse+=timeStep;
 	    return;
 	}
-	if (!BIT(pl->used, HAS_SHIELD)
-	    && Player_has_armor(pl)) {
-	    if(!options.treasureCollisionDestroys)
-		Obj_repel(OBJ_PTR(ball), OBJ_PTR(pl), 
-			  ( ball->pl_radius + SHIP_SZ) * 1.3 * CLICK);
-	    Player_hit_armor(pl);
-	    return;
+	Delta_mv_partly_elastic(OBJ_PTR(ball),
+				OBJ_PTR(pl),
+				options.playerBallBounceBrakeFactor);
+	/* KHS <evil hack on> */
+	/* this stops the ball from penetrating the player in most cases */
+	if(pl->collmode < 3 && ball->collmode < 3){ 
+	    /* cannot do this hack after a wallbounce */
+	    pl->pos=pl->prevpos;
+	    ball->pos=ball->prevpos;
+	    Move_player(pl);
+	    Move_object(OBJ_PTR(ball));
 	}
+	/* KHS </evil hack> */
+	ball->fuse = timeStep;
+	return;
     }
+
+    /* Player has died */
     if (ball->ball_owner == NO_ID) {
 	Set_message_f("%s was killed by a ball.", pl->name);
 	Handle_Scoring(SCORE_BALL_KILL,NULL,pl,NULL,NULL);

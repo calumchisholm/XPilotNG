@@ -94,6 +94,7 @@ extern struct options {
     double	maxUnshieldedWallBounceSpeed;
     int		playerWallBounceType;
     double	playerWallBounceBrakeFactor;
+    double	playerBallBounceBrakeFactor;
     double	playerWallFriction;
     double	objectWallBounceBrakeFactor;
     double	objectWallBounceLifeFactor;
