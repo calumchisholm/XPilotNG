@@ -76,6 +76,7 @@ extern struct options {
     bool	playerStartsShielded;
     bool	shotsWallBounce;
     bool	ballsWallBounce;
+    bool        ballCollisionDetachs;
     bool	ballCollisions;
     bool	ballSparkCollisions;
     bool	minesWallBounce;

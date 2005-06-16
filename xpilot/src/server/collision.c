@@ -687,12 +687,17 @@ static void Player_collides_with_ball(player_t *pl, ballobject_t *ball)
 		     * not the team the ball belongs to. the latter is
 		     * found through the ball's treasure */
 		    ball->team = pl->team;
-		    if (ball->ball_treasure->have)
+		    if (ball->ball_treasure->have){
 			ball->ball_loose_ticks = 0;
+			ball->ball_treasure->have = false;
+			SET_BIT(ball->obj_status, GRAVITY);
+		    }
 		    if(ball->id == NO_ID)
 			ball->ball_owner = pl->id;
-		    SET_BIT(ball->obj_status, GRAVITY);
-		    ball->ball_treasure->have = false;
+		    else if(options.ballCollisionDetachs){
+			Detach_ball(Player_by_id(ball->id), ball);
+			ball->ball_owner = pl->id;
+		    }
 		    sound_play_sensors(pl->pos, ASTEROID_HIT_SOUND);
 	return;
     }
