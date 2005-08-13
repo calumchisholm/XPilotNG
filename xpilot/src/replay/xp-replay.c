@@ -396,7 +396,9 @@ static int		verbose = 0;	/* want extra info messages */
 static int		compress = 0;	/* save files in compressed format */
 static int		frame_count;	/* number of frame next read in */
 static int		frames_in_core;	/* number of frame next read in */
+#ifdef USE_GCLIST
 static struct rGC	*gclist;	/* list of all GCs used */
+#endif
 static int		forceRedraw = False;
 static int		quit = 0;
 static struct xprc	*purge_argument;
@@ -503,24 +505,10 @@ void *MyMalloc(size_t size, enum MemTypes mt)
     return p;
 }
 
-#if 0
-/*
- * Wrapper for strdup(3).
- * This one uses MyMalloc() instead of malloc()
- */
-static char *MyStrDup(const char *str)
-{
-    size_t size = strlen(str) + 1;
-    char *dup = (char *) MyMalloc(size, MEM_STRING);
-    memcpy(dup, str, size);
-    return dup;
-}
-#endif
-
 /*
  * Read one 8-bit byte from the recorded input stream.
  */
-static unsigned char RReadByte(FILE *fp)
+static inline unsigned char RReadByte(FILE *fp)
 {
     return (unsigned char) (getc(fp));
 }
@@ -528,7 +516,7 @@ static unsigned char RReadByte(FILE *fp)
 /*
  * Read one 16-bit unsigned word from the recorded input stream.
  */
-static unsigned short RReadUShort(FILE *fp)
+static inline unsigned short RReadUShort(FILE *fp)
 {
     unsigned short i;
 
@@ -541,7 +529,7 @@ static unsigned short RReadUShort(FILE *fp)
 /*
  * Read one 16-bit signed word from the recorded input stream.
  */
-static short RReadShort(FILE *fp)
+static inline short RReadShort(FILE *fp)
 {
     short i;
 
@@ -556,7 +544,7 @@ static short RReadShort(FILE *fp)
 /*
  * Read one 32-bit unsigned longword from the recorded input stream.
  */
-static unsigned long RReadULong(FILE *fp)
+static inline unsigned long RReadULong(FILE *fp)
 {
     unsigned long	i;
 
@@ -571,7 +559,7 @@ static unsigned long RReadULong(FILE *fp)
 /*
  * Read one 32-bit signed longword from the recorded input stream.
  */
-static long RReadLong(FILE *fp)
+static inline long RReadLong(FILE *fp)
 {
     long i;
 
@@ -587,7 +575,7 @@ static long RReadLong(FILE *fp)
  * Read a pascal-type string from the recorded input stream
  * and convert it to a nul-byte terminated C-string.
  */
-static char *RReadString(FILE *fp)
+static inline char *RReadString(FILE *fp)
 {
     char		*s;
     int			i;
@@ -820,6 +808,11 @@ static struct rGC *RReadGCValues(struct xprc *rc)
 	}
     }
 
+    /*
+     * kps - This linked list of GCs is very inefficient for some
+     * big recordings.
+     */
+#ifdef USE_GCLIST
     for (gcp = gclist; gcp != NULL; gcp = gcp->next) {
 	if (gcp->mask != gc.mask)
 	    continue;
@@ -854,10 +847,13 @@ static struct rGC *RReadGCValues(struct xprc *rc)
 	}
 	return gcp;
     }
+#endif
     gcp = (struct rGC *)MyMalloc(sizeof(*gcp), MEM_GC);
     memcpy(gcp, &gc, sizeof(*gcp));
+#ifdef USE_GCLIST
     gcp->next = gclist;
     gclist = gcp;
+#endif
 
     return gcp;
 }
@@ -956,6 +952,9 @@ static void FreeShapes(struct shape *shp)
 	}
 
 	shp->type = 0;
+#ifndef USE_GCLIST
+	MyFree(shp->gc, sizeof(struct rGC), MEM_GC);
+#endif
 	MyFree(shp, sizeof(struct shape), MEM_SHAPE);
 	shp = nextshp;
     }
@@ -3104,6 +3103,42 @@ static void dox(struct xui *ui, struct xprc *rc)
 		case 'Z':
 		    frameStep = -rc->cur->number;
 		    break;
+
+		    /*
+		     * kps - press a number key to fast forward that many
+		     * minutes.
+		     */
+		case '1':
+		    frameStep += rc->fps * 60;
+		    break;
+		case '2':
+		    frameStep += rc->fps * 60 * 2;
+		    break;
+		case '3':
+		    frameStep += rc->fps * 60 * 3;
+		    break;
+		case '4':
+		    frameStep += rc->fps * 60 * 4;
+		    break;
+		case '5':
+		    frameStep += rc->fps * 60 * 5;
+		    break;
+		case '6':
+		    frameStep += rc->fps * 60 * 6;
+		    break;
+		case '7':
+		    frameStep += rc->fps * 60 * 7;
+		    break;
+		case '8':
+		    frameStep += rc->fps * 60 * 8;
+		    break;
+		case '9':
+		    frameStep += rc->fps * 60 * 9;
+		    break;
+		case '0':
+		    frameStep += rc->fps * 60 * 10;
+		    break;
+
 
 		case '[':
 		    rc->save_first = rc->cur;
