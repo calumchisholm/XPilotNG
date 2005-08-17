@@ -1,3 +1,10 @@
+xpilot-ng (1:4.7.1.0cvs1) unstable; urgency=low
+
+  * Incremented version# and changed maintainer so there's no confusion
+    between this version and the official Debian version.
+
+ -- Unofficial Debian XPilot <xpilot-hacks@lists.sourceforge.net>  Wed, 17 Aug 2005 13:10:17 -0300
+
 xpilot-ng (1:4.7.1-2) unstable; urgency=low
 
   * Use ship_red.ppm to create an xpilot-ng menu icon.  (Closes: #275646).
