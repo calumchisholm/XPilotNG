@@ -1,4 +1,4 @@
-xpilot-ng (1:4.7.1.0cvs1) unstable; urgency=low
+xpilot-ng (1:4.7.1-2.0cvs1) unstable; urgency=low
 
   * Incremented version# and changed maintainer so there's no confusion
     between this version and the official Debian version.
