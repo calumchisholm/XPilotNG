@@ -1,3 +1,9 @@
+xpilot-ng (1:4.7.1-2) unstable; urgency=low
+
+  * Use ship_red.ppm to create an xpilot-ng menu icon.  (Closes: #275646).
+
+ -- Ben Armstrong <synrg@sanctuary.nslug.ns.ca>  Wed, 17 Aug 2005 07:00:25 -0300
+
 xpilot-ng (1:4.7.1-1) unstable; urgency=low
 
   * New upstream release.
