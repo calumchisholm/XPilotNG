@@ -203,6 +203,9 @@ class App(wx.App):
 		frame = MainFrame(None, -1, "XPilot NG Control Center")
 		self.SetTopWindow(frame)
 		frame.Show(True)
+		# FIXME: If you have a gnome-panel open, the fullscreen app window opens under it.
+		# Make the app open on top instead.
+		frame.ShowFullScreen(True)
 		return True
 
 def main():
