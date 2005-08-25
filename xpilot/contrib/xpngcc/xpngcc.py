@@ -75,10 +75,17 @@ class MenuPanel(wx.Panel):
 
 class  MapEditorMenu(MenuPanel):
 	def __init__(self, parent):
-		MenuPanel.__init__(self, parent,
-						   [ ("  Polygon map editor  ", self.onPoly),
-							 ("Block map editor", self.onBlock),
-							 ])
+		b = []
+		if config.javaws:
+			b.append(("  Polygon map editor  ", self.onPoly))
+		if config.mapedit:
+			b.append(("Block map editor", self.onBlock))
+		if b:
+			MenuPanel.__init__(self, parent, b)
+		else:
+			# FIXME: raise some error; we shouldn't even create this menu if
+			# we have nothing to put in it
+			pass
 	def onPoly(self, evt):
 		xputil.Process(self, (config.javaws, config.jxpmap_url)).run()
 	def onBlock(self, evt):
