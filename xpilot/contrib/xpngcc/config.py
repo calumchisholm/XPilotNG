@@ -1,24 +1,37 @@
 import os
 import sys
 
+def which(app):
+	# Does this work on Windows?
+	dirnames = os.environ["PATH"].split(os.path.pathsep)
+	for dirname in dirnames:
+	   filename = os.path.join(dirname, app)
+	   if (os.access(filename, os.X_OK) and
+	       os.path.isfile(filename)):
+		 return filename
+	return None
+
 meta = ('meta.xpilot.org', 4401)
-client = 'xpilot-ng-x11'
+client = which('xpilot-ng-x11')
 if (sys.platform == "win32"):
 	server = '"C:\\Program Files\\XPilotNG-SDL\\xpilot-ng-server"'
 else:
-	server = 'xpilot-ng-server'
+	server = which('xpilot-ng-server')
 if (sys.platform == "win32"):
 	xpilotrc = 'C:\\Progra~1\\XPilotNG-SDL\\xpilotrc.txt'
 else:
 	xpilotrc = os.environ['HOME'] + '/.xpilotrc'
 record_url = 'http://xpilot.sourceforge.net/ballruns/'
-xpreplay = 'xpilot-ng-replay'
+xpreplay = which('xpilot-ng-replay')
 jxpmap_url = 'http://xpilot.sf.net/jxpmap/jxpmap.jnlp'
-javaws = 'javaws'
-mapedit = 'xpilot-ng-xp-mapedit'
+javaws = which('javaws')
+mapedit = which('xpilot-ng-xp-mapedit')
 irc_server = 'irc.freenode.net'
 irc_channel = '#xpilot'
 if (sys.platform == "win32"):
 	mapdir = 'C:\\Progra~1\\XPilotNG-SDL\\lib\\maps'
 else:
 	mapdir = '/usr/local/share/xpilot-ng/maps'
+
+
+
