@@ -12,7 +12,9 @@ def which(app):
 	return None
 
 meta = ('meta.xpilot.org', 4401)
-client = which('xpilot-ng-x11')
+client_x11 = which('xpilot-ng-x11')
+client_sdl = which('xpilot-ng-sdl')
+client = client_x11
 if (sys.platform == "win32"):
 	server = '"C:\\Program Files\\XPilotNG-SDL\\xpilot-ng-server"'
 else:

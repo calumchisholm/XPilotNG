@@ -7,6 +7,7 @@ import wx.lib.mixins.listctrl as listmix
 import socket
 import StringIO
 from string import atoi
+import config
 
 def fetch(meta):
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -78,11 +79,14 @@ class Panel(wx.Panel):
 		self.playerList.InsertColumn(0, "Players")
 		refresh = wx.Button(self, -1, "Refresh")
 		self.Bind(wx.EVT_BUTTON, self.OnRefresh, refresh)
-		join = wx.Button(self, -1, "Join")
-		self.Bind(wx.EVT_BUTTON, self.OnJoin, join)
 		box1 = wx.BoxSizer(wx.HORIZONTAL)
-		box1.Add(join, 0, wx.ALL, 5)
-		box1.Add((5,0))
+		if config.client:
+			join = wx.Button(self, -1, "Join")
+			self.Bind(wx.EVT_BUTTON, self.OnJoin, join)
+			box1.Add(join, 0, wx.ALL, 5)
+			box1.Add((5,0))
+		else:
+			box1.Add((100,0))
 		box1.Add(refresh, 0, wx.ALL, 5)
 		box2 = wx.BoxSizer(wx.VERTICAL)
 		box2.Add(self.detailList, 2, wx.EXPAND)
