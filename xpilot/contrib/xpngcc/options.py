@@ -190,15 +190,16 @@ class BasicServerOptionsPanel(wx.Panel):
 		sz1.Add(l, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5)
 		maps = filter(lambda x: x[-4:-1] == '.xp' or x[-3:] == '.xp', 
 					  os.listdir(mapdir))
-		self.selected = maps[0]
-		self.choice = wx.Choice(self, -1, choices=maps)
-		self.Bind(wx.EVT_CHOICE, self.on_select, self.choice)
-		sz1.Add(self.choice, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5)
-		b = wx.Button(self, -1, "Start")
-		self.Bind(wx.EVT_BUTTON, self.start, b)
-		sz1.Add(b, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5)
-		sz1.Add((0,0), wx.EXPAND, 0, 0)
-		self.SetSizer(sz1)
+		if maps:
+			self.selected = maps[0]
+			self.choice = wx.Choice(self, -1, choices=maps)
+			self.Bind(wx.EVT_CHOICE, self.on_select, self.choice)
+			sz1.Add(self.choice, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5)
+			b = wx.Button(self, -1, "Start")
+			self.Bind(wx.EVT_BUTTON, self.start, b)
+			sz1.Add(b, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5)
+			sz1.Add((0,0), wx.EXPAND, 0, 0)
+			self.SetSizer(sz1)
 	def on_select(self, evt):
 		self.selected = evt.GetString()
 	def start(self, evt):

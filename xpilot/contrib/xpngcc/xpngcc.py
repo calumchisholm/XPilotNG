@@ -125,14 +125,15 @@ class ToolsMenu(MenuPanel):
 
 class MainMenu(MenuPanel):
 	def __init__(self, parent):
-		MenuPanel.__init__(self, parent,
-						   [ ("    Internet servers    ", self.onInternet), 
-							 ("Start server", self.onStart),
-							 (),
-							 ("Tools", self.onTools),
-							 ("Support and Chat", self.onChat),
-							 ("Quit", self.onQuit),
-							 ])
+		b = []
+		b.append(("    Internet servers    ", self.onInternet))
+		if config.server:
+			b.append(("Start server", self.onStart))
+		b.append(())
+		b.append(("Tools", self.onTools))
+		b.append(("Support and Chat", self.onChat))
+		b.append(("Quit", self.onQuit))
+		MenuPanel.__init__(self, parent, b)
 	def onInternet(self, evt):
 		meta = metaui.Panel(self.frame,
 							config.meta,
