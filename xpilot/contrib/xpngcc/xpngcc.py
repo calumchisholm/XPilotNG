@@ -93,12 +93,18 @@ class  MapEditorMenu(MenuPanel):
 
 class ToolsMenu(MenuPanel):
 	def __init__(self, parent):
-		MenuPanel.__init__(self, parent,
-						   [ ("  Client configuration  ", self.onClientConfig),
-							 ("XP-Replay", self.onXPReplay),
-							 ("Recordings", self.onRecordings),
-							 ("Map editor", self.onMapEditor),
-							 ])
+		b = []
+		b.append(("  Client configuration  ", self.onClientConfig))
+		if config.xpreplay:
+			b.append(("XP-Replay", self.onXPReplay))
+			b.append(("Recordings", self.onRecordings))
+		if config.mapedit and config.javaws:
+			b.append(("Map editor", self.onMapEditor))
+		elif config.mapedit:
+			b.append(("Block map editor", self.onBlock))
+		elif config.javaws:
+			b.append(("Polygon map editor", self.onPoly))
+		MenuPanel.__init__(self, parent, b)
 	def onMapEditor(self, evt):
 		self.show(MapEditorMenu(self.frame))
 	def onRecordings(self, evt):
@@ -112,6 +118,10 @@ class ToolsMenu(MenuPanel):
 	def onClientConfig(self, evt):
 		self.show(options.ClientOptionsPanel(
 				self.frame, config.client, config.xpilotrc))
+	def onPoly(self, evt):
+		xputil.Process(self, (config.javaws, config.jxpmap_url)).run()
+	def onBlock(self, evt):
+		xputil.Process(self, (config.mapedit,)).run()
 
 class MainMenu(MenuPanel):
 	def __init__(self, parent):
