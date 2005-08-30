@@ -132,9 +132,9 @@ class MainMenu(MenuPanel):
 		b.append(("    Internet servers    ", self.onInternet))
 		if config.server:
 			b.append(("Start server", self.onStart))
-		b.append(())
 		b.append(("Tools", self.onTools))
 		b.append(("Support and Chat", self.onChat))
+		b.append(("Windowed", self.onWindowed))
 		b.append(("Quit", self.onQuit))
 		MenuPanel.__init__(self, parent, b)
 	def onInternet(self, evt):
@@ -156,6 +156,16 @@ class MainMenu(MenuPanel):
 	def onChat(self, evt):
 		self.show(ircui.IrcPanel(self.frame, config.irc_server, get_nick(), 
 								 config.irc_channel))
+	def onWindowed(self, evt):
+		# FIXME: assert self.frame.fullscreen=True
+		# FIXME: remove "Windowed" button & replace with "Fullscreen"
+		self.frame.ShowFullScreen(False)
+		self.frame.fullscreen=False
+	def onFullscreen(self, evt):
+		# FIXME: assert self.frame.fullscreen=False
+		# FIXME: remove "Fullscreen" button & replace with "Windowed"
+		self.frame.ShowFullScreen(True)
+		self.frame.fullscreen=True
 
 class MainFrame(wx.Frame):
 	def __init__(self, *args, **kwds):
@@ -170,6 +180,7 @@ class MainFrame(wx.Frame):
 		self.history = []
 		self.contentPanel = None
 		self.setContentPanel(MainMenu(self))
+		self.fullscreen = None
 	def setContentPanel(self, p):
 		if self.contentPanel:
 			self.GetSizer().Detach(self.contentPanel)
@@ -225,6 +236,7 @@ class App(wx.App):
 		frame = MainFrame(None, -1, "XPilot NG Control Center")
 		self.SetTopWindow(frame)
 		frame.Show(True)
+		frame.fullscreen=True
 		frame.ShowFullScreen(True)
 		return True
 
