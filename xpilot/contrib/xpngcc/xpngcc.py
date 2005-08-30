@@ -34,8 +34,10 @@ class RecordingsPanel(html.HtmlWindow):
 class MenuPanel(wx.Panel):
 	def __init__(self, parent, items):
 		wx.Panel.__init__(self, parent)
+		self.SetBackgroundColour(wx.BLACK)
 		self.frame = parent
 		p = wx.Panel(self)
+		p.SetBackgroundColour(wx.BLACK)
 		s = wx.BoxSizer(wx.VERTICAL)
 		p.SetSizer(s)
 		items.insert(0, ())
@@ -59,6 +61,7 @@ class MenuPanel(wx.Panel):
 		s.Add(self.makeBottomPanel(), 0, wx.EXPAND, 0)	
 	def makeBottomPanel(self):
 		p = wx.Panel(self)
+		p.SetBackgroundColour(wx.BLACK)
 		s = wx.FlexGridSizer(1, 3)
 		s.Add(wx.StaticBitmap(
 				p, -1, wx.Bitmap("swgrid.png", wx.BITMAP_TYPE_ANY)),
@@ -159,7 +162,7 @@ class MainFrame(wx.Frame):
 		kwds["style"] = wx.DEFAULT_FRAME_STYLE
 		wx.Frame.__init__(self, *args, **kwds)
 		self.SetSize((800, 650))
-		self.SetBackgroundColour(wx.Colour(0, 0, 0))
+		self.SetBackgroundColour(wx.BLACK)
 		s = wx.BoxSizer(wx.VERTICAL)
 		s.Add(self.makeTopPanel(), 0, wx.EXPAND, 0)
 		self.SetAutoLayout(True)
@@ -180,6 +183,7 @@ class MainFrame(wx.Frame):
 		self.Layout()
 	def makeTopPanel(self):
 		p = wx.Panel(self)
+		p.SetBackgroundColour(wx.BLACK)
 		s = wx.FlexGridSizer(1, 5)
 		s.Add(wx.StaticBitmap(
 				p, -1, wx.Bitmap("nwgrid.png", wx.BITMAP_TYPE_ANY)),
@@ -221,8 +225,6 @@ class App(wx.App):
 		frame = MainFrame(None, -1, "XPilot NG Control Center")
 		self.SetTopWindow(frame)
 		frame.Show(True)
-		# FIXME: If you have a gnome-panel open, the fullscreen app window opens under it.
-		# Make the app open on top instead.
 		frame.ShowFullScreen(True)
 		return True
 
