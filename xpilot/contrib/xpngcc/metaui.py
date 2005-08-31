@@ -77,6 +77,13 @@ class Panel(wx.Panel):
 		self.detailList.Layout()
 		self.playerList = AutoSizeListCtrl(self, -1)
 		self.playerList.InsertColumn(0, "Players")
+		box0 = wx.BoxSizer(wx.HORIZONTAL)
+		# FIXME: add a "mute" checkbox to box0
+		if (config.client_sdl and config.client_x11):
+			joinclient = wx.RadioBox(self, label="Client", 
+				choices=["Modern", "Classic"])
+			self.Bind(wx.EVT_RADIOBOX, self.OnJoinClient, joinclient)
+			box0.Add(joinclient, 0, wx.ALL)
 		refresh = wx.Button(self, -1, "Refresh")
 		self.Bind(wx.EVT_BUTTON, self.OnRefresh, refresh)
 		box1 = wx.BoxSizer(wx.HORIZONTAL)
@@ -91,6 +98,8 @@ class Panel(wx.Panel):
 		box2 = wx.BoxSizer(wx.VERTICAL)
 		box2.Add(self.detailList, 2, wx.EXPAND)
 		box2.Add(self.playerList, 1, wx.EXPAND)
+		box2.Add((1, 5))
+		box2.Add(box0)
 		box2.Add((1, 5))
 		box2.Add(box1)
 		box3 = wx.BoxSizer(wx.HORIZONTAL)
@@ -116,6 +125,10 @@ class Panel(wx.Panel):
 		self.serverList.SetItemState(0, wx.LIST_STATE_SELECTED, 
 									 wx.LIST_STATE_SELECTED )
 		self.Layout()
+
+	def OnJoinClient(self, evt):
+		# FIXME: implement join client radio button event
+		pass
 
 	def OnSelect(self, evt):
 		s = self.servers[evt.GetIndex()]
