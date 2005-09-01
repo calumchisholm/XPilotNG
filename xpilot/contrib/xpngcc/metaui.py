@@ -80,10 +80,11 @@ class Panel(wx.Panel):
 		box0 = wx.BoxSizer(wx.HORIZONTAL)
 		# FIXME: add a "mute" checkbox to box0
 		if (config.client_sdl and config.client_x11):
-			joinclient = wx.RadioBox(self, label="Client", 
+			self.client.prog = config.client = config.client_sdl
+			self.joinclient = wx.RadioBox(self, label="Client", 
 				choices=["Modern", "Classic"])
-			self.Bind(wx.EVT_RADIOBOX, self.OnJoinClient, joinclient)
-			box0.Add(joinclient, 0, wx.ALL)
+			self.Bind(wx.EVT_RADIOBOX, self.OnJoinClient, self.joinclient)
+			box0.Add(self.joinclient, 0, wx.ALL)
 		refresh = wx.Button(self, -1, "Refresh")
 		self.Bind(wx.EVT_BUTTON, self.OnRefresh, refresh)
 		box1 = wx.BoxSizer(wx.HORIZONTAL)
@@ -127,8 +128,11 @@ class Panel(wx.Panel):
 		self.Layout()
 
 	def OnJoinClient(self, evt):
-		# FIXME: implement join client radio button event
-		pass
+		preferredClientString = self.joinclient.GetStringSelection()
+		if preferredClientString == 'Modern':
+			self.client.prog = config.client_sdl
+		else:
+			self.client.prog = config.client_x11
 
 	def OnSelect(self, evt):
 		s = self.servers[evt.GetIndex()]
