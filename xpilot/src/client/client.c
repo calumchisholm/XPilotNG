@@ -156,12 +156,6 @@ int	clientPortEnd = 0;	/* Last one (these are for firewalls) */
 byte	lose_item;		/* index for dropping owned item */
 int	lose_item_active;	/* one of the lose keys is pressed */
 
-#ifdef SOUND
-char 	sounds[PATH_MAX];	/* audio mappings */
-char 	audioServer[PATH_MAX];	/* audio server */
-int 	maxVolume;		/* maximum volume (in percent) */
-#endif /* SOUND */
-
 static double       teamscores[MAX_TEAMS];
 static cannontime_t *cannons = NULL;
 static int          num_cannons = 0;

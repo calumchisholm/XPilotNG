@@ -1,4 +1,4 @@
-heyafterburner_pickup		waiting.wav
+afterburner_pickup		waiting.wav
 armor_pickup			waiting.wav
 asteroid_hit			failure.wav
 asteroid_break			popclick.wav

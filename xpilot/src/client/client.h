@@ -283,7 +283,6 @@ typedef struct {
 typedef struct {
     short		x0, y0, x1, y1;
     u_byte		tractor;
-    u_byte		pad[3];
 } connector_t;
 
 typedef struct {
@@ -294,7 +293,6 @@ typedef struct {
 typedef struct {
     short		x, y, dir;
     unsigned char	len;
-    u_byte		pad[1];
 } missile_t;
 
 typedef struct {
@@ -306,7 +304,6 @@ typedef struct {
     short		x, y, id, dir;
     u_byte		shield, cloak, eshield;
     u_byte		phased, deflector;
-    u_byte		pad[3];
 } ship_t;
 
 typedef struct {
@@ -367,13 +364,11 @@ typedef struct {
 typedef struct {
     short		x, y;
     u_byte		wrecktype, size, rotation;
-    u_byte		pad[1];
 } wreckage_t;
 
 typedef struct {
     short		x, y;
     u_byte		type, size, rotation;
-    u_byte		pad[1];
 } asteroid_t;
 
 typedef struct {
@@ -580,12 +575,6 @@ extern int	baseWarningType;	/* Which type of base warning you prefer */
 extern int	maxCharsInNames;
 extern byte	lose_item;		/* flag and index to drop item */
 extern int	lose_item_active;	/* one of the lose keys is pressed */
-
-#ifdef SOUND
-extern char 	sounds[PATH_MAX];	/* audio mappings */
-extern char 	audioServer[PATH_MAX];	/* audio server */
-extern int 	maxVolume;		/* maximum volume (in percent) */
-#endif /* SOUND */
 
 /* mapdata accessible to outside world */
 

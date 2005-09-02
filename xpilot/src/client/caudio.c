@@ -32,7 +32,12 @@
 
 #define	MAX_RANDOM_SOUNDS	6
 
-static int	audioEnabled = 0;
+/* options */
+static bool	audioEnabled = false;
+bool	sound;
+char 	soundFile[PATH_MAX];	/* audio mappings */
+int 	maxVolume;		/* maximum volume (in percent) */
+/* options end */
 
 static struct {
     char	**filenames;
@@ -40,19 +45,32 @@ static struct {
     int		nsounds;
 } table[MAX_SOUNDS];
 
+static bool audioIsEnabled(void)
+{
+    if (!audioEnabled)
+	return false;
+    if (!sound)
+	return false;
+    if (maxVolume <= 0)
+	return false;
+    return true;
+}
 
 void audioInit(char *display)
 {
     FILE           *fp;
-    char            buf[512], *file, *sound, *ifile;
+    char            buf[512], *file, *soundstr, *ifile;
     int             i, j;
 
+#if 0
+    /* kps - let's not do this, otherwise sounds can't be enabled ingame */
     if (!maxVolume) {
-	printf("maxVolume is 0: no sound.\n");
+	xpinfo("maxVolume is 0: no sound.\n");
 	return;
     }
-    if (!(fp = fopen(sounds, "r"))) {
-	error("Could not open soundfile %s", sounds);
+#endif
+    if (!(fp = fopen(soundFile, "r"))) {
+	error("Could not open soundfile %s", soundFile);
 	return;
     }
 
@@ -61,13 +79,14 @@ void audioInit(char *display)
 	if (*buf == '\n' || *buf == '#')
 	    continue;
 
-	sound = strtok(buf, " \t");
+	soundstr = strtok(buf, " \t");
 	file = strtok(NULL, " \t\n");
 
 	for (i = 0; i < MAX_SOUNDS; i++)
-	    if (!strcmp(sound, soundNames[i])) {
+	    if (!strcmp(soundstr, soundNames[i])) {
 		size_t filename_ptrs_size = sizeof(char *) * MAX_RANDOM_SOUNDS;
 		size_t private_ptrs_size = sizeof(void *) * MAX_RANDOM_SOUNDS;
+
 		table[i].filenames = (char **)malloc(filename_ptrs_size);
 		table[i].priv = (void **)malloc(private_ptrs_size);
 		memset(table[i].priv, 0, private_ptrs_size);
@@ -93,13 +112,13 @@ void audioInit(char *display)
 	    }
 
 	if (i == MAX_SOUNDS)
-	    fprintf(stderr, "Unknown sound '%s' (ignored)\n", sound);
+	    warn("audioInit: Unknown sound '%s' (ignored)", soundstr);
 
     }
 
     fclose(fp);
 
-    audioEnabled = !audioDeviceInit(audioServer[0] ? audioServer : display);
+    audioEnabled = !audioDeviceInit(display);
 }
 
 void audioCleanup(void)
@@ -118,13 +137,13 @@ void audioCleanup(void)
 
 void audioEvents(void)
 {
-    if (audioEnabled)
+    if (audioIsEnabled())
 	audioDeviceEvents();
 }
 
 void audioUpdate(void)
 {
-    if (audioEnabled)
+    if (audioIsEnabled())
 	audioDeviceUpdate();
 }
 
@@ -132,7 +151,7 @@ int Handle_audio(int type, int volume)
 {
     int		pick = 0;
 
-    if (!audioEnabled || !table[type].filenames)
+    if (!audioIsEnabled() || !table[type].filenames)
 	return 0;
 
     if (table[type].nsounds > 1)

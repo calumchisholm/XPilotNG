@@ -1313,9 +1313,9 @@ xp_option_t default_options[] = {
 
 #ifdef SOUND
     XP_STRING_OPTION(
-	"sounds",
+	"soundFile",
 	CONF_SOUNDFILE,
-	sounds, sizeof sounds,
+	soundFile, sizeof soundFile,
 	NULL, NULL, NULL,
 	XP_OPTFLAG_DEFAULT,
 	"Specifies the sound file.\n"),
@@ -1324,19 +1324,19 @@ xp_option_t default_options[] = {
 	"maxVolume",
 	100,
 	0,
-	255,
+	100,
 	&maxVolume,
 	NULL,
 	XP_OPTFLAG_CONFIG_DEFAULT,
-	"Specifies the volume to play sounds with.\n"),
+	"Specifies the volume to play sounds with (0-100%%).\n"),
 
-    XP_STRING_OPTION(
-	"audioServer",
-	"",
-	audioServer, sizeof audioServer,
-	NULL, NULL, NULL,
-	XP_OPTFLAG_DEFAULT,
-	"Specifies the audio server to use.\n"),
+    XP_BOOL_OPTION(
+	"sound",
+	true,
+	&sound,
+	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
+	"Is sound enabled? (set to false to mute client).\n"),
 #endif
 
 };

@@ -52,7 +52,7 @@ typedef struct sound {
 
 static sound_t *ring;
 static sound_t *looping;
-static sound_t sound[MAX_SOUNDS];
+static sound_t soundinfo[MAX_SOUNDS];
 static ALuint  source[MAX_SOUNDS];
 
 
@@ -144,13 +144,13 @@ int audioDeviceInit(char *display)
 	return -1;
     }
     for (i = 0; i < MAX_SOUNDS; i++) {
-	sound[i].sample = NULL;
-	sound[i].volume = 0;
-	sound[i].updated = 0;
-	sound[i].source = source[i];
-	sound[i].next = &sound[(i + 1) % MAX_SOUNDS];
+	soundinfo[i].sample = NULL;
+	soundinfo[i].volume = 0;
+	soundinfo[i].updated = 0;
+	soundinfo[i].source = source[i];
+	soundinfo[i].next = &soundinfo[(i + 1) % MAX_SOUNDS];
     }
-    ring = sound;
+    ring = soundinfo;
     looping = NULL;
 
     return 0;

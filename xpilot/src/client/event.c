@@ -312,6 +312,14 @@ static bool Key_press_toggle_record(void)
     return false;	/* server doesn't need to know */
 }
 
+static bool Key_press_toggle_sound(void)
+{
+#ifdef SOUND
+    sound = !sound;
+#endif
+    return false;	/* server doesn't need to know */
+}
+
 static bool Key_press_msgs_stdout(void)
 {
     Print_messages_to_stdout();
@@ -528,6 +536,9 @@ bool Key_press(keys_t key)
 
     case KEY_TOGGLE_RECORD:
 	return Key_press_toggle_record();
+
+    case KEY_TOGGLE_SOUND:
+	return Key_press_toggle_sound();
 
     case KEY_TOGGLE_RADAR_SCORE:
 	return Key_press_toggle_radar_score();
@@ -1247,6 +1258,14 @@ xp_option_t key_options[] = {
 	"KP_5",
 	KEY_TOGGLE_RECORD,
 	"Toggle recording of session (see recordFile).\n"),
+
+#ifdef SOUND
+    XP_KEY_OPTION(
+	"keyToggleSound",
+	"",
+	KEY_TOGGLE_SOUND,
+	"Toggle sound. Changes value of option 'sound'.\n"),
+#endif
 
     XP_KEY_OPTION(
 	"keyToggleRadarScore",

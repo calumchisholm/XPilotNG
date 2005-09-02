@@ -26,9 +26,6 @@
 #ifndef AUDIO_H
 #define AUDIO_H
 
-#define SOUND_MAX_VOLUME	100
-#define SOUND_MIN_VOLUME	10
-
 enum {
     START_SOUND,
     FIRE_SHOT_SOUND,
@@ -138,7 +135,7 @@ static const char    *soundNames[] =
     "wideangle_shot_pickup",
     "sensor_pack_pickup",
     "back_shot_pickup",
-    "smart_shot_pickup",
+    "rocket_pack_pickup",
     "cloaking_device_pickup",
     "energy_pack_pickup",
     "mine_pack_pickup",
