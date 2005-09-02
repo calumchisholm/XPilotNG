@@ -2798,9 +2798,11 @@ void Move_player(player_t *pl)
 			 * happens too often. */
 			/* At the moment it can be caused by illegal shipshapes
 			 * too, because they're not checked */
+#if 0
 			sprintf(msg, "%s got stuck (Illegal shape? "
 				"Shapes aren't checked) [*Notice*]", pl->name);
 			Set_message(msg);
+#endif
 			mv.delta.cx = 0;
 			mv.delta.cy = 0;
 			pl->vel.x = 0;
