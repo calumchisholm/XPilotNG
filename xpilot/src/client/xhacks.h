@@ -41,6 +41,31 @@ static void Disable_emulate3buttons(bool disable, void* display);
 static void Disable_emulate3buttons(bool disable, void* display)
 {
 #ifdef HAVE_XF86MISC
+#if 1
+    /* kps - Lets not try to disable emulate3buttons. Some users have buggy
+     * XF86 implementations which can't enable the disabled emulation
+     * when the client quits.
+     */
+
+    XF86MiscMouseSettings m;
+    Status status;
+
+    if (!disable)
+	return;
+
+    status = XF86MiscGetMouseSettings((Display*) display, &m);
+    if (status != 1) {
+	warn("Failed to retrieve mouse settings from X server.");
+	return;
+    }
+
+    if (m.emulate3buttons) {
+	warn("*** Emulate3Buttons is enabled.");
+	warn("*** This may cause lost and/or laggy mouse button events.");
+	warn("*** More info at: http://xpilot.sourceforge.net/faq.html");
+	return;
+    }
+#else
 /*#define XF86DEBUG*/
     static bool first_run = true;
     static bool working = true;
@@ -130,7 +155,8 @@ static void Disable_emulate3buttons(bool disable, void* display)
     }
     
     first_run = false;
-    
+
+#endif
 #endif
 }
 
