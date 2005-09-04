@@ -85,6 +85,10 @@ class Panel(wx.Panel):
 				choices=["Modern", "Classic"])
 			self.Bind(wx.EVT_RADIOBOX, self.OnJoinClient, self.joinclient)
 			box0.Add(self.joinclient, 0, wx.ALL)
+		elif config.client_sdl:
+			self.client.prog = config.client = config.client_sdl
+		else:
+			self.client.prog = config.client = config.client_x11
 		refresh = wx.Button(self, -1, "Refresh")
 		self.Bind(wx.EVT_BUTTON, self.OnRefresh, refresh)
 		box1 = wx.BoxSizer(wx.HORIZONTAL)
