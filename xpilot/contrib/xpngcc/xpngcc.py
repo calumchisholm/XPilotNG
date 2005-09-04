@@ -134,7 +134,8 @@ class MainMenu(MenuPanel):
 			b.append(("Start server", self.onStart))
 		b.append(("Tools", self.onTools))
 		b.append(("Support and Chat", self.onChat))
-		b.append(("Windowed", self.onWindowed))
+# FIXME: This should be a fullscreen widget in the corner instead.
+#		b.append(("Windowed", self.onWindowed))
 		b.append(("Quit", self.onQuit))
 		MenuPanel.__init__(self, parent, b)
 	def onInternet(self, evt):
@@ -236,8 +237,10 @@ class App(wx.App):
 		frame = MainFrame(None, -1, "XPilot NG Control Center")
 		self.SetTopWindow(frame)
 		frame.Show(True)
-		frame.fullscreen=True
-		frame.ShowFullScreen(True)
+# FIXME: We can only default to fullscreen when we support switching back
+#        and forth between fullscreen & windowed.
+#		frame.fullscreen=True
+#		frame.ShowFullScreen(True)
 		return True
 
 def main():
