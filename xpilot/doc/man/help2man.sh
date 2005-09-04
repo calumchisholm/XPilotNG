@@ -27,3 +27,6 @@ help2man $OPTS --name="Playback an XPilot session." --section=6 --manual=Games -
 test ! -z "$(which xpilot-ng-xp-mapedit)" && \
 echo "Making manpage for xpilot-ng-xp-mapedit ..." && \
 help2man $OPTS --name="Edit block based XPilot maps." --section=6 --manual=Games --source=xpilot.sourceforge.net xpilot-ng-xp-mapedit > xpilot-ng-xp-mapedit.man
+# change /home/kps to /usr/local in man files
+# assuming PREFIX was /home/kps
+for i in *.man; do sed -i 's/\/home\/kps/\/usr\/local/g' "$i"; done

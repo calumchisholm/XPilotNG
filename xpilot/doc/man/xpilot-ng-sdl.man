@@ -439,13 +439,13 @@ Where "myshipshapename" should be the "name:" or "NM:" of
 one of the shipshapes defined in /home/myself/.shipshapes.
 Each shipshape definition should be defined on only one line,
 where all characters up to the first left parenthesis don't matter.
-The default value is: /home/kps/share/xpilot\-ng/shipshapes.txt.
+The default value is: /usr/local/share/xpilot\-ng/shipshapes.txt.
 .HP
 \fB\-texturePath\fR <value>
 .IP
 Search path for texture files.
 This is a list of one or more directories separated by colons.
-The default value is: /home/kps/share/xpilot\-ng/textures/.
+The default value is: /usr/local/share/xpilot\-ng/textures/.
 .HP
 \fB\-clientRankFile\fR <value>
 .IP
@@ -467,7 +467,7 @@ There is no default value for this option.
 \fB\-soundFile\fR <value>
 .IP
 Specifies the sound file.
-The default value is: /home/kps/share/xpilot\-ng/sound/sounds.txt.
+The default value is: /usr/local/share/xpilot\-ng/sound/sounds.txt.
 .HP
 \fB\-maxVolume\fR <value>
 .IP
@@ -1134,7 +1134,7 @@ The default value is: 16.
 \fB\-TTFont\fR <value>
 .IP
 Set the font to use.
-The default value is: /home/kps/share/xpilot\-ng/fonts/FreeSansBoldOblique.ttf.
+The default value is: /usr/local/share/xpilot\-ng/fonts/FreeSansBoldOblique.ttf.
 .HP
 \fB\-messagesColorRGBA\fR <value>
 .IP
