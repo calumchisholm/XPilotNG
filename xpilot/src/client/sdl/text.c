@@ -415,6 +415,7 @@ bool render_text(font_data *ft_font, const char *text, string_tex_t *string_tex)
 	    
 	    Arraylist_add(string_tex->tex_list,&tex);
 	}
+	SDL_FreeSurface(string_glyph);
     } else {
     	printf("TTF_RenderText_Blended failed for [%s]\n",text);
 	return false;
