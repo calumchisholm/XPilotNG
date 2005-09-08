@@ -51,7 +51,7 @@ static inline int Arraylist_get_max_elements(arraylist_t *alp)
 }
 
 arraylist_t *Arraylist_alloc(size_t element_size);
-void Arraylist_free(arraylist_t *alp, int ind);
+void Arraylist_free(arraylist_t *alp);
 
 /*
  * Removes all of the elements from this list by setting number

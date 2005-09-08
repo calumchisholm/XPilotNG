@@ -118,3 +118,11 @@ arraylist_t *Arraylist_alloc(size_t element_size)
  failed:
     return NULL;
 }
+
+void Arraylist_free(arraylist_t *alp)
+{
+    assert(alp != NULL);
+    assert(alp->elements != NULL);
+    XFREE(alp->elements);
+    XFREE(alp);
+}
