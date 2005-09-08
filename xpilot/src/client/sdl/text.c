@@ -519,11 +519,10 @@ void free_string_texture(string_tex_t *string_tex)
 	    	tex = *((tex_t *)Arraylist_get(string_tex->tex_list,i));
 		glDeleteTextures(1,&(tex.texture));
 	    }
-	    free(string_tex->tex_list);
+	    Arraylist_free(string_tex->tex_list);
 	    string_tex->tex_list = NULL;
 	}
-	if (string_tex->text) free(string_tex->text);
-	string_tex->text = NULL;
+	XFREE(string_tex->text);
     }
 }
 
