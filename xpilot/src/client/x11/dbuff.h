@@ -29,9 +29,7 @@
 #include "xpcommon.h"
 
 #ifdef DBE
-#  ifdef HAVE_X11_EXTENSIONS_XDBE_H
-#    include <X11/extensions/Xdbe.h>
-#  endif
+#  include <X11/extensions/Xdbe.h>
 #  undef MBX
 #else
 #  undef XdbeBackBuffer
@@ -39,9 +37,7 @@
 #endif
 
 #ifdef MBX
-#  ifdef HAVE_X11_EXTENSIONS_MULTIBUF_H
-#    include <X11/extensions/multibuf.h>
-#  endif
+#  include <X11/extensions/multibuf.h>
 #else
 #   undef Multibuffer
 #   define Multibuffer	unsigned int
