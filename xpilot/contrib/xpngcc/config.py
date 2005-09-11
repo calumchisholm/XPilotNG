@@ -34,6 +34,5 @@ if (sys.platform == "win32"):
 	mapdir = 'C:\\Progra~1\\XPilotNG-SDL\\lib\\maps'
 else:
 	mapdir = '/usr/local/share/xpilot-ng/maps'
-
-
+png_path = os.path.dirname(os.path.abspath(__file__))
 

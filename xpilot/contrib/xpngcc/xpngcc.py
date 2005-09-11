@@ -64,12 +64,14 @@ class MenuPanel(wx.Panel):
 		p.SetBackgroundColour(wx.BLACK)
 		s = wx.FlexGridSizer(1, 3)
 		s.Add(wx.StaticBitmap(
-				p, -1, wx.Bitmap("swgrid.png", wx.BITMAP_TYPE_ANY)),
-			  0, 0, 0)
+			p, -1,
+			wx.Bitmap(os.path.join(config.png_path, "swgrid.png"),
+			wx.BITMAP_TYPE_ANY)), 0, 0, 0)
 		s.Add((0,0), 0, 0, 0)
 		s.Add(wx.StaticBitmap(
-				p, -1, wx.Bitmap("segrid.png", wx.BITMAP_TYPE_ANY)), 
-			  0, 0, 0)
+			p, -1,
+			wx.Bitmap(os.path.join(config.png_path, "segrid.png"),
+			wx.BITMAP_TYPE_ANY)), 0, 0, 0)
 		s.AddGrowableCol(1);
 		p.SetSizer(s)
 		return p
@@ -198,16 +200,19 @@ class MainFrame(wx.Frame):
 		p.SetBackgroundColour(wx.BLACK)
 		s = wx.FlexGridSizer(1, 5)
 		s.Add(wx.StaticBitmap(
-				p, -1, wx.Bitmap("nwgrid.png", wx.BITMAP_TYPE_ANY)),
-			  0, 0, 0)
+			p, -1,
+			wx.Bitmap(os.path.join(config.png_path, "nwgrid.png"),wx.BITMAP_TYPE_ANY)),
+			0, 0, 0)
 		s.Add((0,0), 0, 0, 0)
 		s.Add(wx.StaticBitmap(
-				p, -1, wx.Bitmap("logo.png", wx.BITMAP_TYPE_ANY)),
-			  0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1)
+			p, -1,
+			wx.Bitmap(os.path.join(config.png_path, "logo.png"),wx.BITMAP_TYPE_ANY)),
+			0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1)
 		s.Add((0,0), 0, 0, 0)
 		s.Add(wx.StaticBitmap(
-				p, -1, wx.Bitmap("negrid.png", wx.BITMAP_TYPE_ANY)), 
-			  0, 0, 0)
+			p, -1,
+			wx.Bitmap(os.path.join(config.png_path, "negrid.png"), wx.BITMAP_TYPE_ANY)), 
+			0, 0, 0)
 		s.AddGrowableCol(1);
 		s.AddGrowableCol(3);
 		p.SetSizer(s)
