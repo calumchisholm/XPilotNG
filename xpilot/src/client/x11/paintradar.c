@@ -695,7 +695,7 @@ static xp_option_t paintradar_options[] = {
 
     COLOR_INDEX_OPTION_WITH_SETFUNC(
 	"wallRadarColor",
-	8,
+	BLUE,
 	&wallRadarColor,
 	Set_wallRadarColor,
 	"Which color number to use for drawing walls on the radar.\n"
