@@ -692,9 +692,9 @@ static void Player_collides_with_ball(player_t *pl, ballobject_t *ball)
 			ball->ball_treasure->have = false;
 			SET_BIT(ball->obj_status, GRAVITY);
 		    }
-		    if(ball->id == NO_ID)
+		    if (ball->id == NO_ID)
 			ball->ball_owner = pl->id;
-		    else if(options.ballCollisionDetachs){
+		    else if (options.ballCollisionDetaches) {
 			Detach_ball(Player_by_id(ball->id), ball);
 			ball->ball_owner = pl->id;
 		    }

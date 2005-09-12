@@ -685,15 +685,16 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-	"ballCollisionDetachs",
-	"ballHitDetachs",
+	"ballCollisionDetaches",
+	"ballHitDetaches",
 	"false",
-	&options.ballCollisionDetachs,
+	&options.ballCollisionDetaches,
 	valBool,
 	tuner_dummy,
 	"Does a ball get freed by a collision with a player?\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },    {
+    },
+    {
 	"ballCollisions",
 	"ballCollisions",
 	"false",
