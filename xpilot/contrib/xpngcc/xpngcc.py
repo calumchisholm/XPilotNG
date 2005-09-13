@@ -99,7 +99,8 @@ class  MapEditorMenu(MenuPanel):
 class ToolsMenu(MenuPanel):
 	def __init__(self, parent):
 		b = []
-		b.append(("  Client configuration  ", self.onClientConfig))
+                if config.client:
+		        b.append(("  Client configuration  ", self.onClientConfig))
 		if config.xpreplay:
 			b.append(("XP-Replay", self.onXPReplay))
 			b.append(("Recordings", self.onRecordings))
@@ -134,7 +135,8 @@ class MainMenu(MenuPanel):
 		b.append(("    Internet servers    ", self.onInternet))
 		if config.server:
 			b.append(("Start server", self.onStart))
-		b.append(("Tools", self.onTools))
+                if config.client or config.xpreplay or config.mapedit or config.javaws:
+		        b.append(("Tools", self.onTools))
 		b.append(("Support and Chat", self.onChat))
 # FIXME: This should be a fullscreen widget in the corner instead.
 #		b.append(("Windowed", self.onWindowed))

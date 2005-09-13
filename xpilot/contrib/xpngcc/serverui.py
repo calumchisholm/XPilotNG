@@ -17,11 +17,12 @@ class Console(wx.Frame):
 		self.stop = b
 		self.Bind(wx.EVT_BUTTON, self.on_close, b)
 		bsz.Add(b, 0, wx.ALL, 5)
-		b = wx.Button(self, -1, "Join")
-		self.Bind(wx.EVT_BUTTON, self.on_join, b)
-		bsz.Add(b, 0, wx.ALL, 5)
-		b.Disable()
-		self.join = b
+                if self.client.prog:
+		        b = wx.Button(self, -1, "Join")
+		        self.Bind(wx.EVT_BUTTON, self.on_join, b)
+		        bsz.Add(b, 0, wx.ALL, 5)
+		        b.Disable()
+		        self.join = b
 		sz = wx.BoxSizer(wx.VERTICAL)
 		sz.Add(bsz, 0, 0, 0)
 		self.area = wx.TextCtrl(self, -1, style=wx.TE_READONLY|wx.TE_MULTILINE)
@@ -44,7 +45,8 @@ class Console(wx.Frame):
 				self.area.AppendText(stream.readline().decode("iso-8859-1"))
 	def attach_server(self, server):
 		self.server = server
-		self.join.Enable(True)
+                if self.client.prog:
+		        self.join.Enable(True)
 		self.stop.Enable(True)
 
 
