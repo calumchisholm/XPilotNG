@@ -579,7 +579,7 @@ int ExitApplication(HandlerInfo_t info)
     XFreeGC(display, Base_GC);
     XFreeGC(display, Cannon_GC);
     T_CloseServerConnection();
-    exit(1);
+    exit(0);
 }
 
 /***************************************************************************/
