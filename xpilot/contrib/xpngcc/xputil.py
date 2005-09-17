@@ -1,4 +1,5 @@
 import wx
+import config
 
 class Process(wx.Process):
 	def __init__(self, win, argv):
@@ -32,10 +33,16 @@ class Client(Process):
 		Process.__init__(self, win, ())
 		self.prog = prog
 	def join(self, host, port, nick=None):
+                if config.is_muted:
+                        sound = "no"
+                else:
+                        sound = "yes"
 		if nick:
-			self.cmd = "%s -name \"%s\" -port %d -join %s" % (self.prog, 
-															  nick, port, host)
+			self.cmd = "%s -name \"%s\" -port %d -join %s -sound %s" % (self.prog, 
+								  nick, port,
+                                                                  host, sound)
 		else:
-			self.cmd = "%s -port %d -join %s" % (self.prog, port, host)
+			self.cmd = "%s -port %d -join %s -sound %s" % (self.prog, port,
+                                        host, sound)
 		self.run()
 

@@ -241,6 +241,7 @@ class MainFrame(wx.Frame):
 
 class App(wx.App):
 	def OnInit(self):
+                wx.InitAllImageHandlers()
 		frame = MainFrame(None, -1, "XPilot NG Control Center")
 		self.SetTopWindow(frame)
 		frame.Show(True)

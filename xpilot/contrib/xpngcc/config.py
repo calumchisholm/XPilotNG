@@ -38,4 +38,5 @@ if (sys.platform == "win32"):
 else:
 	mapdir = '/usr/local/share/xpilot-ng/maps'
 png_path = os.path.dirname(os.path.abspath(__file__))
+is_muted = False
 

@@ -87,6 +87,10 @@ class Panel(wx.Panel):
                         self.client.prog = config.client
 			self.Bind(wx.EVT_RADIOBOX, self.OnJoinClient, self.joinclient)
 			box0.Add(self.joinclient, 0, wx.ALL)
+                        self.mute = wx.CheckBox(self, label="Mute")
+                        self.Bind(wx.EVT_CHECKBOX, self.OnMute, self.mute)
+			box0.Add((5,0))
+			box0.Add(self.mute, 0, wx.ALL)
 		elif config.client_sdl:
 			self.client.prog = config.client = config.client_sdl
 		else:
@@ -139,6 +143,9 @@ class Panel(wx.Panel):
 			self.client.prog = config.client = config.client_sdl
 		else:
 			self.client.prog = config.client = config.client_x11
+
+	def OnMute(self, evt):
+		config.is_muted = self.mute.IsChecked()
 
 	def OnSelect(self, evt):
 		s = self.servers[evt.GetIndex()]
