@@ -118,6 +118,11 @@ static bool Really_empty_space(player_t *pl, int bx, int by)
 		    && gp->type == WORMHOLE
 		    && gp->mapobj_ind == pl->wormHoleDest)
 		    group = NO_GROUP;
+	        else if (gp!=NULL
+		         && !options.targetTeamCollision
+		         && gp->type == TARGET
+		         && gp->team == pl->team)
+		         group = NO_GROUP;
 	    }
 
 	    if (group != NO_GROUP)
