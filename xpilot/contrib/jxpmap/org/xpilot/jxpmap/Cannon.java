@@ -136,7 +136,7 @@ public class Cannon extends Group {
     
     public void printXml(PrintWriter out) throws IOException {
         out.println("<Cannon x=\"" + x + "\" y=\"" + y 
-            + "\" dir=\"" + dir + "\">");
+            + "\" dir=\"" + dir + "\" team=\"" + team + "\">");
         super.printMemberXml(out);
         out.println("</Cannon>");
     }
