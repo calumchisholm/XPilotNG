@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 
-import os
+import wxversion
+wxversion.select('2.6')
 import wx
-import urllib
 import wx.html as html
+import os
+import urllib
 import metaui
 import config
 import options
