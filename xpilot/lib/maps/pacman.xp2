@@ -1,24 +1,30 @@
 <XPilotMap version="1.1">
 <GeneralOptions>
 <Option name="" value=""/>
-<Option name="maxTransporters" value="0"/>
-<Option name="wormholeStableTicks" value="1"/>
-<Option name="minRobots" value="5"/>
-<Option name="initialAfterburners" value="3"/>
-<Option name="maxECMs" value="0"/>
-<Option name="initialWideAngles" value="1"/>
-<Option name="allowRobotShields" value="yes"/>
+<Option name="shieldedMining" value="true"/>
+<Option name="shieldedItemPickup" value="true"/>
+<Option name="cannonInitialDeflectors" value="10"/>
+<Option name="cannonDeadTicks" value="1"/>
+<Option name="minRobots" value="7"/>
+<Option name="allowRobotShields" value="yes" comment="not yet implemented"/>
 <Option name="allowShields" value="no"/>
-<Option name="cannonInitialEmergencyShields" value="10"/>
 <Option name="cannonInitialArmor" value="10"/>
+<Option name="maxEmergencyShields" value="20"/>
+<Option name="cannonInitialEmergencyShields" value="20"/>
+<Option name="initialAfterburners" value="3"/>
 <Option name="initialFuel" value="1800"/>
-<Option name="limitedLives" value="no"/>
+<Option name="initialWideangles" value="1"/>
+<Option name="maxECMs" value="0"/>
+<Option name="maxTransporters" value="0"/>
+<Option name="minRobots" value="5"/>
 <Option name="targetDeadTicks" value="6000"/>
 <Option name="targetSync" value="yes"/>
 <Option name="targetTeamCollision" value="no"/>
 <Option name="teamCannons" value="yes"/>
 <Option name="teamTargets" value="yes"/>
+<Option name="limitedLives" value="false"/>
 <Option name="worldLives" value="3"/>
+<Option name="wormholeStableTicks" value="1"/>
 </GeneralOptions>
 <BmpStyle id="p2.ppm" filename="p2.ppm" scalable="yes"/>
 <EdgeStyle id="default" width="0" color="0000FF" style="0"/>
@@ -772,7 +778,7 @@
 <Offset x="-1728" y="0"/>
 </Polygon>
 </Target>
-<Cannon team="0" x="108544" y="108736" dir="32">
+<Cannon x="108544" y="108736" dir="32" team="0">
 <Polygon x="107328" y="107968" style="cannon">
 <Style state="destroyed" id="invisible"/>
 <Offset x="2368" y="0"/>
@@ -780,7 +786,7 @@
 <Offset x="-1088" y="-960"/>
 </Polygon>
 </Cannon>
-<Cannon team="0" x="100416" y="108928" dir="32">
+<Cannon x="100416" y="108928" dir="32" team="0">
 <Polygon x="99328" y="107904" style="cannon">
 <Style state="destroyed" id="invisible"/>
 <Offset x="2368" y="0"/>
@@ -788,7 +794,7 @@
 <Offset x="-1088" y="-960"/>
 </Polygon>
 </Cannon>
-<Cannon team="0" x="93376" y="108544" dir="32">
+<Cannon x="93376" y="108544" dir="32" team="0">
 <Polygon x="92288" y="107840" style="cannon">
 <Style state="destroyed" id="invisible"/>
 <Offset x="2368" y="0"/>
@@ -796,7 +802,7 @@
 <Offset x="-1088" y="-960"/>
 </Polygon>
 </Cannon>
-<Cannon team="0" x="124608" y="108800" dir="32">
+<Cannon x="124608" y="108800" dir="32" team="0">
 <Polygon x="123520" y="107968" style="cannon">
 <Style state="destroyed" id="invisible"/>
 <Offset x="2368" y="0"/>
@@ -804,7 +810,7 @@
 <Offset x="-1088" y="-960"/>
 </Polygon>
 </Cannon>
-<Cannon team="0" x="132416" y="108864" dir="32">
+<Cannon x="132416" y="108864" dir="32" team="0">
 <Polygon x="131264" y="107968" style="cannon">
 <Style state="destroyed" id="invisible"/>
 <Offset x="2368" y="0"/>
@@ -812,7 +818,7 @@
 <Offset x="-1088" y="-960"/>
 </Polygon>
 </Cannon>
-<Cannon team="0" x="116096" y="109056" dir="32">
+<Cannon x="116096" y="109056" dir="32" team="0">
 <Polygon x="115008" y="108032" style="cannon">
 <Style state="destroyed" id="invisible"/>
 <Offset x="2368" y="0"/>
@@ -820,7 +826,7 @@
 <Offset x="-1088" y="-960"/>
 </Polygon>
 </Cannon>
-<Cannon team="0" x="134558" y="115497" dir="64">
+<Cannon x="134558" y="115497" dir="64" team="0">
 <Polygon x="135037" y="114302" style="cannon">
 <Style state="destroyed" id="invisible"/>
 <Offset x="-4" y="2391"/>
@@ -828,7 +834,7 @@
 <Offset x="957" y="-1175"/>
 </Polygon>
 </Cannon>
-<Cannon team="0" x="92621" y="115851" dir="0">
+<Cannon x="92621" y="115851" dir="0" team="0">
 <Polygon x="92139" y="117049" style="cannon">
 <Style state="destroyed" id="invisible"/>
 <Offset x="4" y="-2395"/>
@@ -836,7 +842,7 @@
 <Offset x="-964" y="1185"/>
 </Polygon>
 </Cannon>
-<Cannon team="0" x="92621" y="122379" dir="0">
+<Cannon x="92621" y="122379" dir="0" team="0">
 <Polygon x="92139" y="123577" style="cannon">
 <Style state="destroyed" id="invisible"/>
 <Offset x="4" y="-2395"/>
@@ -844,7 +850,7 @@
 <Offset x="-964" y="1185"/>
 </Polygon>
 </Cannon>
-<Cannon team="0" x="134558" y="122473" dir="64">
+<Cannon x="134558" y="122473" dir="64" team="0">
 <Polygon x="135037" y="121278" style="cannon">
 <Style state="destroyed" id="invisible"/>
 <Offset x="-4" y="2391"/>
@@ -2698,6 +2704,22 @@
 <Offset x="-1728" y="0"/>
 </Polygon>
 </Target>
+<Cannon x="115776" y="130112" dir="32" team="0">
+<Polygon x="114688" y="129088" style="cannon">
+<Style state="destroyed" id="invisible"/>
+<Offset x="2368" y="0"/>
+<Offset x="-1280" y="960"/>
+<Offset x="-1088" y="-960"/>
+</Polygon>
+</Cannon>
+<Cannon x="110272" y="130240" dir="32" team="0">
+<Polygon x="109184" y="129216" style="cannon">
+<Style state="destroyed" id="invisible"/>
+<Offset x="2368" y="0"/>
+<Offset x="-1280" y="960"/>
+<Offset x="-1088" y="-960"/>
+</Polygon>
+</Cannon>
 <Target team="0">
 <Polygon x="176255" y="35178" style="target">
 <Style state="destroyed" id="invisible"/>
@@ -2710,48 +2732,9 @@
 <Offset x="-1274" y="1279"/>
 <Offset x="-1728" y="0"/>
 </Polygon>
-<Cannon team="0" x="110272" y="130240" dir="32">
-<Polygon x="109184" y="129216" style="cannon">
-<Style state="destroyed" id="invisible"/>
-<Offset x="2368" y="0"/>
-<Offset x="-1280" y="960"/>
-<Offset x="-1088" y="-960"/>
-</Polygon>
-</Cannon>
-<Cannon team="0"  x="115776" y="130112" dir="32">
-<Polygon x="114688" y="129088" style="cannon">
-<Style state="destroyed" id="invisible"/>
-<Offset x="2368" y="0"/>
-<Offset x="-1280" y="960"/>
-<Offset x="-1088" y="-960"/>
-</Polygon>
-</Cannon>
-<Wormhole x="113034" y="119263" type="in">
-<Polygon x="110890" y="121407" style="wormhole">
-<Offset x="0" y="-4288"/>
-<Offset x="4267" y="0"/>
-<Offset x="21" y="4288"/>
-<Offset x="-4288" y="0"/>
-</Polygon>
-</Wormhole>
-<Wormhole x="5002" y="118751" type="out">
-<Polygon x="2858" y="120895" style="wormhole">
-<Offset x="0" y="-4288"/>
-<Offset x="4267" y="0"/>
-<Offset x="21" y="4288"/>
-<Offset x="-4288" y="0"/>
-</Polygon>
-</Wormhole>
-<Wormhole x="76170" y="76255" type="out">
-<Polygon x="74026" y="78399" style="wormhole">
-<Offset x="0" y="-4288"/>
-<Offset x="4267" y="0"/>
-<Offset x="21" y="4288"/>
-<Offset x="-4288" y="0"/>
-</Polygon>
-</Wormhole>
-<Wormhole x="166282" y="49119" type="out">
-<Polygon x="164138" y="51263" style="wormhole">
+</Target>
+<Wormhole x="53642" y="179679" type="out">
+<Polygon x="51498" y="181823" style="wormhole">
 <Offset x="0" y="-4288"/>
 <Offset x="4267" y="0"/>
 <Offset x="21" y="4288"/>
@@ -2766,14 +2749,66 @@
 <Offset x="-4288" y="0"/>
 </Polygon>
 </Wormhole>
-<Wormhole x="53642" y="179679" type="out">
-<Polygon x="51498" y="181823" style="wormhole">
+<Wormhole x="166282" y="49119" type="out">
+<Polygon x="164138" y="51263" style="wormhole">
 <Offset x="0" y="-4288"/>
 <Offset x="4267" y="0"/>
 <Offset x="21" y="4288"/>
 <Offset x="-4288" y="0"/>
 </Polygon>
 </Wormhole>
+<Wormhole x="76170" y="76255" type="out">
+<Polygon x="74026" y="78399" style="wormhole">
+<Offset x="0" y="-4288"/>
+<Offset x="4267" y="0"/>
+<Offset x="21" y="4288"/>
+<Offset x="-4288" y="0"/>
+</Polygon>
+</Wormhole>
+<Wormhole x="5002" y="118751" type="out">
+<Polygon x="2858" y="120895" style="wormhole">
+<Offset x="0" y="-4288"/>
+<Offset x="4267" y="0"/>
+<Offset x="21" y="4288"/>
+<Offset x="-4288" y="0"/>
+</Polygon>
+</Wormhole>
+<Wormhole x="113546" y="120031" type="in">
+<Polygon x="111402" y="122175" style="wormhole">
+<Offset x="0" y="-4288"/>
+<Offset x="4267" y="0"/>
+<Offset x="21" y="4288"/>
+<Offset x="-4288" y="0"/>
+</Polygon>
+</Wormhole>
+<Cannon x="115776" y="130112" dir="32" team="0">
+<Polygon x="114688" y="129088" style="cannon">
+<Style state="destroyed" id="invisible"/>
+<Offset x="2368" y="0"/>
+<Offset x="-1280" y="960"/>
+<Offset x="-1088" y="-960"/>
+</Polygon>
+</Cannon>
+<Cannon x="110272" y="130240" dir="32" team="0">
+<Polygon x="109184" y="129216" style="cannon">
+<Style state="destroyed" id="invisible"/>
+<Offset x="2368" y="0"/>
+<Offset x="-1280" y="960"/>
+<Offset x="-1088" y="-960"/>
+</Polygon>
+</Cannon>
+<Target team="0">
+<Polygon x="176255" y="35178" style="target">
+<Style state="destroyed" id="invisible"/>
+<Offset x="-1280" y="-1280"/>
+<Offset x="0" y="-1728"/>
+<Offset x="1280" y="-1280"/>
+<Offset x="1707" y="0"/>
+<Offset x="1286" y="1279"/>
+<Offset x="9" y="1730"/>
+<Offset x="-1274" y="1279"/>
+<Offset x="-1728" y="0"/>
+</Polygon>
 </Target>
 <Fuel x="134272" y="201088"/>
 <Fuel x="142336" y="201088"/>
@@ -2840,30 +2875,26 @@
 <Base x="113152" y="109312" team="0" dir="32" order="0"/>
 <Base x="120064" y="109312" team="0" dir="32" order="0"/>
 <Base x="129280" y="109312" team="0" dir="32" order="0"/>
-<Base x="133376" y="125120" team="0" dir="0" order="0"/>
-<Base x="94080" y="126144" team="0" dir="64" order="0"/>
-<Base x="93568" y="118272" team="0" dir="64" order="0"/>
-<Base x="93568" y="113152" team="0" dir="64" order="0"/>
-<Base x="133824" y="118912" team="0" dir="0" order="0"/>
-<Base x="133376" y="112704" team="0" dir="0" order="0"/>
-<Base x="177280" y="204928" team="2" dir="32" order="0"/>
-<Base x="191296" y="205184" team="2" dir="32" order="0"/>
-<Base x="134912" y="205056" team="2" dir="32" order="0"/>
-<Base x="155520" y="205056" team="2" dir="32" order="0"/>
-<Base x="92800" y="204928" team="2" dir="32" order="0"/>
-<Base x="69888" y="204928" team="2" dir="32" order="0"/>
-<Base x="50048" y="204800" team="2" dir="32" order="0"/>
-<Base x="35200" y="205056" team="2" dir="32" order="0"/>
-<Group>
-<Fuel x="157033" y="201813"/>
-<Fuel x="154943" y="201834"/>
-<Fuel x="154964" y="199765"/>
-<Fuel x="154943" y="201834"/>
-<Fuel x="154964" y="199765"/>
-<Fuel x="157012" y="199786"/>
-<Fuel x="157012" y="199786"/>
-</Group>
+<Base x="93056" y="125760" team="0" dir="0" order="0"/>
+<Base x="133888" y="125120" team="0" dir="64" order="0"/>
+<Base x="134016" y="119168" team="0" dir="64" order="0"/>
+<Base x="134016" y="112768" team="0" dir="64" order="0"/>
+<Base x="93120" y="119936" team="0" dir="0" order="0"/>
+<Base x="93056" y="113088" team="0" dir="0" order="0"/>
+<Base x="100096" y="49408" team="2" dir="32" order="0"/>
+<Base x="183808" y="204992" team="2" dir="32" order="0"/>
+<Base x="145600" y="204640" team="2" dir="32" order="0"/>
+<Base x="81664" y="204544" team="2" dir="32" order="0"/>
+<Base x="119424" y="49024" team="2" dir="32" order="0"/>
+<Base x="42496" y="205056" team="2" dir="32" order="0"/>
 <Fuel x="103936" y="130944"/>
 <Fuel x="111872" y="149120"/>
 <Fuel x="114944" y="149056"/>
+<Group>
+<Fuel x="155551" y="202154"/>
+<Fuel x="157641" y="202133"/>
+<Fuel x="157652" y="200106"/>
+<Fuel x="155572" y="200085"/>
+</Group>
+<Base x="183040" y="70656" team="2" dir="32" order="0"/>
 </XPilotMap>
