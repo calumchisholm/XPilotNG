@@ -504,6 +504,7 @@ extern short	phasingtimemax;
 extern int	roundDelay;
 extern int	roundDelayMax;
 
+extern bool	UpdateRadar;
 extern unsigned	RadarWidth;
 extern unsigned	RadarHeight;
 extern int	backgroundPointDist;	/* spacing of navigation points */

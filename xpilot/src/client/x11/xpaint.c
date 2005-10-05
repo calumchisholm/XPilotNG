@@ -184,8 +184,9 @@ void Paint_frame(void)
 
     rd.endFrame();
 
-    if (radar_exposures == 1)
+    if (radar_exposures == 1 || UpdateRadar)
 	Paint_world_radar();
+    UpdateRadar=false;
 
     /*
      * Now switch planes and clear the screen.
