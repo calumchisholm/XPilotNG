@@ -59,7 +59,7 @@ am_xpilot_ng_server_OBJECTS = alliance.$(OBJEXT) asteroid.$(OBJEXT) \
 	netserver.$(OBJEXT) object.$(OBJEXT) objpos.$(OBJEXT) \
 	option.$(OBJEXT) parser.$(OBJEXT) player.$(OBJEXT) \
 	polygon.$(OBJEXT) race.$(OBJEXT) rank.$(OBJEXT) \
-	recwrap.$(OBJEXT) robot.$(OBJEXT) robotdef.$(OBJEXT) \
+	recwrap.$(OBJEXT) robot.$(OBJEXT) robotdef.$(OBJEXT) suibotdef.$(OBJEXT)\
 	rules.$(OBJEXT) saudio.$(OBJEXT) sched.$(OBJEXT) \
 	score.$(OBJEXT) server.$(OBJEXT) ship.$(OBJEXT) shot.$(OBJEXT) \
 	showtime.$(OBJEXT) srecord.$(OBJEXT) tag.$(OBJEXT) \
@@ -218,7 +218,7 @@ xpilot_ng_server_SOURCES = \
 	object.c object.h objpos.c objpos.h option.c option.h \
 	parser.c player.c player.h polygon.c \
 	race.c rank.c rank.h recwrap.c recwrap.h \
-	robot.c robot.h robotdef.c rules.c \
+	robot.c robot.h robotdef.c suibotdef.c rules.c \
 	saudio.c saudio.h sched.c sched.h score.c score.h \
 	server.c server.h serverconst.h ship.c shot.c \
 	showtime.c srecord.c srecord.h \
@@ -324,6 +324,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/recwrap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/robot.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/robotdef.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/suibotdef.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rules.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/saudio.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sched.Po@am__quote@
