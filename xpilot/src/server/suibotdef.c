@@ -429,11 +429,6 @@ static void Robot_take_off_from_base(player_t *pl)
   robot_default_data_t  *my_data = Robot_default_get_data(pl);
   /*Function that could do specific things when robot takes off*/  
   
-  /*sprintf (msg,"I will try to learn to take off now [%s]",pl->name);
-    Set_message(msg);*/
-  
-  //      Thrust(pl, true);
-
   Robot_move_randomly(pl);
 
   if((rfrac())<0.1 ){
@@ -495,17 +490,12 @@ static bool Wall_in_between_points(int cx1, int cy1, int cx2, int cy2){ /* Wall 
   
   struct collans answer;
   move_t mv;
-// mv.start.cx = cx1;
-// mv.start.cy = cy1; WRAP_DCX
   mv.delta.cx = WRAP_DCX(cx2 - cx1);
   mv.delta.cy = WRAP_DCY(cy2 - cy1);
   mv.start.cx = WRAP_XCLICK(cx1);
   mv.start.cy = WRAP_YCLICK(cy1);
   mv.obj   = NULL;
   mv.hitmask  = NONBALL_BIT;
-
-//printf(" cx1 %i cy1 %i DCX %i DCY %i WRXC(mv.start.cx) %i WRYC %i WRDX %i WRDY %i\n",
-//	cx1, cy1, (cx2 - cx1), (cy2 - cy1), WRAP_XCLICK(cx1), WRAP_YCLICK(cy1), WRAP_DCX(cx2 - cx1),WRAP_DCY(cy2 - cy1));
 
   while (mv.delta.cx || mv.delta.cy) {
     Move_point(&mv, &answer);
@@ -520,143 +510,6 @@ static bool Wall_in_between_points(int cx1, int cy1, int cx2, int cy2){ /* Wall 
   return false;
 
 }
-
-
-/*   int                        objnum = -1;     */
-/*   int                     dx, dy; */
-/*   object                     *obj = NULL; */
-
-/*  int cx,cy; */
-
-
-
-  
-/*   if (NumObjs >= MAX_TOTAL_SHOTS) { */
-//     /* overload.  we can't do wall checking. */
-/*     return 0; */
-/*   } */
-/*   objnum = NumObjs++; */
-/*   obj = Obj[objnum]; */
-/*   obj->type = OBJ_SHOT; */
-/*   obj->life = 1; */
-/*   obj->id = NO_ID;   */
-/*   obj->count = 0; */
-/*   obj->status = FROMCANNON;  */
-//  /*   } */
-//  /*   Object_position_init_pixels(obj, x1, y1); */ 
-
-
-/*  cx = PIXEL_TO_CLICK(x1); */
-/*  cy = PIXEL_TO_CLICK(y1); */
-
-/*  Obj_pos_set(obj,cx,cy); */
-
-
-/*  obj->vel.x = (x2 - x1)/1.00; */
-/*  obj->vel.y = (y2 - y1)/1.00; */
-
-/*  Move_object(obj); */
-
-
-
-
-/*   if (obj->life == 0) { */
-/*     return 1; */
-//  /*     printf("wall found\n"); */ 
-/*   } */
-/*   obj->life = 0; */
-
-
-//  /*   printf ("no wall, lifes: %i\n",obj->life); */ 
-/*   return 0; */
-  
-    /*-----------------------------------------------------------------------*/
-
-  /*-----------------------------------------------------------------------*/
-  /*2nd try */
-  /*   long  int i,i_max; */
-/*   int x,y,bx,by;  */
-/*   int dx,dy; */
-/*   int block; */
-
-
-/* i_max = rint(sqrt (sqr((x2-x1))+sqr(y2-y1))/BLOCK_SZ*2); */
-/* for (i = 0; i <= i_max; i++){ */
-/*   x=(x1+(x2-x1)*i/i_max); */
-/*   y=(y1+(y2-y1)*i/i_max); */
-
-
-/*     if (BIT(World.rules->mode, WRAP_PLAY)) { */
-/*         if (x < 0) x += World.width; */
-/*         else if (x >= World.width) x -= World.width; */
-/*         if (y < 0) y += World.height; */
-/*         else if (y >= World.height) y -= World.height; */
-/*     } */
-/*     if (x < 0 || x >= World.width || y < 0 || y >= World.height) { */
-/*         return -1; */
-/*     } */
-
-/*     bx = x / BLOCK_SZ; */
-/*         by = y / BLOCK_SZ; */
-/*     if (BIT(World.block[bx][by], FILLED_BIT|FUEL_BIT|TARGET_BIT|TREASURE_BIT)) { */
-/*         return 1; */
-/*     } else if (BIT(World.block[bx][by], REC_LU|REC_RU|REC_LD|REC_RD)) { */
-/*         DFLOAT  x_in_b = x - bx * BLOCK_SZ, */
-/*                 y_in_b = y - by * BLOCK_SZ; */
-/*         switch (World.block[bx][by]) { */
-/*         case REC_LU: */
-/*             if (x_in_b < y_in_b) */
-/*                 return 1; */
-/*             break; */
-/*         case REC_RU: */
-/*             if (x_in_b + y_in_b > BLOCK_SZ) */
-/*                 return 1; */
-/*             break; */
-/*         case REC_LD: */
-/*             if (x_in_b + y_in_b < BLOCK_SZ) */
-/*                 return 1; */
-/*             break; */
-/*         case REC_RD: */
-/*             if (x_in_b > y_in_b) */
-/*                 return 1; */
-/*             break; */
-/*         } */
-
-/*     } */
-
-/* } */
-/*  return 0; */
-
-
- /*------------------------------------------------------------------------/*
-   /* 1st try... */
-
-
-/* if (x1 < 0 || x1 >= World.width || y1 < 0 || y1 >= World.height || */
-/*     x2 < 0 || x2 >= World.width || y2 < 0 || y2 >= World.height  */
-/*     ) */
-/*   {return -1;} */
-
-/*   i_max = rint(sqrt (sqr((x2-x1))+sqr(y2-y1))/BLOCK_SZ*2); */
-/*   for (i = 0; i <= i_max; i++){ */
-
-/*   dx=(x1+(x2-x1)*i/i_max); */
-/*   dy=(y1+(y2-y1)*i/i_max); */
-
-
-/*   dx=fmod(dx+100* World.width ,World.width ); */
-/*   dy=fmod(dy+100* World.height,World.height); */
-/*   printf("dx: %i wwidth: %i dy:%i whight: %i\n",dx, World.width,dy, World.height ); */
-/*   dx=dx/BLOCK_SZ; */
-/*   dy=dy/BLOCK_SZ; */
-
-/*     block = World.block[dx][dy]; */
-/*     if( block != SPACE ) {printf("Wall found\n");return 1;} */
-/*   }  */
-/*   return 0; */
-  
-/*   return 0; */
-/* } */
 
 
 bool Robot_evade_shot(player_t *pl);
@@ -700,7 +553,7 @@ bool Robot_evade_shot(player_t *pl){
     
 
     shortest_hit_time=10000;
-    int i = 1001;
+    int i = -1;
 
     for (j = 0; j < obj_count; j++) { /*for .. obj_count*/
 
@@ -735,8 +588,6 @@ bool Robot_evade_shot(player_t *pl){
 	  sqr(delta_x) + sqr(delta_y);
 
 
-	//	printf("sqd, %f shipsz %f \n", sqdistance, 1.2 * PIXEL_TO_CLICK(SHIP_SZ));
-
 	sqship_sz = sqr(1.1 * PIXEL_TO_CLICK(SHIP_SZ));
 
 		if(sqdistance > sqship_sz)
@@ -756,9 +607,7 @@ bool Robot_evade_shot(player_t *pl){
 	}
     }
 
-    if((i == 1001)) {return false; }
-
-    // printf("DEB1: time: %f vx %f vy %f x %f y %f \n", shortest_hit_time, delta_velx, delta_vely, delta_x, delta_y);
+    if((i == -1)) {return false; }
 
 
     shot = obj_list[i];
@@ -769,27 +618,12 @@ bool Robot_evade_shot(player_t *pl){
 
 
     double direction_pl,direction_evade1,direction_evade2;
-
-    //    direction_pl= (int)findDir(-pl->vel.x,-pl->vel.y);
-
-    // direction_evade1= findDir((int)abs(delta_y+0.5),(int)abs(delta_x+0.5));
-
-        double norm_vel= sqrt(sqr(delta_velx)+sqr(delta_vely));
-        double norm_xy = sqrt(sqr(delta_x)+sqr(delta_y));
-        double evade_x = -(delta_velx / norm_vel  + delta_x / norm_xy);
-        double evade_y = -(delta_vely / norm_vel  + delta_y / norm_xy);
+    double norm_vel= sqrt(sqr(delta_velx)+sqr(delta_vely));
+    double norm_xy = sqrt(sqr(delta_x)+sqr(delta_y));
+    double evade_x = -(delta_velx / norm_vel  + delta_x / norm_xy);
+    double evade_y = -(delta_vely / norm_vel  + delta_y / norm_xy);
 
     direction_evade1 = findDir(evade_x, evade_y );
-
-    //     printf("DEB: time: %f vx %f vy %f ev_x %f ev_y %f ev1 %f\n", shortest_hit_time, delta_velx, delta_vely, evade_x, evade_y, direction_evade1);
-    // printf("DEB: time: %f vx %f vy %f x %f y %f \n", shortest_hit_time, delta_velx, delta_vely, delta_x, delta_y);
-
-    //    direction_evade2= (int)findDir(delta_vely,delta_velx);
-    
-/*     if(abs(direction_evade1-direction_pl) < abs(direction_evade2-direction_pl)) */
-/*       Robot_set_pointing_direction(pl, direction_evade1); */
-/*     else */
-/*       Robot_set_pointing_direction(pl, direction_evade2); */
 
   Robot_set_pointing_direction(pl, direction_evade1);
     Thrust(pl, true);
@@ -797,8 +631,6 @@ bool Robot_evade_shot(player_t *pl){
     return true;
 
 }
-
-
 
 
 void Robot_move_randomly(player_t *pl){
@@ -830,6 +662,7 @@ void Robot_move_randomly(player_t *pl){
     }
   
 } 
+
 void Robot_pop_ball(player_t *pl,ballobject_t *ball){
 int direction; 
 
@@ -880,10 +713,7 @@ void Robot_suicide_player(player_t *pl, player_t *pl_to_suicide){/*Suicide_playe
   tmp_c = (sqr(tmp_a) - tmp_b*(sqr(dx)+sqr(dy)));
   
  if( tmp_c >= 0) { /* square-root only if number positive*/
-/*    printf("------------------------------------------------------\n"); */
-/*    printf("tmp_c %f ",tmp_c); */
    tmp_c = sqrt(tmp_c);
-/*    printf("sqrt(tmp_c) %f\n",tmp_c); */
 
     t1 = (-tmp_a - tmp_c)/tmp_b;
     t2 = (-tmp_a + tmp_c)/tmp_b;
@@ -906,7 +736,7 @@ if (t1 >= 0 && t2 >= 0) {
 /*  t=sqrt(sqr(dx)+sqr(dy))/options.shotSpeed;   */
  t = -tmp_a/tmp_b;
  if (t <0){t = sqrt(sqr(dx)+sqr(dy))/options.shotSpeed;  /*printf("And t negative\n");*/ }
-/*  printf ("Sqrt of negative, no solution!\n"); */  
+ /*  printf ("Sqrt of negative, no solution!\n"); */  
  /* sqrt(neg.number) -> no solution*/
 
 
