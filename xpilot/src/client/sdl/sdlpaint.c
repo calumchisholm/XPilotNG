@@ -317,7 +317,10 @@ void Paint_frame(void)
 	Console_paint();
 	Paint_select();
 
-	if (UpdateRadar) Radar_update();
+	if (UpdateRadar) {
+	  Radar_update();
+	  UpdateRadar = false;
+	}
     	DrawGLWidgets(MainWidget);
     		
 	glPopMatrix();
