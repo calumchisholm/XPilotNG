@@ -932,7 +932,7 @@ static int Lines_check(int msx, int msy, int mdx, int mdy, int *mindone,
 /* Do not call this with no movement. */
 /* May not be called with point already on top of line.
  * Maybe I should change that to allow lines that could be crossed. */
-static void Move_point(const move_t *move, struct collans *answer)
+extern void Move_point(const move_t *move, struct collans *answer)
 {
     int minline, mindone, minheight;
     int block;
