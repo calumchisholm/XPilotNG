@@ -380,7 +380,7 @@ static void Paint_hudradar(double hrscale, double xlimit, double ylimit,
  	    x = x + ext_view_width / 2 - sz / 2;
  	    y = -y + ext_view_height / 2 - sz / 2;
 
-	    if (radar_ptr[i].type == normal) {
+	    if (radar_ptr[i].type == RadarEnemy) {
 		if (hudRadarEnemyColor >= 1)
 		    Arc_add(hudRadarEnemyColor, x, y, sz, sz, 0, 64 * 360);
 	    } else {

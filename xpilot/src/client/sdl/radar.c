@@ -249,7 +249,7 @@ static void Radar_paint_objects( GLWidget *radar )
 	to_screen(radar, &x, &y, RadarWidth, RadarHeight);
 	x -= s/2;
 	y -= s/2;
-	if (radar_ptr[i].type == friendly) glColor3ub(0, 0xff, 0);
+	if (radar_ptr[i].type == RadarFriend) glColor3ub(0, 0xff, 0);
 	else glColor3ub(0xff, 0xff, 0xff);
 	glBegin(GL_QUADS);
 	glVertex2i(x, y);

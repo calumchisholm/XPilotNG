@@ -1990,10 +1990,10 @@ int Handle_fastradar(int x, int y, int size)
     
     t.x = x;
     t.y = y;
-    t.type = normal;
+    t.type = RadarEnemy;
     
     if ((size & 0x80) != 0) {
-	t.type = friendly;
+	t.type = RadarFriend;
 	size &= ~0x80;
     }
     

@@ -331,8 +331,8 @@ typedef struct {
 } appearing_t;
 
 typedef enum {
-    normal,
-    friendly
+    RadarEnemy,
+    RadarFriend
 } radar_type_t;
 
 typedef struct {

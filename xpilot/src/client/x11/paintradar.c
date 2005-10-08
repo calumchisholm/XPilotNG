@@ -146,7 +146,7 @@ static void Paint_objects_radar(void)
 	unsigned s = (rs <= 0 ? 1 : radar_ptr[i].size);
 
 	color = WHITE;
-	if (radar_ptr[i].type == friendly) {
+	if (radar_ptr[i].type == RadarFriend) {
 	    if (maxColors > 4)
 		color = 4;
 	    else if (!colorSwitch)

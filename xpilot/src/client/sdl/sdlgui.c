@@ -1738,7 +1738,7 @@ static void Paint_hudradar(double hrscale, double xlimit, double ylimit, int sz)
  	    x = x + draw_width / 2;
  	    y = -y + draw_height / 2;
 
-	    if (radar_ptr[i].type == normal) {
+	    if (radar_ptr[i].type == RadarEnemy) {
 		c = hudRadarEnemyColorRGBA;
 		shape = hudRadarEnemyShape;
 	    } else {
