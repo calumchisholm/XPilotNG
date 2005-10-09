@@ -59,13 +59,14 @@ am_xpilot_ng_server_OBJECTS = alliance.$(OBJEXT) asteroid.$(OBJEXT) \
 	netserver.$(OBJEXT) object.$(OBJEXT) objpos.$(OBJEXT) \
 	option.$(OBJEXT) parser.$(OBJEXT) player.$(OBJEXT) \
 	polygon.$(OBJEXT) race.$(OBJEXT) rank.$(OBJEXT) \
-	recwrap.$(OBJEXT) robot.$(OBJEXT) robotdef.$(OBJEXT) suibotdef.$(OBJEXT)\
+	recwrap.$(OBJEXT) robot.$(OBJEXT) robotdef.$(OBJEXT) \
 	rules.$(OBJEXT) saudio.$(OBJEXT) sched.$(OBJEXT) \
 	score.$(OBJEXT) server.$(OBJEXT) ship.$(OBJEXT) shot.$(OBJEXT) \
-	showtime.$(OBJEXT) srecord.$(OBJEXT) tag.$(OBJEXT) \
-	target.$(OBJEXT) teamcup.$(OBJEXT) tuner.$(OBJEXT) \
-	treasure.$(OBJEXT) update.$(OBJEXT) walls.$(OBJEXT) \
-	wormhole.$(OBJEXT) xp2map.$(OBJEXT) xpmap.$(OBJEXT)
+	showtime.$(OBJEXT) srecord.$(OBJEXT) suibotdef.$(OBJEXT) \
+	tag.$(OBJEXT) target.$(OBJEXT) teamcup.$(OBJEXT) \
+	tuner.$(OBJEXT) treasure.$(OBJEXT) update.$(OBJEXT) \
+	walls.$(OBJEXT) wormhole.$(OBJEXT) xp2map.$(OBJEXT) \
+	xpmap.$(OBJEXT)
 xpilot_ng_server_OBJECTS = $(am_xpilot_ng_server_OBJECTS)
 xpilot_ng_server_DEPENDENCIES =  \
 	$(top_builddir)/src/common/libxpcommon.a
@@ -218,10 +219,10 @@ xpilot_ng_server_SOURCES = \
 	object.c object.h objpos.c objpos.h option.c option.h \
 	parser.c player.c player.h polygon.c \
 	race.c rank.c rank.h recwrap.c recwrap.h \
-	robot.c robot.h robotdef.c suibotdef.c rules.c \
+	robot.c robot.h robotdef.c rules.c \
 	saudio.c saudio.h sched.c sched.h score.c score.h \
 	server.c server.h serverconst.h ship.c shot.c \
-	showtime.c srecord.c srecord.h \
+	showtime.c srecord.c srecord.h suibotdef.c \
 	tag.c target.c target.h teamcup.h teamcup.c tuner.c tuner.h \
 	treasure.c update.c \
 	walls.c walls.h wormhole.c wormhole.h \
@@ -324,7 +325,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/recwrap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/robot.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/robotdef.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/suibotdef.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rules.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/saudio.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sched.Po@am__quote@
@@ -334,6 +334,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shot.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/showtime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/srecord.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/suibotdef.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tag.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/target.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/teamcup.Po@am__quote@
