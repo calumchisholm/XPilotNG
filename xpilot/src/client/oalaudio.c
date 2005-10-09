@@ -25,12 +25,15 @@
  */
 
 #include "xpclient.h"
-#ifndef _WINDOWS
-#include <AL/al.h>
-#include <AL/alut.h>
-#else
+#if defined(_WINDOWS)
 #include <al.h>
 #include <alut.h>
+#elif defined(MACOSX_FRAMEWORKS)
+#include <OpenAL/al.h>
+#include <OpenAL/alut.h>
+#else
+#include <AL/al.h>
+#include <AL/alut.h>
 #endif
 
 #define MAX_SOUNDS 16
@@ -94,7 +97,11 @@ static sample_t *sample_load(char *filename)
 	free(sample);
 	return NULL;
     }
-    alutLoadWAVFile((ALbyte *)filename, &format, &data, &size, &freq, &loop);
+    #if defined(MACOSX_FRAMEWORKS) /* && Mac OS X version < 10.4 */
+	alutLoadWAVFile((ALbyte *)filename, &format, &data, &size, &freq);
+    #else
+	alutLoadWAVFile((ALbyte *)filename, &format, &data, &size, &freq, &loop);
+    #endif
     if ((err = alGetError()) != AL_NO_ERROR) {
 	error("failed to load sound file %s: %x %s", 
 	      filename, err, alGetString(err));
