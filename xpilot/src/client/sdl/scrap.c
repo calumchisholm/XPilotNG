@@ -21,9 +21,21 @@
     #define WIN_SCRAP
 #elif defined(__QNXNTO__)
     #define QNX_SCRAP
+#elif defined(MACOSX_FRAMEWORKS)
+	#define MAC_SCRAP
 #else
     #error Unknown window manager for clipboard handling
 #endif /* scrap type */
+
+#if defined(MAC_SCRAP) /* for now, these functions are stubbed out */
+int init_scrap(void) { return 0; }
+int lost_scrap(void) { return 0; }
+void put_scrap(int type, int srclen, char *src) { }
+void get_scrap(int type, int *dstlen, char **dst) {
+	*dstlen = 0;
+	*dst = NULL;
+}
+#else
 
 /* System dependent data types */
 #if defined(X11_SCRAP)
@@ -635,3 +647,5 @@ PRIVATE int clipboard_filter(const SDL_Event *event)
   return(1);
 }
 #endif /* X11_SCRAP */
+
+#endif /* MAC_SCRAP */
