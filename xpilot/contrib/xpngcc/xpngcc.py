@@ -1,7 +1,13 @@
 #!/usr/bin/env python
 
 import wxversion
-wxversion.select('2.6')
+try:
+	wxversion.select('2.6')
+except wxversion.VersionError:
+	try:
+		wxversion.select('2.4')
+	except wxversion.VersionError:
+		wxversion.select('2.5')
 import wx
 import wx.html as html
 import os

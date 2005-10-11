@@ -5,11 +5,11 @@ def which(app):
 	# Does this work on Windows?
 	dirnames = os.environ['PATH'].split(os.path.pathsep)
 	for dirname in dirnames:
-	   filename = os.path.join(dirname, app)
-	   if (os.access(filename, os.X_OK) and
-	       os.path.isfile(filename)):
-		 return filename
-	return None
+		filename = os.path.join(dirname, app)
+		if (os.access(filename, os.X_OK) and
+		    os.path.isfile(filename)):
+			return filename
+	return os.environ.get(app.replace('-', '_'), None)
 
 meta = ('meta.xpilot.org', 4401)
 client_x11 = which('xpilot-ng-x11')

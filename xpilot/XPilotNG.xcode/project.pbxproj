@@ -31,6 +31,7 @@
 				E32F9D6908FB15E300AE0B2A,
 				E32F9D6B08FB160100AE0B2A,
 				E32F9D7308FB196700AE0B2A,
+				E3A5D64908FC4FE800869090,
 			);
 			isa = PBXGroup;
 			name = Products;
@@ -65,10 +66,12 @@
 				E3E0AEE7080528F10080821B,
 				E3E0AEF9080529BB0080821B,
 				E32F9D5F08FB14AC00AE0B2A,
+				E3A5D64808FC4FE800869090,
 			);
 		};
 		29B97314FDCFA39411CA2CEA = {
 			children = (
+				E3A5D66408FC5A3600869090,
 				E32F97A308FB068800AE0B2A,
 				E3E0AA0B080515FE0080821B,
 				E32F99A708FB0C6A00AE0B2A,
@@ -272,7 +275,9 @@
 				E3E0A571080515800080821B,
 				E3E0AE1B080520BE0080821B,
 				8D1107310486CEB800E47090,
+				E3A5D64F08FC512300869090,
 				E32F97C208FB086C00AE0B2A,
+				E3A5D67908FC5AE100869090,
 				E32F97DD08FB0ADE00AE0B2A,
 				E32F97DE08FB0ADE00AE0B2A,
 				E32F97DF08FB0ADE00AE0B2A,
@@ -2997,6 +3002,174 @@
 			settings = {
 			};
 		};
+		E3A5D64508FC4FE800869090 = {
+			buildActionMask = 2147483647;
+			files = (
+				E3A5D65308FC51D100869090,
+				E3A5D65408FC522600869090,
+				E3A5D65708FC559800869090,
+				E3A5D67808FC5A3700869090,
+			);
+			isa = PBXResourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E3A5D64808FC4FE800869090 = {
+			buildPhases = (
+				E3A5D64508FC4FE800869090,
+				E3A5D67B08FC5B7F00869090,
+			);
+			buildRules = (
+			);
+			buildSettings = {
+				INFOPLIST_FILE = "contrib/macosx/xpngcc-Info.plist";
+				PREBINDING = NO;
+				PRODUCT_NAME = "XPilotNG Control Center";
+			};
+			dependencies = (
+				E3A5D65608FC523500869090,
+				E3A5D65908FC55A700869090,
+			);
+			isa = PBXNativeTarget;
+			name = "XPilotNG Control Center.app";
+			productName = "XPilotNG Control Center.app";
+			productReference = E3A5D64908FC4FE800869090;
+			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string>XPilotNG Control Center.app</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.yourcompany.XPilotNG_Control_Center_app</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>1.0</string>
+	<key>NSMainNibFile</key>
+	<string>MainMenu</string>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+</dict>
+</plist>
+";
+			productType = "com.apple.product-type.application";
+		};
+		E3A5D64908FC4FE800869090 = {
+			explicitFileType = wrapper.application;
+			includeInIndex = 0;
+			isa = PBXFileReference;
+			path = "XPilotNG Control Center.app";
+			refType = 3;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		E3A5D64F08FC512300869090 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = text.xml;
+			path = "xpngcc-Info.plist";
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E3A5D65308FC51D100869090 = {
+			fileRef = E3E0AE1B080520BE0080821B;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E3A5D65408FC522600869090 = {
+			fileRef = 8D1107320486CEB800E47090;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E3A5D65508FC523500869090 = {
+			containerPortal = 29B97313FDCFA39411CA2CEA;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 8D1107260486CEB800E47090;
+			remoteInfo = XPilotNG.app;
+		};
+		E3A5D65608FC523500869090 = {
+			isa = PBXTargetDependency;
+			target = 8D1107260486CEB800E47090;
+			targetProxy = E3A5D65508FC523500869090;
+		};
+		E3A5D65708FC559800869090 = {
+			fileRef = E3F9396D0812CCDE00F425B2;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E3A5D65808FC55A700869090 = {
+			containerPortal = 29B97313FDCFA39411CA2CEA;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = E3F9396C0812CCDE00F425B2;
+			remoteInfo = "xpilot-ng-server";
+		};
+		E3A5D65908FC55A700869090 = {
+			isa = PBXTargetDependency;
+			target = E3F9396C0812CCDE00F425B2;
+			targetProxy = E3A5D65808FC55A700869090;
+		};
+		E3A5D66108FC571B00869090 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = suibotdef.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E3A5D66208FC571B00869090 = {
+			fileRef = E3A5D66108FC571B00869090;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E3A5D66408FC5A3600869090 = {
+			isa = PBXFileReference;
+			lastKnownFileType = folder;
+			name = xpngcc;
+			path = contrib/xpngcc;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E3A5D67808FC5A3700869090 = {
+			fileRef = E3A5D66408FC5A3600869090;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E3A5D67908FC5AE100869090 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = text.script.python;
+			path = "xpilot-ng-control-center.py";
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E3A5D67B08FC5B7F00869090 = {
+			buildActionMask = 2147483647;
+			dstPath = "XPilotNG Control Center.app/Contents/MacOS";
+			dstSubfolderSpec = 16;
+			files = (
+				E3A5D67C08FC5BB300869090,
+			);
+			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E3A5D67C08FC5BB300869090 = {
+			fileRef = E3A5D67908FC5AE100869090;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		E3E0A571080515800080821B = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
@@ -3576,6 +3749,7 @@
 				E34F6B4608F83CF8007373A1,
 				E34F6B4708F83CF8007373A1,
 				E34F6B4808F83CF8007373A1,
+				E3A5D66108FC571B00869090,
 				E34F6B4908F83CF8007373A1,
 				E34F6B4A08F83CF8007373A1,
 				E34F6B4B08F83CF8007373A1,
@@ -3765,6 +3939,7 @@
 				E34F6B7D08F83D36007373A1,
 				E34F6B7E08F83D37007373A1,
 				E34F6B7F08F83D37007373A1,
+				E3A5D66208FC571B00869090,
 				E34F6B8008F83D38007373A1,
 				E34F6B8108F83D39007373A1,
 				E34F6B8208F83D39007373A1,
