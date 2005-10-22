@@ -35,7 +35,7 @@ and a kunststoff jar file. You can get the beanshell.jar from www.beanshell.org
 and the kunststoff.jar from http://incors.org/archive/. Copy the bsh-2.0b4.jar
 and kunststoff.jar into the xpilot/contrib/jxpmap directory. Change the
 build.xml file so that the filename of the bsh jar matches that what you have
-(e.g. I had to change bsh-2.0b1.jar to bsh-2.0b4.jar). Now if to make the
+(e.g. I had to change bsh-2.0b1.jar to bsh-2.0b4.jar). Now to make the
 jxpmap.jar file you issue the unix command:
 
 ant jar
