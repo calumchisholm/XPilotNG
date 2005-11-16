@@ -276,7 +276,7 @@ void ButtonPress_event(XEvent *event)
     XButtonEvent *xbutton = &(event->xbutton);
 
     if (clData.pointerControl) {
-	assert(!clData.talking);
+	/*assert(!clData.talking); KHS: wrong!*/
 	Pointer_button_pressed((int)xbutton->button);
 	return;
     }
@@ -346,7 +346,7 @@ int ButtonRelease_event(XEvent *event)
     XButtonEvent *xbutton = &(event->xbutton);
 
     if (clData.pointerControl) {
-	assert(!clData.talking);
+	/*assert(!clData.talking); KHS: wrong assert*/
 	Pointer_button_released((int)xbutton->button);
     }
 
