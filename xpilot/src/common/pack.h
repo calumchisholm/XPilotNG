@@ -111,14 +111,19 @@
  * 4.F.1.4: balls use polygon styles
  * 4.F.1.5: Possibility to change polygon styles.
  */
+#define MAGIC_WORD		0xF4ED
+#define POLYGON_VERSION		0x4F15
+#define OLD_VERSION		0x4501
 #ifdef SERVER
-#define	MAGIC	(is_polygon_map ? 0x4F15F4ED : 0x4501F4ED)
+#define	MAGIC (is_polygon_map \
+               ? VERSION2MAGIC(POLYGON_VERSION) \
+               : VERSION2MAGIC(OLD_VERSION))
 #else
-#define	MAGIC	(instruments.blockProtocol ? 0x4501F4ED : 0x4F15F4ED)
+#define	MAGIC (VERSION2MAGIC(protocolVersion))
 #endif
 
 #define MAGIC2VERSION(M)	(((M) >> 16) & 0xFFFF)
-#define VERSION2MAGIC(V)	((((V) & 0xFFFF) << 16) | (MAGIC & 0xFFFF))
+#define VERSION2MAGIC(V)	((((V) & 0xFFFF) << 16) | MAGIC_WORD)
 #define MY_VERSION		MAGIC2VERSION(MAGIC)
 
 /*

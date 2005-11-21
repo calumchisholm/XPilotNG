@@ -500,6 +500,23 @@ static bool Set_dirPrediction(xp_option_t *opt, bool val)
     return true;
 }
 
+int protocolVersion = POLYGON_VERSION;
+static char protocolVersionStr[32];
+
+static bool Set_protocolVersion(xp_option_t *opt, const char *value)
+{
+    if (sscanf(value, "%x", &protocolVersion) <= 0)
+	return false;
+    return true;
+}
+
+static const char *Get_protocolVersion(xp_option_t *opt)
+{
+    snprintf(protocolVersionStr, sizeof protocolVersionStr, "%04x",
+	     protocolVersion);
+    return protocolVersionStr;
+}
+
 void defaultCleanup(void)
 {
     XFREE(keydefs);
@@ -894,13 +911,13 @@ xp_option_t default_options[] = {
 	"Allows drawing polygon bitmaps specified by the (new-style) map.\n"
 	"Be warned that this needs a reasonably fast graphics system.\n"),
 
-    XP_BOOL_OPTION(
-	"blockProtocol",
-	false,
-	&instruments.blockProtocol,
-	NULL,
-	XP_OPTFLAG_CONFIG_DEFAULT,
-	"Prefer (old) block protocol when joining servers.\n"),
+    XP_STRING_OPTION(
+	"protocolVersion",
+	"",
+	NULL, 0,
+	Set_protocolVersion, NULL, Get_protocolVersion,
+	XP_OPTFLAG_KEEP,
+	"Which protocol version to prefer when joining servers.\n"),
 
     XP_BOOL_OPTION(
 	"outlineWorld",
