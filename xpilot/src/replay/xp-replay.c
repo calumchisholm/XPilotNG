@@ -1372,14 +1372,19 @@ static XFontStruct *loadQueryFont(const char *fontName, GC gc)
 
 static void allocViewColors(struct xprc *rc)
 {
-    XColor		*cp, *cp2, myColor;
-    int			i, j;
+    XColor		*cp, /**cp2,*/ myColor;
+    int			i /*, j*/;
 
     rc->pixels = (unsigned long *)
 	MyMalloc(2 * rc->maxColors * sizeof(*rc->pixels), MEM_MISC);
 
     for (i = 0; i < rc->maxColors; i++) {
 	cp = &rc->colors[i];
+	/*
+	 * kps - don't try to do this "optimisation", it seems to break stuff
+	 * for some recordings.
+	 */
+#if 0
 	for (j = 0; j < i; j++) {
 	    cp2 = &rc->colors[j];
 	    if (cp->red == cp2->red &&
@@ -1392,6 +1397,7 @@ static void allocViewColors(struct xprc *rc)
 	    rc->pixels[j] = rc->pixels[i];
 	    continue;
 	}
+#endif
 	if (cp->red < 0x0100 &&
 	    cp->green < 0x0100 &&
 	    cp->blue < 0x0100 &&
