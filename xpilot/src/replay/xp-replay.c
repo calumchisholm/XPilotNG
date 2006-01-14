@@ -3092,9 +3092,25 @@ static void dox(struct xui *ui, struct xprc *rc)
 
 		switch(c) {
 
+		case ' ':
+		    switch(playState) {
+		    case STATE_PLAYING:
+			currentSpeed = 0;
+			playState = STATE_PAUSED;
+			forceRedraw = True;
+			break;
+		    case STATE_PAUSED:
+			currentSpeed = 1;
+			playState = STATE_PLAYING;
+			break;
+		    default:
+			break;
+		    }
+
+		    break;
+
 		case 'f':
 		case 'F':
-		case ' ':
 		    frameStep++;
 		    break;
 
