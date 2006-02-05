@@ -41,9 +41,6 @@ Developer: ?
 Task: implement drawing lists in the SDL client so that the windows client
 can support drawing in a resizable window.
 
-Task: Make pause key unpause players also when baselesspausing option is on.
-Developer: ?
-
 Task: Make baselesspausing option work for non-teamplay maps.
 Developer: ?
 
