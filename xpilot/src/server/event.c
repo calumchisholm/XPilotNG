@@ -221,6 +221,8 @@ static void Player_change_home(player_t *pl)
 	}
     }
 
+#if 0
+    /* kps - perhaps this isn't a good idea. */
     if (pl2 != NULL
 	&& Players_are_teammates(pl, pl2)
 	&& Get_Score(pl) <= Get_Score(pl2)) {
@@ -229,6 +231,7 @@ static void Player_change_home(player_t *pl)
 			   "[*Server notice*]");
 	return;
     }
+#endif
 
     pl->home_base = base2;
     sound_play_all(CHANGE_HOME_SOUND);
