@@ -477,6 +477,8 @@ void Pause_player(player_t *pl, bool on)
 	if (options.baselessPausing) {
 	    if (pl->team != TEAM_NOT_SET)
 		world->teams[pl->team].NumMembers--;
+	    pl->pl_prev_team = pl->team;
+	    /* kps - probably broken if no team play */
 	    pl->team = 0;
 	    for (i = 0; i < NumPlayers; i++) {
 		player_t *pl_i = Player_by_index(i);
@@ -530,25 +532,42 @@ void Pause_player(player_t *pl, bool on)
 	}
     }
     else if (!on && Player_is_paused(pl)) { /* Turn pause mode off */
-	if (pl->home_base == NULL) {
-	    Set_player_message(pl, "You don't have a base. "
-			       "Select team to unpause. [*Server notice*]");
+
+	if (pl->pause_count > 0) {
+	    Set_player_message(pl, "You can't unpause so soon after pausing. "
+			       "[*Server notice*]");
 	    return;
 	}
-	if (pl->pause_count <= 0) {
-	    pl->idleTime = 0;
-	    updateScores = true;
-	    if (BIT(world->rules->mode, LIMITED_LIVES)) {
-		/* too late, wait for next round */
-		Player_set_state(pl, PL_STATE_WAITING);
-	    } else {
-		Player_set_state(pl, PL_STATE_APPEARING);
-		Go_home(pl);
+
+	if (pl->home_base == NULL) {
+	    int team = pl->pl_prev_team;
+
+	    /* kps - code copied from Cmd_team() */
+	    if (world->teams[team].NumBases > world->teams[team].NumMembers) {
+		pl->team = team;
+		world->teams[pl->team].NumMembers++;
+		Set_swapper_state(pl);
+		Pick_startpos(pl);
+		Send_info_about_player(pl);
 	    }
-	    Player_reset_timing(pl);
-	} else {
-	    Set_player_message(pl, "You can't unpause so soon after pausing. [*Server notice*]");
+	    else {
+		Set_player_message(pl, "You don't have a base. "
+				   "Select team to unpause. "
+				   "[*Server notice*]");
+		return;
+	    }
 	}
+
+	pl->idleTime = 0;
+	updateScores = true;
+	if (BIT(world->rules->mode, LIMITED_LIVES)) {
+	    /* too late, wait for next round */
+	    Player_set_state(pl, PL_STATE_WAITING);
+	} else {
+	    Player_set_state(pl, PL_STATE_APPEARING);
+	    Go_home(pl);
+	}
+	Player_reset_timing(pl);
     }
 }
 

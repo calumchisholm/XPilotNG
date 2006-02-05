@@ -117,7 +117,7 @@ player_t *Get_player_by_name(const char *str,
 }
 
 
-static void Send_info_about_player(player_t *pl)
+void Send_info_about_player(player_t *pl)
 {
     int i;
 
@@ -141,7 +141,7 @@ static void Send_info_about_player(player_t *pl)
 }
 
 
-static void Set_swapper_state(player_t *pl)
+void Set_swapper_state(player_t *pl)
 {
     if (BIT(pl->have, HAS_BALL))
 	Detach_ball(pl, NULL);
