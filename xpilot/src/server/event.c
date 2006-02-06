@@ -543,7 +543,9 @@ void Pause_player(player_t *pl, bool on)
 	    int team = pl->pl_prev_team;
 
 	    /* kps - code copied from Cmd_team() */
-	    if (world->teams[team].NumBases > world->teams[team].NumMembers) {
+	    if (team > 0 && team < MAX_TEAMS
+		&& (world->teams[team].NumBases
+		    > world->teams[team].NumMembers)) {
 		pl->team = team;
 		world->teams[pl->team].NumMembers++;
 		Set_swapper_state(pl);
