@@ -160,7 +160,6 @@
 <Option name="restrictrobots" value="yes"/>
 <Option name="itemconcentratorvisible" value="yes"/>
 <Option name="itemenergypackprob" value="0"/>
-<Option name="shotspeed" value="21.0"/>
 <Option name="itemconcentratorradius" value="10"/>
 <Option name="maxmissilesperpack" value="4"/>
 <Option name="crashscoremult" value="0.33"/>

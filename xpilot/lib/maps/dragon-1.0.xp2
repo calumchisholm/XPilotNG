@@ -214,7 +214,6 @@
 <Option name="shotlife" value="60.0"/>
 <Option name="shotmass" value="0.1"/>
 <Option name="shotsgravity" value="yes"/>
-<Option name="shotspeed" value="21.0"/>
 <Option name="shotswallbounce" value="no"/>
 <Option name="shovekillscoremult" value="0.5"/>
 <Option name="smartkillscoremult" value="1.0"/>
