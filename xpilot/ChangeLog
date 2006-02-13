@@ -3,6 +3,14 @@
 ====                       XPilot NG Change Log                            ====
 ===============================================================================
 
+This is a summary of changes of release 4.7.3 compared to release 4.7.2.
+
+Server:
+	* Default shotspeed increased to 25 to compensate for "lost antilag".
+	* Fix unpause when baselessPausing is on.
+
+===============================================================================
+
 This is a summary of changes of release 4.7.2 compared to release 4.7.1.
 
 XPilot NG Control Center:
