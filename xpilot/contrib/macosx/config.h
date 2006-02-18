@@ -378,7 +378,8 @@
 /* #undef size_t */
 
 /* socklen_t size */
-#define socklen_t int
+/* #undef socklen_t */
+typedef int socklen_t
 
 /* Define to empty if the keyword `volatile' does not work. Warning: valid
    code using `volatile' can become incorrect without. Disable with care. */
