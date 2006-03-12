@@ -24,7 +24,7 @@
  */
 
 /* Robot code originally submitted by Maurice Abraham. */
-
+/* Rewrite started by Karsten Siegmund - in progress */
 #include "xpserver.h"
 
 #define ROB_LOOK_AH		2
@@ -65,28 +65,6 @@ static bool Empty_space_for_ball(int bx, int by)
     return false;
 }
 
-#if 0
-/* disabled, might make robots spin on base */
-/*
- * Map objects a robot can fly through without damage.
- */
-static bool Really_empty_space(player_t *pl, int bx, int by)
-{
-    int group;
-    hitmask_t hitmask = NONBALL_BIT; /* kps - ok ? */
-    clpos_t pos;
-
-    UNUSED_PARAM(pl);
-
-    pos.cx = BLOCK_CENTER(bx);
-    pos.cy = BLOCK_CENTER(by);
-    group = shape_is_inside(pos.cx, pos.cy,
-			    hitmask, NULL, &filled_wire, 0);
-    if (group == NO_GROUP)
-	return true;
-    return false;
-}
-#else
 static bool Really_empty_space(player_t *pl, int bx, int by)
 { 	 
     int group, cx, cy, i, j;
@@ -131,7 +109,6 @@ static bool Really_empty_space(player_t *pl, int bx, int by)
 	return false;
     return true; 
 }
-#endif
 
 /* watch out for strong gravity */
 static inline bool Gravity_is_strong(player_t *pl, clpos_t pos, int travel_dir)
