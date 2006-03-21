@@ -1039,7 +1039,8 @@ void Robot_update(bool tick)
     else {
 	new_robot_delay = 0;
 	if (NumRobots > 0) {
-	    if ((num_playing_ships > Num_bases())
+	    if ((!options.baselessPausing &&
+		(num_playing_ships > Num_bases()))
 		|| (num_any_ships > NUM_IDS)
 		|| (num_playing_ships > options.maxRobots
 		    && NumRobots > options.minRobots))
