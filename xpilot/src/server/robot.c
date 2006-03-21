@@ -1022,7 +1022,8 @@ void Robot_update(bool tick)
     num_playing_ships = num_any_ships - NumPseudoPlayers;
     if ((num_playing_ships < options.maxRobots
 	 || NumRobots < options.minRobots)
-	&& num_playing_ships < Num_bases()
+	&& (!options.baselessPausing 
+	    && num_playing_ships < Num_bases())
 	&& num_any_ships < NUM_IDS
 	&& NumRobots < MAX_ROBOTS
 	&& !(BIT(world->rules->mode, TEAM_PLAY)
@@ -1039,8 +1040,8 @@ void Robot_update(bool tick)
     else {
 	new_robot_delay = 0;
 	if (NumRobots > 0) {
-	    if ((!options.baselessPausing &&
-		(num_playing_ships > Num_bases()))
+	    if ((!options.baselessPausing 
+		 && num_playing_ships > Num_bases())
 		|| (num_any_ships > NUM_IDS)
 		|| (num_playing_ships > options.maxRobots
 		    && NumRobots > options.minRobots))
