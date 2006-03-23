@@ -295,6 +295,8 @@ static void Robot_take_off_from_base(player_t *pl)
   /*Function that could do specific things when robot takes off*/  
   
   Robot_move_randomly(pl);
+  Thrust(pl, true);
+
 
   if((rfrac())<0.1 ){
     my_data->robot_mode = RM_ATTACK;
@@ -609,7 +611,7 @@ void Robot_move_randomly(player_t *pl){
         Fire_normal_shots(pl);  
   }
   /* Sometimes thrust */
-  if((rfrac())>0.997 )
+  if((rfrac())>0.65 )
     {  
       Thrust(pl, true); 
     } 
