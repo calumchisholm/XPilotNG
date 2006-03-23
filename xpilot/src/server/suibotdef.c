@@ -128,7 +128,7 @@ static robot_default_data_t *Robot_suibot_get_data(player_t *pl)
 }
 
 /*
- * A suibot is created.
+ * Create the suibot.
  */
 static void Robot_suibot_create(player_t *pl, char *str)
 {
@@ -303,9 +303,9 @@ static void Robot_take_off_from_base(player_t *pl)
 
 
 /*KS: let robot "play mouse" */
-static void Robot_set_pointing_direction(player_t *pl,int direction);
+static void Robot_set_pointing_direction(player_t *pl,double direction);
 
-static void Robot_set_pointing_direction(player_t *pl,int direction)
+static void Robot_set_pointing_direction(player_t *pl,double direction)
 { 
   robot_default_data_t	*my_data = Robot_suibot_get_data(pl);
   int turnvel;     
@@ -313,7 +313,7 @@ static void Robot_set_pointing_direction(player_t *pl,int direction)
     if(pl->turnspeed != 0 | pl->turnresistance != 0) End_game();
 
 
-   turnvel = (direction - pl->dir);
+   turnvel = (direction - pl->float_dir);
    pl->turnvel = turnvel;
 }
 
@@ -357,7 +357,7 @@ static bool Wall_in_between_points(int cx1, int cy1, int cx2, int cy2){ /* Wall 
   while (mv.delta.cx || mv.delta.cy) {
     Move_point(&mv, &answer);
     if (answer.line != -1)
-      return true; //answer.line;
+      return true;
     mv.start.cx = WRAP_XCLICK(mv.start.cx + answer.moved.cx);
     mv.start.cy = WRAP_YCLICK(mv.start.cy + answer.moved.cy);
     mv.delta.cx -= answer.moved.cx;
@@ -370,14 +370,51 @@ static bool Wall_in_between_points(int cx1, int cy1, int cx2, int cy2){ /* Wall 
 
 bool Robot_evade_shot(player_t *pl);
 
-struct dangerous_shot_data{
+typedef struct {
+  int shotnr;
   double hit_time;
   double sqdistance;
-};
+} relative_shot_data_t;
+
+
+
+static bool Get_shot_proximity();
+static bool Get_shot_proximity(player_t *pl, object_t *shot, relative_shot_data_t *shotdata){
+   relative_shot_data_t shotinfo;
+   double delta_velx, delta_vely, delta_x, delta_y, sqdistance;
+   double time_until_closest, shortest_hit_time;
+
+  /* calculate relative positions and velocities */
+  delta_velx=( shot->vel.x -  pl->vel.x );
+  delta_vely=( shot->vel.y -  pl->vel.y );
+  delta_x=   WRAP_DCX( shot->pos.cx - pl->pos.cx );
+  delta_y=   WRAP_DCY( shot->pos.cy - pl->pos.cy );
+
+  /* prevent possible division by 0 */
+  if(delta_velx == 0 || delta_vely == 0)
+    return ;
+
+  /* get time of "hit" from deviation of distance function */
+  time_until_closest =
+    -( delta_x * delta_velx + delta_y * delta_vely) /
+    ((sqr(delta_velx) + sqr(delta_vely)));
+
+  /* ignore if there is enough time to dodge this shot in a later frame*/
+  if((time_until_closest < 0) || (time_until_closest > 1000))
+    /*option instead of fixed value: options.dodgetime))*/
+    return;
+
+  /* look if shot will hit (compare squares of distances and shipsize) */
+  sqdistance =
+    (sqr(delta_velx) + sqr(delta_vely)) * sqr(time_until_closest)  +
+    2 * (delta_velx * delta_x + delta_vely * delta_y) * time_until_closest +
+    sqr(delta_x) + sqr(delta_y);
+
+}
 
 bool Robot_evade_shot(player_t *pl){
 
-/*     struct dangerous_shot_data *shotsarray; */
+/*  change to use   struct dangerous_shot_data *shotsarray; */
   int j;
   object_t *shot, **obj_list;
   int  obj_count;
@@ -402,82 +439,147 @@ bool Robot_evade_shot(player_t *pl){
     double delta_velx, delta_vely, delta_x, delta_y, sqdistance;
     double sqship_sz;
     Cell_get_objects(pl->pos, (int)(Visibility_distance / BLOCK_SZ),
-		     max_objs, &obj_list, &obj_count);
+		     max_objs, &obj_list, &obj_count); 
+
+    /*This is the viewable area for players:
+    #include "connection.h"
+    int hori_blocks, vert_blocks;
+    hori_blocks = (view_width + (BLOCK_SZ - 1)) / (2 * BLOCK_SZ);
+    vert_blocks = (view_height + (BLOCK_SZ - 1)) / (2 * BLOCK_SZ);
+    if (NumObjs >= options.cellGetObjectsThreshold)
+        Cell_get_objects(pl->pos, MAX(hori_blocks, vert_blocks),
+                         num_object_shuffle, &obj_list, &obj_count);*/
+
     
 
     shortest_hit_time=10000;
     int closest_shot = -1;
+    int dangerous_shots[obj_count];
+    double dangerous_shots_time[obj_count];
+    int dangerous_shots_ind =0;
+    double dangerous_shots_distance[obj_count];
 
     for (j = 0; j < obj_count; j++) { /*for .. obj_count*/
-
+	
 	shot = obj_list[j];
-
+	
 	/* Get rid of most objects */
 	if (!BIT(shot->type, killing_shots ))
 	    continue;
-
+	
+	/* calculate relative positions and velocities */
 	delta_velx=( shot->vel.x -  pl->vel.x );
 	delta_vely=( shot->vel.y -  pl->vel.y );
 	delta_x=   WRAP_DCX( shot->pos.cx - pl->pos.cx );
 	delta_y=   WRAP_DCY( shot->pos.cy - pl->pos.cy );
-
+	
 	/* prevent possible division by 0 */
 	if(delta_velx == 0 || delta_vely == 0) 
-	  continue;
-	/* get time of "hit" from deviation of distance function */
-
-
-	time_shot_closest = 
-	  -( delta_x * delta_velx + delta_y * delta_vely) /
-	  ((sqr(delta_velx) + sqr(delta_vely))); 
-
-
-	if((time_shot_closest < 0) || (time_shot_closest > 400))
-          /*option instead of fixed value: options.dodgetime))*/
-	  continue;
+	    continue;
 	
+	/* get time of "hit" from deviation of distance function */
+	time_shot_closest = 
+	    -( delta_x * delta_velx + delta_y * delta_vely) /
+	    ((sqr(delta_velx) + sqr(delta_vely))); 
+	
+	/* ignore if there is enough time to dodge this shot in a later frame*/
+	if((time_shot_closest < 0) || (time_shot_closest > 1000))
+	    /*option instead of fixed value: options.dodgetime))*/
+	    continue;
+	
+	/* look if shot will hit (compare squares of distances and shipsize) */
 	sqdistance = 
-	  (sqr(delta_velx) + sqr(delta_vely)) * sqr(time_shot_closest)  +
-	  2 * (delta_velx * delta_x + delta_vely * delta_y) * time_shot_closest +
-	  sqr(delta_x) + sqr(delta_y);
-
-
-	sqship_sz = sqr(1.1 * PIXEL_TO_CLICK(SHIP_SZ));
-
-		if(sqdistance > sqship_sz)
-	  continue;
-
-		if(Wall_in_between_points(
-				  pl->pos.cx + time_shot_closest * pl->vel.x, 
-				  pl->pos.cy + time_shot_closest * pl->vel.y, 
-				  shot->pos.cx + time_shot_closest * shot->vel.x,
-				  shot->pos.cy + time_shot_closest * shot->vel.y
-				  ))
-	 continue;
-
+	    (sqr(delta_velx) + sqr(delta_vely)) * sqr(time_shot_closest)  
+	    + 2 * (delta_velx * delta_x + delta_vely * delta_y) 
+	    * time_shot_closest 
+	    + sqr(delta_x) + sqr(delta_y);
+	
+#define SQ_SHIP_SZ_11 sqr(1.1 * PIXEL_TO_CLICK(SHIP_SZ))
+#define SQ_SHIP_SZ_16 sqr(1.6 * PIXEL_TO_CLICK(SHIP_SZ))
+	
+	if(sqdistance > SQ_SHIP_SZ_16)
+	    continue;
+	
+	/* ignore shots that will hit a wall before it hits us */
+	if(Wall_in_between_points(
+	       shot->pos.cx ,
+	       shot->pos.cy ,
+	       shot->pos.cx + time_shot_closest * shot->vel.x,
+	       shot->pos.cy + time_shot_closest * shot->vel.y
+	       ))
+	    continue;
+	
+	/* 
+	 * store shot id and time for every shot that hits 
+	 * within the given time 
+	 */
+	
+	dangerous_shots[dangerous_shots_ind]=j;
+	dangerous_shots_time[dangerous_shots_ind]=time_shot_closest;
+        dangerous_shots_distance[dangerous_shots_ind]=sqdistance;
+	dangerous_shots_ind++;
+	
+	if(sqdistance > SQ_SHIP_SZ_11)
+	    continue;
+	
 	if(shortest_hit_time > time_shot_closest){
-	  shortest_hit_time = time_shot_closest;
-	  closest_shot=j;
+	    shortest_hit_time = time_shot_closest;
+	    closest_shot=j;
 	}
     }
-
+    
+    /* return, if nothing will hit */
     if((closest_shot == -1)) {return false; }
+    
+//printf("Time for closest shot (%i): %.2f\n",closest_shot,shortest_hit_time);
+//for (j = 0; j < dangerous_shots_ind  ; j++) { /*for .. dangerous_shots_ind*/
+//printf("dangerous shot %i (%i) impact in %.2f, distance: %.2f\n",j,
+//dangerous_shots[j],dangerous_shots_time[j],
+ //sqrt(dangerous_shots_distance[j]));
+ //}
 
-
+    /* get vector orthogonal vector from ship to path of shot */
     shot = obj_list[closest_shot];
-	delta_velx=( shot->vel.x -  pl->vel.x );
-	delta_vely=( shot->vel.y -  pl->vel.y );
-	delta_x=   WRAP_DCX( shot->pos.cx - pl->pos.cx );
-	delta_y=   WRAP_DCY( shot->pos.cy - pl->pos.cy );
+    delta_velx=( shot->vel.x -  pl->vel.x );
+    delta_vely=( shot->vel.y -  pl->vel.y );
+    delta_x=   WRAP_DCX( shot->pos.cx - pl->pos.cx );
+    delta_y=   WRAP_DCY( shot->pos.cy - pl->pos.cy );
 
 
-    double direction_pl,direction_evade1,direction_evade2;
+double hit_dx, hit_dy;
+hit_dx = delta_x + shortest_hit_time * delta_velx;
+hit_dy = delta_y + shortest_hit_time * delta_vely;
+double evade_x=-hit_dx;
+double evade_y=-hit_dy;
+double direction_evade1;
+
+/*printf("delta_x: %.2f delta_y: %.2f evade_x: %.2f evade_y: %.2f product: %.2f\n",
+	delta_velx, delta_vely, evade_x, evade_y, delta_velx*evade_x+delta_vely*evade_y);*/
+//XXX
+//printf("direction hit: %.2f  --- ",direction_evade1);
+    
+    /* if the shot hits the exactly the center, use alternate calculation of orthogonal to shot path */
+/*    double direction_pl,direction_evade1,direction_evade2;
     double norm_vel= sqrt(sqr(delta_velx)+sqr(delta_vely));
     double norm_xy = sqrt(sqr(delta_x)+sqr(delta_y));
     double evade_x = -(delta_velx / norm_vel  + delta_x / norm_xy);
     double evade_y = -(delta_vely / norm_vel  + delta_y / norm_xy);
+*/
+    direction_evade1 = Wrap_findDir(evade_x, evade_y );
 
-    direction_evade1 = findDir(evade_x, evade_y );
+    /* Change evade by 180° if wall will be in the way in the chosen direction */
+    if(Wall_in_between_points(
+                  pl->pos.cx + time_shot_closest * (pl->vel.x +  pl->power * cos(direction_evade1) / pl->mass),
+                  pl->pos.cy + time_shot_closest * (pl->vel.y +  pl->power * sin(direction_evade1) / pl->mass),
+                  pl->pos.cx ,
+                  pl->pos.cy 
+                  )){
+	direction_evade1+=RES;
+	//	printf("Wall!\n");
+	}
+
+
+//printf("direction old: %.2f\n",direction_evade1);
 
   Robot_set_pointing_direction(pl, direction_evade1);
     Thrust(pl, true);
@@ -488,7 +590,7 @@ bool Robot_evade_shot(player_t *pl){
 
 
 void Robot_move_randomly(player_t *pl){
-  int direction;
+  double direction;
 
   /* Move randomly */
   if(rfrac()<0.25) 
@@ -496,7 +598,7 @@ void Robot_move_randomly(player_t *pl){
 
   if(pl->velocity > options.maxUnshieldedWallBounceSpeed){ /* not too fast...*/
                             
-    direction= (int)findDir(-pl->vel.x,-pl->vel.y);
+    direction= findDir(-pl->vel.x,-pl->vel.y);
     Robot_set_pointing_direction(pl, direction);
     Thrust(pl, true);
     return;
@@ -507,7 +609,7 @@ void Robot_move_randomly(player_t *pl){
         Fire_normal_shots(pl);  
   }
   /* Sometimes thrust */
-  if((rfrac())>0.7 )
+  if((rfrac())>0.997 )
     {  
       Thrust(pl, true); 
     } 
@@ -517,120 +619,254 @@ void Robot_move_randomly(player_t *pl){
   
 } 
 
-void Robot_pop_ball(player_t *pl,ballobject_t *ball){
-int direction; 
+double Robot_ram_object(player_t *pl,object_t *object){
 
- double delta_velx, delta_vely, delta_x, delta_y;
- double time_ball_closest;
+    double direction;
+    int x,y,x_tgo, y_tgo;
+    double velx, vely; /* relative positions and velocities */
+    double time, delta_time;
+    double sqr_a, sqr_b, sqr_c, b_dot_c, function, deviation;
+    int i=0;
+    int j=0;
 
-	delta_velx=( ball->vel.x -  pl->vel.x );
-	delta_vely=( ball->vel.y -  pl->vel.y );
-	delta_x=   WRAP_DCX( ball->pos.cx - pl->pos.cx );
-	delta_y=   WRAP_DCY( ball->pos.cy - pl->pos.cy );
-
-	/* prevent possible division by 0 */
-	if(delta_velx == 0 || delta_vely == 0) 
-	  time_ball_closest =0;
-	else 
-	time_ball_closest = 
-	  -( delta_x * delta_velx + delta_y * delta_vely) /
-	  ((sqr(delta_velx) + sqr(delta_vely))); 
-
-    direction=(int)(Wrap_cfindDir(ball->pos.cx - pl->pos.cx 
-				  + delta_velx * abs(time_ball_closest) / 2,
-				  ball->pos.cy - pl->pos.cy  
-				  + delta_vely * abs(time_ball_closest) / 2));
-Robot_set_pointing_direction(pl, direction);
-    Thrust(pl, true);
-    return;
-  }
-
-
-
-void Robot_suicide_player(player_t *pl, player_t *pl_to_suicide);
-void Robot_suicide_player(player_t *pl, player_t *pl_to_suicide){/*Suicide_player*/
-  
-  int                         dx,dy;
-  double                     tmp_a,tmp_b,tmp_c,direction,t1,t,t2;
-
-  // check if we can fire or have to wait because of repeat rate
-  // if (frame_time <= pl->shot_time + options.fireRepeatRate - timeStep + 1e-3)
-  dx = WRAP_DCX(pl_to_suicide->pos.cx - pl->pos.cx)/CLICK;
-  dy = WRAP_DCY(pl_to_suicide->pos.cy - pl->pos.cy)/CLICK;
-  
-  /*Find direction, where a shot will hit a ship with constant velocity*/
-  /* use tmp_vars to try to keep it readable */
-  tmp_a=dx*(pl_to_suicide->vel.x - pl->vel.x)+dy*(pl_to_suicide->vel.y - pl->vel.y);
-  
-  tmp_b= sqr(pl_to_suicide->vel.x - pl->vel.x) + sqr(pl_to_suicide->vel.y - pl->vel.y) 
-         - sqr(options.shotSpeed);
-  
-  tmp_c = (sqr(tmp_a) - tmp_b*(sqr(dx)+sqr(dy)));
-  
- if( tmp_c >= 0) { /* square-root only if number positive*/
-   tmp_c = sqrt(tmp_c);
-
-    t1 = (-tmp_a - tmp_c)/tmp_b;
-    t2 = (-tmp_a + tmp_c)/tmp_b;
-    t = 0;
+    velx = ( object->vel.x -  pl->vel.x ) * CLICK;
+    vely = ( object->vel.y -  pl->vel.y ) * CLICK;
+    /* multiply with CLICK to get clicks/time, but keep as float */
+    x    = WRAP_DCX( object->pos.cx - pl->pos.cx );
+    y    = WRAP_DCY( object->pos.cy - pl->pos.cy );
     
-    /* t (=time) must be greater than 0, but as small as possible... 
-     if problem can't be solved point where (??)*/
- 
-if (t1 >= 0 && t2 >= 0) { 
-   if (t1 > t2){ t = t2;} else {t = t1;}
-   Fire_normal_shots(pl);
- }
- else if( t2 >= 0 ) {t = t2; Fire_normal_shots(pl);} 
- else if( t1 >= 0 ) {t = t1; Fire_normal_shots(pl);}
- else {t = LENGTH(dx, dy)/options.shotSpeed;
- if(rfrac() >0.5){ Fire_normal_shots(pl);}
- }
-
- }else{t1=-1;t2=-1;
-/*  t=sqrt(sqr(dx)+sqr(dy))/options.shotSpeed;   */
- t = -tmp_a/tmp_b;
- if (t <0){t = sqrt(sqr(dx)+sqr(dy))/options.shotSpeed;  /*printf("And t negative\n");*/ }
- /*  printf ("Sqrt of negative, no solution!\n"); */  
- /* sqrt(neg.number) -> no solution*/
 
 
- if(rfrac() >0.4){ Fire_normal_shots(pl);}
- }
- 
 
- dx = dx + t * (pl_to_suicide->vel.x - pl->vel.x) /*+ pl_to_suicide->acc.x * t * sqr(sqr(rfrac()))*/;
- dy = dy + t * (pl_to_suicide->vel.y - pl->vel.y) /*+ pl_to_suicide->acc.y * t * sqr(sqr(rfrac()))*/;
+#define DD false /* debug */
+    
+    /* use squares of length, so sqrt doesnt need to be calculated */
+    sqr_a   = sqr(pl->power / pl->mass * CLICK);       /* acceleration */
+    sqr_b   = sqr(velx)+sqr(vely);  /* velocity     */
+    sqr_c   = sqr(x)+sqr(y);        /* distance     */
+    b_dot_c = velx*x + vely*y;      /* dot product b·c */
 
- /* actually, it would be accleration * sqr(time); but this is much too much for even relatively
-    small times */
- /* slightly bias shooting towads where a player thrusts */
- if(rfrac() > 0.75){
-   dx = dx + pl_to_suicide->acc.x * t * sqr(sqr(rfrac()));
-   dy = dy + pl_to_suicide->acc.y * t * sqr(sqr(rfrac()));
- }
+/*     for (i = 0; i < 500; i++){ */
+/*       time=i/10.0; */
+/*       double tmp_x = (int)(x + velx * time); */
+/*       double tmp_y = (int)(y + vely * time); */
+      
+/*       double tmp_length= */
+/* 	abs(LENGTH(tmp_x,tmp_y)- 0.5 * (CLICK * pl->power / pl->mass) * sqr(time)); */
+/*       if(tmp_length < 3000) */
+/* 	printf("time %.2f  length %.2f\n",time,tmp_length); */
+/*     } */
 
-    //    printf("t %f sqr t %f\n", t, sqr(t));
-/*     printf("nch:dx: %i dy: %i\n",dx,dy);   */
-   
-    /*    if(dy == 0){direction =  RES * ((dx>=0) ? 0 : 0.5 ); }
-     else{
-    direction =  RES /(6.283185307) * acos(dx / sqrt(sqr(dx)+sqr(dy)));
+    time = 1;
+    //time=sqrt(2*LENGTH(x,y)/(pl->power/pl->mass));
+    /* exact: time=sqrt(2*LENGTH(x,y)/pl->power*pl->mass);*/
+    delta_time=5000; /* set high value so convercence criterion isnt met */
+    
+    if(DD){printf("time %.3f\n",time);}
+
+    for (i = 0; i < 30; i++) { /* allow only limited amount of iterations */
+
+	/* Newton iterations to get the time of impact */
+	function = 
+	    -0.25 * sqr_a * sqr(sqr(time)) 
+	    + sqr_b * sqr(time)
+	    + 2 * b_dot_c * time 
+	    + sqr_c;
+	deviation=
+	    -sqr_a * sqr(time) * time 
+	    + 2 * sqr_b * time 
+	    + 2 * b_dot_c;
+
+	delta_time=function/deviation;	
+
+        if(delta_time > time){
+	  if(j>2)
+	    break; /* setting time=0 failed, give up */
+	  time*=0;
+	  j++;
+	}else{
+	  time-=delta_time;
+	}
+
+	
+	if(DD)
+	    printf("time %.3f function: %e delta_time %E\n",time, function, delta_time);
+	
+	
+	 int tmp_x = (int)(x + velx * time);
+	 int tmp_y = (int)(y + vely * time);
+
+
+//	if( abs(delta_time)< 0.001* abs(time))
+      if(abs(function) < 10)
+//	if(abs(LENGTH(tmp_x,tmp_y)- 0.5 * (CLICK * pl->power/pl->mass) * sqr(time)) < 10 )
+	    break;
     }
-     if(dy <0){direction = -direction;} 
-    */
-    direction= (int)findDir(dx, dy);
+    
+    if(DD){
+	printf("time: %.2f\n",time);
+	printf("test1: %.4f %.4f %.4f\n",
+	       - 0.25 * sqr_a * sqr(sqr(time)),
+	       + sqr_b * sqr(time)
+	       + 2 * b_dot_c * time
+	       + sqr_c,
+	       -sqr_a/4 * sqr(sqr(time)) 
+	       + sqr_b * sqr(time)
+	       + 2 * b_dot_c * time 
+	       + sqr_c
+	    );
+    }
+/*
 
-     if(rfrac() > 0.75){ direction +=  ((rfrac()-0.5 )*10);} 
-  
+    velx=( object->vel.x -  pl->vel.x );
+    vely=( object->vel.y -  pl->vel.y );
+    x=   WRAP_DCX( object->pos.cx - pl->pos.cx );
+    y=   WRAP_DCY( object->pos.cy - pl->pos.cy );
+*/
+    /* prevent possible division by 0 */
+/*    if(velx == 0 || vely == 0) 
+	time =0;
+    else 
+	time = 
+	    -( x * velx + y * vely) /
+	    ((sqr(velx) + sqr(vely))); 
+*/    
+    if(DD){
+    printf("x %i y %.i\n",x,y);
+    printf("velx %.2f * time %.2f = %.2f\n",velx,time,velx*time);
+    }
 
 
-  Robot_set_pointing_direction(pl, (int)(abs(direction+0.5)));
-     Thrust(pl, true); 
+    x_tgo = (int)(x + velx * time);
+    y_tgo = (int)(y + vely * time);
+
+    if(DD) {
+	printf("nx %i ny %i, length %.3f\n",x_tgo,y_tgo,LENGTH(x_tgo,y_tgo));
+	printf("            difference: %.3f\n",LENGTH(x_tgo,y_tgo)- 0.5 * sqrt(sqr_a) * sqr(time));
+
+    }
+
+    /*
+     * if vector to ball at time-to-go (tgo) points away from the ball
+     * something is wrong - better use the vector of current LOS (line of sight)
+     */    
+//    if(sqr_c > sqr(x+x_tgo)+sqr(y+y_tgo)){
+//	x_tgo=x;
+//	y_tgo=y;
+//	}
+	
+
+    direction=(Wrap_cfindDir(x_tgo,y_tgo));
+
+    if(DD)
+    printf("                         direction %.2f, direction %i\n",direction, (int)direction);
+
+    Robot_set_pointing_direction(pl, direction);
+    Thrust(pl, true);
+    return time;
+}
+
+
+#define NO_DIR -1
+void Robot_find_shooting_dir(player_t *pl, player_t *pl_to_suicide);
+void Robot_find_shooting_dir(player_t *pl, player_t *pl_to_suicide){
+
+
 
 }
 
-/*KS: end*/
+void Robot_attack_player(player_t *pl, player_t *opponent);
+void Robot_attack_player(player_t *pl, player_t *opponent){/*attack_player*/   
+    
+    int        dcx,dcy;
+    double     direction;
+    double     velx,vely;
+    double     tmp_a,tmp_b,tmp_c,t1,t,t2;
+    
+    /* check if we can fire or have to wait because of repeat rate */
+    /* same check as in Fire_normal_shots(pl)                      */
+    if (frame_time 
+	<= pl->shot_time + options.fireRepeatRate 
+	- timeStep + 1e-3){
+	Robot_ram_object(pl, OBJ_PTR(opponent));
+	return;
+    }
+    
+    
+    dcx   = WRAP_DCX(opponent->pos.cx - pl->pos.cx);
+    dcy   = WRAP_DCY(opponent->pos.cy - pl->pos.cy);
+    velx  = (opponent->vel.x - pl->vel.x) * CLICK;
+    vely  = (opponent->vel.y - pl->vel.y) * CLICK;
+
+    
+    /*Find direction, where a shot will hit a ship with constant velocity*/
+    /* use tmp_vars to try to keep it readable */
+    tmp_a = dcx * velx + dcy * vely;
+    
+    tmp_b = sqr(velx) + sqr(vely) - sqr(options.shotSpeed * CLICK);
+    
+    tmp_c = sqr(tmp_a) - tmp_b * (sqr(dcx) + sqr(dcy));
+    
+	t  = -1; /* -1 for no solution */
+	
+	if( tmp_c >= 0) { /* square-root only if number positive*/
+	
+	tmp_c = sqrt(tmp_c);
+	
+	t1 = (-tmp_a - tmp_c) / tmp_b;
+	t2 = (-tmp_a + tmp_c) / tmp_b;
+
+	
+	/* t (=time) must be greater than 0, but as small as possible... 
+	   if problem can't be solved call ram_object*/
+	
+	if (t1 >= 0 && t2 >= 0) { 
+	    if (t1 > t2){ t = t2;} else {t = t1;}
+	    Fire_normal_shots(pl);
+	}
+	else if( t2 >= 0 ) {t = t2; Fire_normal_shots(pl);} 
+	else if( t1 >= 0 ) {t = t1; Fire_normal_shots(pl);}
+	}
+    
+	/* t = -1 for no solution */    
+	if(t<0){
+	    /* try to get closer */
+	    Robot_ram_object(pl, OBJ_PTR(opponent));
+	    
+	    if(rfrac() >0.5){ Fire_normal_shots(pl);}
+	    return;
+	}
+	
+#define D2 false
+    if(D2)
+    printf("no:  dcx %i = dcx %i + t %.2f * velx %.2f\n", 
+	   (int)(dcx + t * velx), dcx, t, velx);
+    
+    dcx = (int) (dcx + t * velx);
+    dcy = (int) (dcy + t * vely);
+    
+    /* slightly bias shooting towads where a player thrusts */
+    
+    if(false && rfrac() > 0.75){
+	dcx = dcx + opponent->acc.x * t * sqr(sqr(rfrac()));
+	dcy = dcy + opponent->acc.y * t * sqr(sqr(rfrac()));
+	
+	/* actually, it should be acc * sqr(time); 
+	 * but this is much too much for even relatively
+	 * small times 
+	 */
+    }
+    
+    direction = findDir((double)dcx,(double)dcy);
+    if(D2)
+      printf("no: dir= %i\n",direction);
+    
+    if(rfrac() > 0.8) /* spread shots */
+      direction += ((rfrac()-0.5 )*10);
+    
+        Robot_set_pointing_direction(pl, direction);
+        Thrust(pl, true); 
+}
 
 
 
@@ -859,7 +1095,6 @@ static void Robot_suibot_play(player_t *pl)
   bool harvest_checked, evade_checked, navigate_checked;
   robot_default_data_t *my_data = Robot_suibot_get_data(pl);
   
-  /*KS: mods*/
   double ship_dist_closest;
   player_t *closest_opponent;
   closest_opponent= NULL;
@@ -874,11 +1109,34 @@ static void Robot_suibot_play(player_t *pl)
     Robot_take_off_from_base(pl);
     return;
   }
-  
+  /* important goal is not to be shot */
   if(Robot_evade_shot(pl)){
     return;
   }
-  //    Thrust(pl, false);
+  
+  /* Try not to crash into walls */
+
+
+  if(pl->velocity > options.maxUnshieldedWallBounceSpeed){
+      double time;
+      time= (pl->velocity 
+	     - options.maxUnshieldedWallBounceSpeed)/(pl->power / pl->mass);
+      time=time*0.05;
+      
+      if(Wall_in_between_points(pl->pos.cx, 
+				pl->pos.cy,
+				pl->pos.cx + pl->vel.x * time,
+				pl->pos.cy + pl->vel.y * time)) {
+      direction= (int)findDir(-pl->vel.x, -pl->vel.y);
+      Robot_set_pointing_direction(pl, direction);
+      printf("avoiding wall\n");
+      Thrust(pl, true);
+      return;
+      }
+  }
+
+
+      Thrust(pl, false);
   
   ship_dist_closest= 2* World.hypotenuse;
   for (ship_i = 0; ship_i < NumPlayers; ship_i++) {
@@ -890,11 +1148,14 @@ static void Robot_suibot_play(player_t *pl)
     
     if(BIT(ship->have, HAS_BALL ))
       ship_dist = ship_dist/3.0;
-    /* Player with ball is considered as "much closer" */
-    /* this is rather arbitrary 
-       the reasoning goes: dont try to attack player 
-       with ball who is really far off
-       while some other player is really really close*/
+    /* 
+     * Player with ball is considered as "much closer" 
+     *
+     * this is rather arbitrary 
+     * the reasoning goes: dont try to attack player 
+     * with ball who is really far off
+     * while some other player is really really close
+     */
     
     if ((ship->id != pl->id)
 	&& Player_is_alive(ship)
@@ -910,20 +1171,22 @@ static void Robot_suibot_play(player_t *pl)
       }
   }
   
- if(ship_dist_closest <  maxdist && ! closest_opponent){ /* if not true, there's a bug */ 
-   warn(" Robotdef.c: opponent very close, but variable empty!\n");
-   //   sprintf (msg,"I hit a bug! Chasing a non-existant opponent! [%s]",pl->name);
-   //Set_message(msg);
-   return;
- }
-
- if(ship_dist_closest <  maxdist && BIT(closest_opponent->used, HAS_SHIELD)){
-   direction = Wrap_cfindDir(-closest_opponent->pos.cx + pl->pos.cx,
-			     -closest_opponent->pos.cy + pl->pos.cy);
-   Robot_set_pointing_direction(pl, (int)(abs(direction+0.5)));
-   Thrust(pl, true); 
-   return;
- }
+  if(ship_dist_closest <  maxdist && ! closest_opponent){ 
+      char msg[MSG_LEN];
+      /* if not true, there's a bug */ 
+      warn(" Robotdef.c: opponent very close, but variable empty!\n");
+      sprintf (msg,"Bug: Chasing a non-existant opponent! [%s]",pl->name);
+      Set_message(msg);
+      return;
+  }
+  
+  if(ship_dist_closest <  maxdist && BIT(closest_opponent->used, HAS_SHIELD)){
+      direction = Wrap_cfindDir(-closest_opponent->pos.cx + pl->pos.cx,
+				-closest_opponent->pos.cy + pl->pos.cy);
+      Robot_set_pointing_direction(pl, (int)(abs(direction+0.5)));
+      Thrust(pl, true); 
+      return;
+  }
   
 
   
@@ -967,87 +1230,83 @@ static void Robot_suibot_play(player_t *pl)
  }
  
 
-
-
  if(ship_dist_closest <  maxdist
     && ship_dist_closest < (2.5 * ball_dist)
-    && (Wall_in_between_points((pl->pos.cx),(pl->pos.cy),(closest_opponent->pos.cx),
+    && (Wall_in_between_points((pl->pos.cx),
+			       (pl->pos.cy),
+			       (closest_opponent->pos.cx),
 			       (closest_opponent->pos.cy)) == 0)
-    && (!BIT(pl->have, HAS_BALL))	) {
-   Robot_suicide_player(pl,closest_opponent);
+    && (!BIT(pl->have, HAS_BALL))	
+     ) {
+   Robot_attack_player(pl,closest_opponent);
+   Thrust(pl, false);
    return;
  }
- /*else{
-   if(ship_dist_closest >=  maxdist) {printf("Too far away\n");} else
-   if(!closest_opponent)             {printf("No opponent\n");} else
-   if((Wall_in_between_points((pl->pos.cx),(pl->pos.cy),(closest_opponent->pos.cx),
-   (closest_opponent->pos.cy)))) {printf("Wall!\n");} else
-   if(BIT(pl->have, HAS_BALL)){ printf("Has ball!\n");} else
-   printf("ERROR\n");
-   }*/
- 
 
  if( ball 
      && ball_dist < maxdist 
-          && Wrap_length(ball->pos.cx - ball->ball_treasure->pos.cx,
+     && Wrap_length(ball->pos.cx - ball->ball_treasure->pos.cx,
      		    ball->pos.cy - ball->ball_treasure->pos.cy
-     		    ) > 10000
+	 ) > 10000
      ){
-   Robot_pop_ball(pl, ball);
-   return;
-}
-
-/* Helps to get stuck on walls less frequently
-   10 propably only works ok with framerate of 50 fps 
-   plan: a) make value depend on framerate,
-         b) use better algorithm than that
-*/
-
-if((pl->last_wall_touch + 11) >= frame_loops) {
-   direction= (int)findDir(pl->vel.x,pl->vel.y);
-   Robot_set_pointing_direction(pl, direction);
-
-    Thrust(pl, false);
-  return;
-}
- if((pl->last_wall_touch + 14) >= frame_loops){
-   direction= (int)findDir(pl->vel.x,pl->vel.y);
-   Robot_set_pointing_direction(pl, direction);
-   if(!Wall_in_between_points(pl->pos.cx, pl->pos.cy, 
-                              pl->pos.cx + pl->vel.x * 5,
-                              pl->pos.cy + pl->vel.y * 5)){
-	Thrust(pl, true);
-	}
-
+     Robot_ram_object(pl, OBJ_PTR(ball));
+     return;
  }
 
+ /* Helps to get stuck on walls less frequently
+    10 propably only works ok with framerate of 50 fps 
+    plan: a) make value depend on framerate,
+    b) use better algorithm than that
+    ---> probably no problem anymore because of turnpush.
+    Robots should be able to get free anyways now.
+ */
 
+ if((pl->last_wall_touch + 11) >= frame_loops) {
+     direction= (int)findDir(pl->vel.x,pl->vel.y);
+     Robot_set_pointing_direction(pl, direction);
+     
+     Thrust(pl, false);
+     return;
+ }
+ 
+ if((pl->last_wall_touch + 14) >= frame_loops){
+     direction= (int)findDir(pl->vel.x,pl->vel.y);
+     Robot_set_pointing_direction(pl, direction);
+     if(!Wall_in_between_points(pl->pos.cx, pl->pos.cy, 
+				pl->pos.cx + pl->vel.x * 10,
+				pl->pos.cy + pl->vel.y * 10)){
+	 Thrust(pl, true);
+     }
+ }
+ 
 /* nothing sensible to to at the moment */
-
-    Robot_move_randomly(pl);
+ Robot_move_randomly(pl);
 }
 
-/*KS: mods end*/
 
 
 /*
  * This is called each round.
  * It allows us to adjust our file local parameters.
  */
+
 static void Robot_suibot_round_tick(void)
 {
     double min_visibility = 256.0;
     double min_enemy_distance = 512.0;
 
     /* reduce visibility when there are a lot of robots. */
-    Visibility_distance = min_visibility
+    Visibility_distance = VISIBILITY_DISTANCE;
+	/*min_visibility
 	+ (((VISIBILITY_DISTANCE - min_visibility)
-	    * (NUM_IDS - NumRobots)) / NUM_IDS);
+	    * (NUM_IDS - NumRobots)) / NUM_IDS);*/
+
 
     /* limit distance to allowable enemies. */
     Max_enemy_distance = world->hypotenuse;
     if (world->hypotenuse > Visibility_distance)
-	Max_enemy_distance = min_enemy_distance
+	Max_enemy_distance =  world->hypotenuse;
+/*	min_enemy_distance
 	    + (((world->hypotenuse - min_enemy_distance)
-		* (NUM_IDS - NumRobots)) / NUM_IDS);
+		* (NUM_IDS - NumRobots)) / NUM_IDS);*/
 }
