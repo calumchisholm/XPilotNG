@@ -1239,7 +1239,6 @@ static void Robot_suibot_play(player_t *pl)
     && (!BIT(pl->have, HAS_BALL))	
      ) {
    Robot_attack_player(pl,closest_opponent);
-   Thrust(pl, false);
    return;
  }
 
