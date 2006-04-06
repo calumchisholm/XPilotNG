@@ -6095,9 +6095,11 @@ fi
 
 if test x$enable_sound = xyes; then
 	have_openal=no
-	echo "$as_me:$LINENO: checking for alutInit in -lopenal" >&5
-echo $ECHO_N "checking for alutInit in -lopenal... $ECHO_C" >&6
-if test "${ac_cv_lib_openal_alutInit+set}" = set; then
+	have_alut=no
+	have_sound=no
+	echo "$as_me:$LINENO: checking for main in -lopenal" >&5
+echo $ECHO_N "checking for main in -lopenal... $ECHO_C" >&6
+if test "${ac_cv_lib_openal_main+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
@@ -6109,17 +6111,11 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char alutInit ();
+
 int
 main ()
 {
-alutInit ();
+main ();
   ;
   return 0;
 }
@@ -6145,39 +6141,103 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  ac_cv_lib_openal_alutInit=yes
+  ac_cv_lib_openal_main=yes
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-ac_cv_lib_openal_alutInit=no
+ac_cv_lib_openal_main=no
 fi
 rm -f conftest.err conftest.$ac_objext \
       conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-echo "$as_me:$LINENO: result: $ac_cv_lib_openal_alutInit" >&5
-echo "${ECHO_T}$ac_cv_lib_openal_alutInit" >&6
-if test $ac_cv_lib_openal_alutInit = yes; then
+echo "$as_me:$LINENO: result: $ac_cv_lib_openal_main" >&5
+echo "${ECHO_T}$ac_cv_lib_openal_main" >&6
+if test $ac_cv_lib_openal_main = yes; then
   have_openal=yes
 fi
 
+	echo "$as_me:$LINENO: checking for main in -lalut" >&5
+echo $ECHO_N "checking for main in -lalut... $ECHO_C" >&6
+if test "${ac_cv_lib_alut_main+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lalut  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+main ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_alut_main=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_alut_main=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_alut_main" >&5
+echo "${ECHO_T}$ac_cv_lib_alut_main" >&6
+if test $ac_cv_lib_alut_main = yes; then
+  have_alut=yes
+fi
+
 	if test x$have_openal = xyes; then
-		SOUND_LIBS=-lopenal
+		if test x$have_alut = xyes; then
+			have_sound=yes
+			SOUND_LIBS="-lopenal -lalut"
 
 cat >>confdefs.h <<\_ACEOF
 #define SOUND 1
 _ACEOF
 
-	else
-		echo "*** Client sound disabled. Check that you have OpenAL installed."
+		else
+			echo "*** Client sound disabled. Check that you have OpenAL installed."
+		fi
 	fi
 
 fi
 
 
 
-if test x$have_openal = xyes; then
+if test x$have_sound = xyes; then
   COND_SOUND_TRUE=
   COND_SOUND_FALSE='#'
 else

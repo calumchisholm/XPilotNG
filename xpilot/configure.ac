@@ -314,21 +314,31 @@ AM_CONDITIONAL([COND_SDL_GAMELOOP], [test x$enable_sdl_gameloop = xyes])
 dnl OpenAL client sound support.
 if test x$enable_sound = xyes; then
 	have_openal=no
+	have_alut=no
+	have_sound=no
 	AC_CHECK_LIB(
 		openal, 
-		alutInit, 
+		main, 
 		[have_openal=yes],
 		[])
+	AC_CHECK_LIB(
+		alut, 
+		main, 
+		[have_alut=yes],
+		[])
 	if test x$have_openal = xyes; then
-		SOUND_LIBS=-lopenal
-		AC_DEFINE([SOUND], 1, [Define to 1 if you want OpenAL sound.])
-	else
-		echo "*** Client sound disabled. Check that you have OpenAL installed."
+		if test x$have_alut = xyes; then
+			have_sound=yes
+			SOUND_LIBS="-lopenal -lalut"
+			AC_DEFINE([SOUND], 1, [Define to 1 if you want OpenAL sound.])
+		else
+			echo "*** Client sound disabled. Check that you have OpenAL installed."
+		fi
 	fi
 	AC_SUBST(SOUND_LIBS)
 fi
 
-AM_CONDITIONAL([COND_SOUND], [test x$have_openal = xyes])
+AM_CONDITIONAL([COND_SOUND], [test x$have_sound = xyes])
 
 dnl  Checks for header files.
 dnl AC_HEADER_STDC
