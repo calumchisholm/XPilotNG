@@ -5,6 +5,13 @@
 
 This is a summary of changes of release 4.7.3 compared to release 4.7.2.
 
+Common:
+
+	* OpenAL has split alut into a separate library, freealut.  Configure
+	  now checks for both libraries and will not work with OpenAL versions
+	  prior to the split.   OpenAL 0.0.8 and freealut 1.0.1 have been
+	  tested and work.
+
 Server:
 	* Default shotspeed increased to 25 to compensate for "lost antilag".
 	* Fix unpause when baselessPausing is on.

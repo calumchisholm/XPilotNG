@@ -15,7 +15,7 @@ Additional requirements for the SDL client are:
     SDL_image 1.2
     OpenGL (hardware accelerated, no mesa is too slow)
 	
-Also if you enable sound support you'll need OpenAL.
+Also if you enable sound support you'll need OpenAL and freealut.
     
 To really enjoy the game you also need a fast graphics card and 
 a decent network connection.
