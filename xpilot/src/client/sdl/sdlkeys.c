@@ -160,6 +160,7 @@ static sdlkey_t sdlkeys[] = {
    { "bracketright",	SDLK_RIGHTBRACKET },
    { "grave",	    	SDLK_BACKQUOTE },
    { "quoteleft",   	SDLK_BACKQUOTE },
+   { "quotedbl",   	SDLK_QUOTEDBL },
    { "section",   	SDLK_WORLD_7 },
    { NULL,  	    	SDLK_UNKNOWN },
 };
