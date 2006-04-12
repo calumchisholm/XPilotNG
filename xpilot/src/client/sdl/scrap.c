@@ -15,7 +15,7 @@
 #define PRIVATE	static
 
 /* Determine what type of clipboard we are using */
-#if defined(__unix__) && !defined(__QNXNTO__)
+#if (defined(__unix__) && !defined(__QNXNTO__)) || defined(__NetBSD__)
     #define X11_SCRAP
 #elif defined(__WIN32__)
     #define WIN_SCRAP
