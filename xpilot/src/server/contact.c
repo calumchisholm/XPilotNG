@@ -59,21 +59,21 @@ int Contact_init(void)
 			        options.contactPort)) == -1) {
 	error("Could not create Dgram contactSocket");
 	error("Perhaps %s is already running?", APPNAME);
-	return End_game();
+	return false;
     }
     sock_set_timeout(&contactSocket, 0, 0);
     if (sock_set_non_blocking(&contactSocket, 1) == -1) {
 	error("Can't make contact socket non-blocking");
-	return End_game();
+	return false;
     }
     if (Sockbuf_init(&ibuf, &contactSocket, SERVER_SEND_SIZE,
 		     SOCKBUF_READ | SOCKBUF_WRITE | SOCKBUF_DGRAM) == -1) {
 	error("No memory for contact buffer");
-	return End_game();
-   }
+	return false;
+    }
 
     install_input(Contact, contactSocket.fd, (void *) &contactSocket);
-    return(true);
+    return true;
 }
 
 /*

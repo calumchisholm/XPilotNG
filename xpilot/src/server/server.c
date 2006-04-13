@@ -53,7 +53,18 @@ bool			mute_baseless = false;
 time_t			gameOverTime = 0;
 time_t			serverStartTime = 0;
 
-static void Handle_signal(int sig_no);
+#if !defined(_WINDOWS)
+
+/* The terminating signal, or zero if no signal. */
+static volatile int termsig = 0;
+
+static void Handle_signal(int sig_no)
+{
+    termsig = sig_no;
+    stop_sched();
+}
+
+#endif /* !defined(_WINDOWS) */
 
 int main(int argc, char **argv)
 {
@@ -145,7 +156,7 @@ int main(int argc, char **argv)
     Log_game("START");
 
     if (!Contact_init())
-	return 1;
+	End_game();
 
     Meta_init();
 
@@ -196,10 +207,10 @@ int main(int argc, char **argv)
 #endif
 
     sched();
-    xpprintf("sched returned!?");
     End_game();
 
-    return 1;
+    /* NOT REACHED */
+    abort();
 }
 
 void Main_loop(void)
@@ -298,10 +309,15 @@ void Main_loop(void)
 /*
  *  Last function, exit with grace.
  */
-int End_game(void)
+void End_game(void)
 {
     player_t *pl;
     char msg[MSG_LEN];
+
+#if !defined(_WINDOWS)
+    if (termsig != 0)
+	warn("Terminating on signal %d", termsig);
+#endif
 
     record = rrecord;
     playback = rplayback; /* Could be called from signal handler */
@@ -351,7 +367,15 @@ int End_game(void)
     Log_game("END");
 
     sock_cleanup();
-    exit (0);
+
+#if !defined(_WINDOWS)
+    if (termsig != 0) {
+	signal(termsig, SIG_DFL);
+	raise(termsig);
+    }
+#endif
+
+    exit(0);
 }
 
 /*
@@ -552,40 +576,6 @@ void Server_info(char *str, size_t max_size)
 	strlcat(str, msg, max_size);
     }
     free(order);
-}
-
-
-static void Handle_signal(int sig_no)
-{
-    errno = 0;
-
-#ifndef _WINDOWS
-    switch (sig_no) {
-
-    case SIGHUP:
-	if (options.NoQuit) {
-	    signal(SIGHUP, SIG_IGN);
-	    return;
-	}
-	xpinfo("Caught SIGHUP, terminating.");
-	End_game();
-	break;
-    case SIGINT:
-	xpinfo("Caught SIGINT, terminating.");
-	End_game();
-	break;
-    case SIGTERM:
-	xpinfo("Caught SIGTERM, terminating.");
-	End_game();
-	break;
-
-    default:
-	xpinfo("Caught unknown signal: %d", sig_no);
-	End_game();
-	break;
-    }
-#endif
-    _exit(sig_no);	/* just in case */
 }
 
 /* kps - is this useful??? */

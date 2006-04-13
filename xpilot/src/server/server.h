@@ -370,7 +370,7 @@ void Tune_asteroid_prob(void);
 /*
  * Prototypes for server.c
  */
-int End_game(void);
+void End_game(void);
 int Pick_team(int pick_for_type);
 void Server_info(char *str, size_t max_size);
 void Log_game(const char *heading);

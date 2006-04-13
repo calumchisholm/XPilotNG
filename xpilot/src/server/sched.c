@@ -64,6 +64,15 @@ static fd_set			input_mask;
 int				max_fd, min_fd;
 static int			input_inited = false;
 
+#if !defined(_WINDOWS)
+static volatile bool sched_running = false;
+
+void stop_sched(void)
+{
+	sched_running = false;
+}
+#endif
+
 static void io_dummy(int fd, void *arg)
 {
     xpprintf("io_dummy called!  (%d, %p)\n", fd, arg);
@@ -156,8 +165,6 @@ static void sched_select_error(void)
 
 #ifdef SELECT_SCHED
 
-bool sched_running = false;
-
 static long	timer_freq;
 static void	(*timer_handler)(void);
 static double	frametime;	/* time between 2 frames in seconds */
@@ -192,11 +199,6 @@ void install_timer_tick(void (*func)(void), int freq)
 }
 
 
-void stop_sched(void)
-{
-    sched_running = false;
-}
-
 /*
  * If you set skip_to the server calculates frames
  * until that value of main_loops as fast as it can.
@@ -216,12 +218,11 @@ void sched(void)
 
     playback = rplayback;
 
-    if (sched_running) {
-	error("sched already running");
-	exit(1);
-    }
+    if (sched_running)
+	dumpcore("sched already running");
+    else
+	sched_running = true;
 
-    sched_running = true;
     gettimeofday(&tv, NULL);
     t_now = timeval_to_seconds(&tv);
     t_nextframe = t_now + frametime;
@@ -329,9 +330,7 @@ void sched(void)
 
 #else /* SELECT_SCHED */
 
-int sched_running = false;
-
-volatile long	timer_ticks;	/* SIGALRMs that have occurred */
+static volatile long	timer_ticks;	/* SIGALRMs that have occurred */
 static long		timers_used;	/* SIGALRMs that have been used */
 static long		timer_freq;	/* rate at which timer ticks. (in FPS) */
 #ifndef _WINDOWS
@@ -625,12 +624,10 @@ void sched(void)
 
     playback = rplayback;
 
-    if (sched_running) {
-	error("sched already running");
-	exit(1);
-    }
-
-    sched_running = 1;
+    if (sched_running)
+	dumpcore("sched already running");
+    else
+	sched_running = true;
 
     while (sched_running) {
 
