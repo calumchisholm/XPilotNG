@@ -1,6 +1,7 @@
 <XPilotMap version="1.1">
 <GeneralOptions>
 <Option name="" value=""/>
+<Option name="teamplay" value="true"/>
 <Option name="shieldedMining" value="true"/>
 <Option name="shieldedItemPickup" value="true"/>
 <Option name="cannonInitialDeflectors" value="10"/>
