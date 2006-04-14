@@ -5,7 +5,6 @@
 <Option name="shieldedItemPickup" value="true"/>
 <Option name="cannonInitialDeflectors" value="10"/>
 <Option name="cannonDeadTicks" value="1"/>
-<Option name="minRobots" value="7"/>
 <Option name="allowRobotShields" value="yes" comment="not yet implemented"/>
 <Option name="allowShields" value="no"/>
 <Option name="cannonInitialArmor" value="10"/>
@@ -16,12 +15,11 @@
 <Option name="initialWideangles" value="1"/>
 <Option name="maxECMs" value="0"/>
 <Option name="maxTransporters" value="0"/>
-<Option name="minRobots" value="5"/>
+<Option name="minRobots" value="6"/>
 <Option name="targetDeadTicks" value="6000"/>
 <Option name="targetSync" value="yes"/>
 <Option name="targetTeamCollision" value="no"/>
 <Option name="teamCannons" value="yes"/>
-<Option name="teamTargets" value="yes"/>
 <Option name="limitedLives" value="false"/>
 <Option name="worldLives" value="3"/>
 <Option name="wormholeStableTicks" value="1"/>
