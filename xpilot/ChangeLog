@@ -16,6 +16,8 @@ Server:
 	* Default shotspeed increased to 25 to compensate for "lost antilag".
 	* Fix unpause when baselessPausing is on.
 	* Improved signal handling.
+	* Revert to the old policy of allowing players to "steal" bases
+	  from teammates regardless of score.
 
 Client:
 	* Improved ball message scan.  Clear color attributes of
