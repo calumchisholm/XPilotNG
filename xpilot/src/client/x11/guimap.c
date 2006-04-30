@@ -322,7 +322,7 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 	    if (color != WHITE)
 		color = WHITE;
 	    else
-		color = BLUE;
+		color = BLACK;
 	}
     }
 

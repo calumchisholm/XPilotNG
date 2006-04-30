@@ -477,7 +477,7 @@ void Paint_score_entry(int entry_num, other_t* other, bool is_team)
      * Underline the teams
      */
     if (is_team) {
-	color = (windowColor != BLUE ? BLUE : BLACK);
+	color = (windowColor != WHITE ? WHITE : BLACK);
 	XSetForeground(dpy, scoreListGC, colors[color].pixel);
 	gcv.line_style = LineSolid;
 	XChangeGC(dpy, scoreListGC, GCLineStyle, &gcv);
