@@ -644,8 +644,6 @@ extern int		 num_asteroids, max_asteroids;
 extern wormhole_t	*wormhole_ptr;
 extern int		 num_wormholes, max_wormholes;
 
-extern bool	        ball_shout;
-extern bool	        need_cover;
 extern long		start_loops, end_loops;
 extern long		time_left;
 
@@ -691,6 +689,8 @@ void Set_toggle_shield(bool on);
 /*
  * messages.c
  */
+bool Bms_test_state(msg_bms_t bms);
+void Bms_set_state(msg_bms_t bms);
 int Alloc_msgs(void);
 void Free_msgs(void);
 int Alloc_history(void);

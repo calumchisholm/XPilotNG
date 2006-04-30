@@ -1921,11 +1921,11 @@ void Paint_HUD(void)
 
 
     glDisable(GL_BLEND);
-    /* message scan hack by mara*/
-    if (ball_shout && msgScanBallColorRGBA)
+    /* message scan hack by mara and jpv */
+    if (Bms_test_state(BmsBall) && msgScanBallColorRGBA)
 	Circle(msgScanBallColorRGBA, draw_width / 2,
 	       draw_height / 2, (int)(8*clData.scale),0);
-    if (need_cover && msgScanCoverColorRGBA)
+    if (Bms_test_state(BmsCover) && msgScanCoverColorRGBA)
 	Circle(msgScanCoverColorRGBA, draw_width / 2,
 	       draw_height / 2, (int)(6*clData.scale),0);
 

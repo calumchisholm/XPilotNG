@@ -584,11 +584,11 @@ void Paint_HUD(void)
 		       SHIP_SZ);
     }
 
-    /* message scan hack by mara*/
-    if (ball_shout && msgScanBallColor)
+    /* message scan hack by mara and jpv */
+    if (Bms_test_state(BmsBall) && msgScanBallColor)
 	Arc_add(msgScanBallColor, ext_view_width / 2 - 5,
 		ext_view_height / 2 - 5, 10, 10, 0, 64 * 360);
-    if (need_cover && msgScanCoverColor)
+    if (Bms_test_state(BmsCover) && msgScanCoverColor)
 	Arc_add(msgScanCoverColor, ext_view_width / 2 - 4,
 		ext_view_height / 2 - 4, 8, 8, 0, 64 * 360);
 

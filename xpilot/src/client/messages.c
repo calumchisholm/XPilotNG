@@ -37,8 +37,8 @@ int			maxLinesInHistory;
 int	maxMessages;		/* Max. number of messages to display */
 int	messagesToStdout;	/* Send messages to standard output */
 
-bool ball_shout = false;
-bool need_cover = false;
+static bool ball_shout = false;
+static bool need_cover = false;
 
 bool roundend = false;
 static int killratio_kills = 0;
@@ -64,6 +64,11 @@ static void Delete_pending_messages(void);
  * - Kill/Death ratio counter, based on the original
  *   "e94_msu eKthHacks (killratio)"
  * - Mara's client ranking and base warning hacks
+ */
+
+/*
+ * jpv fixed the BMS ugliness and made it work
+ * the way it should.
  */
 
 /* if you want debug messages, use the upper one */
@@ -241,7 +246,7 @@ static bool Msg_scan_for_replace_treasure(const char *message)
 	char *replacer = mn.nick_name[1];
 
 	if (replacer_team == self->team) {
-	    ball_shout = false;
+	    Bms_set_state(BmsSafe);
 	    if (!strcmp(replacer, self->nick_name))
 		ballstats_replaces++;
 	    return true;
@@ -255,7 +260,7 @@ static bool Msg_scan_for_replace_treasure(const char *message)
 	 * In this case, we can clear the cover flag.
 	 */
 	if (num_playing_teams == 2)
-	    need_cover = false;
+	    Bms_set_state(BmsPop);
 	return true;
     }
 
@@ -339,9 +344,8 @@ static void Msg_scan_game_msg(const char *message)
 	strstr(message, "is the Deadliest Player with") ||
 	strstr(message, "are the Deadly Players with")) {
 
-	/* Mara bmsg scan - clear flags at end of round. */
-	ball_shout = false;
-	need_cover = false;
+	/* Mara & jpv bmsg scan - clear flags at end of round. */
+	Bms_set_state(BmsNone);
 
 	if (played_this_round) {
 	    played_this_round = false;
@@ -575,7 +579,6 @@ static msg_bms_t Msg_do_bms(const char *message)
 	strstr(message, safe_text2) ||
 	strstr(message, safe_text3) ||
 	strstr(message, safe_text4)) {
-	ball_shout = false;
 	return BmsSafe;
     }
 
@@ -585,14 +588,12 @@ static msg_bms_t Msg_do_bms(const char *message)
 	strstr(message, cover_text4) ||
 	strstr(message, cover_text5) ||
 	strstr(message, cover_text6)) {
-	need_cover = true;
 	return BmsCover;
     }
 
     if (strstr(message, pop_text1) ||
 	strstr(message, pop_text2) ||
 	strstr(message, pop_text3)) {
-	need_cover = false;
 	return BmsPop;
     }
 
@@ -601,7 +602,6 @@ static msg_bms_t Msg_do_bms(const char *message)
 	strstr(message, ball_text3) ||
 	strstr(message, ball_text4) ||
 	strstr(message, ball_text5)) {
-	ball_shout = true;
 	return BmsBall;
     }
 
@@ -730,7 +730,65 @@ void Free_selectionAndHistory(void)
     XFREE(selection.txt);
 }
 
+/*
+ * Clear bms info for all messages of the specified type.
+ */
+static void Bms_clear(msg_bms_t type)
+{
+    int i;
 
+    for (i = 0; i < maxMessages && TalkMsg[i]->len > 0; i++)
+	if (TalkMsg[i]->bmsinfo == type)
+	    TalkMsg[i]->bmsinfo = BmsNone;
+}
+
+bool Bms_test_state(msg_bms_t bms)
+{
+    switch (bms) {
+    case BmsBall:
+	return ball_shout;
+    case BmsCover:
+	return need_cover;
+    case BmsSafe:
+	return !ball_shout;
+    case BmsPop:
+	return !need_cover;
+    default:
+	dumpcore("Bms_test_state(): invalid message type");
+    }
+}
+
+void Bms_set_state(msg_bms_t bms)
+{
+    switch (bms) {
+    case BmsBall:
+	ball_shout = true;
+	Bms_clear(BmsSafe);
+	break;
+    case BmsSafe:
+	ball_shout = false;
+	Bms_clear(BmsBall);
+	break;
+    case BmsCover:
+	need_cover = true;
+	Bms_clear(BmsPop);
+	break;
+    case BmsPop:
+	need_cover = false;
+	Bms_clear(BmsCover);
+	break;
+    case BmsNone:
+	ball_shout = false;
+	need_cover = false;
+	Bms_clear(BmsBall);
+	Bms_clear(BmsSafe);
+	Bms_clear(BmsCover);
+	Bms_clear(BmsPop);
+	break;
+    default:
+	dumpcore("Bms_set_state(): invalid message type");
+    }
+}
 
 /*
  * add an incoming talk/game message.
@@ -803,6 +861,10 @@ void Add_message(const char *message)
     strlcpy(msg->txt, message, MSG_LEN);
     msg->len = strlen(message);
     msg->bmsinfo = bmsinfo;
+
+    /* Clear bms flags for out of date messages. */
+    if (bmsinfo != BmsNone)
+	Bms_set_state(bmsinfo);
 
     /*
      * scroll also the emphasizing
@@ -902,11 +964,7 @@ static void Roundend(void)
     int i;
 
     roundend = false;
-    ball_shout = false;
-    need_cover = false;
-
-    for (i = 0; i < maxMessages; i++)
-	TalkMsg[i]->bmsinfo = BmsNone;
+    Bms_set_state(BmsNone);
 }
 
 
