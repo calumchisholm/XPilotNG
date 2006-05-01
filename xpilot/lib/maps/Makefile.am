@@ -9,8 +9,6 @@ xpilotmap_DATA = \
 	ndh.xp2 \
 	ndh.xpd \
 	polybloods.xp2 \
-	polybloods7.xp2 \
-	polybloods8T.xp2 \
 	sadistic_bastard_v2.xp2 \
 	spaceball.xp2 \
 	teamcup.xp \
