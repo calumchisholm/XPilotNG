@@ -10,7 +10,7 @@ General:
 
 	* .rpm .deb and .tar.gz packages available.
 	
-	* Full Backward compatability with older xpilot clients, and
+	* Full Backward compatibility with older xpilot clients, and
 	  servers. (support dropped for xpilot versions prior to 4.2.1).
 	
 	* Numerous bug fixes, and code cleanups / quality improvement. 
@@ -81,9 +81,4 @@ Tools:
  
 	* A Java map editor for the polygon map format, outputs the map
 	  in XML format.
-   
-
-
-
-
  
