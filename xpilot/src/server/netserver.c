@@ -2608,6 +2608,8 @@ static void Handle_talk(connection_t *connp, char *str)
 	return;
     }
     *cp++ = '\0';
+    if (*cp == ' ')
+	cp++;
     len = strlen (str);
     sprintf(msg, "%s [%s]", cp, pl->name);
 
