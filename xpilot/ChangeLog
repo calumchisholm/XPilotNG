@@ -23,6 +23,9 @@ Client:
 	* Improved ball message scan.  Clear color attributes of
 	  out-of-date ball messages.
 
+X11 Client only:
+	* Fix bug that prevented radar colors from being set from xpilotrc.
+
 XPilot NG XP-Replay:
 	* Disable some code in color allocation function, it breaks certain
 	  recordings.
