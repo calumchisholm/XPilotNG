@@ -179,7 +179,7 @@ static option_desc opts[] = {
     {
 	"shotSpeed",
 	"shotSpeed",
-	"25.0",
+	"22.0",
 	&options.shotSpeed,
 	valReal,
 	tuner_dummy,
