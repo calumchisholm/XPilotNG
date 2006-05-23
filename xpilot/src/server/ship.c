@@ -136,35 +136,43 @@ void Delta_mv(object_t *ship, object_t *obj)
  * objects stay alive after the collision. */
 void Delta_mv_elastic(object_t *obj1, object_t *obj2)
 {
-    Delta_mv_partly_elastic(obj1, obj2, 1.0);
+    double	m1 = (double)obj1->mass,
+		m2 = (double)obj2->mass,
+		ms = m1 + m2;
+    double	v1x = obj1->vel.x,
+		v1y = obj1->vel.y,
+		v2x = obj2->vel.x,
+		v2y = obj2->vel.y;
+
+    obj1->vel.x = (m1 - m2) / ms * v1x
+		  + 2 * m2 / ms * v2x;
+    obj1->vel.y = (m1 - m2) / ms * v1y
+		  + 2 * m2 / ms * v2y;
+    obj2->vel.x = 2 * m1 / ms * v1x
+		  + (m2 - m1) / ms * v2x;
+    obj2->vel.y = 2 * m1 / ms * v1y
+		  + (m2 - m1) / ms * v2y;
+    if (obj1->type == OBJ_PLAYER
+	&& obj2->id != NO_ID
+	&& BIT(obj2->obj_status, COLLISIONSHOVE)) {
+	player_t *pl = (player_t *)obj1;
+	player_t *pusher = Player_by_id(obj2->id);
+	if (pusher != pl)
+	    Record_shove(pl, pusher, frame_loops);
+    }
 }
 
-/*
- * Calculates the effect of a partly elastic collision between two objects.
- *
- * Rewritten by JPV to calculate more realistic collisions.
- */
 void Delta_mv_partly_elastic(object_t *obj1, object_t *obj2, double elastic)
 {
-    double m1 = obj1->mass;
-    double m2 = obj2->mass;
-    double ms = m1 + m2;
-    double v1x = obj1->vel.x;
-    double v1y = obj1->vel.y;
-    double v2x = obj2->vel.x;
-    double v2y = obj2->vel.y;
-    double vxd, vyd;		/* difference in speed */
-    double xd, yd;		/* difference in position */
-    double alpha;		/* angle of obj2 as seen from obj1 */
-    double v1, v2;		/* velocities */
-    double a1, a2;		/* velocity angles */
-    double tmp1, tmp2;
-    int ialpha;
-    /* rotated system */
-    double rv1x, rv1y, rv2x, rv2y;
-    double rvx;
-    int ra1, ra2;
-
+    double	m1 = (double)obj1->mass,
+		m2 = (double)obj2->mass,
+		ms = m1 + m2;
+    double	v1x = obj1->vel.x,
+		v1y = obj1->vel.y,
+		v2x = obj2->vel.x,
+		v2y = obj2->vel.y;
+    double	vx, vy;
+    double      vxd, vyd, xd, yd;
     if(elastic < 0)
 	return;
 
@@ -186,41 +194,22 @@ void Delta_mv_partly_elastic(object_t *obj1, object_t *obj2, double elastic)
 	return;
     }
 
-    v1 = sqrt(sqr(v1x) + sqr(v1y));
-    v2 = sqrt(sqr(v2x) + sqr(v2y));
-    a1 = findDir(v1x, v1y);
-    a2 = findDir(v2x, v2y);
-    alpha = findDir(xd, yd);
+    vx = (v1x * m1 + v2x * m2) / ms;
+    vy = (v1y * m1 + v2y * m2) / ms;
 
-    /*
-     * Rotate to get the collision angle as x-axis (subtract alpha).
-     */
-    ra1 = MOD2((int)(a1 - alpha + .5) + RES, RES);
-    ra2 = MOD2((int)(a2 - alpha + .5) + RES, RES);
-    ialpha = MOD2((int)(alpha + .5), RES);
-    rv1x = v1 * tcos(ra1);
-    rv1y = v1 * tsin(ra1);
-    rv2x = v2 * tcos(ra2);
-    rv2y = v2 * tsin(ra2);
-    rvx = (rv1x * m1 + rv2x * m2) / ms;
-
-    /*
-     * Compute new velocities.
-     */
-    tmp1 = ((m1-m2)/ms * rv1x + 2 * m2/ms * rv2x) * elastic
-	   + rvx * (1 - elastic);
-    tmp2 = ((m2-m1)/ms * rv2x + 2 * m1/ms * rv1x) * elastic
-	   + rvx * (1 - elastic);
-    rv1x = tmp1;
-    rv2x = tmp2;
-
-    /*
-     * Rotate back to the original coordinate system.
-     */
-    obj1->vel.x = rv1x * tcos(ialpha) - rv1y * tsin(ialpha);
-    obj1->vel.y = rv1x * tsin(ialpha) + rv1y * tcos(ialpha);
-    obj2->vel.x = rv2x * tcos(ialpha) - rv2y * tsin(ialpha);
-    obj2->vel.y = rv2x * tsin(ialpha) + rv2y * tcos(ialpha);
+    
+    obj1->vel.x = ((m1 - m2) / ms * v1x 
+		   + 2 * m2 / ms * v2x) * elastic
+	+ vx * (1 - elastic);
+    obj1->vel.y = ((m1 - m2) / ms * v1y
+		   + 2 * m2 / ms * v2y) * elastic
+	+ vy * (1 - elastic);
+    obj2->vel.x = (2 * m1 / ms * v1x
+		   + (m2 - m1) / ms * v2x) * elastic
+	+ vx * (1 - elastic);
+    obj2->vel.y = (2 * m1 / ms * v1y
+		   + (m2 - m1) / ms * v2y) * elastic
+	+ vy * (1 - elastic);
 
     if (obj1->type == OBJ_PLAYER
 	&& obj2->id != NO_ID
