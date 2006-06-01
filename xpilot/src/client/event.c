@@ -553,6 +553,7 @@ bool Key_press(keys_t key)
     case KEY_LOSE_ITEM:
 	if (!Key_press_select_lose_item())
 	    return false;
+	break;
 
     case KEY_EXIT:
 	return Key_press_exit();
