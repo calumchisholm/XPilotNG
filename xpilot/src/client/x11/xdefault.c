@@ -27,7 +27,7 @@
 
 #include "xpclient_x11.h"
 
-bool	titleFlip;		/* Do special title bar flipping? */
+static bool titleFlip;		/* Ignored option dummy */
 
 bool pre_exists = False;
 int pre_acc_num, new_acc_num = 0;   /* pre are the Saved mouse settings */
@@ -303,9 +303,7 @@ xp_option_t xdefault_options[] = {
 	&titleFlip,
 	NULL,
 	XP_OPTFLAG_DEFAULT,
-	"Should the title bar change or not.\n"
-	"Some window managers like twm may have problems with\n"
-	"flipping title bars.  Hence this option to turn it off.\n"),
+	"Ignored for compatibility with older clients.\n"),
 
     XP_STRING_OPTION(
 	"gameFont",

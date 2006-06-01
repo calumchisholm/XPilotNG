@@ -99,17 +99,6 @@ void Paint_frame(void)
     Paint_frame_start();
     Paint_score_table();
 
-    /*
-     * Switch between two different window titles.
-     */
-    if (titleFlip && ((loopsSlow % TITLE_DELAY) == 0)) {
-	scroll_i = !scroll_i;
-	if (scroll_i)
-	    XStoreName(dpy, topWindow, COPYRIGHT);
-	else
-	    XStoreName(dpy, topWindow, TITLE);
-    }
-
     SET_FG(colors[BLACK].pixel);
 
     rd.newFrame();

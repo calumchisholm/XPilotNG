@@ -83,7 +83,6 @@ extern Window	talkWindow;		/* Talk window */
 extern XColor	colors[MAX_COLORS];	/* Colors */
 extern Colormap	colormap;		/* Private colormap */
 extern int	maxColors;		/* Max. number of colors to use */
-extern bool	titleFlip;		/* Do special titlebar flipping? */
 extern bool	gotFocus;		/* Do we have the mouse pointer */
 
 extern int	(*radarDrawRectanglePtr)/* Function to draw player on radar */

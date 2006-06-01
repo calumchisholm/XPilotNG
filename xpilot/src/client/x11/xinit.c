@@ -257,7 +257,6 @@ static void Init_disp_prop(Display *d, Window win,
     XClassHint		xclh;
     XWMHints		xwmh;
     XSizeHints		xsh;
-    char		msg[256];
 
     xwmh.flags	   = InputHint|StateHint|IconPixmapHint;
     xwmh.input	   = True;
@@ -292,15 +291,8 @@ static void Init_disp_prop(Display *d, Window win,
     /*
      * Now initialize icon and window title name.
      */
-    if (titleFlip)
-	sprintf(msg, "Successful connection to server at \"%s\".",
-		servername);
-    else
-	sprintf(msg, "%s -- Server at \"%s\".", TITLE, servername);
-    XStoreName(d, win, msg);
-
-    sprintf(msg, "%s:%s", connectParam.nick_name, servername);
-    XSetIconName(d, win, msg);
+    XStoreName(d, win, TITLE);
+    XSetIconName(d, win, TITLE);
 
     if (d != dpy)
 	return;
