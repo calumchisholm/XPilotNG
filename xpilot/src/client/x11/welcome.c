@@ -1585,10 +1585,9 @@ int Welcome_screen(Connect_param_t * conpar)
 
     result = Welcome_doit(conpar);
 
-    if (!quitting && joining) {
+    if (!quitting && joining)
 	Welcome_cleanup();
-	result = Join(conpar);
-    } else
+    else
 	/* kps - ?????? */
 	Platform_specific_cleanup();
 
