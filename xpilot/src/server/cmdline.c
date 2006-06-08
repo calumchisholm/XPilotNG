@@ -217,6 +217,16 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
+	"playerCollisionFuelDrain",
+	"playerFuelDrain",
+	"100",
+	&options.playerCollisionFuelDrain,
+	valReal,
+	tuner_dummy,
+	"How much fuel does a player collision cost?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
 	"shotHitFuelDrainUsesKineticEnergy",
 	"kineticEnergyFuelDrain",
 	"true",

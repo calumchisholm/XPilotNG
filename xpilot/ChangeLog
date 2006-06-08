@@ -19,6 +19,8 @@ Server:
 	* Improved signal handling.
 	* Revert to the old policy of allowing players to "steal" bases
 	  from teammates regardless of score.
+	* Added the playerCollisionFuelDrain option (default 100):
+	  How much fuel does a player collision cost?
 
 Client:
 	* Improved ball message scan.  Clear color attributes of

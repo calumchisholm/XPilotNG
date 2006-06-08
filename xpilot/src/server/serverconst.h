@@ -120,7 +120,7 @@
 #define ED_DEFLECTOR		(-0.15)
 #define ED_SHOT_HIT		(-25.0)
 #define ED_SMART_SHOT_HIT	(-120.0)
-#define ED_PL_CRASH		(-100.0)
+#define ED_PL_CRASH		(-options.playerCollisionFuelDrain)
 #define ED_BALL_HIT		(-options.ballCollisionFuelDrain)
 #define ED_LASER		(-10.0)
 #define ED_LASER_HIT		(-100.0)
