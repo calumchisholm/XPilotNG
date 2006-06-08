@@ -89,12 +89,6 @@ SDL_Event *CON_Events(SDL_Event * event)
 	    return event;
 #endif
 	} else {
-	    /* first of all, check if the console hide key was pressed */
-	    if ((int)event->key.keysym.sym == Topmost->HideKey) {
-		/*was: CON_Hide(Topmost);*/
-		Talk_set_state(false);
-		return NULL;
-	    }
 	    switch (event->key.keysym.sym) {
 	    case SDLK_HOME:
 		if (event->key.keysym.mod & KMOD_SHIFT) {
@@ -173,6 +167,15 @@ SDL_Event *CON_Events(SDL_Event * event)
 		    Talk_set_state(false);
 		break;
 	    case SDLK_ESCAPE:
+			if (strlen(Topmost->Command) > 0) {
+		    CON_NewLineCommand(Topmost);
+
+		    /* copy the input into the past commands strings */
+		    strcpy(Topmost->CommandLines[0], Topmost->Command);
+
+		    Clear_Command(Topmost);
+		    Topmost->CommandScrollBack = -1;
+			}
 		/* deactivate Console */
 
 		/*was: CON_Hide(Topmost);*/
@@ -1120,6 +1123,7 @@ void Clear_History(ConsoleInformation * console)
 void Command_Up(ConsoleInformation * console)
 {
     if (console->CommandScrollBack < console->TotalCommands - 1) {
+		if (console->CommandScrollBack == -1) strcpy(console->BackupCommand,console->LCommand);
 	/* move back a line in the command strings and copy the command to the current input string */
 	console->CommandScrollBack++;
 	/* I want to know if my string handling REALLY works :-) */
@@ -1148,8 +1152,9 @@ void Command_Down(ConsoleInformation * console)
 
 	console->Offset = 0;
 	if (console->CommandScrollBack > -1)
-	    strcpy(console->LCommand,
-		   console->CommandLines[console->CommandScrollBack]);
+	    strcpy(console->LCommand, console->CommandLines[console->CommandScrollBack]);
+	else
+			strcpy(console->LCommand,console->BackupCommand);
 	console->CursorPos = strlen(console->LCommand);
 	Assemble_Command(console);
     }

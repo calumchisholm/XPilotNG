@@ -88,6 +88,7 @@ extern "C" {
 		char RCommand[CON_CHARS_PER_LINE+1];	/*! left hand side of cursor */
 		char LCommand[CON_CHARS_PER_LINE+1];	/*! right hand side of cursor */
 		char VCommand[CON_CHARS_PER_LINE+1];	/*! current visible command line */
+		char BackupCommand[CON_CHARS_PER_LINE+1];	/*! stores your started line while you check history */
 		int CursorPos;						/*! Current cursor position relative to the currently typed in command */
 		int Offset;							/*! First visible character relative to the currently typed in command (used if command is too long to fit into console) */
 		int InsMode;						/*! Boolean that tells us whether we are in Insert- or Overwrite-Mode */
