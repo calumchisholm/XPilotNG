@@ -1374,11 +1374,17 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
     position_t point;
     other_t *other;
 
-    ship = Ship_by_id(id);
     if (!(other = Other_by_id(id))) return;
 
     if (!(color = Gui_calculate_ship_color(id,other))) return;
     
+    if ((!instruments.showShipShapes) && (self != NULL) && (self->id != id))
+			ship = Default_ship();
+    else if ((!instruments.showMyShipShape) && (self != NULL) && (self->id == id))
+			ship = Default_ship();
+		else
+			ship = Ship_by_id(id);
+
     if (shield) {
     	Image_paint(IMG_SHIELD, x - 27, y - 27, 0, (color & 0xffffff00) + ((color & 0x000000ff)/2));
     }
