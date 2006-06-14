@@ -13,8 +13,6 @@ Common:
 	  tested and work.
 
 Server:
-	* Default shotspeed increased to 22 to compensate for higher average
-	  ship speeds.
 	* Fix unpause when baselessPausing is on.
 	* Improved signal handling.
 	* Revert to the old policy of allowing players to "steal" bases
