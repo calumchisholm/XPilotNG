@@ -24,6 +24,9 @@ Client:
 	* Improved ball message scan.  Clear color attributes of
 	  out-of-date ball messages.
 	* Fix a bug that made it impossible to lose items.
+	* Minimum value for hudRadarLimit option changed from 0 to 0.05
+	  because at 0, a randomly flashing dot will be drawn on top of
+	  the ship in the center of screen.
 
 X11 Client only:
 	* Fix bug that prevented radar colors from being set from xpilotrc.
