@@ -27,8 +27,6 @@
 
 #include "xpclient_x11.h"
 
-static bool titleFlip;		/* Ignored option dummy */
-
 bool pre_exists = False;
 int pre_acc_num, new_acc_num = 0;   /* pre are the Saved mouse settings */
 int pre_acc_denom, new_acc_denom = 1; 
@@ -296,14 +294,6 @@ xp_option_t xdefault_options[] = {
 	"preferred position without window manager borders.\n"
 	"Also sometimes window managers may interfere when switching\n"
 	"colormaps. This option may prevent that.\n"),
-
-    XP_BOOL_OPTION(
-	"titleFlip",
-	true,
-	&titleFlip,
-	NULL,
-	XP_OPTFLAG_DEFAULT,
-	"Ignored for compatibility with older clients.\n"),
 
     XP_STRING_OPTION(
 	"gameFont",
