@@ -770,7 +770,7 @@ xp_option_t default_options[] = {
     XP_DOUBLE_OPTION(
 	"hudRadarLimit",
 	0.05,
-	0.0,
+	0.05,
 	5.0,
 	&hudRadarLimit,
 	NULL,
