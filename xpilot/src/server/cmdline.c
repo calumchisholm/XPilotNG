@@ -485,7 +485,7 @@ static option_desc opts[] = {
     {
 	"spaceInvadersReloading",
 	"SIReload",
-	"false",
+	"true",
 	&options.spaceInvadersReloading,
 	valBool,
 	tuner_none,
