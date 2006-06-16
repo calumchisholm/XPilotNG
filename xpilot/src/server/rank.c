@@ -310,8 +310,8 @@ void Rank_write_webpage(void)
 	"  <h1>" PACKAGE_NAME " @ %s</h1>\n" /* <-- server name at %s and %s */
 	"\n"
 	"  <p>\n"
-	"    <a href=\"previous_ranks.html\">Previous rankings</a>\n"
-	"    <a href=\"rank_explanation.html\">How does the ranking work?</a>\n"
+	"    <a href=\"http://xpilot.sourceforge.net/rank-guide.html\">"
+	     "How does the ranking work?</a>\n"
 	"  </p>\n"
 	"\n"
 	"  <table>\n";
