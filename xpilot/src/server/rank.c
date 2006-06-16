@@ -257,43 +257,51 @@ static const char *Rank_get_logout_message(ranknode_t *rank)
     return msg;
 }
 
-#define TABLEHEAD \
-"<table><tr><td></td>" /* First column is the position */ \
-"<td align=left><h1><u><b>Player</b></u></h1></td>" \
-"<td align=right><h1><u><b>Score</b></u></h1></td>" \
-"<td align=right><h1><u><b>Kills</b></u></h1></td>" \
-"<td align=right><h1><u><b>Deaths</b></u></h1></td>" \
-"<td align=right><h1><u><b>Rounds</b></u></h1></td>" \
-"<td align=right><h1><u><b>Shots</b></u></h1></td>" \
-"<td align=center><h1><u><b>Deadliest</b></u></h1></td>" \
-"<td align=center><h1><u><b>Balls</b></u></h1></td>" \
-"<td align=right><h1><u><b>Ratio</b></u></h1></td>" \
-"<td align=right><h1><u><b>User</b></u></h1></td>" \
-"<td align=left><h1><u><b>Host</b></u></h1></td>" \
-"<td align=center><h1><u><b>Logout</b></u></h1></td>" \
-"</tr>\n"
-
 /* Sort the ranks and save them to the webpage. */
 void Rank_write_webpage(void)
 {
     static const char header[] =
-	"<html><head><title>" PACKAGE_NAME " @ %s</title>\n"
-	"</head><body>\n"
-	"<h1>" PACKAGE_NAME " @ %s</h1>" /* <-- server name at %s and %s */
-	"<a href=\"previous_ranks.html\">Previous rankings</a> "
-	"<a href=\"rank_explanation.html\">How does the ranking work?</a>"
-	"<hr>\n" TABLEHEAD;
+	"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n"
+	"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n"
+	"    \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n"
+	"<html xmlns=\"http://www.w3.org/1999/xhtml\" "
+	    "xml:lang=\"en\" lang=\"en\">\n"
+	"<head>\n"
+	"  <title>" PACKAGE_NAME " @ %s</title>\n"
+	"</head>\n"
+	"\n"
+	"<body>\n"
+	"  <h1>" PACKAGE_NAME " @ %s</h1>\n" /* <-- server name at %s and %s */
+	"\n"
+	"  <p>\n"
+	"    <a href=\"previous_ranks.html\">Previous rankings</a>\n"
+	"    <a href=\"rank_explanation.html\">How does the ranking work?</a>\n"
+	"  </p>\n"
+	"\n"
+	"  <hr />\n"
+	"\n"
+	"  <table>\n";
 
-    static const char footer[] = "</table>"
-	"<i>Explanation for ballstats</i>:<br>"
-	"The numbers are c/s/w/l/b, where<br>"
-	"c = The number of enemy balls you have cashed.<br>"
-	"s = The number of your own balls you have returned.<br>"
-	"w = The number of enemy balls your team has cashed.<br>"
-	"l = The number of your own balls you have lost.<br>"
-	"b = The fastest ballrun you have made.<br>"
-	"<hr>%s<BR>\n\n"	/* <-- Insert time here. */
-	"</body></html>";
+    static const char footer[] =
+	"  </table>\n"
+	"\n"
+	"  <p>\n"
+	"    <em>Explanation for ballstats</em>:<br />\n"
+	"    The numbers are c/s/w/l/b, where<br />\n"
+	"    c = The number of enemy balls you have cashed.<br />\n"
+	"    s = The number of your own balls you have returned.<br />\n"
+	"    w = The number of enemy balls your team has cashed.<br />\n"
+	"    l = The number of your own balls you have lost.<br />\n"
+	"    b = The fastest ballrun you have made.<br />\n"
+	"  </p>\n"
+	"\n"
+	"  <hr />\n"
+	"\n"
+	"  <p>\n"
+	"    %s\n"	/* <-- Insert time here. */
+	"  </p>\n"
+	"</body>\n"
+	"</html>\n";
 
     char *filename;
     FILE *file;
@@ -319,22 +327,41 @@ void Rank_write_webpage(void)
 	if (strlen(rank->name) == 0)
 	    continue;
 
+	if (i % 20 == 0)
+	    fprintf(file,
+		"    <tr>\n"
+		"      <th></th>\n"	/* First column is the position */
+		"      <th align=\"left\">Player</th>\n"
+		"      <th align=\"right\">Score</th>\n"
+		"      <th align=\"right\">Kills</th>\n"
+		"      <th align=\"right\">Deaths</th>\n"
+		"      <th align=\"right\">Rounds</th>\n"
+		"      <th align=\"right\">Shots</th>\n"
+		"      <th align=\"center\">Deadliest</th>\n"
+		"      <th align=\"center\">Balls</th>\n"
+		"      <th align=\"right\">Ratio</th>\n"
+		"      <th align=\"right\">User</th>\n"
+		"      <th align=\"left\">Host</th>\n"
+		"      <th align=\"center\">Logout</th>\n"
+		"    </tr>\n");
+
 	fprintf(file,
-		"<tr><td align=left><tt>%d</tt>"
-		"<td align=left><b>%s</b>",
+		"    <tr>\n"
+		"      <td align=\"left\">%d</td>\n"
+		"      <td align=\"left\"><strong>%s</strong></td>\n",
 		i + 1,
 		encode(rank->name));
 
 	fprintf(file,
-		"<td align=right>%.1f"
-		"<td align=right>%u"
-		"<td align=right>%u"
-		"<td align=right>%u"
-		"<td align=right>%u"
-		"<td align=right>%u"
-		"<td align=center>%u/%u/%u/%u/%.2f"
-		"<td align=right>%.2f"
-		"<td align=right>%s",
+		"      <td align=\"right\">%.1f</td>\n"
+		"      <td align=\"right\">%u</td>\n"
+		"      <td align=\"right\">%u</td>\n"
+		"      <td align=\"right\">%u</td>\n"
+		"      <td align=\"right\">%u</td>\n"
+		"      <td align=\"right\">%u</td>\n"
+		"      <td align=\"center\">%u/%u/%u/%u/%.2f</td>\n"
+		"      <td align=\"right\">%.2f</td>\n"
+		"      <td align=\"right\">%s</td>\n",
 		rank->score,
 		rank->kills, rank->deaths,
 		rank->rounds, rank->shots,
@@ -346,9 +373,9 @@ void Rank_write_webpage(void)
 		encode(rank->user));
 
 	fprintf(file,
-		"<td align=left>%s"
-		"<td align=center>%s\n"
-		"</tr>\n",
+		"      <td align=\"left\">%s</td>\n"
+		"      <td align=\"center\">%s</td>\n"
+		"    </tr>\n",
 		encode(rank->host),
 		Rank_get_logout_message(rank));
     }
