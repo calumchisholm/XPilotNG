@@ -262,12 +262,48 @@ void Rank_write_webpage(void)
 {
     static const char header[] =
 	"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n"
+	"<?xml-stylesheet href=\"#internalStyle\" type=\"text/css\"?>\n"
 	"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n"
 	"    \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n"
 	"<html xmlns=\"http://www.w3.org/1999/xhtml\" "
 	    "xml:lang=\"en\" lang=\"en\">\n"
 	"<head>\n"
 	"  <title>" PACKAGE_NAME " @ %s</title>\n"
+	"  <style type=\"text/css\" id=\"internalStyle\">\n"
+	"    body {\n"
+	"      font-family: sans-serif;\n"
+	"      color: #000000;\n"
+	"      background-color: #ffffff;\n"
+	"    }\n"
+	"    table {\n"
+	"      font-size: smaller;\n"
+	"      border-collapse: collapse;\n"
+	"      border-spacing: 0;\n"
+	"    }\n"
+	"    tr.heading {\n"
+	"      color: #000000;\n"
+	"      background-color: #ffffff;\n"
+	"    }\n"
+	"    tr.even {\n"
+	"      color: #000000;\n"
+	"      background-color: #d0d0d0;\n"
+	"    }\n"
+	"    tr.odd {\n"
+	"      color: #000000;\n"
+	"      background-color: #e0e0e0;\n"
+	"    }\n"
+	"    th, td {\n"
+	"      padding: 0.2em 0.5em;\n"
+	"    }\n"
+	"    a:link {\n"
+	"      color: #0000c0;\n"
+	"      background-color: #ffffff;\n"
+	"    }\n"
+	"    a:visited {\n"
+	"      color: #c000c0;\n"
+	"      background-color: #ffffff;\n"
+	"    }\n"
+	"  </style>\n"
 	"</head>\n"
 	"\n"
 	"<body>\n"
@@ -277,8 +313,6 @@ void Rank_write_webpage(void)
 	"    <a href=\"previous_ranks.html\">Previous rankings</a>\n"
 	"    <a href=\"rank_explanation.html\">How does the ranking work?</a>\n"
 	"  </p>\n"
-	"\n"
-	"  <hr />\n"
 	"\n"
 	"  <table>\n";
 
@@ -330,25 +364,26 @@ void Rank_write_webpage(void)
 	if (i % 20 == 0)
 	    fprintf(file,
 		"    <tr>\n"
-		"      <th></th>\n"	/* First column is the position */
+		"      <th align=\"left\">Rank</th>\n"
 		"      <th align=\"left\">Player</th>\n"
-		"      <th align=\"right\">Score</th>\n"
-		"      <th align=\"right\">Kills</th>\n"
-		"      <th align=\"right\">Deaths</th>\n"
-		"      <th align=\"right\">Rounds</th>\n"
-		"      <th align=\"right\">Shots</th>\n"
-		"      <th align=\"center\">Deadliest</th>\n"
-		"      <th align=\"center\">Balls</th>\n"
-		"      <th align=\"right\">Ratio</th>\n"
-		"      <th align=\"right\">User</th>\n"
+		"      <th align=\"left\">Score</th>\n"
+		"      <th align=\"left\">Kills</th>\n"
+		"      <th align=\"left\">Deaths</th>\n"
+		"      <th align=\"left\">Rounds</th>\n"
+		"      <th align=\"left\">Shots</th>\n"
+		"      <th align=\"left\">Deadliest</th>\n"
+		"      <th align=\"left\">Balls</th>\n"
+		"      <th align=\"left\">Ratio</th>\n"
+		"      <th align=\"left\">User</th>\n"
 		"      <th align=\"left\">Host</th>\n"
-		"      <th align=\"center\">Logout</th>\n"
+		"      <th align=\"left\">Logout</th>\n"
 		"    </tr>\n");
 
 	fprintf(file,
-		"    <tr>\n"
-		"      <td align=\"left\">%d</td>\n"
+		"    <tr class=\"%s\">\n"
+		"      <td align=\"right\">%d</td>\n"
 		"      <td align=\"left\"><strong>%s</strong></td>\n",
+		i % 2 == 0 ? "even" : "odd",
 		i + 1,
 		encode(rank->name));
 
@@ -359,7 +394,7 @@ void Rank_write_webpage(void)
 		"      <td align=\"right\">%u</td>\n"
 		"      <td align=\"right\">%u</td>\n"
 		"      <td align=\"right\">%u</td>\n"
-		"      <td align=\"center\">%u/%u/%u/%u/%.2f</td>\n"
+		"      <td align=\"left\">%u/%u/%u/%u/%.2f</td>\n"
 		"      <td align=\"right\">%.2f</td>\n"
 		"      <td align=\"right\">%s</td>\n",
 		rank->score,
@@ -374,7 +409,7 @@ void Rank_write_webpage(void)
 
 	fprintf(file,
 		"      <td align=\"left\">%s</td>\n"
-		"      <td align=\"center\">%s</td>\n"
+		"      <td align=\"left\">%s</td>\n"
 		"    </tr>\n",
 		encode(rank->host),
 		Rank_get_logout_message(rank));
