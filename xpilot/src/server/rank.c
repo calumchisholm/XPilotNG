@@ -398,8 +398,6 @@ void Rank_write_webpage(void)
 		"      <td align=\"right\">%.2f</td>\n"
 		"      <td align=\"right\">%s</td>\n",
 		rank->score,
-		/*rank->round_elo,
-		rank->score_elo,*/
 		rank->kills, rank->deaths,
 		rank->rounds, rank->shots,
 		rank->deadliest,
@@ -429,26 +427,9 @@ bool Rank_get_stats(const char *name, char *buf, size_t size)
 	return false;
 
     snprintf(buf, size,
-	     "%-15s  SC: %7.1f K/D: %5d/%5d  R: %4d  SH: %6d  Dl: %d "
+	     "%-15s  SC: %7.1f  K/D: %5d/%5d  R: %4d  SH: %6d  Dl: %d "
 	     "B: %d/%d/%d/%d/%.2f TM: %.2f",
 	     r->name, r->score, r->kills, r->deaths, r->rounds, r->shots, r->deadliest,
-	     r->ballsCashed, r->ballsSaved, r->ballsWon, r->ballsLost,
-	     r->bestball,r->max_survival_time);
-
-    return true;
-}
-
-bool Rank_get_elo_stats(const char *name, char *buf, size_t size)
-{
-    ranknode_t *r = Rank_get_by_name(name);
-
-    if (r == NULL)
-	return false;
-
-    snprintf(buf, size,
-	     "%-15s  SC: %7.1f Round_ELO: %7.1f Score_ELO: %7.1f K/D: %5d/%5d  R: %4d  SH: %6d  Dl: %d "
-	     "B: %d/%d/%d/%d/%.2f TM: %.2f",
-	     r->name, r->score, r->round_elo, r->score_elo, r->kills, r->deaths, r->rounds, r->shots, r->deadliest,
 	     r->ballsCashed, r->ballsSaved, r->ballsWon, r->ballsLost,
 	     r->bestball,r->max_survival_time);
 
@@ -483,29 +464,6 @@ void Rank_show_ranks(void)
     strlcat(msg, ".", sizeof(msg));
     Set_message(msg);
 
-    snprintf(msg, sizeof(msg), "Ranks: ");
-    num = 0;
-    numranks = 0;
-    for (i = 0; i < MAX_SCORES; i++) {
-	ranknode_t *rank = &ranknodes[rank_base[i].ind];
-
-	if (strlen(rank->name) > 0)
-	    numranks++;
-
-	if (rank->pl != NULL) {
-	    if (num > 0)
-		strlcat(msg, ", ", sizeof(msg));
-	    snprintf(tmpbuf, sizeof(tmpbuf), "[%d]{ELO: %.1f %.1f}", i + 1,rank->round_elo,rank->score_elo);
-	    strlcat(msg, tmpbuf, sizeof(msg));
-	    num++;
-	}
-    }
-
-    for (i = 0; i < NumPlayers; ++i) {
-	player_t *pl = Player_by_index(i);
-	if (pl->isoperator)
-	    Set_player_message(pl,msg);
-    }
     /* show a few best ranks */
     snprintf(msg, sizeof(msg), " < Top %d ranks: ",
 	     numranks < 3 ? numranks : 3);
@@ -541,8 +499,6 @@ static void Init_ranknode(ranknode_t *rank,
     strlcpy(rank->name, name, sizeof(rank->name));
     strlcpy(rank->user, user, sizeof(rank->user));
     strlcpy(rank->host, host, sizeof(rank->host));
-    rank->round_elo = 400.0;
-    rank->score_elo = 400.0;
 }
 
 
@@ -688,8 +644,7 @@ void Rank_save_score(player_t * pl)
 {
     ranknode_t *rank = pl->rank;
 
-    if (!options.temporaryScoring)
-    	rank->score =  Get_Score(pl);
+    rank->score =  Get_Score(pl);
     rank->pl = NULL;
     rank->timestamp = time(NULL);
 }
@@ -739,14 +694,6 @@ void Rank_write_rankfile(void)
 
 	if (rank->score != 0.0
 	    && fprintf(file, "score=\"%.2f\" ", rank->score) < 0)
-	    goto writefailed;
-
-	if (rank->round_elo != 0.0
-	    && fprintf(file, "round_elo=\"%.2f\" ", rank->round_elo) < 0)
-	    goto writefailed;
-
-	if (rank->score_elo != 0.0
-	    && fprintf(file, "score_elo=\"%.2f\" ", rank->score_elo) < 0)
 	    goto writefailed;
 
 	if (rank->kills > 0
@@ -887,10 +834,6 @@ static void tagstart(void *data, const char *el, const char **attr)
 		strlcpy(rank->host, *(attr + 1), sizeof(rank->host));
 	    if (!strcasecmp(*attr, "score"))
 		rank->score = atof(*(attr + 1));
-	    if (!strcasecmp(*attr, "round_elo"))
-		rank->round_elo = atof(*(attr + 1));
-	    if (!strcasecmp(*attr, "score_elo"))
-		rank->score_elo = atof(*(attr + 1));
 	    if (!strcasecmp(*attr, "kills"))
 		rank->kills = atoi(*(attr + 1));
 	    if (!strcasecmp(*attr, "deaths"))
