@@ -92,7 +92,7 @@ void Ball_is_replaced(ballobject_t *ball)
     ball->life = 0;
     SET_BIT(ball->obj_status, (NOEXPLOSION|RECREATE));
 
-    if (!options.zeroSumScoring) Score(pl, 5.0, ball->pos, "Treasure: ");
+    Handle_Scoring(SCORE_TREASURE_REPLACE, pl, NULL, NULL,NULL);
     Set_message_f(" < %s (team %d) has replaced the treasure >",
 		  pl->name, pl->team);
     Rank_saved_ball(pl);

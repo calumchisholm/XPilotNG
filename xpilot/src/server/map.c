@@ -117,7 +117,7 @@ int World_place_cannon(clpos_t pos, int dir, int team)
     t.dead_ticks = 0;
     t.conn_mask = ~0;
     t.group = NO_GROUP;
-    t.score = CANNON_SCORE;
+    t.score = 0.0;
     t.id = ind + MIN_CANNON_ID;
     assert(Is_cannon_id(t.id));
     if (t.id > MAX_CANNON_ID) {

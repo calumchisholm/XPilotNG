@@ -51,5 +51,4 @@ if [ "x$CC" != "xg++" ]; then
     export CFLAGS="$CFLAGS $CFLAGS_C"
 fi
 
-./configure --prefix=$HOME --enable-sound
-
+./configure --prefix=/home/erik --enable-select-sched

@@ -31,13 +31,6 @@
 #ifndef SCORE_H
 #define SCORE_H
 
-#define ASTEROID_SCORE		(-1436.0)
-#define CANNON_SCORE	    	(-1436.0)
-#define TARGET_SCORE	    	(-1436.0)
-#define TREASURE_SCORE	    	(-1436.0)
-#define UNOWNED_SCORE	    	(-1436.0)
-#define WALL_SCORE	    	2000.0
-
 #define RATE_SIZE	    	20
 #define RATE_RANGE	    	1024
 
@@ -50,6 +43,8 @@ void Score_players(player_t * winner_pl, double winner_score,
 		   double loser_score, char *loser_msg, bool transfer_tag);
 
 double Get_Score(player_t * pl);
+double Get_Real_Score(player_t * pl);
+void Set_Real_Score(player_t * pl, double score);
 
 typedef enum {
     SCORE_CANNON_KILL,
@@ -65,10 +60,14 @@ typedef enum {
     SCORE_LASER,
     SCORE_TARGET,
     SCORE_TREASURE,
+    SCORE_TREASURE_REPLACE,
     SCORE_SELF_DESTRUCT,
     SCORE_SHOVE_KILL,
-    SCORE_SHOVE_DEATH
+    SCORE_SHOVE_DEATH,
+    SCORE_BONUS
 } scoretype_t;
+
+void Increment_Scorelist(player_t *pl);
 
 void Handle_Scoring(scoretype_t st, player_t * killer, player_t * victim,
 		    void *extra, const char *somemsg);

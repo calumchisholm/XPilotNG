@@ -29,10 +29,14 @@
  */
 
 #include "xpserver.h"
+void Find_Adversaries(player_t *pl, arraylist_t *list);
+void Generic_Scoring(arraylist_t *winners, arraylist_t *losers, double multiplier, const char *culprit);
 
 void Score(player_t * pl, double points, clpos_t pos, const char *msg)
 {
-    Rank_add_score(pl, points);
+    if (!options.temporaryScoring)
+    	Rank_add_score(pl, points);
+    else Add_Score(pl,points);
     if (pl->conn != NULL)
 	Send_score_object(pl->conn, points, pos, msg);
     updateScores = true;
@@ -96,14 +100,40 @@ void Score_players(player_t * winner_pl, double winner_score,
     Score(loser_pl, loser_score, loser_pl->pos, loser_msg);
 }
 
-double Get_Score(player_t * pl)
+double Get_Real_Score(player_t * pl)
 {
     return pl->score;
 }
 
-void Set_Score(player_t * pl, double score)
+double Get_Score(player_t * pl)
+{
+    if (options.temporaryScoring) {
+    	double score = 0.0;
+    	int i;
+    	for ( i=0 ; i<12 ; ++i) {
+	    score += pl->scorelist[i];
+	}
+	return score;
+    } else 
+    	return pl->score;
+}
+
+void Set_Real_Score(player_t * pl, double score)
 {
     pl->score = score;
+}
+
+void Set_Score(player_t * pl, double score)
+{
+    if (options.temporaryScoring) {
+    	int i;
+    	for ( i=0 ; i<12 ; ++i) {
+	    pl->scorelist[i] = score;
+	}
+	pl->score = 0.0;
+    } else {
+    	pl->score = score;
+    }
 }
 
 void Add_Score(player_t * pl, double score)
@@ -111,12 +141,98 @@ void Add_Score(player_t * pl, double score)
     pl->score += score;
 }
 
+void Increment_Scorelist(player_t *pl)
+{
+    Rank_add_score(pl, pl->score);
+    Set_player_message_f(pl,"You scored %f points this round.",pl->score);
+    pl->scorelist[pl->scorelist_i] = pl->score;
+    pl->score = 0.0;
+    pl->scorelist_i = (pl->scorelist_i +1)%12;
+}
+
+void Find_Adversaries(player_t *pl, arraylist_t *list)
+{
+    int i;
+    for (i = 0; i < NumPlayers; i++) {
+      player_t *pl_i = Player_by_index(i);
+
+      if ( Players_are_teammates(pl, pl_i)
+	  || (Player_is_paused(pl_i) && pl_i->pause_count <= 0)
+	  || Player_is_tank(pl_i)
+	  || Player_is_waiting(pl_i)
+	  || Players_are_allies(pl, pl_i) )
+	  continue;
+      if (pl_i->id != pl->id) /*might not be needed due to team check */
+	  Arraylist_add(list,&pl_i);
+    }
+}
+
+void Generic_Scoring(arraylist_t *winners, arraylist_t *losers, double multiplier, const char *culprit)
+{
+    int num_winners, num_losers;
+    double winner_score = 0.0, loser_score = 0.0;
+    int i;
+    double sc;
+    player_t *killer, *victim;
+    
+    num_winners = Arraylist_get_num_elements(winners);
+    num_losers = Arraylist_get_num_elements(losers);
+    
+    if ((!num_winners) && (!num_losers)) {
+      warn("Generic_Scoring called with neither winners nor losers!");
+      return;
+    }
+    
+    if (options.zeroSumScoring) {
+      if (!num_winners) {
+	  Find_Adversaries(*(player_t **)Arraylist_get(losers,0),winners);
+	  num_winners = Arraylist_get_num_elements(winners);
+	  if (!num_winners) return;
+      }
+      if (!num_losers) {
+	  Find_Adversaries(*(player_t **)Arraylist_get(winners,0),losers);
+	  num_losers = Arraylist_get_num_elements(losers);
+	  if (!num_losers) return;
+      }
+    }
+
+    for ( i=0 ; i < num_winners ; ++i)
+      winner_score += Get_Score(*(player_t **)Arraylist_get(winners,i));
+    for ( i=0 ; i < num_losers ; ++i)
+      loser_score += Get_Score(*(player_t **)Arraylist_get(losers,i));
+
+    sc = Rate(winner_score,loser_score)*multiplier;
+    
+    if ( (num_winners==1) && (num_losers==1) && !culprit) {
+      killer = *(player_t **)Arraylist_get(winners,0);
+      victim = *(player_t **)Arraylist_get(losers,0);
+      Score_players(killer, sc, victim->name, victim, -sc, killer->name, true);
+    } else {
+      for ( i=0 ; i < num_winners ; ++i ) {
+	  killer = *(player_t **)Arraylist_get(winners,i);
+	  Score(killer, sc/(double)num_winners, killer->pos
+		  , (culprit == NULL) ? "" : culprit);
+      }
+      for ( i=0 ; i < num_losers ; ++i ) {
+	  victim = *(player_t **)Arraylist_get(losers,i);
+	  Score(victim, -sc/(double)num_losers, victim->pos
+		  , (culprit == NULL) ? "" : culprit);
+      }
+    }
+}
+
 void Handle_Scoring(scoretype_t st, player_t * killer, player_t * victim,
 		    void *extra, const char *somemsg)
 {
-    double sc = 0.0, sc2 = 0.0, factor = 0.0;
+    double factor = 0.0;
     int i_tank_owner = 0, j = 0;
-    player_t *true_killer;
+    static player_t *true_killer;
+    static arraylist_t *winners = NULL, *losers = NULL;
+    
+    if (!winners)
+      winners = Arraylist_alloc(sizeof(player_t *));
+    if (!losers)
+      losers = Arraylist_alloc(sizeof(player_t *));
 
     if (!(killer || victim)) {
 	warn("Attempted to score with neither victim nor killer");
@@ -125,227 +241,182 @@ void Handle_Scoring(scoretype_t st, player_t * killer, player_t * victim,
 
     switch (st) {
     case SCORE_CANNON_KILL:
-	sc = Rate(Get_Score(killer), ((cannon_t *) extra)->score)
-	    * options.cannonKillScoreMult;
-	if (BIT(world->rules->mode, TEAM_PLAY)
-	    && killer->team == ((cannon_t *) extra)->team)
-	    sc = -sc;
-	if (!options.zeroSumScoring)
-	    Score(killer, sc, ((cannon_t *) extra)->pos, "");
+    	if (BIT(world->rules->mode, TEAM_PLAY)
+    	    && killer->team == ((cannon_t *)extra)->team) {
+    	    Arraylist_add(losers,&killer);
+    	} else {
+    	    Arraylist_add(winners,&killer);
+    	}
+    	Generic_Scoring(winners,losers,options.cannonKillScoreMult,NULL);
 	break;
     case SCORE_WALL_DEATH:
-	sc = Rate(WALL_SCORE, Get_Score(victim));
+    	Arraylist_add(losers,&victim);
 	if (somemsg) {
-	    if (!options.zeroSumScoring)
-		Score(victim, -sc, victim->pos, somemsg);
+    	    Generic_Scoring(winners,losers,options.wallDeathScoreMult,somemsg);
 	} else {
-	    if (!options.zeroSumScoring)
-		Score(victim, -sc, victim->pos, victim->name);
+    	    Generic_Scoring(winners,losers,options.wallDeathScoreMult,victim->name);
 	}
 	break;
     case SCORE_COLLISION:
+    	if (Player_is_tank(killer) && Player_is_tank(victim)) {
+    	    break;
+    	} else if (Player_is_tank(killer)) {
+    	    true_killer = Player_by_id(killer->lock.pl_id);
+    	    Arraylist_add(winners,&true_killer);
+    	    Arraylist_add(losers,&victim);
+    	} else if (Player_is_tank(victim)) {
+    	    true_killer = Player_by_id(victim->lock.pl_id);
+    	    Arraylist_add(winners,&true_killer);
+    	    Arraylist_add(losers,&killer);
+    	} else {
+    	    Arraylist_add(winners,&killer);
+    	    Arraylist_add(losers,&victim);
+    	}
+    	
 	if (!Player_is_tank(killer) && !Player_is_tank(victim)) {
-	    sc = Rate(Get_Score(victim),
-		      Get_Score(killer)) * options.crashScoreMult;
-	    sc2 =
-		Rate(Get_Score(killer),
-		     Get_Score(victim)) * options.crashScoreMult;
-	    if (!options.zeroSumScoring)
-		Score_players(killer, -sc, victim->name, victim, -sc2,
-			      killer->name, false);
-	    else
-		Score_players(killer, sc - sc2, victim->name, victim,
-			      sc2 - sc, killer->name, false);
-	} else if (Player_is_tank(killer)) {
-	    player_t *i_tank_owner_pl = Player_by_id(killer->lock.pl_id);
-	    sc = Rate(Get_Score(i_tank_owner_pl), Get_Score(victim))
-		* options.tankKillScoreMult;
-	    Score_players(i_tank_owner_pl, sc, victim->name, victim, -sc,
-			  killer->name, true);
-	} else if (Player_is_tank(victim)) {
-	    player_t *j_tank_owner_pl = Player_by_id(victim->lock.pl_id);
-	    sc = Rate(Get_Score(j_tank_owner_pl), Get_Score(killer))
-		* options.tankKillScoreMult;
-	    Score_players(j_tank_owner_pl, sc, killer->name, killer, -sc,
-			  victim->name, true);
-	}
-	/* don't bother scoring two tanks */
+    	    Generic_Scoring(winners,losers,options.crashScoreMult,NULL);
+    	    Generic_Scoring(losers,winners,options.crashScoreMult,NULL);
+    	} else {
+    	    Generic_Scoring(winners,losers,options.tankKillScoreMult,NULL);
+    	}
 	break;
     case SCORE_ROADKILL:
-	true_killer = killer;
+    	Arraylist_add(losers,&victim);
 	if (Player_is_tank(killer)) {
 	    i_tank_owner = GetInd(killer->lock.pl_id);
 	    if (i_tank_owner == GetInd(victim->id))
 		i_tank_owner = GetInd(killer->id);
 	    true_killer = Player_by_index(i_tank_owner);
 	    Rank_add_tank_kill(true_killer);
-	    sc = Rate(Get_Score(true_killer), Get_Score(victim))
-		* options.tankKillScoreMult;
+    	    Arraylist_add(winners,&true_killer);
+    	    Generic_Scoring(winners,losers,options.tankKillScoreMult,NULL);
 	} else {
 	    Rank_add_runover_kill(killer);
-	    sc = Rate(Get_Score(killer),
-		      Get_Score(victim)) * options.runoverKillScoreMult;
+    	    Arraylist_add(winners,&killer);
+    	    Generic_Scoring(winners,losers,options.tankKillScoreMult,NULL);
 	}
-	Score_players(true_killer, sc, victim->name, victim, -sc,
-		      killer->name, true);
 	break;
     case SCORE_BALL_KILL:
+    	Arraylist_add(losers,&victim);
 	if (!killer) {
-	    sc = Rate(0.0, Get_Score(victim)) * options.ballKillScoreMult
-		* options.unownedKillScoreMult;
-	    if (!options.zeroSumScoring)
-		Score(victim, -sc, victim->pos, "Ball");
+    	    Generic_Scoring(winners,losers,options.ballKillScoreMult
+    	    	    	    * options.unownedKillScoreMult,"Ball");
 	} else {
 	    if (killer == victim) {
-		sc = Rate(0.0,
-			  Get_Score(victim)) * options.ballKillScoreMult *
-		    options.selfKillScoreMult;
-		if (!options.zeroSumScoring)
-		    Score(victim, -sc, victim->pos, killer->name);
+    	    	Generic_Scoring(winners,losers,options.ballKillScoreMult
+    	    	    	    	* options.selfKillScoreMult,NULL);
 	    } else {
-		Rank_add_ball_kill(killer);
-		sc = Rate(Get_Score(killer),
-			  Get_Score(victim)) * options.ballKillScoreMult;
-		Score_players(killer, sc, victim->name, victim, -sc,
-			      killer->name, true);
+    	    	Arraylist_add(winners,&killer);
+    	    	Generic_Scoring(winners,losers,options.ballKillScoreMult,NULL);
 	    }
 	}
 	break;
     case SCORE_HIT_MINE:
-	sc = Rate(Get_Score(killer),
-		  Get_Score(victim)) * options.mineScoreMult;
-	Score_players(killer, sc, victim->name, victim, -sc, killer->name,
-		      false);
+    	Arraylist_add(winners,&killer);
+    	Arraylist_add(losers,&victim);
+    	Generic_Scoring(winners,losers,options.mineScoreMult,NULL);
 	break;
     case SCORE_EXPLOSION:
+    	Arraylist_add(losers,&victim);
 	if (!killer || killer->id == victim->id) {
-	    sc = Rate(0.0,
-		      Get_Score(victim)) * options.explosionKillScoreMult *
-		options.selfKillScoreMult;
-	    if (!options.zeroSumScoring)
-		Score(victim, -sc, victim->pos,
-		      (killer == NULL) ? "[Explosion]" : victim->name);
+    	    Generic_Scoring(winners,losers,options.explosionKillScoreMult
+    	    	    	    * options.selfKillScoreMult,
+    	    	    	    (killer == NULL) ? "[Explosion]" : victim->name);
 	} else {
-	    Rank_add_explosion_kill(killer);
-	    sc = Rate(Get_Score(killer), Get_Score(victim))
-		* options.explosionKillScoreMult;
-	    Score_players(killer, sc, victim->name, victim, -sc,
-			  killer->name, true);
+    	    Arraylist_add(winners,&killer);
+    	    Generic_Scoring(winners,losers,options.explosionKillScoreMult,NULL);
 	}
 	break;
     case SCORE_ASTEROID_KILL:
-	sc = Rate(Get_Score(killer),
-		  ASTEROID_SCORE) * options.unownedKillScoreMult;
-	if (!options.zeroSumScoring)
-	    Score(killer, sc, ((wireobject_t *) extra)->pos, "");
+    	Arraylist_add(winners,&killer);
+    	Generic_Scoring(winners,losers,options.asteroidKillScoreMult,NULL);
 	break;
     case SCORE_ASTEROID_DEATH:
-	sc = Rate(0.0, Get_Score(victim)) * options.unownedKillScoreMult;
-	if (!options.zeroSumScoring)
-	    Score(victim, -sc, victim->pos, "[Asteroid]");
+    	Arraylist_add(losers,&victim);
+    	Generic_Scoring(winners,losers,options.asteroidDeathScoreMult,"[Asteroid]");
 	break;
     case SCORE_SHOT_DEATH:
 	if (BIT(((object_t *) extra)->obj_status, FROMCANNON)) {
-	    cannon_t *cannon = Cannon_by_id(((object_t *) extra)->id);
+    	    cannon_t *cannon;
+    	    cannon = Cannon_by_id(((object_t *)extra)->id);
 
-	    /*KHS: for cannon dodgers; cannon hit substracts */
-	    /* fixed percentage of score */
-
-	    if (options.survivalScore != 0.0)
-		sc = Get_Score(victim) * 0.02;
-	    else if (cannon != NULL)
-		sc = Rate(cannon->score, Get_Score(victim))
-		    * options.cannonKillScoreMult;
-	    else {
-		assert(((object_t *) extra)->id == NO_ID);
-		sc = Rate(UNOWNED_SCORE, Get_Score(victim))
-		    * options.cannonKillScoreMult;
-	    }
+	    if (options.survivalScore != 0.0) {
+	    	double mult;
+    	    	factor = Get_Score(victim) * 0.02 / 10;
+		mult = victim->survival_time * victim->survival_time * options.survivalScore / 2.0;
+	    	Handle_Scoring(SCORE_BONUS,victim,NULL,&mult,"[Survival Time]");
+    	    } else {
+    	    	factor = options.cannonKillScoreMult;
+    	    }
 	} else if (((object_t *) extra)->id == NO_ID) {
-	    sc = Rate(0.0,
-		      Get_Score(victim)) * options.unownedKillScoreMult;
+    	    factor = options.unownedKillScoreMult;
 	} else {
 	    if (killer->id == victim->id) {
-		sc = Rate(0.0,
-			  Get_Score(victim)) * options.selfKillScoreMult;
+    	    	factor = options.selfKillScoreMult;
 	    } else {
 		Rank_add_shot_kill(killer);
-		sc = Rate(Get_Score(killer), Get_Score(victim));
+    	    	factor = 1.0;
 	    }
 	}
 
 	switch (((object_t *) extra)->type) {
 	case OBJ_SHOT:
 	    if (Mods_get(((object_t *) extra)->mods, ModsCluster))
-		factor = options.clusterKillScoreMult;
+    	    	factor *= options.clusterKillScoreMult;
 	    else
-		factor = options.shotKillScoreMult;
+    	    	factor *= options.shotKillScoreMult;
 	    break;
 	case OBJ_TORPEDO:
-	    factor = options.torpedoKillScoreMult;
+    	    factor *= options.torpedoKillScoreMult;
 	    break;
 	case OBJ_SMART_SHOT:
-	    factor = options.smartKillScoreMult;
+    	    factor *= options.smartKillScoreMult;
 	    break;
 	case OBJ_HEAT_SHOT:
-	    factor = options.heatKillScoreMult;
+    	    factor *= options.heatKillScoreMult;
 	    break;
 	default:
-	    factor = options.shotKillScoreMult;
+    	    factor *= options.shotKillScoreMult;
 	    break;
 	}
-
-	sc *= factor;
+    
+    	Arraylist_add(losers,&victim);
+    	
 	if (BIT(((object_t *) extra)->obj_status, FROMCANNON)) {
-	    if (!options.zeroSumScoring)
-		Score(victim, -sc, victim->pos, "Cannon");
+    	    Generic_Scoring(winners,losers,factor,"Cannon");
 	} else if ((((object_t *) extra)->id == NO_ID)
 		   || (killer && (killer->id == victim->id))) {
-	    if (!options.zeroSumScoring)
-		Score(victim, -sc, victim->pos,
-		      ((object_t *) extra)->id ==
-		      NO_ID ? "" : victim->name);
+    	    Generic_Scoring(winners,losers,factor,
+    	    	((object_t *)extra)->id == NO_ID ? NULL : victim->name);
 	} else {
-	    Score_players(killer, sc, victim->name, victim, -sc,
-			  killer->name, true);
+    	    Arraylist_add(winners,&killer);
+    	    Generic_Scoring(winners,losers,factor,NULL);
 	}
 
 	break;
     case SCORE_LASER:
+    	Arraylist_add(losers,&victim);
 	if (killer) {
+    	    Arraylist_add(winners,&killer);
+    	    factor = options.laserKillScoreMult;
 	    if (victim->id == killer->id) {
-		sc = Rate(0.0,
-			  Get_Score(killer)) * options.laserKillScoreMult *
-		    options.selfKillScoreMult;
-		if (!options.zeroSumScoring)
-		    Score(killer, -sc, killer->pos, killer->name);
-	    } else {
-		sc = Rate(Get_Score(killer),
-			  Get_Score(victim)) * options.laserKillScoreMult;
-		Score_players(killer, sc, victim->name, victim, -sc,
-			      killer->name, true);
+    	    	factor *= options.selfKillScoreMult;
+    	    } else {
 		Rank_add_laser_kill(killer);
 	    }
+    	    Generic_Scoring(winners,losers,factor,NULL);
 	} else if (((cannon_t *) extra) != NULL) {
-	    sc = Rate(((cannon_t *) extra)->score, Get_Score(victim))
-		* options.cannonKillScoreMult;
-	    if (!options.zeroSumScoring)
-		Score(victim, -sc, victim->pos, "Cannon");
+    	    Generic_Scoring(winners,losers,options.cannonKillScoreMult,"Cannon");
 	} else {
-	    sc = Rate(UNOWNED_SCORE,
-		      Get_Score(victim)) * options.unownedKillScoreMult;
-	    if (!options.zeroSumScoring)
-		Score(victim, -sc, victim->pos, "");
+    	    Generic_Scoring(winners,losers,options.unownedKillScoreMult,NULL);
 	    Set_message_f("%s got roasted alive.", victim->name);
 	}
 	break;
     case SCORE_TARGET:
 	{
-	    double por, win_score = 0.0, lose_score = 0.0;
-	    int win_team_members = 0, lose_team_members =
-		0, targets_remaining = 0, targets_total = 0;
+    	    int targets_remaining = 0, targets_total = 0;
 	    target_t *targ = (target_t *) extra;
-	    bool somebody = false;
+    	    bool somebody = false;
 
 	    if (BIT(world->rules->mode, TEAM_PLAY)) {
 		for (j = 0; j < NumPlayers; j++) {
@@ -357,16 +428,15 @@ void Handle_Scoring(scoretype_t st, player_t * killer, player_t * victim,
 			continue;
 
 		    if (pl->team == targ->team) {
-			lose_score += Get_Score(pl);
-			lose_team_members++;
+    	    	    	Arraylist_add(losers,&pl);
 			if (!Player_is_dead(pl))
 			    somebody = true;
-		    } else if (pl->team == killer->team) {
-			win_score += Get_Score(pl);
-			win_team_members++;
+    	    	    } else if (pl->team == killer->team) {
+    	    	    	Arraylist_add(winners,&pl);
 		    }
 		}
 	    }
+	    
 	    if (somebody) {
 		for (j = 0; j < Num_targets(); j++) {
 		    target_t *t = Target_by_index(j);
@@ -377,27 +447,24 @@ void Handle_Scoring(scoretype_t st, player_t * killer, player_t * victim,
 			    targets_remaining++;
 		    }
 		}
-	    }
-	    if (!somebody)
+    	    } else {
 		break;
+    	    }
 
 	    sound_play_sensors(targ->pos, DESTROY_TARGET_SOUND);
 
 	    if (targets_remaining > 0) {
-		sc = Rate(Get_Score(killer), TARGET_SCORE) / 4;
-		sc = sc * (targets_total -
-			   targets_remaining) / (targets_total + 1);
-		if (sc >= 0.01)
-		    if (!options.zeroSumScoring)
-			Score(killer, sc, targ->pos, "Target: ");
+    	    	factor = options.targetScoreMult / 4 * 
+    	    	    	(targets_total - targets_remaining) / (targets_total + 1);
+    	    	Generic_Scoring(winners,losers,factor,"Target: ");
 		break;
 	    }
 
 	    if (options.targetKillTeam)
 		Rank_add_target_kill(killer);
 
-	    sc = Rate(win_score, lose_score);
-	    por = (sc * lose_team_members) / win_team_members;
+    	    Generic_Scoring(winners,losers,options.targetScoreMult
+    	    	    *Arraylist_get_num_elements(losers),"Target: ");
 
 	    for (j = 0; j < NumPlayers; j++) {
 		player_t *pl = Player_by_index(j);
@@ -411,58 +478,44 @@ void Handle_Scoring(scoretype_t st, player_t * killer, player_t * victim,
 		    if (options.targetKillTeam
 			&& targets_remaining == 0 && Player_is_alive(pl))
 			Player_set_state(pl, PL_STATE_KILLED);
-		    if (!options.zeroSumScoring)
-			Score(pl, -sc, targ->pos, "Target: ");
-		} else if (pl->team == killer->team &&
-			   (pl->team != TEAM_NOT_SET
-			    || pl->id == killer->id))
-		    if (!options.zeroSumScoring)
-			Score(pl, por, targ->pos, "Target: ");
+    	    	}
 	    }
 	    break;
 	}
     case SCORE_TREASURE:
 	{
-	    double win_score = 0.0, lose_score = 0.0, por;
-	    int i, win_team_members = 0, lose_team_members = 0;
+    	    int i;
 	    treasure_t *treasure = (treasure_t *) extra;
 	    bool somebody = false;
 
 	    if (BIT(world->rules->mode, TEAM_PLAY)) {
 		for (i = 0; i < NumPlayers; i++) {
-		    player_t *pl_i = Player_by_index(i);
+    	    	    player_t *pl = Player_by_index(i);
 
-		    if (Player_is_tank(pl_i)
-			|| (Player_is_paused(pl_i)
-			    && pl_i->pause_count <= 0)
-			|| Player_is_waiting(pl_i))
+    	    	    if (Player_is_tank(pl)
+    	    	    	|| (Player_is_paused(pl) && pl->pause_count <= 0)
+    	    	    	|| Player_is_waiting(pl))
 			continue;
-		    if (pl_i->team == treasure->team) {
-			lose_score += Get_Score(pl_i);
-			lose_team_members++;
-			if (!Player_is_dead(pl_i))
-			    somebody = true;
-		    } else if (pl_i->team == killer->team) {
-			win_score += Get_Score(pl_i);
-			win_team_members++;
+    	    	    if (pl->team == treasure->team) {
+    	    	    	Arraylist_add(losers,&pl);
+			somebody = true;
+    	    	    } else if (pl->team == killer->team) {
+    	    	    	Arraylist_add(winners,&pl);
 		    }
 		}
 	    }
 
 	    if (!somebody) {
-		if (!options.zeroSumScoring)
-		    Score(killer, Rate(Get_Score(killer),
-				       TREASURE_SCORE) / 2, treasure->pos,
-			  "Treasure:");
+    	    	Generic_Scoring(winners,losers,0.0,"Treasure: ");
 		break;
 	    }
+
+    	    Generic_Scoring(winners,losers,options.treasureScoreMult
+    	    	*Arraylist_get_num_elements(losers),"Treasure: ");
 
 	    treasure->destroyed++;
 	    world->teams[treasure->team].TreasuresLeft--;
 	    world->teams[killer->team].TreasuresDestroyed++;
-
-	    sc = 3 * Rate(win_score, lose_score);
-	    por = (sc * lose_team_members) / (2 * win_team_members + 1);
 
 	    for (i = 0; i < NumPlayers; i++) {
 		player_t *pl_i = Player_by_index(i);
@@ -473,21 +526,15 @@ void Handle_Scoring(scoretype_t st, player_t * killer, player_t * victim,
 		    continue;
 
 		if (pl_i->team == treasure->team) {
-		    Score(pl_i, -sc, treasure->pos, "Treasure: ");
 		    Rank_lost_ball(pl_i);
 		    if (options.treasureKillTeam)
 			Player_set_state(pl_i, PL_STATE_KILLED);
-		} else if (pl_i->team == killer->team &&
+    	    	} else if (pl_i->team == killer->team &&
 			   (pl_i->team != TEAM_NOT_SET
 			    || pl_i->id == killer->id)) {
-		    if (lose_team_members > 0) {
-			if (pl_i->id == killer->id)
-			    Rank_cashed_ball(pl_i);
-			Rank_won_ball(pl_i);
-		    }
-		    Score(pl_i,
-			  (pl_i->id == killer->id ? 3 * por : 2 * por),
-			  treasure->pos, "Treasure: ");
+    	    	    if (pl_i->id == killer->id)
+    	    	    	Rank_cashed_ball(pl_i);
+    	    	    Rank_won_ball(pl_i);
 		}
 	    }
 
@@ -496,30 +543,33 @@ void Handle_Scoring(scoretype_t st, player_t * killer, player_t * victim,
 
 	    break;
 	}
+    case SCORE_TREASURE_REPLACE:
+    	Arraylist_add(winners,&killer);
+    	Generic_Scoring(winners,losers,0.5,"Treasure: ");
+    	break;
     case SCORE_SELF_DESTRUCT:
-	if (options.selfDestructScoreMult != 0) {
-	    sc = Rate(0.0,
-		      Get_Score(killer)) * options.selfDestructScoreMult;
-	    if (!options.zeroSumScoring)
-		Score(killer, -sc, killer->pos, "Self-Destruct");
-	}
+    	Arraylist_add(losers,&killer);
+    	Generic_Scoring(winners,losers,options.selfDestructScoreMult,"Self-Destruct");
 	break;
     case SCORE_SHOVE_KILL:
-	sc = (*((double *) extra)) * Rate(Get_Score(killer),
-					  Get_Score(victim)) *
-	    options.shoveKillScoreMult;
-	if (!options.zeroSumScoring)
-	    Score(killer, sc, victim->pos, victim->name);
+    	Arraylist_add(winners,&killer);
+    	Generic_Scoring(winners,losers,options.shoveKillScoreMult
+    	    	    	* (*((double *)extra)), victim->name);
 	break;
     case SCORE_SHOVE_DEATH:
-	sc = (*((double *) extra)) * Rate(killer->score,
-					  Get_Score(victim)) *
-	    options.shoveKillScoreMult;
-	if (!options.zeroSumScoring)
-	    Score(victim, -sc, victim->pos, "[Shove]");
+    	Arraylist_add(losers,&victim);
+    	Generic_Scoring(winners,losers,options.shoveKillScoreMult
+    	    	    	* (*((double *)extra)), "[Shove]");
 	break;
+    case SCORE_BONUS:
+    	Arraylist_add(winners,&killer);
+    	Generic_Scoring(winners,losers,*((double *)extra), somemsg);
+    	break;
     default:
 	error("unknown scoring type!");
 	break;
     }
+    
+    Arraylist_clear(winners);
+    Arraylist_clear(losers);
 }

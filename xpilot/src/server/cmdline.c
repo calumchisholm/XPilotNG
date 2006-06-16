@@ -483,6 +483,38 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
+	"spaceInvadersReloading",
+	"SIReload",
+	"false",
+	&options.spaceInvadersReloading,
+	valBool,
+	tuner_none,
+	"When turned on, ships will get 'ammo' back when old shots disappear.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"reloadInterval",
+	"reloadTime",
+	"4",
+	&options.reloadInterval,
+	valReal,
+	tuner_dummy,
+	"Defines how many ticks pass between ammo reloads.\n"
+	"(only works with spaceInvadersReloading false).\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"reloadAmount",
+	"reloadAmount",
+	"1",
+	&options.reloadAmount,
+	valInt,
+	tuner_dummy,
+	"How much ammo should get reloaded per reload.\n"
+	"(only works with spaceInvadersReloading false).\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
 	"shotsGravity",
 	"shotsGravity",
 	"true",
@@ -2457,6 +2489,56 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
+	"wallDeathScoreMult",
+	"wallDeathScoreMult",
+	"0.34",
+	&options.wallDeathScoreMult,
+	valReal,
+	tuner_dummy,
+	"Multiplication factor to scale score for being killed by walls.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"asteroidKillScoreMult",
+	"asteroidKillScoreMult",
+	"0.21",
+	&options.asteroidKillScoreMult,
+	valReal,
+	tuner_dummy,
+	"Multiplication factor to scale score for destroying asteroids.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"asteroidDeathScoreMult",
+	"asteroidDeathScoreMult",
+	"0.5",
+	&options.asteroidDeathScoreMult,
+	valReal,
+	tuner_dummy,
+	"Multiplication factor to scale score for being killed by asteroids.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"targetScoreMult",
+	"targetScoreMult",
+	"3.0",
+	&options.targetScoreMult,
+	valReal,
+	tuner_dummy,
+	"Multiplication factor to scale score for target destruction.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"treasureScoreMult",
+	"treasurecoreMult",
+	"3.0",
+	&options.treasureScoreMult,
+	valReal,
+	tuner_dummy,
+	"Multiplication factor to scale score for treasure destruction.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
 	"movingItemProb",
 	"movingItemProb",
 	"0.2",
@@ -3646,7 +3728,27 @@ static option_desc opts[] = {
 	valBool,
 	tuner_dummy,
 	"Use Zero sum scoring?\n",
-	OPT_COMMAND | OPT_VISIBLE
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"temporaryScoring",
+	"tempScoring",
+	"false",
+	&options.temporaryScoring,
+	valBool,
+	tuner_none,
+	"Use temporary Scoring?\n",
+	 OPT_ORIGIN_ANY| OPT_VISIBLE
+    },
+    {
+	"ELORatingK",
+	"ELOK",
+	"4.0",
+	&options.ELORatingK,
+	valReal,
+	tuner_dummy,
+	"How fast the ELO rating should move (maximally)\n",
+	 OPT_ORIGIN_ANY| OPT_VISIBLE
     },
     {
 	"elimination",

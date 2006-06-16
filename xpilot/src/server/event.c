@@ -525,6 +525,9 @@ void Pause_player(player_t *pl, bool on)
 	pl->stunned		= 0;
 	pl->lock.distance	= 0;
 	pl->used		= DEF_USED;
+	
+	if (options.temporaryScoring)
+	    Set_Real_Score(pl,0.0);
 
 	for (i = 0; i < MAX_TEAMS ; i++) {
 	    if (world->teams[i].SwapperId == pl->id)

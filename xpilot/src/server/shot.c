@@ -356,11 +356,13 @@ char *Describe_shot(int type, int status, modifiers_t mods, int hit)
 
 static inline bool Player_can_fire_shot(player_t *pl)
 {
-    if (pl->shots >= options.maxPlayerShots
-	|| BIT(pl->used, HAS_SHIELD)
-	|| Player_is_phasing(pl))
-	return false;
-    return true;
+	if ( BIT(pl->used, HAS_SHIELD) || Player_is_phasing(pl) )
+		return false;
+
+	if ( (options.spaceInvadersReloading && (pl->shots >= options.maxPlayerShots))
+			|| (pl->shots <= 0) )
+		return false;
+	return true;
 }
 
 void Fire_main_shot(player_t *pl, int type, int dir)
@@ -1267,13 +1269,15 @@ void Delete_shot(int ind)
 	break;
 
     case OBJ_SHOT:
-	if (shot->id == NO_ID
+	if (options.spaceInvadersReloading) {
+		if (shot->id == NO_ID
 	    || BIT(shot->obj_status, FROMCANNON)
 	    || Mods_get(shot->mods, ModsCluster))
 	    break;
-	pl = Player_by_id(shot->id);
-	if (--pl->shots <= 0)
+		pl = Player_by_id(shot->id);
+		if (--pl->shots <= 0)
 	    pl->shots = 0;
+	}
 	break;
 
     case OBJ_PULSE:
