@@ -1059,16 +1059,9 @@ static int Cmd_stats(char *arg, player_t *pl, bool oper, char *msg, size_t size)
     if (!arg || !*arg)
 	return CMD_RESULT_NO_NAME;
 
-    if (oper) {
-    	if (!Rank_get_elo_stats(arg, msg, size)) {
-	    snprintf(msg, size, "Player \"%s\" doesn't have ranking stats.", arg);
-	    return CMD_RESULT_ERROR;
-    	}
-    } else {
-    	if (!Rank_get_stats(arg, msg, size)) {
-	    snprintf(msg, size, "Player \"%s\" doesn't have ranking stats.", arg);
-	    return CMD_RESULT_ERROR;
-    	}
+    if (!Rank_get_stats(arg, msg, size)) {
+	snprintf(msg, size, "Player \"%s\" doesn't have ranking stats.", arg);
+	return CMD_RESULT_ERROR;
     }
 
     return CMD_RESULT_SUCCESS;

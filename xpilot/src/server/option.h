@@ -45,9 +45,6 @@ extern struct options {
     double	ballMass;
     double	minItemMass;
     int		maxPlayerShots;
-    bool		spaceInvadersReloading;
-    double	reloadInterval;
-    int	reloadAmount;
     double	shotLife;
     double	pulseSpeed;
     double	pulseLength;
@@ -175,16 +172,9 @@ extern struct options {
     double	selfDestructScoreMult;
     double	unownedKillScoreMult;
     double	cannonKillScoreMult;
-    double	wallDeathScoreMult;
-    double	asteroidKillScoreMult;
-    double	asteroidDeathScoreMult;
-    double	targetScoreMult;
-    double	treasureScoreMult;
     double	tagItKillScoreMult;
     double	tagKillItScoreMult;
     bool    	zeroSumScoring;
-    int    	temporaryScoring;
-    double    	ELORatingK;
 
     double	destroyItemInCollisionProb;
     bool 	allowSmartMissiles;

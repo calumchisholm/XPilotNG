@@ -219,8 +219,6 @@ typedef struct player {
     double	oldturnvel;		/* Last velocity of turn (right) */
     double	turnacc;		/* Current acceleration of turn */
     double	score;			/* Current score of player */
-    double	*scorelist; 	    	/* score list of player (used for temporary scoring)*/
-    int     	scorelist_i; 	    	/* Current score list index of player */
     bool    	update_score;	    	/* score table info needs to be sent */
     shipshape_t	*ship;			/* wire model of ship shape */
     double	power;			/* Force of thrust */
@@ -229,7 +227,6 @@ typedef struct player {
     double	turnresistance_s;	/* Saved (see above) */
     double	sensor_range;		/* Range of sensors (radar) */
     int		shots;			/* Number of active shots by player */
-    int		reload_loop;			/* loop# of last reload */
     int		missile_rack;		/* Next missile rack to be active */
 
     int		num_pulses;		/* Number of laser pulses "flying". */

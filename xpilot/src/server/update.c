@@ -590,23 +590,6 @@ static void Transporter_update(void)
     }
 }
 
-static void Players_reload(void)
-{
-	int i;
-	player_t *pl;
-	for (i = 0; i < NumPlayers; i++) {
-		pl = Player_by_index(i);
-		if (pl->shots < options.maxPlayerShots) {
-			if ((frame_loops - pl->reload_loop)*timeStep >= options.reloadInterval) {
-				pl->shots += options.reloadAmount;
-				
-				if (pl->shots > options.maxPlayerShots) pl->shots = options.maxPlayerShots;
-				pl->reload_loop = frame_loops;
-			}
-		}
-	}
-}
-
 static void Players_turn(void)
 {
     int i;
@@ -869,19 +852,18 @@ static void Update_players(void)
 
 	if (Player_is_paused(pl)) {
 	    if (options.pauseTax > 0.0 && (frame_loops % FPS) == 0) {
-	    	double mult = options.pauseTax/10.0;
-	    	Handle_Scoring(SCORE_BONUS,NULL,pl,&mult,NULL);
+		Player_add_score(pl,-options.pauseTax);
+		updateScores = true;
 	    }
 	}
 
         if (Player_is_alive(pl)
 	    && !BIT(pl->used, USES_SHIELD)) {
-	    /*if (options.survivalScore != 0.0) {
-	    	double mult;
-		mult = pl->survival_time * options.survivalScore/FPS;
-		mult /= 10.0;
-	    	Handle_Scoring(SCORE_BONUS,pl,NULL,&mult,NULL);
-	    }*/
+	    if (options.survivalScore != 0.0) {
+		Player_add_score(pl, pl->survival_time * 
+				 options.survivalScore/FPS);
+		updateScores = true;
+	    }
 	    pl->survival_time+= timePerFrame;
 	}
 
@@ -900,10 +882,8 @@ static void Update_players(void)
 	/* ugly hack */
 	if (Player_is_human(pl)||Player_is_robot(pl))
 	    /* kps - keep only score in one place ???? */
-	    if (pl->rank != NULL) {
-	    	if (!options.temporaryScoring)
-		    pl->rank->score =  Get_Score(pl);
-	    }
+	    if (pl->rank != NULL)
+		pl->rank->score =  Get_Score(pl);
 
 	if (pl->pause_count > 0) {
 	    /*assert(Player_is_paused(pl)
@@ -1163,9 +1143,7 @@ void Update_objects(void)
 	time_to_tick += 1.0;
     }
 
-    if (!options.spaceInvadersReloading) Players_reload();		
-		
-		Robot_update(tick);
+    Robot_update(tick);
 
     /*
      * Fast aim:

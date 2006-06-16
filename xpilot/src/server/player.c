@@ -463,9 +463,6 @@ int Init_player(int ind, shipshape_t *ship, int type)
     memset(pl, 0, sizeof(player_t));
     pl->visibility = v;
 
-    if (options.temporaryScoring) {
-    	pl->scorelist = (double *)malloc(sizeof(double)*12);
-    }
     /*
      * Make sure floats, doubles and pointers are correctly zeroed.
      */
@@ -573,13 +570,6 @@ int Init_player(int ind, shipshape_t *ship, int type)
 	pl->shove_record[i].pusher_id = NO_ID;
 	
     pl->update_score = true;
-		
-		if (options.spaceInvadersReloading)
-			pl->shots = 0;
-		else {
-			pl->shots = options.maxPlayerShots;
-			pl->reload_loop = frame_loops;
-		}
 
     return pl->id;
 }
@@ -699,15 +689,12 @@ void Reset_all_players(void)
 	    }
 	}
 
-	if (!Player_is_paused(pl)
-	    && !Player_is_waiting(pl)) {
-    	    Rank_add_round(pl);
-    	    if (options.temporaryScoring)
-    	    	Increment_Scorelist(pl);
-	}
-
 	pl->kills = 0;
 	pl->deaths = 0;
+
+	if (!Player_is_paused(pl)
+	    && !Player_is_waiting(pl))
+	    Rank_add_round(pl);
 
 	CLR_BIT(pl->have, HAS_BALL);
 	Player_reset_timing(pl);
@@ -860,243 +847,6 @@ static void Compute_end_of_round_values(double *average_score,
 	*average_score /= n;
 }
 
-static void Handle_ELO(int winning_team)
-{
-    double Round_ELO_Team_A = 0.0, Round_ELO_Team_B = 0.0;
-    double Score_ELO_Team_A = 0.0, Score_ELO_Team_B = 0.0;
-    double Score_Team_A = 0.0, Score_Team_B = 0.0;
-    int team_members[MAX_TEAMS];
-    int num_teams = 0;
-    int i,j;
-    int team_A = -1, team_B = -1;
-    double win_prob, result;
-    static arraylist_t *team_A_list_R = NULL;
-    static arraylist_t *team_A_list_S = NULL;
-    static arraylist_t *team_B_list_R = NULL;
-    static arraylist_t *team_B_list_S = NULL;
-    
-    double  highest_Round_ELO, highest_Score_ELO,
-    	    highest_Round_ELO_new, highest_Score_ELO_new,
-	    mult;
-     
-    if (!BIT(world->rules->mode, TEAM_PLAY))
-	return;
-    
-    for ( i = 0; i < MAX_TEAMS ; ++i)
-    	team_members[i] = 0;
-    
-    if (!team_A_list_R)
-    	team_A_list_R = Arraylist_alloc(sizeof(ranknode_t *));
-    if (!team_A_list_S)
-    	team_A_list_S = Arraylist_alloc(sizeof(ranknode_t *));
-    if (!team_B_list_R)
-    	team_B_list_R = Arraylist_alloc(sizeof(ranknode_t *));
-    if (!team_B_list_S)
-    	team_B_list_S = Arraylist_alloc(sizeof(ranknode_t *));
-    
-    xpprintf("{ELO}{");
-
-    for (i = 0; i < NumPlayers; ++i) {
-	player_t *pl = Player_by_index(i);
-
-	if (Player_is_tank(pl)
-	    || (Player_is_paused(pl) && pl->pause_count <= 0)
-	    || Player_is_waiting(pl))
-	    continue;
-
-    	if (pl->rank) {
-	    if (pl->team != TEAM_NOT_SET) {
-		if (!team_members[pl->team]) {
-		    ++num_teams;
-		    if (num_teams == 3) {
-		    	Arraylist_clear(team_A_list_R);
-		    	Arraylist_clear(team_A_list_S);
-		    	Arraylist_clear(team_B_list_R);
-		    	Arraylist_clear(team_B_list_S);
-			return;
-		    }
-		    if (team_A == -1) {
-		    	team_A = pl->team;
-			xpprintf("<TEAM A=%i>",pl->team);
-		    } else if (team_B == -1) {
-		    	team_B = pl->team;
-			xpprintf("<TEAM B=%i>",pl->team);
-		    }
-		}
-
-		if (team_A == pl->team) {
-		    ++team_members[team_A];
-		    Score_Team_A += Get_Real_Score(pl);
-		    Arraylist_add(team_A_list_R,&(pl->rank));
-		    Arraylist_add(team_A_list_S,&(pl->rank));
-		} else {
-		    ++team_members[team_B];
-		    Score_Team_B += Get_Real_Score(pl);
-		    Arraylist_add(team_B_list_R,&(pl->rank));
-		    Arraylist_add(team_B_list_S,&(pl->rank));
-		}
-	    }
-	}
-    }
-
-    if (num_teams != 2) {
-    	xpprintf("}(ELO_NOOP)\n");
-    	Arraylist_clear(team_A_list_R);
-    	Arraylist_clear(team_A_list_S);
-    	Arraylist_clear(team_B_list_R);
-    	Arraylist_clear(team_B_list_S);
-    	return;
-    }
-    
-    xpprintf("<TEAM_A_PLAYERS> ");
-    for ( i=0 ; i < Arraylist_get_num_elements(team_A_list_R) ; ++i ) {
-    	ranknode_t *rank_R = *(ranknode_t **)Arraylist_get(team_A_list_R,i);
-    	xpprintf("PL:[%s] ",rank_R->name);
-    }
-    xpprintf("</TEAM_A_PLAYERS> <TEAM_B_PLAYERS> ");
-    for ( i=0 ; i < Arraylist_get_num_elements(team_B_list_R) ; ++i ) {
-    	ranknode_t *rank_R = *(ranknode_t **)Arraylist_get(team_B_list_R,i);
-    	xpprintf("PL:[%s] ",rank_R->name);
-    }
-    xpprintf("</TEAM_B_PLAYERS> ");
-	
-    highest_Round_ELO = 666666.0;
-    highest_Score_ELO = 666666.0;
-    mult = 1.0;
-    for ( i=0 ; i < team_members[team_A] ; ++i ) {
-    	int high_r = 0, high_s = 0;
-    	highest_Round_ELO_new = -666666.0;
-    	highest_Score_ELO_new = -666666.0;
-	if (i)
-	    mult = 1.0/(double)i;
-	
-    	for ( j=0 ; j < Arraylist_get_num_elements(team_A_list_R) ; ++j ) {
-	    ranknode_t *rank_R, *rank_S;
-	    rank_R = *(ranknode_t **)Arraylist_get(team_A_list_R,j);
-	    rank_S = *(ranknode_t **)Arraylist_get(team_A_list_S,j);
-	    if (rank_R->round_elo <= highest_Round_ELO) {
-	    	if (rank_R->round_elo > highest_Round_ELO_new) {
-	    	    highest_Round_ELO_new = rank_R->round_elo;
-		    high_r = j;
-		}
-	    }
-	    if (rank_S->score_elo <= highest_Score_ELO) {
-	    	if (rank_S->score_elo > highest_Score_ELO_new) {
-	    	    highest_Score_ELO_new = rank_S->score_elo;
-		    high_s = j;
-		}
-	    }
-	}
-	
-	Arraylist_fast_remove(team_A_list_R,high_r);
-	Arraylist_fast_remove(team_A_list_S,high_s);
-    	
-	highest_Round_ELO = highest_Round_ELO_new;
-	highest_Score_ELO = highest_Score_ELO_new;
-	
-	Round_ELO_Team_A += highest_Round_ELO*mult;
-	Score_ELO_Team_A += highest_Score_ELO*mult;
-    }
-    
-    highest_Round_ELO = 666666.0;
-    highest_Score_ELO = 666666.0;
-    mult = 1.0;
-    for ( i=0 ; i < team_members[team_B] ; ++i ) {
-    	int high_r = 0, high_s = 0;
-    	highest_Round_ELO_new = -666666.0;
-    	highest_Score_ELO_new = -666666.0;
-	mult = 1.0/(1.0 + (double)i);
-	
-    	for ( j=0 ; j < Arraylist_get_num_elements(team_B_list_R) ; ++j ) {
-	    ranknode_t *rank_R, *rank_S;
-	    rank_R = *(ranknode_t **)Arraylist_get(team_B_list_R,j);
-	    rank_S = *(ranknode_t **)Arraylist_get(team_B_list_S,j);
-	    if (rank_R->round_elo <= highest_Round_ELO) {
-	    	if (rank_R->round_elo >= highest_Round_ELO_new) {
-	    	    highest_Round_ELO_new = rank_R->round_elo;
-		    high_r = j;
-		}
-	    }
-	    if (rank_S->score_elo <= highest_Score_ELO) {
-	    	if (rank_S->score_elo >= highest_Score_ELO_new) {
-	    	    highest_Score_ELO_new = rank_S->score_elo;
-		    high_s = j;
-		}
-	    }
-	}
-	
-	Arraylist_fast_remove(team_B_list_R,high_r);
-	Arraylist_fast_remove(team_B_list_S,high_s);
-    	
-	highest_Round_ELO = highest_Round_ELO_new;
-	highest_Score_ELO = highest_Score_ELO_new;
-	
-	Round_ELO_Team_B += highest_Round_ELO*mult;
-	Score_ELO_Team_B += highest_Score_ELO*mult;
-    }
-    
-    Arraylist_clear(team_A_list_R);
-    Arraylist_clear(team_A_list_S);
-    Arraylist_clear(team_B_list_R);
-    Arraylist_clear(team_B_list_S);
-    
-    win_prob = 1.0 / (1.0 + pow(10.0, (Round_ELO_Team_B - Round_ELO_Team_A)/400.0));
-    
-    xpprintf("<ROUND_WINNER: ");
-    if (winning_team == -1) {
-    	result = 0.5;
-	xpprintf("NONE>");
-    } else if (winning_team == team_A) {
-    	result = 1.0;
-	xpprintf("TEAM_A>");
-    } else {
-    	result = 0.0;
-	xpprintf("TEAM_B>");
-    }
-
-    Round_ELO_Team_A = options.ELORatingK*(result - win_prob);
-    Round_ELO_Team_B = -Round_ELO_Team_A;
-
-    win_prob = 1.0 / (1.0 + pow(10.0, (Score_ELO_Team_B - Score_ELO_Team_A)/400.0));
-
-    result  = (Score_Team_A - Score_Team_B)
-    	    / (120.0 * MIN(team_members[team_A],team_members[team_B])) + 0.5;
-    
-    xpprintf("<SCORE_WINNER: ");
-    if (result == 0.5000) {
-	xpprintf("NONE");
-    } else if (result > 0.5) {
-	xpprintf("TEAM_A");
-    } else {
-	xpprintf("TEAM_B");
-    }
-    xpprintf(" %f> }\n",Score_Team_A - Score_Team_B);
-
-    Score_ELO_Team_A = options.ELORatingK*(result - win_prob);
-    Score_ELO_Team_B = -Score_ELO_Team_A;
-
-    for (i = 0; i < NumPlayers; ++i) {
-	player_t *pl = Player_by_index(i);
-
-	if (Player_is_tank(pl)
-	    || (Player_is_paused(pl) && pl->pause_count <= 0)
-	    || Player_is_waiting(pl))
-	    continue;
-
-    	if (pl->rank) {
-	    if (pl->team != TEAM_NOT_SET) {
-	    	if (pl->team == team_A) {
-	    	    Rank_add_Round_ELO(pl,Round_ELO_Team_A/(double)team_members[team_A]);
-	    	    Rank_add_Score_ELO(pl,Score_ELO_Team_A/(double)team_members[team_A]);
-		} else {
-	    	    Rank_add_Round_ELO(pl,Round_ELO_Team_B/(double)team_members[team_B]);
-	    	    Rank_add_Score_ELO(pl,Score_ELO_Team_B/(double)team_members[team_B]);
-		}
-    	    }
-	}
-    }
-}
-
 
 static void Give_best_player_bonus(double average_score,
 				   int num_best_players,
@@ -1110,7 +860,6 @@ static void Give_best_player_bonus(double average_score,
     if (num_best_players == 0 || best_ratio == 0)
 	sprintf(msg, "There is no Deadly Player.");
     else if (num_best_players == 1) {
-    	double mult;
 	player_t *bp = Player_by_index(best_players[0]);
 
 	sprintf(msg,
@@ -1118,8 +867,7 @@ static void Give_best_player_bonus(double average_score,
 		bp->name,
 		bp->kills, bp->deaths);
 	points = best_ratio * Rate(Get_Score(bp), average_score);
-	mult = points/10.0;
-	Handle_Scoring(SCORE_BONUS,bp,NULL,&mult,"[Deadliest]");
+	if (!options.zeroSumScoring) Score(bp, points, bp->pos, "[Deadliest]");
     	Rank_add_deadliest(bp);
 	/*if (options.zeroSumScoring);*//* TODO */
     } else {
@@ -1128,7 +876,6 @@ static void Give_best_player_bonus(double average_score,
 	    player_t	*bp = Player_by_index(best_players[i]);
 	    double	ratio = Rate(Get_Score(bp), average_score);
 	    double	score = (ratio + num_best_players) / num_best_players;
-	    double mult;
 
 	    if (msg[0]) {
 		if (i == num_best_players - 1)
@@ -1142,9 +889,9 @@ static void Give_best_player_bonus(double average_score,
 	    }
 	    strcat(msg, bp->name);
 	    points = best_ratio * score;
-	    mult = points/10.0;
-	    Handle_Scoring(SCORE_BONUS,bp,NULL,&mult, "[Deadly]");
+	    if (!options.zeroSumScoring) Score(bp, points, bp->pos, "[Deadly]");
 	    Rank_add_deadliest(bp);
+	    /*if (options.zeroSumScoring);*//* TODO */
 	}
 	if (strlen(msg) + 64 >= sizeof(msg)) {
 	    Set_message(msg);
@@ -1160,12 +907,12 @@ static void Give_best_player_bonus(double average_score,
 
 static void Give_individual_bonus(player_t *pl, double average_score)
 {
-    double ratio, points, mult;
+    double ratio, points;
 
     ratio = (double) pl->kills / (pl->deaths + 1);
     points = ratio * Rate( Get_Score(pl), average_score);
-    mult = points/10.0;
-    Handle_Scoring(SCORE_BONUS,pl,NULL,&mult, "[Winner]");
+    if (!options.zeroSumScoring) Score(pl, points, pl->pos, "[Winner]");
+    /*if (options.zeroSumScoring);*//* TODO */
 }
 
 void Count_rounds(void)
@@ -1192,14 +939,14 @@ void Team_game_over(int winning_team, const char *reason)
 	warn("no mem");
 	End_game();
     }
-        
+
     /* Figure out the average score and who has the best kill/death ratio */
     /* ratio for this round */
     Compute_end_of_round_values(&average_score,
 				&num_best_players,
 				&best_ratio,
 				best_players);
-    
+
     /* Print out the results of the round */
     if (winning_team != -1) {
 	Set_message_f(" < Team %d has won the round%s! >",
@@ -1240,7 +987,6 @@ void Team_game_over(int winning_team, const char *reason)
 
     teamcup_round_end(winning_team);
 
-    Handle_ELO(winning_team);
     Reset_all_players();
 
     Count_rounds();
@@ -1264,6 +1010,7 @@ void Individual_game_over(int winner)
 	warn("no mem");
 	End_game();
     }
+
     /* Figure out what the average score is and who has the best kill/death */
     /* ratio for this round */
     Compute_end_of_round_values(&average_score, &num_best_players,
@@ -1590,9 +1337,6 @@ void Delete_player(player_t *pl)
     int ind = GetInd(pl->id), i, j, id = pl->id;
     object_t *obj;
     team_t *teamp = Team_by_index(pl->team);
-    
-    if (options.temporaryScoring)
-    	free(pl->scorelist);
 
     /* call before important player structures are destroyed */
     Leave_alliance(pl);
@@ -1884,13 +1628,6 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
     pl->used	|= DEF_USED;
     pl->used	&= ~(USED_KILL);
     pl->used	&= pl->have;
-		
-		if (options.spaceInvadersReloading)
-			pl->shots = 0;
-		else {
-			pl->shots = options.maxPlayerShots;
-			pl->reload_loop = frame_loops;
-		}
 }
 
 /* determines if two players are immune to eachother */

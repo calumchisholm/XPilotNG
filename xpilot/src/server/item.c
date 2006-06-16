@@ -403,12 +403,8 @@ void Detonate_items(player_t *pl)
 	if (rfrac() < options.detonateItemOnKillProb) {
 	    int	type;
 
-			if (options.spaceInvadersReloading) {
-	    	if (pl->shots >= options.maxPlayerShots);
-					break;
-			} else {
-				if (pl->shots <= 0);
-			}
+	    if (pl->shots >= options.maxPlayerShots)
+		break;
 
 	    /*
 	     * Missiles are random type at random players, which could

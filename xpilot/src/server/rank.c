@@ -311,7 +311,7 @@ void Rank_write_webpage(void)
 	"\n"
 	"  <p>\n"
 	"    <a href=\"http://xpilot.sourceforge.net/rank-guide.html\">"
-	     "How does the ranking work?</a>\n"
+	    "How does the ranking work?</a>\n"
 	"  </p>\n"
 	"\n"
 	"  <table>\n";

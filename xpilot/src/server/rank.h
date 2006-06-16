@@ -46,14 +46,11 @@ typedef struct ranknode {
     int ballsWon, ballsLost;
     double bestball;
     double score;
-    double round_elo;
-    double score_elo;
     player_t *pl;
     double max_survival_time;
 } ranknode_t;
 
 bool Rank_get_stats(const char *name, char *buf, size_t size);
-bool Rank_get_elo_stats(const char *name, char *buf, size_t size);
 ranknode_t *Rank_get_by_name(const char *name);
 void Rank_init_saved_scores(void);
 void Rank_get_saved_score(player_t *pl);
@@ -64,17 +61,10 @@ void Rank_show_ranks(void);
 
 static inline void Rank_add_score(player_t *pl, double points)
 {
-    if (!options.temporaryScoring)
-    	Add_Score(pl,points);
+    Add_Score(pl,points);
     pl->update_score = true;
-    if (pl->rank) {
-    	if (!options.temporaryScoring || !pl->rank->rounds) {
-	    pl->rank->score += points;
-	} else {
-	    pl->rank->score += (points - pl->rank->score)
-	    	    	    / (double)pl->rank->rounds;
-	}
-    }
+    if (pl->rank)
+	pl->rank->score += points;
 }
 
 static inline void Rank_set_score(player_t *pl, double points)
@@ -87,12 +77,9 @@ static inline void Rank_set_score(player_t *pl, double points)
 
 static inline void Rank_fire_shot(player_t *pl)
 {
-	if (options.spaceInvadersReloading)
-		pl->shots++;
-	else
-		pl->shots--;
-	if (pl->rank)
-		pl->rank->shots++;
+    pl->shots++;
+    if (pl->rank)
+	pl->rank->shots++;
 }
 
 static inline void Rank_add_kill(player_t *pl)
@@ -162,17 +149,6 @@ static inline void Rank_survival(player_t *pl, double tim)
     }
 }
 
-static inline void Rank_add_Round_ELO(player_t *pl, double elo)
-{
-    if (pl->rank)
-    	pl->rank->round_elo += elo;
-}
-
-static inline void Rank_add_Score_ELO(player_t *pl, double elo)
-{
-    if (pl->rank)
-    	pl->rank->score_elo += elo;
-}
 
 static inline double Rank_get_max_survival_time(player_t *pl)
 {

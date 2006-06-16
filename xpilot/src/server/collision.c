@@ -1177,11 +1177,8 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 
 		/* if there are no rounds in survival mode */
 		/* deaths act like rounds                  */
-		if (!BIT(world->rules->mode, LIMITED_LIVES)) {
-		    Rank_add_round(pl);
-	    	    if (options.temporaryScoring)
-	    	    	Increment_Scorelist(pl);
-		}
+		if (!BIT(world->rules->mode, LIMITED_LIVES))
+		    Rank_add_round(pl); 
 
 		Rank_write_webpage();
 		Rank_write_rankfile();

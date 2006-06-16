@@ -214,7 +214,6 @@ void Race_compute_game_status(void)
 		CLR_BIT(pl->pl_status, FINISH);
 		SET_BIT(pl->pl_status, RACE_OVER);
 		if (pts > 0) {
-		    double mult;
 		    sprintf(msg,
 			    "%s finishes %sin position %d "
 			    "scoring %.2f point%s.",
@@ -225,9 +224,9 @@ void Race_compute_game_status(void)
 		    Set_message(msg);
 		    sprintf(msg, "[Position %d%s]", pos,
 			    (num_finished_players == 1) ? "" : " (jointly)");
-		    mult = pts/10.0;
-		    Handle_Scoring(SCORE_BONUS,pl,NULL,&mult, msg);
-		} else {
+		    if (!options.zeroSumScoring) Score(pl, pts, pl->pos, msg);
+		}
+		else {
 		    sprintf(msg,
 			    "%s finishes %sin position %d.",
 			    pl->name,
@@ -363,15 +362,13 @@ void Race_game_over(void)
 		continue;
 
 	    if (pl->best_lap == bestlap) {
-	    	double mult;
 		Set_message_f("%s %s the best lap time of %.2fs",
 			      pl->name,
 			      (num_best_players == 1) ? "had" : "shares",
 			      (double) bestlap / FPS);
-		mult = (5.0 + num_active_players)/10.0;
-		Handle_Scoring(SCORE_BONUS,pl,NULL,&mult,
-		    (num_best_players == 1) ?
-		    "[Fastest lap]" : "[Joint fastest lap]");
+		if (!options.zeroSumScoring) Score(pl, 5.0 + num_active_players, pl->pos,
+		      (num_best_players == 1)
+		      ? "[Fastest lap]" : "[Joint fastest lap]");
 	    }
 	}
 
