@@ -363,7 +363,7 @@ void Rank_write_webpage(void)
 
 	if (i % 20 == 0)
 	    fprintf(file,
-		"    <tr>\n"
+		"    <tr class="heading">\n"
 		"      <th align=\"left\">Rank</th>\n"
 		"      <th align=\"left\">Player</th>\n"
 		"      <th align=\"left\">Score</th>\n"
