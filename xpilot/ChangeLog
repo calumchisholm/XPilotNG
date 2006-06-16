@@ -19,6 +19,7 @@ Server:
 	  from teammates regardless of score.
 	* Added the playerCollisionFuelDrain option (default 100):
 	  How much fuel does a player collision cost?
+	* Generate rank pages in valid XHTML 1.0 Strict.
 
 Client:
 	* Improved ball message scan.  Clear color attributes of
