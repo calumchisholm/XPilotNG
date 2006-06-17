@@ -377,7 +377,7 @@ void Rank_write_webpage(void)
 		"      <th align=\"left\">Deadliest</th>\n"
 		"      <th align=\"left\">Balls</th>\n"
 		"      <th align=\"left\">Ratio</th>\n"
-		"      <th align=\"left\">User</th>\n"
+		"      <th align=\"right\">User</th>\n"
 		"      <th align=\"left\">Host</th>\n"
 		"      <th align=\"left\">Logout</th>\n"
 		"    </tr>\n");
