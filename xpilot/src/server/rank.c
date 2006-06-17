@@ -268,7 +268,7 @@ void Rank_write_webpage(void)
 	"<html xmlns=\"http://www.w3.org/1999/xhtml\" "
 	    "xml:lang=\"en\" lang=\"en\">\n"
 	"<head>\n"
-	"  <title> %s @ %s</title>\n"  /* mapname @ servername */
+	"  <title>%s @ %s</title>\n"  /* mapname @ servername */
 	"  <style type=\"text/css\" id=\"internalStyle\">\n"
 	"    body {\n"
 	"      font-family: sans-serif;\n"
@@ -309,7 +309,7 @@ void Rank_write_webpage(void)
 	"</head>\n"
 	"\n"
 	"<body>\n"
-	"  <h1> %s @ %s</h1>\n"  /* mapname @ servername */
+	"  <h1>%s @ %s</h1>\n"  /* mapname @ servername */
 	"\n"
 	"  <p>\n"
 	"    <a href=\"http://xpilot.sourceforge.net/rank-guide.html\">"
