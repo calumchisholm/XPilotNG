@@ -312,7 +312,7 @@ void Rank_write_webpage(void)
 	"  <h1>%s @ %s</h1>\n"  /* mapname @ servername */
 	"\n"
 	"  <p>\n"
-	"    <a href=\"http://xpilot.sourceforge.net/rank-guide.html\">"
+	"    <a href=\"http://xpilot.sourceforge.net/rank-info.html\">"
 	    "How does the ranking work?</a>\n"
 	"  </p>\n"
 	"\n"
