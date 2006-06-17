@@ -37,6 +37,10 @@ XPilot NG XP-Replay:
 	  recordings.
 	* Space key now toggles pause.
 
+Maps:
+	* Provide only one version polybloods map, namely that used at the
+	  Chaos server (v8T2).  Call it v9.
+
 ===============================================================================
 
 This is a summary of changes of release 4.7.2 compared to release 4.7.1.
