@@ -252,6 +252,7 @@ extern struct options {
     int		adminMessageFileSizeLimit;
     char	*rankFileName;
     char	*rankWebpageFileName;
+    char	*rankWebpageCSS;
     double	frictionSetting;
     double	blockFriction;
     bool	blockFrictionVisible;

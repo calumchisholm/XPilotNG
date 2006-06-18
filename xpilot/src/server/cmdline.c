@@ -1951,6 +1951,16 @@ static option_desc opts[] = {
 	OPT_COMMAND | OPT_DEFAULTS
     },
     {
+	"rankWebpageCSS",
+	"rankCSS",
+	NULL,
+	&options.rankWebpageCSS,
+	valString,
+	tuner_none,
+	"The URL of an optional style sheet for the ranking webpage.\n",
+	OPT_COMMAND | OPT_DEFAULTS
+    },
+    {
 	"framesPerSecond",
 	"FPS",
 	"50",
