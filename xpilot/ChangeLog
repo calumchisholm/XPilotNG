@@ -18,7 +18,9 @@ Server:
 	  from teammates regardless of score.
 	* Added the playerCollisionFuelDrain option (default 100):
 	  How much fuel does a player collision cost?
-	* Generate nicer rank pages in valid XHTML 1.0 Strict.
+	* Generate nicer rank webpages in valid XHTML 1.0 Strict.
+	* Add the -rankWebpageCSS option to support custom style sheets
+	  for the rank webpages.
 
 Client:
 	* Improved ball message scan.  Clear color attributes of
