@@ -69,10 +69,9 @@ static int rank_cmp(const void *p1, const void *p2)
 static char *rank_showtime(const time_t t)
 {
     static char buf[80];
-    struct tm *tmp;
 
-    tmp = localtime(&t);
-    strftime(buf, sizeof(buf), "%d %b %Y %T %Z", localtime(&t));
+    strftime(buf, sizeof(buf), "%d&nbsp;%b&nbsp;%Y&nbsp;%H:%M&nbsp;UTC",
+	gmtime(&t));
     return buf;
 }
 
