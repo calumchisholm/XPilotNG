@@ -70,7 +70,7 @@ static char *rank_showtime(const time_t t)
 {
     static char buf[80];
 
-    strftime(buf, sizeof(buf), "%d&nbsp;%b&nbsp;%Y&nbsp;%H:%M&nbsp;UTC",
+    strftime(buf, sizeof(buf), "%d\xA0%b\xA0%Y\xA0%H:%M\xA0UTC",
 	gmtime(&t));
     return buf;
 }
