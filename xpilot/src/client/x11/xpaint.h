@@ -71,6 +71,7 @@ extern XGCValues gcv;
 extern Window	topWindow, drawWindow, keyboardWindow;
 extern Window	radarWindow, playersWindow;
 extern Pixmap	drawPixmap;		/* Drawing area pixmap */
+extern Pixmap	playersPixmap;		/* Player list area pixmap */
 extern Pixmap	radarPixmap;		/* Radar drawing pixmap */
 extern Pixmap	radarPixmap2;		/* Second radar drawing pixmap */
 extern long	dpl_1[2];		/* Used by radar hack */
