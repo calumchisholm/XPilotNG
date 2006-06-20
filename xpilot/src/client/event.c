@@ -852,17 +852,16 @@ static const char *getPointerButtonBinding(xp_option_t *opt)
 /*
  * Generic key options.
  */
-/* unused: a s */
 xp_option_t key_options[] = {
     XP_KEY_OPTION(
 	"keyTurnLeft",
-	"",
+	"a",
 	KEY_TURN_LEFT,
 	"Turn left (anti-clockwise).\n"),
 
     XP_KEY_OPTION(
 	"keyTurnRight",
-	"",
+	"s",
 	KEY_TURN_RIGHT,
 	"Turn right (clockwise).\n"),
 
