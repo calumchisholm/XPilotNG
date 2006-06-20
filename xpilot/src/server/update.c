@@ -1285,7 +1285,8 @@ void Update_objects(void)
 	    }
 	}
 
-	if (Player_is_alive(pl)) {
+	if (Player_is_alive(pl) && !Player_is_waiting(pl)
+	                        && !Player_is_appearing(pl)) {
 	    pl->idleTime += timePerFrame;
 	    if (Player_is_human(pl)
 		&& options.maxIdleTime > 0
