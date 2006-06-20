@@ -21,6 +21,7 @@ Server:
 	* Generate nicer rank webpages in valid XHTML 1.0 Strict.
 	* Add the -rankWebpageCSS option to support custom style sheets
 	  for the rank webpages.
+	* Don't pause players for idling while they are waiting or appearing.
 
 Client:
 	* Improved ball message scan.  Clear color attributes of
