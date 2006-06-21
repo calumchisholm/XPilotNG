@@ -19,8 +19,8 @@ affected:
 Problem : client wants to quit if keypad 0 is pressed
 	  (does item selection and release work) ?
 Found by: xswift
-Solution:
-Fixed by:
+Solution: Add missing break in switch.
+Fixed by: Serge De Marre (committed by veenhuizen)
 Files 
 affected:
 
