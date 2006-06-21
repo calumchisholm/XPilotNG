@@ -34,6 +34,7 @@ Client:
 X11 Client only:
 	* Fix bug that prevented radar colors from being set from xpilotrc.
 	* Remove window title flipping.
+	* Implement pixmap copying for the score list window to avoid flicker.
 
 XPilot NG XP-Replay:
 	* Disable some code in color allocation function, it breaks certain
