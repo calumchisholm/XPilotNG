@@ -99,6 +99,7 @@ void Paint_frame(void)
 
     Paint_frame_start();
     Paint_score_table();
+    Paint_clock(false);
 
     SET_FG(colors[BLACK].pixel);
 
@@ -278,8 +279,6 @@ void Paint_frame(void)
 	}
 	Talk_cursor(toggle);
     }
-
-    Paint_clock(false);
 
     XFlush(dpy);
 }
