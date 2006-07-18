@@ -490,7 +490,7 @@ int sock_receive_any(sock_t *sock, char *buf, int len)
     int			count;
     socklen_t		addrlen;
 
-    if (sock_alloc_lastaddr(sock))
+    if (sock_alloc_lastaddr(sock) == SOCK_IS_ERROR)
 	return SOCK_IS_ERROR;
     addrlen = sizeof(struct sockaddr_in);
     count = recvfrom(sock->fd, buf, len, 0,
