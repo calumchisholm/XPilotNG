@@ -755,6 +755,7 @@ bool Bms_test_state(msg_bms_t bms)
 	return !need_cover;
     default:
 	dumpcore("Bms_test_state(): invalid message type");
+	return 0;
     }
 }
 
