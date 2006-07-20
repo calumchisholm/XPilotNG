@@ -7,6 +7,7 @@ autom4te.cache
 config.h
 config.log
 config.status
+configure.lineno
 configure.scan
 configure.sh
 stamp-h1
