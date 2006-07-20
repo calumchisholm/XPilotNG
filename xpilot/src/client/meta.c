@@ -340,7 +340,7 @@ void Meta_connect(int *connections_ptr, int *maxfd_ptr)
 						      metas[i].addr,
 						      META_PROG_PORT);
 	if (status == SOCK_IS_ERROR) {
-	  error(metas[i].addr);
+	    error("%s\n", metas[i].addr);
 	} else {
 	    connections++;
 	    if (metas[i].sock.fd > max)
