@@ -46,8 +46,14 @@ void Get_login_name(char *buf, size_t size)
     buf[size - 1] = '\0';
 #else
     /* Unix */
-    struct passwd *pwent = getpwuid(geteuid());
-    strlcpy(buf, pwent->pw_name, size);
+    struct passwd *p;
+
+    setpwent();
+    if ((p = getpwuid(geteuid())) != NULL)
+	strlcpy(buf, p->pw_name, size);
+    else
+	strlcpy(buf, "nameless", size);
+    endpwent();
 #endif
 }
 
