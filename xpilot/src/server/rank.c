@@ -76,9 +76,9 @@ static char *rank_showtime(const time_t t)
 }
 
 /*
- * Encode 'str' for XML or HTML.
+ * Encode 'str' for XML (xml set to nonzero) or HTML (xml set to zero).
  */
-static char *encode(const char *str)
+static char *encode(const char *str, int xml)
 {
     static char result[MAX_CHARS];
     char c;
@@ -91,7 +91,7 @@ static char *encode(const char *str)
 	    strlcat(result, "&gt;", sizeof(result));
 	else if (c == '&')
 	    strlcat(result, "&amp;", sizeof(result));
-	else if (c == '\'')
+	else if (c == '\'' && xml)
 	    strlcat(result, "&apos;", sizeof(result));
 	else if (c == '"')
 	    strlcat(result, "&quot;", sizeof(result));
@@ -252,7 +252,7 @@ static const char *Rank_get_logout_message(ranknode_t *rank)
 void Rank_write_webpage(void)
 {
     static const char stdcss[] =
-	"  <style type=\"text/css\" id=\"internalStyle\">\n"
+	"  <style type=\"text/css\">\n"
 	"    body {\n"
 	"      font-family: sans-serif;\n"
 	"      color: #000000;\n"
@@ -310,19 +310,14 @@ void Rank_write_webpage(void)
 	return;
     }
 
-    fprintf(file, "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n");
-
-    if (options.rankWebpageCSS == NULL)
-	fprintf(file,
-	    "<?xml-stylesheet href=\"#internalStyle\" type=\"text/css\"?>\n");
-
     fprintf(file,
-	"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n"
-	"    \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n"
-	"<html xmlns=\"http://www.w3.org/1999/xhtml\" "
-	    "xml:lang=\"en\" lang=\"en\">\n"
+	"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"\n"
+	"    \"http://www.w3.org/TR/HTML4/strict.dtd\">\n"
+	"<html lang=\"en\">\n"
 	"<head>\n"
-	"  <title>%s @ %s</title>\n",
+	"  <title>%s @ %s</title>\n"
+	"  <meta http-equiv=\"Content-Type\" "
+	    "content=\"text/html; charset=ISO-8859-1\">\n",
 	options.mapName, Server.host);
 
     if (options.rankWebpageCSS != NULL)
@@ -376,7 +371,7 @@ void Rank_write_webpage(void)
 	    "      <td class=\"player\" align=\"left\">%s</td>\n",
 	    i % 2 == 0 ? "odd" : "even",  /* sic */
 	    i + 1,
-	    encode(rank->name));
+	    encode(rank->name, 0));
 
 	fprintf(file,
 	    "      <td class=\"score\" align=\"right\">%.1f</td>\n"
@@ -396,13 +391,13 @@ void Rank_write_webpage(void)
 	    rank->ballsWon, rank->ballsLost,
 	    rank->bestball,
 	    rank_base[i].ratio,
-	    encode(rank->user));
+	    encode(rank->user, 0));
 
 	fprintf(file,
 		"      <td class=\"host\" align=\"left\">%s</td>\n"
 		"      <td class=\"logout\" align=\"left\">%s</td>\n"
 		"    </tr>\n",
-		encode(rank->host),
+		encode(rank->host, 0),
 		Rank_get_logout_message(rank));
     }
 
@@ -410,13 +405,13 @@ void Rank_write_webpage(void)
 	"  </table>\n"
 	"\n"
 	"  <p>\n"
-	"    <em>Explanation for ballstats</em>:<br />\n"
-	"    The numbers are c/s/w/l/b, where<br />\n"
-	"    c = The number of enemy balls you have cashed.<br />\n"
-	"    s = The number of your own balls you have returned.<br />\n"
-	"    w = The number of enemy balls your team has cashed.<br />\n"
-	"    l = The number of your own balls you have lost.<br />\n"
-	"    b = The fastest ballrun you have made.<br />\n"
+	"    <em>Explanation for ballstats</em>:<br>\n"
+	"    The numbers are c/s/w/l/b, where<br>\n"
+	"    c = The number of enemy balls you have cashed.<br>\n"
+	"    s = The number of your own balls you have returned.<br>\n"
+	"    w = The number of enemy balls your team has cashed.<br>\n"
+	"    l = The number of your own balls you have lost.<br>\n"
+	"    b = The fastest ballrun you have made.<br>\n"
 	"  </p>\n"
 	"\n"
 	"  <p>\n"
@@ -692,15 +687,15 @@ void Rank_write_rankfile(void)
 	    continue;
 
 	if (fprintf(file, "<Player "
-		    "name=\"%s\" ", encode(rank->name)) < 0)
+		    "name=\"%s\" ", encode(rank->name, 1)) < 0)
 	    goto writefailed;
 
 	if (fprintf(file,
-		    "user=\"%s\" ", encode(rank->user)) < 0)
+		    "user=\"%s\" ", encode(rank->user, 1)) < 0)
 	    goto writefailed;
 
 	if (fprintf(file,
-		    "host=\"%s\" ", encode(rank->host)) < 0)
+		    "host=\"%s\" ", encode(rank->host, 1)) < 0)
 	    goto writefailed;
 
 	if (rank->score != 0.0
