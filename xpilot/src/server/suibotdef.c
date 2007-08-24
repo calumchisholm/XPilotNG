@@ -393,7 +393,7 @@ static bool Get_shot_proximity(player_t *pl, object_t *shot, relative_shot_data_
   delta_y=   WRAP_DCY( shot->pos.cy - pl->pos.cy );
 
   /* prevent possible division by 0 */
-  if(delta_velx == 0 || delta_vely == 0)
+  if(delta_velx == 0 && delta_vely == 0)
     return ;
 
   /* get time of "hit" from deviation of distance function */
@@ -497,9 +497,9 @@ bool Robot_evade_shot(player_t *pl){
 	    + sqr(delta_x) + sqr(delta_y);
 	
 #define SQ_SHIP_SZ_11 sqr(1.1 * PIXEL_TO_CLICK(SHIP_SZ))
-#define SQ_SHIP_SZ_16 sqr(1.6 * PIXEL_TO_CLICK(SHIP_SZ))
+#define SQ_SHIP_SZ_25 sqr(2.5 * PIXEL_TO_CLICK(SHIP_SZ))
 	
-	if(sqdistance > SQ_SHIP_SZ_16)
+	if(sqdistance > SQ_SHIP_SZ_25)
 	    continue;
 	
 	/* ignore shots that will hit a wall before it hits us */
@@ -540,7 +540,8 @@ bool Robot_evade_shot(player_t *pl){
  //sqrt(dangerous_shots_distance[j]));
  //}
 
-    /* get vector orthogonal vector from ship to path of shot */
+    /* get vector from center of ship to shot at hit time */
+    /* this is orthogonal to delta_vel(x,y) */
     shot = obj_list[closest_shot];
     delta_velx=( shot->vel.x -  pl->vel.x );
     delta_vely=( shot->vel.y -  pl->vel.y );
