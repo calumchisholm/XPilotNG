@@ -160,6 +160,22 @@ typedef struct robot_default_data {
     double	fuel_l3;		/* Fuel notify level */
 } robot_default_data_t;
 
+/*
+ * The private robot instance data for the simple ng robot.
+ */
+typedef struct robot_suibot_data {
+    int         robot_lock;             /* lock mode */
+    int         robot_lock_id;          /* target player if in war mode */
+    int         robot_mode;             /* ultrashort term mode of robot. */
+    int         robot_count;            /* Misc timings, minimizes rand use */
+    int         attack;                 /* how aggressive (1-99) */
+    int         defense;                /* how defensive (1-99) */
+    int         longterm_mode;          /* long term robot mode */
+    double      fuel_l1;                /* Fuel critical level */
+    double      fuel_l2;                /* Fuel warning level */
+    int last_attacked_player; /* relative to robot_count */
+} robot_suibot_data_t;
+
 
 /*
  * Prototypes for robot.c

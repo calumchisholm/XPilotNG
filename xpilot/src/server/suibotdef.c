@@ -373,16 +373,17 @@ static bool Wall_in_between_points(int cx1, int cy1, int cx2, int cy2){ /* Wall 
 bool Robot_evade_shot(player_t *pl);
 
 typedef struct {
-  int shotnr;
   double hit_time;
   double sqdistance;
-} relative_shot_data_t;
+} object_proximity_t;
 
 
-
-static bool Get_shot_proximity();
-static bool Get_shot_proximity(player_t *pl, object_t *shot, relative_shot_data_t *shotdata){
-   relative_shot_data_t shotinfo;
+static bool Get_object_proximity();
+static bool Get_object_proximity(player_t *pl, object_t *shot, double sqmaxdist,int maxtime, object_proximity_t *object_proximity){
+   /* get square of closest distance between player and object
+    * compare with sqmaxdist and maxtime and return sqdistance and time
+    * if both are smaller than the maximal wanted values 
+    */
    double delta_velx, delta_vely, delta_x, delta_y, sqdistance;
    double time_until_closest, shortest_hit_time;
 
@@ -394,25 +395,34 @@ static bool Get_shot_proximity(player_t *pl, object_t *shot, relative_shot_data_
 
   /* prevent possible division by 0 */
   if(delta_velx == 0 && delta_vely == 0)
-    return ;
+    return false;
 
-  /* get time of "hit" from deviation of distance function */
+  /* get time of encounter from deviation of distance function */
   time_until_closest =
     -( delta_x * delta_velx + delta_y * delta_vely) /
     ((sqr(delta_velx) + sqr(delta_vely)));
 
-  /* ignore if there is enough time to dodge this shot in a later frame*/
-  if((time_until_closest < 0) || (time_until_closest > 1000))
+  /* ignore if there is enough time to deal with this object  later */
+  if((time_until_closest < 0) || (time_until_closest > maxtime))
     /*option instead of fixed value: options.dodgetime))*/
     return;
 
-  /* look if shot will hit (compare squares of distances and shipsize) */
+  /* get the square of the distance */
   sqdistance =
     (sqr(delta_velx) + sqr(delta_vely)) * sqr(time_until_closest)  +
     2 * (delta_velx * delta_x + delta_vely * delta_y) * time_until_closest +
     sqr(delta_x) + sqr(delta_y);
+  
+  if(sqdistance>sqmaxdist)
+    return false;
+
+  object_proximity->hit_time=time_until_closest;
+  object_proximity->sqdistance=sqdistance;
+
+  return true;
 
 }
+
 
 bool Robot_evade_shot(player_t *pl){
 
@@ -476,10 +486,10 @@ bool Robot_evade_shot(player_t *pl){
 	delta_y=   WRAP_DCY( shot->pos.cy - pl->pos.cy );
 	
 	/* prevent possible division by 0 */
-	if(delta_velx == 0 || delta_vely == 0) 
+	if(delta_velx == 0 && delta_vely == 0) 
 	    continue;
 	
-	/* get time of "hit" from deviation of distance function */
+	/* get time of encounter from deviation of distance function */
 	time_shot_closest = 
 	    -( delta_x * delta_velx + delta_y * delta_vely) /
 	    ((sqr(delta_velx) + sqr(delta_vely))); 
