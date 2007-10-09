@@ -172,8 +172,10 @@ void Meta_update(bool change)
     for (i = 0; i < NumPlayers; i++) {
 	player_t *pl = Player_by_index(i);
 
-	if (!Player_is_human(pl)
-	    || Player_is_paused(pl))
+	if (!Player_is_human(pl))
+	    /*|| Player_is_paused(pl)) // reporting paused players, 
+	     * will appear in team 0
+	     */
 	    continue;
 
 	num_active_players++;
@@ -247,8 +249,10 @@ void Meta_update(bool change)
 	char str[4 * MAX_CHARS];
 	char tstr[32];
 
-	if (!Player_is_human(pl)
-	    || Player_is_paused(pl))
+	if (!Player_is_human(pl))
+	    /*|| Player_is_paused(pl) // reporting paused players, 
+             * will appear in team 0
+             */
 	    continue;
 
 	snprintf(str, sizeof(str),
