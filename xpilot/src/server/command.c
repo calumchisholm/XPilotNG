@@ -632,7 +632,7 @@ static int Cmd_get(char *arg, player_t *pl, bool oper, char *msg, size_t size)
 	retval = CMD_RESULT_SUCCESS;
 	break;
     case -2:
-	snprintf(msg, size, "No option named %s.", name);
+	snprintf(msg, size, "No server option named %s.", name);
 	break;
     case -3:
 	snprintf(msg, size, "Cannot show the value of this option.");
