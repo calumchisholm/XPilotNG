@@ -339,6 +339,7 @@ void Player_used_kill(player_t *pl)
     pl->used &= ~USED_KILL;
     if (!BIT(DEF_HAVE, HAS_SHIELD))
 	CLR_BIT(pl->have, HAS_SHIELD);
+    pl->used |= DEF_USED;
 }
 
 /*
@@ -1625,8 +1626,8 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
     }
 
     pl->have	= DEF_HAVE;
-    pl->used	|= DEF_USED;
     pl->used	&= ~(USED_KILL);
+    pl->used	|= DEF_USED;
     pl->used	&= pl->have;
 }
 

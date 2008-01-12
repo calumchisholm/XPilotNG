@@ -1022,6 +1022,16 @@ void Fire_general_shot(int id, int team,
     }
 }
 
+bool Can_shoot_normal_shot(player_t *pl)
+{
+    int                 i, shot_angle;
+
+    /* same test as in Fire_normal_shots */
+    if (frame_time <= pl->shot_time + options.fireRepeatRate - timeStep + 1e-3)
+        return false;
+    else
+        return true;
+}
 
 void Fire_normal_shots(player_t *pl)
 {
@@ -1427,6 +1437,11 @@ void Update_connector_force(ballobject_t *ball)
     /* no player connected ? */
     if (!pl)
 	return;
+
+    /* being connected makes the player visible */   
+    if(pl->forceVisible == 0){
+       pl->forceVisible =2;
+    }
 
     /* compute the normalized vector between the ball and the player */
     D.x = WRAP_DCX(pl->pos.cx - ball->pos.cx);
