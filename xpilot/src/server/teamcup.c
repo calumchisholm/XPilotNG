@@ -60,7 +60,7 @@ static void teamcup_open_score_file(void)
 {
     if (!options.teamcup)
 	return;
-
+printf("--------- start score_file --------\n");
     if (teamcup_score_file != NULL) {
 	error("teamcup_score_file != NULL");
 	End_game();
@@ -96,8 +96,6 @@ static void teamcup_close_score_file(void)
 {
     char msg[MSG_LEN];
 
-    if (!options.teamcup || teamcup_score_file == NULL)
-	return;
 
     fclose(teamcup_score_file);
     teamcup_score_file = NULL;
@@ -118,6 +116,10 @@ void teamcup_game_start(void)
 
 void teamcup_game_over(void)
 {
+
+    if (!options.teamcup || teamcup_score_file == NULL)
+	return;
+
     teamcup_close_score_file();
 }
 
@@ -146,9 +148,10 @@ void teamcup_round_start(void)
 
 void teamcup_round_end(int winning_team)
 {
-    int i, j, *list, best, team_players[MAX_TEAMS];
+    int i, j, *list, best, team_players[MAX_TEAMS], best_team;
     double team_score[MAX_TEAMS];
     double best_score = -FLT_MAX;
+    double best_team_score = -FLT_MAX;
     double double_max = FLT_MAX;
     player_t *pl;
 
@@ -195,9 +198,15 @@ void teamcup_round_end(int winning_team)
     }
 
     for (i = 0; i < MAX_TEAMS; i++) {
-	if (team_score[i] != double_max)
+	if (team_score[i] != double_max){
 	    teamcup_log("Team %d\t%d\n", i, (int)(team_score[i]));
+	    if(team_score[i]>best_team_score){
+	      best_team_score=team_score[i];
+	      best_team=i;
+	    }
+        }
     }
+     teamcup_log("Advantage Team %d\n",best_team);
     if (teamcup_score_file != NULL)
 	fflush(teamcup_score_file);
 
