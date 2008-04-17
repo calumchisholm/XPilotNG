@@ -3868,7 +3868,7 @@ static option_desc opts[] = {
 	valBool,
 	tuner_none,
 	"Is this a teamcup match?.\n",
-	OPT_MAP
+	OPT_ORIGIN_ANY 
     },
     {
 	"teamcupName",
@@ -3878,7 +3878,7 @@ static option_desc opts[] = {
  	valString,
 	tuner_none,
 	"The name of the teamcup (used only if teamcup is true).\n",
-	OPT_MAP
+	OPT_ORIGIN_ANY
     },
     {
 	"teamcupMailAddress",
@@ -3888,7 +3888,7 @@ static option_desc opts[] = {
 	valString,
 	tuner_none,
 	"The mail address where players should send match results.\n",
-	OPT_MAP
+	OPT_ORIGIN_ANY
     },
     {
 	"teamcupScoreFileNamePrefix",
@@ -3899,7 +3899,7 @@ static option_desc opts[] = {
 	tuner_none,
 	"First part of file name for teamcup score files.\n"
 	"The whole filename will be this followed by the match number.\n",
-	OPT_MAP
+	OPT_ORIGIN_ANY
      },
      {
  	"teamcupMatchNumber",

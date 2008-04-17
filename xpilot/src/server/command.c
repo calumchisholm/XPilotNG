@@ -1036,6 +1036,7 @@ static int Cmd_reset(char *arg, player_t *pl, bool oper, char *msg, size_t size)
 	Set_message(msg);
 	strlcpy(msg, "", size);
 
+	teamcup_game_over();
 	teamcup_game_start();
     }
     else {

@@ -58,23 +58,32 @@ void teamcup_init(void)
 
 static void teamcup_open_score_file(void)
 {
+    char msg[MSG_LEN];
+
+
     if (!options.teamcup)
 	return;
-printf("--------- start score_file --------\n");
-    if (teamcup_score_file != NULL) {
+
+/*    if (teamcup_score_file != NULL) {
 	error("teamcup_score_file != NULL");
 	End_game();
-    }
+*/
 
     snprintf(teamcup_score_file_name, sizeof(teamcup_score_file_name), "%s%d",
 	     options.teamcupScoreFileNamePrefix, options.teamcupMatchNumber);
+    
 
     teamcup_score_file = fopen(teamcup_score_file_name, "w");
     if (teamcup_score_file == NULL) {
 	error("fopen() failed, could not create score file");
 	End_game();
     }
-    warn("Teamcup score file is \"%s\".\n", teamcup_score_file_name);
+
+    snprintf(msg, sizeof(msg),
+             "Score file \"%s\" opened.", teamcup_score_file_name);
+    Set_message_f("%s [*Server notice*]", msg);
+
+    warn("%s\n", msg);
 
     teamcup_log("1) Fill the names of the teams below.\n"
 		"2) Fill the team number of total winner only if "
