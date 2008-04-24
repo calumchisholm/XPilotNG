@@ -59,6 +59,8 @@ void teamcup_init(void)
 static void teamcup_open_score_file(void)
 {
     char msg[MSG_LEN];
+    player_t *pl;
+    int i;
 
 
     if (!options.teamcup)
@@ -99,6 +101,13 @@ static void teamcup_open_score_file(void)
 		options.teamcupMailAddress, options.teamcupName,
 		options.teamcupMatchNumber
 	);
+
+    teamcup_log("Player present:\n");
+    for (i = 0; i < NumPlayers; i++) {
+	pl = Player_by_index(i);
+        teamcup_log("Team %d: %s\n",pl->team,pl->name);
+    }
+
 }
 
 static void teamcup_close_score_file(void)
