@@ -825,7 +825,7 @@ xp_option_t default_options[] = {
 
     XP_BOOL_OPTION(
 	"dirPrediction",
-	false,
+	true,
 	&dirPrediction,
 	Set_dirPrediction,
 	XP_OPTFLAG_CONFIG_DEFAULT,
@@ -1051,7 +1051,7 @@ xp_option_t default_options[] = {
 
     XP_INT_OPTION(
 	"messagesToStdout",
-	0,
+	1,
 	0,
 	2,
 	&messagesToStdout,
