@@ -463,7 +463,6 @@ void Pause_player(player_t *pl, bool on)
     /* kps - add support for pausing robots ? */
     if (!Player_is_human(pl))
 	return;
-
     if (on && !Player_is_paused(pl)) { /* Turn pause mode on */
 	if (pl->team != TEAM_NOT_SET)
 	    world->teams[pl->team].SwapperId = NO_ID;
@@ -538,6 +537,8 @@ void Pause_player(player_t *pl, bool on)
 			       "[*Server notice*]");
 	    return;
 	}
+	/* there seems to be a race condition if idleTime is set later */
+	pl->idleTime = 0;
 
 	if (pl->home_base == NULL) {
 	    int team = pl->pl_prev_team;
@@ -560,7 +561,6 @@ void Pause_player(player_t *pl, bool on)
 	    }
 	}
 
-	pl->idleTime = 0;
 	updateScores = true;
 	if (BIT(world->rules->mode, LIMITED_LIVES)) {
 	    /* too late, wait for next round */
