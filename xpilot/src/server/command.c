@@ -1020,6 +1020,13 @@ static int Cmd_reset(char *arg, player_t *pl, bool oper, char *msg, size_t size)
     if (!oper)
 	return CMD_RESULT_NOT_OPERATOR;
 
+        for (i = NumObjs - 1; i >= 0; i--) {
+        object_t *obj = Obj[i];
+        obj->life = 0;
+        Delete_shot(i);
+
+    }
+
     if (arg && !strcasecmp(arg, "all")) {
 	for (i = NumPlayers - 1; i >= 0; i--) {
 	    player_t *pl_i = Player_by_index(i);
