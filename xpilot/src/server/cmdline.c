@@ -1628,6 +1628,15 @@ static option_desc opts[] = {
 	"a radius of 10 pixels.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
+    {   "multipleConnectors",
+	"multipleBallConnectors",
+	"true",
+	&options.multipleConnectors,
+	valBool,
+	tuner_dummy,
+	"Can a player connect to multiple balls or just to one?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
     {
 	"treasureCollisionMayKill",
 	"treasureUnshieldedCollisionKills",

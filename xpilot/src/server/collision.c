@@ -313,7 +313,8 @@ static void PlayerCollision(void)
 
 	/* Player picking up ball/treasure */
 	if (!BIT(pl->used, HAS_CONNECTOR)
-	    || Player_is_phasing(pl))
+	    || Player_is_phasing(pl)
+	    ||(!options.multipleConnectors && BIT(pl->have, HAS_BALL)))
 	    pl->ball = NULL;
 	else if (pl->ball != NULL) {
 	    ballobject_t *ball = pl->ball;
@@ -332,7 +333,6 @@ static void PlayerCollision(void)
 		     * found through the ball's treasure */
 		    ball->team = pl->team;
 		    if (ball->ball_treasure->have)
-			ball->ball_loose_ticks = 0;
 		    ball->ball_owner = pl->id;
 		    SET_BIT(ball->obj_status, GRAVITY);
 		    ball->ball_treasure->have = false;

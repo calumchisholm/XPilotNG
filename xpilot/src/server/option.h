@@ -222,6 +222,7 @@ extern struct options {
     double	ballConnectorLength;
     bool	connectorIsString;
     double	ballRadius;
+    bool	multipleConnectors;
 
     double 	dropItemOnKillProb;
     double	detonateItemOnKillProb;
