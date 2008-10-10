@@ -30,6 +30,7 @@
 
 static void Disable_emulate3buttons(bool disable, void* display);
 
+
 /*
  * If disable==true, the function tries to deactivate the Emulate3Buttons
  * X server option if it was enabled. On some systems the request for setting
@@ -40,6 +41,12 @@ static void Disable_emulate3buttons(bool disable, void* display);
  */ 
 static void Disable_emulate3buttons(bool disable, void* display)
 {
+
+/* according to reports XF86MiscGetMouseSettings crashes the client on more 
+   recent Xorg servers - so I'm disabling the whole function for now.
+   Will test myself whenever I upgrade to xorg8 myself KHS  */
+return;
+
 #ifdef HAVE_XF86MISC
 #if 1
     /* kps - Lets not try to disable emulate3buttons. Some users have buggy
