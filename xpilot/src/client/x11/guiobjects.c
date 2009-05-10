@@ -932,30 +932,21 @@ static void Set_drawstyle_dashed(int ship_color)
     SET_FG(colors[ship_color].pixel);
 }
 
-
 static int set_shipshape(int world_x, int world_y,
 			 int dir, shipshape_t *ship, XPoint *points)
 {
     int cnt;
     position_t ship_point_pos;
     XPoint *xpts = points;
-    double off_x, off_y;
+    double x, y;
 
     for (cnt = 0; cnt < ship->num_points; cnt++) {
 	ship_point_pos = Ship_get_point_position(ship, cnt, dir);
-	off_x = ship_point_pos.x / clData.scaleFactor;
-	if (off_x > 0.0)
-	    off_x += 0.5;
-	else if (off_x < 0.0)
-	    off_x -= 0.5;
-	off_y = ship_point_pos.y / clData.scaleFactor;
-	if (off_y > 0.0)
-	    off_y += 0.5;
-	else if (off_y < 0.0)
-	    off_y -= 0.5;
-	xpts->x = (short)(((world_x - world.x) / clData.scaleFactor) + off_x);
-	xpts->y = (short)(((world.y + ext_view_height - world_y)
-			   / clData.scaleFactor) - off_y);
+	x = (world_x - world.x + ship_point_pos.x) / clData.scaleFactor;
+	y = (world.y + ext_view_height - world_y - ship_point_pos.y)
+		/ clData.scaleFactor;
+	xpts->x = (short)rint(x);
+	xpts->y = (short)rint(y);
 	xpts++;
     }
     points[cnt++] = points[0];
