@@ -51,8 +51,7 @@ Window	keyboardWindow;		/* Keyboard window */
 Pixmap	drawPixmap;		/* Saved pixmap for the drawing */
 				/* area (monochromes use this) */
 Window	playersWindow;		/* Player list window */
-Pixmap  playersPixmap;		/* Player list pixmap */
-
+				/* monochromes) */
 Window	aboutWindow;
 Window	about_close_b;		/* About window's close button */
 Window	about_next_b;		/* About window's next button */
@@ -241,12 +240,9 @@ void Paint_frame(void)
     else if (radar_exposures > 2)
 	Paint_world_radar();
 
-    if (dbuf_state->type == PIXMAP_COPY) {
+    if (dbuf_state->type == PIXMAP_COPY)
 	XCopyArea(dpy, drawPixmap, drawWindow, gameGC,
 		  0, 0, draw_width, draw_height, 0, 0);
-	XCopyArea(dpy, playersPixmap, playersWindow, gameGC,
-		  0, 0, players_width, players_height, 0, 0);
-    }
 
     dbuff_switch(dbuf_state);
 
@@ -290,8 +286,8 @@ void Paint_frame(void)
 static void Paint_score_background(void)
 {
     if (fullColor &&
-	Bitmap_get(playersPixmap, BM_SCORE_BG, 0) != NULL &&
-	Bitmap_get(playersPixmap, BM_LOGO, 0) != NULL) {
+	Bitmap_get(playersWindow, BM_SCORE_BG, 0) != NULL &&
+	Bitmap_get(playersWindow, BM_LOGO, 0) != NULL) {
 	unsigned bgh, lh;
 
 	XSetForeground(dpy, scoreListGC, colors[BLACK].pixel);
@@ -299,16 +295,16 @@ static void Paint_score_background(void)
 	bgh = pixmaps[BM_SCORE_BG].height;
 	lh = pixmaps[BM_LOGO].height;
 
-	Bitmap_paint(playersPixmap, BM_SCORE_BG, 0, 0, 0);
+	Bitmap_paint(playersWindow, BM_SCORE_BG, 0, 0, 0);
 	if (players_height > bgh + lh)
-	    XFillRectangle(dpy, playersPixmap, scoreListGC,
+	    XFillRectangle(dpy, playersWindow, scoreListGC,
 			   0, (int)bgh,
 			   players_width, players_height - (bgh + lh));
-	Bitmap_paint(playersPixmap, BM_LOGO, 0, (int)(players_height - lh), 0);
+	Bitmap_paint(playersWindow, BM_LOGO, 0, (int)(players_height - lh), 0);
 	XFlush(dpy);
     } else {
 	XSetForeground(dpy, scoreListGC, colors[windowColor].pixel);
-	XFillRectangle(dpy, playersPixmap, scoreListGC,
+	XFillRectangle(dpy, playersWindow, scoreListGC,
 		       0, 0, players_width, players_height);
 	XFlush(dpy);
     }
@@ -338,7 +334,7 @@ void Paint_score_start(void)
     }
     Paint_score_background();
 
-    ShadowDrawString(dpy, playersPixmap, scoreListGC,
+    ShadowDrawString(dpy, playersWindow, scoreListGC,
 		     SCORE_BORDER, thisLine,
 		     headingStr,
 		     colors[scoreColor].pixel,
@@ -346,7 +342,7 @@ void Paint_score_start(void)
 
     gcv.line_style = LineSolid;
     XChangeGC(dpy, scoreListGC, GCLineStyle, &gcv);
-    XDrawLine(dpy, playersPixmap, scoreListGC,
+    XDrawLine(dpy, playersWindow, scoreListGC,
 	      SCORE_BORDER, thisLine,
 	      (int)players_width - SCORE_BORDER, thisLine);
 
@@ -440,7 +436,7 @@ void Paint_score_entry(int entry_num, other_t* other, bool is_team)
 	    color = scoreInactiveColor;
 
 	XSetForeground(dpy, scoreListGC, colors[color].pixel);
-	XDrawString(dpy, playersPixmap, scoreListGC,
+	XDrawString(dpy, playersWindow, scoreListGC,
 		    SCORE_BORDER, thisLine,
 		    label, (int)strlen(label));
     } else {
@@ -459,7 +455,7 @@ void Paint_score_entry(int entry_num, other_t* other, bool is_team)
 	    }
 	}
 
-	ShadowDrawString(dpy, playersPixmap, scoreListGC, SCORE_BORDER,
+	ShadowDrawString(dpy, playersWindow, scoreListGC, SCORE_BORDER,
 			 thisLine, label,
 			 colors[color].pixel,
 			 colors[BLACK].pixel);
@@ -473,7 +469,7 @@ void Paint_score_entry(int entry_num, other_t* other, bool is_team)
 	XSetForeground(dpy, scoreListGC, colors[color].pixel);
 	gcv.line_style = LineSolid;
 	XChangeGC(dpy, scoreListGC, GCLineStyle, &gcv);
-	XDrawLine(dpy, playersPixmap, scoreListGC,
+	XDrawLine(dpy, playersWindow, scoreListGC,
 		  SCORE_BORDER, thisLine,
 		  (int)players_width - SCORE_BORDER, thisLine);
 	gcv.line_style = LineOnOffDash;
@@ -503,7 +499,7 @@ static void Paint_clock(bool redraw)
     if (!clockColor) {
 	if (width != 0) {
 	    XSetForeground(dpy, scoreListGC, colors[windowColor].pixel);
-	    XFillRectangle(dpy, playersPixmap, scoreListGC,
+	    XFillRectangle(dpy, playersWindow, scoreListGC,
 			   256 - (int)(width + 2 * border), 0,
 			   width + 2 * border, height);
 	    width = 0;
@@ -533,10 +529,10 @@ static void Paint_clock(bool redraw)
     }
     width = XTextWidth(scoreListFont, buf, (int)strlen(buf));
     XSetForeground(dpy, scoreListGC, colors[windowColor].pixel);
-    XFillRectangle(dpy, playersPixmap, scoreListGC,
+    XFillRectangle(dpy, playersWindow, scoreListGC,
 		   256 - (int)(width + 2 * border), 0,
 		   width + 2 * border, height);
-    ShadowDrawString(dpy, playersPixmap, scoreListGC,
+    ShadowDrawString(dpy, playersWindow, scoreListGC,
 		     256 - (int)(width + border),
 		     scoreListFont->ascent + 4,
 		     buf,

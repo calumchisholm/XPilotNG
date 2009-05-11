@@ -597,9 +597,6 @@ int Init_playing_windows(void)
 	drawPixmap
 	    = XCreatePixmap(dpy, drawWindow, draw_width, draw_height,
 			    dispDepth);
-	playersPixmap
-	    = XCreatePixmap(dpy, playersWindow, players_width, players_height,
-			    dispDepth);
 	break;
 
     case MULTIBUFFER:
@@ -608,14 +605,12 @@ int Init_playing_windows(void)
 	radarPixmap2
 	    = XCreatePixmap(dpy, radarWindow, 256, RadarHeight, dispDepth);
 	dbuff_init_buffer(dbuf_state);
-	playersPixmap = playersWindow;	/* yet to be implemented */
 	break;
 
     case COLOR_SWITCH:
 	radarPixmap2 = radarWindow;
 	radarPixmap = radarWindow;
 	drawPixmap = drawWindow;
-	playersPixmap = playersWindow;
 	Paint_sliding_radar();
 	break;
 
@@ -736,11 +731,6 @@ void Resize(Window w, unsigned width, unsigned height)
     players_height = top_height - (RadarHeight + ButtonHeight + 2);
     XResizeWindow(dpy, playersWindow,
 		  players_width, players_height);
-    if (dbuf_state->type == PIXMAP_COPY) {
-	XFreePixmap(dpy, playersPixmap);
-	playersPixmap = XCreatePixmap(dpy, playersWindow, players_width,
-				      players_height, dispDepth);
-    }
     Talk_resize();
     Config_resize();
 }
