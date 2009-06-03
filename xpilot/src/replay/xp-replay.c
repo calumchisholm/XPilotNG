@@ -249,6 +249,7 @@ struct xprc {
     double		gamma;		/* gamma correction when saving */
     struct errorwin	*ewin;		/* Error display window */
     tile_list_t		*tlist;		/* list of pixmaps */
+    int     		linewidth;	/* linewidth */
 };
 
 enum LabelDataTypes {
@@ -764,6 +765,8 @@ static struct rGC *RReadGCValues(struct xprc *rc)
 	if (input_mask & RC_GC_LW) {
 	    gc.mask |= GCLineWidth;
 	    gc.line_width = RReadByte(rc->fp);
+	    if(rc->linewidth)
+	    	gc.line_width = rc->linewidth;
 	}
 	if (input_mask & RC_GC_LS) {
 	    gc.mask |= GCLineStyle;
@@ -3368,6 +3371,8 @@ static void usage(void)
 "        -scale \"factor\"\n"
 "               Set the scale reduction factor for saving operations.\n"
 "               Valid scale factors are in the range [0.01 - 1.0].\n"
+"        -linewidth \"width\"\n"
+"               use a fixed linewidth \"width\" for drawing all lines\n"
 "        -gamma \"factor\"\n"
 "               Set the gamma correction factor when saving scaled frames.\n"
 "               Valid gamma correction factors are in the range [0.1 - 10].\n"
@@ -3414,6 +3419,7 @@ int main(int argc, char **argv)
     int			fps = 0;
     double		scale = 0;
     double		gamma_val = 0;
+    int 		linewidth = 0;
 
     Argc = argc;
     Argv = argv;
@@ -3450,6 +3456,12 @@ int main(int argc, char **argv)
 		usage();
 	    if (gamma_val == 1.0)
 		gamma_val = 0;
+	}
+	else if (!strcmp(argv[argi], "-linewidth")) {
+	    if (++argi == argc || sscanf(argv[argi], "%d", &linewidth) != 1)
+		usage();
+	    if (linewidth < 1 || gamma_val > 100)
+		usage();
 	}
 	else if (!strcmp(argv[argi], "-play"))
 	    currentSpeed = 1;
@@ -3502,6 +3514,7 @@ int main(int argc, char **argv)
     rc->fps = fps;
     rc->scale = scale;
     rc->gamma = gamma_val;
+    rc->linewidth = linewidth;
     TestInput(rc);
     purge_argument = rc;
     if (RReadHeader(rc) >= 0) {
