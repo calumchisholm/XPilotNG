@@ -30,6 +30,9 @@ Client:
 	* Minimum value for hudRadarLimit option changed from 0 to 0.05
 	  because at 0, a randomly flashing dot will be drawn on top of
 	  the ship in the center of screen.
+	* Rename textinterface.c function readline() to read_line().
+	  Otherwise it will not build with eglibc 2.10 which always defines
+	  readline, since it became a standard in POSIX2008.
 
 X11 Client only:
 	* Improve shipshape rendering by fixing some rounding errors.

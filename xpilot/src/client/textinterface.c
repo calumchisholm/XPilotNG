@@ -37,7 +37,7 @@ extern int		dgram_one_socket;	/* from datagram.c */
 /*
  * just like fgets() but strips newlines like gets().
  */
-static char* getline(char* buf, int len, FILE* stream)
+static char* get_line(char* buf, int len, FILE* stream)
 {
     char		*nl;
 
@@ -251,7 +251,7 @@ static bool Process_commands(sockbuf_t *ibuf,
 	else if (!auto_connect) {
 	    printf("*** Server on %s. Enter command> ", conpar->server_name);
 
-	    getline(linebuf, MAX_LINE, stdin);
+	    get_line(linebuf, MAX_LINE, stdin);
 	    if (feof(stdin)) {
 		puts("");
 		c = 'Q';
@@ -338,7 +338,7 @@ static bool Process_commands(sockbuf_t *ibuf,
 	    case 'K':
 		printf("Enter name of victim: ");
 		fflush(stdout);
-		if (!getline(linebuf, MAX_LINE, stdin)) {
+		if (!get_line(linebuf, MAX_LINE, stdin)) {
 		    printf("Nothing changed.\n");
 		    continue;
 		}
@@ -349,7 +349,7 @@ static bool Process_commands(sockbuf_t *ibuf,
 	    case 'M':				/* Send a message to server. */
 		printf("Enter message: ");
 		fflush(stdout);
-		if (!getline(linebuf, MAX_LINE, stdin) || !linebuf[0]) {
+		if (!get_line(linebuf, MAX_LINE, stdin) || !linebuf[0]) {
 		    printf("No message sent.\n");
 		    continue;
 		}
@@ -364,7 +364,7 @@ static bool Process_commands(sockbuf_t *ibuf,
 	    case 'D':				/* Shutdown */
 		if (!auto_shutdown) {
 		    printf("Enter delay in seconds or return for cancel: ");
-		    getline(linebuf, MAX_LINE, stdin);
+		    get_line(linebuf, MAX_LINE, stdin);
 		    /*
 		     * No argument = cancel shutdown = arg_int=0
 		     */
@@ -375,7 +375,7 @@ static bool Process_commands(sockbuf_t *ibuf,
 			    delay = 1;
 
 		    printf("Enter reason: ");
-		    getline(linebuf, MAX_LINE, stdin);
+		    get_line(linebuf, MAX_LINE, stdin);
 		} else {
 		    strlcpy(linebuf, shutdown_reason, sizeof(linebuf));
 		    delay = 60;
@@ -388,7 +388,7 @@ static bool Process_commands(sockbuf_t *ibuf,
 	    case 'O':				/* Tune an option. */
 		printf("Enter option: ");
 		fflush(stdout);
-		if (!getline(linebuf, MAX_LINE, stdin)
+		if (!get_line(linebuf, MAX_LINE, stdin)
 		    || (len=strlen(linebuf)) == 0) {
 		    printf("Nothing changed.\n");
 		    continue;
@@ -396,7 +396,7 @@ static bool Process_commands(sockbuf_t *ibuf,
 		printf("Enter new value for %s: ", linebuf);
 		fflush(stdout);
 		strcat(linebuf, ":"); len++;
-		if (!getline(&linebuf[len], MAX_LINE-len, stdin)
+		if (!get_line(&linebuf[len], MAX_LINE-len, stdin)
 		    || linebuf[len] == '\0') {
 		    printf("Nothing changed.\n");
 		    continue;
@@ -450,7 +450,7 @@ static bool Process_commands(sockbuf_t *ibuf,
 	    case 'T':				/* Set team. */
 		printf("Enter team: ");
 		fflush(stdout);
-		if (!getline(linebuf, MAX_LINE, stdin)
+		if (!get_line(linebuf, MAX_LINE, stdin)
 		    || (len = strlen(linebuf)) == 0)
 		    printf("Nothing changed.\n");
 		else {
