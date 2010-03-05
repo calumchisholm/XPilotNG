@@ -33,6 +33,7 @@ Client:
 	* Rename textinterface.c function readline() to read_line().
 	  Otherwise it will not build with eglibc 2.10 which always defines
 	  readline, since it became a standard in POSIX2008.
+        * Remove checking for emulation of three buttons, as that leads to a crash under xorg 8
 
 X11 Client only:
 	* Improve shipshape rendering by fixing some rounding errors.
