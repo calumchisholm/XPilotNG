@@ -9,6 +9,11 @@ Common:
 Server:
 Client:
 
+XPilot NG Control Center:
+	* Support wxgtk 2.8.
+	* Start full-screen and let wxgtk 2.8 handle switching to windowed
+	  via F11 toggle instead of old (incomplete) code to handle it in the
+	  app.
 
 
 ===============================================================================

@@ -2,12 +2,15 @@
 
 import wxversion
 try:
-	wxversion.select('2.6')
+	wxversion.select('2.8')
 except wxversion.VersionError:
 	try:
-		wxversion.select('2.4')
+		wxversion.select('2.6')
 	except wxversion.VersionError:
-		wxversion.select('2.5')
+		try:
+			wxversion.select('2.4')
+		except wxversion.VersionError:
+			wxversion.select('2.5')
 import wx
 import wx.html as html
 import os
@@ -152,8 +155,6 @@ class MainMenu(MenuPanel):
 		if config.client or config.xpreplay or config.mapedit or config.javaws:
 			b.append(("Tools", self.onTools))
 		b.append(("Support and Chat", self.onChat))
-# FIXME: This should be a fullscreen widget in the corner instead.
-#		b.append(("Windowed", self.onWindowed))
 		b.append(("Quit", self.onQuit))
 		MenuPanel.__init__(self, parent, b)
 	def onInternet(self, evt):
@@ -175,16 +176,6 @@ class MainMenu(MenuPanel):
 	def onChat(self, evt):
 		self.show(ircui.IrcPanel(self.frame, config.irc_server, get_nick(), 
 								 config.irc_channel))
-	def onWindowed(self, evt):
-		# FIXME: assert self.frame.fullscreen=True
-		# FIXME: remove "Windowed" button & replace with "Fullscreen"
-		self.frame.ShowFullScreen(False)
-		self.frame.fullscreen=False
-	def onFullscreen(self, evt):
-		# FIXME: assert self.frame.fullscreen=False
-		# FIXME: remove "Fullscreen" button & replace with "Windowed"
-		self.frame.ShowFullScreen(True)
-		self.frame.fullscreen=True
 
 class MainFrame(wx.Frame):
 	def __init__(self, *args, **kwds):
@@ -199,7 +190,6 @@ class MainFrame(wx.Frame):
 		self.history = []
 		self.contentPanel = None
 		self.setContentPanel(MainMenu(self))
-		self.fullscreen = None
 	def setContentPanel(self, p):
 		if self.contentPanel:
 			self.GetSizer().Detach(self.contentPanel)
@@ -258,10 +248,7 @@ class App(wx.App):
 		frame = MainFrame(None, -1, "XPilot NG Control Center")
 		self.SetTopWindow(frame)
 		frame.Show(True)
-# FIXME: We can only default to fullscreen when we support switching back
-#        and forth between fullscreen & windowed.
-#		frame.fullscreen=True
-#		frame.ShowFullScreen(True)
+		frame.ShowFullScreen(True)
 		return True
 
 def main():
