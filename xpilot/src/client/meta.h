@@ -41,6 +41,7 @@
 #define NUM_META_DATA_FIELDS	18
 #define META_INIT_SOCK {-2, {0, 0}, 0, {0, 0, 0}, NULL, NULL}
 
+/* Note: pingtime_str must be long enough to hold these constants and a NIL */
 #define PING_UNKNOWN	10000	/* never transmitted a ping to it */
 #define PING_NORESP	9999	/* never responded to our ping */
 #define PING_SLOW	9998	/* responded to first ping after
@@ -72,7 +73,7 @@ struct ServerInfo {
 	*playlist,
 	*sound,
 	*teambases_str,
-	*timing, *ip_str, *freebases, *queue_str, *domain, pingtime_str[5];
+	*timing, *ip_str, *freebases, *queue_str, *domain, pingtime_str[6];
     unsigned port,
 	ip, users, bases, fps, uptime, teambases, queue, pingtime;
     struct timeval start;
